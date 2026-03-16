@@ -2,6 +2,8 @@ import { render, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { MobileSheetProvider } from '../Navigation/NavigationBar/MobileSheetContext'
+import { ProjectLayout } from './index'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
 const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
@@ -158,9 +160,6 @@ vi.mock('@/state/database-selector', () => ({
   }),
 }))
 
-import { MobileSheetProvider } from './NavigationBar/MobileSheetContext'
-import { ProjectLayout } from './index'
-
 describe('ProjectLayout title', () => {
   beforeEach(() => {
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
@@ -176,7 +175,7 @@ describe('ProjectLayout title', () => {
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
     render(
       <MobileSheetProvider>
-        <ProjectLayout title="Settings" product="Settings" isBlocking={false}>
+        <ProjectLayout browserTitle={{ section: 'Settings' }} product="Settings" isBlocking={false}>
           <div>Page Content</div>
         </ProjectLayout>
       </MobileSheetProvider>
@@ -193,7 +192,6 @@ describe('ProjectLayout title', () => {
     render(
       <MobileSheetProvider>
         <ProjectLayout
-          title="Database"
           product="Database"
           browserTitle={{ entity: 'users', section: 'Tables' }}
           isBlocking={false}

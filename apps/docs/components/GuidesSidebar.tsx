@@ -11,6 +11,7 @@ import { Feedback } from '~/components/Feedback'
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
 import { Chatgpt } from 'icons'
 import { Claude } from 'icons'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 interface TOCHeader {
   id?: string
@@ -22,6 +23,7 @@ interface TOCHeader {
 function AiTools({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false)
   const path = usePathname()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   async function copyMarkdown() {
     const mdUrl = `/docs/${path}.md`
@@ -35,6 +37,10 @@ function AiTools({ className }: { className?: string }) {
     } catch (error) {
       console.error('Failed to copy markdown', error)
     }
+
+    sendTelemetryEvent({
+      action: 'copy_as_markdown_clicked',
+    })
   }
 
   return (
@@ -60,6 +66,9 @@ function AiTools({ className }: { className?: string }) {
         <a
           href={`https://chatgpt.com/?hint=search&q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
           target="_blank"
+          onClick={() =>
+            sendTelemetryEvent({ action: 'ask_ai_clicked', properties: { agent: 'chatgpt' } })
+          }
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >
@@ -69,6 +78,9 @@ function AiTools({ className }: { className?: string }) {
         <a
           href={`https://claude.ai/new?q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
           target="_blank"
+          onClick={() =>
+            sendTelemetryEvent({ action: 'ask_ai_clicked', properties: { agent: 'claude' } })
+          }
           rel="noreferrer noopener"
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
         >

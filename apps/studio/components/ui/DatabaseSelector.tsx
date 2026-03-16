@@ -91,12 +91,10 @@ export const DatabaseSelector = ({
           <Button
             type="default"
             icon={isLoading && <Loader2 className="animate-spin" />}
-            iconRight={
-              <ChevronDown strokeWidth={1.5} size={12} className="absolute right-2 top-2" />
-            }
+            iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             {...buttonProps}
             className={cn(
-              'pr-2 justify-start',
+              'justify-start',
               !isForm && 'rounded-l-none',
               variant === 'connected-on-right' && 'rounded-r-none',
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',

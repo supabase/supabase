@@ -748,6 +748,29 @@ export interface DocsFeedbackClickedEvent {
 }
 
 /**
+ * User clicked 'Copy as Markdown' option on a page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface CopyAsMarkdownEvent {
+  action: 'copy_as_markdown_clicked'
+}
+
+/**
+ * User clicked "Ask..." to open a new window to consult an agent about the current page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AskAIEvent {
+  action: 'ask_ai_clicked'
+  properties: {
+    agent: 'chatgpt' | 'claude'
+  }
+}
+
+/**
  * User clicked the framework quickstart card on the homepage, leading to the specific framework documentation.
  *
  * @group Events
@@ -2974,6 +2997,8 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
+  | CopyAsMarkdownEvent
+  | AskAIEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent

@@ -50,13 +50,13 @@ export const EditorBaseLayout = ({
 
   const mergedBrowserTitle = {
     ...browserTitle,
+    section: title ?? browserTitle?.section,
     entity: browserTitle?.entity ?? activeEditorTabEntity,
   }
 
   return (
     <ProjectLayoutWithAuth
       resizableSidebar
-      title={title}
       product={product}
       browserTitle={mergedBrowserTitle}
       productMenuClassName={productMenuClassName}

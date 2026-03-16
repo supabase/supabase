@@ -18,18 +18,18 @@ import { StatusCode } from 'ui-patterns'
 
 ## API Reference
 
-| Prop         | Type                              | Default  | Description                                                                  |
-| ------------ | --------------------------------- | -------- | ---------------------------------------------------------------------------- |
-| `statusCode` | `number \| string \| undefined`   | —        | The HTTP status code to display. Drives the color coding (see below).        |
-| `method`     | `string`                          | —        | Optional HTTP method label (e.g. `GET`, `POST`). Rendered as a pill prefix.  |
-| `className`  | `string`                          | —        | Additional CSS classes applied to the root element.                          |
+| Prop         | Type                            | Default | Description                                                                 |
+| ------------ | ------------------------------- | ------- | --------------------------------------------------------------------------- |
+| `statusCode` | `number \| string \| undefined` | —       | The HTTP status code to display. Drives the color coding (see below).       |
+| `method`     | `string`                        | —       | Optional HTTP method label (e.g. `GET`, `POST`). Rendered as a pill prefix. |
+| `className`  | `string`                        | —       | Additional CSS classes applied to the root element.                         |
 
 ### Color coding
 
 The status code pill color is determined automatically from the `statusCode` value:
 
-| Value                              | Color      |
-| ---------------------------------- | ---------- |
-| `1xx`, `2xx`, `3xx`, `'info'`, `'success'`, `undefined` | Neutral    |
-| `4xx`, `'warning'`, `'redirect'`   | Warning    |
-| `5xx`, `'error'`                   | Destructive |
+| Value                                                   | Color       |
+| ------------------------------------------------------- | ----------- |
+| `1xx`, `2xx`, `3xx`, `'info'`, `'success'`, `undefined` | Neutral     |
+| `4xx`, `'warning'`, `'redirect'`                        | Warning     |
+| `5xx`, `'error'`                                        | Destructive |
