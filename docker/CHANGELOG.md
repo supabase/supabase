@@ -17,7 +17,7 @@ Check updates for each service to learn more.
 
 ## [2026-03-16]
 
-⚠️ **Note:** This update includes several important changes. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
+⚠️ **Note:** This update includes **important changes**. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
 
 ### Configuration
 - ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions
@@ -31,7 +31,7 @@ Check updates for each service to learn more.
 - Added `./tests` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
 
 ### Studio
-- Updated to `2026.03.xx-xxx-xxxxxxx`
+- Updated to `supabase/studio:2026.03.16-sha-5528817`
 - ⚠️ Added the link to Data API page in Integrations - PR [#43268](https://github.com/supabase/supabase/pull/43268)
 - ⚠️ Added `PGRST_DB_SCHEMAS`, `PGRST_DB_EXTRA_SEARCH_PATH`, and `PGRST_DB_MAX_ROWS` to Studio configuration (requires `docker-compose.yml` update) - PR [#43268](https://github.com/supabase/supabase/pull/43268)
 
