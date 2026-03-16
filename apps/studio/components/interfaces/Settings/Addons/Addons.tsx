@@ -76,8 +76,7 @@ export const Addons = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const hasHipaaAddon =
-    subscriptionHasHipaaAddon(subscription) && settings?.is_sensitive === true
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && settings?.is_sensitive === true
 
   // Only projects of version greater than supabase-postgrest-14.1.0.44 can use PITR
   const sufficientPgVersion =
