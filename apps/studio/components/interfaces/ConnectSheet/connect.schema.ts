@@ -265,7 +265,7 @@ export const connectSchema: ConnectSchema = {
       label: 'Client',
       description: 'Choose the MCP client you are using.',
       options: { source: 'mcpClients' },
-      defaultValue: 'cursor',
+      defaultValue: 'claude-code',
     },
     mcpReadonly: {
       id: 'mcpReadonly',

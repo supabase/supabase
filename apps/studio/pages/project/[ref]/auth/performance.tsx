@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
 import { PerformanceSettingsForm } from 'components/interfaces/Auth/PerformanceSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
@@ -66,7 +65,7 @@ const PerformancePage: NextPageWithLayout = () => {
 
 PerformancePage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Performance">{page}</AuthLayout>
   </DefaultLayout>
 )
 

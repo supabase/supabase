@@ -39,7 +39,7 @@ function getChannelFromUrl(url: string): ThreadSource {
   if (u.includes('discord')) return 'discord'
   if (u.includes('reddit')) return 'reddit'
   if (u.includes('github')) return 'github'
-  // TODO: handle unknown URL patterns more explictly, don’t just default to GitHub
+  // TODO: handle unknown URL patterns more explicitly, don’t just default to GitHub
   return 'github'
 }
 

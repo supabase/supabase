@@ -65,7 +65,7 @@ export const useEntitlementsQuery = <TData = EntitlementsData>(
   }: UseCustomQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
 ) => {
   return useQuery<EntitlementsData, EntitlementsError, TData>({
-    queryKey: [organizationKeys.entitlements(slug)],
+    queryKey: organizationKeys.entitlements(slug),
     queryFn: ({ signal }) => getEntitlements({ slug }, signal),
     enabled: enabled && typeof slug !== 'undefined',
     ...options,

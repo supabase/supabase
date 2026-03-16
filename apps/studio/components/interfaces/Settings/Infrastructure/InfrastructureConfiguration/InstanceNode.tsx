@@ -139,7 +139,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.region}</span>
                 {projectHomepageShowInstanceSize && (
                   <>
-                    <span className="text-sm text-foreground-light">•</span>
+                    <span className="text-sm text-foreground-lighter">·</span>
                     <span className="text-sm text-foreground-light">{computeSize}</span>
                   </>
                 )}
@@ -291,7 +291,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <span>{region.region}</span>
                 {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
-                    <span>•</span>
+                    <span className="text-foreground-lighter">·</span>
                     <span>{computeSize}</span>
                   </>
                 )}

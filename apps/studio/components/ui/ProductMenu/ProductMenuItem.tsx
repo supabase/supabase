@@ -57,7 +57,7 @@ export const ProductMenuItem = ({
     }
 
     return (
-      <Link href={url} className="block" target={target}>
+      <Link href={url} className="block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )

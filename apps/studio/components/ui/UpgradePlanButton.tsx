@@ -73,7 +73,13 @@ export const UpgradePlanButton = ({
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
-  const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
+  const linkChildren =
+    children ||
+    (isOnPaidPlanAndRequestingToPurchaseAddon
+      ? addon === 'computeSize'
+        ? 'Change compute size'
+        : 'Enable add-on'
+      : `Upgrade to ${plan}`)
   const link = billingAll ? (
     <Link href={href}>{linkChildren}</Link>
   ) : (
