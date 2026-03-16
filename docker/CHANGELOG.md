@@ -38,6 +38,9 @@ Check updates for each service to learn more.
 ### MCP Server
 - Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
 
+### API gateway
+- Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+
 ### PostgREST
 - Updated to `v14.6` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.6)
 
