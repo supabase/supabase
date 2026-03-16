@@ -709,6 +709,14 @@
     "author_image_url": "/images/avatars/harry-roper.png"
   },
   {
+    "author_id": "zimo_holdijk",
+    "author": "Zimo Holdijk",
+    "position": "Lead Product Builder",
+    "company": "Brthrs",
+    "author_url": "https://www.linkedin.com/in/zimoholdijk",
+    "author_image_url": "/images/avatars/zimo-holdijk.png"
+  },
+  {
     "author_id": "shahed_islam",
     "author": "Shahed Islam",
     "position": "Co-Founder and CEO",
@@ -833,5 +841,29 @@
     "position": "Product Manager",
     "author_url": "https://www.linkedin.com/in/mairuzu",
     "author_image_url": "https://github.com/myruzuu.png"
+  },
+  {
+    "author_id": "deepthi_sigireddi",
+    "author": "Deepthi Sigireddi",
+    "username": "deepthi",
+    "position": "Head of Databases",
+    "author_url": "https://github.com/deepthi",
+    "author_image_url": "https://github.com/deepthi.png"
+  },
+  {
+    "author_id": "manan_gupta",
+    "author": "Manan Gupta",
+    "username": "GuptaManan100",
+    "position": "Engineering",
+    "author_url": "https://github.com/GuptaManan100",
+    "author_image_url": "https://github.com/GuptaManan100.png"
+  },
+  {
+    "author_id": "sugu_sougoumarane",
+    "author": "Sugu Sougoumarane",
+    "username": "sougou",
+    "position": "Head of Multigres",
+    "author_url": "https://github.com/sougou",
+    "author_image_url": "https://github.com/sougou.png"
   }
 ]

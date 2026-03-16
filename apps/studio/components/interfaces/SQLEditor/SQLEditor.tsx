@@ -64,8 +64,14 @@ import {
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
-import { DiffType, IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
 import {
+  DiffType,
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+  type PotentialIssues,
+} from './SQLEditor.types'
+import {
+  checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
@@ -118,15 +124,32 @@ export const SQLEditor = () => {
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const scrollTopRef = useRef<number>(0)
+  const shouldRefocusAfterRunRef = useRef(false)
 
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
-  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
-  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
-  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
+  const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
+
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
+
+  const refocusEditor = useCallback(() => {
+    requestAnimationFrame(() => {
+      setTimeout(() => editorRef.current?.focus(), 0)
+    })
+  }, [])
+
+  const clearPendingRunRefocus = useCallback(() => {
+    shouldRefocusAfterRunRef.current = false
+  }, [])
+
+  const refocusEditorAfterRunIfNeeded = useCallback(() => {
+    if (!shouldRefocusAfterRunRef.current) return
+
+    shouldRefocusAfterRunRef.current = false
+    refocusEditor()
+  }, [refocusEditor])
 
   // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -173,6 +196,7 @@ export const SQLEditor = () => {
 
       // revalidate lint query
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
+      refocusEditorAfterRunIfNeeded()
     },
     onError(error: any, vars) {
       if (id) {
@@ -209,6 +233,8 @@ export const SQLEditor = () => {
 
         snapV2.addResultError(id, error, vars.autoLimit)
       }
+
+      refocusEditorAfterRunIfNeeded()
     },
   })
 
@@ -273,87 +299,92 @@ export const SQLEditor = () => {
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
-      if (isDiffOpen) return
+      if (isDiffOpen) {
+        clearPendingRunRefocus()
+        return
+      }
 
       // use the latest state
       const state = getSqlEditorV2StateSnapshot()
       const snippet = state.snippets[id]
 
-      if (editorRef.current !== null && !isExecuting && project !== undefined) {
-        const editor = editorRef.current
-        const selection = editor.getSelection()
-        const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-
-        const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
-          : selectedValue || editorRef.current?.getValue()
-
-        let queryHasIssues = false
-
-        const destructiveOperations = checkDestructiveQuery(sql)
-        if (!force && destructiveOperations) {
-          setShowPotentialIssuesModal(true)
-          setQueryHasDestructiveOperations(true)
-          queryHasIssues = true
-        }
-
-        const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
-        if (!force && updateWithoutWhereClause) {
-          setShowPotentialIssuesModal(true)
-          setQueryHasUpdateWithoutWhere(true)
-          queryHasIssues = true
-        }
-
-        if (queryHasIssues) {
-          return
-        }
-
-        if (
-          !isHipaaProjectDisallowed &&
-          snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
-          IS_PLATFORM
-        ) {
-          // Intentionally don't await title gen (lazy)
-          setAiTitle(id, sql)
-        }
-
-        if (lineHighlights.length > 0) {
-          editor?.deltaDecorations(lineHighlights, [])
-          setLineHighlights([])
-        }
-
-        const impersonatedRoleState = getImpersonatedRoleState()
-        const connectionString = databases?.find(
-          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
-        )?.connectionString
-        if (!isValidConnString(connectionString)) {
-          return toast.error('Unable to run query: Connection string is missing')
-        }
-
-        const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-        const formattedSql = suffixWithLimit(sql, limit)
-
-        execute({
-          projectRef: project.ref,
-          connectionString: connectionString,
-          sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
-          autoLimit: appendAutoLimit ? limit : undefined,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-          isStatementTimeoutDisabled: true,
-          contextualInvalidation: true,
-          handleError: (error) => {
-            throw error
-          },
-        })
-
-        sendEvent({
-          action: 'sql_editor_query_run_button_clicked',
-          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-        })
+      if (editorRef.current === null || isExecuting || project === undefined) {
+        clearPendingRunRefocus()
+        return
       }
+
+      const editor = editorRef.current
+      const selection = editor.getSelection()
+      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+
+      const sql = snippet
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        : selectedValue || editorRef.current?.getValue()
+
+      const hasDestructiveOperations = checkDestructiveQuery(sql)
+      const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
+      const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
+
+      const queryHasIssues =
+        !force &&
+        (hasDestructiveOperations || hasUpdateWithoutWhere || hasAlterDatabasePreventConnection)
+
+      if (queryHasIssues) {
+        setPotentialIssues({
+          hasDestructiveOperations,
+          hasUpdateWithoutWhere,
+          hasAlterDatabasePreventConnection,
+        })
+        return
+      }
+
+      if (
+        !isHipaaProjectDisallowed &&
+        snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
+        IS_PLATFORM
+      ) {
+        // Intentionally don't await title gen (lazy)
+        setAiTitle(id, sql)
+      }
+
+      if (lineHighlights.length > 0) {
+        editor?.deltaDecorations(lineHighlights, [])
+        setLineHighlights([])
+      }
+
+      const impersonatedRoleState = getImpersonatedRoleState()
+      const connectionString = databases?.find(
+        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+      )?.connectionString
+      if (!isValidConnString(connectionString)) {
+        clearPendingRunRefocus()
+        return toast.error('Unable to run query: Connection string is missing')
+      }
+
+      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+      const formattedSql = suffixWithLimit(sql, limit)
+
+      execute({
+        projectRef: project.ref,
+        connectionString: connectionString,
+        sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
+        autoLimit: appendAutoLimit ? limit : undefined,
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+        isStatementTimeoutDisabled: true,
+        contextualInvalidation: true,
+        handleError: (error) => {
+          throw error
+        },
+      })
+
+      sendEvent({
+        action: 'sql_editor_query_run_button_clicked',
+        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
+      clearPendingRunRefocus,
       isDiffOpen,
       id,
       isExecuting,
@@ -367,6 +398,12 @@ export const SQLEditor = () => {
       limit,
     ]
   )
+
+  const executeQueryFromButton = useCallback(() => {
+    shouldRefocusAfterRunRef.current = true
+    refocusEditor()
+    void executeQuery()
+  }, [executeQuery, refocusEditor])
 
   const executeExplainQuery = useCallback(async () => {
     if (isDiffOpen) return
@@ -766,28 +803,28 @@ export const SQLEditor = () => {
   return (
     <>
       <RunQueryWarningModal
-        visible={showPotentialIssuesModal}
-        hasDestructiveOperations={queryHasDestructiveOperations}
-        hasUpdateWithoutWhere={queryHasUpdateWithoutWhere}
+        visible={!!potentialIssues}
+        potentialIssues={potentialIssues}
         onCancel={() => {
-          setShowPotentialIssuesModal(false)
-          setQueryHasDestructiveOperations(false)
-          setQueryHasUpdateWithoutWhere(false)
-          setTimeout(() => editorRef.current?.focus(), 100)
+          clearPendingRunRefocus()
+          setPotentialIssues(undefined)
+          refocusEditor()
         }}
         onConfirm={() => {
-          setShowPotentialIssuesModal(false)
-          executeQuery(true)
+          shouldRefocusAfterRunRef.current = true
+          setPotentialIssues(undefined)
+          refocusEditor()
+          void executeQuery(true)
         }}
       />
 
       <div className="flex h-full">
         <ResizablePanelGroup
           className="relative"
-          direction="vertical"
+          orientation="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             <div className="flex-grow overflow-y-auto border-b h-full">
               {isLoading ? (
                 <div className="flex h-full w-full items-center justify-center">
@@ -898,7 +935,7 @@ export const SQLEditor = () => {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={50} maxSize={70}>
+          <ResizablePanel defaultSize="50" maxSize="70">
             {isLoading ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="animate-spin text-brand" />
@@ -911,7 +948,7 @@ export const SQLEditor = () => {
                 isDisabled={isDiffOpen}
                 hasSelection={hasSelection}
                 prettifyQuery={prettifyQuery}
-                executeQuery={executeQuery}
+                executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}

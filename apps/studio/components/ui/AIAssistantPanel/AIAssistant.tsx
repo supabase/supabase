@@ -231,6 +231,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
           reason,
+          spanId: state.messageSpanIds[messageId],
         })
 
         sendEvent({
@@ -254,7 +255,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent, state]
   )
 
   const isContextExceededError =

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { supabaseClient } from "../providers/supabase-client";
+import { supabaseClient } from "../utility/supabaseClient";
 
 type TAvatarProps = {
   url?: string;

@@ -1,3 +1,4 @@
+import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -10,14 +11,11 @@ import {
   type ReactElement,
 } from 'react'
 import type { StreamdownProps } from 'streamdown'
-
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import {
   Button,
   cn,
   CodeBlock,
   CodeBlockLang,
-  markdownComponents,
   Dialog,
   DialogClose,
   DialogContent,
@@ -26,12 +24,14 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
+  markdownComponents,
 } from 'ui'
+
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
-import { defaultUrlTransform } from './Message.utils'
+import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),
@@ -155,13 +155,13 @@ export function MessageMarkdown({
 }) {
   const markdownSource = useMemo(() => {
     if (typeof children === 'string') {
-      return children
+      return wrapPlaceholderUrls(children)
     }
-
     if (Array.isArray(children)) {
-      return children.filter((child): child is string => typeof child === 'string').join('')
+      return wrapPlaceholderUrls(
+        children.filter((child): child is string => typeof child === 'string').join('')
+      )
     }
-
     return ''
   }, [children])
 

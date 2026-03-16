@@ -1,13 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import AlertError from 'components/ui/AlertError'
+import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
+import { Service } from 'data/graphql/graphql'
 import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, Telescope, BarChart2, Bot } from 'lucide-react'
+import { BarChart2, Bot, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import AlertError from 'components/ui/AlertError'
-import { cn, Tooltip, TooltipContent, TooltipTrigger, Button } from 'ui'
+import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { StatusCode } from 'ui-patterns'
+import {
+  Chart,
+  ChartActions,
+  ChartCard,
+  ChartContent,
+  ChartEmptyState,
+  ChartHeader,
+  ChartLoadingState,
+  ChartMetric,
+  ChartTitle,
+} from 'ui-patterns/Chart'
 import {
   PageSection,
   PageSectionContent,
@@ -15,17 +30,8 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import {
-  Chart,
-  ChartCard,
-  ChartHeader,
-  ChartActions,
-  ChartMetric,
-  ChartTitle,
-  ChartContent,
-  ChartEmptyState,
-  ChartLoadingState,
-} from 'ui-patterns/Chart'
+
+import { ErrorCodeTooltip } from '../../Settings/Logs/ErrorCodeTooltip'
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
@@ -40,11 +46,6 @@ import {
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
-import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
-import { AiIconAnimation } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 const StatCard = ({
   title,
@@ -289,7 +290,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartTitle>Auth API Errors</ChartTitle>
                 </ChartHeader>
                 <ChartContent
-                  className="p-0"
+                  className="!p-0"
                   isEmpty={responseErrors.length === 0}
                   emptyState={
                     <div className="p-6">
@@ -315,27 +316,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Request',
                         className: 'w-auto !pr-0',
                         render: (row) => {
-                          const level = getStatusLevel(row.status_code)
-                          const colors = getStatusColor(level)
-                          return (
-                            <div className="flex items-center gap-2">
-                              <span className="flex-shrink-0 flex items-center text-xs font-mono">
-                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
-                                  {row.method}
-                                </span>
-                                <span
-                                  className={cn(
-                                    'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums',
-                                    colors.text,
-                                    colors.bg,
-                                    colors.border
-                                  )}
-                                >
-                                  {row.status_code}
-                                </span>
-                              </span>
-                            </div>
-                          )
+                          return <StatusCode method={row.method} statusCode={row.status_code} />
                         },
                       },
                       {
@@ -372,7 +353,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartActions actions={errorCodesActions} />
                 </ChartHeader>
                 <ChartContent
-                  className="p-0"
+                  className="!p-0"
                   isEmpty={errorCodes.length === 0}
                   emptyState={
                     <div className="p-6">
@@ -398,9 +379,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Error code',
                         className: 'w-full',
                         render: (row) => (
-                          <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light">
-                            {row.error_code}
-                          </span>
+                          <ErrorCodeTooltip errorCode={row.error_code} service={Service.Auth}>
+                            <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light cursor-default">
+                              {row.error_code}
+                            </span>
+                          </ErrorCodeTooltip>
                         ),
                       },
                       {

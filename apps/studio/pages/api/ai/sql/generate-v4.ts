@@ -1,19 +1,18 @@
 import pgMeta from '@supabase/pg-meta'
-import { safeValidateUIMessages } from 'ai'
 import type { JwtPayload } from '@supabase/supabase-js'
-import type { NextApiRequest, NextApiResponse } from 'next'
-import z from 'zod'
-
+import { safeValidateUIMessages } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getModel } from 'lib/ai/model'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getTools } from 'lib/ai/tools'
-import { getURL } from 'lib/helpers'
 import apiWrapper from 'lib/api/apiWrapper'
 import { executeQuery } from 'lib/api/self-hosted/query'
+import { getURL } from 'lib/helpers'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import z from 'zod'
 
 export const maxDuration = 120
 
@@ -196,9 +195,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       userId,
       orgId,
       planId,
+      requestedModel,
       promptProviderOptions,
       providerOptions,
       abortSignal: abortController.signal,
+      onSpanCreated: (spanId) => {
+        res.setHeader('x-braintrust-span-id', spanId)
+      },
     })
 
     result.pipeUIMessageStreamToResponse(res, {

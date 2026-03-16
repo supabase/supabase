@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
@@ -13,12 +11,30 @@ import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
-import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useMemo } from 'react'
 import type { Organization } from 'types'
-import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Card,
+  cn,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableHeadSort,
+  TableRow,
+} from 'ui'
+
 import { LoadingCardView, LoadingTableView, NoProjectsState } from './EmptyStates'
 import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'
+import {
+  getNextProjectListSortForColumn,
+  getProjectListAriaSort,
+  PROJECT_LIST_SORT_VALUES,
+  toTableHeadSortValue,
+} from './ProjectListSort.utils'
 import { ProjectTableRow } from './ProjectTableRow'
 
 export interface ProjectListProps {
@@ -37,6 +53,10 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     'status',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
+  const [sort, setSort] = useQueryState(
+    'sort',
+    parseAsStringLiteral(PROJECT_LIST_SORT_VALUES).withDefault('name_asc')
+  )
   const [viewMode] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECTS_VIEW, 'grid')
 
   const organization = organization_ ?? selectedOrganization
@@ -54,6 +74,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   } = useOrgProjectsInfiniteQuery(
     {
       slug,
+      sort,
       search: search.length === 0 ? search : debouncedSearch,
       statuses: filterStatus,
     },
@@ -81,7 +102,6 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     debouncedSearch.length === 0 &&
     filterStatus.length === 0 &&
     (!orgProjects || orgProjects.length === 0)
-  const sortedProjects = [...(orgProjects || [])].sort((a, b) => a.name.localeCompare(b.name))
 
   const noResultsFromSearch =
     debouncedSearch.length > 0 && isSuccessProjects && orgProjects.length === 0
@@ -89,6 +109,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
     filterStatus.length > 0 && isSuccessProjects && orgProjects.length === 0
 
   const noResults = noResultsFromStatusFilter || noResultsFromSearch
+  const tableHeadSortValue = toTableHeadSortValue(sort)
 
   const githubConnections = connections?.map((connection) => ({
     id: String(connection.id),
@@ -143,18 +164,52 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
             <TableRow>
-              <TableHead className={cn(noResults && 'text-foreground-muted')}>Project</TableHead>
+              <TableHead
+                className={cn(noResults && 'text-foreground-muted')}
+                aria-sort={getProjectListAriaSort(sort)}
+              >
+                <TableHeadSort
+                  column="name"
+                  currentSort={tableHeadSortValue}
+                  onSortChange={() => {
+                    const sortValue = sort.includes('created')
+                      ? 'name_asc'
+                      : getNextProjectListSortForColumn(sort)
+                    setSort(sortValue)
+                  }}
+                  className={cn(noResults && 'text-foreground-muted')}
+                >
+                  Project
+                </TableHeadSort>
+              </TableHead>
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Status</TableHead>
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Compute</TableHead>
               <TableHead className={cn(noResults && 'text-foreground-muted')}>Region</TableHead>
-              <TableHead className={cn(noResults && 'text-foreground-muted')}>Created</TableHead>
+              <TableHead
+                className={cn(noResults && 'text-foreground-muted')}
+                aria-sort={getProjectListAriaSort(sort)}
+              >
+                <TableHeadSort
+                  column="created"
+                  currentSort={tableHeadSortValue}
+                  onSortChange={() => {
+                    const sortValue = sort.includes('name')
+                      ? 'created_asc'
+                      : getNextProjectListSortForColumn(sort)
+                    setSort(sortValue)
+                  }}
+                  className={cn(noResults && 'text-foreground-muted')}
+                >
+                  Created
+                </TableHeadSort>
+              </TableHead>
               <TableHead className={cn(noResults && 'text-foreground-muted')} />
             </TableRow>
           </TableHeader>
           <TableBody>
             {noResultsFromStatusFilter ? (
               <TableRow className="[&>td]:hover:bg-inherit">
-                <TableCell colSpan={5}>
+                <TableCell colSpan={6}>
                   <NoSearchResults
                     withinTableCell
                     label={
@@ -169,13 +224,13 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               </TableRow>
             ) : noResultsFromSearch ? (
               <TableRow className="[&>td]:hover:bg-inherit">
-                <TableCell colSpan={5}>
+                <TableCell colSpan={6}>
                   <NoSearchResults searchString={search} withinTableCell />
                 </TableCell>
               </TableRow>
             ) : (
               <>
-                {sortedProjects?.map((project) => (
+                {orgProjects?.map((project) => (
                   <ProjectTableRow
                     key={project.ref}
                     project={project}
@@ -230,7 +285,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
             )}
           >
-            {sortedProjects?.map((project) => (
+            {orgProjects?.map((project) => (
               <ProjectCard
                 key={project.ref}
                 slug={slug}

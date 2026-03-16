@@ -2,14 +2,17 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Brooks
 Aaron Byrne
 Ada Wong
+Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
+Alex Hall
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -34,6 +37,7 @@ Brendan Stephens
 Brent Newson
 Carel de Waal
 Cameron Blackwood
+Cameron Michie
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
@@ -55,6 +59,7 @@ Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
 David Birdsong
+David Camacho Cateura
 David Weitzman
 Deepthi Sigireddi
 Deji I
@@ -81,6 +86,8 @@ Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
 Gerardo Estaba
+Gildas Garcia
+Giuseppe Mandato
 Greg Kress
 Greg P
 Greg Richardson
@@ -107,7 +114,12 @@ Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joaquim Moreno
 Joel Low
+Joey Freeland
+John Fitzgerald
+Joel Martin
+Johan Bergström
 John Pena
 John Schaeffer
 Jon M
@@ -126,6 +138,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Strong-Holte
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -135,6 +148,7 @@ Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
+Lindsay Moss
 Long Hoang
 Luca Forstner
 Lukas Bernert
@@ -176,6 +190,7 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rodrigo Esteves
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
@@ -184,8 +199,10 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Sana Cordeaux
 Sara Read
 Sean Oliver
+Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shane E

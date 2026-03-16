@@ -1,69 +1,51 @@
 import { supabase } from '@/lib/supabase';
+import { AppleButton, appleAuth } from '@invertase/react-native-apple-authentication';
 import type { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
-import AppleSignin, { type AppleAuthResponse } from 'react-apple-signin-auth';
+import { router } from 'expo-router';
 import { Platform } from 'react-native';
 
-/**
- * This is the Apple sign in button for the web.
- */
-export default function AppleSignInButton() {
-  const [nonce, setNonce] = useState('');
-  const [sha256Nonce, setSha256Nonce] = useState('');
-  
-  async function onAppleButtonSuccess(appleAuthRequestResponse: AppleAuthResponse) {
-    console.debug('Apple sign in successful:', { appleAuthRequestResponse })
-    if (appleAuthRequestResponse.authorization && appleAuthRequestResponse.authorization.id_token && appleAuthRequestResponse.authorization.code) {
-      const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
-        provider: 'apple',
-        token: appleAuthRequestResponse.authorization.id_token,
-        nonce,
-        access_token: appleAuthRequestResponse.authorization.code,
-      }
+async function onAppleButtonPress() {
+  // Performs login request
+  const appleAuthRequestResponse = await appleAuth.performRequest({
+    requestedOperation: appleAuth.Operation.LOGIN,
+    // Note: it appears putting FULL_NAME first is important, see issue #293
+    requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+  });
 
-      const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials)
+  // Get the current authentication state for user
+  // Note: This method must be tested on a real device. On the iOS simulator it always throws an error.
+  const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
 
-      if (error) {
-        console.error('Error signing in with Apple:', error)
-      }
+  console.log('Apple sign in successful:', { credentialState, appleAuthRequestResponse });
 
-      if (data) {
-        console.log('Apple sign in successful:', data)
-      }
-    }
-  }
-
-  useEffect(() => {
-    function generateNonce(): string {
-      const array = new Uint32Array(1);
-      window.crypto.getRandomValues(array);
-      return array[0].toString();
+  if (credentialState === appleAuth.State.AUTHORIZED && appleAuthRequestResponse.identityToken && appleAuthRequestResponse.authorizationCode) {
+    const signInWithIdTokenCredentials: SignInWithIdTokenCredentials = {
+      provider: 'apple',
+      token: appleAuthRequestResponse.identityToken,
+      nonce: appleAuthRequestResponse.nonce,
+      access_token: appleAuthRequestResponse.authorizationCode,
     };
 
-    async function generateSha256Nonce(nonce: string): Promise<string> {
-      const buffer = await window.crypto.subtle.digest('sha-256', new TextEncoder().encode(nonce));
-      const array = Array.from(new Uint8Array(buffer));
-      return array.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-  
-    let nonce = generateNonce();
-    setNonce(nonce);
-    
-    generateSha256Nonce(nonce)
-      .then((sha256Nonce) => { setSha256Nonce(sha256Nonce) });
-  }, []);
+    const { data, error } = await supabase.auth.signInWithIdToken(signInWithIdTokenCredentials);
 
-  if (Platform.OS !== 'web') { return <></> }
-  
-  return <AppleSignin
-    authOptions={{
-      clientId: process.env.EXPO_PUBLIC_APPLE_AUTH_SERVICE_ID ?? '',
-      redirectURI: process.env.EXPO_PUBLIC_APPLE_AUTH_REDIRECT_URI ?? '',
-      scope: 'email name',
-      state: 'state',
-      nonce: sha256Nonce,
-      usePopup: true,
-    }}
-    onSuccess={onAppleButtonSuccess}
+    if (error) {
+      console.error('Error signing in with Apple:', error);
+    }
+
+    if (data) {
+      console.log('Apple sign in successful:', data);
+      router.navigate('/(tabs)');
+    }
+  }
+}
+
+export default function AppleSignInButton() {
+  if (Platform.OS !== 'ios') { return <></>; }
+
+  return <AppleButton
+    buttonStyle={AppleButton.Style.BLACK}
+    buttonType={AppleButton.Type.SIGN_IN}
+    style={{ width: 160, height: 45 }}
+    onPress={() => onAppleButtonPress()}
   />;
 }
