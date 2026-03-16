@@ -21,8 +21,8 @@ export const DatabaseProductMenu = () => {
 const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
   return (
     <ProjectLayout
-      title={title}
       product="Database"
+      browserTitle={{ section: title }}
       productMenu={<DatabaseProductMenu />}
       isBlocking={false}
     >
