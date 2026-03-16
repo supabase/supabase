@@ -17,12 +17,9 @@ interface UseFirstTouchStoreProps {
  */
 export function useFirstTouchStore({ enabled }: UseFirstTouchStoreProps) {
   useEffect(() => {
-    if (typeof window === 'undefined') return
     if (!enabled) return
 
     const telemetryData = getSharedTelemetryData(window.location.pathname)
     setFirstTouchData(telemetryData)
   }, [enabled])
 }
-
-export default useFirstTouchStore

@@ -22,7 +22,11 @@ import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
-import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
+import {
+  clearFirstTouchData,
+  getFirstTouchData,
+  type SharedTelemetryData,
+} from './telemetry-first-touch-store'
 import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
 export { posthogClient, type ClientTelemetryEvent }
@@ -52,8 +56,6 @@ export const TelemetryTagManager = () => {
 //---
 // PAGE TELEMETRY
 //---
-type SharedTelemetryData = ReturnType<typeof getSharedTelemetryData>
-
 function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   const urlString = telemetryData.page_url
 
@@ -125,10 +127,10 @@ function handlePageTelemetry({
   if (typeof window !== 'undefined') {
     const livePageData = getSharedTelemetryData(pathname)
     const liveReferrer = livePageData.ph.referrer
-    const cookieReferrer = telemetryDataOverride?.ph?.referrer
+    const storedReferrer = telemetryDataOverride?.ph?.referrer
 
-    const shouldUseCookieReferrer = Boolean(
-      cookieReferrer && isExternalReferrer(cookieReferrer) && !isExternalReferrer(liveReferrer)
+    const shouldUseStoredReferrer = Boolean(
+      storedReferrer && isExternalReferrer(storedReferrer) && !isExternalReferrer(liveReferrer)
     )
 
     const pageData = telemetryDataOverride
@@ -136,7 +138,7 @@ function handlePageTelemetry({
           ...livePageData,
           ph: {
             ...livePageData.ph,
-            referrer: shouldUseCookieReferrer ? cookieReferrer! : liveReferrer,
+            referrer: shouldUseStoredReferrer ? storedReferrer! : liveReferrer,
           },
         }
       : { ...livePageData, ph: { ...livePageData.ph } }
@@ -353,20 +355,21 @@ export const PageTelemetry = ({
       // Read first-touch attribution data from the in-memory store (set before consent)
       const firstTouchData = getFirstTouchData()
 
-      handlePageTelemetry({
-        apiUrl: API_URL,
-        pathname: pathnameRef.current,
-        featureFlags: featureFlagsRef.current,
-        slug,
-        ref,
-        ...(firstTouchData && { telemetryDataOverride: firstTouchData }),
-        firstReferrerData,
-        mwDiagData,
-      })
-
-      clearFirstTouchData()
-
-      hasSentInitialPageTelemetryRef.current = true
+      try {
+        handlePageTelemetry({
+          apiUrl: API_URL,
+          pathname: pathnameRef.current,
+          featureFlags: featureFlagsRef.current,
+          slug,
+          ref,
+          ...(firstTouchData && { telemetryDataOverride: firstTouchData }),
+          firstReferrerData,
+          mwDiagData,
+        })
+      } finally {
+        clearFirstTouchData()
+        hasSentInitialPageTelemetryRef.current = true
+      }
     }
   }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
 
