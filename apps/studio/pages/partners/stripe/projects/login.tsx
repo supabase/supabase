@@ -15,17 +15,17 @@ import {
 import APIAuthorizationLayout from '@/components/layouts/APIAuthorizationLayout'
 import { OrganizationSelector } from '@/components/ui/org-selector'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-fabric-confirm-mutation'
+import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-projects-confirm-mutation'
 import {
   accountRequestQueryOptions,
   type AccountRequestDetails,
-} from '@/data/partners/stripe-fabric-query'
+} from '@/data/partners/stripe-projects-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { useSignOut } from '@/lib/auth'
 
 type OrgSummary = NonNullable<AccountRequestDetails['linked_organization']>
 
-const StripeFabricLoginPage = () => {
+const StripeProjectsLoginPage = () => {
   const router = useRouter()
   const { ar_id } = useParams()
 
@@ -297,4 +297,4 @@ const StripeFabricLoginPage = () => {
   )
 }
 
-export default withAuth(StripeFabricLoginPage)
+export default withAuth(StripeProjectsLoginPage)

@@ -18,7 +18,7 @@ async function confirmAccountRequest({
   if (!arId) throw new Error('Account request ID is required')
 
   const { data, error } = await post(
-    '/platform/stripe/fabric/provisioning/account_requests/{id}/confirm',
+    '/platform/stripe/projects/provisioning/account_requests/{id}/confirm',
     {
       params: { path: { id: arId } },
       body: { organization_id: organizationId, organization_name: organizationName },
