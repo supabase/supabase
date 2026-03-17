@@ -146,7 +146,7 @@ const NewFunctionPage = () => {
   const {
     mutate: deployFunction,
     isPending: isDeploying,
-    isSuccess: hasDeployed
+    isSuccess: hasDeployed,
   } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
@@ -285,10 +285,7 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
-  const hasUnsavedChanges = useMemo(
-    () => !isEqual(INITIAL_FILES, files),
-    [files]
-  )
+  const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
 
   return (
     <PageLayout
