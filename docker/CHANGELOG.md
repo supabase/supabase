@@ -39,7 +39,7 @@ Check updates for each service to learn more.
 - Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
 
 ### API gateway
-- Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+- ⚠️ Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
 
 ### PostgREST
 - Updated to `v14.6` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.6)
@@ -49,7 +49,7 @@ Check updates for each service to learn more.
 - ⚠️ Added **mandatory** `METRICS_JWT_SECRET` environment variable (requires `docker-compose.s3.yml` update) - PR [realtime#1729](https://github.com/supabase/realtime/pull/1729)
 
 ### Storage
-- Updated `supabase/storage-api` to `v1.44.2`
+- Updated to `v1.44.2`
 - ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
 - ⚠️ Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
 - ⚠️ Changed Docker Compose configuration for S3 backends to use named volumes - PR [#43815](https://github.com/supabase/supabase/pull/43815)
