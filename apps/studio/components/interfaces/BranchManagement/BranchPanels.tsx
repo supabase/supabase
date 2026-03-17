@@ -1,13 +1,14 @@
-import dayjs from 'dayjs'
-import { Github } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, ReactNode } from 'react'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { Branch } from 'data/branches/branches-query'
+import dayjs from 'dayjs'
+import { Github } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, ReactNode } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { WorkflowLogs } from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
@@ -137,12 +138,14 @@ export const BranchRow = ({
           </p>
         ) : (
           <p className="text-xs text-foreground-lighter">
-            {daysFromNow > 1
-              ? `Updated on ${formattedUpdatedAt}`
-              : `Updated ${formattedTimeFromNow}`}
+            {daysFromNow > 1 ? 'Updated on' : 'Updated'}{' '}
+            <TimestampInfo
+              utcTimestamp={branch.updated_at}
+              label={daysFromNow <= 1 ? formattedTimeFromNow : undefined}
+            />
           </p>
         )}
-        <WorkflowLogs projectRef={branch.project_ref} status={branch.status} />
+        <WorkflowLogs branch={branch} />
         {rowActions}
       </div>
     </div>

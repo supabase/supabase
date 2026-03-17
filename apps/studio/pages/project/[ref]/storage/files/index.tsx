@@ -10,7 +10,7 @@ const StorageFilesPage: NextPageWithLayout = () => {
 
 StorageFilesPage.getLayout = (page) => (
   <DefaultLayout>
-    <StorageLayout title="Storage">
+    <StorageLayout title="Files">
       <StorageBucketsLayout>{page}</StorageBucketsLayout>
     </StorageLayout>
   </DefaultLayout>

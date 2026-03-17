@@ -1,22 +1,48 @@
+import { IS_PLATFORM } from 'common'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { IS_PLATFORM } from 'common'
-import { InternalServerError } from 'lib/api/apiHelpers'
-import { getActiveIncidents, type IncidentInfo } from 'lib/api/incident-status'
+import { InternalServerError } from '@/lib/api/apiHelpers'
+import { getActiveIncidents, type IncidentCache } from '@/lib/api/incident-status'
+import { createAdminClient } from '@/lib/api/supabase-admin'
 
 /**
- * Cache on browser for 5 minutes
  * Cache on CDN for 5 minutes
  * Allow serving stale content for 1 minute while revalidating
  */
-const CACHE_CONTROL_SETTINGS = 'public, max-age=300, s-maxage=300, stale-while-revalidate=60'
+const CACHE_CONTROL_SETTINGS = 'public, s-maxage=300, stale-while-revalidate=60'
 
-// Default export needed by Next.js convention
-// eslint-disable-next-line no-restricted-exports
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<IncidentInfo[] | { error: string }>
-) {
+async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<string, IncidentCache>> {
+  const cacheMap = new Map<string, IncidentCache>()
+
+  if (incidentIds.length === 0) return cacheMap
+
+  const supabase = createAdminClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('incident_status_cache')
+      .select('incident_id, affected_regions, affects_project_creation')
+      .in('incident_id', incidentIds)
+
+    if (error) {
+      console.error('Failed to fetch incident_status_cache: %O', error)
+      return cacheMap
+    }
+
+    for (const row of data ?? []) {
+      cacheMap.set(row.incident_id, {
+        affected_regions: row.affected_regions ?? null,
+        affects_project_creation: row.affects_project_creation,
+      })
+    }
+  } catch (error) {
+    console.error('Unexpected error fetching incident_status_cache: %O', error)
+  }
+
+  return cacheMap
+}
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!IS_PLATFORM) {
     return res.status(404).end()
   }
@@ -34,13 +60,33 @@ export default async function handler(
   }
 
   try {
-    const incidents = await getActiveIncidents()
+    const allIncidents = await getActiveIncidents()
+
+    const bannerIncidents = allIncidents.filter(
+      (incident) =>
+        incident.impact !== 'maintenance' &&
+        incident.metadata?.dashboard_metadata?.show_banner === true
+    )
+
+    const cacheMap = await fetchIncidentCache(bannerIncidents.map((i) => i.id))
+
+    const enrichedIncidents = bannerIncidents.map((incident) => ({
+      ...incident,
+      cache: cacheMap.get(incident.id) ?? null,
+    }))
 
     res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
 
-    return res.status(200).json(incidents)
+    return res.status(200).json(enrichedIncidents)
   } catch (error) {
+    let errorCode = 500
+
     if (error instanceof InternalServerError) {
+      if (typeof error.details?.status === 'number') errorCode = error.details.status
+      if (errorCode === 420) errorCode = 429
+      if (errorCode === 429 && typeof error.details?.retryAfter === 'string') {
+        res.setHeader('Retry-After', error.details.retryAfter)
+      }
       console.error('Failed to fetch active StatusPage incidents: %O', {
         message: error.message,
         details: error.details,
@@ -49,6 +95,8 @@ export default async function handler(
       console.error('Unexpected error fetching active StatusPage incidents: %O', error)
     }
 
-    return res.status(500).json({ error: 'Unable to fetch incidents at this time' })
+    return res.status(errorCode).json({ error: 'Unable to fetch incidents at this time' })
   }
 }
+
+export default handler

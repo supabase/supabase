@@ -114,7 +114,7 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.mcpClient
     expect(field.type).toBe('select')
     expect(field.options).toEqual({ source: 'mcpClients' })
-    expect(field.defaultValue).toBe('cursor')
+    expect(field.defaultValue).toBe('claude-code')
   })
 
   test('mcpFeatures field should have multi-select type', () => {

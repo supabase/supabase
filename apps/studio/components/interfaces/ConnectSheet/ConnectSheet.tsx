@@ -1,34 +1,63 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
-import type { ProjectKeys } from './Connect.types'
+import type { ConnectMode, ProjectKeys } from './Connect.types'
+import { CONNECT_MODES } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useConnectState } from './useConnectState'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useAvailableConnectModes } from './useAvailableConnectModes'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAppStateSnapshot } from '@/state/app-state'
+import { useTrack } from 'lib/telemetry/track'
+
+function isConnectMode(value: string): value is ConnectMode {
+  return CONNECT_MODES.some((mode) => mode === value)
+}
 
 export const ConnectSheet = () => {
-  const {
-    projectConnectionShowAppFrameworks: showAppFrameworks,
-    projectConnectionShowMobileFrameworks: showMobileFrameworks,
-    projectConnectionShowOrms: showOrms,
-  } = useIsFeatureEnabled([
-    'project_connection:show_app_frameworks',
-    'project_connection:show_mobile_frameworks',
-    'project_connection:show_orms',
-  ])
+  const { ref: projectRef } = useParams()
+
+  const availableModeIds = useAvailableConnectModes()
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false)
   )
-  const [, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const [connectTab, setConnectTab] = useQueryState('connectTab', parseAsString)
+  const { connectSheetSource, setConnectSheetSource } = useAppStateSnapshot()
+  const track = useTrack()
+  const prevShowConnect = useRef(false)
+
+  const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
+    useConnectState()
+
+  useEffect(() => {
+    const justOpened = showConnect && !prevShowConnect.current
+    prevShowConnect.current = showConnect
+
+    if (!justOpened) return
+
+    track('connect_sheet_opened', { source: connectSheetSource })
+    setConnectSheetSource('header_button')
+
+    if (connectTab && isConnectMode(connectTab) && availableModeIds.includes(connectTab)) {
+      setMode(connectTab)
+    }
+  }, [
+    showConnect,
+    connectSheetSource,
+    connectTab,
+    availableModeIds,
+    track,
+    setConnectSheetSource,
+    setMode,
+  ])
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
@@ -37,12 +66,8 @@ export const ConnectSheet = () => {
     setShowConnect(sheetOpen)
   }
 
-  const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
-    useConnectState()
+  const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
 
-  // Project keys for step components
-  const { ref: projectRef } = useParams()
-  const { data: settings } = useProjectSettingsV2Query({ projectRef }, { enabled: showConnect })
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'service_api_keys'
@@ -53,39 +78,22 @@ export const ConnectSheet = () => {
     : { anonKey: null, publishableKey: null }
 
   const projectKeys: ProjectKeys = useMemo(() => {
-    const protocol = settings?.app_config?.protocol ?? 'https'
-    const endpoint = settings?.app_config?.endpoint ?? ''
-    const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
-
     return {
-      apiUrl: apiHost ?? null,
+      apiUrl: endpoint,
       anonKey: anonKey?.api_key ?? null,
       publishableKey: publishableKey?.api_key ?? null,
     }
-  }, [
-    settings?.app_config?.protocol,
-    settings?.app_config?.endpoint,
-    canReadAPIKeys,
-    anonKey?.api_key,
-    publishableKey?.api_key,
-  ])
-
-  const availableModeIds = useMemo(() => {
-    const modes: string[] = []
-    const showFrameworks = showAppFrameworks || showMobileFrameworks
-
-    if (showFrameworks) modes.push('framework')
-    modes.push('direct')
-    if (showOrms) modes.push('orm')
-    modes.push('mcp')
-
-    return modes
-  }, [showAppFrameworks, showMobileFrameworks, showOrms])
+  }, [endpoint, anonKey?.api_key, publishableKey?.api_key])
 
   const availableModes = useMemo(
     () => schema.modes.filter((m) => availableModeIds.includes(m.id)),
     [schema.modes, availableModeIds]
   )
+
+  const handleModeChange = (mode: ConnectMode) => {
+    setMode(mode)
+    setConnectTab(mode)
+  }
 
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
@@ -97,7 +105,11 @@ export const ConnectSheet = () => {
 
         <div className="flex flex-1 flex-col overflow-y-auto divide-y">
           <div className="p-8">
-            <ModeSelector modes={availableModes} selected={state.mode} onChange={setMode} />
+            <ModeSelector
+              modes={availableModes}
+              selected={state.mode}
+              onChange={handleModeChange}
+            />
           </div>
 
           <div className="border-b p-8">

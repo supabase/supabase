@@ -14,7 +14,7 @@ interface PolicyEditorProps {
   onReviewPolicy: () => void
 }
 
-const PolicyEditor = ({
+export const PolicyEditor = ({
   isNewPolicy = true,
   policyFormFields = {},
   onUpdatePolicyFormFields = () => {},
@@ -75,5 +75,3 @@ const PolicyEditor = ({
     </div>
   )
 }
-
-export default PolicyEditor

@@ -61,7 +61,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
 
 LogsSavedPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Recent">{page}</LogsLayout>
   </DefaultLayout>
 )
 

@@ -109,7 +109,7 @@ export const QueryPerformanceGrid = ({
       minWidth:
         col.id === 'prop_total_time'
           ? calculateTimeConsumedWidth((aggregatedData as any) ?? [])
-          : col.minWidth ?? 120,
+          : (col.minWidth ?? 120),
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {

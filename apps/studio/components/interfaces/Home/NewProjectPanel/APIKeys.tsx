@@ -176,7 +176,7 @@ export const APIKeys = () => {
                       ? 'JWT secret update failed, new API key may have issues'
                       : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                         ? 'Updating JWT secret...'
-                        : publishableKey?.api_key ?? anonKey?.api_key
+                        : (publishableKey?.api_key ?? anonKey?.api_key)
                 }
               />
             </FormItemLayout>

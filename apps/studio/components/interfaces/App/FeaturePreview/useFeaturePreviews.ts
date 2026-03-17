@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
-type FeaturePreview = {
+export type FeaturePreview = {
   key: string
   name: string
   discussionsUrl?: string
@@ -14,10 +14,11 @@ type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-  const advisorRulesEnabled = useFlag('advisorRules')
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
+  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
 
   return [
     {
@@ -33,7 +34,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
       name: 'Branching via dashboard',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-      enabled: gitlessBranchingEnabled,
+      enabled: true,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
@@ -42,10 +43,29 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
       name: 'Disable Advisor rules',
       discussionsUrl: undefined,
-      enabled: advisorRulesEnabled,
+      enabled: true,
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,
+    },
+
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
+      name: 'PG Delta Diff',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: true,
+      enabled: pgDeltaDiffEnabled,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+      name: 'Platform webhooks',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: false,
+      enabled: platformWebhooksEnabled,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
@@ -82,6 +102,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: tableEditorNewFilterBar,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
+      name: 'Floating Mobile Toolbar',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/43721',
+      enabled: showFloatingMobileToolbar,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: true,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

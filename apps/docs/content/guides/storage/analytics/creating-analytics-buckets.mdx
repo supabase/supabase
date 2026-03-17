@@ -11,6 +11,12 @@ This feature is in **Private Alpha**. API stability and backward compatibility a
 
 Analytics buckets use [Apache Iceberg](https://iceberg.apache.org/), an open-table format for efficient management of large analytical datasets. You can interact with analytics buckets using tools such as [PyIceberg](https://py.iceberg.apache.org/), [Apache Spark](https://spark.apache.org/), or any client supporting the [Iceberg REST Catalog API](https://editor-next.swagger.io/?url=https://raw.githubusercontent.com/apache/iceberg/main/open-api/rest-catalog-open-api.yaml).
 
+<Admonition type="note" title="About replication">
+
+Analytics Buckets are still available, but managed replication into Analytics Buckets through Supabase ETL is no longer supported. If you need managed replication today, use [Database Replication](/docs/guides/database/replication/replication-setup) with **BigQuery**. If you want to use Analytics Buckets, bring your own ingestion pipeline.
+
+</Admonition>
+
 ## Creating an Analytics bucket
 
 You can create an analytics bucket using either the Supabase SDK or the Supabase Dashboard.
@@ -73,5 +79,4 @@ print('Analytics bucket created:', response)
 Once you've created your analytics bucket, you can:
 
 - [Connect with Iceberg clients](/docs/guides/storage/analytics/connecting-to-analytics-bucket) like PyIceberg or Apache Spark
-- [Set up real-time replication](/docs/guides/storage/analytics/replication) from your Postgres database
 - [Query data with Postgres](/docs/guides/storage/analytics/query-with-postgres) using the Iceberg Foreign Data Wrapper

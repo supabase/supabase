@@ -42,8 +42,6 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
 
 ## Examples
 
-### With actions
-
 <ComponentPreview
   name="admonition-demo"
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
@@ -51,14 +49,12 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
 
 ## Responsive
 
-{' '}
+Resize your browser to see the button(s) change `layout` based on the Admonition’s width.
 
 <ComponentPreview
   name="admonition-responsive"
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
-
-Reize your browser to see the button(s) change `layout` based on the Admonition’s width.
 
 When `layout="responsive"`, the Alert root gets `@container` so the Admonition is the container-query context. The Admonition stays `vertical` when it’s narrow and switches to `horizontal` when its own width reaches the `@md` container breakpoint, independent of page width.
 
@@ -82,3 +78,14 @@ AlertError for example rolls up consistent error handling and support contact me
   name="admonition-destructive"
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
+
+### Sandwiched
+
+Some [Card](../components/card) or [Dialog](../components/dialog) instances may need to include callout information in-between core content. Admonition can be used ‘full-bleed’ in these cases by removing borders and radii.
+
+<ComponentPreview
+  name="admonition-sandwiched"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+/>
+
+Depending on the context, you may want to reset borders on the Admonition itself rather than the surrounding elements. The above Admonition is `type` `"warning"` with stark yellow borders which we want to emphasize.

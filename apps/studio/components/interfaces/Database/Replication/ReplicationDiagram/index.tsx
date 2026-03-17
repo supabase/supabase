@@ -14,6 +14,8 @@ import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-s
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { timeout } from '@/lib/helpers'
 
+import 'reactflow/dist/style.css'
+
 export const ReplicationDiagram = () => {
   return (
     <ReactFlowProvider>

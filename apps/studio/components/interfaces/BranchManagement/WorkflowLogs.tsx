@@ -1,8 +1,3 @@
-import dayjs from 'dayjs'
-import { groupBy } from 'lodash'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useState } from 'react'
-
 import AlertError from 'components/ui/AlertError'
 import { ActionRunData } from 'data/actions/action-detail-query'
 import { useActionRunLogsQuery } from 'data/actions/action-logs-query'
@@ -12,6 +7,10 @@ import {
   type ActionStatus,
 } from 'data/actions/action-runs-query'
 import type { Branch } from 'data/branches/branches-query'
+import dayjs from 'dayjs'
+import { groupBy } from 'lodash'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
 import {
   Button,
   cn,
@@ -25,13 +24,13 @@ import {
   DialogTrigger,
   StatusIcon,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader, TimestampInfo } from 'ui-patterns'
+
 import { ActionStatusBadge, ActionStatusBadgeCondensed, STATUS_TO_LABEL } from './ActionStatusBadge'
 import BranchStatusBadge from './BranchStatusBadge'
 
 interface WorkflowLogsProps {
-  projectRef: string
-  status: Branch['status']
+  branch: Branch
 }
 
 type StatusType = Branch['status']
@@ -39,7 +38,8 @@ type StatusType = Branch['status']
 const HEALTHY_STATUSES: StatusType[] = ['FUNCTIONS_DEPLOYED', 'MIGRATIONS_PASSED']
 const UNHEALTHY_STATUSES: StatusType[] = ['MIGRATIONS_FAILED', 'FUNCTIONS_FAILED']
 
-export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
+export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
+  const { project_ref: projectRef, status, name } = branch
   const [isOpen, setIsOpen] = useState(false)
 
   const {
@@ -84,13 +84,22 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
 
       <DialogContent size="xlarge">
         <DialogHeader>
-          <DialogTitle>Workflow Logs</DialogTitle>
-          <DialogDescription>Select a workflow run to view logs</DialogDescription>
+          <DialogTitle>Workflow logs for {name}</DialogTitle>
+          <DialogDescription>
+            {!selectedWorkflowRun ? (
+              'Select a workflow run to view logs'
+            ) : (
+              <>
+                Run created at{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={selectedWorkflowRun.created_at} />
+              </>
+            )}
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />
 
-        <DialogSection className={cn('px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
+        <DialogSection className={cn('!px-0', isWorkflowRunLogsSuccess ? 'py-0 pt-2' : '!py-0')}>
           {!selectedWorkflowRun ? (
             <>
               {isWorkflowRunsLoading && <GenericSkeletonLoader className="py-4" />}
@@ -103,7 +112,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                 (workflowRuns.length > 0 ? (
                   <ul className="divide-y">
                     {workflowRuns.map((workflowRun) => (
-                      <li key={workflowRun.id} className="py-3">
+                      <li key={workflowRun.id} className="px-4 py-3">
                         <button
                           type="button"
                           disabled={workflowRun.id === projectRef}
@@ -116,9 +125,11 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                             ) : (
                               <BranchStatusBadge status={status} />
                             )}
-                            <span className="text-sm">
-                              {dayjs(workflowRun.created_at).format('DD MMM, YYYY HH:mm')}
-                            </span>
+
+                            <TimestampInfo
+                              className="text-sm"
+                              utcTimestamp={workflowRun.created_at}
+                            />
                           </div>
                           {workflowRun.id !== projectRef && <ArrowRight size={16} />}
                         </button>
@@ -132,7 +143,7 @@ export const WorkflowLogs = ({ projectRef, status }: WorkflowLogsProps) => {
                 ))}
             </>
           ) : (
-            <div className="flex flex-col gap-2 py-2">
+            <div className="px-4 flex flex-col gap-2 py-2">
               <Button
                 onClick={() => setSelectedWorkflowRun(undefined)}
                 type="text"
@@ -180,13 +191,20 @@ function RunSteps({ steps }: { steps: Array<ActionRunStep> }) {
           {numberFailedSteps - 1} more
         </ActionStatusBadgeCondensed>
       )}
-      {(Object.keys(stepsByStatus) as Array<ActionStatus>)
-        .filter((status) => status !== 'DEAD')
-        .map((status) => (
-          <ActionStatusBadgeCondensed key={status} status={status} details={stepsByStatus[status]}>
-            {stepsByStatus[status].length} {STATUS_TO_LABEL[status]}
-          </ActionStatusBadgeCondensed>
-        ))}
+
+      <div className="flex items-center gap-x-2">
+        {(Object.keys(stepsByStatus) as Array<ActionStatus>)
+          .filter((status) => status !== 'DEAD')
+          .map((status) => (
+            <ActionStatusBadgeCondensed
+              key={status}
+              status={status}
+              details={stepsByStatus[status]}
+            >
+              {stepsByStatus[status].length} {STATUS_TO_LABEL[status]}
+            </ActionStatusBadgeCondensed>
+          ))}
+      </div>
     </>
   )
 }

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { useMemo } from 'react'
 import {
@@ -79,7 +79,6 @@ function McpCursorContentInner({
     <McpConfigurationDisplay
       className="space-y-4"
       theme="dark"
-      basePath={BASE_PATH}
       selectedClient={selectedClient}
       clientConfig={clientConfig}
       onCopyCallback={handleCopy}

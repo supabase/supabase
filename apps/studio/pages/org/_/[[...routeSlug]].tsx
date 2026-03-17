@@ -7,8 +7,11 @@ import { buildOrgUrl } from 'components/interfaces/Organization/Organization.uti
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { withAuth } from 'hooks/misc/withAuth'
+import { buildStudioPageTitle } from 'lib/page-title'
 import { NextPage } from 'next'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
@@ -16,6 +19,7 @@ import { OrganizationCard } from '@/components/interfaces/Organization/Organizat
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
+  const { appTitle } = useCustomContent(['app:title'])
   const { routeSlug, ...queryParams } = router.query
   const queryString =
     Object.keys(queryParams).length > 0
@@ -23,9 +27,18 @@ const GenericOrganizationPage: NextPage = () => {
       : ''
 
   const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
+  const pageTitle = buildStudioPageTitle({
+    section: 'Select an organization',
+    surface: 'Organizations',
+    brand: appTitle || 'Supabase',
+  })
 
   return (
     <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
       <Header />
       <PageLayout className="flex-grow min-h-0" title="Select an organization to continue">
         <ScaffoldContainer>

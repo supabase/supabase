@@ -163,6 +163,12 @@ export const customerioFormConfigSchema = z.object({
    * Example: { workEmail: 'email', firstName: 'first_name' }
    */
   profileMap: z.record(z.string(), z.string()).optional(),
+  /**
+   * Static properties merged into the Customer.io track() event payload.
+   * Use this for fixed values that aren't form fields (e.g. event_name, source).
+   * Example: { event_name: 'Stripe Sessions 2026 Exec Dinner' }
+   */
+  staticProperties: z.record(z.string(), z.unknown()).optional(),
 })
 
 export const formCrmConfigSchema = z
@@ -201,6 +207,10 @@ export const featureGridSectionSchema = z.object({
   type: z.literal('feature-grid'),
   title: z.string().optional(),
   description: z.string().optional(),
+  columns: z
+    .union([z.literal(1), z.literal(2), z.literal(3)])
+    .optional()
+    .default(3),
   items: z.array(featureGridItemSchema).min(1).max(6),
 })
 

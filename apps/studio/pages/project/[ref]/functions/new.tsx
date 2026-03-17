@@ -45,6 +45,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { useLatest } from '@/hooks/misc/useLatest'
 
@@ -142,14 +143,22 @@ const NewFunctionPage = () => {
     },
   })
 
-  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
+  const {
+    mutate: deployFunction,
+    isPending: isDeploying,
+    isSuccess: hasDeployed,
+  } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
-      if (ref && functionName) {
-        router.push(`/project/${ref}/functions/${functionName}/details`)
-      }
+      // Allow the mutation state (isSuccess) to propagate before navigating
+      // to prevent unnecessary dialog about unsaved changes
+      setTimeout(() => {
+        if (ref && functionName) {
+          router.push(`/project/${ref}/functions/${functionName}/details`)
+        }
+      }, 150)
     },
   })
 
@@ -276,21 +285,7 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
-  // [Joshen] Probably a candidate for useStaticEffectEvent
-  const filesRef = useLatest(files)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      const hasUnsavedChanges = !isEqual(INITIAL_FILES, filesRef.current)
-
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
 
   return (
     <PageLayout
@@ -428,6 +423,7 @@ const NewFunctionPage = () => {
           </Button>
         </form>
       </Form_Shadcn_>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
     </PageLayout>
   )
 }
@@ -435,7 +431,7 @@ const NewFunctionPage = () => {
 NewFunctionPage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="New">{page}</EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }

@@ -66,7 +66,12 @@ export async function submitFormAction(
   try {
     // Detect the email value from common field names
     const email =
-      values['email'] ?? values['workEmail'] ?? values['work_email'] ?? values['emailAddress'] ?? ''
+      values['email'] ??
+      values['workEmail'] ??
+      values['work_email'] ??
+      values['emailAddress'] ??
+      values['email_address'] ??
+      ''
 
     if (!email) {
       debug('Submission rejected: no email field found in values')
@@ -125,7 +130,9 @@ export async function submitFormAction(
       context,
       consent,
       event: crm.customerio?.event,
-      properties: crm.customerio ? (values as Record<string, unknown>) : undefined,
+      properties: crm.customerio
+        ? { ...(values as Record<string, unknown>), ...crm.customerio.staticProperties }
+        : undefined,
       customerioProfile,
     } as any)
 
