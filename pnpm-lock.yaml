@@ -95,7 +95,7 @@ importers:
         version: 3.823.0
       '@ianvs/prettier-plugin-sort-imports':
         specifier: ^4.7.0
-        version: 4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.2.4)(supports-color@8.1.1)
+        version: 4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.7.3)(supports-color@8.1.1)
       '@types/node':
         specifier: 'catalog:'
         version: 22.13.14
@@ -106,11 +106,11 @@ importers:
         specifier: ^28.1.0
         version: 28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1)
       prettier:
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: 3.7.3
+        version: 3.7.3
       prettier-plugin-sql-cst:
-        specifier: ^0.11.0
-        version: 0.11.1
+        specifier: ^0.18.0
+        version: 0.18.0
       rimraf:
         specifier: ^6.0.0
         version: 6.0.1
@@ -1258,9 +1258,6 @@ importers:
       postcss:
         specifier: ^8.5.3
         version: 8.5.3
-      prettier:
-        specifier: 3.2.4
-        version: 3.2.4
       raw-loader:
         specifier: ^4.0.2
         version: 4.0.2(webpack@5.94.0)
@@ -2017,8 +2014,8 @@ importers:
         specifier: ^7.4.3
         version: 7.5.2(encoding@0.1.13)(typescript@5.9.2)
       prettier:
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: '*'
+        version: 3.7.3
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
@@ -2028,9 +2025,6 @@ importers:
       minimist:
         specifier: ^1.2.7
         version: 1.2.8
-      prettier:
-        specifier: 3.2.4
-        version: 3.2.4
       svgson:
         specifier: ^5.2.1
         version: 5.3.1
@@ -15695,8 +15689,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-sql-cst@0.11.1:
-    resolution: {integrity: sha512-MZ8058LfIlNyGILQBeKE15PUTKGbP/QgflKcjkIl+JKgT4jiN6vecgfEhpMnhZLvopxX0xjuDyKM+/4mE0j6Ug==}
+  prettier-plugin-sql-cst@0.18.0:
+    resolution: {integrity: sha512-IEbKtlZ+H94uWFHQt4iKWMiJJRIuzWYw8jeLz+RCzy4bDtsM3/07GIF1+EFCbT9d0gWibTPotZWx8o3hz+ITeA==}
 
   prettier-plugin-sql@0.13.0:
     resolution: {integrity: sha512-Ui9603tDD6PFyr7JvIEoE6cIFMQnJVDriG+oLyVThsGo/MIl5ek18JhH3xtox9ux8jvyww/FUFrJzxpZ7FIdvw==}
@@ -15707,16 +15701,6 @@ packages:
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
-    hasBin: true
-
-  prettier@3.2.4:
-    resolution: {integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==}
-    engines: {node: '>=14'}
-    hasBin: true
-
-  prettier@3.2.5:
-    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
-    engines: {node: '>=14'}
     hasBin: true
 
   prettier@3.7.3:
@@ -16997,8 +16981,8 @@ packages:
     resolution: {integrity: sha512-5vmt2HlCAVozxsBZuXWkAki/KGawaK+b5GG5x+BtXOFVpN/8cqppblFUxHl4jxdA0cvo14lABhM+KBnrUapOlw==}
     hasBin: true
 
-  sql-parser-cst@0.24.0:
-    resolution: {integrity: sha512-38NNWamo0PKv80Zn8r1iXgatkWEB04CPhun8nEQhEJlYBMSIV4OOt4g3diynjVHJSunNSQqAjKcwmhM0EeLCtg==}
+  sql-parser-cst@0.38.2:
+    resolution: {integrity: sha512-4SR3cZYMxG4gsmvZQSQYYzzfk20OnbpsnwOVbU6Fw39ORLPpIHCMqoX5li0dz+ZWyF5HeR+mSgbgayKhN4JR9w==}
 
   sql-template-strings@2.2.2:
     resolution: {integrity: sha512-UXhXR2869FQaD+GMly8jAMCRZ94nU5KcrFetZfWEMd+LVVG6y0ExgHAhatEcKZ/wk8YcKPdi+hiD2wm75lq3/Q==}
@@ -21018,13 +21002,13 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@ianvs/prettier-plugin-sort-imports@4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.2.4)(supports-color@8.1.1)':
+  '@ianvs/prettier-plugin-sort-imports@4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.7.3)(supports-color@8.1.1)':
     dependencies:
       '@babel/generator': 7.29.0
       '@babel/parser': 7.29.0
       '@babel/traverse': 7.29.0(supports-color@8.1.1)
       '@babel/types': 7.29.0
-      prettier: 3.2.4
+      prettier: 3.7.3
       semver: 7.7.3
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.21
@@ -25699,7 +25683,7 @@ snapshots:
     dependencies:
       '@babel/parser': 7.29.0
       libpg-query: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
-      prettier: 3.2.5
+      prettier: 3.7.3
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -34704,10 +34688,10 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-sql-cst@0.11.1:
+  prettier-plugin-sql-cst@0.18.0:
     dependencies:
-      prettier: 3.2.5
-      sql-parser-cst: 0.24.0
+      prettier: 3.7.3
+      sql-parser-cst: 0.38.2
 
   prettier-plugin-sql@0.13.0(prettier@2.8.8):
     dependencies:
@@ -34717,10 +34701,6 @@ snapshots:
       tslib: 2.8.1
 
   prettier@2.8.8: {}
-
-  prettier@3.2.4: {}
-
-  prettier@3.2.5: {}
 
   prettier@3.7.3: {}
 
@@ -36381,7 +36361,7 @@ snapshots:
       get-stdin: 8.0.0
       nearley: 2.20.1
 
-  sql-parser-cst@0.24.0: {}
+  sql-parser-cst@0.38.2: {}
 
   sql-template-strings@2.2.2: {}
 

@@ -48,8 +48,8 @@
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
-    "prettier": "3.2.4",
-    "prettier-plugin-sql-cst": "^0.11.0",
+    "prettier": "3.7.3",
+    "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^2.76.10",
@@ -68,13 +68,6 @@
     "pnpm": "10.24",
     "node": ">=22"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@10.24.0"
 }
