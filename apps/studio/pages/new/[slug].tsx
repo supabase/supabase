@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
@@ -34,7 +35,6 @@ import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { buildDefaultPrivilegesSql } from 'data/privileges/privileges.sql'
 import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import {
