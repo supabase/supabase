@@ -24,8 +24,10 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-interface DataTableSheetRowActionProps<TData, TFields extends DataTableFilterField<TData>>
-  extends ComponentPropsWithRef<typeof DropdownMenuTrigger> {
+interface DataTableSheetRowActionProps<
+  TData,
+  TFields extends DataTableFilterField<TData>,
+> extends ComponentPropsWithRef<typeof DropdownMenuTrigger> {
   fieldValue: TFields['value']
   filterFields: TFields[]
   value: string | number

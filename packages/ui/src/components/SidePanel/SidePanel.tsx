@@ -10,7 +10,8 @@ import styleHandler from '../../lib/theme/styleHandler'
 export type SidePanelProps = RadixProps & CustomProps
 
 interface RadixProps
-  extends Dialog.DialogProps,
+  extends
+    Dialog.DialogProps,
     Pick<
       Dialog.DialogContentProps,
       | 'onOpenAutoFocus'

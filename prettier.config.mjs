@@ -6,6 +6,8 @@ let options = {
   printWidth: 100,
   endOfLine: 'lf',
   sqlKeywordCase: 'lower',
+  sqlLiteralCase: 'lower',
+  sqlTypeCase: 'lower',
   plugins: ['prettier-plugin-sql-cst'],
   overrides: [
     {

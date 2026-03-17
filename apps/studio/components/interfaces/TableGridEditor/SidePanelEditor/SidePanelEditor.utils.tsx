@@ -725,7 +725,7 @@ export const createTable = async ({
       async (span) => {
         const rowCount = importContent.file
           ? importContent.rowCount
-          : importContent.rows?.length ?? 0
+          : (importContent.rows?.length ?? 0)
         span.setAttribute('import.row_count', rowCount)
         span.setAttribute('import.method', importContent.file ? 'csv' : 'paste')
 

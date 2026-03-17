@@ -141,7 +141,7 @@ const Wizard: NextPageWithLayout = () => {
   // an in-between render, but watchedInstanceSize is still undefined from the
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
-  const instanceSize = canChooseInstanceSize ? watchedInstanceSize ?? sizes[0] : undefined
+  const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
 
   const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
     { slug },
@@ -227,7 +227,7 @@ const Wizard: NextPageWithLayout = () => {
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {
       cloudProvider: cloudProvider as CloudProvider,
-      dbRegion: smartRegionEnabled ? dbRegionExact : dbRegion ?? '',
+      dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
     },
     { enabled: currentOrg !== null }
@@ -304,7 +304,7 @@ const Wizard: NextPageWithLayout = () => {
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
     const selectedRegion = smartRegionEnabled
-      ? smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
 
     const data: ProjectCreateVariables = {

@@ -71,7 +71,7 @@ export function useQueryInsightsTableColumns({
         name: col.name,
         cellClass: `column-${col.id}`,
         resizable: true,
-        minWidth: col.id === 'prop_total_time' ? timeConsumedWidth : col.minWidth ?? 120,
+        minWidth: col.id === 'prop_total_time' ? timeConsumedWidth : (col.minWidth ?? 120),
         sortable: isSortable,
         headerCellClass: 'first:pl-6 cursor-pointer',
         renderHeaderCell: () => {

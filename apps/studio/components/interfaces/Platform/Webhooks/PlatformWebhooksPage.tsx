@@ -112,7 +112,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   )
   const isEndpointView = !!selectedEndpoint
   const headerTitle = isEndpointView ? 'Endpoint' : scopeLabel
-  const headerDescription = isEndpointView ? selectedEndpoint?.url ?? '' : scopeDescription
+  const headerDescription = isEndpointView ? (selectedEndpoint?.url ?? '') : scopeDescription
 
   const endpointPendingDelete = useMemo(
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
@@ -380,7 +380,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         mode={panel === 'create' ? 'create' : 'edit'}
         scope={scope}
         orgSlug={scope === 'project' ? selectedOrganization?.slug : undefined}
-        endpoint={panel === 'edit' ? selectedEndpoint ?? undefined : undefined}
+        endpoint={panel === 'edit' ? (selectedEndpoint ?? undefined) : undefined}
         enabledOverride={panel === 'edit' ? editEnabledOverride : null}
         eventTypes={eventTypeOptions}
         onClose={() => {
