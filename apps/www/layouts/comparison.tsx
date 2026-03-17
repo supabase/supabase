@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
-
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { generateReadingTime } from '~/lib/helpers'
@@ -78,7 +77,7 @@ const LayoutComparison = ({ components, props }: Props) => {
             }),
           },
           images: (() => {
-            const img = props.blog.imgSocial
+            const img = props.blog.imgSocial || props.blog.imgThumb
             if (!img) return []
             const url =
               img.startsWith('/') || img.startsWith('http')
