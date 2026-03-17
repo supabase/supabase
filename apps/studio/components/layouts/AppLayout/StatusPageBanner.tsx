@@ -16,5 +16,12 @@ export const StatusPageBanner = () => {
 
   if (!banner) return null
 
-  return <HeaderBanner variant="warning" title={banner.title} description={BANNER_DESCRIPTION} />
+  return (
+    <HeaderBanner
+      variant="warning"
+      title={banner.title}
+      description={BANNER_DESCRIPTION}
+      onDismiss={banner.dismiss}
+    />
+  )
 }

@@ -114,8 +114,8 @@ export const ChartBar = ({
   const yAxisConfig = {
     tick: showYAxis,
     hide: !showYAxis,
-    tickMargin: showYAxis ? YAxisProps?.tickMargin ?? 4 : 0,
-    width: showYAxis ? YAxisProps?.width ?? undefined : 0,
+    tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
+    width: showYAxis ? (YAxisProps?.width ?? undefined) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,

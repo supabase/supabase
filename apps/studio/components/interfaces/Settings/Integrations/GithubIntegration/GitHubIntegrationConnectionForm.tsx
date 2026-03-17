@@ -50,6 +50,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -79,8 +80,10 @@ const GitHubIntegrationConnectionForm = ({
   const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !selectedProject?.parent_project_ref
 
-  const isProPlanAndUp = selectedOrganization?.plan?.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+  const { hasAccess: hasAccessToGitHubIntegration, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('integrations.github_connections')
+  const promptProPlanUpgrade =
+    IS_PLATFORM && !isLoadingEntitlements && !hasAccessToGitHubIntegration
 
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -425,7 +428,8 @@ const GitHubIntegrationConnectionForm = ({
     )
   }
 
-  const isLoading = isCreatingConnection || isUpdatingConnection || isDeletingConnection
+  const isLoading =
+    isLoadingEntitlements || isCreatingConnection || isUpdatingConnection || isDeletingConnection
 
   return (
     <>

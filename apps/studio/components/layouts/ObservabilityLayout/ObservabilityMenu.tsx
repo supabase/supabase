@@ -16,10 +16,11 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Fragment, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import type { Dashboards } from 'types'
-import { Menu, cn } from 'ui'
+import { cn, Menu } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
 
@@ -29,15 +30,10 @@ const ObservabilityMenu = () => {
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
   const showOverview = useFlag('observabilityOverview')
-  const authEnabled = useFlag('authreportv2')
-  const edgeFnEnabled = useFlag('edgefunctionreport')
-  const realtimeEnabled = useFlag('realtimeReport')
-  const storageReportEnabled = useFlag('storagereport')
-  const postgrestReportEnabled = useFlag('postgrestreport')
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
-  const storageEnabled = storageReportEnabled && storageSupported
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -142,11 +138,21 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-        },
+        ...(isSupamonitorEnabled
+          ? [
+              {
+                name: 'Query Insights',
+                key: 'query-insights',
+                url: `/project/${ref}/observability/query-insights${preservedQueryParams}`,
+              },
+            ]
+          : [
+              {
+                name: 'Query Performance',
+                key: 'query-performance',
+                url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
+              },
+            ]),
         ...(IS_PLATFORM
           ? [
               {
@@ -162,43 +168,27 @@ const ObservabilityMenu = () => {
       title: 'PRODUCT',
       key: 'product-section',
       items: [
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'Database',
-                key: 'database',
-                url: `/project/${ref}/observability/database${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(postgrestReportEnabled
-          ? [
-              {
-                name: 'Data API',
-                key: 'postgrest',
-                url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(authEnabled
-          ? [
-              {
-                name: 'Auth',
-                key: 'auth',
-                url: `/project/${ref}/observability/auth${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(edgeFnEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'edge-functions',
-                url: `/project/${ref}/observability/edge-functions${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(storageEnabled
+        {
+          name: 'Database',
+          key: 'database',
+          url: `/project/${ref}/observability/database${preservedQueryParams}`,
+        },
+        {
+          name: 'Data API',
+          key: 'postgrest',
+          url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
+        },
+        {
+          name: 'Auth',
+          key: 'auth',
+          url: `/project/${ref}/observability/auth${preservedQueryParams}`,
+        },
+        {
+          name: 'Edge Functions',
+          key: 'edge-functions',
+          url: `/project/${ref}/observability/edge-functions${preservedQueryParams}`,
+        },
+        ...(storageSupported
           ? [
               {
                 name: 'Storage',
@@ -207,15 +197,11 @@ const ObservabilityMenu = () => {
               },
             ]
           : []),
-        ...(realtimeEnabled
-          ? [
-              {
-                name: 'Realtime',
-                key: 'realtime',
-                url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Realtime',
+          key: 'realtime',
+          url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
+        },
       ],
     },
   ]

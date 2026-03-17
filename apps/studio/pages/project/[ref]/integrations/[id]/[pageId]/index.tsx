@@ -1,11 +1,10 @@
-import { useFlag, useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
+import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
@@ -16,6 +15,7 @@ import {
   BreadcrumbList_Shadcn_ as BreadcrumbList,
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  Button,
   NavMenu,
   NavMenuItem,
 } from 'ui'
@@ -33,7 +33,10 @@ import {
   PageSection,
   PageSectionContent,
 } from 'ui-patterns'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
 
 type NavigationItem = { label: string; href: string; active?: boolean }
 
@@ -41,13 +44,16 @@ const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
 
-  const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
-    useInstalledIntegrations()
+  const { data: allIntegrations, isPending: isAvailableIntegrationsLoading } =
+    useAvailableIntegrations()
+  const {
+    installedIntegrations: installedIntegrations,
+    isLoading: isInstalledIntegrationsLoading,
+  } = useInstalledIntegrations()
 
   // everything is wrapped in useMemo to avoid UI resets when installing additional extensions like pg_net
-  const integration = useMemo(() => INTEGRATIONS.find((i) => i.id === id), [id])
+  const integration = useMemo(() => allIntegrations.find((i) => i.id === id), [allIntegrations, id])
 
   const installation = useMemo(
     () => installedIntegrations.find((inst) => inst.id === id),
@@ -84,13 +90,13 @@ const IntegrationPage: NextPageWithLayout = () => {
     if (
       router &&
       router?.isReady &&
-      !isIntegrationsLoading &&
+      !isInstalledIntegrationsLoading &&
       !installation &&
       pageId !== 'overview'
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isIntegrationsLoading, pageId, router, ref, id])
+  }, [installation, isInstalledIntegrationsLoading, pageId, router, ref, id])
 
   // Determine page title, icon, and subtitle based on state
   const pageTitle = integration?.name || 'Integration not found'
@@ -100,14 +106,14 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   // Get integration icon and subtitle
   const pageIcon = integration ? (
-    <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
+    <div className="shrink-0 w-14 h-14 relative bg-white border rounded-md flex items-center justify-center">
       {integration.icon()}
     </div>
   ) : null
 
   // Determine content based on state
   const content = useMemo(() => {
-    if (!router?.isReady || isIntegrationsLoading) {
+    if (!router?.isReady || isInstalledIntegrationsLoading || isAvailableIntegrationsLoading) {
       return (
         <PageContainer size="full">
           <PageSection>
@@ -119,29 +125,30 @@ const IntegrationPage: NextPageWithLayout = () => {
       )
     } else if (!Component || !id || !integration) {
       return (
-        <PageSection>
-          <PageSectionContent>
-            <Admonition type="warning" title="This integration is not currently available">
-              Please try again later or contact support if the problem persists.
-            </Admonition>
-          </PageSectionContent>
-        </PageSection>
+        <PageContainer size="full">
+          <PageSection>
+            <PageSectionContent>
+              <Admonition type="warning" title="This integration is not currently available">
+                Please try again later or contact support if the problem persists.
+              </Admonition>
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
       )
     } else {
       return <Component />
     }
-  }, [router?.isReady, isIntegrationsLoading, id, integration, Component])
+  }, [
+    router?.isReady,
+    isInstalledIntegrationsLoading,
+    isAvailableIntegrationsLoading,
+    id,
+    integration,
+    Component,
+  ])
 
   if (!router?.isReady) {
     return null
-  }
-
-  if (id === 'data_api' && !IS_PLATFORM) {
-    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
-  }
-
-  if (id === 'stripe_sync_engine' && !stripeSyncEnabled) {
-    return <UnknownInterface urlBack={`/project/${ref}/integrations`} />
   }
 
   if (!integrationsWrappers && id?.endsWith('_wrapper')) {
@@ -164,13 +171,36 @@ const IntegrationPage: NextPageWithLayout = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </PageHeaderBreadcrumb>
-        <PageHeaderMeta>
-          {pageIcon && <PageHeaderIcon>{pageIcon}</PageHeaderIcon>}
-          <PageHeaderSummary>
-            <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
-            <PageHeaderDescription>{pageSubTitle}</PageHeaderDescription>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
+
+        {isAvailableIntegrationsLoading ? (
+          <PageHeaderMeta>
+            <PageHeaderSummary>
+              <PageHeaderTitle>
+                <ShimmeringLoader className="w-64 py-4" />
+              </PageHeaderTitle>
+              <PageHeaderDescription>
+                <ShimmeringLoader />
+              </PageHeaderDescription>
+            </PageHeaderSummary>
+          </PageHeaderMeta>
+        ) : (
+          <PageHeaderMeta>
+            {pageIcon && <PageHeaderIcon>{pageIcon}</PageHeaderIcon>}
+            <PageHeaderSummary className="truncate gap-y-0.5">
+              <PageHeaderTitle>{pageTitle}</PageHeaderTitle>
+              <PageHeaderDescription className="truncate">{pageSubTitle}</PageHeaderDescription>
+            </PageHeaderSummary>
+
+            {integration?.type === 'oauth' && (
+              <Button asChild type="primary" className="shrink-0">
+                <a target="_blank" rel="noreferrer" href={integration.siteUrl ?? '/'}>
+                  Install integration
+                </a>
+              </Button>
+            )}
+          </PageHeaderMeta>
+        )}
+
         {navigationItems.length > 0 && (
           <PageHeaderNavigationTabs>
             <NavMenu>
@@ -191,7 +221,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <IntegrationsLayout>{page}</IntegrationsLayout>
+    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
   </DefaultLayout>
 )
 

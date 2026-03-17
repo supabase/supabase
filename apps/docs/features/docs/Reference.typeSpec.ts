@@ -58,7 +58,14 @@ interface Comment {
   shortText?: string
   text?: string
   tags?: Array<{ tag: string; text: string }>
-  examples?: Array<{ id: string; name: string; code: string; response?: string }>
+  examples?: Array<{
+    id: string
+    name: string
+    code: string
+    description?: string
+    response?: string
+    data?: { sql: string }
+  }>
 }
 
 export interface FunctionParameterType {
@@ -242,33 +249,75 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
     comment.tags = original.modifierTags.map((tag) => ({ tag: tag.replace(/^@/, ''), text: '' }))
   }
 
+  if ('blockTags' in original && Array.isArray(original.blockTags)) {
+    const remarksTag = original.blockTags.find((t) => t.tag === '@remarks')
+    if (remarksTag) {
+      comment.text = remarksTag.content.map((p) => p.text).join('')
+    }
+  }
+
   // Extract @example tags from blockTags
   if ('blockTags' in original && Array.isArray(original.blockTags)) {
-    const exampleTags = original.blockTags.filter((tag) => tag.tag === '@example')
+    const exampleTags = original.blockTags.filter((t) => t.tag === '@example')
+    // Helper: companion tags (e.g. @exampleDescription) may have no TypeDoc
+    // `name` field; the example name is then the first line of content.
+    function deconstructTag(t: CommentBlockTag): [name: string, body: string] {
+      if (t.name) {
+        return [t.name, t.content.map((p) => p.text).join('')]
+      }
+      const first = t.content[0]
+      // TypeDoc may produce a tag with an empty content array (e.g. a tag with
+      // no body text). Guard here so the rest of the parsing can safely assume
+      // a non-empty first element.
+      if (!first) return ['', '']
+      const newline = first.text.indexOf('\n')
+      const name = (newline >= 0 ? first.text.slice(0, newline) : first.text).trim()
+      const tail = newline >= 0 ? first.text.slice(newline + 1) : ''
+      const body = [{ ...first, text: tail }, ...t.content.slice(1)].map((p) => p.text).join('')
+      return [name, body]
+    }
+
+    const descByName = Object.fromEntries(
+      original.blockTags
+        .filter((t) => t.tag === '@exampleDescription')
+        .map((t) => deconstructTag(t))
+    )
+    const sqlByName = Object.fromEntries(
+      original.blockTags.filter((t) => t.tag === '@exampleSql').map((t) => deconstructTag(t))
+    )
+    const respByName = Object.fromEntries(
+      original.blockTags.filter((t) => t.tag === '@exampleResponse').map((t) => deconstructTag(t))
+    )
+
     if (exampleTags.length > 0) {
       comment.examples = exampleTags.map((tag, index) => {
-        // Use the name if provided, otherwise generate a default name
         const name = tag.name || `Example ${index + 1}`
-        // Convert name to kebab-case for id
         const id = name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-|-$/g, '')
-        // Join content to get the full text
-        const fullText = tag.content.map((part) => part.text).join('')
+        const fullCode = tag.content.map((p) => p.text).join('')
 
-        // Check if there's a "Response:" section and split it
-        const responseMatch = fullText.match(/\n\s*Response:\s*\n/i)
-        let code = fullText
-        let response: string | undefined = undefined
-
-        if (responseMatch) {
-          const splitIndex = responseMatch.index! + responseMatch[0].length
-          code = fullText.substring(0, responseMatch.index!).trim()
-          response = fullText.substring(splitIndex).trim()
+        // Prefer structured @exampleResponse tag; fall back to legacy inline "Response:" split
+        // for methods not yet migrated to the new JSDoc format.
+        let code = fullCode
+        let response: string | undefined = respByName[name] || undefined
+        if (!response) {
+          const match = fullCode.match(/\n\nResponse:\n/)
+          if (match && match.index !== undefined) {
+            code = fullCode.slice(0, match.index)
+            response = fullCode.slice(match.index + match[0].length)
+          }
         }
 
-        return { id, name, code, response }
+        return {
+          id,
+          name,
+          code,
+          description: descByName[name] || undefined,
+          data: sqlByName[name] ? { sql: sqlByName[name] } : undefined,
+          response,
+        }
       })
     }
   }
@@ -487,7 +536,13 @@ function parseMethod(
   const signature = node.signatures[0]
   if (!signature) return
 
-  const { params, ret, comment } = parseSignature(signature, map)
+  let { params, ret, comment } = parseSignature(signature, map)
+
+  // When a method has multiple overload signatures, TypeDoc places the shared
+  // JSDoc on the method node rather than any individual signature.
+  if (!comment && node.comment) {
+    comment = normalizeComment(node.comment)
+  }
 
   const types: MethodTypes = {
     name: $ref,

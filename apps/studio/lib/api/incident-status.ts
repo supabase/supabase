@@ -6,6 +6,8 @@ import { InternalServerError } from 'lib/api/apiHelpers'
 export type IncidentCache = {
   affected_regions: Array<string> | null
   affects_project_creation: boolean
+  /** When true, the banner is shown unconditionally regardless of regions or project state. */
+  force?: boolean
 }
 
 export type IncidentMetadata = {
@@ -85,9 +87,11 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
   const responseText = await response.text()
 
   if (!response.ok) {
+    const retryAfter = response.headers.get('Retry-After') ?? undefined
     throw new InternalServerError(`StatusPage API responded with ${response.status}`, {
       status: response.status,
       body: responseText,
+      ...(retryAfter !== undefined && { retryAfter }),
     })
   }
 

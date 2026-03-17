@@ -28,11 +28,11 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
     showApiKey !== 'SUPABASE_KEY'
-      ? anonKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
+      ? (anonKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY')
       : 'SUPABASE_CLIENT_API_KEY'
   const serviceApiKey =
     showApiKey !== 'SUPABASE_KEY'
-      ? serviceKey?.api_key ?? 'SUPABASE_SERVICE_KEY'
+      ? (serviceKey?.api_key ?? 'SUPABASE_SERVICE_KEY')
       : 'SUPABASE_SERVICE_KEY'
 
   return (

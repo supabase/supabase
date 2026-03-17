@@ -6,7 +6,7 @@ import {
   findStripeSchema,
   isInProgress,
   isInstalled,
-  parseStripeSchemaStatus,
+  parseStripeSchema,
   type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
@@ -30,10 +30,10 @@ export function useStripeSyncStatus({
 
   // Find and parse stripe schema status
   const stripeSchema = findStripeSchema(schemas)
-  const installationStatus = parseStripeSchemaStatus(stripeSchema)
+  const parsedSchema = parseStripeSchema(stripeSchema)
 
-  const installed = isInstalled(installationStatus)
-  const inProgress = isInProgress(installationStatus)
+  const installed = isInstalled(parsedSchema.status)
+  const inProgress = isInProgress(parsedSchema.status)
 
   // Poll schemas during install/uninstall operations
   useEffect(() => {
@@ -58,7 +58,7 @@ export function useStripeSyncStatus({
   )
 
   return {
-    installationStatus,
+    parsedSchema,
     syncState: installed ? syncState : undefined,
     isLoading: isSchemasLoading,
   }

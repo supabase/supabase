@@ -196,7 +196,7 @@ export const StorageReport: NextPageWithLayout = () => {
 
 StorageReport.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout>{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Storage">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

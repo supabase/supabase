@@ -100,6 +100,7 @@ export class ResponseError extends Error {
   retryAfter?: number
   requestPathname?: string
   metadata?: CostMetadata
+  errorType?: string
 
   constructor(
     message: string | undefined,

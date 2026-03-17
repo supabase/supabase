@@ -38,7 +38,7 @@ const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
 
 DatabaseEnumeratedTypes.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Enumerated Types">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
