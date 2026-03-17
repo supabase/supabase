@@ -112,6 +112,7 @@ module.exports.getCSP = function getCSP() {
     SUPABASE_ASSETS_URL,
     STAPE_URL,
     POSTHOG_URL,
+    USERCENTRICS_URLS,
   ]
   const FRAME_SRC_URLS = [
     HCAPTCHA_ASSET_URL,
