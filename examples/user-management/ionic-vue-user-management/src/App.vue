@@ -12,8 +12,8 @@ import { supabase } from './supabase';
 
 const router = useIonRouter();
 
-supabase.auth.getUser().then(({ data: { user } }) => {
-  store.user = user;
+supabase.auth.getClaims().then(({ data: { claims } }) => {
+  store.user = claims;
 });
 
 const {

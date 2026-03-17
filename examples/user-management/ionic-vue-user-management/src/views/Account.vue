@@ -80,13 +80,13 @@ async function getProfile() {
   const toast = await toastController.create({ duration: 5000 });
   await loader.present();
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No user logged in');
+    const { data: { claims } } = await supabase.auth.getClaims();
+    if (!claims) throw new Error('No user logged in');
 
     const { data, error, status } = await supabase
       .from('profiles')
       .select(`username, website, avatar_url`)
-      .eq('id', user.id)
+      .eq('id', claims.sub)
       .single();
 
     if (error && status !== 406) throw error;
@@ -111,11 +111,11 @@ const updateProfile = async () => {
   const toast = await toastController.create({ duration: 5000 });
   try {
     await loader.present();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('No user logged in');
+    const { data: { claims } } = await supabase.auth.getClaims();
+    if (!claims) throw new Error('No user logged in');
 
     const updates = {
-      id: user.id,
+      id: claims.sub,
       ...profile.value,
       updated_at: new Date(),
     };
