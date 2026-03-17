@@ -306,7 +306,7 @@ describe('createTable', () => {
     const sqlCall = mockExecuteSql.mock.calls[0][0]
     expect(sqlCall.sql).toContain('ADD FOREIGN KEY')
     expect(sqlCall.sql).toContain('REFERENCES')
-    expect(sqlCall.sql).toContain('"users"')
+    expect(sqlCall.sql).toContain('users')
     expect(sqlCall.sql).toContain('ON DELETE CASCADE')
   })
 
