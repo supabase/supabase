@@ -10,11 +10,9 @@ type ValidationWarn = (message?: unknown, ...optionalParams: unknown[]) => void
 const warnedBlogImageIssues = new Set<string>()
 
 export const BLOG_PLACEHOLDER_IMAGE = '/images/blog/blog-placeholder.png'
-export const BLOG_GRID_IMAGE_SIZES =
-  '(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 33vw'
+export const BLOG_GRID_IMAGE_SIZES = '(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 33vw'
 export const BLOG_FEATURED_IMAGE_SIZES = '(max-width: 1023px) 100vw, 42vw'
-export const BLOG_POST_HERO_IMAGE_SIZES =
-  '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+export const BLOG_POST_HERO_IMAGE_SIZES = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
 
 function isAbsoluteUrl(image: string) {
   return image.startsWith('http://') || image.startsWith('https://')

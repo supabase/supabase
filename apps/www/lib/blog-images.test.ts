@@ -69,9 +69,7 @@ describe('blog image helpers', () => {
       warn
     )
 
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining('missing "imgSocial"')
-    )
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('missing "imgSocial"'))
   })
 
   it('warns when a blog image uses the prefixed public path', () => {

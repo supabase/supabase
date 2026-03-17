@@ -12,10 +12,7 @@ import type { ComponentType } from 'react'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
-import {
-  BLOG_POST_HERO_IMAGE_SIZES,
-  getBlogThumbnailImage,
-} from '@/lib/blog-images'
+import { BLOG_POST_HERO_IMAGE_SIZES, getBlogThumbnailImage } from '@/lib/blog-images'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 
 const ShareArticleActions = dynamic(() => import('@/components/Blog/ShareArticleActions'))

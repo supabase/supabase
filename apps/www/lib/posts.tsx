@@ -68,10 +68,7 @@ export const getSortedPosts = ({
       }
 
       if (directory === '_blog') {
-        validateBlogFrontmatterImages(
-          data as { imgSocial?: string; imgThumb?: string },
-          fullPath
-        )
+        validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
       }
 
       const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
@@ -180,10 +177,7 @@ export const getPostdata = async (slug: string, directory: string) => {
 
   if (directory === '_blog') {
     const { data } = matter(postContent) as unknown as { data: { [key: string]: any } }
-    validateBlogFrontmatterImages(
-      data as { imgSocial?: string; imgThumb?: string },
-      fullPath
-    )
+    validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
   }
 
   return postContent
