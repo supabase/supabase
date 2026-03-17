@@ -76,8 +76,6 @@ const routesToIgnorePostgrestConnection = [
 ]
 
 export interface ProjectLayoutProps {
-  /** @deprecated Use browserTitle.section instead. */
-  title?: string
   isLoading?: boolean
   isBlocking?: boolean
   product?: string
@@ -85,7 +83,6 @@ export interface ProjectLayoutProps {
   browserTitle?: {
     entity?: string
     section?: string
-    surface?: string
     override?: string
   }
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
@@ -97,7 +94,6 @@ export interface ProjectLayoutProps {
 export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
   (
     {
-      title,
       isLoading = false,
       isBlocking = true,
       product = '',
@@ -140,8 +136,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       browserTitle?.override ||
       buildStudioPageTitle({
         entity: browserTitle?.entity ?? selectedTable,
-        section: browserTitle?.section ?? title,
-        surface: browserTitle?.surface ?? product,
+        section: browserTitle?.section,
+        surface: product,
         project: projectName,
         org: organizationName,
         brand: brandTitle,

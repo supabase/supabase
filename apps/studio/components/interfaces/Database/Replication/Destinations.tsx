@@ -56,7 +56,7 @@ export const Destinations = () => {
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
 
   const [_, setDestinationType] = useQueryState(
-    'type',
+    'destinationType',
     parseAsStringEnum<DestinationType>([
       'Read Replica',
       'BigQuery',
