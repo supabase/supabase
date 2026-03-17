@@ -324,8 +324,8 @@ describe('useConnectState', () => {
       const { result } = renderHook(() => useConnectState({ mode: 'mcp' }))
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
-      // MCP mode should have configure step
-      expect(stepIds.some((id) => id.includes('configure') || id.includes('mcp'))).toBe(true)
+      // MCP mode (defaults to claude-code) should have claude-add-server step
+      expect(stepIds.some((id) => id.includes('claude') || id.includes('mcp'))).toBe(true)
     })
 
     test('should resolve different steps for different mcp clients', () => {

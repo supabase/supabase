@@ -27,6 +27,7 @@ const page: GoPageInput = {
       type: 'feature-grid',
       title: 'Your cloud, operated by Supabase',
       description: 'Get the full power of Supabase deployed inside your own infrastructure.',
+      columns: 2,
       items: [
         {
           title: 'Control where your data goes',
@@ -55,7 +56,7 @@ const page: GoPageInput = {
       id: 'form',
       title: 'Early Access Request Form',
       description:
-        "If you are interested in participating in BYOC early access when it becomes available later in 2026, please fill out the form below. A member of the Supabase team will reach out if you've been selected.",
+        "If you are interested in participating in BYOC early access when it becomes available, please fill out the form below. A member of the Supabase team will reach out if you've been selected.",
       fields: [
         {
           type: 'text',

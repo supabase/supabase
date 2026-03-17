@@ -4,7 +4,7 @@ import type { LogData } from '../Logs.types'
 import { ResponseCodeFormatter, RowLayout, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
-import { ErrorCodeTooltip } from '../ErrorCodeTooltip'
+import { ErrorCodeTooltip } from 'components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 
 const columns: Column<LogData>[] = [
   {

@@ -1,5 +1,4 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
@@ -329,15 +328,10 @@ export const TableEditor = ({
 
   if (!tableFields) return null
 
-  const isExposed = isApiGrantTogglesEnabled
-    ? !!apiAccessToggleHandler.data?.schemaExposed &&
-      checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data.privileges)
-    : undefined
-
   return (
     <SidePanel
       data-testid="table-editor-side-panel"
-      size="large"
+      size="xlarge"
       key="TableEditor"
       visible={visible}
       header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
@@ -358,6 +352,7 @@ export const TableEditor = ({
         <Input
           data-testid="table-name-input"
           label="Name"
+          id="name"
           layout="horizontal"
           type="text"
           error={errors.name ? String(errors.name) : undefined}
@@ -366,6 +361,7 @@ export const TableEditor = ({
         />
         <Input
           label="Description"
+          id="description"
           placeholder="Optional"
           layout="horizontal"
           type="text"

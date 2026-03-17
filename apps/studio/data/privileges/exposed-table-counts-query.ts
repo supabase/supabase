@@ -1,9 +1,9 @@
+import { getExposedTableCountsSql } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
 import { privilegeKeys } from './keys'
-import { getExposedTableCountsSql } from './privileges.sql'
 
 export type ExposedTableCountsVariables = {
   projectRef?: string

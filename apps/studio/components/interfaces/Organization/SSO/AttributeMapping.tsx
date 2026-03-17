@@ -104,10 +104,10 @@ export const AttributeMapping = ({
   function applyPreset(preset: ProviderPreset) {
     const keys = preset.attributeMapping.keys
     // Set each field if present in the preset, otherwise clear
-    form.setValue(emailField, [{ value: keys.email?.name ?? '' }])
-    form.setValue(userNameField, [{ value: keys.user_name?.name ?? '' }])
-    form.setValue(firstNameField, [{ value: keys.first_name?.name ?? '' }])
-    form.setValue(lastNameField, [{ value: keys.last_name?.name ?? '' }])
+    form.setValue(emailField, [{ value: keys.email?.name ?? '' }], { shouldDirty: true })
+    form.setValue(userNameField, [{ value: keys.user_name?.name ?? '' }], { shouldDirty: true })
+    form.setValue(firstNameField, [{ value: keys.first_name?.name ?? '' }], { shouldDirty: true })
+    form.setValue(lastNameField, [{ value: keys.last_name?.name ?? '' }], { shouldDirty: true })
   }
 
   return (

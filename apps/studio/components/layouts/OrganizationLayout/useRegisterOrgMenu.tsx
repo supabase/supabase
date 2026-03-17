@@ -3,8 +3,8 @@
 import { useRouter } from 'next/router'
 import { useLayoutEffect } from 'react'
 
+import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { OrgMenuContent } from '../ProjectLayout/LayoutHeader/MobileMenuContent/OrgMenuContent'
-import { useMobileSheet } from '../ProjectLayout/NavigationBar/MobileSheetContext'
 import { getPathnameWithoutQuery, isOrgMenuScope } from './OrganizationLayout.utils'
 
 /**

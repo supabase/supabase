@@ -59,6 +59,14 @@ describe('useGenerateSettingsMenu', () => {
     expect(hasWebhooks).toBe(false)
   })
 
+  it('does not include members link in project settings navigation', () => {
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
+    const hasMembers = configurationGroup?.items.some((item) => item.name === 'Members')
+
+    expect(hasMembers).toBe(false)
+  })
+
   it('includes dashboard preferences when flag is enabled', () => {
     vi.mocked(useFlag).mockReturnValue(true)
 

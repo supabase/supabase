@@ -6,6 +6,7 @@ import { ComponentProps } from 'react'
 import { Button, cn } from 'ui'
 
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface ConnectButtonProps {
   buttonType?: ComponentProps<typeof Button>['type']
@@ -14,6 +15,7 @@ interface ConnectButtonProps {
 
 export const ConnectButton = ({ buttonType = 'default', className }: ConnectButtonProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
+  const { setConnectSheetSource } = useAppStateSnapshot()
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
@@ -24,7 +26,10 @@ export const ConnectButton = ({ buttonType = 'default', className }: ConnectButt
       disabled={!isActiveHealthy}
       className={cn('rounded-full', className)}
       icon={<Plug className="rotate-90" />}
-      onClick={() => setShowConnect(true)}
+      onClick={() => {
+        setConnectSheetSource('header_button')
+        setShowConnect(true)
+      }}
       tooltip={{
         content: {
           side: 'bottom',

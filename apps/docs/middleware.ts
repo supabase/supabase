@@ -11,9 +11,12 @@ const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
 
+  const requestsMarkdown =
+    request.headers.get('Accept')?.includes('text/markdown') || url.pathname.endsWith('.md')
+
   // Serve pre-generated .md files before the [[...slug]] page route can intercept them
-  if (url.pathname.startsWith(GUIDES_PATH + '/') && url.pathname.endsWith('.md')) {
-    const slug = url.pathname.slice(GUIDES_PATH.length + 1, -'.md'.length)
+  if (url.pathname.startsWith(GUIDES_PATH + '/') && requestsMarkdown) {
+    const slug = url.pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
     const rewriteUrl = new URL(url)
     rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
     return NextResponse.rewrite(rewriteUrl)

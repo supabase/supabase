@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**/*", "!.next/dev/**/*"]
     },
     "design-system#build": {
       "dependsOn": ["^build"],
@@ -20,7 +20,7 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },
     "studio#build": {
       "dependsOn": ["^build"],
@@ -70,6 +70,9 @@
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
+        "PGRST_DB_SCHEMAS",
+        "PGRST_DB_MAX_ROWS",
+        "PGRST_DB_EXTRA_SEARCH_PATH",
         "POSTGRES_PASSWORD",
         "POSTGRES_HOST",
         "POSTGRES_USER_READ_WRITE",
@@ -113,6 +116,7 @@
         "SUPPORT_SUPABASE_SECRET_KEY",
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
+        "INCIDENT_IO_API_KEY",
 		"LIVE_SUPABASE_SECRET_KEY"
       ],
       "passThroughEnv": [
@@ -122,7 +126,7 @@
         "SNIPPETS_MANAGEMENT_FOLDER",
         "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
       ],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"]
     },
     "www#build": {
       "dependsOn": ["^build"],
@@ -194,7 +198,7 @@
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },
     "ui-library#build": {
       "dependsOn": ["^build"],
@@ -219,7 +223,7 @@
         "SUPABASE_MANAGEMENT_API_TOKEN",
         "OPENAI_API_KEY"
       ],
-      "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },
     "lint": {
       "outputs": []
