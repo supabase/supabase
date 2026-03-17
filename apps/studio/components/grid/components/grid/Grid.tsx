@@ -97,8 +97,10 @@ export const Grid = memo(
 
       const { mutate: sendEvent } = useSendEventMutation()
 
+      const isEditable = snap.editable
+
       const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
-        enabled: isTableEmpty && !isForeignTable,
+        enabled: isTableEmpty && !isForeignTable && isEditable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
           sendEvent({
@@ -278,7 +280,7 @@ export const Grid = memo(
                             started.
                           </p>
                         </div>
-                      ) : (
+                      ) : isEditable ? (
                         <div className="flex flex-col items-center gap-4 mt-4">
                           <Button
                             type="default"
@@ -301,7 +303,7 @@ export const Grid = memo(
                             or drag and drop a CSV file here
                           </p>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center">
