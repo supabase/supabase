@@ -130,7 +130,7 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        'Insert some sample rows into the messages table. Use the content: "We\'ll be in touch soon", "Don\'t hesitate to ask", and "It\'s a great day"',
+        'Insert some sample rows into the messages table. Use the content: "We\'ll be in touch soon", "Don\'t hesitate to ask", and "It\'s a great day". Escape apostrophes in SQL string literals using a backslash (e.g. \'We\\\'ll\').',
       mockTables: {
         public: [
           {
@@ -150,7 +150,7 @@ export const dataset: AssistantEvalCase[] = [
     metadata: {
       category: ['sql_generation'],
       description:
-        "Verifies apostrophes in SQL string literals are properly escaped (e.g., 'We''ll' not 'We'll')",
+        "Adversarial check to verify Assistant recovers from MySQL-style backslash escapes (\\') and converts them to PostgreSQL double-apostrophes ('') before execution",
     },
   },
 ]
