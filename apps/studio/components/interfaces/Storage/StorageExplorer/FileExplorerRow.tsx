@@ -10,6 +10,7 @@ import {
   Edit,
   File,
   Film,
+  FolderOpen,
   Image,
   LoaderCircle,
   MoreVertical,
@@ -53,11 +54,13 @@ export const RowIcon = ({
   view,
   status,
   fileType,
+  isOpened = false,
   mimeType,
 }: {
   view: STORAGE_VIEWS
   status: STORAGE_ROW_STATUS
   fileType: string
+  isOpened?: boolean
   mimeType: string | undefined
 }) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
@@ -67,22 +70,26 @@ export const RowIcon = ({
   }
 
   if (fileType === STORAGE_ROW_TYPES.FOLDER) {
-    return <FilesBucketIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
+    return isOpened ? (
+      <FolderOpen size={16} strokeWidth={2} className="text-foreground-lighter" />
+    ) : (
+      <FilesBucketIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
+    )
   }
 
   if (mimeType?.includes('image')) {
-    return <Image size={14} className="text-foreground-lighter" />
+    return <Image size={16} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={2} />
+    return <Music size={16} strokeWidth={2} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={2} />
+    return <Film size={16} strokeWidth={2} className="text-foreground-lighter" />
   }
 
-  return <File size={16} strokeWidth={2} />
+  return <File size={16} strokeWidth={2} className="text-foreground-lighter" />
 }
 
 interface FileExplorerRowProps {
@@ -336,6 +343,7 @@ export const FileExplorerRow = ({
                   view={view}
                   status={item.status}
                   fileType={item.type}
+                  isOpened={isOpened}
                   mimeType={item.metadata?.mimetype}
                 />
               </div>
