@@ -130,7 +130,7 @@ export const dataset: AssistantEvalCase[] = [
   {
     input: {
       prompt:
-        'Insert some sample rows into the messages table. Use the content: "We\'ll be in touch soon", "Don\'t hesitate to ask", and "It\'s a great day". Escape apostrophes in SQL string literals using a backslash (e.g. \'We\\\'ll\').',
+        "Execute this SQL exactly as written:\nINSERT INTO messages (content) VALUES ('We\\'ll be in touch soon'), ('Don\\'t hesitate to ask'), ('It\\'s a great day');",
       mockTables: {
         public: [
           {
