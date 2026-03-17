@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
+import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
@@ -19,7 +19,6 @@ import {
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { useContextMenu } from 'react-contexify'
-import SVG from 'react-inlinesvg'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
@@ -67,25 +66,12 @@ export const RowIcon = ({
     )
   }
 
-  if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
-    const iconSrc =
-      fileType === STORAGE_ROW_TYPES.BUCKET
-        ? `${BASE_PATH}/img/bucket-filled.svg`
-        : fileType === STORAGE_ROW_TYPES.FOLDER
-          ? `${BASE_PATH}/img/folder-filled.svg`
-          : `${BASE_PATH}/img/file-filled.svg`
-    return (
-      <SVG
-        src={iconSrc}
-        preProcessor={(code) =>
-          code.replace(/svg/, 'svg class="w-4 h-4 text-color-inherit opacity-75"')
-        }
-      />
-    )
+  if (fileType === STORAGE_ROW_TYPES.FOLDER) {
+    return <FilesBucketIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('image')) {
-    return <Image size={16} strokeWidth={2} />
+    return <Image size={14} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('audio')) {
@@ -175,19 +161,19 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Rename',
-                  icon: <Edit size={14} strokeWidth={1} />,
+                  icon: <Edit size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <Download size={14} strokeWidth={1} />,
+            icon: <Download size={12} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           {
             name: 'Copy path to folder',
-            icon: <Copy size={14} strokeWidth={1} />,
+            icon: <Copy size={12} className="text-foreground-light" />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -195,7 +181,7 @@ export const FileExplorerRow = ({
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  icon: <Trash2 size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -208,14 +194,14 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={14} strokeWidth={1} />,
+                        icon: <Copy size={12} className="text-foreground-light" />,
                         onClick: () => onCopyUrl(itemWithColumnIndex.name),
                       },
                     ]
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={14} strokeWidth={1} />,
+                        icon: <Copy size={12} className="text-foreground-light" />,
                         children: [
                           {
                             name: 'Expire in 1 week',
@@ -241,19 +227,19 @@ export const FileExplorerRow = ({
                     ]),
                 {
                   name: 'Download',
-                  icon: <Download size={14} strokeWidth={1} />,
+                  icon: <Download size={12} className="text-foreground-light" />,
                   onClick: () => downloadFile(itemWithColumnIndex),
                 },
                 ...(canUpdateFiles
                   ? [
                       {
                         name: 'Rename',
-                        icon: <Edit size={14} strokeWidth={1} />,
+                        icon: <Edit size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <Move size={14} strokeWidth={1} />,
+                        icon: <Move size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
@@ -265,7 +251,7 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  icon: <Trash2 size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -326,7 +312,7 @@ export const FileExplorerRow = ({
           event.stopPropagation()
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
+            item.type === STORAGE_ROW_TYPES.FOLDER
               ? openFolder(columnIndex, item)
               : onSelectFile(columnIndex)
           }
