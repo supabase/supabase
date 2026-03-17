@@ -1,14 +1,14 @@
-import { Clock5, Layers, Timer, Vault, Webhook, Receipt } from 'lucide-react'
+import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
-
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export type Navigation = {
   route: string
@@ -18,7 +18,7 @@ export type Navigation = {
   children?: Navigation[]
 }
 
-const Loading = () => (
+export const Loading = () => (
   <div className="p-10">
     <GenericSkeletonLoader />
   </div>
@@ -28,30 +28,37 @@ export type IntegrationDefinition = {
   id: string
   name: string
   status?: 'alpha' | 'beta'
+  categories?: string[]
   icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
-  description: string
-  docsUrl: string
+  description: string | null
+  content?: string | null
+  files?: string[]
+  docsUrl: string | null
+  siteUrl?: string | null
   author: {
     name: string
     websiteUrl: string
   }
-  requiredExtensions: string[]
+  requiredExtensions: Array<string>
   /** Optional component to render if the integration requires extensions that are not available on the current database image */
   missingExtensionsAlert?: ReactNode
-  navigation?: Navigation[]
+  navigation?: Array<Navigation>
   navigate: (
     id: string,
     pageId: string | undefined,
     childId: string | undefined
   ) => ComponentType<{}> | null
-} & ({ type: 'wrapper'; meta: WrapperMeta } | { type: 'postgres_extension' } | { type: 'custom' })
+} & (
+  | { type: 'wrapper'; meta: WrapperMeta }
+  | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
+)
 
 const authorSupabase = {
   name: 'Supabase',
   websiteUrl: 'https://supabase.com',
 }
 
-const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
+const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'queues',
     type: 'postgres_extension' as const,
@@ -261,6 +268,67 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
     },
   },
   {
+    id: 'data_api',
+    type: 'custom' as const,
+    requiredExtensions: [],
+    name: `Data API`,
+    icon: ({ className, ...props } = {}) => (
+      <Code2 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description: 'Auto-generate an API directly from your database schema',
+    docsUrl: `${DOCS_URL}/guides/api`,
+    author: authorSupabase,
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+      {
+        route: 'settings',
+        label: 'Settings',
+      },
+      {
+        route: 'docs',
+        label: 'Docs',
+      },
+    ],
+    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/OverviewTab').then(
+                (mod) => mod.DataApiOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'settings':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/SettingsTab').then(
+                (mod) => mod.DataApiSettingsTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'docs':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/DataApi/DocsTab').then(
+                (mod) => mod.DataApiDocsTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
+  },
+  {
     id: 'graphiql',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_graphql'],
@@ -315,7 +383,7 @@ const SUPABASE_INTEGRATIONS: IntegrationDefinition[] = [
   },
 ] as const
 
-const WRAPPER_INTEGRATIONS: IntegrationDefinition[] = WRAPPERS.map((w) => {
+const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
   return {
     id: w.name,
     type: 'wrapper' as const,
@@ -366,7 +434,7 @@ const WRAPPER_INTEGRATIONS: IntegrationDefinition[] = WRAPPERS.map((w) => {
   }
 })
 
-const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
+const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'stripe_sync_engine',
     type: 'custom' as const,
@@ -424,7 +492,7 @@ const TEMPLATE_INTEGRATIONS: IntegrationDefinition[] = [
   },
 ]
 
-export const INTEGRATIONS: IntegrationDefinition[] = [
+export const INTEGRATIONS: Array<IntegrationDefinition> = [
   ...WRAPPER_INTEGRATIONS,
   ...SUPABASE_INTEGRATIONS,
   ...TEMPLATE_INTEGRATIONS,

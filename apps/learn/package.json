@@ -1,0 +1,49 @@
+{
+  "name": "learn",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "next dev --port 3007",
+    "build": "pnpm run content:build && next build --turbopack",
+    "internal:sync": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/sync-internal-content.mts",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
+    "content:build": "contentlayer2 build",
+    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
+    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "common": "workspace:*",
+    "contentlayer2": "0.4.6",
+    "framer-motion": "^11.0.3",
+    "jotai": "^2.8.0",
+    "lucide-react": "*",
+    "next": "catalog:",
+    "next-contentlayer2": "0.4.6",
+    "next-themes": "^0.3.0",
+    "react": "catalog:",
+    "react-wrap-balancer": "^1.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-pretty-code": "^0.9.0",
+    "rehype-slug": "^6.0.0",
+    "remark": "^14.0.3",
+    "remark-code-import": "^1.2.0",
+    "remark-gfm": "^4.0.0",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@shikijs/compat": "^1.1.7",
+    "@supabase/supa-mdx-lint": "0.3.1",
+    "@types/react": "catalog:",
+    "config": "workspace:^",
+    "mdast-util-toc": "^6.1.1",
+    "tsconfig": "workspace:*",
+    "tsx": "catalog:",
+    "shiki": "^1.1.7"
+  }
+}

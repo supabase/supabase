@@ -48,13 +48,4 @@ export const RESTRICTION_MESSAGES = {
       </>
     ),
   },
-  MISSING_BILLING_INFO: {
-    title: 'Missing billing information',
-    description: (slug: string): ReactNode => (
-      <>
-        Please <InlineLink href={`/org/${slug}/billing#address`}>add a billing address</InlineLink>{' '}
-        to avoid restrictions. If you are a registered business, please add a tax ID too
-      </>
-    ),
-  },
 }

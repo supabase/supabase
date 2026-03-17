@@ -16,6 +16,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { DOCS_URL } from '@/lib/constants'
@@ -86,7 +87,7 @@ export const EnableReplicationCallout = ({
   className,
   hasAccess,
 }: {
-  type?: string
+  type?: DestinationType | null
   className?: string
   hasAccess: boolean
 }) => {

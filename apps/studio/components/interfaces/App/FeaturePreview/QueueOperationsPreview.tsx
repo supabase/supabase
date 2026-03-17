@@ -1,19 +1,20 @@
+import { useParams } from 'common'
+import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
-import { BASE_PATH } from 'lib/constants'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 export const QueueOperationsPreview = () => {
+  const { ref = '_' } = useParams()
+
   return (
     <div className="flex flex-col gap-2">
       <p className="text-foreground-light text-sm mb-4">
-        Queue your table edits and review all pending changes before saving them to your database.
-        This gives you more control over when changes are committed, allowing you to batch multiple
-        edits and review them together.
+        Queue your table edits in the{' '}
+        <InlineLink href={`/project/${ref}/editor`}>Table Editor</InlineLink> and review all pending
+        changes before saving them to your database. This gives you more control over when changes
+        are committed, allowing you to batch multiple edits and review them together.
       </p>
-      <div className="bg-yellow-300/15 border-l-4 border-yellow-500 p-3 text-yellow-1100 text-sm rounded mb-2">
-        <strong>Note:</strong> We are currently working to add all CRUD operations to the queue.
-        Right now, only cell edits are supported.
-      </div>
       <Image
         src={`${BASE_PATH}/img/previews/queue-operations-table-preview.png`}
         width={1296}

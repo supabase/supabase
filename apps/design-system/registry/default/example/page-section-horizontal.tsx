@@ -1,12 +1,12 @@
+import { Card, CardContent } from 'ui'
 import {
   PageSection,
+  PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionDescription,
-  PageSectionContent,
 } from 'ui-patterns/PageSection'
-import { Card, CardContent } from 'ui'
 
 export default function PageSectionHorizontal() {
   return (

@@ -1,26 +1,30 @@
-import { expect } from '@playwright/test'
 import path from 'path'
+import { expect } from '@playwright/test'
+
 import { env } from '../env.config.js'
-import { test } from '../utils/test.js'
-import { waitForApiResponse } from '../utils/wait-for-response.js'
 import {
   createBucket,
   createFolder,
-  deleteAllBuckets,
   deleteBucket,
   deleteItem,
   downloadFile,
   navigateToBucket,
+  navigateToStorageFiles,
   renameItem,
   uploadFile,
 } from '../utils/storage-helpers.js'
-import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
+import {
+  createBucket as createBucketViaApi,
+  deleteBucket as deleteBucketViaApi,
+} from '../utils/storage/index.js'
+import { test } from '../utils/test.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 const bucketNamePrefix = 'pw_bucket'
 
-test.describe.serial('Storage', () => {
+test.describe('Storage', () => {
   test.beforeEach(async ({ page, ref }) => {
-    await deleteAllBuckets(page, ref)
+    await navigateToStorageFiles(page, ref)
   })
 
   test('can navigate to storage page', async ({ page, ref }) => {
@@ -36,6 +40,7 @@ test.describe.serial('Storage', () => {
   test('can create a private bucket', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_private`
 
+    await deleteBucketViaApi(bucketName)
     await createBucket(page, ref, bucketName, false)
 
     // Verify it's marked as private (no "Public" badge should be visible)
@@ -50,6 +55,7 @@ test.describe.serial('Storage', () => {
   test('can create a public bucket', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_public`
 
+    await deleteBucketViaApi(bucketName)
     await createBucket(page, ref, bucketName, true)
 
     // Verify it's marked as public - wait for the badge to appear
@@ -66,8 +72,10 @@ test.describe.serial('Storage', () => {
   test('can edit bucket settings', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_edit`
 
-    // Create a private bucket
-    await createBucket(page, ref, bucketName, false)
+    // Create a fresh private bucket via API
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
 
     // Navigate to the bucket
     await navigateToBucket(page, ref, bucketName)
@@ -96,12 +104,14 @@ test.describe.serial('Storage', () => {
   })
 
   test('can delete a bucket', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_delete`
+    const bucketName = `${bucketNamePrefix}_delbkt`
 
-    // Create a bucket
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
 
-    // Delete it
+    // Delete it via UI
     await deleteBucket(page, ref, bucketName)
 
     // Verify it's gone
@@ -115,10 +125,12 @@ test.describe.serial('Storage', () => {
     const bucketName1 = `${bucketNamePrefix}_search_1`
     const bucketName2 = `${bucketNamePrefix}_search_2`
 
-    // Create two buckets
-    await createBucket(page, ref, bucketName1, false)
-    await dismissToastsIfAny(page)
-    await createBucket(page, ref, bucketName2, false)
+    // Create two buckets via API
+    await deleteBucketViaApi(bucketName1)
+    await deleteBucketViaApi(bucketName2)
+    await createBucketViaApi(bucketName1, false)
+    await createBucketViaApi(bucketName2, false)
+    await navigateToStorageFiles(page, ref)
 
     // Search for first bucket
     const searchInput = page.getByPlaceholder('Search for a bucket')
@@ -152,24 +164,25 @@ test.describe.serial('Storage', () => {
     const bucketName = `${bucketNamePrefix}_upload`
     const fileName = 'test-file.txt'
 
-    // Create a bucket and navigate to it
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API and navigate to it
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
     // Upload a file
     const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can create a folder', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_folder`
+    const bucketName = `${bucketNamePrefix}_newfolder`
     const folderName = 'test_folder'
 
-    // Create a bucket and navigate to it
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API and navigate to it
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
     // Create a folder
@@ -181,8 +194,10 @@ test.describe.serial('Storage', () => {
     const fileName = 'test-file.txt'
     const newFileName = 'renamed-file.txt'
 
-    // Create a bucket, navigate to it, and upload a file
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and upload a file
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
     const filePath = path.join(import.meta.dirname, 'files', fileName)
@@ -190,18 +205,17 @@ test.describe.serial('Storage', () => {
 
     // Rename the file
     await renameItem(page, fileName, newFileName)
-
-    // Clean up
-    await deleteBucket(page, ref, bucketName)
   })
 
   test('can rename a folder', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_rename_folder`
+    const bucketName = `${bucketNamePrefix}_mvdir`
     const folderName = 'old_folder'
     const newFolderName = 'new_folder'
 
-    // Create a bucket, navigate to it, and create a folder
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and create a folder
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
 
@@ -210,11 +224,13 @@ test.describe.serial('Storage', () => {
   })
 
   test('resets folder name when renaming with empty string', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_rename_folder_empty`
+    const bucketName = `${bucketNamePrefix}_reset_enter`
     const folderName = 'folder_to_rename'
 
-    // Create a bucket, navigate to it, and create a folder
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and create a folder
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
 
@@ -243,11 +259,13 @@ test.describe.serial('Storage', () => {
   })
 
   test('resets folder name when clicking outside with empty string', async ({ page, ref }) => {
-    const bucketName = `${bucketNamePrefix}_rename_folder_blur`
+    const bucketName = `${bucketNamePrefix}_reset_blur`
     const folderName = 'folder_to_blur'
 
-    // Create a bucket, navigate to it, and create a folder
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and create a folder
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
 
@@ -274,12 +292,42 @@ test.describe.serial('Storage', () => {
     ).toBeVisible()
   })
 
+  test('resets storage view when switching buckets', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_navigation`
+    const bucketName2 = `${bucketNamePrefix}2_navigation`
+    const folderName = 'folder_navigation'
+    const fileName = 'test-file.txt'
+
+    // Create 2 bucket via API, navigate to the first
+    await deleteBucketViaApi(bucketName)
+    await deleteBucketViaApi(bucketName2)
+    await createBucketViaApi(bucketName, false)
+    await createBucketViaApi(bucketName2, false)
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // create a folder and add a file
+    await createFolder(page, folderName)
+    // Open the folder
+    await page.getByTitle(folderName).click()
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Navigate to bucket list
+    await page.getByRole('link', { name: 'Files' }).nth(1).click()
+    // Navigate to the 2nd bucket
+    await navigateToBucket(page, ref, bucketName2)
+    await expect(page.getByTitle(fileName)).not.toBeVisible()
+  })
+
   test('can delete a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_delete_file`
     const fileName = 'test-file.txt'
 
-    // Create a bucket, navigate to it, and upload a file
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and upload a file
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
     const filePath = path.join(import.meta.dirname, 'files', fileName)
@@ -293,8 +341,10 @@ test.describe.serial('Storage', () => {
     const bucketName = `${bucketNamePrefix}_delete_folder`
     const folderName = 'test_folder'
 
-    // Create a bucket, navigate to it, and create a folder
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and create a folder
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
     await createFolder(page, folderName)
 
@@ -306,8 +356,10 @@ test.describe.serial('Storage', () => {
     const bucketName = `${bucketNamePrefix}_download`
     const fileName = 'test-file.txt'
 
-    // Create a bucket, navigate to it, and upload a file
-    await createBucket(page, ref, bucketName, false)
+    // Create a bucket via API, navigate to it, and upload a file
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 
     const filePath = path.join(import.meta.dirname, 'files', fileName)

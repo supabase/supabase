@@ -60,7 +60,7 @@ const HomePageCover = (props) => {
       tooltip: 'TanStack Start',
       icon: '/docs/img/icons/tanstack-icon',
       href: '/guides/getting-started/quickstarts/tanstack',
-      hasLightIcon: false,
+      hasLightIcon: true,
     },
     {
       tooltip: 'Vue',
@@ -141,12 +141,7 @@ const HomePageCover = (props) => {
 
                 return (
                   <Link key={i} href={framework.href} passHref className="no-underline">
-                    <IconPanel
-                      iconSize={iconSize}
-                      hideArrow
-                      tooltip={framework.tooltip}
-                      icon={iconToUse}
-                    />
+                    <IconPanel iconSize={iconSize} tooltip={framework.tooltip} icon={iconToUse} />
                   </Link>
                 )
               })}

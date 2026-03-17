@@ -1,10 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, X } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CopyButton from 'components/ui/CopyButton'
@@ -13,8 +8,32 @@ import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-app
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, cn } from 'ui'
+import { Check, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import {
+  Button,
+  Card,
+  cn,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableHeadSort,
+  TableRow,
+} from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AuthorizedAppRow } from './AuthorizedAppRow'
 import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'
@@ -26,6 +45,29 @@ import { RevokeAppModal } from './RevokeAppModal'
 // to prevent any confusion (case study: GitHub). Authorized apps could be in the "integrations" tab, but let's
 // check in again after we wrap up Vercel integration
 
+type SortOrder = 'asc' | 'desc'
+type PublishedAppsSort = 'created:asc' | 'created:desc'
+type PublishedAppsSortColumn = 'created'
+type AuthorizedAppsSort = 'authorized:asc' | 'authorized:desc'
+type AuthorizedAppsSortColumn = 'authorized'
+
+const parseSort = <C extends string>(sort: string): [C, SortOrder] => {
+  return sort.split(':') as [C, SortOrder]
+}
+
+const toggleSort = <S extends string>(
+  currentSort: S,
+  column: string,
+  setSort: (sort: S) => void
+) => {
+  const [currentColumn, currentOrder] = parseSort(currentSort)
+  if (currentColumn === column) {
+    setSort(`${column}:${currentOrder === 'asc' ? 'desc' : 'asc'}` as S)
+  } else {
+    setSort(`${column}:asc` as S)
+  }
+}
+
 export const OAuthApps = () => {
   const { slug } = useParams()
   const [showPublishModal, setShowPublishModal] = useState(false)
@@ -33,6 +75,8 @@ export const OAuthApps = () => {
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
+  const [publishedAppsSort, setPublishedAppsSort] = useState<PublishedAppsSort>('created:asc')
+  const [authorizedAppsSort, setAuthorizedAppsSort] = useState<AuthorizedAppsSort>('authorized:asc')
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -51,9 +95,21 @@ export const OAuthApps = () => {
     isError: isErrorPublishedApps,
   } = useOAuthAppsQuery({ slug }, { enabled: canReadOAuthApps })
 
-  const sortedPublishedApps = publishedApps?.sort((a, b) => {
-    return Number(new Date(a.created_at ?? '')) - Number(new Date(b.created_at ?? ''))
-  })
+  const sortedPublishedApps = useMemo(() => {
+    const [sortColumn, sortOrder] = parseSort<PublishedAppsSortColumn>(publishedAppsSort)
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return [...(publishedApps ?? [])].sort((a, b) => {
+      if (sortColumn === 'created') {
+        return (
+          (new Date(a.created_at ?? '').getTime() - new Date(b.created_at ?? '').getTime()) *
+          orderMultiplier
+        )
+      }
+
+      return 0
+    })
+  }, [publishedApps, publishedAppsSort])
 
   const {
     data: authorizedApps,
@@ -62,22 +118,47 @@ export const OAuthApps = () => {
     isError: isErrorAuthorizedApps,
   } = useAuthorizedAppsQuery({ slug })
 
-  const sortedAuthorizedApps = authorizedApps?.sort((a, b) => {
-    return Number(new Date(a.authorized_at)) - Number(new Date(b.authorized_at))
-  })
+  const sortedAuthorizedApps = useMemo(() => {
+    const [sortColumn, sortOrder] = parseSort<AuthorizedAppsSortColumn>(authorizedAppsSort)
+    const orderMultiplier = sortOrder === 'asc' ? 1 : -1
+
+    return [...(authorizedApps ?? [])].sort((a, b) => {
+      if (sortColumn === 'authorized') {
+        return (
+          (new Date(a.authorized_at).getTime() - new Date(b.authorized_at).getTime()) *
+          orderMultiplier
+        )
+      }
+
+      return 0
+    })
+  }, [authorizedApps, authorizedAppsSort])
+
+  const hasPublishedApps = (publishedApps?.length ?? 0) > 0
+  const hasAuthorizedApps = (authorizedApps?.length ?? 0) > 0
+  const avatarHeadClass = 'w-[62px] min-w-[62px] max-w-[62px]'
+  const avatarHeadCollapsedClass = 'w-0 min-w-0 max-w-0 p-0'
+
+  const handlePublishedSortChange = (column: PublishedAppsSortColumn) => {
+    toggleSort(publishedAppsSort, column, setPublishedAppsSort)
+  }
+
+  const handleAuthorizedSortChange = (column: AuthorizedAppsSortColumn) => {
+    toggleSort(authorizedAppsSort, column, setAuthorizedAppsSort)
+  }
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth className="flex flex-col gap-y-8">
-          <div className="space-y-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
-              <div>
-                <p>Published Apps</p>
-                <p className="text-foreground-light text-sm">
-                  Build integrations that extend Supabase's functionality
-                </p>
-              </div>
+      <PageContainer size="default" className="pb-16">
+        <PageSection id="published-apps" className="pt-12">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Published apps</PageSectionTitle>
+              <PageSectionDescription>
+                Build integrations that extend Supabase's functionality
+              </PageSectionDescription>
+            </PageSectionSummary>
+            <PageSectionAside>
               <ButtonTooltip
                 disabled={!canCreateOAuthApps}
                 type="primary"
@@ -91,10 +172,11 @@ export const OAuthApps = () => {
                   },
                 }}
               >
-                Add application
+                Publish OAuth app
               </ButtonTooltip>
-            </div>
-
+            </PageSectionAside>
+          </PageSectionMeta>
+          <PageSectionContent className="space-y-4">
             {isLoadingPublishedApps || isLoadingPermissions ? (
               <div className="space-y-2">
                 <ShimmeringLoader />
@@ -157,21 +239,46 @@ export const OAuthApps = () => {
             )}
 
             {isSuccessPublishedApps && (
-              <>
-                {(publishedApps?.length ?? 0) === 0 ? (
-                  <div className="bg-surface-100 border rounded p-4 flex items-center justify-between mt-4">
-                    <p className="prose text-sm">You do not have any published applications yet</p>
-                  </div>
-                ) : (
-                  <Table
-                    head={[
-                      <Table.th key="icon" className="w-[30px]"></Table.th>,
-                      <Table.th key="name">Name</Table.th>,
-                      <Table.th key="client-id">Client ID</Table.th>,
-                      <Table.th key="created-at">Created at</Table.th>,
-                      <Table.th key="delete-action"></Table.th>,
-                    ]}
-                    body={
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead
+                        className={cn(
+                          hasPublishedApps ? avatarHeadClass : avatarHeadCollapsedClass,
+                          !hasPublishedApps && 'text-foreground-muted'
+                        )}
+                      >
+                        <span className="sr-only">Avatar</span>
+                      </TableHead>
+                      <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>
+                        Name
+                      </TableHead>
+                      <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>
+                        Client ID
+                      </TableHead>
+                      <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>
+                        {hasPublishedApps ? (
+                          <TableHeadSort
+                            column="created"
+                            currentSort={publishedAppsSort}
+                            onSortChange={handlePublishedSortChange}
+                          >
+                            CREATED
+                          </TableHeadSort>
+                        ) : (
+                          'CREATED'
+                        )}
+                      </TableHead>
+                      <TableHead
+                        className={cn('text-right', !hasPublishedApps && 'text-foreground-muted')}
+                      >
+                        <span className="sr-only">Actions</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {hasPublishedApps ? (
                       sortedPublishedApps?.map((app) => (
                         <OAuthAppRow
                           key={app.id}
@@ -182,69 +289,114 @@ export const OAuthApps = () => {
                           }}
                           onSelectDelete={() => setSelectedAppToDelete(app)}
                         />
-                      )) ?? []
-                    }
-                  />
-                )}
-              </>
+                      ))
+                    ) : (
+                      <TableRow className="[&>td]:hover:bg-inherit">
+                        <TableCell colSpan={5}>
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-lighter">
+                            You do not have any published applications yet
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
             )}
-          </div>
+          </PageSectionContent>
+        </PageSection>
 
-          <div>
-            <p>Authorized Apps</p>
-            <p className="text-foreground-light text-sm">
-              Applications that have access to your organization's settings and projects
-            </p>
+        <PageSection id="authorized-apps">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Authorized apps</PageSectionTitle>
+              <PageSectionDescription>
+                Applications that have access to your organization's settings and projects
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent className="space-y-4">
+            {isLoadingAuthorizedApps || isLoadingPermissions ? (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            ) : !canReadOAuthApps ? (
+              <NoPermission resourceText="view authorized apps" />
+            ) : null}
 
-            <div className="mt-4">
-              {isLoadingAuthorizedApps || isLoadingPermissions ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <ShimmeringLoader className="w-3/4" />
-                  <ShimmeringLoader className="w-1/2" />
-                </div>
-              ) : !canReadOAuthApps ? (
-                <NoPermission resourceText="view authorized apps" />
-              ) : null}
+            {isErrorAuthorizedApps && <AlertError subject="Failed to retrieve authorized apps" />}
 
-              {isErrorAuthorizedApps && <AlertError subject="Failed to retrieve authorized apps" />}
-
-              {isSuccessAuthorizedApps && (
-                <>
-                  {(authorizedApps.length ?? 0) === 0 ? (
-                    <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                      <p className="prose text-sm">
-                        You do not have any authorized applications yet
-                      </p>
-                    </div>
-                  ) : (
-                    <Table
-                      className="mt-4"
-                      head={[
-                        <Table.th key="icon" className="w-[30px]"></Table.th>,
-                        <Table.th key="name">Name</Table.th>,
-                        <Table.th key="created-by">Created by</Table.th>,
-                        <Table.th key="app-id">App ID</Table.th>,
-                        <Table.th key="authorized-at">Authorized at</Table.th>,
-                        <Table.th key="delete-action"></Table.th>,
-                      ]}
-                      body={
-                        sortedAuthorizedApps?.map((app) => (
-                          <AuthorizedAppRow
-                            key={app.id}
-                            app={app}
-                            onSelectRevoke={() => setSelectedAppToRevoke(app)}
-                          />
-                        )) ?? []
-                      }
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+            {isSuccessAuthorizedApps && (
+              <Card>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead
+                        className={cn(
+                          hasAuthorizedApps ? avatarHeadClass : avatarHeadCollapsedClass,
+                          !hasAuthorizedApps && 'text-foreground-muted'
+                        )}
+                      >
+                        <span className="sr-only">Avatar</span>
+                      </TableHead>
+                      <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                        Name
+                      </TableHead>
+                      <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                        Author
+                      </TableHead>
+                      <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                        App ID
+                      </TableHead>
+                      <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                        {hasAuthorizedApps ? (
+                          <TableHeadSort
+                            column="authorized"
+                            currentSort={authorizedAppsSort}
+                            onSortChange={handleAuthorizedSortChange}
+                          >
+                            AUTHORIZED
+                          </TableHeadSort>
+                        ) : (
+                          'AUTHORIZED'
+                        )}
+                      </TableHead>
+                      <TableHead
+                        className={cn('text-right', !hasAuthorizedApps && 'text-foreground-muted')}
+                      >
+                        <span className="sr-only">Actions</span>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {hasAuthorizedApps ? (
+                      sortedAuthorizedApps?.map((app) => (
+                        <AuthorizedAppRow
+                          key={app.id}
+                          app={app}
+                          onSelectRevoke={() => setSelectedAppToRevoke(app)}
+                        />
+                      ))
+                    ) : (
+                      <TableRow className="[&>td]:hover:bg-inherit">
+                        <TableCell colSpan={6}>
+                          <p className="text-sm text-foreground">No results found</p>
+                          <p className="text-sm text-foreground-lighter">
+                            You do not have any authorized applications yet
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
+            )}
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
 
       <PublishAppSidePanel
         visible={showPublishModal}

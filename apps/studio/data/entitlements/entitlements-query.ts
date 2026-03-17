@@ -17,12 +17,17 @@ export type EntitlementConfig =
 export type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][0]
 export type EntitlementType = Entitlement['type']
 
-export async function getEntitlements({ slug }: EntitlementsVariables, signal?: AbortSignal) {
+export async function getEntitlements(
+  { slug }: EntitlementsVariables,
+  signal?: AbortSignal,
+  headers?: HeadersInit
+) {
   if (!slug) throw new Error('slug is required')
 
   const { data, error } = await get('/platform/organizations/{slug}/entitlements', {
     params: { path: { slug } },
     signal,
+    ...(headers && { headers }),
   })
   if (error) handleError(error)
 
@@ -32,6 +37,26 @@ export async function getEntitlements({ slug }: EntitlementsVariables, signal?: 
 export type EntitlementsData = Awaited<ReturnType<typeof getEntitlements>>
 export type EntitlementsError = ResponseError
 
+/**
+ * Helper to check a specific entitlement for an organization
+ * For client-side components, please using useCheckEntitlements hook instead
+ */
+export async function checkEntitlement(
+  slug: string,
+  featureKey: string,
+  signal?: AbortSignal,
+  headers?: HeadersInit
+): Promise<{ hasAccess: boolean; entitlement?: Entitlement }> {
+  const entitlements = await getEntitlements({ slug }, signal, headers)
+
+  const entitlement = entitlements.entitlements.find((e) => e.feature.key === (featureKey as any))
+
+  return {
+    hasAccess: entitlement?.hasAccess ?? false,
+    entitlement,
+  }
+}
+
 export const useEntitlementsQuery = <TData = EntitlementsData>(
   { slug }: EntitlementsVariables,
   {
@@ -40,7 +65,7 @@ export const useEntitlementsQuery = <TData = EntitlementsData>(
   }: UseCustomQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
 ) => {
   return useQuery<EntitlementsData, EntitlementsError, TData>({
-    queryKey: [organizationKeys.entitlements(slug)],
+    queryKey: organizationKeys.entitlements(slug),
     queryFn: ({ signal }) => getEntitlements({ slug }, signal),
     enabled: enabled && typeof slug !== 'undefined',
     ...options,
