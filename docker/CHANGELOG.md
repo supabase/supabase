@@ -66,10 +66,10 @@ Check updates for each service to learn more.
 ## [2026-02-18]
 
 ### Storage
-- Updated `supabase/storage-api` to `v1.37.8` in `docker-compose.s3.yml`
-- Changed MinIO image in `docker-compose.s3.yml` to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Updated to `v1.37.8`
+- Changed MinIO image to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
 - Removed `imgproxy` service from `docker-compose.s3.yml` to minimize redundancy - PR [#42942](https://github.com/supabase/supabase/pull/42942)
-- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability (requires `docker-compose.yml` and `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability - PR [#42942](https://github.com/supabase/supabase/pull/42942)
 
 ### Edge Runtime
 
