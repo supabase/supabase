@@ -1,4 +1,4 @@
-import { ident } from "../../../pg-format"
+import { ident } from '../../../pg-format'
 
 export const getDropConstraintSQL = ({
   schema,

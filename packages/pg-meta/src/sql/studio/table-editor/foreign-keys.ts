@@ -1,4 +1,4 @@
-import { ident } from "../../../pg-format";
+import { ident } from '../../../pg-format'
 
 export const getAddForeignKeySQL = ({
   table,
@@ -63,7 +63,6 @@ DROP CONSTRAINT IF EXISTS ${ident(relation.name)}
       .join(';') + ';'
   )
 }
-
 
 export interface ForeignKey {
   id?: number | string

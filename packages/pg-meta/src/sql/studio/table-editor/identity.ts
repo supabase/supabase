@@ -1,4 +1,4 @@
-import { ident } from "../../../pg-format"
+import { ident } from '../../../pg-format'
 
 export const getUpdateIdentitySequenceSQL = ({
   schema,
@@ -11,7 +11,6 @@ export const getUpdateIdentitySequenceSQL = ({
 }) => {
   return `SELECT setval('${ident(schema)}.${ident(`${table}_${column}_seq`)}', (SELECT COALESCE(MAX(${ident(column)}), 1) FROM ${ident(schema)}.${ident(table)}))`
 }
-
 
 export const getDuplicateIdentitySequenceSQL = ({
   columnName,

@@ -1,4 +1,4 @@
-import { ident } from "../../../pg-format"
+import { ident } from '../../../pg-format'
 
 /**
  * The functions below are basically just queries but may be supported directly

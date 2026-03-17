@@ -1,13 +1,12 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
 import pgMeta from '@supabase/pg-meta'
-
-import { isNull } from 'lodash'
-import type { Dictionary } from 'types'
-
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
 import { uuidv4 } from 'lib/helpers'
+import { isNull } from 'lodash'
 import { toast } from 'sonner'
+import type { Dictionary } from 'types'
+
 import {
   ColumnField,
   CreateColumnPayload,
@@ -230,8 +229,10 @@ export const getColumnForeignKey = (
     const foreignKeyMeta = foreignKeys.find((fk) => fk.id === foreignKey.id)
     return {
       ...foreignKey,
-      deletion_action: foreignKeyMeta?.deletion_action ?? pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-      update_action: foreignKeyMeta?.update_action ?? pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      deletion_action:
+        foreignKeyMeta?.deletion_action ?? pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      update_action:
+        foreignKeyMeta?.update_action ?? pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
   }
 }
