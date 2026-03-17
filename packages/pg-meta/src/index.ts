@@ -27,6 +27,31 @@ export { getPaginatedUsersSQL, type UsersCursor } from './sql/studio/auth/get-us
 export { getUsersCountSQL } from './sql/studio/auth/get-users-count'
 import * as tableEditor from './sql/studio/table-editor'
 export type { ForeignKey } from './sql/studio/table-editor'
+export {
+  getLargestSizeLimitBucketsSqlUnoptimized,
+  LARGEST_SIZE_LIMIT_BUCKETS_COUNT,
+} from './sql/studio/storage/get-largest-size-limit-buckets'
+export {
+  getExposedTablesSql,
+  getExposedTableCountsSql,
+  getExposedFunctionsSql,
+  getExposedFunctionCountsSql,
+  buildTablePrivilegesSql,
+  buildFunctionPrivilegesSql,
+  buildDefaultPrivilegesSql,
+  getDefaultPrivilegesStateSql,
+} from './sql/studio/privileges'
+export { getIndexesSQL } from './sql/studio/database/indexes'
+export { getDatabaseExtensionDefaultSchemaSQL } from './sql/studio/database/extensions'
+export {
+  getCronJobsMinimalSql,
+  getCronJobsSql,
+  getJobRunDetailsPageCountSql,
+  getDeleteOldCronJobRunDetailsByCtidSql,
+  getScheduleDeleteCronJobRunDetailsSql,
+} from './sql/studio/database/cron-jobs'
+export { getTableRowsCountSql } from './sql/studio/database/rows'
+export { getLiveTupleEstimate } from './sql/studio/get-live-tuple-estimate'
 
 export default {
   roles,

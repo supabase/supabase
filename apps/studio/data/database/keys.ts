@@ -1,3 +1,5 @@
+import { sqlKeys } from '../sql/keys'
+
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
@@ -63,3 +65,9 @@ export const databaseKeys = {
   supamonitorEnabled: (projectRef: string | undefined) =>
     ['projects', projectRef, 'supamonitor-enabled'] as const,
 }
+
+export const getLiveTupleEstimateKey = (
+  projectRef: string | undefined,
+  table: string,
+  schema = 'public'
+) => sqlKeys.query(projectRef, ['live-tuple-estimate', schema, table])

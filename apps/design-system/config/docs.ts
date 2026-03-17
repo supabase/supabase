@@ -168,6 +168,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Error Display',
+          href: '/docs/fragments/error-display',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
