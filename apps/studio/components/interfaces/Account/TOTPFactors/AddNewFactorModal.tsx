@@ -77,7 +77,7 @@ const FirstStep = ({ visible, isEnrolling, reset, enroll, onClose }: FirstStepPr
       // Generate a name with a number between 0 and 1000
       form.reset({ name: `App ${Math.floor(Math.random() * 1000)}` })
     }
-  }, [visible])
+  }, [form, visible])
 
   return (
     <ConfirmationModal
