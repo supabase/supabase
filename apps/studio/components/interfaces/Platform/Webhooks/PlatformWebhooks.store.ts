@@ -20,6 +20,10 @@ interface UpdateEndpointOptions {
   headerIdFactory?: () => string
 }
 
+interface RetryDeliveryOptions {
+  now?: string
+}
+
 const secureRandomHex = (length: number) => {
   if (length <= 0) return ''
 
@@ -180,6 +184,31 @@ export const regenerateWebhookEndpointSecret = (
   }
 }
 
+export const retryWebhookDelivery = (
+  state: PlatformWebhooksState,
+  deliveryId: string,
+  options?: RetryDeliveryOptions
+) => {
+  const delivery = state.deliveries.find((item) => item.id === deliveryId)
+  if (!delivery || delivery.status === 'success') return state
+
+  const now = options?.now ?? new Date().toISOString()
+
+  return {
+    ...state,
+    deliveries: state.deliveries.map<WebhookDelivery>((delivery) => {
+      if (delivery.id !== deliveryId) return delivery
+
+      return {
+        ...delivery,
+        status: 'pending',
+        responseCode: undefined,
+        attemptAt: now,
+      }
+    }),
+  }
+}
+
 export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: string) => {
   const normalizedSearch = normalizeSearch(search)
   if (normalizedSearch.length === 0) return endpoints
@@ -205,6 +234,7 @@ export const filterWebhookDeliveries = (
         `${delivery.eventType} ${delivery.status} ${delivery.responseCode ?? ''}`.toLowerCase()
       return haystack.includes(normalizedSearch)
     })
+    .sort((a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime())
 }
 
 export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
@@ -262,6 +292,9 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
 
       applyStateUpdate(() => next.state)
       return next.signingSecret
+    },
+    retryDelivery: (deliveryId: string) => {
+      applyStateUpdate((prev) => retryWebhookDelivery(prev, deliveryId))
     },
   }
 }
