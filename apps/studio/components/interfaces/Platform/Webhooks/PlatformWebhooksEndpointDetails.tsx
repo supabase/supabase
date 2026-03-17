@@ -165,12 +165,12 @@ export const PlatformWebhooksEndpointDetails = ({
                     <TableCell>
                       <TimestampInfo className="text-sm" utcTimestamp={delivery.attemptAt} />
                     </TableCell>
-                    <TableCell className="w-1">
-                      <div className="flex justify-end">
+                    <TableCell className="w-1 text-right">
+                      <div className="flex h-full items-center justify-end">
                         {delivery.status !== 'success' && (
                           <ButtonTooltip
                             type="default"
-                            className="w-7 hit-area-2"
+                            className="w-7 shrink-0 hit-area-2"
                             icon={<RotateCcw size={14} />}
                             aria-label={`Retry ${delivery.id}`}
                             tooltip={{ content: { side: 'top', text: 'Retry' } }}
@@ -181,6 +181,7 @@ export const PlatformWebhooksEndpointDetails = ({
                             onKeyDown={(event) => event.stopPropagation()}
                           />
                         )}
+                        {delivery.status === 'success' && <span aria-hidden className="size-7 shrink-0" />}
                       </div>
                     </TableCell>
                   </TableRow>
