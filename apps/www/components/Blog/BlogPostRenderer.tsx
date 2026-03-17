@@ -168,7 +168,7 @@ const BlogPostRenderer = ({
                   <h1 className="text-2xl sm:text-4xl">{blogMetaData.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
-                    <p>•</p>
+                    <p>·</p>
                     <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                   {authors.length > 0 && (

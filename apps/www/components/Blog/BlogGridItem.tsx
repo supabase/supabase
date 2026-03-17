@@ -58,7 +58,7 @@ const BlogGridItem = ({ post }: Props) => {
               <p>{dayjs(post.date).format('D MMM YYYY')}</p>
               {post.readingTime && (
                 <>
-                  <p>•</p>
+                  <p>·</p>
                   <p>{post.readingTime}</p>
                 </>
               )}
