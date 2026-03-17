@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) yra atvirojo kodo ,,Firebase" alternatyva. Kuriame ,,Firebase" funkcijas naudodami įmonių-lygmens atvirojo kodo įrankius.
+[Supabase](https://supabase.com) yra atvirojo kodo „Firebase" alternatyva. Kuriame „Firebase" funkcijas naudodami įmonių-lygmens atvirojo kodo įrankius.
 
 - [x] Prieglobos Postgres duomenų bazė. [Dokumentai](https://supabase.com/docs/guides/database)
 - [x] Autentifikacijos nustatymas ir autorizavimas. [Dokumentai](https://supabase.com/docs/guides/auth)
