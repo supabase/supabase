@@ -61,7 +61,7 @@ const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
  * @returns The row data if available, undefined otherwise
  */
 export function getRowFromSidePanel(
-  sidePanel: SidePanel | DeepReadonly<SidePanel> | undefined
+  sidePanel: SidePanel | DeepReadonly | undefined
 ): SupaRow | undefined {
   if (!sidePanel) return undefined
 
@@ -465,7 +465,7 @@ export const createTable = async ({
   const sqlStatements: string[] = []
 
   // 1. Create table SQL
-  const { sql: createTableSql } = pgMeta.tables.create(payload)
+  const { sql: createTableSql } = pgMeta.tables.create({ ...payload, no_transaction: true })
   sqlStatements.push(createTableSql)
 
   // 2. Enable RLS if configured
@@ -496,6 +496,7 @@ export const createTable = async ({
       is_unique: columnPayload.isUnique,
       comment: columnPayload.comment,
       check: columnPayload.check,
+      no_transaction: true,
     })
     sqlStatements.push(columnSQL)
   }

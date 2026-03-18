@@ -1,25 +1,25 @@
-import { Link, Menu, Plus, Settings, X } from 'lucide-react'
-import {
-  Badge,
-  Button,
-  Checkbox,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Command_Shadcn_,
-  Input,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
-} from 'ui'
-
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
+import { Link, Menu, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  cn,
+  Command_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
+  Input,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
+
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
@@ -54,7 +54,7 @@ interface ColumnProps {
   hasForeignKeys: boolean
   hasImportContent: boolean
   dragHandleProps?: any
-  onUpdateColumn: (changes: Partial<ColumnField>) => void
+  onUpdateColumn: (changes: Partial) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
 }
@@ -115,6 +115,7 @@ const Column = ({
       <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
+            aria-label="Column name"
             size="small"
             value={column.name}
             title={column.name}
@@ -241,6 +242,7 @@ const Column = ({
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
           <InputWithSuggestions
+            aria-label="Column default value"
             data-testid={`${column.name}-default-value`}
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
