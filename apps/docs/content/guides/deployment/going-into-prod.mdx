@@ -18,22 +18,24 @@ Check and review issues in your database using [Security Advisor](/dashboard/pro
 
 </Admonition>
 
-- [Ensure you have enabled row level security (RLS) on all tables](/dashboard/project/_/database/tables)
+- Ensure you have enabled row level security (RLS) on all tables from the [**Database > Tables**](/dashboard/project/_/database/tables) section of the Supabase Dashboard.
   - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is usually not what you want.
   - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
 - Enable replication on tables containing sensitive data by enabling RLS and setting row security policies:
-  - Go to the [**Authentication > Policies**](/dashboard/project/_/auth/policies) page in the Supabase Dashboard to enable RLS and create security policies.
-  - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) page in the Supabase Dashboard to manage replication tables.
+  - Go to the [**Authentication > Policies**](/dashboard/project/_/auth/policies) section of the Supabase Dashboard to enable RLS and create security policies.
+  - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Supabase Dashboard to manage replication tables.
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) from the [**Database > Settings > SSL Configuration**](/dashboard/project/_/database/settings#ssl-configuration) section of the dashboard.
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for the database from the [**Database > Settings > Network Restrictions**](/dashboard/project/_/database/settings#network-restrictions) section of the dashboard.
-- Ensure that your Supabase Account is protected with multi-factor authentication (MFA).
-  - If using a GitHub sign-in, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
+- Ensure that you protect your Supabase Account with multi-factor authentication (MFA).
+  - If using a GitHub sign-in, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication).
+  - Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
   - If using email+password sign-in, set up [MFA for your Supabase account](/docs/guides/platform/multi-factor-authentication#enable-mfa).
 - Enable [MFA enforcement on your organization](/docs/guides/platform/network-restrictions). This ensures all users must have a valid MFA backed session to interact with organization and project resources.
-- Consider [adding multiple owners on your Supabase org](/dashboard/org/_/team). This ensures that if one of the owners is unreachable or loses access to their account, you still have Owner access to your org.
-- Ensure you enable email confirmations in the [**Settings > Auth**](/dashboard/project/_/auth/providers) page of the dashboard.
-- Ensure that you've set the expiry in the [**Settings > Auth**](/dashboard/project/_/auth/providers) page of the dashboard for one-time passwords (OTPs) to a reasonable value that you are comfortable with. We recommend setting this to 3600 seconds (1 hour) or lower.
-- Increase the length of the OTP if you need a higher level of entropy.
+- Consider adding multiple owners on your Supabase org from [the **Organization > Team**](/dashboard/org/_/team) section of the Supabase Dashboard. This ensures that if one of the owners is unreachable or loses access to their account, you still have Owner access to your org.
+- Enable email confirmations in the [**Settings > Auth**](/dashboard/project/_/auth/providers) section of the dashboard.
+- Set the expiry in the [**Settings > Auth**](/dashboard/project/_/auth/providers) section of the dashboard for one-time passwords (OTPs) to a reasonable value that you are comfortable with.
+  - We recommend setting this to 3600 seconds (1 hour) or lower.
+  - Increase the length of the OTP if you need a higher level of entropy.
 - If your application requires a higher level of security, consider setting up [multi-factor authentication](/docs/guides/auth/auth-mfa) (MFA) for your users.
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
 - Consider how _you_ might abuse your service as an attacker, and take steps to mitigate it.
@@ -52,9 +54,9 @@ Check and review issues in your database using [Performance Advisor](/dashboard/
   - `pg_stat_statements` can help you [identify hot or slow queries](https://www.virtual-dba.com/blog/postgresql-performance-identifying-hot-and-slow-queries/).
 - Perform load testing (preferably on a staging env)
   - Tools like [k6](https://k6.io/) can simulate traffic from many different users.
-- Upgrade your database if you require more resources. If you need anything beyond what is listed, contact enterprise@supabase.io.
+- Upgrade your database if you require more resources. If you need anything beyond what is listed, contact [enterprise@supabase.io](mailto:enterprise@supabase.io).
 - If you are expecting a surge in traffic (for a big launch) and are on a Team or Enterprise Plan, [contact support](/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
-- If you expect your database size to be > 4 GB, [enable](/dashboard/project/_/settings/addons?panel=pitr) the Point in Time Recovery (PITR) add-on. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
+- If you expect your database size to be > 4 GB, enable the Point in Time Recovery (PITR) add-on in the [**Settings > Add-ons**](/dashboard/project/_/settings/addons?panel=pitr) section of the dashboard. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
 
 ## Availability
 
@@ -79,7 +81,7 @@ Check and review issues in your database using [Performance Advisor](/dashboard/
 
 ### Auth rate limits
 
-- The table below shows the rate limit quotas on the following authentication endpoints. You can configure the auth rate limits for your project [here](/dashboard/project/_/auth/rate-limits).
+- The table below shows the rate limit quotas on the following authentication endpoints. You can configure the auth rate limits for your project in the [**Auth > Rate Limits**](/dashboard/project/_/auth/rate-limits) section of the dashboard.
 
 | Endpoint                                         | Path                                                           | Limited By               | Rate Limit                                                                                                                                                                                                                                     |
 | ------------------------------------------------ | -------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
