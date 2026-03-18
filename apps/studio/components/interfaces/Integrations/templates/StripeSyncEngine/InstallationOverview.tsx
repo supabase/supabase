@@ -45,7 +45,6 @@ import {
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
-import { InlineLink } from '@/components/ui/InlineLink'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
