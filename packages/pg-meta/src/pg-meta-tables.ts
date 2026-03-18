@@ -144,7 +144,9 @@ type TableCreateParams = {
   no_transaction?: boolean
 }
 
-function create({ name, schema = 'public', comment, no_transaction = false }: TableCreateParams): { sql: string } {
+function create({ name, schema = 'public', comment, no_transaction = false }: TableCreateParams): {
+  sql: string
+} {
   const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
   const commentSql =
     comment != undefined
