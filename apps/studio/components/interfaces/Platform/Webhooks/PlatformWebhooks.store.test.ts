@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createInitialPlatformWebhooksState,
   createWebhookEndpoint,
+  filterWebhookDeliveries,
   filterWebhookEndpoints,
+  retryWebhookDelivery,
   updateWebhookEndpoint,
 } from './PlatformWebhooks.store'
 import type { PlatformWebhooksState, WebhookEndpoint } from './PlatformWebhooks.types'
@@ -98,5 +101,45 @@ describe('PlatformWebhooks.store', () => {
     expect(filterWebhookEndpoints(endpoints, 'billing')).toEqual([endpoints[0]])
     expect(filterWebhookEndpoints(endpoints, 'slack')).toEqual([endpoints[1]])
     expect(filterWebhookEndpoints(endpoints, 'alerts')).toEqual([endpoints[1]])
+  })
+
+  it('retries an individual delivery by resetting it to pending with a new timestamp', () => {
+    const nextState = retryWebhookDelivery(
+      createInitialPlatformWebhooksState('project'),
+      'project-delivery-2',
+      { now: '2026-03-17T02:15:00.000Z' }
+    )
+
+    expect(nextState.deliveries.find((delivery) => delivery.id === 'project-delivery-2')).toEqual({
+      id: 'project-delivery-2',
+      endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
+      eventType: 'project.resource_exhausted',
+      status: 'pending',
+      responseCode: undefined,
+      attemptAt: '2026-03-17T02:15:00.000Z',
+    })
+  })
+
+  it('returns endpoint deliveries sorted by latest attempt first after a retry', () => {
+    const nextState = retryWebhookDelivery(
+      createInitialPlatformWebhooksState('project'),
+      'project-delivery-2',
+      { now: '2026-03-17T02:15:00.000Z' }
+    )
+
+    expect(
+      filterWebhookDeliveries(nextState.deliveries, '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12', '').map(
+        (delivery) => delivery.id
+      )
+    ).toEqual(['project-delivery-2', 'project-delivery-1', 'project-delivery-3'])
+  })
+
+  it('does not retry successful deliveries', () => {
+    const initialState = createInitialPlatformWebhooksState('project')
+    const nextState = retryWebhookDelivery(initialState, 'project-delivery-1', {
+      now: '2026-03-17T02:15:00.000Z',
+    })
+
+    expect(nextState).toBe(initialState)
   })
 })

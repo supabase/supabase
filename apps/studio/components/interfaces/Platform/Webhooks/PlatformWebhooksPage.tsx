@@ -74,6 +74,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     updateEndpoint,
     deleteEndpoint,
     regenerateSecret,
+    retryDelivery,
   } = usePlatformWebhooksMockStore(scope)
   const [deliveryId, setDeliveryId] = useQueryState('deliveryId', parseAsString)
   const [panel, setPanel] = useQueryState('panel', parseAsStringLiteral(PANEL_VALUES))
@@ -270,6 +271,14 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     toast.success('Signing secret regenerated')
   }
 
+  const handleRetryDelivery = (deliveryId: string) => {
+    const delivery = deliveries.find((item) => item.id === deliveryId)
+    if (!delivery || delivery.status === 'success') return
+
+    retryDelivery(deliveryId)
+    toast.success('Delivery queued for retry')
+  }
+
   const handleCopy = (value: string, label: string) => {
     copyToClipboard(value)
     toast.success(`Copied ${label}`)
@@ -369,6 +378,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   setDeliveryDetailsTab('event')
                   setDeliveryId(id)
                 }}
+                onRetryDelivery={handleRetryDelivery}
               />
             )}
           </PageSectionContent>
@@ -384,6 +394,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         selectedDelivery={selectedDelivery}
         onCopy={handleCopy}
         onOpenChange={(open) => !open && setDeliveryId(null)}
+        onRetryDelivery={handleRetryDelivery}
         onTabChange={setDeliveryDetailsTab}
       />
 

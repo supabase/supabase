@@ -1,6 +1,7 @@
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { Search } from 'lucide-react'
+import { RotateCcw, Search } from 'lucide-react'
 import {
   Badge,
   Card,
@@ -37,6 +38,7 @@ interface PlatformWebhooksEndpointDetailsProps {
   selectedEndpoint: WebhookEndpoint
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
+  onRetryDelivery: (deliveryId: string) => void
 }
 
 export const PlatformWebhooksEndpointDetails = ({
@@ -45,6 +47,7 @@ export const PlatformWebhooksEndpointDetails = ({
   selectedEndpoint,
   onDeliverySearchChange,
   onOpenDelivery,
+  onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
   const hasName = selectedEndpoint.name.trim().length > 0
@@ -128,6 +131,9 @@ export const PlatformWebhooksEndpointDetails = ({
                 <TableHead>Event type</TableHead>
                 <TableHead>Response</TableHead>
                 <TableHead>Attempted</TableHead>
+                <TableHead className="w-1">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -165,11 +171,32 @@ export const PlatformWebhooksEndpointDetails = ({
                     <TableCell>
                       <TimestampInfo className="text-sm" utcTimestamp={delivery.attemptAt} />
                     </TableCell>
+                    <TableCell className="w-1 text-right">
+                      <div className="flex h-full items-center justify-end">
+                        {delivery.status !== 'success' && (
+                          <ButtonTooltip
+                            type="default"
+                            className="w-7 shrink-0 hit-area-2"
+                            icon={<RotateCcw size={14} />}
+                            aria-label={`Retry ${delivery.id}`}
+                            tooltip={{ content: { side: 'top', text: 'Retry' } }}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onRetryDelivery(delivery.id)
+                            }}
+                            onKeyDown={(event) => event.stopPropagation()}
+                          />
+                        )}
+                        {delivery.status === 'success' && (
+                          <span aria-hidden className="size-7 shrink-0" />
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4}>No deliveries found</TableCell>
+                  <TableCell colSpan={5}>No deliveries found</TableCell>
                 </TableRow>
               )}
             </TableBody>
