@@ -58,20 +58,19 @@ Check and review issues in your database using [Performance Advisor](/dashboard/
 
 ## Availability
 
-- Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails (see Settings > Auth)
-  - you can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc. You can refer to our [SMTP guide](/docs/guides/auth/auth-smtp) for more details.
-  - The default rate limit for auth emails when using a custom SMTP provider is 30 new users per hour, if doing a major public announcement you will likely require more than this.
-- Applications on the Free Plan that exhibit extremely low activity in a 7 day period may be paused by Supabase to save on server resources.
-  - You can restore paused projects from the Supabase dashboard.
-  - Upgrade to Pro to guarantee that your project will not be paused for inactivity.
+- Use your own SMTP credentials so that you have full control over the deliverability of your transactional auth emails in the [**Authentication > Emails > SMTP Settings**](/dashboard/project/_/auth/smtp) section of the dashboard.
+  - You can grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc. Read our [SMTP guide](/docs/guides/auth/auth-smtp) for more setup details.
+  - The default rate limit for auth emails when using a custom SMTP provider is _30 new users per hour_, if doing a major public announcement you will likely require more than this.
+- We may pause applications on the Free Plan that exhibit low activity in a 7 day period to save on server resources.
+  - You can restore paused projects from [the Supabase dashboard](/dashboard/project/_).
+  - Upgrade to Pro to guarantee that we won't pause your project for inactivity.
 - Database backups are not available for download for Free Plan projects.
-  - You can set up your own backup systems using tools like [pg_dump](https://www.postgresql.org/docs/current/app-pgdump) or [wal-g](https://github.com/wal-g/wal-g).
-  - Nightly backups for Pro Plan projects are available on the Supabase dashboard for up to 7 days.
-  - Point-in-Time Recovery (PITR) allows a project to be backed up at much shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity. If a lower RPO is required, enable PITR.
+  - Read [the Database Backups guide](/docs/guides/platform/backups) for more options and retention details.
+  -  If you need a lower recovery point objective (RPO), enable Point-in-Time Recovery (PITR). PITR allows you to backup a project at shorter intervals. This provides users an option to restore to any chosen point of up to seconds in granularity.
 - Supabase Projects use disks that offer 99.8-99.9% durability by default.
-  - Use Read Replicas if you require availability resilience to a disk failure event
+  - Use [Read Replicas](/docs/guides/platform/read-replicas) if you require availability resilience to a disk failure event
   - Use PITR if you require durability resilience to a disk failure event
-- Upgrading to the Supabase Pro Plan will give you [access to our support team](/dashboard/support/new).
+- Upgrading to the Supabase Pro Plan gives you [access to our support team](/dashboard/support/new).
 
 ## Rate limiting, resource allocation, & abuse prevention
 
@@ -97,15 +96,13 @@ Check and review issues in your database using [Performance Advisor](/dashboard/
 ### Realtime limits
 
 - Review the [Realtime limits](/docs/guides/realtime/limits).
-- If you need limits increased you can always [contact support](/dashboard/support/new).
+- If you need limits increased, [contact support](/dashboard/support/new).
 
 ### Abuse prevention
 
-- Supabase provides CAPTCHA protection on the signup, sign-in and password reset endpoints. Refer to [our guide](/docs/guides/auth/auth-captcha) on how to protect against abuse using this method.
+- Supabase provides CAPTCHA protection on the signup, sign-in and password reset endpoints. Read [the Auth CAPTCHA guide](/docs/guides/auth/auth-captcha) for more details on how to protect against abuse using this method.
 
 ### Email link validity
 
-- When working with enterprise systems, email scanners may scan and make a `GET` request to the reset password link or sign up link in your email. Since links in Supabase Auth are single use, a user who opens an email post-scan to click on a link will receive an error. To get around this problem,
-  consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button which redirect the user to the original magic link URL when clicked.
-
-- When using a custom SMTP service, some services might have link tracking enabled which may overwrite or disform the email confirmation links sent by Supabase Auth. To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
+- When working with enterprise systems, email scanners may scan and make a `GET` request to the reset password link or sign up link in your email. Since links in Supabase Auth are single use, a user who opens an email post-scan to click on a link will receive an error. To get around this problem, consider altering the email template to replace the original magic link with a link to a domain you control. The domain can present the user with a "Sign-in" button which redirect the user to the original magic link URL when clicked.
+- When using a custom SMTP service, some services might have link tracking enabled which may overwrite or deform the email confirmation links sent by Supabase Auth. To prevent this from happening, we recommend that you disable link tracking when using a custom SMTP service.
