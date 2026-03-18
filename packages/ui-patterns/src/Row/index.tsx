@@ -9,8 +9,8 @@ import { Button, cn } from 'ui'
 import { useMeasuredWidth } from './Row.utils'
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
-  // Maximum number of items visible in the row at once
-  maxRows: number
+  // Maximum number of columns visible in the row at once
+  maxColumns: number
   // Minimum width in pixels for each item before the row reduces the visible count
   minWidth: number
   children: ReactNode
@@ -25,23 +25,25 @@ interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const resolveColumnsForWidth = ({
   width,
-  maxRows,
+  maxColumns,
   minWidth,
   gap,
 }: {
   width: number
-  maxRows: number
+  maxColumns: number
   minWidth: number
   gap: number
 }) => {
-  const fittedColumns = Math.floor((width + gap) / (minWidth + gap))
+  const denominator = minWidth + gap
+  if (denominator <= 0) return Math.max(1, maxColumns)
+  const fittedColumns = Math.floor((width + gap) / denominator)
 
-  return Math.max(1, Math.min(maxRows, fittedColumns))
+  return Math.max(1, Math.min(maxColumns, fittedColumns))
 }
 
 export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   {
-    maxRows,
+    maxColumns,
     minWidth,
     children,
     className,
@@ -63,11 +65,11 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     () =>
       resolveColumnsForWidth({
         width: measuredWidth ?? 0,
-        maxRows,
+        maxColumns,
         minWidth,
         gap,
       }),
-    [gap, maxRows, measuredWidth, minWidth]
+    [gap, maxColumns, measuredWidth, minWidth]
   )
 
   const scrollByStep = (direction: -1 | 1) => {

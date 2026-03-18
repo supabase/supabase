@@ -95,7 +95,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
         </div>
       ) : errorLints.length > 0 ? (
         <>
-          <Row maxRows={4} minWidth={280}>
+          <Row maxColumns={3} minWidth={280}>
             {errorLints.map((lint) => {
               return (
                 <Card
