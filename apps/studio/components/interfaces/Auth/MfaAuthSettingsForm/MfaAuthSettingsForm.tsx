@@ -24,6 +24,7 @@ import {
   Form_Shadcn_,
   Input_Shadcn_,
   PrePostTab,
+  Textarea_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
@@ -497,10 +498,10 @@ export const MfaAuthSettingsForm = () => {
                         description="To format the OTP code use `{{ .Code }}`"
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="text"
+                          <Textarea_Shadcn_
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
+                            rows={4}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
