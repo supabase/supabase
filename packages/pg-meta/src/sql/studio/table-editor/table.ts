@@ -1,4 +1,4 @@
-import { ident } from '../../../pg-format'
+import { ident, literal } from '../../../pg-format'
 
 export const getDuplicateTableSQL = ({
   comment,
@@ -14,7 +14,7 @@ export const getDuplicateTableSQL = ({
   return [
     `CREATE TABLE ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} (LIKE ${ident(sourceTableSchema)}.${ident(sourceTableName)} INCLUDING ALL);`,
     comment != undefined
-      ? `comment on table ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} is '${comment}';`
+      ? `comment on table ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} is ${literal(comment)};`
       : '',
   ].join('\n')
 }
