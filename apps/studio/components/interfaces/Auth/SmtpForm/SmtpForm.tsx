@@ -469,7 +469,7 @@ export const SmtpForm = () => {
               >
                 {form.formState.isDirty && (
                   <p className="text-sm text-foreground-light">
-                    {enableSmtp ? (
+                    {enableSmtp && !isSmtpEnabled(authConfig) ? (
                       <>
                         Rate limit for sending emails will be increased to 30 and{' '}
                         <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
@@ -477,6 +477,8 @@ export const SmtpForm = () => {
                         </InlineLink>{' '}
                         after enabling custom SMTP
                       </>
+                    ) : enableSmtp ? (
+                      'Custom SMTP settings will be updated'
                     ) : (
                       'Rate limit for sending emails will be reduced to 2 after disabling custom SMTP'
                     )}
