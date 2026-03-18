@@ -258,7 +258,7 @@ test.describe('Database', () => {
 
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
-      await page.getByLabel('Name').fill(databaseTableNameNew)
+      await page.getByLabel('Name', { exact: true }).fill(databaseTableNameNew)
       const createTableWait = createApiResponseWaiter(
         page,
         'pg-meta',
