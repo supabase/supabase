@@ -264,7 +264,9 @@ const Wizard: NextPageWithLayout = () => {
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
           useOrioleDb: form.getValues('useOrioleDb'),
-          tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag ?? undefined,
+          ...(tableEditorApiAccessToggleFlag !== undefined && {
+            tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag,
+          }),
         },
         {
           project: res.ref,

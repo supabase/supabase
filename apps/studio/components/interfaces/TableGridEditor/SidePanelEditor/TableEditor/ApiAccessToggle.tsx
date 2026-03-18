@@ -296,12 +296,13 @@ export const ApiAccessToggle = ({
   const handleMasterToggle = (checked: boolean) => {
     if (!handler.isSuccess) return
     if (!isSchemaExposed) return
-    if (!isNewRecord) return
 
-    track('table_api_access_toggle_clicked', {
-      newState: checked ? 'enabled' : 'disabled',
-      schemaName: schemaName ?? 'unknown',
-    })
+    if (isNewRecord) {
+      track('table_api_access_toggle_clicked', {
+        newState: checked ? 'enabled' : 'disabled',
+        schemaName: schemaName ?? 'unknown',
+      })
+    }
 
     if (checked) {
       handler.data?.restorePreviousPrivileges()
