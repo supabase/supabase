@@ -381,8 +381,7 @@ export const PlatformWebhooksEndpointSheet = ({
                           )
                         }
                         layout="vertical"
-                        className="gap-3"
-                        hideMessage
+                        className="gap-2"
                       >
                         <FormField_Shadcn_
                           control={form.control}
@@ -531,11 +530,6 @@ export const PlatformWebhooksEndpointSheet = ({
                             })}
                           </Accordion>
                         </FormControl_Shadcn_>
-                        {fieldState.error?.message && (
-                          <p className="text-sm text-destructive mt-2" role="alert">
-                            {fieldState.error.message}
-                          </p>
-                        )}
                       </FormItemLayout>
                     )
                   }}
