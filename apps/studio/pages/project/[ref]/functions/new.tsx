@@ -143,14 +143,22 @@ const NewFunctionPage = () => {
     },
   })
 
-  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
+  const {
+    mutate: deployFunction,
+    isPending: isDeploying,
+    isSuccess: hasDeployed,
+  } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
-      if (ref && functionName) {
-        router.push(`/project/${ref}/functions/${functionName}/details`)
-      }
+      // Allow the mutation state (isSuccess) to propagate before navigating
+      // to prevent unnecessary dialog about unsaved changes
+      setTimeout(() => {
+        if (ref && functionName) {
+          router.push(`/project/${ref}/functions/${functionName}/details`)
+        }
+      }, 150)
     },
   })
 
@@ -415,7 +423,7 @@ const NewFunctionPage = () => {
           </Button>
         </form>
       </Form_Shadcn_>
-      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges} />
+      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
     </PageLayout>
   )
 }

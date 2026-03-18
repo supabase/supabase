@@ -1,8 +1,5 @@
+import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
-
 import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
@@ -14,14 +11,18 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
+import { useDataApiGrantTogglesEnabled } from 'hooks/misc/useDataApiGrantTogglesEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH, PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
+import { toast } from 'sonner'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -61,6 +62,7 @@ const CreateProject = () => {
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
   const snapshot = useIntegrationInstallationSnapshot()
+  const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
@@ -135,11 +137,15 @@ const CreateProject = () => {
 
     snapshot.setLoading(true)
 
-    let dbSql: string | undefined
+    let dbSqlParts: string[] = []
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
-      dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
+      const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
+      if (migrationSql) dbSqlParts.push(migrationSql)
       toast.success(`Done fetching initial migrations`, { id })
+    }
+    if (isDataApiGrantTogglesEnabled) {
+      dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
     createProject({
@@ -147,7 +153,7 @@ const CreateProject = () => {
       name: projectName,
       dbPass,
       dbRegion,
-      dbSql,
+      dbSql: dbSqlParts.length > 0 ? dbSqlParts.join('\n') : undefined,
     })
   }
 

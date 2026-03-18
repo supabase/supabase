@@ -1,10 +1,12 @@
+import { getExposedTablesSql } from '@supabase/pg-meta'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
 import { privilegeKeys } from './keys'
-import { getExposedTablesSql } from './privileges.sql'
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
+const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
 export const EXPOSED_TABLES_PAGE_LIMIT = 50
 
 export type ExposedTablesVariables = {
@@ -39,7 +41,7 @@ export async function getExposedTables(
 
   const offset = page * limit
 
-  const sql = getExposedTablesSql({ search, offset, limit })
+  const sql = getExposedTablesSql({ search, offset, limit, ignoredSchemas: IGNORED_SCHEMAS })
 
   const { result } = await executeSql(
     {

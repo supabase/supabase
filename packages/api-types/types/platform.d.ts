@@ -4337,7 +4337,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/stripe/fabric/provisioning/account_requests/{id}': {
+  '/platform/stripe/invoices/overdue': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets information about overdue invoices that relate to the authenticated user */
+    get: operations['InvoicesController_getOverdueInvoices']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/stripe/projects/provisioning/account_requests/{id}': {
     parameters: {
       query?: never
       header?: never
@@ -4354,7 +4371,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/stripe/fabric/provisioning/account_requests/{id}/confirm': {
+  '/platform/stripe/projects/provisioning/account_requests/{id}/confirm': {
     parameters: {
       query?: never
       header?: never
@@ -4365,23 +4382,6 @@ export interface paths {
     put?: never
     /** Confirm account request (from Studio) */
     post: operations['AccountRequestsController_confirmAccountRequest']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/stripe/invoices/overdue': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets information about overdue invoices that relate to the authenticated user */
-    get: operations['InvoicesController_getOverdueInvoices']
-    put?: never
-    post?: never
     delete?: never
     options?: never
     head?: never
@@ -4865,6 +4865,7 @@ export interface components {
     }
     ConfirmRequestDto: {
       organization_id?: number
+      organization_name?: string
     }
     ConfirmResponseDto: {
       organization_slug: string
@@ -5048,6 +5049,7 @@ export interface components {
     }
     CreateInvitationBody: {
       email: string
+      require_sso?: boolean
       role_id: number
       role_scoped_projects?: string[]
     }
@@ -5228,7 +5230,12 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
+          billing_partner:
+            | 'fly'
+            | 'aws_marketplace'
+            | 'vercel_marketplace'
+            | 'stripe_projects'
+            | null
           id: number
           is_owner: boolean
           name: string
@@ -5299,6 +5306,8 @@ export interface components {
         | '48xlarge_optimized_memory'
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+      /** @description Whether to enable high availability for the project. */
+      high_availability?: boolean
       name: string
       organization_slug: string
       /**
@@ -6578,7 +6587,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -7594,7 +7603,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects' | null
       id: number
       is_owner: boolean
       name: string
@@ -7658,7 +7667,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_fabric' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -8374,6 +8383,7 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
       subscription_id: string
+      updated_at: string
       volumeSizeGb?: number
     }
     ProjectMembersResponse: {
@@ -26489,6 +26499,25 @@ export interface operations {
       }
     }
   }
+  InvoicesController_getOverdueInvoices: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OverdueInvoiceCount'][]
+        }
+      }
+    }
+  }
   AccountRequestsController_getAccountRequest: {
     parameters: {
       query?: never
@@ -26531,25 +26560,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ConfirmResponseDto']
-        }
-      }
-    }
-  }
-  InvoicesController_getOverdueInvoices: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['OverdueInvoiceCount'][]
         }
       }
     }

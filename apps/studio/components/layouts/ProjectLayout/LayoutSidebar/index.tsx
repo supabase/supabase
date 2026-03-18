@@ -1,12 +1,18 @@
 import { useBreakpoint } from 'common'
+import { useMobileSheet } from 'components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
 
-import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
+import { SIDEBAR_KEYS, type TYPEOF_SIDEBAR_KEYS } from './LayoutSidebarProvider'
 
-// Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
-// as react resizeable panels requires all these values to be valid to render correctly
+function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
+  return (
+    typeof content === 'string' &&
+    Object.values(SIDEBAR_KEYS).includes(content as TYPEOF_SIDEBAR_KEYS)
+  )
+}
+
 interface LayoutSidebarProps {
   minSize?: string | number
   maxSize?: string | number
@@ -20,9 +26,8 @@ export const LayoutSidebar = ({
 }: LayoutSidebarProps) => {
   const { activeSidebar } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
-  const { setContent: setMobileSheetContent } = useMobileSheet()
+  const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
-  // On mobile, sidebar content is shown in the sheet. Sync sheet content with active sidebar; clear when none or when switching to desktop.
   useEffect(() => {
     if (!isMobile) {
       setMobileSheetContent(null)
@@ -30,10 +35,10 @@ export const LayoutSidebar = ({
     }
     if (activeSidebar?.component) {
       setMobileSheetContent(activeSidebar.id)
-    } else {
+    } else if (isSidebarId(sheetContent)) {
       setMobileSheetContent(null)
     }
-  }, [isMobile, activeSidebar, setMobileSheetContent])
+  }, [isMobile, activeSidebar, sheetContent, setMobileSheetContent])
 
   if (!activeSidebar?.component) return null
   if (isMobile) return null

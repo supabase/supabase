@@ -21,8 +21,8 @@
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "SORT_IMPORTS=false prettier --cache --check '{apps,packages,blocks}/**/*.{js,jsx,ts,tsx,css,md,json}'",
-    "format": "SORT_IMPORTS=false prettier --cache --write '{apps,packages,blocks}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "test:prettier": "SORT_IMPORTS=false prettier --config prettier.config.mjs --cache --check '{apps,packages,blocks,examples,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "SORT_IMPORTS=false prettier --config prettier.config.mjs --cache --write '{apps,packages,blocks,examples,i18n}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:ui-patterns": "turbo run test --filter=ui-patterns",
@@ -30,6 +30,7 @@
     "test:studio:watch": "turbo run test --filter=studio -- watch",
     "e2e:setup:cli": "supabase stop --all --no-backup ; supabase start --exclude studio && if [ -z \"${CI}\" ]; then supabase db reset; fi && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "e2e:setup:selfhosted": "SKIP_ASSET_UPLOAD=1 pnpm e2e:setup:cli && NODE_ENV=test NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && NODE_ENV=test pnpm --prefix ./apps/studio start",
+    "e2e:setup:selfhosted:start-studio": "SKIP_ASSET_UPLOAD=1 NODE_ENV=test pnpm --prefix ./apps/studio start",
     "e2e:setup:platform": "SKIP_ASSET_UPLOAD=1 NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm run build:studio && pnpm --prefix ./apps/studio start",
     "e2e": "pnpm --prefix e2e/studio run e2e",
     "e2e:ui": "pnpm --prefix e2e/studio run e2e:ui",
@@ -47,8 +48,8 @@
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
-    "prettier": "3.2.4",
-    "prettier-plugin-sql-cst": "^0.11.0",
+    "prettier": "^3.8.0",
+    "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^2.76.10",
@@ -67,13 +68,6 @@
     "pnpm": "10.24",
     "node": ">=22"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "pnpm@10.24.0"
 }

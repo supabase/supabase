@@ -1,14 +1,12 @@
+import { useParams } from 'common'
+import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
-
-import { useParams } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { InlineLink } from 'components/ui/InlineLink'
-import { Admonition } from 'ui-patterns'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,17 +17,26 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   Label_Shadcn_,
-  copyToClipboard,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
-import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
+import {
+  filterWebhookDeliveries,
+  filterWebhookEndpoints,
+  usePlatformWebhooksMockStore,
+} from './PlatformWebhooks.store'
+import type { WebhookScope } from './PlatformWebhooks.types'
+import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
 import { PlatformWebhooksDeliveryDetailsSheet } from './PlatformWebhooksDeliveryDetailsSheet'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
 import { PlatformWebhooksEndpointList } from './PlatformWebhooksEndpointList'
@@ -38,19 +45,13 @@ import {
   PlatformWebhooksEndpointSheet,
   toEndpointPayload,
 } from './PlatformWebhooksEndpointSheet'
+import { PlatformWebhooksHeader } from './PlatformWebhooksHeader'
 import {
   clearPendingSigningSecretReveal,
   getPendingSigningSecretReveal,
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
 } from './PlatformWebhooksPage.utils'
-import { PlatformWebhooksHeader } from './PlatformWebhooksHeader'
-import {
-  filterWebhookDeliveries,
-  filterWebhookEndpoints,
-  usePlatformWebhooksMockStore,
-} from './PlatformWebhooks.store'
-import type { WebhookScope } from './PlatformWebhooks.types'
 
 const PANEL_VALUES = ['create', 'edit'] as const
 
@@ -73,6 +74,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     updateEndpoint,
     deleteEndpoint,
     regenerateSecret,
+    retryDelivery,
   } = usePlatformWebhooksMockStore(scope)
   const [deliveryId, setDeliveryId] = useQueryState('deliveryId', parseAsString)
   const [panel, setPanel] = useQueryState('panel', parseAsStringLiteral(PANEL_VALUES))
@@ -111,13 +113,24 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     [endpoints, endpointId]
   )
   const isEndpointView = !!selectedEndpoint
-  const headerTitle = isEndpointView ? 'Endpoint' : scopeLabel
-  const headerDescription = isEndpointView ? selectedEndpoint?.url ?? '' : scopeDescription
+  const selectedEndpointHasName = selectedEndpoint ? selectedEndpoint.name.trim().length > 0 : false
+  const selectedEndpointDisplayName = selectedEndpoint
+    ? getWebhookEndpointDisplayName(selectedEndpoint)
+    : ''
+  const headerTitle = isEndpointView ? selectedEndpointDisplayName : scopeLabel
+  const headerDescription = isEndpointView
+    ? selectedEndpointHasName
+      ? (selectedEndpoint?.url ?? '')
+      : ''
+    : scopeDescription
 
   const endpointPendingDelete = useMemo(
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
+  const endpointPendingDeleteDisplayName = endpointPendingDelete
+    ? getWebhookEndpointDisplayName(endpointPendingDelete)
+    : ''
 
   useEffect(() => {
     if (!platformWebhooksEnabled) {
@@ -220,7 +233,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       setDeliverySearch('')
     }
     setEndpointIdPendingDelete(null)
-    toast.success(`Deleted endpoint "${endpointPendingDelete.url}"`)
+    toast.success(`Deleted endpoint "${endpointPendingDeleteDisplayName}"`)
   }
 
   const handleUpsertEndpoint = (values: EndpointFormValues) => {
@@ -256,6 +269,14 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     setSigningSecretReveal({ signingSecret: nextSecret })
     setShowRegenerateSecretConfirm(false)
     toast.success('Signing secret regenerated')
+  }
+
+  const handleRetryDelivery = (deliveryId: string) => {
+    const delivery = deliveries.find((item) => item.id === deliveryId)
+    if (!delivery || delivery.status === 'success') return
+
+    retryDelivery(deliveryId)
+    toast.success('Delivery queued for retry')
   }
 
   const handleCopy = (value: string, label: string) => {
@@ -357,6 +378,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   setDeliveryDetailsTab('event')
                   setDeliveryId(id)
                 }}
+                onRetryDelivery={handleRetryDelivery}
               />
             )}
           </PageSectionContent>
@@ -372,6 +394,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         selectedDelivery={selectedDelivery}
         onCopy={handleCopy}
         onOpenChange={(open) => !open && setDeliveryId(null)}
+        onRetryDelivery={handleRetryDelivery}
         onTabChange={setDeliveryDetailsTab}
       />
 
@@ -380,7 +403,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         mode={panel === 'create' ? 'create' : 'edit'}
         scope={scope}
         orgSlug={scope === 'project' ? selectedOrganization?.slug : undefined}
-        endpoint={panel === 'edit' ? selectedEndpoint ?? undefined : undefined}
+        endpoint={panel === 'edit' ? (selectedEndpoint ?? undefined) : undefined}
         enabledOverride={panel === 'edit' ? editEnabledOverride : null}
         eventTypes={eventTypeOptions}
         onClose={() => {
@@ -399,7 +422,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             <AlertDialogTitle>Delete endpoint</AlertDialogTitle>
             <AlertDialogDescription>
               {endpointPendingDelete
-                ? `This will delete endpoint ${endpointPendingDelete.url}. This action cannot be undone.`
+                ? endpointPendingDelete.name.trim().length > 0
+                  ? `This will delete endpoint "${endpointPendingDeleteDisplayName}" with URL ${endpointPendingDelete.url}. This action cannot be undone.`
+                  : `This will delete endpoint ${endpointPendingDelete.url}. This action cannot be undone.`
                 : 'This action cannot be undone.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
