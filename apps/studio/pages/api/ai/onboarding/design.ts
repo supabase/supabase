@@ -102,5 +102,5 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     tools: getTools(),
   })
 
-  result.pipeUIMessageStreamToResponse(res)
+  result.pipeUIMessageStreamToResponse(res, { headers: { 'Content-Encoding': 'none' } })
 }

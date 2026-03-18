@@ -4,7 +4,9 @@ import * as bedrockModule from './bedrock'
 import { getModel, ModelErrorMessage } from './model'
 
 vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn(() => 'openai-model'),
+  openai: Object.assign(vi.fn(() => 'openai-model'), {
+    chat: vi.fn(() => 'openai-model'),
+  }),
 }))
 
 vi.mock('./bedrock', async () => ({
@@ -68,7 +70,7 @@ describe('getModel', () => {
 
     expect(model).toEqual('openai-model')
     // Default openai model in registry is gpt-5-mini
-    expect(openai).toHaveBeenCalledWith('gpt-5-mini')
+    expect(openai.chat).toHaveBeenCalledWith('gpt-5-mini')
     expect(promptProviderOptions).toBeUndefined()
   })
 
@@ -94,6 +96,6 @@ describe('getModel', () => {
 
     expect(error).toBeUndefined()
     expect(model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5')
+    expect(openai.chat).toHaveBeenCalledWith('gpt-5')
   })
 })
