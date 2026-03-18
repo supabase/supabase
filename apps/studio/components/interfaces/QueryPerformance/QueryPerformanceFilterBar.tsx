@@ -3,7 +3,6 @@ import {
   ReportsNumericFilter,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
 import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
-import { sources } from 'next/dist/compiled/webpack/webpack'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { ReactNode, useEffect, useState } from 'react'
 

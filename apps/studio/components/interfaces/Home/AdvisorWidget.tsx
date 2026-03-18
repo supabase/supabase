@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
+import { useQueryPerformanceQuery } from 'components/interfaces/Observability/QueryPerformance/useQueryPerformanceQuery'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -43,9 +43,7 @@ export const AdvisorWidget = () => {
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
   const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
-    {
-      preset: 'slowestExecutionTime',
-    }
+    { preset: 'slowestExecutionTime' }
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()

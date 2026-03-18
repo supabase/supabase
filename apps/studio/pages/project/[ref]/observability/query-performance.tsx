@@ -1,12 +1,10 @@
 import { useParams } from 'common'
+import { type QuerySource } from 'components/interfaces/Observability/QueryPerformance/QueryPerformance.types'
+import { useQueryPerformanceQuery } from 'components/interfaces/Observability/QueryPerformance/useQueryPerformanceQuery'
 import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import {
-  QuerySource,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
