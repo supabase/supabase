@@ -38,49 +38,16 @@ import type {
   WebhookScope,
 } from './PlatformWebhooks.types'
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
-
-const isValidWebhookEndpointUrl = (value: string) => {
-  try {
-    const url = new URL(value)
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
-
-    const { hostname } = url
-    return (
-      hostname === 'localhost' ||
-      hostname.includes('.') ||
-      /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname) ||
-      (hostname.startsWith('[') && hostname.endsWith(']'))
-    )
-  } catch {
-    return false
-  }
-}
+import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const endpointFormSchema = z
   .object({
     name: z.string().trim().max(64, 'Name cannot exceed 64 characters'),
-    url: z
-      .string()
-      .trim()
-      .min(1, 'Please provide a URL')
-      .superRefine((value, ctx) => {
-        if (!value) return
-
-        if (!value.startsWith('http://') && !value.startsWith('https://')) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Please prefix your URL with http:// or https://',
-          })
-          return
-        }
-
-        if (!isValidWebhookEndpointUrl(value)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'Please provide a valid URL',
-          })
-        }
-      }),
+    url: httpEndpointUrlSchema({
+      requiredMessage: 'Please provide a URL',
+      invalidMessage: 'Please provide a valid URL',
+      prefixMessage: 'Please prefix your URL with http:// or https://',
+    }),
     description: z.string().trim().max(512, 'Description cannot exceed 512 characters'),
     enabled: z.boolean().default(true),
     subscribeAll: z.boolean().default(false),
@@ -388,6 +355,7 @@ export const PlatformWebhooksEndpointSheet = ({
                   name="eventTypes"
                   render={({ field, fieldState }) => {
                     const selectedTypes = field.value ?? []
+                    const hasEventTypeError = !!fieldState.error
 
                     return (
                       <FormItemLayout
@@ -481,7 +449,10 @@ export const PlatformWebhooksEndpointSheet = ({
                                 <AccordionItem
                                   key={group.id}
                                   value={group.id}
-                                  className="overflow-hidden rounded-md border"
+                                  className={cn(
+                                    'overflow-hidden rounded-md border',
+                                    hasEventTypeError && 'border-destructive-400'
+                                  )}
                                 >
                                   <AccordionTrigger
                                     hideIcon
@@ -561,7 +532,7 @@ export const PlatformWebhooksEndpointSheet = ({
                           </Accordion>
                         </FormControl_Shadcn_>
                         {fieldState.error?.message && (
-                          <p className="text-sm text-destructive" role="alert">
+                          <p className="text-sm text-destructive mt-2" role="alert">
                             {fieldState.error.message}
                           </p>
                         )}

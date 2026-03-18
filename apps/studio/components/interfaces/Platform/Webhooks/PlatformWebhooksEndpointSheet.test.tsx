@@ -131,6 +131,18 @@ describe('PlatformWebhooksEndpointSheet', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
+  it('blocks submit when the endpoint URL uses an incomplete hostname', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'https://webhook')
+    await user.click(await findEventTypeCheckbox('project.updated'))
+    submitForm()
+
+    expect(await screen.findByText('Please provide a valid URL')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it('blocks submit when the endpoint URL does not include a protocol', async () => {
     const user = userEvent.setup()
     const { onSubmit } = renderEndpointSheet()
