@@ -6,20 +6,28 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
-import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsQueueOperationsEnabled,
+  useIsTableFilterBarEnabled,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BannerTableEditorFilter } from '@/components/ui/BannerStack/Banners/BannerTableEditorFilter'
+import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-
-const TABLE_EDITOR_NEW_FILTER_BANNER_ID = 'table-editor-new-filter-banner'
 
 export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { addBanner, dismissBanner } = useBannerStack()
   const isTableFilterBarEnabled = useIsTableFilterBarEnabled()
+  const isTableQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const [isTableEditorNewFilterBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
+  const [isTableEditorQueueOperationsBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
     false
   )
 
@@ -28,22 +36,43 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     'tables'
   )
 
+  const { can: canWriteTables } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
+
   useEffect(() => {
     if (!isPermissionsLoaded) return
 
     if (canReadTables && !isTableEditorNewFilterBannerDismissed && !isTableFilterBarEnabled) {
       addBanner({
-        id: TABLE_EDITOR_NEW_FILTER_BANNER_ID,
-        priority: 2,
+        id: 'table-editor-new-filter-banner',
+        priority: 3,
         isDismissed: false,
         content: <BannerTableEditorFilter />,
       })
     } else {
-      dismissBanner(TABLE_EDITOR_NEW_FILTER_BANNER_ID)
+      dismissBanner('table-editor-new-filter-banner')
+    }
+
+    if (
+      canWriteTables &&
+      !isTableEditorQueueOperationsBannerDismissed &&
+      !isTableQueueOperationsEnabled
+    ) {
+      addBanner({
+        id: 'table-editor-queue-operations-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerTableEditorQueueOperations />,
+      })
+    } else {
+      dismissBanner('table-editor-queue-operations-banner')
     }
 
     return () => {
-      dismissBanner(TABLE_EDITOR_NEW_FILTER_BANNER_ID)
+      dismissBanner('table-editor-new-filter-banner')
+      dismissBanner('table-editor-queue-operations-banner')
     }
   }, [
     addBanner,
@@ -52,6 +81,9 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     isPermissionsLoaded,
     isTableEditorNewFilterBannerDismissed,
     isTableFilterBarEnabled,
+    canWriteTables,
+    isTableEditorQueueOperationsBannerDismissed,
+    isTableQueueOperationsEnabled,
   ])
 
   if (isPermissionsLoaded && !canReadTables) {
