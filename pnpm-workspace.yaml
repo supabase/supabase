@@ -62,6 +62,7 @@ minimumReleaseAgeExclude:
   - react-resizable-panels
   - swiper@12.1.2
   - immutable
+  - undici
 
 onlyBuiltDependencies:
   - node-pty
