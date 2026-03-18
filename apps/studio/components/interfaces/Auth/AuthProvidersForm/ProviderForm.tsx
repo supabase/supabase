@@ -20,6 +20,7 @@ import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, She
 import { Admonition } from 'ui-patterns'
 
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { normalizeSmsTemplateValue } from './AuthProvidersForm.utils'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -83,11 +84,14 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
           initialValues[key] = !(config as any)[key]
         } else {
           const configValue = (config as any)[key]
-          initialValues[key] = configValue
-            ? configValue
-            : provider.properties[key].type === 'boolean'
-              ? false
-              : ''
+          initialValues[key] = normalizeSmsTemplateValue(
+            key,
+            configValue
+              ? configValue
+              : provider.properties[key].type === 'boolean'
+                ? false
+                : ''
+          )
         }
       }
     })
@@ -95,7 +99,11 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   })()
 
   const onSubmit = (values: any, { resetForm }: any) => {
-    const payload = { ...values }
+    const payload = Object.entries(values).reduce((acc, [key, value]) => {
+      acc[key] = normalizeSmsTemplateValue(key, value)
+      return acc
+    }, {} as Record<string, any>)
+
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
