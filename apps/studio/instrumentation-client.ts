@@ -148,8 +148,10 @@ Sentry.init({
       return null
     }
 
-    const isErrorBoundaryCrash = event.tags?.globalErrorBoundary === true
-    const isThirdPartyOnly = event.tags?.third_party_code === true
+    const isErrorBoundaryCrash =
+      event.tags?.globalErrorBoundary === true || event.tags?.globalErrorBoundary === 'true'
+    const isThirdPartyOnly =
+      event.tags?.third_party_code === true || event.tags?.third_party_code === 'true'
 
     // Drop third-party-only errors UNLESS they crashed the page via the global error boundary.
     // This preserves noise reduction for browser extensions and injected scripts,
