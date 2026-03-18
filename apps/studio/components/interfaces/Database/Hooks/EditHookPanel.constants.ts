@@ -7,7 +7,7 @@ const httpRequestSchema = z.object({
   http_url: httpEndpointUrlSchema({
     requiredMessage: 'Please provide a URL',
     invalidMessage: 'Please provide a valid URL',
-    prefixMessage: 'Please prefix your URL with http or https',
+    prefixMessage: 'Please prefix your URL with http:// or https://',
   }),
 })
 

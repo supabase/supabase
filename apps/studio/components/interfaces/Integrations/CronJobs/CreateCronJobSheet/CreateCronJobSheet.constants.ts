@@ -43,7 +43,7 @@ const httpRequestSchema = z.object({
   endpoint: httpEndpointUrlSchema({
     requiredMessage: 'Please provide a URL',
     invalidMessage: 'Please provide a valid URL',
-    prefixMessage: 'Please include HTTP or HTTPs in your URL',
+    prefixMessage: 'Please prefix your URL with http:// or https://',
   }),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
