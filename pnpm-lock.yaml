@@ -95,7 +95,7 @@ importers:
         version: 3.823.0
       '@ianvs/prettier-plugin-sort-imports':
         specifier: ^4.7.0
-        version: 4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.7.3)(supports-color@8.1.1)
+        version: 4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.8.1)(supports-color@8.1.1)
       '@types/node':
         specifier: 'catalog:'
         version: 22.13.14
@@ -106,8 +106,8 @@ importers:
         specifier: ^28.1.0
         version: 28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1)
       prettier:
-        specifier: 3.7.3
-        version: 3.7.3
+        specifier: ^3.8.0
+        version: 3.8.1
       prettier-plugin-sql-cst:
         specifier: ^0.18.0
         version: 0.18.0
@@ -2033,7 +2033,7 @@ importers:
         version: 7.5.2(encoding@0.1.13)(typescript@5.9.2)
       prettier:
         specifier: '*'
-        version: 3.7.3
+        version: 3.8.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
@@ -15740,8 +15740,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.7.3:
-    resolution: {integrity: sha512-QgODejq9K3OzoBbuyobZlUhznP5SKwPqp+6Q6xw6o8gnhr4O85L2U915iM2IDcfF2NPXVaM9zlo9tdwipnYwzg==}
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -21056,13 +21056,13 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@ianvs/prettier-plugin-sort-imports@4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.7.3)(supports-color@8.1.1)':
+  '@ianvs/prettier-plugin-sort-imports@4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.8.1)(supports-color@8.1.1)':
     dependencies:
       '@babel/generator': 7.29.0
       '@babel/parser': 7.29.0
       '@babel/traverse': 7.29.0(supports-color@8.1.1)
       '@babel/types': 7.29.0
-      prettier: 3.7.3
+      prettier: 3.8.1
       semver: 7.7.3
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.21
@@ -24662,7 +24662,7 @@ snapshots:
       p-map: 7.0.4
       pathe: 1.1.2
       picocolors: 1.1.1
-      prettier: 3.7.3
+      prettier: 3.8.1
       react-refresh: 0.14.2
       react-router: 7.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       semver: 7.7.3
@@ -25746,7 +25746,7 @@ snapshots:
     dependencies:
       '@babel/parser': 7.29.0
       libpg-query: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
-      prettier: 3.7.3
+      prettier: 3.8.1
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -26006,7 +26006,7 @@ snapshots:
       '@tanstack/router-core': 1.158.0
       '@tanstack/router-utils': 1.158.0(supports-color@8.1.1)
       '@tanstack/virtual-file-routes': 1.154.7
-      prettier: 3.7.3
+      prettier: 3.8.1
       recast: 0.23.11
       source-map: 0.7.6
       tsx: 4.20.3
@@ -34766,7 +34766,7 @@ snapshots:
 
   prettier-plugin-sql-cst@0.18.0:
     dependencies:
-      prettier: 3.7.3
+      prettier: 3.8.1
       sql-parser-cst: 0.38.2
 
   prettier-plugin-sql@0.13.0(prettier@2.8.8):
@@ -34778,7 +34778,7 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.7.3: {}
+  prettier@3.8.1: {}
 
   pretty-bytes@7.0.1: {}
 

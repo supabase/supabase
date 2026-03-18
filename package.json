@@ -48,7 +48,7 @@
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
-    "prettier": "3.7.3",
+    "prettier": "^3.8.0",
     "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
