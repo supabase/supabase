@@ -30,7 +30,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
   const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
   const _maxSizeGb = errors.maxSizeGb
     ? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-    : maxSizeGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+    : (maxSizeGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb)
 
   const growthSize = Math.floor(totalSize * (_growthPercent / 100))
   const autoscaleGrowValue = Math.min(

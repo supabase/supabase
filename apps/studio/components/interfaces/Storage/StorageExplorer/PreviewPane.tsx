@@ -1,13 +1,12 @@
 import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isEmpty } from 'lodash'
-import { AlertCircle, ChevronDown, Copy, Download, Loader, Trash2, X } from 'lucide-react'
-import SVG from 'react-inlinesvg'
-
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
+import { isEmpty } from 'lodash'
+import { AlertCircle, ChevronDown, Copy, Download, LoaderCircle, Trash2, X } from 'lucide-react'
+import SVG from 'react-inlinesvg'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -16,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'
@@ -41,7 +41,7 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <Loader size={14} strokeWidth={2} className="animate-spin" />
+        <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
       </div>
     )
   }
@@ -212,7 +212,7 @@ export const PreviewPane = () => {
               <Button
                 type="outline"
                 icon={<Copy />}
-                onClick={() => onCopyUrl(file.name)}
+                onClick={() => onCopyUrl(file.path!)}
                 disabled={file.isCorrupted}
               >
                 Get URL
@@ -232,19 +232,19 @@ export const PreviewPane = () => {
                 <DropdownMenuContent side="bottom" align="center">
                   <DropdownMenuItem
                     key="expires-one-week"
-                    onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.WEEK)}
+                    onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}
                   >
                     Expire in 1 week
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="expires-one-month"
-                    onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.MONTH)}
+                    onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}
                   >
                     Expire in 1 month
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="expires-one-year"
-                    onClick={() => onCopyUrl(file.name, URL_EXPIRY_DURATION.YEAR)}
+                    onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}
                   >
                     Expire in 1 year
                   </DropdownMenuItem>

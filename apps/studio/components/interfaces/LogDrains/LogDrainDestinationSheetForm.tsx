@@ -211,7 +211,7 @@ export function LogDrainDestinationSheetForm({
   }
   const DEFAULT_HEADERS =
     mode === 'create'
-      ? CREATE_DEFAULT_HEADERS_BY_TYPE[defaultType] ?? {}
+      ? (CREATE_DEFAULT_HEADERS_BY_TYPE[defaultType] ?? {})
       : defaultConfig?.headers || {}
 
   const sentryEnabled = useFlag('SentryLogDrain')

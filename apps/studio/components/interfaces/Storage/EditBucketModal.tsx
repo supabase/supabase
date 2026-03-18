@@ -109,7 +109,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     name: bucket?.name ?? '',
     public: bucket?.public,
     has_file_size_limit: Boolean(bucket?.file_size_limit),
-    formatted_size_limit: bucket?.file_size_limit ? fileSizeLimit ?? 0 : undefined,
+    formatted_size_limit: bucket?.file_size_limit ? (fileSizeLimit ?? 0) : undefined,
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
   }
 

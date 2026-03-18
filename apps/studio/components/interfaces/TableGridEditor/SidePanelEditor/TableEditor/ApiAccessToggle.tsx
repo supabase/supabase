@@ -126,9 +126,9 @@ const useTableApiAccessHandler = (
 
   const canResolvePrivilegeParams = Boolean(
     shouldReadExistingGrants &&
-      project?.ref &&
-      permissionsTemplateSchema &&
-      permissionsTemplateTable
+    project?.ref &&
+    permissionsTemplateSchema &&
+    permissionsTemplateTable
   )
   const isPrivilegesQueryEnabled = enabled && canResolvePrivilegeParams
   const apiAccessStatus = useTableApiAccessQuery(
