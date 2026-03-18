@@ -134,6 +134,7 @@ services:
 
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      GOTRUE_DB_MAX_POOL_SIZE: ${AUTH_DB_MAX_POOL_SIZE:-20}
 
       GOTRUE_SITE_URL: ${SITE_URL}
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS}
@@ -148,7 +149,7 @@ services:
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
 
       # JSON array of signing JWKs (EC private + legacy symmetric)
-      #GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
+      GOTRUE_JWT_KEYS: ${JWT_KEYS:-[]}
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
@@ -293,8 +294,8 @@ services:
       # Legacy symmetric HS256 key
       API_JWT_SECRET: ${JWT_SECRET}
 
-      # JWKS for token verification (EC public + legacy symmetric)
-      #API_JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+      # JWKS for token      # JSON array of public JWKs for verification
+      API_JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       ERL_AFLAGS: -proto_dist inet_tcp
@@ -339,8 +340,8 @@ services:
       # Legacy symmetric HS256 key
       AUTH_JWT_SECRET: ${JWT_SECRET}
 
-      # JWKS for token verification (EC public + legacy symmetric)
-      #JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
+      # JWKS for token      # JSON array of public JWKs for verification
+      JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
@@ -541,7 +542,9 @@ services:
         "-c",
         "config_file=/etc/postgresql/postgresql.conf",
         "-c",
-        "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
+        "log_min_messages=fatal", # prevents Realtime polling queries from appearing in logs
+        "-c",
+        "max_slot_wal_keep_size=1024MB" # prevents indefinite WAL growth from lagging replication slots
       ]
 
   vector:
