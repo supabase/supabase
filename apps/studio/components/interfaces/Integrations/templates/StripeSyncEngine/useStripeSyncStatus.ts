@@ -33,7 +33,24 @@ export function useStripeSyncStatus({
 
   // Find and parse stripe schema status
   const stripeSchema = findStripeSchema(schemas)
-  const schemaComment = parseSchemaComment(stripeSchema?.comment)
+  const rawSchemaComment = parseSchemaComment(stripeSchema?.comment)
+
+  const now = Date.now()
+  const timedOut = rawSchemaComment.startTime
+    ? now - rawSchemaComment.startTime > OPERATION_TIME_OUT_MS
+    : false
+  let status = rawSchemaComment.status
+  let errorMessage = rawSchemaComment.errorMessage
+  if (timedOut) {
+    if (status === 'installing') {
+      status = 'install error'
+      errorMessage = 'Installation timed out'
+    } else if (status === 'uninstalling') {
+      status = 'uninstall error'
+      errorMessage = 'Uninstallation timed out'
+    }
+  }
+  const schemaComment = { ...rawSchemaComment, status, errorMessage }
 
   const installed = isInstalled(schemaComment.status)
   const inProgress = isInProgress(schemaComment.status)
@@ -50,21 +67,6 @@ export function useStripeSyncStatus({
 
     return () => clearInterval(interval)
   }, [inProgress, refetch])
-
-  const now = Date.now()
-  const timedOut = schemaComment.startTime
-    ? now - schemaComment.startTime > OPERATION_TIME_OUT_MS
-    : false
-
-  if (timedOut) {
-    if (schemaComment.status == 'installing') {
-      schemaComment.status = 'install error'
-      schemaComment.errorMessage = 'Installation timed out'
-    } else if (schemaComment.status == 'uninstalling') {
-      schemaComment.status = 'uninstall error'
-      schemaComment.errorMessage = 'Uninstallation timed out'
-    }
-  }
 
   // Query sync state only when installed
   const { data: syncState } = useStripeSyncingState(
