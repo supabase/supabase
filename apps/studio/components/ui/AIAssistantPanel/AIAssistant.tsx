@@ -27,7 +27,6 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
-
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import type { SqlSnippet } from './AIAssistant.types'
