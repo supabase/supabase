@@ -23,8 +23,6 @@ import {
   DialogTrigger,
 } from 'ui'
 
-import { useProjectLastRestoreInitiatedQuery } from '@/data/projects/project-restore-status-query'
-
 export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -49,11 +47,7 @@ export const RestoringState = () => {
     }
   )
 
-  const { data: lastRestoreInitiatedEvent } = useProjectLastRestoreInitiatedQuery({ ref })
-  const restoreInitiatedSinceMinutes = dayjs().diff(
-    dayjs.utc(lastRestoreInitiatedEvent?.restore_initiated_on),
-    'minute'
-  )
+  const restoreInitiatedSinceMinutes = dayjs().diff(dayjs.utc(project?.updated_at), 'minute')
   const showSupportCta = restoreInitiatedSinceMinutes >= 30
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({

@@ -3205,23 +3205,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/{ref}/restore/status': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets the latest restore initiated event for a project if a project is restored */
-    get: operations['UnpauseController_getRestoreInitiatedEvent']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/projects/{ref}/restore/versions': {
     parameters: {
       query?: never
@@ -8417,9 +8400,6 @@ export interface components {
       /** @enum {string|null} */
       need_pitr: 'critical' | 'warning' | null
       project: string
-    }
-    ProjectRestoreInitiatedEventResponse: {
-      restore_initiated_on: string | null
     }
     ProjectSensitivityResponse: {
       is_sensitive: boolean
@@ -22300,49 +22280,6 @@ export interface operations {
       }
       /** @description Failed to unpause project */
       500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  UnpauseController_getRestoreInitiatedEvent: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ProjectRestoreInitiatedEventResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
         headers: {
           [name: string]: unknown
         }

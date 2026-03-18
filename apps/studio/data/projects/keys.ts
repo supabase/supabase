@@ -39,7 +39,4 @@ export const projectKeys = {
 
   // Banner-specific: first-page snapshot used by the status page banner hook
   bannerProjectsByOrg: (slug: string) => ['banner', 'org-projects', slug] as const,
-
-  lastRestoreInitiated: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'last-restore-initiated'] as const,
 }
