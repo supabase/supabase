@@ -140,7 +140,7 @@ export async function generateAssistantResponse({
       ...(await convertToModelMessages(messages)),
     ]
 
-    const streamTextFn = ai.streamText
+    const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
 
     return streamTextFn({
       model,
