@@ -80,7 +80,7 @@ export const RestoringState = () => {
     if (isProjectStatusSuccess && projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
       setIsCompleted(true)
     }
-  }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
+  }, [isProjectStatusSuccess, projectStatusData])
 
   return (
     <div className="flex items-center justify-center h-full">
