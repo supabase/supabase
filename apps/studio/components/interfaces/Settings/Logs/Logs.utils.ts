@@ -811,7 +811,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<string, string> = {
 function extractServiceLabelFromSql(sql: string): string | null {
   const match = sql.match(/\bfrom\s+(\w+)/i)
   const tableName = match?.[1]
-  return tableName ? LOG_TABLE_TO_SERVICE_LABEL[tableName] ?? null : null
+  return tableName ? (LOG_TABLE_TO_SERVICE_LABEL[tableName] ?? null) : null
 }
 
 export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {

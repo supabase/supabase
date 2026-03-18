@@ -126,13 +126,13 @@ export const UpdateVersionModal = ({
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">Current version:</p>{' '}
               <code className="text-code-inline">
-                {isLoadingVersion ? 'Loading...' : currentVersionName ?? 'Unknown'}
+                {isLoadingVersion ? 'Loading...' : (currentVersionName ?? 'Unknown')}
               </code>
             </div>
             <div className="text-sm text-foreground prose max-w-full">
               <p className="text-foreground-light mb-1">New version:</p>{' '}
               <code className="text-code-inline">
-                {isLoadingVersion ? 'Loading...' : newVersionName ?? 'Unknown'}
+                {isLoadingVersion ? 'Loading...' : (newVersionName ?? 'Unknown')}
               </code>
             </div>
           </div>

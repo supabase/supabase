@@ -15,7 +15,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - minio-data:/data:z
+      - minio-data:/data
 
   minio-createbucket:
     image: cgr.dev/chainguard/minio-client:latest-dev

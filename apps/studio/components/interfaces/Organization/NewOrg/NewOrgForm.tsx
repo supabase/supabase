@@ -290,7 +290,7 @@ export const NewOrgForm = ({
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
       address: dbTier === 'FREE' ? null : customerData?.address,
-      tax_id: dbTier === 'FREE' ? undefined : customerData?.tax_id ?? undefined,
+      tax_id: dbTier === 'FREE' ? undefined : (customerData?.tax_id ?? undefined),
     })
   }
 

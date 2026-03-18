@@ -18,10 +18,10 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 6. You can also use Node built-in APIs. You will need to import them using `node:` specifier. For example, to import Node process: `import process from "node:process". Use Node APIs when you find gaps in Deno APIs.
 7. Do NOT use `import { serve } from "https://deno.land/std@0.168.0/http/server.ts"`. Instead use the built-in `Deno.serve`.
 8. Following environment variables (ie. secrets) are pre-populated in both local and hosted Supabase environments. Users don't need to manually set them:
-	* SUPABASE_URL
-	* SUPABASE_ANON_KEY
-	* SUPABASE_SERVICE_ROLE_KEY
-	* SUPABASE_DB_URL
+   - SUPABASE_URL
+   - SUPABASE_ANON_KEY
+   - SUPABASE_SERVICE_ROLE_KEY
+   - SUPABASE_DB_URL
 9. To set other environment variables (ie. secrets) users can put them in a env file and run the `supabase secrets set --env-file path/to/env-file`
 10. A single Edge Function can handle multiple routes. It is recommended to use a library like Express or Hono to handle the routes as it's easier for developer to understand and maintain. Each route must be prefixed with `/function-name` so they are routed correctly.
 11. File write operations are ONLY permitted on `/tmp` directory. You can use either Deno or Node File APIs.
@@ -33,83 +33,74 @@ You're an expert in writing TypeScript and Deno JavaScript runtime. Generate **h
 
 ```tsx
 interface reqPayload {
-	name: string;
+  name: string
 }
 
-console.info('server started');
+console.info('server started')
 
 Deno.serve(async (req: Request) => {
-	const { name }: reqPayload = await req.json();
-	const data = {
-		message: `Hello ${name} from foo!`,
-	};
+  const { name }: reqPayload = await req.json()
+  const data = {
+    message: `Hello ${name} from foo!`,
+  }
 
-	return new Response(
-		JSON.stringify(data),
-		{ headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive' }}
-		);
-});
-
+  return new Response(JSON.stringify(data), {
+    headers: { 'Content-Type': 'application/json', Connection: 'keep-alive' },
+  })
+})
 ```
 
 ### Example Function using Node built-in API
 
 ```tsx
-import { randomBytes } from "node:crypto";
-import { createServer } from "node:http";
-import process from "node:process";
+import { randomBytes } from 'node:crypto'
+import { createServer } from 'node:http'
+import process from 'node:process'
 
 const generateRandomString = (length) => {
-    const buffer = randomBytes(length);
-    return buffer.toString('hex');
-};
+  const buffer = randomBytes(length)
+  return buffer.toString('hex')
+}
 
-const randomString = generateRandomString(10);
-console.log(randomString);
+const randomString = generateRandomString(10)
+console.log(randomString)
 
 const server = createServer((req, res) => {
-    const message = `Hello`;
-    res.end(message);
-});
+  const message = `Hello`
+  res.end(message)
+})
 
-server.listen(9999);
+server.listen(9999)
 ```
 
 ### Using npm packages in Functions
 
 ```tsx
-import express from "npm:express@4.18.2";
+import express from 'npm:express@4.18.2'
 
-const app = express();
+const app = express()
 
 app.get(/(.*)/, (req, res) => {
-    res.send("Welcome to Supabase");
-});
+  res.send('Welcome to Supabase')
+})
 
-app.listen(8000);
-
+app.listen(8000)
 ```
 
 ### Generate embeddings using built-in @Supabase.ai API
 
 ```tsx
-const model = new Supabase.ai.Session('gte-small');
+const model = new Supabase.ai.Session('gte-small')
 
 Deno.serve(async (req: Request) => {
-	const params = new URL(req.url).searchParams;
-	const input = params.get('text');
-	const output = await model.run(input, { mean_pool: true, normalize: true });
-	return new Response(
-		JSON.stringify(
-			output,
-		),
-		{
-			headers: {
-				'Content-Type': 'application/json',
-				'Connection': 'keep-alive',
-			},
-		},
-	);
-});
-
+  const params = new URL(req.url).searchParams
+  const input = params.get('text')
+  const output = await model.run(input, { mean_pool: true, normalize: true })
+  return new Response(JSON.stringify(output), {
+    headers: {
+      'Content-Type': 'application/json',
+      Connection: 'keep-alive',
+    },
+  })
+})
 ```

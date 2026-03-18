@@ -139,8 +139,10 @@ export const VirtualizedTable = <TItem,>({
   )
 }
 
-interface VirtualizedTableBodyProps<TItem>
-  extends Omit<React.ComponentProps<typeof TableBody>, 'children'> {
+interface VirtualizedTableBodyProps<TItem> extends Omit<
+  React.ComponentProps<typeof TableBody>,
+  'children'
+> {
   emptyContent?: ReactNode
   leadingContent?: ReactNode
   trailingContent?: ReactNode
@@ -167,7 +169,7 @@ export const VirtualizedTableBody = <TItem,>({
     <TableBody {...props}>
       {leadingContent}
       {data.length === 0 ? (
-        emptyContent ?? null
+        (emptyContent ?? null)
       ) : (
         <>
           {paddingTop > 0 && (

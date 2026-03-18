@@ -23,5 +23,5 @@ export const getDuplicateIdentitySequenceSQL = ({
   sourceTableName: string
   sourceTableSchema: string
 }) => {
-  return `SELECT setval('${ident(sourceTableSchema)}.${ident(`${duplicatedTableName}_${columnName}_seq`)}', (SELECT MAX(${ident(columnName)}) FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)}));`
+  return `SELECT setval('${ident(sourceTableSchema)}.${ident(`${duplicatedTableName}_${columnName}_seq`)}', (SELECT COALESCE(MAX(${ident(columnName)}), 1) FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)}));`
 }

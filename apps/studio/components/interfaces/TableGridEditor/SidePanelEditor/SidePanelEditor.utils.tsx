@@ -1,5 +1,16 @@
 import * as Sentry from '@sentry/nextjs'
-import pgMeta, { type ForeignKey } from '@supabase/pg-meta'
+import pgMeta, {
+  getAddForeignKeySQL,
+  getAddPrimaryKeySQL,
+  getDropConstraintSQL,
+  getDuplicateIdentitySequenceSQL,
+  getDuplicateRowsSQL,
+  getDuplicateTableSQL,
+  getEnableRLSSQL,
+  getRemoveForeignKeySQL,
+  getUpdateIdentitySequenceSQL,
+  type ForeignKey,
+} from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
 import type { SupaRow } from 'components/grid/types'
@@ -86,7 +97,7 @@ const addPrimaryKey = async (
   table: string,
   columns: string[]
 ) => {
-  const query = pgMeta.tableEditor.getAddPrimaryKeySQL({ schema, table, columns })
+  const query = getAddPrimaryKeySQL({ schema, table, columns })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -102,7 +113,7 @@ const dropConstraint = async (
   table: string,
   name: string
 ) => {
-  const query = pgMeta.tableEditor.getDropConstraintSQL({ schema, table, name })
+  const query = getDropConstraintSQL({ schema, table, name })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -122,7 +133,7 @@ const addForeignKey = async ({
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
-  const query = pgMeta.tableEditor.getAddForeignKeySQL({ table, foreignKeys })
+  const query = getAddForeignKeySQL({ table, foreignKeys })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -142,7 +153,7 @@ const removeForeignKey = async ({
   table: { schema: string; name: string }
   foreignKeys: ForeignKey[]
 }) => {
-  const query = pgMeta.tableEditor.getRemoveForeignKeySQL({ table, foreignKeys })
+  const query = getRemoveForeignKeySQL({ table, foreignKeys })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
@@ -163,8 +174,8 @@ const updateForeignKey = async ({
   foreignKeys: ForeignKey[]
 }) => {
   const query = `
-  ${pgMeta.tableEditor.getRemoveForeignKeySQL({ table, foreignKeys })}
-  ${pgMeta.tableEditor.getAddForeignKeySQL({ table, foreignKeys })}
+  ${getRemoveForeignKeySQL({ table, foreignKeys })}
+  ${getAddForeignKeySQL({ table, foreignKeys })}
   `
     .replace(/\s+/g, ' ')
     .trim()
@@ -251,7 +262,7 @@ export const createColumn = async ({
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
     return { error: undefined }
-  } catch (error: any) {
+  } catch (error) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
   }
@@ -359,7 +370,7 @@ export const duplicateTable = async (
   await executeSql({
     projectRef,
     connectionString,
-    sql: pgMeta.tableEditor.getDuplicateTableSQL({
+    sql: getDuplicateTableSQL({
       sourceTableName,
       sourceTableSchema,
       duplicatedTableName,
@@ -383,7 +394,7 @@ export const duplicateTable = async (
     await executeSql({
       projectRef,
       connectionString,
-      sql: pgMeta.tableEditor.getDuplicateRowsSQL({
+      sql: getDuplicateRowsSQL({
         sourceTableName,
         sourceTableSchema,
         duplicatedTableName,
@@ -397,7 +408,7 @@ export const duplicateTable = async (
       await executeSql({
         projectRef,
         connectionString,
-        sql: pgMeta.tableEditor.getDuplicateIdentitySequenceSQL({
+        sql: getDuplicateIdentitySequenceSQL({
           sourceTableName,
           sourceTableSchema,
           duplicatedTableName,
@@ -470,7 +481,7 @@ export const createTable = async ({
 
   // 2. Enable RLS if configured
   if (isRLSEnabled) {
-    const enableRLSSQL = pgMeta.tableEditor.getEnableRLSSQL({
+    const enableRLSSQL = getEnableRLSSQL({
       schema: payload.schema,
       table: payload.name,
     })
@@ -506,7 +517,7 @@ export const createTable = async ({
     .filter((column) => column.isPrimaryKey)
     .map((column) => column.name)
   if (primaryKeyColumns.length > 0) {
-    const primaryKeySQL = pgMeta.tableEditor.getAddPrimaryKeySQL({
+    const primaryKeySQL = getAddPrimaryKeySQL({
       schema: payload.schema,
       table: payload.name,
       columns: primaryKeyColumns,
@@ -516,7 +527,7 @@ export const createTable = async ({
 
   // 5. Add foreign key constraints
   if (foreignKeyRelations.length > 0) {
-    const fkSql = pgMeta.tableEditor.getAddForeignKeySQL({
+    const fkSql = getAddForeignKeySQL({
       table: { schema: payload.schema, name: payload.name },
       foreignKeys: foreignKeyRelations,
     })
@@ -639,7 +650,7 @@ export const createTable = async ({
       async (span) => {
         const rowCount = importContent.file
           ? importContent.rowCount
-          : importContent.rows?.length ?? 0
+          : (importContent.rows?.length ?? 0)
         span.setAttribute('import.row_count', rowCount)
         span.setAttribute('import.method', importContent.file ? 'csv' : 'paste')
 
@@ -709,7 +720,7 @@ export const createTable = async ({
         if (identityColumns.length > 0) {
           const updateSequenceSQL = identityColumns
             .map((column) =>
-              pgMeta.tableEditor.getUpdateIdentitySequenceSQL({
+              getUpdateIdentitySequenceSQL({
                 schema: table.schema,
                 table: table.name,
                 column: column.name,

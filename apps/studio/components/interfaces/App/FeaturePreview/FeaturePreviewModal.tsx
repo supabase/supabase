@@ -130,7 +130,7 @@ export const FeaturePreviewModal = () => {
                 >
                   <SelectTrigger id="feature-preview-select">
                     <div className="flex items-center gap-x-2">
-                      {flags[selectedFeature.key] ?? false ? (
+                      {(flags[selectedFeature.key] ?? false) ? (
                         <Eye size={14} strokeWidth={2} className="text-brand" />
                       ) : (
                         <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />

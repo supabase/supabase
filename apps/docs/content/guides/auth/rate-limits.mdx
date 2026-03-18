@@ -34,7 +34,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
 ## Rate limit behavior
 
-Supabase Auth uses a token bucket algorithm for endpoint operations that are limited by IP address. 
+Supabase Auth uses a token bucket algorithm for endpoint operations that are limited by IP address.
 
 Each bucket has a maximum capacity of 30 requests. When the bucket is full, brief bursts of up to 30 requests can be allowed in a short period. Once the bucket empties, requests are rate limited until tokens refill. The rate limit defines the rate at which the bucket is refilled.
 

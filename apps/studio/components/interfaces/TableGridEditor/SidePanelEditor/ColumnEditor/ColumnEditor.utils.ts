@@ -1,4 +1,4 @@
-import pgMeta from '@supabase/pg-meta'
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
@@ -32,7 +32,9 @@ const isSQLExpression = (input: string) => {
   return false
 }
 
-export const generateColumnField = (field: any = {}): ColumnField => {
+export const generateColumnField = (
+  field: { name?: string; table?: string; schema?: string; format?: string } = {}
+): ColumnField => {
   const { name, table, schema, format } = field
   return {
     id: uuidv4(),
@@ -173,7 +175,7 @@ export const generateUpdateColumnPayload = (
 }
 
 export const validateFields = (field: ColumnField) => {
-  const errors = {} as Dictionary<any>
+  const errors = {} as Dictionary<string>
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
     toast.error(errors['name'])
@@ -230,9 +232,9 @@ export const getColumnForeignKey = (
     return {
       ...foreignKey,
       deletion_action:
-        foreignKeyMeta?.deletion_action ?? pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       update_action:
-        foreignKeyMeta?.update_action ?? pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        foreignKeyMeta?.update_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
   }
 }
@@ -245,13 +247,13 @@ const formatArrayToPostgresArray = (arrayString: string) => {
 
 export const getForeignKeyCascadeAction = (action?: string) => {
   switch (action) {
-    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.CASCADE:
+    case FOREIGN_KEY_CASCADE_ACTION.CASCADE:
       return 'Cascade'
-    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.RESTRICT:
+    case FOREIGN_KEY_CASCADE_ACTION.RESTRICT:
       return 'Restrict'
-    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT:
+    case FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT:
       return 'Set default'
-    case pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
+    case FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
       return 'Set NULL'
     default:
       return undefined
