@@ -100,15 +100,15 @@ This should return the EC public key (the symmetric key is excluded). Third-part
 
 New variables default to empty values in `.env.example`. When empty, the API gateway and all services operate in legacy-only mode: `sb_publishable` and `sb_secret` API keys are not configured.
 
-| Environment variable (existing and new) | Type | Description |
-|---|---|---|
-| `JWT_SECRET` | Symmetric secret | **Existing:** Shared secret for signing and verifying HS256 JWTs. Used by multiple services. |
-| `ANON_KEY` | HS256 JWT | **Existing:** Legacy client-side API key. Embedded JWT with `role: "anon"`. |
-| `SERVICE_ROLE_KEY` | HS256 JWT | **Existing:** Legacy server-side API key. Embedded JWT with `role: "service_role"`. |
-| `SUPABASE_PUBLISHABLE_KEY` | Opaque | **New:** Short random key with checksum. Replaces `ANON_KEY` for **client-side** use. |
-| `SUPABASE_SECRET_KEY` | Opaque | **New:** Short random key with checksum. Replaces `SERVICE_ROLE_KEY` for **server-side** use. |
-| `JWT_KEYS` | JSON array | **New:** JSON array of signing JWKs containing the new asymmetric key pair and the legacy symmetric key. Used by Auth to sign tokens. |
-| `JWT_JWKS` | JWKS (JSON) | **New:** Contains the new public key and the legacy symmetric key. Used by PostgREST, Realtime, and Storage to verify tokens. |
+| Environment variable (existing and new) | Type             | Description                                                                                                                           |
+| --------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `JWT_SECRET`                            | Symmetric secret | **Existing:** Shared secret for signing and verifying HS256 JWTs. Used by multiple services.                                          |
+| `ANON_KEY`                              | HS256 JWT        | **Existing:** Legacy client-side API key. Embedded JWT with `role: "anon"`.                                                           |
+| `SERVICE_ROLE_KEY`                      | HS256 JWT        | **Existing:** Legacy server-side API key. Embedded JWT with `role: "service_role"`.                                                   |
+| `SUPABASE_PUBLISHABLE_KEY`              | Opaque           | **New:** Short random key with checksum. Replaces `ANON_KEY` for **client-side** use.                                                 |
+| `SUPABASE_SECRET_KEY`                   | Opaque           | **New:** Short random key with checksum. Replaces `SERVICE_ROLE_KEY` for **server-side** use.                                         |
+| `JWT_KEYS`                              | JSON array       | **New:** JSON array of signing JWKs containing the new asymmetric key pair and the legacy symmetric key. Used by Auth to sign tokens. |
+| `JWT_JWKS`                              | JWKS (JSON)      | **New:** Contains the new public key and the legacy symmetric key. Used by PostgREST, Realtime, and Storage to verify tokens.         |
 
 ### Differences from the Supabase platform
 
@@ -186,7 +186,6 @@ For **Realtime WebSocket** connections, the API key is sent as a `?apikey=` quer
 
 **Storage** and **Edge Functions** accept requests without an API key. These services handle their own authentication.
 
-
 ### API gateway routing
 
 Kong is configured with two consumers that each accept both the legacy and new API keys:
@@ -195,27 +194,27 @@ Kong is configured with two consumers that each accept both the legacy and new A
 consumers:
   - username: anon
     keyauth_credentials:
-      - key: $SUPABASE_ANON_KEY         # legacy HS256 JWT (ANON_KEY)
-      - key: $SUPABASE_PUBLISHABLE_KEY  # new opaque key (omitted when not configured)
+      - key: $SUPABASE_ANON_KEY # legacy HS256 JWT (ANON_KEY)
+      - key: $SUPABASE_PUBLISHABLE_KEY # new opaque key (omitted when not configured)
   - username: service_role
     keyauth_credentials:
-      - key: $SUPABASE_SERVICE_KEY      # legacy HS256 JWT (SERVICE_ROLE_KEY)
-      - key: $SUPABASE_SECRET_KEY       # new opaque key (omitted when not configured)
+      - key: $SUPABASE_SERVICE_KEY # legacy HS256 JWT (SERVICE_ROLE_KEY)
+      - key: $SUPABASE_SECRET_KEY # new opaque key (omitted when not configured)
 ```
 
 When new API keys have not been added yet, the `kong-entrypoint.sh` script removes the empty credential entries before Kong loads the config.
 
 To assist with the authorization flows a specialized configuration in `kong.yml` substitutes internal, gateway-level-only pre-signed JWTs for `sb_publishable` and `sb_secret` API keys. These pre-signed JWTs are also auto-configured in `.env` but **should not** be used in any application code.
 
-| Route | Service | API key required | Header substitution |
-|---|---|---|---|
-| `/auth/v1/*` | Auth | Yes | `Authorization` |
-| `/rest/v1/*` | PostgREST | Yes | `Authorization` |
-| `/graphql/v1` | PostgREST | Yes | `Authorization` |
-| `/realtime/v1/api/*` | Realtime (REST) | Yes | `Authorization` |
-| `/realtime/v1/*` | Realtime (WebSocket) | Yes | `x-api-key` |
-| `/storage/v1/*` | Storage | No | `Authorization` |
-| `/functions/v1/*` | Edge Functions | No | - |
+| Route                | Service              | API key required | Header substitution |
+| -------------------- | -------------------- | ---------------- | ------------------- |
+| `/auth/v1/*`         | Auth                 | Yes              | `Authorization`     |
+| `/rest/v1/*`         | PostgREST            | Yes              | `Authorization`     |
+| `/graphql/v1`        | PostgREST            | Yes              | `Authorization`     |
+| `/realtime/v1/api/*` | Realtime (REST)      | Yes              | `Authorization`     |
+| `/realtime/v1/*`     | Realtime (WebSocket) | Yes              | `x-api-key`         |
+| `/storage/v1/*`      | Storage              | No               | `Authorization`     |
+| `/functions/v1/*`    | Edge Functions       | No               | -                   |
 
 ### Request flows
 

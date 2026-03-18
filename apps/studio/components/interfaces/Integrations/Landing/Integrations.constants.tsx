@@ -473,17 +473,17 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import(
-                'components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview'
-              ).then((mod) => mod.StripeSyncInstallationPage),
+              import('components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
+                (mod) => mod.StripeSyncInstallationPage
+              ),
             { loading: Loading }
           )
         case 'settings':
           return dynamic(
             () =>
-              import(
-                'components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage'
-              ).then((mod) => mod.StripeSyncSettingsPage),
+              import('components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
+                (mod) => mod.StripeSyncSettingsPage
+              ),
             { loading: Loading }
           )
       }

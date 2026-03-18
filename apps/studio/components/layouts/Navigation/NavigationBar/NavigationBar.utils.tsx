@@ -141,16 +141,19 @@ export const generateOtherRoutes = (
       icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
-    ...(IS_PLATFORM && reportsEnabled
-      ? [
-          {
-            key: 'observability',
-            label: 'Observability',
-            disabled: !isProjectActive,
-            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
-          },
-        ]
+    // Observability is only available on the platform, not for self-hosted/CLI
+    ...(IS_PLATFORM
+      ? reportsEnabled
+        ? [
+            {
+              key: 'observability',
+              label: 'Observability',
+              disabled: !isProjectActive,
+              icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+              link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
+            },
+          ]
+        : []
       : []),
     {
       key: 'logs',

@@ -16,8 +16,7 @@ export function AppLayoutDropdownError({ message }: AppLayoutDropdownErrorProps)
   )
 }
 
-interface AppLayoutDropdownTriggerButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface AppLayoutDropdownTriggerButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 

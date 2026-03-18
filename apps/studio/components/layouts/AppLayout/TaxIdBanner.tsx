@@ -22,10 +22,10 @@ export const TaxIdBanner = () => {
 
   const shouldFetch = Boolean(
     !!slug &&
-      org?.plan?.id !== 'free' &&
-      isDismissLoaded &&
-      !isDismissed &&
-      !!org?.organization_missing_tax_id
+    org?.plan?.id !== 'free' &&
+    isDismissLoaded &&
+    !isDismissed &&
+    !!org?.organization_missing_tax_id
   )
   const { data: customerProfile } = useOrganizationCustomerProfileQuery(
     { slug },

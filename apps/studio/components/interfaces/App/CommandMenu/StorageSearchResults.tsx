@@ -235,8 +235,8 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
 
   const totalBucketsEstimate = useMemo(() => {
     const fileBucketCount = fileBucketsEstimate ?? 0
-    const analyticsBucketCount = isAnalyticsBucketsEnabled ? analyticsBuckets?.length ?? 0 : 0
-    const vectorBucketCount = isVectorBucketsEnabled ? vectorBuckets?.length ?? 0 : 0
+    const analyticsBucketCount = isAnalyticsBucketsEnabled ? (analyticsBuckets?.length ?? 0) : 0
+    const vectorBucketCount = isVectorBucketsEnabled ? (vectorBuckets?.length ?? 0) : 0
 
     return fileBucketCount + analyticsBucketCount + vectorBucketCount
   }, [

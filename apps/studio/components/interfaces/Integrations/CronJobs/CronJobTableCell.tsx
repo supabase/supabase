@@ -216,7 +216,8 @@ export const CronJobTableCell = ({
           <DialogSectionSeparator />
           <DialogSection>
             <p className="text-sm">
-              Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}"?{' '}
+              Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}
+              "?{' '}
             </p>
           </DialogSection>
           <DialogFooter>
