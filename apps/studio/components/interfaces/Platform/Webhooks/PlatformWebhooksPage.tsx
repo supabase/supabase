@@ -119,7 +119,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const headerTitle = isEndpointView ? selectedEndpointDisplayName : scopeLabel
   const headerDescription = isEndpointView
     ? selectedEndpointHasName
-      ? selectedEndpoint?.url ?? ''
+      ? (selectedEndpoint?.url ?? '')
       : ''
     : scopeDescription
 
