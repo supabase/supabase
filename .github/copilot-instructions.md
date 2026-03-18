@@ -47,7 +47,7 @@ Flag these:
 
 ### Event Implementation
 
-- Import `useTrack` from `lib/telemetry/track` — flag any usage of `useSendEventMutation` (deprecated)
+- Import `useTrack` from `lib/telemetry/track` — prefer `useTrack` for new telemetry and avoid introducing new `useSendEventMutation` usage
 - New events must have a TypeScript interface in `packages/common/telemetry-constants.ts`:
   - Include `@group Events`, `@page`, and `@source` JSDoc tags
   - Add the interface to the `TelemetryEvent` union type
