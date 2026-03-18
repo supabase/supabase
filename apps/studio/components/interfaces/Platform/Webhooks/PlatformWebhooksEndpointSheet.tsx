@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { InlineLink } from 'components/ui/InlineLink'
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { ChevronDown, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -21,6 +21,7 @@ import {
   Separator,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -36,9 +37,11 @@ import type {
   WebhookEndpoint,
   WebhookScope,
 } from './PlatformWebhooks.types'
+import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
 
 const endpointFormSchema = z
   .object({
+    name: z.string().trim().max(64, 'Name cannot exceed 64 characters'),
     url: z.string().trim().url('Please enter a valid URL'),
     description: z.string().trim().max(512, 'Description cannot exceed 512 characters'),
     enabled: z.boolean().default(true),
@@ -110,7 +113,7 @@ const toControlId = (prefix: string, value: string) =>
   `${prefix}-${value.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 
 export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndpointInput => ({
-  name: '',
+  name: values.name,
   url: values.url,
   description: values.description,
   enabled: values.enabled,
@@ -144,6 +147,7 @@ export const PlatformWebhooksEndpointSheet = ({
   const form = useForm<EndpointFormValues>({
     resolver: zodResolver(endpointFormSchema),
     defaultValues: {
+      name: generateWebhookEndpointName(),
       url: '',
       description: '',
       enabled: true,
@@ -180,6 +184,7 @@ export const PlatformWebhooksEndpointSheet = ({
 
     if (!endpoint) {
       form.reset({
+        name: generateWebhookEndpointName(),
         url: '',
         description: '',
         enabled: true,
@@ -191,6 +196,7 @@ export const PlatformWebhooksEndpointSheet = ({
     }
 
     form.reset({
+      name: endpoint.name,
       url: endpoint.url,
       description: endpoint.description,
       enabled: enabledOverride ?? endpoint.enabled,
@@ -227,6 +233,11 @@ export const PlatformWebhooksEndpointSheet = ({
       <SheetContent showClose={false} size="default" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>{mode === 'create' ? 'Create endpoint' : 'Edit endpoint'}</SheetTitle>
+          <SheetDescription className="sr-only">
+            {mode === 'create'
+              ? 'Create a webhook endpoint by setting a name, URL, and event subscriptions.'
+              : 'Edit this webhook endpoint name, URL, and event subscriptions.'}
+          </SheetDescription>
         </SheetHeader>
         <Separator />
         <SheetSection className="overflow-auto flex-grow px-0 py-0">
@@ -237,6 +248,27 @@ export const PlatformWebhooksEndpointSheet = ({
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="px-5 space-y-5">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label={
+                        <>
+                          Name
+                          {/* Technically optional but encourage, so no (optional) label */}
+                        </>
+                      }
+                      layout="vertical"
+                      className="gap-1"
+                    >
+                      <FormControl_Shadcn_>
+                        <InputField {...field} placeholder="winged-envelope" maxLength={64} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+
                 <FormField_Shadcn_
                   control={form.control}
                   name="url"

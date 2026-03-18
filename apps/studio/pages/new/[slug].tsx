@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
@@ -9,6 +10,7 @@ import { CustomPostgresVersionInput } from 'components/interfaces/ProjectCreatio
 import { DatabasePasswordInput } from 'components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
+import { HighAvailabilityInput } from 'components/interfaces/ProjectCreation/HighAvailabilityInput'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
   extractPostgresVersionDetails,
@@ -40,19 +42,19 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useDataApiGrantTogglesEnabled } from 'hooks/misc/useDataApiGrantTogglesEnabled'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { buildStudioPageTitle } from 'lib/page-title'
 import { useProfile } from 'lib/profile'
 import { useTrack } from 'lib/telemetry/track'
-import Link from 'next/link'
 import Head from 'next/head'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -93,6 +95,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -116,6 +119,7 @@ const Wizard: NextPageWithLayout = () => {
     defaultValues: {
       organization: slug,
       projectName: projectName || '',
+      highAvailability: false,
       postgresVersion: '',
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
@@ -134,6 +138,7 @@ const Wizard: NextPageWithLayout = () => {
     cloudProvider,
     dbRegion,
     organization,
+    highAvailability,
   } = useWatch_Shadcn_({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
@@ -285,6 +290,7 @@ const Wizard: NextPageWithLayout = () => {
     const {
       cloudProvider,
       projectName,
+      highAvailability,
       dbPass,
       dbRegion,
       postgresVersion,
@@ -312,6 +318,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider,
       organizationSlug: currentOrg.slug,
       name: projectName,
+      highAvailability,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
@@ -321,7 +328,13 @@ const Wizard: NextPageWithLayout = () => {
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
-      ...(enableRlsEventTrigger ? { dbSql: AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } : {}),
+      dbSql:
+        [
+          enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
+          isDataApiGrantTogglesEnabled && buildDefaultPrivilegesSql('revoke'),
+        ]
+          .filter(Boolean)
+          .join('\n') || undefined,
     }
 
     if (postgresVersion) {
@@ -429,6 +442,7 @@ const Wizard: NextPageWithLayout = () => {
                   {canCreateProject && (
                     <>
                       <ProjectNameInput form={form} />
+                      <HighAvailabilityInput form={form} />
 
                       {cloudProviderEnabled && showNonProdFields && (
                         <CloudProviderSelector form={form} />
