@@ -259,6 +259,7 @@ const Wizard: NextPageWithLayout = () => {
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
           useOrioleDb: form.getValues('useOrioleDb'),
+          secureByDefault: isDataApiGrantTogglesEnabled,
         },
         {
           project: res.ref,

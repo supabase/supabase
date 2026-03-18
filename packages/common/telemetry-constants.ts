@@ -322,6 +322,13 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean
+    /**
+     * Whether the secure-by-default flag was active, revoking default privileges
+     * for anon/authenticated/service_role on the public schema at project creation.
+     * true = revoke SQL appended (tableEditorApiAccessToggle enabled)
+     * false = default grants left intact
+     */
+    secureByDefault?: boolean
   }
   groups: TelemetryGroups
 }
