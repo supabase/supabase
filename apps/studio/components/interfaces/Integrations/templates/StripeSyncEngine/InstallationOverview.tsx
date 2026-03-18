@@ -46,7 +46,6 @@ import {
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
@@ -148,14 +147,6 @@ export const StripeSyncInstallationPage = () => {
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { refetchInterval: installing || uninstalling ? 5000 : false }
   )
-
-  const { data: sslEnforcementConfiguration, isSuccess: isSuccessSslEnforcement } =
-    useSSLEnforcementQuery({
-      projectRef: project?.ref,
-    })
-  const isSSLEnforced =
-    sslEnforcementConfiguration?.appliedSuccessfully &&
-    sslEnforcementConfiguration?.currentConfig.database
 
   const handleUninstall = useCallback(() => {
     if (!project?.ref) return
@@ -343,24 +334,6 @@ export const StripeSyncInstallationPage = () => {
                   installationStatus={installationStatus}
                   isUpgrade={upgradeAvailable}
                 />
-
-                {isSuccessSslEnforcement && isSSLEnforced && (
-                  <Admonition type="warning">
-                    <h5 className="mb-0.5">
-                      This integration currently requires{' '}
-                      <InlineLink
-                        href={`/project/${project?.ref ?? '_'}/database/settings#ssl-configuration`}
-                      >
-                        SSL Enforcement
-                      </InlineLink>{' '}
-                      to be disabled during initial setup.
-                    </h5>
-                    <p className="text-foreground-light">
-                      Support for SSL Enforcement will be added in a future update. Once installed,
-                      all webhook and sync operations use HTTPS/SSL.
-                    </p>
-                  </Admonition>
-                )}
 
                 <h3 className="heading-default">Configuration</h3>
 
