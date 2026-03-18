@@ -1,5 +1,5 @@
 import { EdgeFunctions } from 'icons'
-import { Layers, Table } from 'lucide-react'
+import { Layers, Loader2, Table } from 'lucide-react'
 import { SchemaInstallationStatus } from 'stripe-experiment-sync/supabase'
 import { Card, CardContent, cn } from 'ui'
 
@@ -35,13 +35,14 @@ export const StripeSyncChangesCard = ({
   const uninstallDone = isUninstallDone(installationStatus)
 
   // Special case: installed integration with upgrade available (shown in sheet context)
+  const isInProgress = installInProgress || uninstallInProgress
   const isInstalledWithUpgrade = installed && isUpgrade
 
   const title = isInstalledWithUpgrade
     ? 'This integration will upgrade your Supabase project:'
     : uninstallDone || installError
       ? 'This integration will modify your Supabase project:'
-      : installInProgress || uninstallInProgress
+      : isInProgress
         ? 'This integration is modifying your Supabase project:'
         : installDone || installed || uninstallError
           ? 'This integration has modified your Supabase project:'
@@ -110,28 +111,44 @@ export const StripeSyncChangesCard = ({
         <CardContent className="p-0">
           <ul className="text-foreground-light text-sm">
             <li className={ListItemClassName}>
-              <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+              {isInProgress ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+              )}
               <span>
                 {dbLine} <code className="text-code-inline">stripe</code>
               </span>
             </li>
             <li className={ListItemClassName}>
-              <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+              {isInProgress ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+              )}
               <span>
                 {tableAndViewLine} <code className="text-code-inline">stripe</code> schema for
                 synced Stripe data
               </span>
             </li>
             <li className={ListItemClassName}>
-              <EdgeFunctions
-                size={16}
-                strokeWidth={1.5}
-                className="text-foreground-lighter shrink-0"
-              />
+              {isInProgress ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <EdgeFunctions
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter shrink-0"
+                />
+              )}
               <span>{edgeFunctionsLine}</span>
             </li>
             <li className="flex items-center gap-x-3 py-2 px-3">
-              <Layers size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+              {isInProgress ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Layers size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+              )}
               <span>{scheduleLine}</span>
             </li>
           </ul>
