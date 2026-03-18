@@ -30,10 +30,10 @@ When tracking is missing, comment: _"This adds a user interaction that may benef
 
 Format: `[object]_[verb]` in snake_case.
 
-Approved verbs only: `opened`, `clicked`, `submitted`, `created`, `removed`, `updated`, `retrieved`, `intended`, `evaluated`, `added`, `enabled`, `disabled`, `copied`, `exposed`, `failed`, `converted`.
+Prefer verbs that already exist in `packages/common/telemetry-constants.ts` (reuse existing patterns wherever possible). Common examples include: `opened`, `clicked`, `submitted`, `created`, `removed`, `updated`, `retrieved`, `intended`, `evaluated`, `added`, `enabled`, `disabled`, `copied`, `exposed`, `failed`, `converted`, `closed`, `completed`, `applied`, `sent`.
 
 Flag these:
-- Unapproved verbs (`saved`, `viewed`, `seen`, `pressed`)
+- Inconsistent or overly generic verbs that don't match existing patterns (e.g. `saved`, `viewed`, `seen`, `pressed`)
 - Wrong order: `click_product_card` → should be `product_card_clicked`
 - Wrong casing: `productCardClicked` → should be `product_card_clicked`
 - Passive view tracking on page load (`dashboard_viewed`, `page_loaded`) — exception: `_exposed` events for A/B experiments are valid
