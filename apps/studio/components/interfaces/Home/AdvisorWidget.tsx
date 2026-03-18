@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
-import { useQueryPerformanceQuery } from 'components/interfaces/Observability/QueryPerformance/useQueryPerformanceQuery'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -30,6 +29,8 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useQueryPerformanceQuery } from '../QueryPerformance/useQueryPerformanceQuery'
 
 interface SlowQuery {
   rolname: string

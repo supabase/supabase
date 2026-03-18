@@ -1,7 +1,7 @@
 import useDbQuery from 'hooks/analytics/useDbQuery'
 
-import { PRESET_CONFIG } from '../../Reports/Reports.constants'
-import { Presets } from '../../Reports/Reports.types'
+import { PRESET_CONFIG } from '../Reports/Reports.constants'
+import { Presets } from '../Reports/Reports.types'
 import { QueryPerformanceSQLParams } from './QueryPerformance.types'
 
 export function generateQueryPerformanceSql({

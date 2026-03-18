@@ -1,6 +1,6 @@
 import { parseAsString, useQueryStates } from 'nuqs'
 
-import { type QueryPerformanceSort } from '../../Observability/QueryPerformance/QueryPerformance.types'
+import { type QueryPerformanceSort } from '../QueryPerformance.types'
 
 export const useQueryPerformanceSort = () => {
   const [{ sort, order }, setQueryStates] = useQueryStates({

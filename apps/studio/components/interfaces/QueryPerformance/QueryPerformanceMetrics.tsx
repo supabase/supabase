@@ -4,7 +4,7 @@ import { parseAsJson, useQueryStates } from 'nuqs'
 import React, { useMemo } from 'react'
 import { cn, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useQueryPerformanceQuery } from '../Observability/QueryPerformance/useQueryPerformanceQuery'
+import { useQueryPerformanceQuery } from './useQueryPerformanceQuery'
 
 export const QueryPerformanceMetrics = () => {
   const { data: queryMetrics, isLoading } = useQueryPerformanceQuery({ preset: 'queryMetrics' })

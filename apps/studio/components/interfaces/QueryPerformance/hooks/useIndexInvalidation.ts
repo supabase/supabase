@@ -7,12 +7,12 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback } from 'react'
 
-import { type QueryPerformanceSort } from '../../Observability/QueryPerformance/QueryPerformance.types'
-import { useQueryPerformanceQuery } from '../../Observability/QueryPerformance/useQueryPerformanceQuery'
 import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
+import { type QueryPerformanceSort } from '../QueryPerformance.types'
+import { useQueryPerformanceQuery } from '../useQueryPerformanceQuery'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
 
 export function useIndexInvalidation() {
