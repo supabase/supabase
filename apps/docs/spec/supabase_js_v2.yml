@@ -3313,212 +3313,9 @@ functions:
   - id: functions-setauth
     $ref: '@supabase/functions-js.FunctionsClient.setAuth'
   - id: subscribe
-    title: on().subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.on'
-    notes: |
-      - By default, Broadcast and Presence are enabled for all projects.
-      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
-      - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
-      - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
-    examples:
-      - id: listen-to-broadcast
-        name: Listen to broadcast messages
-        isSpotlight: true
-        code: |
-          ```js
-          const channel = supabase.channel("room1")
-
-          channel.on("broadcast", { event: "cursor-pos" }, (payload) => {
-            console.log("Cursor position received!", payload);
-          }).subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              channel.send({
-                type: "broadcast",
-                event: "cursor-pos",
-                payload: { x: Math.random(), y: Math.random() },
-              });
-            }
-          });
-          ```
-      - id: listen-to-presence-sync
-        name: Listen to presence sync
-        isSpotlight: true
-        code: |
-          ```js
-          const channel = supabase.channel('room1')
-          channel
-            .on('presence', { event: 'sync' }, () => {
-              console.log('Synced presence state: ', channel.presenceState())
-            })
-            .subscribe(async (status) => {
-              if (status === 'SUBSCRIBED') {
-                await channel.track({ online_at: new Date().toISOString() })
-              }
-            })
-          ```
-      - id: listen-to-presence-join
-        name: Listen to presence join
-        isSpotlight: true
-        code: |
-          ```js
-          const channel = supabase.channel('room1')
-          channel
-            .on('presence', { event: 'join' }, ({ newPresences }) => {
-              console.log('Newly joined presences: ', newPresences)
-            })
-            .subscribe(async (status) => {
-              if (status === 'SUBSCRIBED') {
-                await channel.track({ online_at: new Date().toISOString() })
-              }
-            })
-          ```
-      - id: listen-to-presence-leave
-        name: Listen to presence leave
-        isSpotlight: true
-        code: |
-          ```js
-          const channel = supabase.channel('room1')
-          channel
-            .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-              console.log('Newly left presences: ', leftPresences)
-            })
-            .subscribe(async (status) => {
-              if (status === 'SUBSCRIBED') {
-                await channel.track({ online_at: new Date().toISOString() })
-                await channel.untrack()
-              }
-            })
-          ```
-      - id: listen-to-all-database-changes
-        name: Listen to all database changes
-        isSpotlight: true
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: '*', schema: '*' }, payload => {
-              console.log('Change received!', payload)
-            })
-            .subscribe()
-          ```
-      - id: listen-to-a-specific-table
-        name: Listen to a specific table
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
-              console.log('Change received!', payload)
-            })
-            .subscribe()
-          ```
-      - id: listen-to-inserts
-        name: Listen to inserts
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
-              console.log('Change received!', payload)
-            })
-            .subscribe()
-          ```
-      - id: listen-to-updates
-        name: Listen to updates
-        description: |
-          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
-          enable full replication for the table you are listening to:
-
-          ```sql
-          alter table "your_table" replica identity full;
-          ```
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
-              console.log('Change received!', payload)
-            })
-            .subscribe()
-          ```
-      - id: listen-to-deletes
-        name: Listen to deletes
-        description: |
-          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
-          enable full replication for the table you are listening too:
-
-          ```sql
-          alter table "your_table" replica identity full;
-          ```
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
-              console.log('Change received!', payload)
-            })
-            .subscribe()
-          ```
-      - id: listen-to-multiple-events
-        name: Listen to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
-            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
-            .subscribe()
-          ```
-      - id: listening-to-row-level-changes
-        name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-        notes: |
-          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
-            .subscribe()
-          ```
   - id: broadcast-message
-    title: broadcastMessage()
-    notes: |
-      - When using REST you don't need to subscribe to the channel
-      - REST calls are only available from 2.37.0 onwards
     $ref: '@supabase/realtime-js.RealtimeChannel.send'
-    examples:
-      - id: send-a-message
-        name: Send a message via websocket
-        isSpotlight: true
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .subscribe((status) => {
-              if (status === 'SUBSCRIBED') {
-                channel.send({
-                  type: 'broadcast',
-                  event: 'cursor-pos',
-                  payload: { x: Math.random(), y: Math.random() },
-                })
-              }
-            })
-          ```
-        response: |
-          ```
-          ok | timed out | error
-          ```
-      - id: send-a-message-via-rest
-        name: Send a message via REST
-        isSpotlight: true
-        code: |
-          ```js
-          supabase
-            .channel('room1')
-            .httpSend('cursor-pos', { x: Math.random(), y: Math.random() })
-          ```
   - id: get-channels
     title: getChannels()
     $ref: '@supabase/supabase-js.SupabaseClient.getChannels'
@@ -3814,110 +3611,51 @@ functions:
   - id: postgrest-js-postgresttransformbuilder-rollback
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.rollback'
   - id: realtime-js-realtimechannel-httpsend
-    title: RealtimeChannel.httpSend()
     $ref: '@supabase/realtime-js.RealtimeChannel.httpSend'
   - id: realtime-js-realtimechannel-subscribe
-    title: RealtimeChannel.subscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.subscribe'
   - id: realtime-js-realtimechannel-teardown
-    title: RealtimeChannel.teardown()
     $ref: '@supabase/realtime-js.RealtimeChannel.teardown'
   - id: realtime-js-realtimechannel-unsubscribe
-    title: RealtimeChannel.unsubscribe()
     $ref: '@supabase/realtime-js.RealtimeChannel.unsubscribe'
   - id: realtime-js-realtimeclient-constructor
-    title: new RealtimeClient()
     $ref: '@supabase/realtime-js.RealtimeClient.constructor'
-    examples:
-      - id: realtime-js-realtimeclient-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import RealtimeClient from '@supabase/realtime-js'
-
-          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
-            params: { apikey: 'public-anon-key' },
-          })
-          client.connect()
-          ```
   - id: realtime-js-realtimeclient-connect
-    title: RealtimeClient.connect()
     $ref: '@supabase/realtime-js.RealtimeClient.connect'
   - id: realtime-js-realtimeclient-connectionstate
-    title: RealtimeClient.connectionState()
     $ref: '@supabase/realtime-js.RealtimeClient.connectionState'
   - id: realtime-js-realtimeclient-disconnect
-    title: RealtimeClient.disconnect()
     $ref: '@supabase/realtime-js.RealtimeClient.disconnect'
   - id: realtime-js-realtimeclient-endpointurl
-    title: RealtimeClient.endpointURL()
     $ref: '@supabase/realtime-js.RealtimeClient.endpointURL'
   - id: realtime-js-realtimeclient-flushsendbuffer
-    title: RealtimeClient.flushSendBuffer()
     $ref: '@supabase/realtime-js.RealtimeClient.flushSendBuffer'
   - id: realtime-js-realtimeclient-getchannels
-    title: RealtimeClient.getChannels()
     $ref: '@supabase/realtime-js.RealtimeClient.getChannels'
   - id: realtime-js-realtimeclient-isconnected
-    title: RealtimeClient.isConnected()
     $ref: '@supabase/realtime-js.RealtimeClient.isConnected'
   - id: realtime-js-realtimeclient-isconnecting
-    title: RealtimeClient.isConnecting()
     $ref: '@supabase/realtime-js.RealtimeClient.isConnecting'
   - id: realtime-js-realtimeclient-isdisconnecting
-    title: RealtimeClient.isDisconnecting()
     $ref: '@supabase/realtime-js.RealtimeClient.isDisconnecting'
   - id: realtime-js-realtimeclient-log
-    title: RealtimeClient.log()
     $ref: '@supabase/realtime-js.RealtimeClient.log'
   - id: realtime-js-realtimeclient-push
-    title: RealtimeClient.push()
     $ref: '@supabase/realtime-js.RealtimeClient.push'
   - id: realtime-js-realtimeclient-removeallchannels
-    title: RealtimeClient.removeAllChannels()
     $ref: '@supabase/realtime-js.RealtimeClient.removeAllChannels'
   - id: realtime-js-realtimeclient-removechannel
-    title: RealtimeClient.removeChannel()
     $ref: '@supabase/realtime-js.RealtimeClient.removeChannel'
   - id: realtime-js-realtimeclient-sendheartbeat
-    title: RealtimeClient.sendHeartbeat()
     $ref: '@supabase/realtime-js.RealtimeClient.sendHeartbeat'
   - id: realtime-js-realtimeclient-setauth
-    title: RealtimeClient.setAuth()
     $ref: '@supabase/realtime-js.RealtimeClient.setAuth'
   - id: realtime-js-websocketfactory-createwebsocket
-    title: WebSocketFactory.createWebSocket()
     $ref: '@supabase/realtime-js.WebSocketFactory.createWebSocket'
-    examples:
-      - id: realtime-js-websocketfactory-createwebsocket-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          const socket = WebSocketFactory.createWebSocket('wss://realtime.supabase.co/socket')
-          ```
   - id: realtime-js-websocketfactory-getwebsocketconstructor
-    title: WebSocketFactory.getWebSocketConstructor()
     $ref: '@supabase/realtime-js.WebSocketFactory.getWebSocketConstructor'
-    examples:
-      - id: realtime-js-websocketfactory-getwebsocketconstructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          const WS = WebSocketFactory.getWebSocketConstructor()
-          const socket = new WS('wss://realtime.supabase.co/socket')
-          ```
   - id: realtime-js-websocketfactory-iswebsocketsupported
-    title: WebSocketFactory.isWebSocketSupported()
     $ref: '@supabase/realtime-js.WebSocketFactory.isWebSocketSupported'
-    examples:
-      - id: realtime-js-websocketfactory-iswebsocketsupported-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          if (!WebSocketFactory.isWebSocketSupported()) {
-            console.warn('Falling back to long polling')
-          }
-          ```
   - id: functions-js-functionsclient-constructor
     title: new FunctionsClient()
     $ref: '@supabase/functions-js.FunctionsClient.constructor'
@@ -4004,64 +3742,28 @@ functions:
   - id: vectorindex-queryvectors
     $ref: '@supabase/storage-js.packages/StorageVectorsClient.VectorIndexScope.queryVectors'
   - id: realtime-js-realtimechannel-constructor
-    title: new RealtimeChannel()
     $ref: '@supabase/realtime-js.RealtimeChannel.constructor'
-    examples:
-      - id: realtime-js-realtimechannel-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          import RealtimeClient from '@supabase/realtime-js'
-
-          const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
-            params: { apikey: 'public-anon-key' },
-          })
-          const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
-          ```
   - id: realtime-js-realtimechannel-presencestate
-    title: RealtimeChannel.presenceState()
     $ref: '@supabase/realtime-js.RealtimeChannel.presenceState'
   - id: realtime-js-realtimechannel-track
-    title: RealtimeChannel.track()
     $ref: '@supabase/realtime-js.RealtimeChannel.track'
   - id: realtime-js-realtimechannel-untrack
-    title: RealtimeChannel.untrack()
     $ref: '@supabase/realtime-js.RealtimeChannel.untrack'
   - id: realtime-js-realtimechannel-updatejoinpayload
-    title: RealtimeChannel.updateJoinPayload()
     $ref: '@supabase/realtime-js.RealtimeChannel.updateJoinPayload'
   - id: realtime-js-realtimeclient-channel
-    title: RealtimeClient.channel()
     $ref: '@supabase/realtime-js.RealtimeClient.channel'
   - id: realtime-js-realtimeclient-onheartbeat
-    title: RealtimeClient.onHeartbeat()
     $ref: '@supabase/realtime-js.RealtimeClient.onHeartbeat'
   - id: realtime-js-realtimepresence-constructor
-    title: new RealtimePresence()
     $ref: '@supabase/realtime-js.RealtimePresence.constructor'
-    examples:
-      - id: realtime-js-realtimepresence-constructor-example-1
-        name: Example 1
-        code: |-
-          ```ts
-          const presence = new RealtimePresence(channel)
-
-          channel.on('presence', ({ event, key }) => {
-            console.log(`Presence ${event} on ${key}`)
-          })
-          ```
   - id: realtime-js-websocketlike-addeventlistener
-    title: WebSocketLike.addEventListener()
     $ref: '@supabase/realtime-js.WebSocketLike.addEventListener'
   - id: realtime-js-websocketlike-close
-    title: WebSocketLike.close()
     $ref: '@supabase/realtime-js.WebSocketLike.close'
   - id: realtime-js-websocketlike-removeeventlistener
-    title: WebSocketLike.removeEventListener()
     $ref: '@supabase/realtime-js.WebSocketLike.removeEventListener'
   - id: realtime-js-websocketlike-send
-    title: WebSocketLike.send()
     $ref: '@supabase/realtime-js.WebSocketLike.send'
   - id: realtime-js-websocketlikeconstructor-constructor
-    title: new WebSocketLikeConstructor()
     $ref: '@supabase/realtime-js.WebSocketLikeConstructor.constructor'
