@@ -17,20 +17,23 @@ import types from './pg-meta-types'
 import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
+import * as tableEditor from './sql/studio/table-editor'
 
 // Studio SQL queries
-export { getUserSQL } from './sql/studio/auth/get-user'
-export { getIndexStatusesSQL, USER_SEARCH_INDEXES } from './sql/studio/auth/get-index-statuses'
-export { getIndexWorkerStatusSQL } from './sql/studio/auth/get-index-worker-status'
-export { type OptimizedSearchColumns } from './sql/studio/auth/get-users-types'
-export { getPaginatedUsersSQL, type UsersCursor } from './sql/studio/auth/get-users-paginated'
-export { getUsersCountSQL } from './sql/studio/auth/get-users-count'
-import * as tableEditor from './sql/studio/table-editor'
-export type { ForeignKey } from './sql/studio/table-editor'
+export {
+  getUserSQL,
+  getIndexStatusesSQL,
+  getUsersCountSQL,
+  getPaginatedUsersSQL,
+  getIndexWorkerStatusSQL,
+  USER_SEARCH_INDEXES,
+  type OptimizedSearchColumns,
+  type UsersCursor,
+} from './sql/studio/auth'
 export {
   getLargestSizeLimitBucketsSqlUnoptimized,
   LARGEST_SIZE_LIMIT_BUCKETS_COUNT,
-} from './sql/studio/storage/get-largest-size-limit-buckets'
+} from './sql/studio/storage'
 export {
   getExposedTablesSql,
   getExposedTableCountsSql,
@@ -41,16 +44,30 @@ export {
   buildDefaultPrivilegesSql,
   getDefaultPrivilegesStateSql,
 } from './sql/studio/privileges'
-export { getIndexesSQL } from './sql/studio/database/indexes'
-export { getDatabaseExtensionDefaultSchemaSQL } from './sql/studio/database/extensions'
 export {
+  getIndexesSQL,
+  getDatabaseExtensionDefaultSchemaSQL,
   getCronJobsMinimalSql,
   getCronJobsSql,
   getJobRunDetailsPageCountSql,
   getDeleteOldCronJobRunDetailsByCtidSql,
   getScheduleDeleteCronJobRunDetailsSql,
-} from './sql/studio/database/cron-jobs'
-export { getTableRowsCountSql } from './sql/studio/database/rows'
+  getTableRowsCountSql,
+} from './sql/studio/database'
+export {
+  type ForeignKey,
+  FOREIGN_KEY_CASCADE_ACTION,
+  getAddPrimaryKeySQL,
+  getDropConstraintSQL,
+  getAddForeignKeySQL,
+  getRemoveForeignKeySQL,
+  getUpdateIdentitySequenceSQL,
+  getDuplicateIdentitySequenceSQL,
+  getDuplicateTableSQL,
+  getDuplicateRowsSQL,
+  getEnableRLSSQL,
+} from './sql/studio/table-editor'
+
 export { getLiveTupleEstimate } from './sql/studio/get-live-tuple-estimate'
 
 export default {
@@ -73,5 +90,4 @@ export default {
   indexes,
   columnPrivileges,
   query,
-  tableEditor,
 }
