@@ -49,9 +49,9 @@ Flag these:
 
 - Import `useTrack` from `lib/telemetry/track` — prefer `useTrack` for new telemetry and avoid introducing new `useSendEventMutation` usage
 - New events must have a TypeScript interface in `packages/common/telemetry-constants.ts`:
-  - Include `@group Events`, `@page`, and `@source` JSDoc tags
+  - Include `@group Events` and `@source` JSDoc tags; add `@page` when applicable (for page-specific events)
   - Add the interface to the `TelemetryEvent` union type
-- Flag `@page`/`@source` descriptions that don't match the actual implementation
+- Flag `@source` descriptions that don't match the actual implementation; when `@page` is present, validate that it matches the actual page usage
 
 ### Correct Pattern
 
