@@ -25,7 +25,6 @@ export const StripeSyncSettingsPage = () => {
   const {
     schemaComment: { status: installationStatus },
     syncState,
-    isLoading: isLoadingInstallationStatus,
   } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
