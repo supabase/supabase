@@ -51,7 +51,7 @@
               "fileName": "packages/core/supabase-js/src/cors.ts",
               "line": 47,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/cors.ts#L47"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/cors.ts#L47"
             }
           ],
           "type": {
@@ -106,7 +106,7 @@
               "fileName": "packages/core/supabase-js/src/cors.ts",
               "line": 71,
               "character": 13,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/cors.ts#L71"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/cors.ts#L71"
             }
           ],
           "type": {
@@ -133,7 +133,7 @@
           "fileName": "packages/core/supabase-js/src/cors.ts",
           "line": 1,
           "character": 0,
-          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/cors.ts#L1"
+          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/cors.ts#L1"
         }
       ]
     },
@@ -14812,7 +14812,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 186,
+                  "line": 198,
                   "character": 4
                 }
               ],
@@ -14839,13 +14839,32 @@
                             "text": "```ts\nimport RealtimeClient from '@supabase/realtime-js'\n\nconst client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {\n  params: { apikey: 'public-anon-key' },\n})\nconst channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)\n```"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Example 1",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nimport RealtimeClient from '@supabase/realtime-js'\n\nconst client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {\n  params: { apikey: 'public-anon-key' },\n})\nconst channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)\n```"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 186,
+                      "line": 198,
                       "character": 4
                     }
                   ],
@@ -15326,7 +15345,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 330,
+                  "line": 352,
                   "character": 4
                 }
               ],
@@ -15353,13 +15372,22 @@
                             "text": "Promise resolving to object with success status, and error details if failed"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 330,
+                      "line": 352,
                       "character": 4
                     }
                   ],
@@ -15438,7 +15466,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 331,
+                                  "line": 353,
                                   "character": 8
                                 }
                               ],
@@ -15457,7 +15485,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 330,
+                              "line": 352,
                               "character": 49
                             }
                           ]
@@ -15493,7 +15521,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                      "line": 333,
+                                      "line": 355,
                                       "character": 8
                                     }
                                   ],
@@ -15512,7 +15540,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 332,
+                                  "line": 354,
                                   "character": 16
                                 }
                               ]
@@ -15536,7 +15564,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                      "line": 337,
+                                      "line": 359,
                                       "character": 8
                                     }
                                   ],
@@ -15554,7 +15582,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                      "line": 336,
+                                      "line": 358,
                                       "character": 8
                                     }
                                   ],
@@ -15572,7 +15600,7 @@
                                   "sources": [
                                     {
                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                      "line": 335,
+                                      "line": 357,
                                       "character": 8
                                     }
                                   ],
@@ -15591,7 +15619,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 334,
+                                  "line": 356,
                                   "character": 8
                                 }
                               ]
@@ -15615,52 +15643,42 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 219,
+                  "line": 239,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 222,
+                  "line": 242,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 227,
+                  "line": 247,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 232,
+                  "line": 252,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 237,
+                  "line": 257,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 240,
+                  "line": 260,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 243,
+                  "line": 263,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 246,
-                  "character": 4
-                },
-                {
-                  "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 249,
-                  "character": 4
-                },
-                {
-                  "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 258,
+                  "line": 266,
                   "character": 4
                 },
                 {
@@ -15670,7 +15688,7 @@
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 282,
+                  "line": 278,
                   "character": 4
                 },
                 {
@@ -15680,17 +15698,27 @@
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 298,
+                  "line": 302,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 307,
+                  "line": 309,
                   "character": 4
                 },
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 316,
+                  "line": 318,
+                  "character": 4
+                },
+                {
+                  "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
+                  "line": 327,
+                  "character": 4
+                },
+                {
+                  "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
+                  "line": 336,
                   "character": 4
                 }
               ],
@@ -15712,7 +15740,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 219,
+                      "line": 239,
                       "character": 4
                     }
                   ],
@@ -15752,7 +15780,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 220,
+                                  "line": 240,
                                   "character": 8
                                 }
                               ],
@@ -15771,7 +15799,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 219,
+                              "line": 239,
                               "character": 58
                             }
                           ]
@@ -15795,7 +15823,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 221,
+                              "line": 241,
                               "character": 17
                             }
                           ],
@@ -15809,7 +15837,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 221,
+                                  "line": 241,
                                   "character": 17
                                 }
                               ],
@@ -15848,7 +15876,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 222,
+                      "line": 242,
                       "character": 4
                     }
                   ],
@@ -15870,7 +15898,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 222,
+                              "line": 242,
                               "character": 17
                             }
                           ],
@@ -15884,7 +15912,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 223,
+                                  "line": 243,
                                   "character": 8
                                 }
                               ],
@@ -15947,7 +15975,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 225,
+                                  "line": 245,
                                   "character": 8
                                 }
                               ],
@@ -15966,7 +15994,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 224,
+                              "line": 244,
                               "character": 58
                             }
                           ]
@@ -15990,7 +16018,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 226,
+                              "line": 246,
                               "character": 17
                             }
                           ],
@@ -16004,7 +16032,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 226,
+                                  "line": 246,
                                   "character": 17
                                 }
                               ],
@@ -16067,7 +16095,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 227,
+                      "line": 247,
                       "character": 4
                     }
                   ],
@@ -16089,7 +16117,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 227,
+                              "line": 247,
                               "character": 17
                             }
                           ],
@@ -16103,7 +16131,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 228,
+                                  "line": 248,
                                   "character": 8
                                 }
                               ],
@@ -16166,7 +16194,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 230,
+                                  "line": 250,
                                   "character": 8
                                 }
                               ],
@@ -16185,7 +16213,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 229,
+                              "line": 249,
                               "character": 58
                             }
                           ]
@@ -16209,7 +16237,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 231,
+                              "line": 251,
                               "character": 17
                             }
                           ],
@@ -16223,7 +16251,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 231,
+                                  "line": 251,
                                   "character": 17
                                 }
                               ],
@@ -16286,7 +16314,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 232,
+                      "line": 252,
                       "character": 4
                     }
                   ],
@@ -16308,7 +16336,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 232,
+                              "line": 252,
                               "character": 17
                             }
                           ],
@@ -16322,7 +16350,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 233,
+                                  "line": 253,
                                   "character": 8
                                 }
                               ],
@@ -16385,7 +16413,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 235,
+                                  "line": 255,
                                   "character": 8
                                 }
                               ],
@@ -16404,7 +16432,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 234,
+                              "line": 254,
                               "character": 58
                             }
                           ]
@@ -16428,7 +16456,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 236,
+                              "line": 256,
                               "character": 17
                             }
                           ],
@@ -16442,7 +16470,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 236,
+                                  "line": 256,
                                   "character": 17
                                 }
                               ],
@@ -16527,7 +16555,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 237,
+                      "line": 257,
                       "character": 4
                     }
                   ],
@@ -16549,7 +16577,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 237,
+                              "line": 257,
                               "character": 17
                             }
                           ],
@@ -16563,7 +16591,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 238,
+                                  "line": 258,
                                   "character": 8
                                 }
                               ],
@@ -16638,7 +16666,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 239,
+                              "line": 259,
                               "character": 156
                             }
                           ],
@@ -16652,7 +16680,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 239,
+                                  "line": 259,
                                   "character": 156
                                 }
                               ],
@@ -16715,7 +16743,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 240,
+                      "line": 260,
                       "character": 4
                     }
                   ],
@@ -16737,7 +16765,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 240,
+                              "line": 260,
                               "character": 17
                             }
                           ],
@@ -16751,7 +16779,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 241,
+                                  "line": 261,
                                   "character": 8
                                 }
                               ],
@@ -16826,7 +16854,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 242,
+                              "line": 262,
                               "character": 159
                             }
                           ],
@@ -16840,7 +16868,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 242,
+                                  "line": 262,
                                   "character": 159
                                 }
                               ],
@@ -16903,7 +16931,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 243,
+                      "line": 263,
                       "character": 4
                     }
                   ],
@@ -16925,7 +16953,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 243,
+                              "line": 263,
                               "character": 17
                             }
                           ],
@@ -16939,7 +16967,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 244,
+                                  "line": 264,
                                   "character": 8
                                 }
                               ],
@@ -17014,7 +17042,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 245,
+                              "line": 265,
                               "character": 159
                             }
                           ],
@@ -17028,7 +17056,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 245,
+                                  "line": 265,
                                   "character": 159
                                 }
                               ],
@@ -17091,7 +17119,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 246,
+                      "line": 266,
                       "character": 4
                     }
                   ],
@@ -17113,7 +17141,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 246,
+                              "line": 266,
                               "character": 17
                             }
                           ],
@@ -17127,7 +17155,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 247,
+                                  "line": 267,
                                   "character": 8
                                 }
                               ],
@@ -17202,7 +17230,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 248,
+                              "line": 268,
                               "character": 159
                             }
                           ],
@@ -17216,7 +17244,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 248,
+                                  "line": 268,
                                   "character": 159
                                 }
                               ],
@@ -17279,7 +17307,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 249,
+                      "line": 269,
                       "character": 4
                     }
                   ],
@@ -17301,7 +17329,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 249,
+                              "line": 269,
                               "character": 17
                             }
                           ],
@@ -17315,7 +17343,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 250,
+                                  "line": 270,
                                   "character": 8
                                 }
                               ],
@@ -17407,7 +17435,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 251,
+                              "line": 271,
                               "character": 152
                             }
                           ],
@@ -17421,7 +17449,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 251,
+                                  "line": 271,
                                   "character": 152
                                 }
                               ],
@@ -17484,7 +17512,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 258,
+                      "line": 278,
                       "character": 4
                     }
                   ],
@@ -17540,7 +17568,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 259,
+                                  "line": 279,
                                   "character": 8
                                 }
                               ],
@@ -17559,7 +17587,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 258,
+                              "line": 278,
                               "character": 59
                             }
                           ]
@@ -17591,7 +17619,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 260,
+                              "line": 280,
                               "character": 17
                             }
                           ],
@@ -17605,7 +17633,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 260,
+                                  "line": 280,
                                   "character": 17
                                 }
                               ],
@@ -17634,7 +17662,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 262,
+                                              "line": 282,
                                               "character": 8
                                             }
                                           ],
@@ -17654,7 +17682,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 263,
+                                              "line": 283,
                                               "character": 8
                                             }
                                           ],
@@ -17676,7 +17704,7 @@
                                                   "sources": [
                                                     {
                                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                                      "line": 265,
+                                                      "line": 285,
                                                       "character": 12
                                                     }
                                                   ],
@@ -17696,7 +17724,7 @@
                                                   "sources": [
                                                     {
                                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                                      "line": 264,
+                                                      "line": 284,
                                                       "character": 12
                                                     }
                                                   ],
@@ -17715,7 +17743,7 @@
                                               "sources": [
                                                 {
                                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                                  "line": 263,
+                                                  "line": 283,
                                                   "character": 15
                                                 }
                                               ]
@@ -17731,7 +17759,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 261,
+                                              "line": 281,
                                               "character": 8
                                             }
                                           ],
@@ -17750,7 +17778,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                          "line": 260,
+                                          "line": 280,
                                           "character": 27
                                         }
                                       ],
@@ -17764,7 +17792,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 267,
+                                              "line": 287,
                                               "character": 8
                                             }
                                           ],
@@ -17826,7 +17854,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 269,
+                      "line": 289,
                       "character": 4
                     }
                   ],
@@ -17848,7 +17876,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 269,
+                              "line": 289,
                               "character": 17
                             }
                           ],
@@ -17862,7 +17890,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 270,
+                                  "line": 290,
                                   "character": 8
                                 }
                               ],
@@ -17925,7 +17953,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 272,
+                                  "line": 292,
                                   "character": 8
                                 }
                               ],
@@ -17944,7 +17972,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 271,
+                              "line": 291,
                               "character": 59
                             }
                           ]
@@ -17968,7 +17996,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 273,
+                              "line": 293,
                               "character": 17
                             }
                           ],
@@ -17982,7 +18010,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 273,
+                                  "line": 293,
                                   "character": 17
                                 }
                               ],
@@ -18011,7 +18039,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 275,
+                                              "line": 295,
                                               "character": 8
                                             }
                                           ],
@@ -18031,7 +18059,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 276,
+                                              "line": 296,
                                               "character": 8
                                             }
                                           ],
@@ -18053,7 +18081,7 @@
                                                   "sources": [
                                                     {
                                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                                      "line": 278,
+                                                      "line": 298,
                                                       "character": 12
                                                     }
                                                   ],
@@ -18073,7 +18101,7 @@
                                                   "sources": [
                                                     {
                                                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                                      "line": 277,
+                                                      "line": 297,
                                                       "character": 12
                                                     }
                                                   ],
@@ -18092,7 +18120,7 @@
                                               "sources": [
                                                 {
                                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                                  "line": 276,
+                                                  "line": 296,
                                                   "character": 15
                                                 }
                                               ]
@@ -18108,7 +18136,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 280,
+                                              "line": 300,
                                               "character": 8
                                             }
                                           ],
@@ -18129,7 +18157,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 274,
+                                              "line": 294,
                                               "character": 8
                                             }
                                           ],
@@ -18148,7 +18176,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                          "line": 273,
+                                          "line": 293,
                                           "character": 27
                                         }
                                       ]
@@ -18191,7 +18219,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 282,
+                      "line": 302,
                       "character": 4
                     }
                   ],
@@ -18259,7 +18287,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 283,
+                                  "line": 303,
                                   "character": 8
                                 }
                               ],
@@ -18281,7 +18309,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 282,
+                              "line": 302,
                               "character": 94
                             }
                           ]
@@ -18305,7 +18333,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 284,
+                              "line": 304,
                               "character": 17
                             }
                           ],
@@ -18319,7 +18347,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 284,
+                                  "line": 304,
                                   "character": 17
                                 }
                               ],
@@ -18348,7 +18376,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 286,
+                                              "line": 306,
                                               "character": 8
                                             }
                                           ],
@@ -18369,7 +18397,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 287,
+                                              "line": 307,
                                               "character": 8
                                             }
                                           ],
@@ -18401,7 +18429,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 285,
+                                              "line": 305,
                                               "character": 8
                                             }
                                           ],
@@ -18420,7 +18448,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                          "line": 284,
+                                          "line": 304,
                                           "character": 27
                                         }
                                       ]
@@ -18463,7 +18491,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 289,
+                      "line": 309,
                       "character": 4
                     }
                   ],
@@ -18485,7 +18513,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 289,
+                              "line": 309,
                               "character": 17
                             }
                           ],
@@ -18499,7 +18527,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 290,
+                                  "line": 310,
                                   "character": 8
                                 }
                               ],
@@ -18562,7 +18590,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 292,
+                                  "line": 312,
                                   "character": 8
                                 }
                               ],
@@ -18584,7 +18612,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 291,
+                              "line": 311,
                               "character": 59
                             }
                           ]
@@ -18608,7 +18636,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 293,
+                              "line": 313,
                               "character": 17
                             }
                           ],
@@ -18622,7 +18650,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 293,
+                                  "line": 313,
                                   "character": 17
                                 }
                               ],
@@ -18651,7 +18679,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 295,
+                                              "line": 315,
                                               "character": 8
                                             }
                                           ],
@@ -18672,7 +18700,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 296,
+                                              "line": 316,
                                               "character": 8
                                             }
                                           ],
@@ -18704,7 +18732,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 294,
+                                              "line": 314,
                                               "character": 8
                                             }
                                           ],
@@ -18723,7 +18751,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                          "line": 293,
+                                          "line": 313,
                                           "character": 27
                                         }
                                       ]
@@ -18766,7 +18794,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 298,
+                      "line": 318,
                       "character": 4
                     }
                   ],
@@ -18788,7 +18816,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 298,
+                              "line": 318,
                               "character": 17
                             }
                           ],
@@ -18802,7 +18830,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 299,
+                                  "line": 319,
                                   "character": 8
                                 }
                               ],
@@ -18865,7 +18893,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 301,
+                                  "line": 321,
                                   "character": 8
                                 }
                               ],
@@ -18887,7 +18915,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 300,
+                              "line": 320,
                               "character": 59
                             }
                           ]
@@ -18911,7 +18939,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 302,
+                              "line": 322,
                               "character": 17
                             }
                           ],
@@ -18925,7 +18953,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 302,
+                                  "line": 322,
                                   "character": 17
                                 }
                               ],
@@ -18954,7 +18982,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 304,
+                                              "line": 324,
                                               "character": 8
                                             }
                                           ],
@@ -18975,7 +19003,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 305,
+                                              "line": 325,
                                               "character": 8
                                             }
                                           ],
@@ -19007,7 +19035,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 303,
+                                              "line": 323,
                                               "character": 8
                                             }
                                           ],
@@ -19026,7 +19054,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                          "line": 302,
+                                          "line": 322,
                                           "character": 27
                                         }
                                       ]
@@ -19069,7 +19097,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 307,
+                      "line": 327,
                       "character": 4
                     }
                   ],
@@ -19091,7 +19119,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 307,
+                              "line": 327,
                               "character": 17
                             }
                           ],
@@ -19105,7 +19133,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 308,
+                                  "line": 328,
                                   "character": 8
                                 }
                               ],
@@ -19168,7 +19196,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 310,
+                                  "line": 330,
                                   "character": 8
                                 }
                               ],
@@ -19190,7 +19218,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 309,
+                              "line": 329,
                               "character": 59
                             }
                           ]
@@ -19214,7 +19242,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 311,
+                              "line": 331,
                               "character": 17
                             }
                           ],
@@ -19228,7 +19256,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 311,
+                                  "line": 331,
                                   "character": 17
                                 }
                               ],
@@ -19257,7 +19285,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 313,
+                                              "line": 333,
                                               "character": 8
                                             }
                                           ],
@@ -19278,7 +19306,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 314,
+                                              "line": 334,
                                               "character": 8
                                             }
                                           ],
@@ -19310,7 +19338,7 @@
                                           "sources": [
                                             {
                                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                              "line": 312,
+                                              "line": 332,
                                               "character": 8
                                             }
                                           ],
@@ -19329,7 +19357,7 @@
                                       "sources": [
                                         {
                                           "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                          "line": 311,
+                                          "line": 331,
                                           "character": 27
                                         }
                                       ]
@@ -19372,7 +19400,7 @@
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 316,
+                      "line": 336,
                       "character": 4
                     }
                   ],
@@ -19394,7 +19422,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 316,
+                              "line": 336,
                               "character": 17
                             }
                           ],
@@ -19408,7 +19436,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 317,
+                                  "line": 337,
                                   "character": 8
                                 }
                               ],
@@ -19481,7 +19509,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 318,
+                              "line": 338,
                               "character": 70
                             }
                           ],
@@ -19495,7 +19523,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 318,
+                                  "line": 338,
                                   "character": 70
                                 }
                               ],
@@ -19541,7 +19569,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 198,
+                  "line": 214,
                   "character": 4
                 }
               ],
@@ -19558,12 +19586,23 @@
                         "kind": "text",
                         "text": "Returns the current presence state for this channel.\n\nThe shape is a map keyed by presence key (for example a user id) where each entry contains the\ntracked metadata for that user."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 198,
+                      "line": 214,
                       "character": 4
                     }
                   ],
@@ -19585,7 +19624,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 198,
+                              "line": 214,
                               "character": 28
                             }
                           ],
@@ -19599,7 +19638,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 199,
+                                  "line": 215,
                                   "character": 8
                                 }
                               ],
@@ -19663,7 +19702,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 348,
+                  "line": 403,
                   "character": 4
                 }
               ],
@@ -19680,12 +19719,65 @@
                         "kind": "text",
                         "text": "Sends a message into the channel."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@remarks",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "- When using REST you don't need to subscribe to the channel\n- REST calls are only available from 2.37.0 onwards"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Send a message via websocket",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nsupabase\n  .channel('room1')\n  .subscribe((status) => {\n    if (status === 'SUBSCRIBED') {\n      channel.send({\n        type: 'broadcast',\n        event: 'cursor-pos',\n        payload: { x: Math.random(), y: Math.random() },\n      })\n    }\n  })\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@exampleResponse",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Send a message via websocket\n"
+                          },
+                          {
+                            "kind": "code",
+                            "text": "```js\nok | timed out | error\n```"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Send a message via REST",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```js\nsupabase\n  .channel('room1')\n  .httpSend('cursor-pos', { x: Math.random(), y: Math.random() })\n```"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 348,
+                      "line": 403,
                       "character": 4
                     }
                   ],
@@ -19730,7 +19822,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 350,
+                                  "line": 405,
                                   "character": 8
                                 }
                               ],
@@ -19758,7 +19850,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 351,
+                                  "line": 406,
                                   "character": 8
                                 }
                               ],
@@ -19784,7 +19876,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 349,
+                                  "line": 404,
                                   "character": 8
                                 }
                               ],
@@ -19816,7 +19908,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 348,
+                              "line": 403,
                               "character": 15
                             }
                           ],
@@ -19830,7 +19922,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 352,
+                                  "line": 407,
                                   "character": 8
                                 }
                               ],
@@ -19883,7 +19975,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 353,
+                              "line": 408,
                               "character": 14
                             }
                           ],
@@ -19897,7 +19989,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 354,
+                                  "line": 409,
                                   "character": 8
                                 }
                               ],
@@ -19953,7 +20045,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 190,
+                  "line": 204,
                   "character": 4
                 }
               ],
@@ -19968,14 +20060,25 @@
                     "summary": [
                       {
                         "kind": "text",
-                        "text": "Subscribe registers your client with the server"
+                        "text": "Subscribe registers your client with the server  *"
+                      }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 190,
+                      "line": 204,
                       "character": 4
                     }
                   ],
@@ -19999,7 +20102,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 190,
+                              "line": 204,
                               "character": 25
                             }
                           ],
@@ -20013,7 +20116,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 190,
+                                  "line": 204,
                                   "character": 25
                                 }
                               ],
@@ -20092,7 +20195,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 374,
+                  "line": 435,
                   "character": 4
                 }
               ],
@@ -20109,12 +20212,23 @@
                         "kind": "text",
                         "text": "Destroys and stops related timers."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 374,
+                      "line": 435,
                       "character": 4
                     }
                   ],
@@ -20134,7 +20248,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 205,
+                  "line": 223,
                   "character": 4
                 }
               ],
@@ -20159,12 +20273,23 @@
                         "kind": "text",
                         "text": " to stop broadcasting presence for the same key."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 205,
+                      "line": 223,
                       "character": 4
                     }
                   ],
@@ -20186,7 +20311,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 205,
+                              "line": 223,
                               "character": 19
                             }
                           ],
@@ -20200,7 +20325,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 206,
+                                  "line": 224,
                                   "character": 8
                                 }
                               ],
@@ -20245,7 +20370,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 207,
+                              "line": 225,
                               "character": 14
                             }
                           ],
@@ -20259,7 +20384,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 208,
+                                  "line": 226,
                                   "character": 8
                                 }
                               ],
@@ -20315,7 +20440,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 370,
+                  "line": 429,
                   "character": 4
                 }
               ],
@@ -20340,12 +20465,23 @@
                         "kind": "text",
                         "text": " hook to bind to the server ack, ie:\nchannel.unsubscribe().receive(\"ok\", () => alert(\"left!\") )"
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 370,
+                      "line": 429,
                       "character": 4
                     }
                   ],
@@ -20393,7 +20529,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 213,
+                  "line": 233,
                   "character": 4
                 }
               ],
@@ -20410,12 +20546,23 @@
                         "kind": "text",
                         "text": "Removes the current presence state for this client."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 213,
+                      "line": 233,
                       "character": 4
                     }
                   ],
@@ -20439,7 +20586,7 @@
                           "sources": [
                             {
                               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                              "line": 213,
+                              "line": 233,
                               "character": 19
                             }
                           ],
@@ -20453,7 +20600,7 @@
                               "sources": [
                                 {
                                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                                  "line": 214,
+                                  "line": 234,
                                   "character": 8
                                 }
                               ],
@@ -20509,7 +20656,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                  "line": 360,
+                  "line": 417,
                   "character": 4
                 }
               ],
@@ -20526,12 +20673,23 @@
                         "kind": "text",
                         "text": "Updates the payload that will be sent the next time the channel joins (reconnects).\nUseful for rotating access tokens or updating config without re-creating the channel."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
-                      "line": 360,
+                      "line": 417,
                       "character": 4
                     }
                   ],
@@ -20589,6 +20747,18 @@
               "children": [2077, 1858, 1835, 2090, 1826, 2109, 1842, 2106, 1852, 2103]
             }
           ],
+          "categories": [
+            {
+              "title": "Other",
+              "children": [
+                1809, 1811, 1807, 1813, 1812, 1808, 1810, 1806, 1818, 1822, 1824, 1814, 1820, 1858
+              ]
+            },
+            {
+              "title": "Realtime",
+              "children": [1801, 2077, 1835, 2090, 1826, 2109, 1842, 2106, 1852, 2103]
+            }
+          ],
           "sources": [
             {
               "fileName": "packages/core/realtime-js/dist/module/RealtimeChannel.d.ts",
@@ -20613,7 +20783,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 121,
+                  "line": 133,
                   "character": 4
                 }
               ],
@@ -20640,13 +20810,32 @@
                             "text": "```ts\nimport RealtimeClient from '@supabase/realtime-js'\n\nconst client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {\n  params: { apikey: 'public-anon-key' },\n})\nclient.connect()\n```"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Example 1",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nimport RealtimeClient from '@supabase/realtime-js'\n\nconst client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {\n  params: { apikey: 'public-anon-key' },\n})\nclient.connect()\n```"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 121,
+                      "line": 133,
                       "character": 4
                     }
                   ],
@@ -22224,7 +22413,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 180,
+                  "line": 216,
                   "character": 4
                 }
               ],
@@ -22259,12 +22448,23 @@
                         "kind": "text",
                         "text": " to match the Realtime service.\nIf a channel with the same topic already exists it will be returned instead of creating\na duplicate connection."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 180,
+                      "line": 216,
                       "character": 4
                     }
                   ],
@@ -22315,7 +22515,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 125,
+                  "line": 139,
                   "character": 4
                 }
               ],
@@ -22332,12 +22532,23 @@
                         "kind": "text",
                         "text": "Connects the socket, unless already connected."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 125,
+                      "line": 139,
                       "character": 4
                     }
                   ],
@@ -22357,7 +22568,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 160,
+                  "line": 188,
                   "character": 4
                 }
               ],
@@ -22374,12 +22585,23 @@
                         "kind": "text",
                         "text": "Returns the current state of the socket."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 160,
+                      "line": 188,
                       "character": 4
                     }
                   ],
@@ -22404,7 +22626,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 137,
+                  "line": 155,
                   "character": 4
                 }
               ],
@@ -22421,12 +22643,23 @@
                         "kind": "text",
                         "text": "Disconnects the socket."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 137,
+                      "line": 155,
                       "character": 4
                     }
                   ],
@@ -22510,7 +22743,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 130,
+                  "line": 146,
                   "character": 4
                 }
               ],
@@ -22537,13 +22770,22 @@
                             "text": "string The URL of the websocket."
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 130,
+                      "line": 146,
                       "character": 4
                     }
                   ],
@@ -22563,7 +22805,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 141,
+                  "line": 161,
                   "character": 4
                 }
               ],
@@ -22580,12 +22822,23 @@
                         "kind": "text",
                         "text": "Returns all created channels"
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 141,
+                      "line": 161,
                       "character": 4
                     }
                   ],
@@ -22611,7 +22864,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 164,
+                  "line": 194,
                   "character": 4
                 }
               ],
@@ -22636,12 +22889,23 @@
                         "kind": "text",
                         "text": " is the connection is open."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 164,
+                      "line": 194,
                       "character": 4
                     }
                   ],
@@ -22661,7 +22925,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 168,
+                  "line": 200,
                   "character": 4
                 }
               ],
@@ -22686,12 +22950,23 @@
                         "kind": "text",
                         "text": " if the connection is currently connecting."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 168,
+                      "line": 200,
                       "character": 4
                     }
                   ],
@@ -22711,7 +22986,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 172,
+                  "line": 206,
                   "character": 4
                 }
               ],
@@ -22736,12 +23011,23 @@
                         "kind": "text",
                         "text": " if the connection is currently disconnecting."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 172,
+                      "line": 206,
                       "character": 4
                     }
                   ],
@@ -22761,7 +23047,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 156,
+                  "line": 182,
                   "character": 4
                 }
               ],
@@ -22786,12 +23072,23 @@
                         "kind": "text",
                         "text": " can be overridden in Client constructor."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 156,
+                      "line": 182,
                       "character": 4
                     }
                   ],
@@ -22848,7 +23145,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 216,
+                  "line": 260,
                   "character": 4
                 }
               ],
@@ -22865,12 +23162,23 @@
                         "kind": "text",
                         "text": "Sets a callback that receives lifecycle events for internal heartbeat messages.\nUseful for instrumenting connection health (e.g. sent/ok/timeout/disconnected)."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 216,
+                      "line": 260,
                       "character": 4
                     }
                   ],
@@ -22908,7 +23216,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 186,
+                  "line": 224,
                   "character": 4
                 }
               ],
@@ -22925,12 +23233,23 @@
                         "kind": "text",
                         "text": "Push out a message if the socket is connected.\n\nIf the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 186,
+                      "line": 224,
                       "character": 4
                     }
                   ],
@@ -22965,7 +23284,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 150,
+                  "line": 174,
                   "character": 4
                 }
               ],
@@ -22982,12 +23301,23 @@
                         "kind": "text",
                         "text": "Unsubscribes, removes and tears down all channels"
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 150,
+                      "line": 174,
                       "character": 4
                     }
                   ],
@@ -23023,7 +23353,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 146,
+                  "line": 168,
                   "character": 4
                 }
               ],
@@ -23040,12 +23370,23 @@
                         "kind": "text",
                         "text": "Unsubscribes, removes and tears down a single channel"
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 146,
+                      "line": 168,
                       "character": 4
                     }
                   ],
@@ -23102,7 +23443,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 211,
+                  "line": 253,
                   "character": 4
                 }
               ],
@@ -23119,12 +23460,23 @@
                         "kind": "text",
                         "text": "Sends a heartbeat message if the socket is connected."
                       }
+                    ],
+                    "blockTags": [
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 211,
+                      "line": 253,
                       "character": 4
                     }
                   ],
@@ -23155,7 +23507,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                  "line": 207,
+                  "line": 247,
                   "character": 4
                 }
               ],
@@ -23206,13 +23558,22 @@
                             "text": "```ts\n// Use a manual token (preserved across resubscribes, ignores accessToken callback)\nclient.realtime.setAuth('my-custom-jwt')\n\n// Switch back to using the accessToken callback\nclient.realtime.setAuth()\n```"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
-                      "line": 207,
+                      "line": 247,
                       "character": 4
                     }
                   ],
@@ -23292,6 +23653,22 @@
               ]
             }
           ],
+          "categories": [
+            {
+              "title": "Other",
+              "children": [
+                2133, 2132, 2136, 2131, 2148, 2138, 2137, 2147, 2142, 2146, 2159, 2156, 2158, 2157,
+                2180, 2178, 2160, 2166, 2168, 2170, 2172, 2182, 2174, 2187, 2191, 2162, 2164, 2176
+              ]
+            },
+            {
+              "title": "Realtime",
+              "children": [
+                2127, 2230, 2202, 2222, 2206, 2204, 2210, 2224, 2226, 2228, 2217, 2242, 2234, 2215,
+                2212, 2240, 2237
+              ]
+            }
+          ],
           "sources": [
             {
               "fileName": "packages/core/realtime-js/dist/module/RealtimeClient.d.ts",
@@ -23316,7 +23693,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/RealtimePresence.d.ts",
-                  "line": 58,
+                  "line": 69,
                   "character": 4
                 }
               ],
@@ -23343,13 +23720,32 @@
                             "text": "```ts\nconst presence = new RealtimePresence(channel)\n\nchannel.on('presence', ({ event, key }) => {\n  console.log(`Presence ${event} on ${key}`)\n})\n```"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Example 1",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nconst presence = new RealtimePresence(channel)\n\nchannel.on('presence', ({ event, key }) => {\n  console.log(`Presence ${event} on ${key}`)\n})\n```"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/RealtimePresence.d.ts",
-                      "line": 58,
+                      "line": 69,
                       "character": 4
                     }
                   ],
@@ -23491,6 +23887,16 @@
               "children": [1797]
             }
           ],
+          "categories": [
+            {
+              "title": "Other",
+              "children": [1796, 1797]
+            },
+            {
+              "title": "Realtime",
+              "children": [1792]
+            }
+          ],
           "sources": [
             {
               "fileName": "packages/core/realtime-js/dist/module/RealtimePresence.d.ts",
@@ -23525,7 +23931,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 279,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L279"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L279"
                 }
               ],
               "signatures": [
@@ -23803,7 +24209,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 279,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L279"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L279"
                     }
                   ],
                   "typeParameters": [
@@ -23851,7 +24257,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 44,
                                       "character": 8,
-                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                                     }
                                   ],
                                   "type": {
@@ -23871,7 +24277,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 44,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                                 }
                               ]
                             }
@@ -24221,7 +24627,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 59,
                                   "character": 26,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                                 }
                               ],
                               "type": {
@@ -24241,7 +24647,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 59,
                               "character": 24,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                             }
                           ]
                         }
@@ -24322,7 +24728,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 62,
                                       "character": 25,
-                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                     }
                                   ],
                                   "type": {
@@ -24345,7 +24751,7 @@
                                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                               "line": 62,
                                               "character": 47,
-                                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                             }
                                           ],
                                           "type": {
@@ -24365,7 +24771,7 @@
                                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                           "line": 62,
                                           "character": 45,
-                                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                         }
                                       ]
                                     }
@@ -24383,7 +24789,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 62,
                                   "character": 23,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                 }
                               ]
                             }
@@ -24433,7 +24839,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 65,
                                       "character": 10,
-                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                                     }
                                   ],
                                   "type": {
@@ -24453,7 +24859,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 65,
                                   "character": 8,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                                 }
                               ]
                             }
@@ -24489,7 +24895,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 66,
                                       "character": 42,
-                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                                     }
                                   ],
                                   "type": {
@@ -24509,7 +24915,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 66,
                                   "character": 40,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                                 }
                               ]
                             }
@@ -24685,7 +25091,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 88,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                 }
               ],
               "type": {
@@ -24701,7 +25107,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 88,
                       "character": 26,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                     }
                   ],
                   "signatures": [
@@ -24716,7 +25122,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 88,
                           "character": 26,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L88"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L88"
                         }
                       ],
                       "type": {
@@ -24767,7 +25173,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 73,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L73"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L73"
                 }
               ],
               "type": {
@@ -24793,7 +25199,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 81,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L81"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L81"
                 }
               ],
               "type": {
@@ -24820,7 +25226,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 87,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L87"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L87"
                 }
               ],
               "type": {
@@ -24842,7 +25248,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 86,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L86"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L86"
                 }
               ],
               "type": {
@@ -25071,7 +25477,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 83,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L83"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L83"
                 }
               ],
               "type": {
@@ -25097,7 +25503,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 90,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L90"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L90"
                 }
               ],
               "type": {
@@ -25131,7 +25537,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 74,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L74"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L74"
                 }
               ],
               "type": {
@@ -25155,7 +25561,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 80,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L80"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L80"
                 }
               ],
               "type": {
@@ -25181,7 +25587,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 84,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L84"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L84"
                 }
               ],
               "type": {
@@ -25239,7 +25645,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 78,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L78"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L78"
                 }
               ],
               "type": {
@@ -25265,7 +25671,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 85,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L85"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L85"
                 }
               ],
               "type": {
@@ -25286,7 +25692,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 82,
                   "character": 12,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L82"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L82"
                 }
               ],
               "type": {
@@ -25320,7 +25726,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 281,
                   "character": 14,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L281"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L281"
                 }
               ],
               "type": {
@@ -25349,7 +25755,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 280,
                   "character": 14,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L280"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L280"
                 }
               ],
               "type": {
@@ -25368,7 +25774,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 364,
                   "character": 6,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L364"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L364"
                 }
               ],
               "getSignature": {
@@ -25390,7 +25796,7 @@
                     "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                     "line": 364,
                     "character": 6,
-                    "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L364"
+                    "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L364"
                   }
                 ],
                 "type": {
@@ -25415,7 +25821,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 478,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L478"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L478"
                 }
               ],
               "signatures": [
@@ -25438,7 +25844,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 478,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L478"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L478"
                     }
                   ],
                   "parameters": [
@@ -25525,19 +25931,19 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 372,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L372"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L372"
                 },
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 376,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L376"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L376"
                 },
                 {
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 384,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L384"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L384"
                 }
               ],
               "signatures": [
@@ -25552,7 +25958,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 372,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L372"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L372"
                     }
                   ],
                   "typeParameters": [
@@ -25653,7 +26059,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 376,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L376"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L376"
                     }
                   ],
                   "typeParameters": [
@@ -25756,7 +26162,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 485,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L485"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L485"
                 }
               ],
               "signatures": [
@@ -25779,7 +26185,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 485,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L485"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L485"
                     }
                   ],
                   "type": {
@@ -25806,7 +26212,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 502,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L502"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L502"
                 }
               ],
               "signatures": [
@@ -25829,7 +26235,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 502,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L502"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L502"
                     }
                   ],
                   "type": {
@@ -25877,7 +26283,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 495,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L495"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L495"
                 }
               ],
               "signatures": [
@@ -25900,7 +26306,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 495,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L495"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L495"
                     }
                   ],
                   "parameters": [
@@ -25969,7 +26375,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 431,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L431"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L431"
                 }
               ],
               "signatures": [
@@ -25992,7 +26398,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 431,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L431"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L431"
                     }
                   ],
                   "typeParameters": [
@@ -26218,7 +26624,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 445,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L445"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L445"
                                 }
                               ],
                               "type": {
@@ -26268,7 +26674,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 444,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L444"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L444"
                                 }
                               ],
                               "type": {
@@ -26313,7 +26719,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 443,
                                   "character": 6,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L443"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L443"
                                 }
                               ],
                               "type": {
@@ -26333,7 +26739,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 442,
                               "character": 13,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L442"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L442"
                             }
                           ]
                         }
@@ -26442,7 +26848,7 @@
                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                   "line": 396,
                   "character": 2,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L396"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L396"
                 }
               ],
               "signatures": [
@@ -26465,7 +26871,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 396,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L396"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L396"
                     }
                   ],
                   "typeParameters": [
@@ -26626,7 +27032,7 @@
               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
               "line": 37,
               "character": 21,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L37"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L37"
             }
           ],
           "typeParameters": [
@@ -26706,7 +27112,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 44,
                               "character": 8,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                             }
                           ],
                           "type": {
@@ -26726,7 +27132,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 44,
                           "character": 6,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L44"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L44"
                         }
                       ]
                     }
@@ -27196,7 +27602,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 59,
                           "character": 26,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                         }
                       ],
                       "type": {
@@ -27216,7 +27622,7 @@
                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                       "line": 59,
                       "character": 24,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L59"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L59"
                     }
                   ]
                 }
@@ -27297,7 +27703,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 62,
                               "character": 25,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                             }
                           ],
                           "type": {
@@ -27320,7 +27726,7 @@
                                       "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                       "line": 62,
                                       "character": 47,
-                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                     }
                                   ],
                                   "type": {
@@ -27340,7 +27746,7 @@
                                   "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                                   "line": 62,
                                   "character": 45,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                                 }
                               ]
                             }
@@ -27358,7 +27764,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 62,
                           "character": 23,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L62"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L62"
                         }
                       ]
                     }
@@ -27398,7 +27804,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 65,
                               "character": 10,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                             }
                           ],
                           "type": {
@@ -27418,7 +27824,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 65,
                           "character": 8,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L65"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L65"
                         }
                       ]
                     }
@@ -27454,7 +27860,7 @@
                               "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                               "line": 66,
                               "character": 42,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                             }
                           ],
                           "type": {
@@ -27474,7 +27880,7 @@
                           "fileName": "packages/core/supabase-js/src/SupabaseClient.ts",
                           "line": 66,
                           "character": 40,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/SupabaseClient.ts#L66"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/SupabaseClient.ts#L66"
                         }
                       ]
                     }
@@ -27522,7 +27928,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/lib/websocket-factory.d.ts",
-                  "line": 58,
+                  "line": 66,
                   "character": 11
                 }
               ],
@@ -27549,13 +27955,32 @@
                             "text": "```ts\nconst WS = WebSocketFactory.getWebSocketConstructor()\nconst socket = new WS('wss://realtime.supabase.co/socket')\n```"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Example 1",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nconst WS = WebSocketFactory.getWebSocketConstructor()\nconst socket = new WS('wss://realtime.supabase.co/socket')\n```"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/lib/websocket-factory.d.ts",
-                      "line": 58,
+                      "line": 66,
                       "character": 11
                     }
                   ],
@@ -27667,7 +28092,7 @@
               "sources": [
                 {
                   "fileName": "packages/core/realtime-js/dist/module/lib/websocket-factory.d.ts",
-                  "line": 69,
+                  "line": 86,
                   "character": 11
                 }
               ],
@@ -27694,13 +28119,32 @@
                             "text": "```ts\nif (!WebSocketFactory.isWebSocketSupported()) {\n  console.warn('Falling back to long polling')\n}\n```"
                           }
                         ]
+                      },
+                      {
+                        "tag": "@category",
+                        "content": [
+                          {
+                            "kind": "text",
+                            "text": "Realtime"
+                          }
+                        ]
+                      },
+                      {
+                        "tag": "@example",
+                        "name": "Example 1",
+                        "content": [
+                          {
+                            "kind": "code",
+                            "text": "```ts\nif (!WebSocketFactory.isWebSocketSupported()) {\n  console.warn('Falling back to long polling')\n}\n```"
+                          }
+                        ]
                       }
                     ]
                   },
                   "sources": [
                     {
                       "fileName": "packages/core/realtime-js/dist/module/lib/websocket-factory.d.ts",
-                      "line": 69,
+                      "line": 86,
                       "character": 11
                     }
                   ],
@@ -27715,6 +28159,12 @@
           "groups": [
             {
               "title": "Methods",
+              "children": [2390, 2396]
+            }
+          ],
+          "categories": [
+            {
+              "title": "Realtime",
               "children": [2390, 2396]
             }
           ],
@@ -41703,7 +42153,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 173,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L173"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L173"
             }
           ],
           "typeParameters": [
@@ -48894,7 +49344,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 161,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L161"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L161"
             }
           ],
           "typeParameters": [
@@ -48942,7 +49392,7 @@
                             "fileName": "packages/core/supabase-js/src/lib/types.ts",
                             "line": 161,
                             "character": 51,
-                            "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L161"
+                            "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L161"
                           }
                         ],
                         "type": {
@@ -48962,7 +49412,7 @@
                         "fileName": "packages/core/supabase-js/src/lib/types.ts",
                         "line": 161,
                         "character": 49,
-                        "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L161"
+                        "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L161"
                       }
                     ]
                   }
@@ -49013,7 +49463,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 162,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L162"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L162"
             }
           ],
           "type": {
@@ -49042,7 +49492,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 160,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L160"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L160"
             }
           ],
           "typeParameters": [
@@ -55825,7 +56275,7 @@
               "fileName": "packages/core/supabase-js/src/lib/types.ts",
               "line": 28,
               "character": 12,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L28"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L28"
             }
           ],
           "typeParameters": [
@@ -55875,7 +56325,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 154,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L154"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L154"
                     }
                   ],
                   "type": {
@@ -55891,7 +56341,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 154,
                           "character": 16,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L154"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L154"
                         }
                       ],
                       "signatures": [
@@ -55943,7 +56393,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 61,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L61"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L61"
                     }
                   ],
                   "type": {
@@ -55976,7 +56426,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 65,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L65"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L65"
                             }
                           ],
                           "type": {
@@ -56005,7 +56455,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 115,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L115"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L115"
                             }
                           ],
                           "type": {
@@ -56057,7 +56507,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 95,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L95"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L95"
                             }
                           ],
                           "type": {
@@ -56080,7 +56530,7 @@
                                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                                       "line": 95,
                                       "character": 36,
-                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L95"
+                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L95"
                                     }
                                   ],
                                   "signatures": [
@@ -56126,7 +56576,7 @@
                                                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                                                   "line": 95,
                                                   "character": 55,
-                                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L95"
+                                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L95"
                                                 }
                                               ],
                                               "indexSignatures": [
@@ -56141,7 +56591,7 @@
                                                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                                                       "line": 95,
                                                       "character": 57,
-                                                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L95"
+                                                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L95"
                                                     }
                                                   ],
                                                   "parameters": [
@@ -56199,7 +56649,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 111,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L111"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L111"
                             }
                           ],
                           "type": {
@@ -56241,7 +56691,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 121,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L121"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L121"
                             }
                           ],
                           "type": {
@@ -56282,7 +56732,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 73,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L73"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L73"
                             }
                           ],
                           "type": {
@@ -56311,7 +56761,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 99,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L99"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L99"
                             }
                           ],
                           "type": {
@@ -56352,7 +56802,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 69,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L69"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L69"
                             }
                           ],
                           "type": {
@@ -56381,7 +56831,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 126,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L126"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L126"
                             }
                           ],
                           "type": {
@@ -56423,7 +56873,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 107,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L107"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L107"
                             }
                           ],
                           "type": {
@@ -56455,7 +56905,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 61,
                           "character": 9,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L61"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L61"
                         }
                       ]
                     }
@@ -56490,7 +56940,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 32,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L32"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L32"
                     }
                   ],
                   "type": {
@@ -56515,7 +56965,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 33,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L33"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L33"
                             }
                           ],
                           "type": {
@@ -56558,7 +57008,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 45,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L45"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L45"
                             }
                           ],
                           "type": {
@@ -56598,7 +57048,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 58,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L58"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L58"
                             }
                           ],
                           "type": {
@@ -56618,7 +57068,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 32,
                           "character": 7,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L32"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L32"
                         }
                       ]
                     }
@@ -56637,7 +57087,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 133,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L133"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L133"
                     }
                   ],
                   "type": {
@@ -56678,7 +57128,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 137,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L137"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L137"
                             }
                           ],
                           "type": {
@@ -56712,7 +57162,7 @@
                               "fileName": "packages/core/supabase-js/src/lib/types.ts",
                               "line": 141,
                               "character": 4,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L141"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L141"
                             }
                           ],
                           "type": {
@@ -56747,7 +57197,7 @@
                           "fileName": "packages/core/supabase-js/src/lib/types.ts",
                           "line": 133,
                           "character": 11,
-                          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L133"
+                          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L133"
                         }
                       ]
                     }
@@ -56774,7 +57224,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 131,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L131"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L131"
                     }
                   ],
                   "type": {
@@ -56797,7 +57247,7 @@
                       "fileName": "packages/core/supabase-js/src/lib/types.ts",
                       "line": 132,
                       "character": 2,
-                      "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L132"
+                      "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L132"
                     }
                   ],
                   "type": {
@@ -56822,7 +57272,7 @@
                   "fileName": "packages/core/supabase-js/src/lib/types.ts",
                   "line": 28,
                   "character": 48,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/lib/types.ts#L28"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/lib/types.ts#L28"
                 }
               ]
             }
@@ -58335,7 +58785,7 @@
               "fileName": "packages/core/supabase-js/src/index.ts",
               "line": 41,
               "character": 13,
-              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/index.ts#L41"
+              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/index.ts#L41"
             }
           ],
           "signatures": [
@@ -58350,7 +58800,7 @@
                   "fileName": "packages/core/supabase-js/src/index.ts",
                   "line": 41,
                   "character": 28,
-                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/index.ts#L41"
+                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/index.ts#L41"
                 }
               ],
               "typeParameters": [
@@ -58398,7 +58848,7 @@
                                   "fileName": "packages/core/supabase-js/src/index.ts",
                                   "line": 45,
                                   "character": 8,
-                                  "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/index.ts#L45"
+                                  "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/index.ts#L45"
                                 }
                               ],
                               "type": {
@@ -58418,7 +58868,7 @@
                               "fileName": "packages/core/supabase-js/src/index.ts",
                               "line": 45,
                               "character": 6,
-                              "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/index.ts#L45"
+                              "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/index.ts#L45"
                             }
                           ]
                         }
@@ -59631,7 +60081,7 @@
           "fileName": "packages/core/supabase-js/src/index.ts",
           "line": 1,
           "character": 0,
-          "url": "https://github.com/supabase/supabase-js/blob/2a37c26fb84adfde0688d3dcd9f8a0bb0921354f/packages/core/supabase-js/src/index.ts#L1"
+          "url": "https://github.com/supabase/supabase-js/blob/7de9a58180e245b253b908890bb30135445d7495/packages/core/supabase-js/src/index.ts#L1"
         }
       ]
     }
