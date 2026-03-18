@@ -48,31 +48,31 @@ export const StripeSyncChangesCard = ({
           : ''
 
   const dbLine = isInstalledWithUpgrade
-    ? 'Upgrades the database schema named '
+    ? 'Upgrades the database schema named'
     : uninstallDone || installError
-      ? 'Creates a new database schema named '
+      ? 'Creates a new database schema named'
       : installInProgress
         ? isUpgrade
-          ? 'Upgrading database schema named '
-          : 'Creating a new database schema named '
+          ? 'Upgrading database schema named'
+          : 'Creating a new database schema named'
         : installDone || installed || uninstallError
-          ? 'Created a new database schema named '
+          ? 'Created a new database schema named'
           : uninstallInProgress
-            ? 'Dropping database schema named '
+            ? 'Dropping database schema named'
             : ''
 
   const tableAndViewLine = isInstalledWithUpgrade
-    ? 'Upgrades tables and views in the '
+    ? 'Upgrades tables and views in the'
     : uninstallDone || installError
-      ? 'Creates tables and views in the '
+      ? 'Creates tables and views in the'
       : installInProgress
         ? isUpgrade
-          ? 'Upgrading tables and views in the '
-          : 'Creating tables and views in the '
+          ? 'Upgrading tables and views in the'
+          : 'Creating tables and views in the'
         : installDone || installed || uninstallError
-          ? 'Created tables and views in the '
+          ? 'Created tables and views in the'
           : uninstallInProgress
-            ? 'Dropping tables and views in the '
+            ? 'Dropping tables and views in the'
             : ''
 
   const edgeFunctionsLine = isInstalledWithUpgrade

@@ -1,6 +1,7 @@
 import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
 import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
 import { useEffect } from 'react'
+import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import {
@@ -24,6 +25,8 @@ export function useStripeSyncStatus({
   projectRef,
   connectionString,
 }: SchemasVariables): StripeSyncStatusResult {
+  const latestAvailableVersion = getCurrentVersion()
+
   // Query schemas once
   const {
     data: schemas,
@@ -39,21 +42,36 @@ export function useStripeSyncStatus({
   const timedOut = rawSchemaComment.startTime
     ? now - rawSchemaComment.startTime > OPERATION_TIME_OUT_MS
     : false
-  let status = rawSchemaComment.status
-  let errorMessage = rawSchemaComment.errorMessage
-  if (timedOut) {
-    if (status === 'installing') {
-      status = 'install error'
-      errorMessage = 'Installation timed out'
-    } else if (status === 'uninstalling') {
-      status = 'uninstall error'
-      errorMessage = 'Uninstallation timed out'
-    }
-  }
+
+  const status = timedOut
+    ? rawSchemaComment.status === 'installing'
+      ? 'install error'
+      : rawSchemaComment.status === 'uninstalling'
+        ? 'uninstall error'
+        : rawSchemaComment.status
+    : rawSchemaComment.status
+
+  const errorMessage = timedOut
+    ? rawSchemaComment.status === 'installing'
+      ? 'Installation timed out'
+      : rawSchemaComment.status === 'uninstalling'
+        ? 'Uninstallation timed out'
+        : rawSchemaComment.errorMessage
+    : rawSchemaComment.errorMessage
+
   const schemaComment = { ...rawSchemaComment, status, errorMessage }
 
   const installed = isInstalled(schemaComment.status)
   const inProgress = isInProgress(schemaComment.status)
+
+  // Query sync state only when installed
+  const { data: syncState, isPending: isLoadingStripeSyncState } = useStripeSyncingState(
+    { projectRef: projectRef!, connectionString },
+    {
+      refetchInterval: 4000,
+      enabled: !!projectRef && installed,
+    }
+  )
 
   // Poll schemas during install/uninstall operations
   useEffect(() => {
@@ -68,21 +86,10 @@ export function useStripeSyncStatus({
     return () => clearInterval(interval)
   }, [inProgress, refetch])
 
-  // Query sync state only when installed
-  const { data: syncState } = useStripeSyncingState(
-    { projectRef: projectRef!, connectionString },
-    {
-      refetchInterval: 4000,
-      enabled: !!projectRef && installed,
-    }
-  )
-
-  const latestAvailableVersion = getCurrentVersion()
-
   return {
     schemaComment,
     syncState: installed ? syncState : undefined,
-    isLoading: isSchemasLoading,
+    isLoading: isSchemasLoading || isLoadingStripeSyncState,
     latestAvailableVersion,
     timedOut,
   }
