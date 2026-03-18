@@ -323,12 +323,12 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether default privileges for anon/authenticated/service_role on the public
-     * schema were revoked at project creation (tableEditorApiAccessToggle enabled).
-     * true = revoke SQL appended, tables not exposed to Data API by default
-     * false = default grants left intact (existing behavior)
+     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
+     * meaning the project was created with default public schema grants revoked.
+     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
+     * false = user is outside the rollout (default grants left intact)
      */
-    revokedPublicDefaultGrants?: boolean
+    tableEditorApiAccessToggleEnabled?: boolean
   }
   groups: TelemetryGroups
 }
@@ -349,6 +349,25 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
     instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User toggled Data API access on a table via the switch in the table editor side panel.
+ * Only fires for new tables — editing existing tables links out to the settings page instead.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableApiAccessToggleClickedEvent {
+  action: 'table_api_access_toggle_clicked'
+  properties: {
+    /**
+     * The resulting state of the toggle after the click.
+     */
+    newState: 'enabled' | 'disabled'
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -3041,6 +3060,7 @@ export type TelemetryEvent =
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | TableApiAccessToggleClickedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
