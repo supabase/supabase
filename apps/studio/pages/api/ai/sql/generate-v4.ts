@@ -208,8 +208,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       sendReasoning: true,
       headers: { 'Content-Encoding': 'none' },
       onError: (error) => {
-        console.error('[generate-v4] stream error:', error)
-
         if (error == null) {
           return 'unknown error'
         }

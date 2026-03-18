@@ -62,7 +62,7 @@ test('rate calls the tool sanitizer', async () => {
         category: 'sql_generation',
       },
     }),
-    Output: { object: vi.fn((opts) => opts) },
+    Output: { object: vi.fn() },
   }))
 
   vi.mock('components/ui/AIAssistantPanel/Message.utils', () => ({
