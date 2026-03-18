@@ -323,12 +323,12 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether the secure-by-default flag was active, revoking default privileges
-     * for anon/authenticated/service_role on the public schema at project creation.
-     * true = revoke SQL appended (tableEditorApiAccessToggle enabled)
-     * false = default grants left intact
+     * Whether default privileges for anon/authenticated/service_role on the public
+     * schema were revoked at project creation (tableEditorApiAccessToggle enabled).
+     * true = revoke SQL appended, tables not exposed to Data API by default
+     * false = default grants left intact (existing behavior)
      */
-    secureByDefault?: boolean
+    revokedPublicDefaultGrants?: boolean
   }
   groups: TelemetryGroups
 }
