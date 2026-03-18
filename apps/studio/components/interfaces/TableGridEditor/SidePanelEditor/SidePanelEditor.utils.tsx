@@ -61,7 +61,7 @@ const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
  * @returns The row data if available, undefined otherwise
  */
 export function getRowFromSidePanel(
-  sidePanel: SidePanel | DeepReadonly | undefined
+  sidePanel: SidePanel | DeepReadonly<SidePanel> | undefined
 ): SupaRow | undefined {
   if (!sidePanel) return undefined
 

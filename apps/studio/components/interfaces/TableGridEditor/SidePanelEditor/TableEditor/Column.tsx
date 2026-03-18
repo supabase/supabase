@@ -54,7 +54,7 @@ interface ColumnProps {
   hasForeignKeys: boolean
   hasImportContent: boolean
   dragHandleProps?: any
-  onUpdateColumn: (changes: Partial) => void
+  onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
 }

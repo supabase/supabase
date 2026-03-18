@@ -29,7 +29,7 @@ const pgColumnZod = z.object({
 export const pgColumnArrayZod = z.array(pgColumnZod)
 const pgColumnOptionalZod = z.optional(pgColumnZod)
 
-export type PGColumn = z.infer
+export type PGColumn = z.infer<typeof pgColumnZod>
 
 function list({
   tableId,
@@ -84,7 +84,7 @@ where
   }
 }
 
-type ColumnIdentifier = Pick | Pick
+type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
 function getIdentifierWhereClause(identifier: ColumnIdentifier) {
   if ('id' in identifier && identifier.id) {
@@ -181,9 +181,9 @@ function create({
 
   return {
     sql: `
-BEGIN;
-  ${sql};
-COMMIT;`,
+  BEGIN;
+    ${sql};
+  COMMIT;`,
   }
 }
 
@@ -197,7 +197,10 @@ const typeIdent = (type: string) => {
 }
 
 function update(
-  old: Pick,
+  old: Pick<
+    PGColumn,
+    'name' | 'schema' | 'table' | 'table_id' | 'ordinal_position' | 'is_identity' | 'is_unique'
+  >,
   {
     name,
     type,
@@ -387,7 +390,10 @@ COMMIT;`
   return { sql }
 }
 
-function remove(column: Pick, { cascade = false } = {}): { sql: string } {
+function remove(
+  column: Pick<PGColumn, 'name' | 'schema' | 'table'>,
+  { cascade = false } = {}
+): { sql: string } {
   const sql = `ALTER TABLE ${ident(column.schema)}.${ident(column.table)} DROP COLUMN ${ident(
     column.name
   )} ${cascade ? 'CASCADE' : 'RESTRICT'};`
