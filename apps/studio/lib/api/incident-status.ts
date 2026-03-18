@@ -87,9 +87,11 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
   const responseText = await response.text()
 
   if (!response.ok) {
+    const retryAfter = response.headers.get('Retry-After') ?? undefined
     throw new InternalServerError(`StatusPage API responded with ${response.status}`, {
       status: response.status,
       body: responseText,
+      ...(retryAfter !== undefined && { retryAfter }),
     })
   }
 

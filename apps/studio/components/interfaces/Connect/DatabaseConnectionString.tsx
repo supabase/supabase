@@ -224,7 +224,7 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: sharedPoolerConfig?.connection_string ?? '',
-      db_host: isReplicaSelected ? connectionInfo.db_host : sharedPoolerConfig?.db_host ?? '',
+      db_host: isReplicaSelected ? connectionInfo.db_host : (sharedPoolerConfig?.db_host ?? ''),
       db_name: sharedPoolerConfig?.db_name ?? '',
       db_port: sharedPoolerConfig?.db_port ?? 0,
       db_user: sharedPoolerConfig?.db_user ?? '',
@@ -236,11 +236,11 @@ export const DatabaseConnectionString = () => {
     connectionInfo,
     poolingInfo: {
       connectionString: isReplicaSelected
-        ? poolingConfiguration?.connection_string.replace(
+        ? (poolingConfiguration?.connection_string.replace(
             poolingConfiguration?.db_host,
             connectionInfo.db_host
-          ) ?? ''
-        : poolingConfiguration?.connection_string ?? '',
+          ) ?? '')
+        : (poolingConfiguration?.connection_string ?? ''),
       db_host: isReplicaSelected ? connectionInfo.db_host : poolingConfiguration?.db_host,
       db_name: poolingConfiguration?.db_name ?? '',
       db_port: poolingConfiguration?.db_port ?? 0,
@@ -469,7 +469,7 @@ export const DatabaseConnectionString = () => {
                       ...CONNECTION_PARAMETERS.host,
                       value: isReplicaSelected
                         ? connectionInfo.db_host
-                        : poolingConfiguration?.db_host ?? '',
+                        : (poolingConfiguration?.db_host ?? ''),
                     },
                     {
                       ...CONNECTION_PARAMETERS.port,

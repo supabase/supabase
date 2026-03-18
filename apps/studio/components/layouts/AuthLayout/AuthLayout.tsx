@@ -22,8 +22,8 @@ export const AuthProductMenu = () => {
 const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
   return (
     <ProjectLayout
-      title={title}
       product="Authentication"
+      browserTitle={{ section: title }}
       productMenu={<AuthProductMenu />}
       isBlocking={false}
     >

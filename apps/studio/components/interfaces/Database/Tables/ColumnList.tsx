@@ -61,7 +61,7 @@ export const ColumnList = ({
 
   const columns =
     (filterString.length === 0
-      ? selectedTable?.columns ?? []
+      ? (selectedTable?.columns ?? [])
       : selectedTable?.columns?.filter((column) => column.name.includes(filterString))) ?? []
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })

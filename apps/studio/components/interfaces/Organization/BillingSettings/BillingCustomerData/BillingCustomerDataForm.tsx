@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronsUpDown, Info, X } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -17,6 +17,9 @@ import {
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -246,7 +249,24 @@ export const BillingCustomerDataForm = ({
           name="tax_id_name"
           control={form.control}
           render={() => (
-            <FormItemLayout hideMessage layout="vertical" label="Tax ID">
+            <FormItemLayout
+              hideMessage
+              layout="vertical"
+              label="Business Tax ID"
+              afterLabel={
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info size={14} className="text-foreground-lighter cursor-pointer" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-xs text-left">
+                    If you are an individual, no need to add a Tax ID. If you are a business below
+                    your country's income threshold and don't have a Tax ID, you can leave this
+                    blank. Taxes will be added to your invoice according to your country's tax laws
+                    in the near future.
+                  </TooltipContent>
+                </Tooltip>
+              }
+            >
               <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                 <PopoverTrigger asChild>
                   <FormControl>

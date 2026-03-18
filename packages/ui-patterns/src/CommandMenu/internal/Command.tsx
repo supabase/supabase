@@ -20,7 +20,7 @@ const generateCommandClassNames = (isLink: boolean) =>
     'rounded-md',
     'text-sm',
     'group',
-    'py-3',
+    'py-2 md:py-3',
     'text-foreground-light',
     'relative',
     'flex',

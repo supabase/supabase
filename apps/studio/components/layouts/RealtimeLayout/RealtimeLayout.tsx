@@ -31,8 +31,8 @@ export const RealtimeLayout = ({ title, children }: PropsWithChildren<RealtimeLa
 
   return (
     <ProjectLayout
-      title={title}
       product="Realtime"
+      browserTitle={{ section: title }}
       productMenu={<ProductMenu page={page} menu={generateRealtimeMenu(project)} />}
     >
       {children}
