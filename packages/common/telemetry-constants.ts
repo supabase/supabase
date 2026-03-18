@@ -291,10 +291,10 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
-  /**
-   * the instance size selected in the project creation form
-   */
   properties: {
+    /**
+     * The instance size selected in the project creation form.
+     */
     instanceSize?: string
     /**
      * Whether the automatic RLS event trigger option was enabled
@@ -327,6 +327,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * meaning the project was created with default public schema grants revoked.
      * true = user is in the staged rollout cohort (revoke SQL ran at creation)
      * false = user is outside the rollout (default grants left intact)
+     * omitted = PostHog flags had not loaded at the time of project creation
      */
     tableEditorApiAccessToggleEnabled?: boolean
   }
@@ -366,6 +367,10 @@ export interface TableApiAccessToggleClickedEvent {
      * The resulting state of the toggle after the click.
      */
     newState: 'enabled' | 'disabled'
+    /**
+     * The schema containing the table being created.
+     */
+    schemaName: string
   }
   groups: TelemetryGroups
 }

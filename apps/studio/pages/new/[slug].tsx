@@ -46,6 +46,7 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from 'hooks/misc/useDataApiGrantTogglesEnabled'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -96,6 +97,10 @@ const Wizard: NextPageWithLayout = () => {
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
+  // Read the raw flag for telemetry — useDataApiGrantTogglesEnabled coerces undefined→false,
+  // which would record false for users whose flags haven't loaded yet. The raw value preserves
+  // undefined (omitted from PostHog) so we only record true/false when the flag is resolved.
+  const tableEditorApiAccessToggleFlag = usePHFlag<boolean>('tableEditorApiAccessToggle')
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -259,7 +264,7 @@ const Wizard: NextPageWithLayout = () => {
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
           useOrioleDb: form.getValues('useOrioleDb'),
-          tableEditorApiAccessToggleEnabled: isDataApiGrantTogglesEnabled,
+          tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag ?? undefined,
         },
         {
           project: res.ref,
