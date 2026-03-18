@@ -9,6 +9,7 @@ import { CustomPostgresVersionInput } from 'components/interfaces/ProjectCreatio
 import { DatabasePasswordInput } from 'components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
+import { HighAvailabilityInput } from 'components/interfaces/ProjectCreation/HighAvailabilityInput'
 import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
 import {
   extractPostgresVersionDetails,
@@ -116,6 +117,7 @@ const Wizard: NextPageWithLayout = () => {
     defaultValues: {
       organization: slug,
       projectName: projectName || '',
+      highAvailability: false,
       postgresVersion: '',
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
@@ -134,6 +136,7 @@ const Wizard: NextPageWithLayout = () => {
     cloudProvider,
     dbRegion,
     organization,
+    highAvailability,
   } = useWatch_Shadcn_({ control: form.control })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
@@ -285,6 +288,7 @@ const Wizard: NextPageWithLayout = () => {
     const {
       cloudProvider,
       projectName,
+      highAvailability,
       dbPass,
       dbRegion,
       postgresVersion,
@@ -312,6 +316,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider,
       organizationSlug: currentOrg.slug,
       name: projectName,
+      highAvailability,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
@@ -429,6 +434,7 @@ const Wizard: NextPageWithLayout = () => {
                   {canCreateProject && (
                     <>
                       <ProjectNameInput form={form} />
+                      <HighAvailabilityInput form={form} />
 
                       {cloudProviderEnabled && showNonProdFields && (
                         <CloudProviderSelector form={form} />

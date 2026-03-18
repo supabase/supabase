@@ -64,7 +64,6 @@ const findEventTypeCheckbox = (eventType: string) =>
   screen.findByRole('checkbox', {
     name: new RegExp(eventType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
   })
-
 describe('PlatformWebhooksEndpointSheet', () => {
   afterEach(() => {
     vi.clearAllMocks()
