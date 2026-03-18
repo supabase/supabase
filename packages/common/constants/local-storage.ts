@@ -111,6 +111,7 @@ export const LOCAL_STORAGE_KEYS = {
 
   TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED: (ref: string) =>
     `table-editor-new-filter-banner-dismissed-${ref}`,
+  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
 
   /**
    * COMMON

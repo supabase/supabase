@@ -25,8 +25,10 @@ const verifyJSON = (value: string) => {
   }
 }
 
-interface JsonEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface JsonEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   isEditable: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }

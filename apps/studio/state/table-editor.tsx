@@ -1,4 +1,5 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
+import * as Sentry from '@sentry/nextjs'
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
 import {
@@ -105,6 +106,11 @@ export const createTableEditorState = () => {
 
     /* Tables */
     onAddTable: (templateData?: Partial<TableField>) => {
+      // Record that the table creator was opened
+      Sentry.startSpan({ name: 'table_creator.opened', op: 'ui.action' }, (span) => {
+        span.setAttribute('table_creator.opened', 1)
+      })
+
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'table', mode: 'new', templateData },
