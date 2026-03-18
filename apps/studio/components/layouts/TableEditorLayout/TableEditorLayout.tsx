@@ -6,11 +6,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
-import {
-  useIsQueueOperationsEnabled,
-  useIsTableFilterBarEnabled,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { BannerTableEditorFilter } from '@/components/ui/BannerStack/Banners/BannerTableEditorFilter'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -18,13 +14,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { addBanner, dismissBanner } = useBannerStack()
-  const isTableFilterBarEnabled = useIsTableFilterBarEnabled()
   const isTableQueueOperationsEnabled = useIsQueueOperationsEnabled()
-
-  const [isTableEditorNewFilterBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
 
   const [isTableEditorQueueOperationsBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
@@ -44,17 +34,6 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   useEffect(() => {
     if (!isPermissionsLoaded) return
 
-    if (canReadTables && !isTableEditorNewFilterBannerDismissed && !isTableFilterBarEnabled) {
-      addBanner({
-        id: 'table-editor-new-filter-banner',
-        priority: 3,
-        isDismissed: false,
-        content: <BannerTableEditorFilter />,
-      })
-    } else {
-      dismissBanner('table-editor-new-filter-banner')
-    }
-
     if (
       canWriteTables &&
       !isTableEditorQueueOperationsBannerDismissed &&
@@ -71,16 +50,12 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     }
 
     return () => {
-      dismissBanner('table-editor-new-filter-banner')
       dismissBanner('table-editor-queue-operations-banner')
     }
   }, [
     addBanner,
     dismissBanner,
-    canReadTables,
     isPermissionsLoaded,
-    isTableEditorNewFilterBannerDismissed,
-    isTableFilterBarEnabled,
     canWriteTables,
     isTableEditorQueueOperationsBannerDismissed,
     isTableQueueOperationsEnabled,

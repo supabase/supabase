@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useState } from 'react'
 const BANNER_ID = {
   METRICS_API: 'metrics-api-banner',
   INDEX_ADVISOR: 'index-advisor-banner',
-  TABLE_EDITOR_NEW_FILTER: 'table-editor-new-filter-banner',
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
 } as const
