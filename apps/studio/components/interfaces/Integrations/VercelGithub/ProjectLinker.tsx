@@ -310,7 +310,7 @@ const ProjectLinker = ({
                     icon={
                       <div>
                         {selectedForeignProject
-                          ? getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon
+                          ? (getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon)
                           : integrationIcon}
                       </div>
                     }

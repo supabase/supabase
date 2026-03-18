@@ -108,7 +108,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                     ) : !field.value || field.value === NO_PROJECT_MARKER ? (
                       'No specific project'
                     ) : (
-                      project?.name ?? 'Unknown project'
+                      (project?.name ?? 'Unknown project')
                     )}
                   </Button>
                 )

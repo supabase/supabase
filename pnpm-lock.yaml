@@ -10,17 +10,17 @@ catalogs:
       specifier: ^10.26.0
       version: 10.27.0
     '@supabase/auth-js':
-      specifier: 2.99.1
-      version: 2.99.1
+      specifier: 2.100.0-canary.0
+      version: 2.100.0-canary.0
     '@supabase/postgrest-js':
-      specifier: 2.99.1
-      version: 2.99.1
+      specifier: 2.100.0-canary.0
+      version: 2.100.0-canary.0
     '@supabase/realtime-js':
-      specifier: 2.99.1
-      version: 2.99.1
+      specifier: 2.100.0-canary.0
+      version: 2.100.0-canary.0
     '@supabase/supabase-js':
-      specifier: 2.99.1
-      version: 2.99.1
+      specifier: 2.100.0-canary.0
+      version: 2.100.0-canary.0
     '@types/node':
       specifier: ^22.0.0
       version: 22.13.14
@@ -95,7 +95,7 @@ importers:
         version: 3.823.0
       '@ianvs/prettier-plugin-sort-imports':
         specifier: ^4.7.0
-        version: 4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.2.4)(supports-color@8.1.1)
+        version: 4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.8.1)(supports-color@8.1.1)
       '@types/node':
         specifier: 'catalog:'
         version: 22.13.14
@@ -106,11 +106,11 @@ importers:
         specifier: ^28.1.0
         version: 28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1)
       prettier:
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: ^3.8.0
+        version: 3.8.1
       prettier-plugin-sql-cst:
-        specifier: ^0.11.0
-        version: 0.11.1
+        specifier: ^0.18.0
+        version: 0.18.0
       rimraf:
         specifier: ^6.0.0
         version: 6.0.1
@@ -330,7 +330,7 @@ importers:
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
@@ -842,7 +842,7 @@ importers:
         version: 7.5.0
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@supabase/mcp-server-supabase':
         specifier: ^0.7.0
         version: 0.7.0(@modelcontextprotocol/sdk@1.27.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
@@ -854,7 +854,7 @@ importers:
         version: link:../../packages/pg-meta
       '@supabase/realtime-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@supabase/shared-types':
         specifier: 0.1.84
         version: 0.1.84
@@ -863,7 +863,7 @@ importers:
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@tanstack/react-query':
         specifier: ^5.0.0
         version: 5.83.0(react@18.3.1)
@@ -1081,8 +1081,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       stripe-experiment-sync:
-        specifier: ^1.0.19
-        version: 1.0.19(@types/node@22.13.14)(supports-color@8.1.1)
+        specifier: 1.0.27
+        version: 1.0.27(@types/node@22.13.14)(supports-color@8.1.1)
       tus-js-client:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1258,9 +1258,6 @@ importers:
       postcss:
         specifier: ^8.5.3
         version: 8.5.3
-      prettier:
-        specifier: 3.2.4
-        version: 3.2.4
       raw-loader:
         specifier: ^4.0.2
         version: 4.0.2(webpack@5.94.0)
@@ -1293,7 +1290,7 @@ importers:
         version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
       '@monaco-editor/react':
         specifier: ^4.6.0
-        version: 4.7.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.7.0(monaco-editor@0.55.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-accordion':
         specifier: '*'
         version: 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1378,9 +1375,12 @@ importers:
       '@react-router/fs-routes':
         specifier: ^7.4.0
         version: 7.4.0(@react-router/dev@7.9.6(@types/node@22.13.14)(@vitejs/plugin-rsc@0.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)))(babel-plugin-macros@3.1.0)(jiti@2.5.1)(react-router@7.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@5.9.2)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))(yaml@2.8.1))(typescript@5.9.2)
+      '@supabase-labs/y-supabase':
+        specifier: 0.1.0
+        version: 0.1.0
       '@supabase/postgrest-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@supabase/supa-mdx-lint':
         specifier: 0.2.6-alpha
         version: 0.2.6-alpha
@@ -1426,6 +1426,9 @@ importers:
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@18.3.1)
+      monaco-editor:
+        specifier: ^0.55.1
+        version: 0.55.1
       next:
         specifier: 'catalog:'
         version: 15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
@@ -1492,10 +1495,22 @@ importers:
       vaul:
         specifier: ^0.9.6
         version: 0.9.9(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      y-monaco:
+        specifier: ^0.1.6
+        version: 0.1.6(monaco-editor@0.55.1)(yjs@13.6.29)
+      y-protocols:
+        specifier: ^1.0.7
+        version: 1.0.7(yjs@13.6.29)
+      yjs:
+        specifier: ^13.6.29
+        version: 13.6.29
       zod:
         specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
+      '@babel/core':
+        specifier: '*'
+        version: 7.29.0(supports-color@8.1.1)
       '@react-router/dev':
         specifier: ^7.9.0
         version: 7.9.6(@types/node@22.13.14)(@vitejs/plugin-rsc@0.5.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)))(babel-plugin-macros@3.1.0)(jiti@2.5.1)(react-router@7.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(typescript@5.9.2)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))(yaml@2.8.1)
@@ -1504,10 +1519,10 @@ importers:
         version: 1.6.0
       '@supabase/ssr':
         specifier: ^0.7.0
-        version: 0.7.0(@supabase/supabase-js@2.99.1)
+        version: 0.7.0(@supabase/supabase-js@2.100.0-canary.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@tanstack/react-router':
         specifier: ^1.150.0
         version: 1.158.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1618,10 +1633,10 @@ importers:
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.10(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/ssr':
         specifier: ^0.9.0
-        version: 0.9.0(@supabase/supabase-js@2.99.1)
+        version: 0.9.0(@supabase/supabase-js@2.100.0-canary.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@vercel/og':
         specifier: ^0.6.2
         version: 0.6.2
@@ -1868,10 +1883,10 @@ importers:
     dependencies:
       '@supabase/ssr':
         specifier: ^0.7.0
-        version: 0.7.0(@supabase/supabase-js@2.99.1)
+        version: 0.7.0(@supabase/supabase-js@2.100.0-canary.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@vueuse/core':
         specifier: ^14.1.0
         version: 14.1.0(vue@3.5.21(typescript@5.9.2))
@@ -1917,7 +1932,7 @@ importers:
         version: 1.56.1
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       cross-fetch:
         specifier: ^4.1.0
         version: 4.1.0(encoding@0.1.13)
@@ -1945,7 +1960,7 @@ importers:
         version: 0.18.5
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       ai:
         specifier: 5.0.52
         version: 5.0.52(zod@3.25.76)
@@ -2017,8 +2032,8 @@ importers:
         specifier: ^7.4.3
         version: 7.5.2(encoding@0.1.13)(typescript@5.9.2)
       prettier:
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: '*'
+        version: 3.8.1
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
@@ -2028,9 +2043,6 @@ importers:
       minimist:
         specifier: ^1.2.7
         version: 1.2.8
-      prettier:
-        specifier: 3.2.4
-        version: 3.2.4
       svgson:
         specifier: ^5.2.1
         version: 5.3.1
@@ -2039,10 +2051,10 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@types/dat.gui':
         specifier: ^0.7.12
         version: 0.7.12
@@ -2281,6 +2293,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      shiki:
+        specifier: ^4.0.1
+        version: 4.0.1
       ui:
         specifier: workspace:*
         version: link:../ui
@@ -2601,7 +2616,7 @@ importers:
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.99.1
+        version: 2.100.0-canary.0
       '@vitest/coverage-v8':
         specifier: ^3.2.0
         version: 3.2.4(supports-color@8.1.1)(vitest@3.2.4)
@@ -4339,15 +4354,6 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/core@10.1.9':
-    resolution: {integrity: sha512-sXhVB8n20NYkUBfDYgizGHlpRVaCRjtuzNZA6xpALIUbkgfd2Hjz+DfEN6+h1BRnuxw0/P4jCIMjMsEOAMwAJw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@types/node': '>=18'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-
   '@inquirer/core@10.3.2':
     resolution: {integrity: sha512-43RTuEbfP8MbKzedNqBrlhhNKVwoK//vUFNW3Q3vZ88BLcrs4kYpGg+B2mm5p2K/HfygoCxuKwJJiv8PbGmE0A==}
     engines: {node: '>=18'}
@@ -4383,10 +4389,6 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
-
-  '@inquirer/figures@1.0.11':
-    resolution: {integrity: sha512-eOg92lvrn/aRUqbxRyvpEWnrvRuTYRifixHkYVpJiygTgVSBIHDqLh0SrMQXkafvULg3ck11V7xvR+zcgvpHFw==}
-    engines: {node: '>=18'}
 
   '@inquirer/figures@1.0.15':
     resolution: {integrity: sha512-t2IEY+unGHOzAaVM5Xx6DEWKeXlDDcNPeDyUpsRc6CUhBfU3VQOEl+Vssh7VNp1dR8MdUJBWhuObjXCsVpjN5g==}
@@ -4457,15 +4459,6 @@ packages:
 
   '@inquirer/type@3.0.10':
     resolution: {integrity: sha512-BvziSRxfz5Ov8ch0z/n3oijRSEcEsHnhggm4xFZe93DHcUCTlutlq9Ox4SVENAfcRD22UQq7T/atg9Wr3k09eA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@types/node': '>=18'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-
-  '@inquirer/type@3.0.5':
-    resolution: {integrity: sha512-ZJpeIYYueOz/i/ONzrfof8g89kNdO2hjGuvULROo3O8rlB2CRtSseE5KeirnyE4t/thAn/EwvS/vuQeJCn+NZg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -8055,23 +8048,51 @@ packages:
   '@shikijs/core@3.13.0':
     resolution: {integrity: sha512-3P8rGsg2Eh2qIHekwuQjzWhKI4jV97PhvYjYUzGqjvJfqdQPz+nMlfWahU24GZAyW1FxFI1sYjyhfh5CoLmIUA==}
 
+  '@shikijs/core@4.0.1':
+    resolution: {integrity: sha512-vWvqi9JNgz1dRL9Nvog5wtx7RuNkf7MEPl2mU/cyUUxJeH1CAr3t+81h8zO8zs7DK6cKLMoU9TvukWIDjP4Lzg==}
+    engines: {node: '>=20'}
+
   '@shikijs/engine-javascript@3.13.0':
     resolution: {integrity: sha512-Ty7xv32XCp8u0eQt8rItpMs6rU9Ki6LJ1dQOW3V/56PKDcpvfHPnYFbsx5FFUP2Yim34m/UkazidamMNVR4vKg==}
+
+  '@shikijs/engine-javascript@4.0.1':
+    resolution: {integrity: sha512-DJK9NiwtGYqMuKCRO4Ip0FKNDQpmaiS+K5bFjJ7DWFn4zHueDWgaUG8kAofkrnXF6zPPYYQY7J5FYVW9MbZyBg==}
+    engines: {node: '>=20'}
 
   '@shikijs/engine-oniguruma@3.13.0':
     resolution: {integrity: sha512-O42rBGr4UDSlhT2ZFMxqM7QzIU+IcpoTMzb3W7AlziI1ZF7R8eS2M0yt5Ry35nnnTX/LTLXFPUjRFCIW+Operg==}
 
+  '@shikijs/engine-oniguruma@4.0.1':
+    resolution: {integrity: sha512-oCWdCTDch3J8Kc0OZJ98KuUPC02O1VqIE3W/e2uvrHqTxYRR21RGEJMtchrgrxhsoJJCzmIciKsqG+q/yD+Cxg==}
+    engines: {node: '>=20'}
+
   '@shikijs/langs@3.13.0':
     resolution: {integrity: sha512-672c3WAETDYHwrRP0yLy3W1QYB89Hbpj+pO4KhxK6FzIrDI2FoEXNiNCut6BQmEApYLfuYfpgOZaqbY+E9b8wQ==}
 
+  '@shikijs/langs@4.0.1':
+    resolution: {integrity: sha512-v/mluaybWdnGJR4GqAR6zh8qAZohW9k+cGYT28Y7M8+jLbC0l4yG085O1A+WkseHTn+awd+P3UBymb2+MXFc8w==}
+    engines: {node: '>=20'}
+
+  '@shikijs/primitive@4.0.1':
+    resolution: {integrity: sha512-ns0hHZc5eWZuvuIEJz2pTx3Qecz0aRVYumVQJ8JgWY2tq/dH8WxdcVM49Fc2NsHEILNIT6vfdW9MF26RANWiTA==}
+    engines: {node: '>=20'}
+
   '@shikijs/themes@3.13.0':
     resolution: {integrity: sha512-Vxw1Nm1/Od8jyA7QuAenaV78BG2nSr3/gCGdBkLpfLscddCkzkL36Q5b67SrLLfvAJTOUzW39x4FHVCFriPVgg==}
+
+  '@shikijs/themes@4.0.1':
+    resolution: {integrity: sha512-FW41C/D6j/yKQkzVdjrRPiJCtgeDaYRJFEyCKFCINuRJRj9WcmubhP4KQHPZ4+9eT87jruSrYPyoblNRyDFzvA==}
+    engines: {node: '>=20'}
 
   '@shikijs/transformers@1.6.0':
     resolution: {integrity: sha512-qGfHe1ECiqfE2STPWvfogIj/9Q0SK+MCRJdoITkW7AmFuB7DmbFnBT2US84+zklJOB51MzNO8RUXZiauWssJlQ==}
 
   '@shikijs/types@3.13.0':
     resolution: {integrity: sha512-oM9P+NCFri/mmQ8LoFGVfVyemm5Hi27330zuOBp0annwJdKH1kOLndw3zCtAVDehPLg9fKqoEx3Ht/wNZxolfw==}
+
+  '@shikijs/types@4.0.1':
+    resolution: {integrity: sha512-EaygPEn57+jJ76mw+nTLvIpJMAcMPokFbrF8lufsZP7Ukk+ToJYEcswN1G0e49nUZAq7aCQtoeW219A8HK1ZOw==}
+    engines: {node: '>=20'}
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
@@ -8311,8 +8332,19 @@ packages:
     resolution: {integrity: sha512-Cq3KKe+G1o7PSBMbmrgpT2JgBeyH2THHr3RdIX2MqF7AnBuspIMgtZ3ktcCgP7kZsTMvnmWymr7zZCT1zeWbMw==}
     engines: {node: '>=12.16'}
 
+  '@supabase-labs/y-supabase@0.1.0':
+    resolution: {integrity: sha512-1ItaKbcImgy7ueYfJcyVYihqCKi9RAee9MKBV8wcCqSMNsrWvw4ibhW8ai91kWsewsiWzIDXVPONgcUcxagk9g==}
+
+  '@supabase/auth-js@2.100.0-canary.0':
+    resolution: {integrity: sha512-V9cg2OvvY1RC1S1i+B1z+pPLJB4P0XWzYeBJx72ZQ7FTklPadEjUniBMlPwfrqhYqAcZ72FCrYy5jFryyy/1dA==}
+    engines: {node: '>=20.0.0'}
+
   '@supabase/auth-js@2.99.1':
     resolution: {integrity: sha512-x7lKKTvKjABJt/FYcRSPiTT01Xhm2FF8RhfL8+RHMkmlwmRQ88/lREupIHKwFPW0W6pTCJqkZb7Yhpw/EZ+fNw==}
+    engines: {node: '>=20.0.0'}
+
+  '@supabase/functions-js@2.100.0-canary.0':
+    resolution: {integrity: sha512-f1hKYX/mxZ9B8nkdC/1jrRtKQXDshK6Uu9SJRdO00e1x46k+hVl3q7OqiUvMB3LUBS0GpplAyJrkraFhsVvBRw==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/functions-js@2.99.1':
@@ -8332,12 +8364,23 @@ packages:
       '@modelcontextprotocol/sdk': ^1.25.2
       zod: ^3.25.0 || ^4.0.0
 
+  '@supabase/phoenix@0.4.0':
+    resolution: {integrity: sha512-RHSx8bHS02xwfHdAbX5Lpbo6PXbgyf7lTaXTlwtFDPwOIw64NnVRwFAXGojHhjtVYI+PEPNSWwkL90f4agN3bw==}
+
   '@supabase/postgres-meta@0.64.6':
     resolution: {integrity: sha512-vz5gc6RKNfDVnIfRUmH2ssTMYFI0U3MYOVyQ9R4YkzOS2dKSanjC4rTEDGjlMFwGTCUPW3N3pbY7HJIW81wMyg==}
     engines: {node: '>=16', npm: '>=8'}
 
+  '@supabase/postgrest-js@2.100.0-canary.0':
+    resolution: {integrity: sha512-rZ0qWSo0NSFvSByWLW2AhcUNnv7UI7CaYVhZStspxJKUojL8Kux4hldzgZINvCqTkZMqauW/5E9VeFVXyLKvnA==}
+    engines: {node: '>=20.0.0'}
+
   '@supabase/postgrest-js@2.99.1':
     resolution: {integrity: sha512-gtw2ibJrADvfqrpUWXGNlrYUvxttF4WVWfPpTFKOb2IRj7B6YRWMDgcrYqIuD4ZEabK4m6YKQCCGy6clgf1lPA==}
+    engines: {node: '>=20.0.0'}
+
+  '@supabase/realtime-js@2.100.0-canary.0':
+    resolution: {integrity: sha512-621nWkc+aIBN8vQGWNljCIkQpMnYaG5NOekpbmtNlkjm8FZx0nhMjQZ75g3Z8tPwpxi0Q4NZ9vJ3M1sxiAqOKQ==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/realtime-js@2.99.1':
@@ -8359,6 +8402,10 @@ packages:
     resolution: {integrity: sha512-UFY6otYV3yqCgV+AyHj80vNkTvbf1Gas2LW4dpbQ4ap6p6v3eB2oaDfcI99jsuJzwVBCFU4BJI+oDYyhNk1z0Q==}
     peerDependencies:
       '@supabase/supabase-js': ^2.97.0
+
+  '@supabase/storage-js@2.100.0-canary.0':
+    resolution: {integrity: sha512-P+e53zG1FGKxP/7S0X5PWCsvjWMW45M1qvfEQeiQu9tcBGszn/DigvLibjs2yD5i7gU8wvLjmaF7rcCYUnm2Ng==}
+    engines: {node: '>=20.0.0'}
 
   '@supabase/storage-js@2.99.1':
     resolution: {integrity: sha512-mf7zPfqofI62SOoyQJeNUVxe72E4rQsbWim6lTDPeLu3lHija/cP5utlQADGrjeTgOUN6znx/rWn7SjrETP1dw==}
@@ -8498,6 +8545,10 @@ packages:
   '@supabase/supa-mdx-lint@0.3.2':
     resolution: {integrity: sha512-iqJHDk/ToyxFMa/um9A5gsp9jYN7iI0cIabNq9nyBpK/Yat/J9I2IIMueQwIMy3TsG6a2qdPyUkZkuPC37SdRg==}
     hasBin: true
+
+  '@supabase/supabase-js@2.100.0-canary.0':
+    resolution: {integrity: sha512-Oj+62BfZ9VEX27WHE/uBKf2jqqZJ09UHsFSbnQrynxYTyzG3ASj3m+K0FP9qsSnenZZPOduLIIRM0gos1PKCyw==}
+    engines: {node: '>=20.0.0'}
 
   '@supabase/supabase-js@2.99.1':
     resolution: {integrity: sha512-5MRoYD9ffXq8F6a036dm65YoSHisC3by/d22mauKE99Vrwf792KxYIIr/iqCX7E4hkuugbPZ5EGYHTB7MKy6Vg==}
@@ -13226,6 +13277,9 @@ packages:
     peerDependencies:
       ws: '*'
 
+  isomorphic.js@0.2.5:
+    resolution: {integrity: sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw==}
+
   istanbul-lib-coverage@3.2.2:
     resolution: {integrity: sha512-O8dpsF+r0WV/8MNRKfnmrtCWhuKjxrq2w+jpzBL5UZKTi2LeVWnWOmWRxFlesJONmc+wLAGvKQZEOanko0LFTg==}
     engines: {node: '>=8'}
@@ -13514,6 +13568,11 @@ packages:
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
+
+  lib0@0.2.117:
+    resolution: {integrity: sha512-DeXj9X5xDCjgKLU/7RR+/HQEVzuuEUiwldwOGsHK/sfAfELGWEyTcf0x+uOvCvK3O2zPmZePXWL85vtia6GyZw==}
+    engines: {node: '>=16'}
+    hasBin: true
 
   libpg-query@13.3.1:
     resolution: {integrity: sha512-RLvnKPLWngNR7bNep/Q9euPcfFJVFfDg/iP13lYGxcSI01emS/1vbTw6EBd8UordweWFdvUuK+31sHp104dukA==}
@@ -13810,6 +13869,11 @@ packages:
 
   markdown-wasm@1.2.0:
     resolution: {integrity: sha512-S12OTkyXCkOgI1n1rZY9cg4bK/PGu80Emjpvwp8BEjwCxhPV3yddF0U6+QhCitdBsI1tzWcoeahmW7k0Pq81OA==}
+
+  marked@14.0.0:
+    resolution: {integrity: sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==}
+    engines: {node: '>= 18'}
+    hasBin: true
 
   marked@16.3.0:
     resolution: {integrity: sha512-K3UxuKu6l6bmA5FUwYho8CfJBlsUWAooKtdGgMcERSpF7gcBUrCGsLH7wDaaNOzwq18JzSUDyoEb/YsrqMac3w==}
@@ -14434,6 +14498,9 @@ packages:
   monaco-editor@0.52.2:
     resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
 
+  monaco-editor@0.55.1:
+    resolution: {integrity: sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==}
+
   moo@0.5.2:
     resolution: {integrity: sha512-iSAJLHYKnX41mKcJKjqvnAN9sf0LMDTXDEvFv+ffuRR9a1MIuXLjMNL6EsnDHSkKLTWNqQQ5uo61P4EbU4NU+Q==}
 
@@ -14966,6 +15033,9 @@ packages:
   oniguruma-to-es@4.3.3:
     resolution: {integrity: sha512-rPiZhzC3wXwE59YQMRDodUwwT9FZ9nNBwQQfsd1wfdtlKEyCdRV0avrTcSZ5xlIvGRVPd/cx6ZN45ECmS39xvg==}
 
+  oniguruma-to-es@4.3.4:
+    resolution: {integrity: sha512-3VhUGN3w2eYxnTzHn+ikMI+fp/96KoRSVK9/kMTcFqj1NRDh2IhQCKvYxDnWePKRXY/AqH+Fuiyb7VHSzBjHfA==}
+
   oo-ascii-tree@1.98.0:
     resolution: {integrity: sha512-+GE7ywhtS6MctbfcO+vZzqIxcFzucZCwmawcwCVo89DxQDakV1JFfFViTXG4A90UzTAsU4tQteGmwDtwOlOXLw==}
     engines: {node: '>= 14.17.0'}
@@ -15019,9 +15089,6 @@ packages:
 
   openapi-fetch@0.13.8:
     resolution: {integrity: sha512-yJ4QKRyNxE44baQ9mY5+r/kAzZ8yXMemtNAOFwOzRXJscdjSxxzWSNlyBAr+o5JjkUw9Lc3W7OIoca0cY3PYnQ==}
-
-  openapi-fetch@0.6.2:
-    resolution: {integrity: sha512-Faj29Kzh7oCbt1bz6vAGNKtRJlV/GolOQTx87eYUnfCK7eVXdN9jQVojroc7tcJ5OQgyhbeOqD7LS/8UtGBnMQ==}
 
   openapi-sampler@1.6.1:
     resolution: {integrity: sha512-s1cIatOqrrhSj2tmJ4abFYZQK6l5v+V4toO5q1Pa0DyN8mtyqy2I+Qrj5W9vOELEtybIMQs/TBZGVO/DtTFK8w==}
@@ -15695,8 +15762,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-sql-cst@0.11.1:
-    resolution: {integrity: sha512-MZ8058LfIlNyGILQBeKE15PUTKGbP/QgflKcjkIl+JKgT4jiN6vecgfEhpMnhZLvopxX0xjuDyKM+/4mE0j6Ug==}
+  prettier-plugin-sql-cst@0.18.0:
+    resolution: {integrity: sha512-IEbKtlZ+H94uWFHQt4iKWMiJJRIuzWYw8jeLz+RCzy4bDtsM3/07GIF1+EFCbT9d0gWibTPotZWx8o3hz+ITeA==}
 
   prettier-plugin-sql@0.13.0:
     resolution: {integrity: sha512-Ui9603tDD6PFyr7JvIEoE6cIFMQnJVDriG+oLyVThsGo/MIl5ek18JhH3xtox9ux8jvyww/FUFrJzxpZ7FIdvw==}
@@ -15709,18 +15776,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.2.4:
-    resolution: {integrity: sha512-FWu1oLHKCrtpO1ypU6J0SbK2d9Ckwysq6bHj/uaCP26DxrPpppCLQRGVuqAxSTvhF00AcvDRyYrLNW7ocBhFFQ==}
-    engines: {node: '>=14'}
-    hasBin: true
-
-  prettier@3.2.5:
-    resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
-    engines: {node: '>=14'}
-    hasBin: true
-
-  prettier@3.7.3:
-    resolution: {integrity: sha512-QgODejq9K3OzoBbuyobZlUhznP5SKwPqp+6Q6xw6o8gnhr4O85L2U915iM2IDcfF2NPXVaM9zlo9tdwipnYwzg==}
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -16792,6 +16849,10 @@ packages:
   shiki@3.13.0:
     resolution: {integrity: sha512-aZW4l8Og16CokuCLf8CF8kq+KK2yOygapU5m3+hoGw0Mdosc6fPitjM+ujYarppj5ZIKGyPDPP1vqmQhr+5/0g==}
 
+  shiki@4.0.1:
+    resolution: {integrity: sha512-EkAEhDTN5WhpoQFXFw79OHIrSAfHhlImeCdSyg4u4XvrpxKEmdo/9x/HWSowujAnUrFsGOwWiE58a6GVentMnQ==}
+    engines: {node: '>=20'}
+
   should-equal@2.0.0:
     resolution: {integrity: sha512-ZP36TMrK9euEuWQYBig9W55WPC7uo37qzAEmbjHz4gfyuXrEUgF8cUvQVO+w+d3OMfPvSRQJ22lSm8MQJ43LTA==}
 
@@ -16997,8 +17058,8 @@ packages:
     resolution: {integrity: sha512-5vmt2HlCAVozxsBZuXWkAki/KGawaK+b5GG5x+BtXOFVpN/8cqppblFUxHl4jxdA0cvo14lABhM+KBnrUapOlw==}
     hasBin: true
 
-  sql-parser-cst@0.24.0:
-    resolution: {integrity: sha512-38NNWamo0PKv80Zn8r1iXgatkWEB04CPhun8nEQhEJlYBMSIV4OOt4g3diynjVHJSunNSQqAjKcwmhM0EeLCtg==}
+  sql-parser-cst@0.38.2:
+    resolution: {integrity: sha512-4SR3cZYMxG4gsmvZQSQYYzzfk20OnbpsnwOVbU6Fw39ORLPpIHCMqoX5li0dz+ZWyF5HeR+mSgbgayKhN4JR9w==}
 
   sql-template-strings@2.2.2:
     resolution: {integrity: sha512-UXhXR2869FQaD+GMly8jAMCRZ94nU5KcrFetZfWEMd+LVVG6y0ExgHAhatEcKZ/wk8YcKPdi+hiD2wm75lq3/Q==}
@@ -17202,8 +17263,8 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
-  stripe-experiment-sync@1.0.19:
-    resolution: {integrity: sha512-sGFMnHrXp8by6DvKARx1yaAhPWGJj2v83y566VOWUV+O/mok0WRlKBCqoAnjsuA9WRF4AkIrido1LR9BEYaYUw==}
+  stripe-experiment-sync@1.0.27:
+    resolution: {integrity: sha512-Uxt3DLFnjUnBza8c6xrEW1MWrvnIaLg0J7TfZA3kDSlxsNkI3xSj7KV4Gx221ruOgjcbpa2yN++mLLjM795V0w==}
     hasBin: true
 
   stripe@17.7.0:
@@ -17273,8 +17334,8 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
-  supabase-management-js@0.1.6:
-    resolution: {integrity: sha512-TDQg6Nh7e2DaLmMjqpJt7Wwh2Au5loVPH2gwKMkD89e3pb5F/zMQGWt22asEXme031jEmhjazixFH0lwMgbRJA==}
+  supabase-management-js@2.0.2:
+    resolution: {integrity: sha512-CWGAczaNXTUDExaxi+hUEPqlPtCiZ4r3a74NXOx7+Sf+P75foCuX/aXL9MztosWwRnZZAI8VGUXpdNe6K3xTtA==}
     engines: {node: '>=18.0.0'}
 
   supabase@2.76.14:
@@ -18613,6 +18674,19 @@ packages:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
 
+  y-monaco@0.1.6:
+    resolution: {integrity: sha512-sYRywMmcylt+Nupl+11AvizD2am06ST8lkVbUXuaEmrtV6Tf+TD4rsEm6u9YGGowYue+Vfg1IJ97SUP2J+PVXg==}
+    engines: {node: '>=12.0.0', npm: '>=6.0.0'}
+    peerDependencies:
+      monaco-editor: '>=0.20.0'
+      yjs: ^13.3.1
+
+  y-protocols@1.0.7:
+    resolution: {integrity: sha512-YSVsLoXxO67J6eE/nV4AtFtT3QEotZf5sK5BHxFBXso7VDUT3Tx07IfA6hsu5Q5OmBdMkQVmFZ9QOA7fikWvnw==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+    peerDependencies:
+      yjs: ^13.0.0
+
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
     engines: {node: '>=10'}
@@ -18658,6 +18732,10 @@ packages:
   yesql@7.0.0:
     resolution: {integrity: sha512-sosfr7agy4ibLM7BvXBkM6BpBmKMGuBO8DUYQEuey+QqaqrgW+2bsSg6D050ocBYIz0PuHxUyehyzEztZTU4pw==}
 
+  yjs@13.6.29:
+    resolution: {integrity: sha512-kHqDPdltoXH+X4w1lVmMtddE3Oeqq48nM40FD5ojTd8xYhQpzIDcfE2keMSU5bAgRPJBe225WTUdyUgj1DtbiQ==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+
   yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
@@ -18665,10 +18743,6 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-  yoctocolors-cjs@2.1.2:
-    resolution: {integrity: sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==}
-    engines: {node: '>=18'}
 
   yoctocolors-cjs@2.1.3:
     resolution: {integrity: sha512-U/PBtDf35ff0D8X8D0jfdzHYEPFxAI7jJlxZXwCSez5M3190m+QobIfh+sWDWSHMCWWJN2AWamkegn6vr6YBTw==}
@@ -18714,6 +18788,9 @@ packages:
 
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
   zustand@4.4.7:
     resolution: {integrity: sha512-QFJWJMdlETcI69paJwhSMJz7PPWjVP8Sjhclxmxmxv/RYI7ZOvR5BHX+ktH0we9gTWQMxcne8q1OY8xxz604gw==}
@@ -21018,13 +21095,13 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@ianvs/prettier-plugin-sort-imports@4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.2.4)(supports-color@8.1.1)':
+  '@ianvs/prettier-plugin-sort-imports@4.7.0(@vue/compiler-sfc@3.5.21)(prettier@3.8.1)(supports-color@8.1.1)':
     dependencies:
       '@babel/generator': 7.29.0
       '@babel/parser': 7.29.0
       '@babel/traverse': 7.29.0(supports-color@8.1.1)
       '@babel/types': 7.29.0
-      prettier: 3.2.4
+      prettier: 3.8.1
       semver: 7.7.3
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.21
@@ -21164,21 +21241,8 @@ snapshots:
 
   '@inquirer/confirm@5.1.8(@types/node@22.13.14)':
     dependencies:
-      '@inquirer/core': 10.1.9(@types/node@22.13.14)
-      '@inquirer/type': 3.0.5(@types/node@22.13.14)
-    optionalDependencies:
-      '@types/node': 22.13.14
-
-  '@inquirer/core@10.1.9(@types/node@22.13.14)':
-    dependencies:
-      '@inquirer/figures': 1.0.11
+      '@inquirer/core': 10.3.2(@types/node@22.13.14)
       '@inquirer/type': 3.0.10(@types/node@22.13.14)
-      ansi-escapes: 4.3.2
-      cli-width: 4.1.0
-      mute-stream: 2.0.0
-      signal-exit: 4.1.0
-      wrap-ansi: 6.2.0
-      yoctocolors-cjs: 2.1.2
     optionalDependencies:
       '@types/node': 22.13.14
 
@@ -21217,8 +21281,6 @@ snapshots:
       iconv-lite: 0.7.0
     optionalDependencies:
       '@types/node': 22.13.14
-
-  '@inquirer/figures@1.0.11': {}
 
   '@inquirer/figures@1.0.15': {}
 
@@ -21287,10 +21349,6 @@ snapshots:
       '@types/node': 22.13.14
 
   '@inquirer/type@3.0.10(@types/node@22.13.14)':
-    optionalDependencies:
-      '@types/node': 22.13.14
-
-  '@inquirer/type@3.0.5(@types/node@22.13.14)':
     optionalDependencies:
       '@types/node': 22.13.14
 
@@ -21559,10 +21617,10 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@monaco-editor/react@4.7.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@monaco-editor/react@4.7.0(monaco-editor@0.55.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@monaco-editor/loader': 1.5.0
-      monaco-editor: 0.52.2
+      monaco-editor: 0.55.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -24624,7 +24682,7 @@ snapshots:
       p-map: 7.0.4
       pathe: 1.1.2
       picocolors: 1.1.1
-      prettier: 3.7.3
+      prettier: 3.8.1
       react-refresh: 0.14.2
       react-router: 7.12.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       semver: 7.7.3
@@ -25276,30 +25334,68 @@ snapshots:
       '@types/hast': 3.0.4
       hast-util-to-html: 9.0.5
 
+  '@shikijs/core@4.0.1':
+    dependencies:
+      '@shikijs/primitive': 4.0.1
+      '@shikijs/types': 4.0.1
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.4
+      hast-util-to-html: 9.0.5
+
   '@shikijs/engine-javascript@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
       '@shikijs/vscode-textmate': 10.0.2
       oniguruma-to-es: 4.3.3
 
+  '@shikijs/engine-javascript@4.0.1':
+    dependencies:
+      '@shikijs/types': 4.0.1
+      '@shikijs/vscode-textmate': 10.0.2
+      oniguruma-to-es: 4.3.4
+
   '@shikijs/engine-oniguruma@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
+      '@shikijs/vscode-textmate': 10.0.2
+
+  '@shikijs/engine-oniguruma@4.0.1':
+    dependencies:
+      '@shikijs/types': 4.0.1
       '@shikijs/vscode-textmate': 10.0.2
 
   '@shikijs/langs@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
 
+  '@shikijs/langs@4.0.1':
+    dependencies:
+      '@shikijs/types': 4.0.1
+
+  '@shikijs/primitive@4.0.1':
+    dependencies:
+      '@shikijs/types': 4.0.1
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.4
+
   '@shikijs/themes@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
+
+  '@shikijs/themes@4.0.1':
+    dependencies:
+      '@shikijs/types': 4.0.1
 
   '@shikijs/transformers@1.6.0':
     dependencies:
       shiki: 1.6.0
 
   '@shikijs/types@3.13.0':
+    dependencies:
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.4
+
+  '@shikijs/types@4.0.1':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
@@ -25640,7 +25736,24 @@ snapshots:
 
   '@stripe/stripe-js@7.5.0': {}
 
+  '@supabase-labs/y-supabase@0.1.0':
+    dependencies:
+      '@supabase/supabase-js': 2.99.1
+      y-protocols: 1.0.7(yjs@13.6.29)
+      yjs: 13.6.29
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@supabase/auth-js@2.100.0-canary.0':
+    dependencies:
+      tslib: 2.8.1
+
   '@supabase/auth-js@2.99.1':
+    dependencies:
+      tslib: 2.8.1
+
+  '@supabase/functions-js@2.100.0-canary.0':
     dependencies:
       tslib: 2.8.1
 
@@ -25664,6 +25777,8 @@ snapshots:
       '@modelcontextprotocol/sdk': 1.27.0(supports-color@8.1.1)(zod@3.25.76)
       zod: 3.25.76
 
+  '@supabase/phoenix@0.4.0': {}
+
   '@supabase/postgres-meta@0.64.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
       '@sinclair/typebox': 0.25.24
@@ -25679,9 +25794,23 @@ snapshots:
       - pg-native
       - supports-color
 
+  '@supabase/postgrest-js@2.100.0-canary.0':
+    dependencies:
+      tslib: 2.8.1
+
   '@supabase/postgrest-js@2.99.1':
     dependencies:
       tslib: 2.8.1
+
+  '@supabase/realtime-js@2.100.0-canary.0':
+    dependencies:
+      '@supabase/phoenix': 0.4.0
+      '@types/ws': 8.18.1
+      tslib: 2.8.1
+      ws: 8.18.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@supabase/realtime-js@2.99.1':
     dependencies:
@@ -25699,20 +25828,25 @@ snapshots:
     dependencies:
       '@babel/parser': 7.29.0
       libpg-query: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
-      prettier: 3.2.5
+      prettier: 3.8.1
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@supabase/ssr@0.7.0(@supabase/supabase-js@2.99.1)':
+  '@supabase/ssr@0.7.0(@supabase/supabase-js@2.100.0-canary.0)':
     dependencies:
-      '@supabase/supabase-js': 2.99.1
+      '@supabase/supabase-js': 2.100.0-canary.0
       cookie: 1.0.2
 
-  '@supabase/ssr@0.9.0(@supabase/supabase-js@2.99.1)':
+  '@supabase/ssr@0.9.0(@supabase/supabase-js@2.100.0-canary.0)':
     dependencies:
-      '@supabase/supabase-js': 2.99.1
+      '@supabase/supabase-js': 2.100.0-canary.0
       cookie: 1.0.2
+
+  '@supabase/storage-js@2.100.0-canary.0':
+    dependencies:
+      iceberg-js: 0.8.1
+      tslib: 2.8.1
 
   '@supabase/storage-js@2.99.1':
     dependencies:
@@ -25814,6 +25948,17 @@ snapshots:
       '@supabase/supa-mdx-lint-win32-i686': 0.3.2
       '@supabase/supa-mdx-lint-win32-x64': 0.3.2
       node-pty: 1.0.0
+
+  '@supabase/supabase-js@2.100.0-canary.0':
+    dependencies:
+      '@supabase/auth-js': 2.100.0-canary.0
+      '@supabase/functions-js': 2.100.0-canary.0
+      '@supabase/postgrest-js': 2.100.0-canary.0
+      '@supabase/realtime-js': 2.100.0-canary.0
+      '@supabase/storage-js': 2.100.0-canary.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@supabase/supabase-js@2.99.1':
     dependencies:
@@ -25959,7 +26104,7 @@ snapshots:
       '@tanstack/router-core': 1.158.0
       '@tanstack/router-utils': 1.158.0(supports-color@8.1.1)
       '@tanstack/virtual-file-routes': 1.154.7
-      prettier: 3.7.3
+      prettier: 3.8.1
       recast: 0.23.11
       source-map: 0.7.6
       tsx: 4.20.3
@@ -31298,6 +31443,8 @@ snapshots:
     dependencies:
       ws: 8.18.3
 
+  isomorphic.js@0.2.5: {}
+
   istanbul-lib-coverage@3.2.2: {}
 
   istanbul-lib-report@3.0.1:
@@ -31582,6 +31729,10 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  lib0@0.2.117:
+    dependencies:
+      isomorphic.js: 0.2.5
 
   libpg-query@13.3.1(encoding@0.1.13)(supports-color@8.1.1):
     dependencies:
@@ -31963,6 +32114,8 @@ snapshots:
       strip-color: 0.1.0
 
   markdown-wasm@1.2.0: {}
+
+  marked@14.0.0: {}
 
   marked@16.3.0: {}
 
@@ -33130,6 +33283,11 @@ snapshots:
 
   monaco-editor@0.52.2: {}
 
+  monaco-editor@0.55.1:
+    dependencies:
+      dompurify: 3.2.7
+      marked: 14.0.0
+
   moo@0.5.2: {}
 
   motion-dom@12.9.4:
@@ -33919,6 +34077,12 @@ snapshots:
       regex: 6.0.1
       regex-recursion: 6.0.2
 
+  oniguruma-to-es@4.3.4:
+    dependencies:
+      oniguruma-parser: 0.12.1
+      regex: 6.0.1
+      regex-recursion: 6.0.2
+
   oo-ascii-tree@1.98.0: {}
 
   open@10.2.0:
@@ -33966,8 +34130,6 @@ snapshots:
   openapi-fetch@0.13.8:
     dependencies:
       openapi-typescript-helpers: 0.0.15
-
-  openapi-fetch@0.6.2: {}
 
   openapi-sampler@1.6.1:
     dependencies:
@@ -34704,10 +34866,10 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-sql-cst@0.11.1:
+  prettier-plugin-sql-cst@0.18.0:
     dependencies:
-      prettier: 3.2.5
-      sql-parser-cst: 0.24.0
+      prettier: 3.8.1
+      sql-parser-cst: 0.38.2
 
   prettier-plugin-sql@0.13.0(prettier@2.8.8):
     dependencies:
@@ -34718,11 +34880,7 @@ snapshots:
 
   prettier@2.8.8: {}
 
-  prettier@3.2.4: {}
-
-  prettier@3.2.5: {}
-
-  prettier@3.7.3: {}
+  prettier@3.8.1: {}
 
   pretty-bytes@7.0.1: {}
 
@@ -35381,7 +35539,7 @@ snapshots:
       classnames: 2.5.1
       core-js: 3.35.0
       decko: 1.2.0
-      dompurify: 3.2.7
+      dompurify: 3.3.1
       eventemitter3: 5.0.1
       json-pointer: 0.6.2
       lunr: 2.3.9
@@ -36155,6 +36313,17 @@ snapshots:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.4
 
+  shiki@4.0.1:
+    dependencies:
+      '@shikijs/core': 4.0.1
+      '@shikijs/engine-javascript': 4.0.1
+      '@shikijs/engine-oniguruma': 4.0.1
+      '@shikijs/langs': 4.0.1
+      '@shikijs/themes': 4.0.1
+      '@shikijs/types': 4.0.1
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.4
+
   should-equal@2.0.0:
     dependencies:
       should-type: 1.4.0
@@ -36381,7 +36550,7 @@ snapshots:
       get-stdin: 8.0.0
       nearley: 2.20.1
 
-  sql-parser-cst@0.24.0: {}
+  sql-parser-cst@0.38.2: {}
 
   sql-template-strings@2.2.2: {}
 
@@ -36615,24 +36784,26 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  stripe-experiment-sync@1.0.19(@types/node@22.13.14)(supports-color@8.1.1):
+  stripe-experiment-sync@1.0.27(@types/node@22.13.14)(supports-color@8.1.1):
     dependencies:
       '@ngrok/ngrok': 1.6.0
       chalk: 5.4.1
       commander: 12.1.0
       dotenv: 16.5.0
+      esbuild: 0.25.2
       express: 4.22.1(supports-color@8.1.1)
       inquirer: 12.11.1(@types/node@22.13.14)
       papaparse: 5.4.1
       pg: 8.16.3
       pg-node-migrations: 0.0.8
       stripe: 17.7.0
-      supabase-management-js: 0.1.6
+      supabase-management-js: 2.0.2
       ws: 8.18.3
       yesql: 7.0.0
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
+      - debug
       - pg-native
       - supports-color
       - utf-8-validate
@@ -36719,9 +36890,12 @@ snapshots:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
 
-  supabase-management-js@0.1.6:
+  supabase-management-js@2.0.2:
     dependencies:
-      openapi-fetch: 0.6.2
+      axios: 1.13.5
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - debug
 
   supabase@2.76.14(supports-color@8.1.1):
     dependencies:
@@ -38187,6 +38361,17 @@ snapshots:
 
   xtend@4.0.2: {}
 
+  y-monaco@0.1.6(monaco-editor@0.55.1)(yjs@13.6.29):
+    dependencies:
+      lib0: 0.2.117
+      monaco-editor: 0.55.1
+      yjs: 13.6.29
+
+  y-protocols@1.0.7(yjs@13.6.29):
+    dependencies:
+      lib0: 0.2.117
+      yjs: 13.6.29
+
   y18n@5.0.8: {}
 
   yallist@3.1.1: {}
@@ -38227,12 +38412,14 @@ snapshots:
 
   yesql@7.0.0: {}
 
+  yjs@13.6.29:
+    dependencies:
+      lib0: 0.2.117
+
   yn@3.1.1:
     optional: true
 
   yocto-queue@0.1.0: {}
-
-  yoctocolors-cjs@2.1.2: {}
 
   yoctocolors-cjs@2.1.3: {}
 
@@ -38282,6 +38469,8 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zod@4.3.6: {}
 
   zustand@4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1):
     dependencies:

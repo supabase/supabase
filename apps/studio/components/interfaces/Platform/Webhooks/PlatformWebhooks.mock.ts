@@ -14,7 +14,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
     ],
     endpoints: [
       {
-        id: 'org-endpoint-1',
+        id: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
         name: 'Lovable production',
         url: 'https://api.lovable.dev/webhooks/supabase',
         description: 'Primary organization webhook endpoint',
@@ -28,7 +28,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
         createdAt: '2026-02-15T21:30:00.000Z',
       },
       {
-        id: 'org-endpoint-2',
+        id: '1a4e8c73-5b29-44af-8c62-9f1d2b3c4d5e',
         name: 'Slack notifications',
         url: 'https://hooks.slack.com/services/T000/B000/ORG',
         description: 'Operational alerts for organization-level events',
@@ -42,7 +42,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
     deliveries: [
       {
         id: 'org-delivery-1',
-        endpointId: 'org-endpoint-1',
+        endpointId: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
         eventType: 'project.created',
         status: 'success',
         responseCode: 200,
@@ -50,7 +50,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
       },
       {
         id: 'org-delivery-2',
-        endpointId: 'org-endpoint-1',
+        endpointId: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
         eventType: 'project.updated',
         status: 'failure',
         responseCode: 500,
@@ -58,14 +58,14 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
       },
       {
         id: 'org-delivery-3',
-        endpointId: 'org-endpoint-1',
+        endpointId: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
         eventType: 'project.deleted',
         status: 'pending',
         attemptAt: '2026-02-27T07:45:00.000Z',
       },
       {
         id: 'org-delivery-4',
-        endpointId: 'org-endpoint-2',
+        endpointId: '1a4e8c73-5b29-44af-8c62-9f1d2b3c4d5e',
         eventType: 'organization.updated',
         status: 'skipped',
         attemptAt: '2026-02-26T14:12:00.000Z',
@@ -83,7 +83,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
     ],
     endpoints: [
       {
-        id: 'project-endpoint-1',
+        id: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
         name: 'Project analytics',
         url: 'https://analytics.example.com/hooks/supabase-project',
         description: 'Project-level status updates for analytics pipeline',
@@ -97,7 +97,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
     deliveries: [
       {
         id: 'project-delivery-1',
-        endpointId: 'project-endpoint-1',
+        endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
         eventType: 'project.updated',
         status: 'success',
         responseCode: 200,
@@ -105,7 +105,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
       },
       {
         id: 'project-delivery-2',
-        endpointId: 'project-endpoint-1',
+        endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
         eventType: 'project.resource_exhausted',
         status: 'failure',
         responseCode: 429,
@@ -113,7 +113,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
       },
       {
         id: 'project-delivery-3',
-        endpointId: 'project-endpoint-1',
+        endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
         eventType: 'project.paused',
         status: 'success',
         responseCode: 202,

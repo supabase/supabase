@@ -4,7 +4,7 @@ import type { Branch } from 'data/branches/branches-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { BranchBadge } from './BranchBadge'
@@ -57,9 +57,9 @@ export const BranchDropdown = ({
     branches && branches.length > 0
       ? mainBranch
         ? [mainBranch].concat(restOfBranches ?? [])
-        : restOfBranches ?? []
+        : (restOfBranches ?? [])
       : [defaultMainBranch]
-  const branchList = isBranchingEnabled ? sortedBranches ?? [] : [defaultMainBranch]
+  const branchList = isBranchingEnabled ? (sortedBranches ?? []) : [defaultMainBranch]
 
   const commandContent = (
     <BranchDropdownCommandContent
@@ -75,7 +75,7 @@ export const BranchDropdown = ({
     />
   )
 
-  if (isLoading) return <GenericSkeletonLoader className="p-2" />
+  if (isLoading) return <ShimmeringLoader className="p-2 md:w-[90px]" />
 
   if (isError) return <AppLayoutDropdownError message="Failed to load branches" />
 

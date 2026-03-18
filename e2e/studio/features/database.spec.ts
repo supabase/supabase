@@ -61,12 +61,67 @@ test.describe('Database', () => {
       await expect(page.getByText('users', { exact: true })).toBeVisible()
       await expect(page.getByText('sso_providers', { exact: true })).toBeVisible()
       await expect(page.getByText('saml_providers', { exact: true })).toBeVisible()
+    })
 
-      // navigate to table editor when icon is clicked
-      const samlProvidersHeader = await page.getByText('saml_providers', { exact: true })
-      await samlProvidersHeader.locator('..').getByRole('link').click()
+    test('table actions work as expected', async ({ page, ref }) => {
+      const databaseTableName = 'pw_database_schema_table_actions'
+      const databaseColumnName = 'pw_database_schema_column_table_actions'
+      await using _ = await withSetupCleanup(
+        async () => {
+          await createTable(databaseTableName, databaseColumnName)
+        },
+        async () => {
+          await dropTable(databaseTableName)
+        }
+      )
+      const wait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
+      await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
+      await wait
+
+      // validates table and column exists
+      await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
+      // test we can edit the column
+      await page.getByText(`${databaseTableName} actions`).click()
+
+      await page.getByText(`${databaseTableName} actions`).click()
+      await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'Edit table' }).click({ force: true })
+      const dialog = page.getByRole('dialog')
+      await expect(dialog).toBeVisible()
+      await expect(dialog.getByText('timestamptz')).toBeVisible()
+      await page.getByLabel('Description').fill('Bazinga')
+      await page.getByRole('button', { name: 'Save' }).click()
+      await expect(page.getByText(`Successfully updated ${databaseTableName}!`)).toBeVisible()
+      await expect(page.getByRole('dialog')).not.toBeVisible()
+
+      // test the schema view has been refreshed
+      await page.getByText(`${databaseTableName} actions`).click()
+      await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'Edit table' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
+      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
+      await page.waitForTimeout(500)
+      await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
+      await page.getByRole('button', { name: 'Cancel' }).click()
+      await expect(page.getByRole('dialog')).not.toBeVisible()
+
+      await page.getByText(`${databaseTableName} actions`).click()
+      await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'Copy name' }).click()
+      await page.waitForTimeout(500)
+      const copiedTableResult = await page.evaluateHandle(() => navigator.clipboard.readText())
+      expect(await copiedTableResult.jsonValue()).toBe(databaseTableName)
+
+      await page.getByText(`${databaseTableName} actions`).click()
+      await expect(page.getByRole('menuitem', { name: 'View in Table Editor' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'View in Table Editor' }).click()
       await page.waitForURL(/.*\/editor\/\d+/)
-      await page.getByRole('button', { name: 'View saml_providers', exact: true }).click()
+      await expect(page.getByRole('tab', { name: databaseTableName })).toBeVisible()
     })
 
     test('columns actions work as expected', async ({ page, ref }) => {
@@ -93,8 +148,11 @@ test.describe('Database', () => {
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       await expect(page.getByText(databaseColumnName, { exact: true })).toBeVisible()
       // test we can edit the column
-      await page.getByText(databaseColumnName, { exact: true }).hover()
-      await page.getByText(`Edit ${databaseTableName} ${databaseColumnName} column`).click()
+      await page
+        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
+        .click({ force: true })
+      await expect(page.getByRole('menuitem', { name: 'Edit column' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'Edit column' }).click()
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(
@@ -103,9 +161,23 @@ test.describe('Database', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // test the schema view has been refreshed
-      await page.getByText(databaseColumnName, { exact: true }).hover()
-      await page.getByText(`Edit ${databaseTableName} ${databaseColumnName} column`).click()
+      await page
+        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
+        .click({ force: true })
+      await expect(page.getByRole('menuitem', { name: 'Edit column' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'Edit column' }).click()
       await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
+      await page.getByRole('button', { name: 'Cancel' }).click()
+      await expect(page.getByRole('dialog')).not.toBeVisible()
+
+      await page
+        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
+        .click({ force: true })
+      await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
+      await page.getByRole('menuitem', { name: 'Copy name' }).click()
+      await page.waitForTimeout(500)
+      const copiedTableResult = await page.evaluateHandle(() => navigator.clipboard.readText())
+      expect(await copiedTableResult.jsonValue()).toBe(databaseColumnName)
     })
   })
 
@@ -186,7 +258,7 @@ test.describe('Database', () => {
 
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
-      await page.getByTestId('table-name-input').fill(databaseTableNameNew)
+      await page.getByLabel('Name').fill(databaseTableNameNew)
       const createTableWait = createApiResponseWaiter(
         page,
         'pg-meta',
@@ -224,8 +296,8 @@ test.describe('Database', () => {
         .last()
         .click()
       await page.getByRole('menuitem', { name: 'Duplicate Table' }).click()
-      await page.getByTestId('table-name-input').fill(databaseTableNameDuplicate)
-      await page.getByRole('textbox', { name: 'Optional' }).fill('')
+      await page.getByLabel('Name').fill(databaseTableNameDuplicate)
+      await page.getByLabel('Description').fill('')
       const duplicateTableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=')
       await page.getByRole('button', { name: 'Save' }).click()
 

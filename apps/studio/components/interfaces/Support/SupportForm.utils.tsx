@@ -143,7 +143,8 @@ const serializeSupportFormInitialParams = createSerializer(supportFormUrlState)
 
 export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>) {
   const serializedParams = serializeSupportFormInitialParams(initialParams)
-  return `/support/new${serializedParams ?? ''}`
+  const query = serializedParams && serializedParams !== '?' ? serializedParams : ''
+  return `/support/new${query}`
 }
 
 /**

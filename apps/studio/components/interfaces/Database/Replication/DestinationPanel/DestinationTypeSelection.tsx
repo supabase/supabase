@@ -18,7 +18,7 @@ export const DestinationTypeSelection = () => {
   ).length
 
   const [urlDestinationType, setDestinationType] = useQueryState(
-    'type',
+    'destinationType',
     parseAsStringEnum<DestinationType>([
       'Read Replica',
       'BigQuery',

@@ -34,7 +34,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
-import { ColumnEditionContextProvider, ColumnEditionContextType } from './ColumnEditionContext'
+import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
@@ -210,10 +210,20 @@ export const SchemaGraph = () => {
         }
       })
     }
-  }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
+  }, [
+    isSuccessTables,
+    isSuccessSchemas,
+    tables,
+    reactFlowInstance,
+    ref,
+    resolvedTheme,
+    schemas,
+    selectedSchema,
+  ])
 
-  const columnEditionContext = useMemo<ColumnEditionContextType>(
+  const schemaGraphPanelEditorContext = useMemo<SchemaGraphContextType>(
     () => ({
+      isDownloading,
       onEditColumn: (tableId, columnId) => {
         const table = tables.find((table) => table.id === tableId)
         if (!table || table.columns == null) return
@@ -224,8 +234,15 @@ export const SchemaGraph = () => {
         setSelectedTable(table)
         snap.onEditColumn(column)
       },
+      onEditTable: (tableId) => {
+        const table = tables.find((table) => table.id === tableId)
+        if (!table || table.columns == null) return
+
+        setSelectedTable(table)
+        snap.onEditTable()
+      },
     }),
-    [tables, snap]
+    [tables, snap, isDownloading]
   )
 
   return (
@@ -349,7 +366,7 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <ColumnEditionContextProvider value={columnEditionContext}>
+            <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
               <div className="w-full h-full">
                 <ReactFlow
                   defaultNodes={[]}
@@ -382,7 +399,7 @@ export const SchemaGraph = () => {
                   <SchemaGraphLegend />
                 </ReactFlow>
               </div>
-            </ColumnEditionContextProvider>
+            </SchemaGraphContextProvider>
           )}
         </>
       )}

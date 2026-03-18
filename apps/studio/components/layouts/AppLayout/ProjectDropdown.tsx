@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import type { ComponentProps } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
@@ -141,7 +141,7 @@ export const ProjectDropdown = ({
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    if (!embedded) return <GenericSkeletonLoader className="p-2" />
+    if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
   const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen

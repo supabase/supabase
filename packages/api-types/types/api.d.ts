@@ -4807,6 +4807,8 @@ export interface components {
       name: string
     }
     V1RestorePointResponse: {
+      /** Format: date-time */
+      completed_on: string | null
       name: string
       /** @enum {string} */
       status: 'AVAILABLE' | 'PENDING' | 'REMOVED' | 'FAILED'
