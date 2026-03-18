@@ -1,8 +1,10 @@
+import pgMeta, { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import pgMeta from '@supabase/pg-meta'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from './SidePanelEditor.types'
+// Import after mocks are set up
+import { createTable } from './SidePanelEditor.utils'
 
 // Define mock functions at module level
 const mockExecuteSql = vi.fn()
@@ -50,9 +52,6 @@ vi.mock('sonner', () => ({
 vi.mock('components/ui/SparkBar', () => ({
   default: () => null,
 }))
-
-// Import after mocks are set up
-import { createTable } from './SidePanelEditor.utils'
 
 // Helper to create a column field with defaults
 const createColumnField = (overrides: Partial<ColumnField> = {}): ColumnField => ({
@@ -288,8 +287,8 @@ describe('createTable', () => {
         schema: 'public',
         table: 'users',
         columns: [{ source: 'user_id', target: 'id' }],
-        deletionAction: pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.CASCADE,
-        updateAction: pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+        deletionAction: FOREIGN_KEY_CASCADE_ACTION.CASCADE,
+        updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
       },
     ]
 

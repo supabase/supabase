@@ -1,4 +1,4 @@
-import pgMeta from '@supabase/pg-meta'
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import type { XYCoord } from 'dnd-core'
 import { ArrowRight, Key, Lightbulb, Link, Lock } from 'lucide-react'
@@ -206,14 +206,12 @@ function renderColumnIcon(
                   {foreignKey?.targetColumnName}
                 </p>
               </div>
-              {foreignKey?.updateAction !==
-                pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+              {foreignKey?.updateAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                 <p className="text-xs !text-foreground mt-1">
                   On update: {getForeignKeyCascadeAction(foreignKey?.updateAction)}
                 </p>
               )}
-              {foreignKey?.deletionAction !==
-                pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+              {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                 <p className="text-xs !text-foreground mt-1">
                   On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                 </p>

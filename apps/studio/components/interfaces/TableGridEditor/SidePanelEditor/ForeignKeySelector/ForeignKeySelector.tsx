@@ -1,17 +1,5 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PostgresTable } from '@supabase/postgres-meta'
-import pgMeta from '@supabase/pg-meta'
-import { sortBy } from 'lodash'
-import { ArrowRight, Database, HelpCircle, Loader2, Table, X } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Listbox,
-  SidePanel,
-} from 'ui'
-
 import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -21,6 +9,18 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
+import { sortBy } from 'lodash'
+import { ArrowRight, Database, HelpCircle, Loader2, Table, X } from 'lucide-react'
+import { Fragment, useEffect, useState } from 'react'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Listbox,
+  SidePanel,
+} from 'ui'
+
 import { ActionBar } from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField } from '../SidePanelEditor.types'
@@ -33,8 +33,8 @@ const EMPTY_STATE: ForeignKey = {
   schema: 'public',
   table: '',
   columns: [] as { source: string; target: string }[],
-  deletionAction: pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-  updateAction: pgMeta.tableEditor.FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+  deletionAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+  updateAction: FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
 }
 
 interface ForeignKeySelectorProps {
