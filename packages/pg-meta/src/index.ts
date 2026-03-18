@@ -89,5 +89,4 @@ export default {
   indexes,
   columnPrivileges,
   query,
-  tableEditor,
 }
