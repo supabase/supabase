@@ -1,7 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { Search } from 'lucide-react'
 import { Badge, Button, Card, CardContent, CardHeader } from 'ui'
 
 import { BannerCard } from '../BannerCard'
