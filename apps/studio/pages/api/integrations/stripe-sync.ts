@@ -117,9 +117,11 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       })
     }
   } catch (error) {
+    const normalizedErrorMessage = error instanceof Error ? error.message : String(error)
+
     return res.status(400).json({
       data: null,
-      error: { message: `Failed to validate Stripe API key: ${error}` },
+      error: { message: `Failed to validate Stripe API key: ${normalizedErrorMessage}` },
     })
   }
   waitUntil(
