@@ -4,7 +4,8 @@ import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { SidebarContent } from 'components/interfaces/Sidebar'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
-import FloatingMobileToolbar from 'components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
+import { FloatingMobileToolbar } from 'components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft, Menu, Search } from 'lucide-react'
@@ -32,8 +33,9 @@ const MobileNavigationBar = ({
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
   const { ref: projectRef, slug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { isPending: isLoadingOrganizations } = useOrganizationsQuery()
   const isProjectScope = !!projectRef
-  const showOrgSelection = slug || (selectedOrganization && projectRef)
+  const showOrgSelection = slug || isLoadingOrganizations || (selectedOrganization && projectRef)
   const { openMenu } = useMobileSheet()
 
   return (

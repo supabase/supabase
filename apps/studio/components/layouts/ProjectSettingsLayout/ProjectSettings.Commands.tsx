@@ -27,6 +27,13 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
     COMMAND_MENU_SECTIONS.NAVIGATE,
     [
       {
+        id: 'nav-project-settings-add-ons',
+        name: 'Add-ons',
+        value: 'Add-ons addons add ons add on add-on',
+        route: `/project/${ref}/settings/addons`,
+        defaultHidden: true,
+      },
+      {
         id: 'nav-project-settings-general',
         name: 'General Settings',
         route: `/project/${ref}/settings/general`,

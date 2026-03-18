@@ -12,6 +12,7 @@ export type OrganizationCreateInvitationVariables = {
   email: string
   roleId: number
   projects?: string[]
+  requireSso?: boolean
 }
 
 export async function createOrganizationInvitation({
@@ -19,9 +20,11 @@ export async function createOrganizationInvitation({
   email,
   roleId,
   projects,
+  requireSso,
 }: OrganizationCreateInvitationVariables) {
   const payload: components['schemas']['CreateInvitationBody'] = { email, role_id: roleId }
   if (projects !== undefined) payload.role_scoped_projects = projects
+  if (requireSso !== undefined) payload.require_sso = requireSso
 
   const { data, error } = await post('/platform/organizations/{slug}/members/invitations', {
     params: { path: { slug } },

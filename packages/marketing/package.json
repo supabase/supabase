@@ -17,12 +17,13 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "ui": "workspace:*",
-    "zod": "catalog:",
+    "@types/react": "catalog:",
     "react": "catalog:",
     "react-markdown": "^8.0.3",
     "server-only": "^0.0.1",
-    "@types/react": "catalog:"
+    "shiki": "^4.0.1",
+    "ui": "workspace:*",
+    "zod": "catalog:"
   },
   "license": "MIT"
 }
