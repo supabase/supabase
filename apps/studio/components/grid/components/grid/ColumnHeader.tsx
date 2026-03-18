@@ -206,14 +206,12 @@ function renderColumnIcon(
                   {foreignKey?.targetColumnName}
                 </p>
               </div>
-              {foreignKey?.updateAction !==
-                FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+              {foreignKey?.updateAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                 <p className="text-xs !text-foreground mt-1">
                   On update: {getForeignKeyCascadeAction(foreignKey?.updateAction)}
                 </p>
               )}
-              {foreignKey?.deletionAction !==
-                FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+              {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
                 <p className="text-xs !text-foreground mt-1">
                   On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
                 </p>

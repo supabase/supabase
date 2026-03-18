@@ -231,10 +231,8 @@ export const getColumnForeignKey = (
     const foreignKeyMeta = foreignKeys.find((fk) => fk.id === foreignKey.id)
     return {
       ...foreignKey,
-      deletion_action:
-        foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-      update_action:
-        foreignKeyMeta?.update_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      deletion_action: foreignKeyMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+      update_action: foreignKeyMeta?.update_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
     }
   }
 }
