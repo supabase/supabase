@@ -39,10 +39,48 @@ import type {
 } from './PlatformWebhooks.types'
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
 
+const isValidWebhookEndpointUrl = (value: string) => {
+  try {
+    const url = new URL(value)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false
+
+    const { hostname } = url
+    return (
+      hostname === 'localhost' ||
+      hostname.includes('.') ||
+      /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname) ||
+      (hostname.startsWith('[') && hostname.endsWith(']'))
+    )
+  } catch {
+    return false
+  }
+}
+
 const endpointFormSchema = z
   .object({
     name: z.string().trim().max(64, 'Name cannot exceed 64 characters'),
-    url: z.string().trim().url('Please enter a valid URL'),
+    url: z
+      .string()
+      .trim()
+      .min(1, 'Please provide a URL')
+      .superRefine((value, ctx) => {
+        if (!value) return
+
+        if (!value.startsWith('http://') && !value.startsWith('https://')) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Please prefix your URL with http:// or https://',
+          })
+          return
+        }
+
+        if (!isValidWebhookEndpointUrl(value)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'Please provide a valid URL',
+          })
+        }
+      }),
     description: z.string().trim().max(512, 'Description cannot exceed 512 characters'),
     enabled: z.boolean().default(true),
     subscribeAll: z.boolean().default(false),
@@ -345,188 +383,192 @@ export const PlatformWebhooksEndpointSheet = ({
               <Separator />
 
               <div className="px-5 space-y-3">
-                <FormItemLayout
-                  label="Event types"
-                  description={
-                    scope === 'organization' ? (
-                      <>
-                        Project events are triggered when any project in this organization matches
-                        the event type. Add a{' '}
-                        <InlineLink href="/project/_/settings/webhooks">
-                          project endpoint
-                        </InlineLink>{' '}
-                        to listen to events on an individual project only.
-                      </>
-                    ) : (
-                      <>
-                        Project events are triggered for this project only. Add an{' '}
-                        <InlineLink href={`/org/${orgSlug ?? '_'}/webhooks`}>
-                          organization endpoint
-                        </InlineLink>{' '}
-                        to listen to events from any project in your organization.
-                      </>
-                    )
-                  }
-                  layout="vertical"
-                  className="gap-3"
-                >
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="subscribeAll"
-                    render={({ field }) => {
-                      const subscribeAllId = 'subscribe-all-events'
-                      return (
-                        <div className="rounded-md border bg-surface-100   overflow-hidden">
-                          <Label
-                            htmlFor={subscribeAllId}
-                            className={cn(
-                              'flex w-full cursor-pointer items-center gap-3 px-4 py-3',
-                              field.value ? 'bg-surface-100' : 'bg-surface-200'
-                            )}
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="eventTypes"
+                  render={({ field, fieldState }) => {
+                    const selectedTypes = field.value ?? []
+
+                    return (
+                      <FormItemLayout
+                        label="Event types"
+                        description={
+                          scope === 'organization' ? (
+                            <>
+                              Project events are triggered when any project in this organization
+                              matches the event type. Add a{' '}
+                              <InlineLink href="/project/_/settings/webhooks">
+                                project endpoint
+                              </InlineLink>{' '}
+                              to listen to events on an individual project only.
+                            </>
+                          ) : (
+                            <>
+                              Project events are triggered for this project only. Add an{' '}
+                              <InlineLink href={`/org/${orgSlug ?? '_'}/webhooks`}>
+                                organization endpoint
+                              </InlineLink>{' '}
+                              to listen to events from any project in your organization.
+                            </>
+                          )
+                        }
+                        layout="vertical"
+                        className="gap-3"
+                        hideMessage
+                      >
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="subscribeAll"
+                          render={({ field }) => {
+                            const subscribeAllId = 'subscribe-all-events'
+                            return (
+                              <div className="rounded-md border bg-surface-100 overflow-hidden">
+                                <Label
+                                  htmlFor={subscribeAllId}
+                                  className={cn(
+                                    'flex w-full cursor-pointer items-center gap-3 px-4 py-3',
+                                    field.value ? 'bg-surface-100' : 'bg-surface-200'
+                                  )}
+                                >
+                                  <FormControl_Shadcn_>
+                                    <Checkbox
+                                      id={subscribeAllId}
+                                      checked={field.value}
+                                      onCheckedChange={(checked) => {
+                                        const nextValue = Boolean(checked)
+                                        field.onChange(nextValue)
+
+                                        if (nextValue) {
+                                          form.setValue('eventTypes', eventTypes, {
+                                            shouldDirty: true,
+                                            shouldValidate: true,
+                                          })
+                                          return
+                                        }
+
+                                        form.setValue('eventTypes', [], {
+                                          shouldDirty: true,
+                                          shouldValidate: true,
+                                        })
+                                      }}
+                                    />
+                                  </FormControl_Shadcn_>
+                                  <span className="text-sm text-foreground">
+                                    Subscribe to all events{' '}
+                                    <code className="text-code-inline">(*)</code>
+                                  </span>
+                                </Label>
+                              </div>
+                            )
+                          }}
+                        />
+
+                        <FormControl_Shadcn_>
+                          <Accordion
+                            type="multiple"
+                            value={openEventGroups}
+                            onValueChange={setOpenEventGroups}
+                            className="mt-2 space-y-2"
                           >
-                            <FormControl_Shadcn_>
-                              <Checkbox
-                                id={subscribeAllId}
-                                checked={field.value}
-                                onCheckedChange={(checked) => {
-                                  const nextValue = Boolean(checked)
-                                  field.onChange(nextValue)
+                            {groupedEventTypes.map((group) => {
+                              const selectedInGroup = group.eventTypes.filter((eventType) =>
+                                selectedTypes.includes(eventType)
+                              )
+                              const allSelected = selectedInGroup.length === group.eventTypes.length
+                              const isGroupOpen = openEventGroups.includes(group.id)
 
-                                  if (nextValue) {
-                                    form.setValue('eventTypes', eventTypes, {
-                                      shouldDirty: true,
-                                      shouldValidate: true,
-                                    })
-                                    return
-                                  }
-
-                                  form.setValue('eventTypes', [], {
-                                    shouldDirty: true,
-                                    shouldValidate: true,
-                                  })
-                                }}
-                              />
-                            </FormControl_Shadcn_>
-                            <span className="text-sm text-foreground">
-                              Subscribe to all events <code className="text-code-inline">(*)</code>
-                            </span>
-                          </Label>
-                        </div>
-                      )
-                    }}
-                  />
-
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="eventTypes"
-                    render={({ field }) => {
-                      const selectedTypes = field.value ?? []
-
-                      return (
-                        <>
-                          <FormControl_Shadcn_>
-                            <Accordion
-                              type="multiple"
-                              value={openEventGroups}
-                              onValueChange={setOpenEventGroups}
-                              className="mt-2 space-y-2"
-                            >
-                              {groupedEventTypes.map((group) => {
-                                const selectedInGroup = group.eventTypes.filter((eventType) =>
-                                  selectedTypes.includes(eventType)
-                                )
-                                const allSelected =
-                                  selectedInGroup.length === group.eventTypes.length
-                                const isGroupOpen = openEventGroups.includes(group.id)
-
-                                return (
-                                  <AccordionItem
-                                    key={group.id}
-                                    value={group.id}
-                                    className="overflow-hidden rounded-md border"
+                              return (
+                                <AccordionItem
+                                  key={group.id}
+                                  value={group.id}
+                                  className="overflow-hidden rounded-md border"
+                                >
+                                  <AccordionTrigger
+                                    hideIcon
+                                    className="group px-4 py-3 hover:no-underline"
                                   >
-                                    <AccordionTrigger
-                                      hideIcon
-                                      className="group px-4 py-3 hover:no-underline"
-                                    >
-                                      <div className="flex w-full items-center justify-between gap-3">
-                                        <div className="flex items-center gap-2">
-                                          <p className="text-sm text-foreground-light">
-                                            {group.label}
-                                          </p>
-                                          {selectedInGroup.length > 0 && (
-                                            <span className="text-xs text-foreground-muted">
-                                              {selectedInGroup.length}
-                                            </span>
-                                          )}
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                          {isGroupOpen && group.eventTypes.length > 1 && (
-                                            <span
-                                              className="text-xs text-foreground-muted hover:text-foreground"
-                                              onClick={(event) => {
-                                                event.preventDefault()
-                                                event.stopPropagation()
+                                    <div className="flex w-full items-center justify-between gap-3">
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-sm text-foreground-light">
+                                          {group.label}
+                                        </p>
+                                        {selectedInGroup.length > 0 && (
+                                          <span className="text-xs text-foreground-muted">
+                                            {selectedInGroup.length}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-3">
+                                        {isGroupOpen && group.eventTypes.length > 1 && (
+                                          <span
+                                            className="text-xs text-foreground-muted hover:text-foreground"
+                                            onClick={(event) => {
+                                              event.preventDefault()
+                                              event.stopPropagation()
+                                              field.onChange(
+                                                toggleEventTypeGroup(
+                                                  selectedTypes,
+                                                  group.eventTypes,
+                                                  !allSelected
+                                                )
+                                              )
+                                            }}
+                                          >
+                                            {allSelected ? 'Clear all' : 'Select all'}
+                                          </span>
+                                        )}
+                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                      </div>
+                                    </div>
+                                  </AccordionTrigger>
+                                  <AccordionContent className="pb-0 pt-0 [&>div]:pb-0 [&>div]:pt-0">
+                                    <div className="divide-y border-t">
+                                      {group.eventTypes.map((eventType) => {
+                                        const checked = selectedTypes.includes(eventType)
+                                        const eventTypeId = toControlId('event-type', eventType)
+
+                                        return (
+                                          <Label
+                                            key={eventType}
+                                            htmlFor={eventTypeId}
+                                            className={cn(
+                                              'flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-200',
+                                              checked && 'bg-surface-100'
+                                            )}
+                                          >
+                                            <Checkbox
+                                              id={eventTypeId}
+                                              checked={checked}
+                                              onCheckedChange={(next) => {
                                                 field.onChange(
-                                                  toggleEventTypeGroup(
+                                                  toggleEventType(
                                                     selectedTypes,
-                                                    group.eventTypes,
-                                                    !allSelected
+                                                    eventType,
+                                                    Boolean(next)
                                                   )
                                                 )
                                               }}
-                                            >
-                                              {allSelected ? 'Clear all' : 'Select all'}
-                                            </span>
-                                          )}
-                                          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-                                        </div>
-                                      </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pb-0 pt-0 [&>div]:pb-0 [&>div]:pt-0">
-                                      <div className="divide-y border-t">
-                                        {group.eventTypes.map((eventType) => {
-                                          const checked = selectedTypes.includes(eventType)
-                                          const eventTypeId = toControlId('event-type', eventType)
-
-                                          return (
-                                            <Label
-                                              key={eventType}
-                                              htmlFor={eventTypeId}
-                                              className={cn(
-                                                'flex w-full cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-200',
-                                                checked && 'bg-surface-100'
-                                              )}
-                                            >
-                                              <Checkbox
-                                                id={eventTypeId}
-                                                checked={checked}
-                                                onCheckedChange={(next) => {
-                                                  field.onChange(
-                                                    toggleEventType(
-                                                      selectedTypes,
-                                                      eventType,
-                                                      Boolean(next)
-                                                    )
-                                                  )
-                                                }}
-                                              />
-                                              <code className="text-code-inline">{eventType}</code>
-                                            </Label>
-                                          )
-                                        })}
-                                      </div>
-                                    </AccordionContent>
-                                  </AccordionItem>
-                                )
-                              })}
-                            </Accordion>
-                          </FormControl_Shadcn_>
-                        </>
-                      )
-                    }}
-                  />
-                </FormItemLayout>
+                                            />
+                                            <code className="text-code-inline">{eventType}</code>
+                                          </Label>
+                                        )
+                                      })}
+                                    </div>
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )
+                            })}
+                          </Accordion>
+                        </FormControl_Shadcn_>
+                        {fieldState.error?.message && (
+                          <p className="text-sm text-destructive" role="alert">
+                            {fieldState.error.message}
+                          </p>
+                        )}
+                      </FormItemLayout>
+                    )
+                  }}
+                />
               </div>
 
               <Separator />
