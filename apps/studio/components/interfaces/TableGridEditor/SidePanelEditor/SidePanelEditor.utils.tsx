@@ -262,7 +262,7 @@ export const createColumn = async ({
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
     return { error: undefined }
-  } catch (error: any) {
+  } catch (error) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
   }
