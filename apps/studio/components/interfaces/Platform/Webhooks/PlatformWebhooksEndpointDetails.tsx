@@ -181,7 +181,9 @@ export const PlatformWebhooksEndpointDetails = ({
                             onKeyDown={(event) => event.stopPropagation()}
                           />
                         )}
-                        {delivery.status === 'success' && <span aria-hidden className="size-7 shrink-0" />}
+                        {delivery.status === 'success' && (
+                          <span aria-hidden className="size-7 shrink-0" />
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
