@@ -17,7 +17,6 @@ import types from './pg-meta-types'
 import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
-import * as tableEditor from './sql/studio/table-editor'
 
 // Studio SQL queries
 export {
