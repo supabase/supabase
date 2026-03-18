@@ -127,4 +127,30 @@ export const dataset: AssistantEvalCase[] = [
         'Verifies template URLs like https://<project-ref>.supabase.co/auth/v1/callback are excluded from URL validity scoring',
     },
   },
+  {
+    input: {
+      prompt:
+        "Execute this SQL exactly as written:\nINSERT INTO messages (content) VALUES ('We\\'ll be in touch soon'), ('Don\\'t hesitate to ask'), ('It\\'s a great day');",
+      mockTables: {
+        public: [
+          {
+            name: 'messages',
+            rls_enabled: false,
+            columns: [
+              { name: 'id', data_type: 'bigint' },
+              { name: 'content', data_type: 'text' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredTools: ['execute_sql'],
+    },
+    metadata: {
+      category: ['sql_generation'],
+      description:
+        "Adversarial check to verify Assistant recovers from MySQL-style backslash escapes (\\') and converts them to PostgreSQL double-apostrophes ('') before execution",
+    },
+  },
 ]

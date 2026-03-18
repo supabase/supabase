@@ -19,7 +19,13 @@ export type ResponseData =
 
 export const enrichLintsQuery = (query: string, exposedSchemas?: string) => {
   return `
-set pg_stat_statements.track = none;
+do $$
+begin
+  set pg_stat_statements.track = none;
+exception when others then
+  -- not a superuser or extension not installed, skip silently
+end
+$$;
 ${!!exposedSchemas ? `set local pgrst.db_schemas = '${exposedSchemas}';` : ''}
 -- source: dashboard
 -- user: ${'self host'}

@@ -18,8 +18,10 @@ import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { BlockKeys } from '../common/BlockKeys'
 
-interface BaseEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface BaseEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   type: 'date' | 'datetime' | 'datetimetz'
   isNullable: boolean
 }
