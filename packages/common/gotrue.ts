@@ -129,6 +129,7 @@ async function debuggableNavigatorLock<R>(
   acquireTimeout: number,
   fn: () => Promise<R>
 ): Promise<R> {
+  const controller = new AbortController()
   let stackException: any
 
   try {
@@ -147,14 +148,18 @@ async function debuggableNavigatorLock<R>(
       }
 
       console.error(
-        `Waited for over 10s to acquire an Auth client lock`,
+        `Waited for over 10s to acquire an Auth client lock. Aborting request to prevent indefinite hang.`,
         await navigator.locks.query(),
         stackException
       )
+
+      // Actually abort the lock request if it hasn't been granted yet
+      controller.abort()
     })()
   }, 10000)
 
   try {
+    // We pass the controller signal to ensure the lock request can be cancelled
     return await navigatorLock(name, acquireTimeout, async () => {
       clearTimeout(debugTimeout)
 
@@ -172,7 +177,13 @@ async function debuggableNavigatorLock<R>(
       } finally {
         bc.close()
       }
-    })
+    }, { signal: controller.signal })
+  } catch (e: any) {
+    if (e.name === 'AbortError') {
+      console.warn('Auth client lock acquisition was aborted due to timeout.')
+      throw new Error('Authentication service is currently busy. Please try again later.')
+    }
+    throw e
   } finally {
     clearTimeout(debugTimeout)
   }
