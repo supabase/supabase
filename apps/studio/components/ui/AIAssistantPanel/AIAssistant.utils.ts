@@ -18,11 +18,72 @@ export const identifyQueryType = (query: string) => {
   const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
   if (
     formattedQuery.includes('create function') ||
-    formattedQuery.includes('create or replace function')
+    formattedQuery.includes('create or replace function') ||
+    formattedQuery.includes('drop function') ||
+    formattedQuery.includes('alter function')
   ) {
     return 'functions'
-  } else if (formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')) {
+  } else if (
+    formattedQuery.includes('create policy') ||
+    formattedQuery.includes('alter policy') ||
+    formattedQuery.includes('drop policy')
+  ) {
     return 'rls-policies'
+  } else if (
+    formattedQuery.includes('create table') ||
+    formattedQuery.includes('alter table') ||
+    formattedQuery.includes('drop table')
+  ) {
+    return 'tables'
+  } else if (
+    formattedQuery.includes('create trigger') ||
+    formattedQuery.includes('alter trigger') ||
+    formattedQuery.includes('drop trigger')
+  ) {
+    return 'triggers'
+  } else if (
+    formattedQuery.includes('create index') ||
+    formattedQuery.includes('drop index') ||
+    formattedQuery.includes('alter index')
+  ) {
+    return 'indexes'
+  } else if (
+    formattedQuery.includes('create view') ||
+    formattedQuery.includes('drop view') ||
+    formattedQuery.includes('alter view') ||
+    formattedQuery.includes('create materialized view')
+  ) {
+    return 'views'
+  } else if (
+    formattedQuery.includes('create schema') ||
+    formattedQuery.includes('drop schema') ||
+    formattedQuery.includes('alter schema')
+  ) {
+    return 'schemas'
+  }
+}
+
+export const getInvalidationKeysFromSQL = (query: string, ref: string, schema: string = 'public') => {
+  const type = identifyQueryType(query)
+  if (!type) return []
+
+  switch (type) {
+    case 'functions':
+      return [databaseKeys.databaseFunctions(ref)]
+    case 'rls-policies':
+      return [databasePoliciesKeys.list(ref)]
+    case 'tables':
+      return [tableKeys.list(ref, schema, true), tableKeys.list(ref, schema, false)]
+    case 'triggers':
+      return [databaseTriggerKeys.list(ref)]
+    case 'indexes':
+      return [databaseIndexesKeys.list(ref, schema)]
+    case 'views':
+      return [tableKeys.list(ref, schema, true), tableKeys.list(ref, schema, false)]
+    case 'schemas':
+      return [databaseKeys.schemas(ref)]
+    default:
+      return []
   }
 }
 

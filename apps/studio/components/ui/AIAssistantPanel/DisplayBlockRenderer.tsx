@@ -15,7 +15,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '../QueryBlock/QueryBlock'
-import { identifyQueryType } from './AIAssistant.utils'
+import { getInvalidationKeysFromSQL, identifyQueryType } from './AIAssistant.utils'
 import { ConfirmFooter } from './ConfirmFooter'
 
 interface DisplayBlockRendererProps {
@@ -173,6 +173,11 @@ export const DisplayBlockRenderer = ({
             results: Array.isArray(data.result) ? data.result : undefined,
           })
           if (queryType === 'mutation') {
+            const granularKeys = getInvalidationKeysFromSQL(sqlQuery, ref, initialArgs.schema)
+            granularKeys.forEach((key) => {
+              queryClient.invalidateQueries({ queryKey: key })
+            })
+
             queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
             queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(ref) })
           }
