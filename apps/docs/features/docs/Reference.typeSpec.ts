@@ -559,9 +559,14 @@ function parseMethod(
   let { params, ret, comment } = parseSignature(signature, map)
 
   // When a method has multiple overload signatures, TypeDoc places the shared
-  // JSDoc on the method node rather than any individual signature.
-  if (!comment && node.comment) {
-    comment = normalizeComment(node.comment)
+  // JSDoc on the method node rather than any individual signature. Always merge
+  // node.comment as the base so that block tags (@remarks, @example, etc.) are
+  // not lost when overload signatures already carry a minimal summary comment.
+  if (node.comment) {
+    const nodeComment = normalizeComment(node.comment)
+    if (nodeComment) {
+      comment = { ...nodeComment, ...comment }
+    }
   }
 
   const types: MethodTypes = {
