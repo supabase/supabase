@@ -1,9 +1,8 @@
-import pgMeta, { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from './SidePanelEditor.types'
-// Import after mocks are set up
 import { createTable } from './SidePanelEditor.utils'
 
 // Define mock functions at module level
