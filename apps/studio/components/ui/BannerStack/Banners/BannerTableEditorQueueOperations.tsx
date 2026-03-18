@@ -65,7 +65,7 @@ export const BannerTableEditorQueueOperations = () => {
         <Button
           type="default"
           className="w-min"
-          onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR)}
+          onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS)}
         >
           {isQueueOperationsEnabled ? 'View' : 'Enable'} feature preview
         </Button>
