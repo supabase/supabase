@@ -59,10 +59,22 @@ describe('parseCronJobCommand', () => {
     })
   })
 
-  it('should return a sql snippet command when the command is using a SQL function from the search path', () => {
+  it('should return a sql function command with public schema when the command has no schema (fixes #41508)', () => {
     const command = 'SELECT test_cron_function()'
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
-      type: 'sql_snippet',
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'test_cron_function',
+      snippet: command,
+    })
+  })
+
+  it('should correctly parse function name into Function name field, not Schema field (fixes #41508)', () => {
+    const command = 'SELECT truncate_uploaded_images()'
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      type: 'sql_function',
+      schema: 'public',
+      functionName: 'truncate_uploaded_images',
       snippet: command,
     })
   })

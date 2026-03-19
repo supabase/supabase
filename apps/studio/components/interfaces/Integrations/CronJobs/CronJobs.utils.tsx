@@ -127,20 +127,39 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
-  if (command.toLocaleLowerCase().match(regexDBFunction)) {
-    const [schemaName, functionName] = command
-      .replace('SELECT ', '')
-      .replace(/\(.*\);*/, '')
-
+  // Handle SELECT schema.functionname() - explicit schema
+  const regexDBFunctionWithSchema = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/i
+  if (regexDBFunctionWithSchema.test(command)) {
+    const parts = command
+      .replace(/^\s*select\s+/i, '')
+      .replace(/\(.*\)\s*;?\s*$/, '')
       .trim()
       .split('.')
 
-    return {
-      type: 'sql_function',
-      schema: schemaName,
-      functionName: functionName,
-      snippet: originalCommand,
+    if (parts.length >= 2) {
+      const schemaName = parts[0]
+      const functionName = parts.slice(1).join('.')
+      return {
+        type: 'sql_function',
+        schema: schemaName,
+        functionName,
+        snippet: originalCommand,
+      }
+    }
+  }
+
+  // Handle SELECT functionname() - no schema, default to public (fixes #41508)
+  const regexDBFunctionNoSchema = /^\s*select\s+[a-zA-Z0-9_]+\s*\(\s*\)\s*;?\s*$/i
+  if (regexDBFunctionNoSchema.test(command)) {
+    const match = command.match(/^\s*select\s+([a-zA-Z0-9_]+)\s*\(\s*\)/i)
+    const functionName = match?.[1] || ''
+    if (functionName) {
+      return {
+        type: 'sql_function',
+        schema: 'public',
+        functionName,
+        snippet: originalCommand,
+      }
     }
   }
 
