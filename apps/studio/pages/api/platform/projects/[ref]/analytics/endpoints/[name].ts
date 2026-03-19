@@ -44,7 +44,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           })
         }
 
-        throw error
+        return res.status(500).json({
+          error: {
+            message: error instanceof Error ? error.message : 'Unknown error',
+          },
+        })
       }
     default:
       res.setHeader('Allow', ['GET', 'POST'])
