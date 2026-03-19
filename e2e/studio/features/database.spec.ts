@@ -93,6 +93,7 @@ test.describe('Database', () => {
       await page.getByText(`${databaseTableName} actions`).click()
       await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
       await page.getByRole('menuitem', { name: 'Edit table' }).click({ force: true })
+      await expect(page.getByRole('menuitem', { name: 'Edit table' })).not.toBeVisible()
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
@@ -105,6 +106,7 @@ test.describe('Database', () => {
       await page.getByText(`${databaseTableName} actions`).click()
       await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
       await page.getByRole('menuitem', { name: 'Edit table' }).click()
+      await expect(page.getByRole('menuitem', { name: 'Edit table' })).not.toBeVisible()
       await expect(page.getByRole('dialog')).toBeVisible()
       // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
       await page.waitForTimeout(500)
@@ -115,6 +117,7 @@ test.describe('Database', () => {
       await page.getByText(`${databaseTableName} actions`).click()
       await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
       await page.getByRole('menuitem', { name: 'Copy name' }).click()
+      await expect(page.getByRole('menuitem', { name: 'Copy name' })).not.toBeVisible()
       await expect(async () => {
         const copiedTableName = await page.evaluateHandle(() => navigator.clipboard.readText())
         expect(await copiedTableName.jsonValue()).toBe(databaseTableName)
