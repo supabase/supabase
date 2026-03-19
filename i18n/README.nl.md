@@ -251,7 +251,7 @@ Onze aanpak voor client libraries is modulair. Elke sub-bibliotheek is een op zi
 - [Turks / Türkçe](/i18n/README.tr.md)
 - [Oekraïens / Українська](/i18n/README.uk.md)
 - [Vietnamees / Tiếng Việt](/i18n/README.vi-vn.md)
-- [Lijst van vertalingen](/i18n/talen.md) <!--- Keep only this -->
+- [Lijst van vertalingen](/i18n/languages.md) <!--- Keep only this -->
 
 ---
 
