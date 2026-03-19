@@ -33,7 +33,7 @@ In the server, you need to handle the redirect to the OAuth provider's authentic
 
 If your framework requires custom response headers on redirects (for example Remix), forward all `Set-Cookie` headers produced by the server client when returning the redirect response.
 
-```js
+```ts
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 import type { Provider } from '@supabase/supabase-js'
 const request = new Request('http://example.com/auth/login')
