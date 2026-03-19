@@ -242,8 +242,8 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   // Use nextjs useSearchParams to get the latest URL params
   const searchParams = useSearchParams()
   const urlParams = useMemo(() => {
-    const sort = searchParams.getAll('sort')
-    const filter = searchParams.getAll('filter')
+    const sort = searchParams?.getAll('sort') ?? []
+    const filter = searchParams?.getAll('filter') ?? []
     return { sort, filter }
   }, [searchParams])
 

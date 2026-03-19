@@ -21,6 +21,7 @@ import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useTrack } from 'lib/telemetry/track'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
@@ -282,6 +283,7 @@ export const ApiAccessToggle = ({
   isNewRecord,
   handler,
 }: ApiAccessToggleComponentProps): ReactNode => {
+  const track = useTrack()
   const isPending = handler.isPending
   const isError = handler.isError
   const isSchemaExposed = handler.data?.schemaExposed
@@ -294,6 +296,13 @@ export const ApiAccessToggle = ({
   const handleMasterToggle = (checked: boolean) => {
     if (!handler.isSuccess) return
     if (!isSchemaExposed) return
+
+    if (isNewRecord) {
+      track('table_api_access_toggle_clicked', {
+        newState: checked ? 'enabled' : 'disabled',
+        schemaName: schemaName ?? 'unknown',
+      })
+    }
 
     if (checked) {
       handler.data?.restorePreviousPrivileges()

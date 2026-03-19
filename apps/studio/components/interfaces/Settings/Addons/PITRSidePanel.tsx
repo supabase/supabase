@@ -321,7 +321,7 @@ const PITRSidePanel = () => {
 
           {hasChanges && selectedOption !== 'pitr_0' && (
             <p className="text-sm text-foreground-light">
-              There are no immediate charges. The addon is billed at the end of your billing cycle
+              There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.
             </p>
           )}

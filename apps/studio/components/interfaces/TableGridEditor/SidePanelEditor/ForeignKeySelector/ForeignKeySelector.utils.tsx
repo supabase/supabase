@@ -1,4 +1,4 @@
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { isEqual } from 'lodash'
 import { HelpCircle } from 'lucide-react'
