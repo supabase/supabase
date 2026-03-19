@@ -865,5 +865,13 @@
     "position": "Head of Multigres",
     "author_url": "https://github.com/sougou",
     "author_image_url": "https://github.com/sougou.png"
+  },
+  {
+    "author_id": "gregor_vand",
+    "author": "Gregor Vand",
+    "username": "gregorvand",
+    "position": "Technical Program Manager",
+    "author_url": "https://www.linkedin.com/in/gregorvand/",
+    "author_image_url": "https://github.com/gregorvand.png"
   }
 ]
