@@ -344,7 +344,6 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Add two rows to the queue
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('first row')
@@ -357,14 +356,12 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    // Undo the latest operation (second row)
     await page.keyboard.press('ControlOrMeta+z')
 
     await expect(page.getByText('1 pending change')).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'first row' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'second row' })).not.toBeVisible()
 
-    // Undo the remaining operation (first row)
     await page.keyboard.press('ControlOrMeta+z')
 
     await expect(page.getByText('pending change')).not.toBeVisible()
@@ -392,16 +389,18 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Edit a cell
+    await expect(page.getByRole('gridcell', { name: 'original value' })).toBeVisible()
+
     const cell = page.getByRole('gridcell', { name: 'original value' })
     await cell.dblclick()
+
     const editor = page.getByRole('textbox', { name: /Editor content/ })
+    await expect(editor).toBeVisible()
     await editor.fill('edited value')
     await page.keyboard.press('Enter')
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Undo the edit
     await page.keyboard.press('ControlOrMeta+z')
 
     await expect(page.getByText('pending change')).not.toBeVisible()
@@ -430,14 +429,14 @@ test.describe('Queue Table Operations', () => {
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
-    // Delete a row via context menu
+    await expect(page.getByRole('gridcell', { name: 'row to keep' })).toBeVisible()
+
     const cell = page.getByRole('gridcell', { name: 'row to keep' })
     await cell.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Delete row' }).click()
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    // Undo the delete
     await page.keyboard.press('ControlOrMeta+z')
 
     await expect(page.getByText('pending change')).not.toBeVisible()
