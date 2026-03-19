@@ -567,7 +567,7 @@ You can now use any Supabase features from your client or server code!
 <TabPanel id="solidstart-server" label="Server API route">
 
 ```ts routes/api/hello.ts
-import { APIEvent } from '@solidjs/start/server'
+import { type APIEvent } from '@solidjs/start/server'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function GET({ request }: APIEvent) {
