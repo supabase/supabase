@@ -418,6 +418,11 @@ testRunner('table editor', () => {
         await dropTable(tableName)
       }
     )
+    // Disable the new filter bar for this test since it uses the old filter UI
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.evaluate(() => {
+      localStorage.setItem('supabase-ui-table-filter-bar', 'false')
+    })
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
