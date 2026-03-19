@@ -70,9 +70,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
           const existing = ctx.res.getHeader('Set-Cookie') ?? []
           ctx.res.setHeader('Set-Cookie', [
             ...(Array.isArray(existing) ? existing : [String(existing)]),
-            ...cookiesToSet.map(({ name, value, options }) =>
-              serialize(name, value, options)
-            ),
+            ...cookiesToSet.map(({ name, value, options }) => serialize(name, value, options)),
           ])
         },
       },

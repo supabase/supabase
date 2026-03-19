@@ -7,7 +7,8 @@ import styleHandler from 'ui/src/lib/theme/styleHandler'
 export type ImageModalProps = RadixProps & Props
 
 interface RadixProps
-  extends Dialog.DialogProps,
+  extends
+    Dialog.DialogProps,
     Pick<
       Dialog.DialogContentProps,
       | 'onOpenAutoFocus'

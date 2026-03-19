@@ -63,9 +63,9 @@ export const EdgeFunctionSecrets = () => {
 
   const secrets =
     searchString.length > 0
-      ? data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
-        []
-      : data ?? []
+      ? (data?.filter((secret) => secret.name.toLowerCase().includes(searchString.toLowerCase())) ??
+        [])
+      : (data ?? [])
 
   const headers = [
     <TableHead key="secret-name">Name</TableHead>,

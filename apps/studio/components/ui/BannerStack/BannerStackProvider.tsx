@@ -1,7 +1,16 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useCallback, useContext, useState } from 'react'
+
+const BANNER_ID = {
+  METRICS_API: 'metrics-api-banner',
+  INDEX_ADVISOR: 'index-advisor-banner',
+  TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
+  RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
+} as const
+
+export type BannerId = (typeof BANNER_ID)[keyof typeof BANNER_ID]
 
 export interface Banner {
-  id: string
+  id: BannerId
   content: React.ReactNode
   isDismissed: boolean
   priority?: number
@@ -11,7 +20,7 @@ export interface Banner {
 interface BannerStackContextType {
   banners: Banner[]
   addBanner: (banner: Banner) => void
-  dismissBanner: (id: string) => void
+  dismissBanner: (id: BannerId) => void
 }
 
 const BannerStackContext = createContext<BannerStackContextType | undefined>(undefined)

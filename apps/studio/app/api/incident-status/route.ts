@@ -1,20 +1,15 @@
 import { IS_PLATFORM } from 'common'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextResponse } from 'next/server'
 
 import { InternalServerError } from '@/lib/api/apiHelpers'
-import {
-  getActiveIncidents,
-  type IncidentCache,
-  type IncidentInfo,
-} from '@/lib/api/incident-status'
+import { getActiveIncidents, type IncidentCache } from '@/lib/api/incident-status'
 import { createAdminClient } from '@/lib/api/supabase-admin'
 
 /**
- * Cache on browser for 5 minutes
  * Cache on CDN for 5 minutes
  * Allow serving stale content for 1 minute while revalidating
  */
-const CACHE_CONTROL_SETTINGS = 'public, max-age=300, s-maxage=300, stale-while-revalidate=60'
+const CACHE_CONTROL_SETTINGS = 'public, s-maxage=300, stale-while-revalidate=60'
 
 async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<string, IncidentCache>> {
   const cacheMap = new Map<string, IncidentCache>()
@@ -47,22 +42,26 @@ async function fetchIncidentCache(incidentIds: Array<string>): Promise<Map<strin
   return cacheMap
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!IS_PLATFORM) {
-    return res.status(404).end()
-  }
+export async function OPTIONS() {
+  if (!IS_PLATFORM) return new Response(null, { status: 404 })
+  return new Response(null, {
+    status: 204,
+    headers: {
+      Allow: 'GET, HEAD, OPTIONS',
+    },
+  })
+}
 
-  const { method } = req
+export async function HEAD() {
+  if (!IS_PLATFORM) return new Response(null, { status: 404 })
+  return new Response(null, {
+    status: 200,
+    headers: { 'Cache-Control': CACHE_CONTROL_SETTINGS },
+  })
+}
 
-  if (method === 'HEAD') {
-    res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
-    return res.status(200).end()
-  }
-
-  if (method !== 'GET') {
-    res.setHeader('Allow', ['GET', 'HEAD'])
-    return res.status(405).json({ error: `Method ${method} Not Allowed` })
-  }
+export async function GET() {
+  if (!IS_PLATFORM) return new Response(null, { status: 404 })
 
   try {
     const allIncidents = await getActiveIncidents()
@@ -80,11 +79,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       cache: cacheMap.get(incident.id) ?? null,
     }))
 
-    res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
-
-    return res.status(200).json(enrichedIncidents)
+    return NextResponse.json(enrichedIncidents, {
+      headers: { 'Cache-Control': CACHE_CONTROL_SETTINGS },
+    })
   } catch (error) {
+    let errorCode = 500
+    const headers = new Headers()
+
     if (error instanceof InternalServerError) {
+      if (typeof error.details?.status === 'number') errorCode = error.details.status
+      if (errorCode === 420) errorCode = 429
+      if (errorCode === 429 && typeof error.details?.retryAfter === 'string') {
+        headers.set('Retry-After', error.details.retryAfter)
+      }
       console.error('Failed to fetch active StatusPage incidents: %O', {
         message: error.message,
         details: error.details,
@@ -93,8 +100,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       console.error('Unexpected error fetching active StatusPage incidents: %O', error)
     }
 
-    return res.status(500).json({ error: 'Unable to fetch incidents at this time' })
+    return NextResponse.json(
+      { error: 'Unable to fetch incidents at this time' },
+      { status: errorCode, headers }
+    )
   }
 }
-
-export default handler

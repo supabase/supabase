@@ -197,7 +197,7 @@ export const PolicyEditorPanel = memo(function ({
         command,
         roles: roles.length === 0 ? 'public' : roles,
         using: using ?? '',
-        check: command === 'insert' ? using ?? '' : check ?? '',
+        check: command === 'insert' ? (using ?? '') : (check ?? ''),
       })
 
       setError(undefined)

@@ -12,8 +12,10 @@ import {
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 
-interface EditCellKeyOperation
-  extends Omit<EditCellContentOperation, 'payload' | 'id' | 'timestamp'> {
+interface EditCellKeyOperation extends Omit<
+  EditCellContentOperation,
+  'payload' | 'id' | 'timestamp'
+> {
   type: QueuedOperationType.EDIT_CELL_CONTENT
   tableId: number
   payload: {

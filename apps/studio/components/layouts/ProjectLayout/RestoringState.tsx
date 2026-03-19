@@ -1,6 +1,3 @@
-import { CheckCircle, Download, Loader } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -9,11 +6,24 @@ import { useBackupDownloadMutation } from 'data/database/backup-download-mutatio
 import { useDownloadableBackupQuery } from 'data/database/backup-query'
 import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
+import dayjs from 'dayjs'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
-import { Button } from 'ui'
+import { CheckCircle, Download, Loader } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+} from 'ui'
 
-const RestoringState = () => {
+export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -37,12 +47,8 @@ const RestoringState = () => {
     }
   )
 
-  useEffect(() => {
-    if (!isProjectStatusSuccess) return
-    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-      setIsCompleted(true)
-    }
-  }, [isProjectStatusSuccess, projectStatusData, ref, invalidateProjectDetailsQuery])
+  const restoreInitiatedSinceMinutes = dayjs().diff(dayjs.utc(project?.updated_at), 'minute')
+  const showSupportCta = restoreInitiatedSinceMinutes >= 30
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -69,6 +75,12 @@ const RestoringState = () => {
     setLoading(true)
     if (ref) await invalidateProjectDetailsQuery(ref)
   }
+
+  useEffect(() => {
+    if (isProjectStatusSuccess && projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
+      setIsCompleted(true)
+    }
+  }, [isProjectStatusSuccess, projectStatusData])
 
   return (
     <div className="flex items-center justify-center h-full">
@@ -110,17 +122,43 @@ const RestoringState = () => {
               </div>
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
-                <SupportLink
-                  queryParams={{
-                    category: SupportCategories.DATABASE_UNRESPONSIVE,
-                    projectRef: project?.ref,
-                    subject: 'Ongoing restoration for project',
-                  }}
-                >
-                  Contact support
-                </SupportLink>
-              </Button>
+              {showSupportCta && (
+                <Dialog>
+                  <DialogTrigger>
+                    <Button type="text" className="text-foreground-light">
+                      Taking longer than expected?
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent aria-describedby={undefined}>
+                    <DialogHeader>
+                      <DialogTitle>Restoration taking longer than expected?</DialogTitle>
+                    </DialogHeader>
+                    <DialogSectionSeparator />
+                    <DialogSection>
+                      <p className="text-sm">
+                        Restores may take from a minutes up to several hours depending on the size
+                        of your database. However, if the restoration process is taking far longer
+                        than expected for the size of your database, you may reach out to us via
+                        Support for help.
+                      </p>
+                    </DialogSection>
+                    <DialogFooter>
+                      <Button asChild type="default">
+                        <SupportLink
+                          queryParams={{
+                            category: SupportCategories.DATABASE_UNRESPONSIVE,
+                            projectRef: project?.ref,
+                            subject: 'Ongoing restoration for project',
+                          }}
+                        >
+                          Contact support
+                        </SupportLink>
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+
               <ButtonTooltip
                 type="default"
                 icon={<Download />}
@@ -144,5 +182,3 @@ const RestoringState = () => {
     </div>
   )
 }
-
-export default RestoringState

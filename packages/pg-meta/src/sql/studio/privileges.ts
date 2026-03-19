@@ -45,7 +45,7 @@ function getTableGrantsCTEs({
       left join pg_roles pr
         on pr.oid = acl.grantee
       where c.relkind in ('r', 'p', 'v', 'm', 'f')
-        and n.nspname not in (${IGNORED_SCHEMAS_LIST})
+        ${IGNORED_SCHEMAS_LIST ? `and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : ''}
         ${search ? `and (n.nspname || '.' || c.relname) ilike '%${search}%'` : ''}
       group by c.oid, n.nspname, c.relname, c.relkind
     ),
@@ -116,12 +116,18 @@ export function getExposedTablesSql({
   `
 }
 
-export function getExposedTableCountsSql({ selectedSchemas }: { selectedSchemas: string[] }) {
+export function getExposedTableCountsSql({
+  selectedSchemas,
+  ignoredSchemas = [],
+}: {
+  selectedSchemas: string[]
+  ignoredSchemas?: string[]
+}) {
   const schemasList =
     selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
 
   return /* SQL */ `
-    with ${getTableGrantsCTEs()}
+    with ${getTableGrantsCTEs({ ignoredSchemas })}
     select
       count(*)::int as total_count,
       (count(*) filter (where status = 'granted' and schema_name in (${schemasList})))::int as grants_count
@@ -161,7 +167,7 @@ function getFunctionGrantsCTEs({
       left join pg_roles pr
         on pr.oid = acl.grantee
       where p.prokind in ('f', 'w')
-        and n.nspname not in (${IGNORED_SCHEMAS_LIST})
+        ${IGNORED_SCHEMAS_LIST ? `and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : ''}
         ${search ? `and (n.nspname || '.' || p.proname) ilike '%${search}%'` : ''}
       group by n.nspname, p.proname
     ),
@@ -216,12 +222,18 @@ export function getExposedFunctionsSql({
   `
 }
 
-export function getExposedFunctionCountsSql({ selectedSchemas }: { selectedSchemas: string[] }) {
+export function getExposedFunctionCountsSql({
+  selectedSchemas,
+  ignoredSchemas = [],
+}: {
+  selectedSchemas: string[]
+  ignoredSchemas?: string[]
+}) {
   const schemasList =
     selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
 
   return /* SQL */ `
-    with ${getFunctionGrantsCTEs()}
+    with ${getFunctionGrantsCTEs({ ignoredSchemas })}
     select
       count(*)::int as total_count,
       (count(*) filter (where status = 'granted' and schema_name in (${schemasList})))::int as grants_count
