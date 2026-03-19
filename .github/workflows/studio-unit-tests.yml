@@ -11,6 +11,7 @@ on:
       - 'pnpm-lock.yaml'
   pull_request:
     branches: [master, studio]
+  workflow_dispatch:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:

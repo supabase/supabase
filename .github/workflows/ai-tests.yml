@@ -11,6 +11,7 @@ on:
       - 'packages/ai-commands/**'
   schedule:
     - cron: '15 0 * * 1' # Every Monday @ 12:15am UTC (off the hour to avoid heavy load times)
+  workflow_dispatch:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:

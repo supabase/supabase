@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/docs/**/*.ts*'
       - 'apps/docs/spec/**/*.json'
+  workflow_dispatch:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:

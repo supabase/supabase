@@ -3,6 +3,7 @@ name: UI Tests
 on:
   pull_request:
     branches: [master]
+  workflow_dispatch:
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
