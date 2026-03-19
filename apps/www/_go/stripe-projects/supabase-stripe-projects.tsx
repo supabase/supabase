@@ -5,12 +5,12 @@ const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'supabase-stripe-projects',
   metadata: {
-    title: 'Provision Supabase from the Stripe CLI | Supabase',
+    title: 'Stripe Projects: Provision Supabase from the Stripe CLI | Supabase',
     description:
       'One command gives you a full Supabase project with a Postgres database, Auth, Storage, Edge Functions, and Realtime. Project credentials are delivered to your environment automatically.',
   },
   hero: {
-    title: 'Provision Supabase from the Stripe CLI',
+    title: 'Stripe Projects: Provision Supabase from the Stripe CLI',
     description:
       'One command gives you a full Supabase project with a Postgres database, Auth, Storage, Edge Functions, and Realtime. Project credentials are delivered to your environment automatically.',
     image: {
