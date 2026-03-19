@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
+import type { SupaRow } from '../types'
 import {
   formatGridDataWithOperationValues,
   generateTableChangeKey,
@@ -7,12 +8,11 @@ import {
 } from './queueOperationUtils'
 import {
   QueuedOperationType,
-  type QueuedOperation,
   type NewAddRowOperation,
   type NewDeleteRowOperation,
   type NewEditCellContentOperation,
+  type QueuedOperation,
 } from '@/state/table-editor-operation-queue.types'
-import type { SupaRow } from '../types'
 
 describe('generateTableChangeKey', () => {
   test('should generate key for EDIT_CELL_CONTENT with row identifiers', () => {
@@ -238,10 +238,7 @@ describe('formatGridDataWithOperationValues', () => {
   })
 
   test('should apply multiple EDIT_CELL_CONTENT operations to different rows', () => {
-    const rows = [
-      makeRow(0, { id: 1, name: 'Alice' }),
-      makeRow(1, { id: 2, name: 'Bob' }),
-    ]
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
     const op1 = makeEditOp({
       id: 'op-1',
       payload: {
