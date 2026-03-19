@@ -1,9 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { partition } from 'lodash'
+import { groupBy, partition } from 'lodash'
 import {
   Clock,
   ExternalLink,
+  GitMerge,
   Infinity,
   MoreVertical,
   Pencil,
@@ -12,6 +13,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -41,6 +43,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { getDevBranchMemberId, getDevBranchParentName, isDevBranch } from './branch-dev-utils'
 
 interface OverviewProps {
   isGithubConnected: boolean
@@ -73,6 +76,21 @@ export const Overview = ({
     aliveBranches,
     (branch) => branch.persistent
   )
+
+  const [devBranches, regularEphemeralBranches] = partition(ephemeralBranches, (branch) =>
+    isDevBranch(branch.name)
+  )
+  const devBranchesByParent = groupBy(devBranches, (branch) => getDevBranchParentName(branch.name))
+
+  const allParentBranchNames = new Set([
+    ...(mainBranch ? [mainBranch.name] : []),
+    ...persistentBranches.map((b) => b.name),
+    ...regularEphemeralBranches.map((b) => b.name),
+  ])
+  const orphanDevBranchParents = Object.keys(devBranchesByParent).filter(
+    (parentName) => !allParentBranchNames.has(parentName)
+  )
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
@@ -147,21 +165,53 @@ export const Overview = ({
         {isSuccess &&
           !isLoadingEntitlement &&
           persistentBranches.map((branch) => {
+            const childDevBranches = devBranchesByParent[branch.name] ?? []
             return (
-              <BranchRow
-                isGithubConnected={isGithubConnected}
-                key={branch.id}
-                repo={repo}
-                branch={branch}
-                rowActions={
-                  <PreviewBranchActions
-                    branch={branch}
+              <div key={branch.id}>
+                <BranchRow
+                  isGithubConnected={isGithubConnected}
+                  repo={repo}
+                  branch={branch}
+                  rowActions={
+                    <div className="flex items-center gap-x-2">
+                      {!isGithubConnected && !branch.deletion_scheduled_at && (
+                        <Button
+                          type="default"
+                          size="tiny"
+                          icon={<GitMerge size={12} />}
+                          onClick={() => router.push(`/project/${branch.project_ref}/merge`)}
+                        >
+                          Review merge
+                        </Button>
+                      )}
+                      <PreviewBranchActions
+                        branch={branch}
+                        repo={repo}
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    </div>
+                  }
+                />
+                {childDevBranches.map((devBranch) => (
+                  <BranchRow
+                    key={devBranch.id}
+                    isGithubConnected={isGithubConnected}
                     repo={repo}
-                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
-                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    branch={devBranch}
+                    isChild
+                    devMemberId={getDevBranchMemberId(devBranch.name)}
+                    rowActions={
+                      <PreviewBranchActions
+                        branch={devBranch}
+                        repo={repo}
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(devBranch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    }
                   />
-                }
-              />
+                ))}
+              </div>
             )
           })}
       </BranchManagementSection>
@@ -169,28 +219,86 @@ export const Overview = ({
       {/* Ephemeral/Preview Branches Section */}
       <BranchManagementSection header="Preview branches">
         {isLoading && <BranchLoader />}
-        {isSuccess && ephemeralBranches.length === 0 && (
+        {isSuccess && regularEphemeralBranches.length === 0 && devBranches.length === 0 && (
           <PreviewBranchesEmptyState onSelectCreateBranch={onSelectCreateBranch} />
         )}
         {isSuccess &&
-          ephemeralBranches.map((branch) => {
+          regularEphemeralBranches.map((branch) => {
+            const childDevBranches = devBranchesByParent[branch.name] ?? []
             return (
-              <BranchRow
-                isGithubConnected={isGithubConnected}
-                key={branch.id}
-                repo={repo}
-                branch={branch}
-                rowActions={
-                  <PreviewBranchActions
-                    branch={branch}
+              <div key={branch.id}>
+                <BranchRow
+                  isGithubConnected={isGithubConnected}
+                  repo={repo}
+                  branch={branch}
+                  rowActions={
+                    <div className="flex items-center gap-x-2">
+                      {!isGithubConnected && !branch.deletion_scheduled_at && (
+                        <Button
+                          type="default"
+                          size="tiny"
+                          icon={<GitMerge size={12} />}
+                          onClick={() => router.push(`/project/${branch.project_ref}/merge`)}
+                        >
+                          Review merge
+                        </Button>
+                      )}
+                      <PreviewBranchActions
+                        branch={branch}
+                        repo={repo}
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    </div>
+                  }
+                />
+                {childDevBranches.map((devBranch) => (
+                  <BranchRow
+                    key={devBranch.id}
+                    isGithubConnected={isGithubConnected}
                     repo={repo}
-                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
-                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    branch={devBranch}
+                    isChild
+                    devMemberId={getDevBranchMemberId(devBranch.name)}
+                    rowActions={
+                      <PreviewBranchActions
+                        branch={devBranch}
+                        repo={repo}
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(devBranch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    }
                   />
-                }
-              />
+                ))}
+              </div>
             )
           })}
+        {isSuccess &&
+          orphanDevBranchParents.map((parentName) => (
+            <div key={parentName}>
+              <div className="px-4 py-1.5 text-xs text-foreground-lighter bg-surface-100 border-t">
+                {parentName}
+              </div>
+              {devBranchesByParent[parentName].map((devBranch) => (
+                <BranchRow
+                  key={devBranch.id}
+                  isGithubConnected={isGithubConnected}
+                  repo={repo}
+                  branch={devBranch}
+                  isChild
+                  devMemberId={getDevBranchMemberId(devBranch.name)}
+                  rowActions={
+                    <PreviewBranchActions
+                      branch={devBranch}
+                      repo={repo}
+                      onSelectDeleteBranch={() => onSelectDeleteBranch(devBranch)}
+                      generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    />
+                  }
+                />
+              ))}
+            </div>
+          ))}
       </BranchManagementSection>
       {/* Scheduled for deletion branches section */}
       <BranchManagementSection header="Scheduled for deletion branches">

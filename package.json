@@ -66,5 +66,10 @@
     "node": ">=22"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@10.24.0"
+  "packageManager": "pnpm@10.24.0",
+  "pnpm": {
+    "overrides": {
+      "@supabase-dx/config": "file:/Users/jonathansummers-muir/Documents/GitHub/supabase/supabase-vscode-extension/packages/config"
+    }
+  }
 }

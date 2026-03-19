@@ -37,12 +37,14 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useProjectConfig } from 'components/interfaces/EnvironmentVariables/useProjectConfig'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 export const General = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { data: projectConfig, isSuccess: isProjectConfigSuccess } = useProjectConfig()
 
   const isBranch = Boolean(project?.parent_project_ref)
 
@@ -183,6 +185,43 @@ export const General = () => {
           )}
         </PageSectionContent>
       </PageSection>
+
+      {isProjectConfigSuccess && (
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Project configuration</PageSectionTitle>
+              <PageSectionDescription>
+                Workflow and schema settings managed by the Supabase CLI.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <Card>
+              {(
+                [
+                  { label: 'Workflow profile', description: 'The workflow model for this project.', value: projectConfig?.workflow_profile },
+                  { label: 'Schema management', description: 'How database schema changes are managed.', value: projectConfig?.schema_management },
+                  { label: 'Config source', description: 'Where project configuration is stored.', value: projectConfig?.config_source },
+                  { label: 'Production branch', description: 'The Git branch mapped to the production environment.', value: projectConfig?.production_branch },
+                ] as const
+              ).map(({ label, description, value }) => (
+                <CardContent key={label}>
+                  <div className="flex flex-col @lg:flex-row @lg:items-center @lg:justify-between gap-2">
+                    <div className="@lg:w-1/2">
+                      <p className="text-sm">{label}</p>
+                      <p className="text-sm text-foreground-light">{description}</p>
+                    </div>
+                    <div className="@lg:w-1/2">
+                      <Input copy={!!value} readOnly size="small" value={value ?? 'Not set'} />
+                    </div>
+                  </div>
+                </CardContent>
+              ))}
+            </Card>
+          </PageSectionContent>
+        </PageSection>
+      )}
 
       <PageSection id="restart-project">
         <PageSectionMeta>

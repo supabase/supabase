@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { DatabaseDiffPanel } from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
 import { EdgeFunctionsDiffPanel } from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
+import { EnvironmentVariablesDiffPanel } from 'components/interfaces/BranchManagement/EnvironmentVariablesDiffPanel'
 import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
 import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
 import { WorkflowLogsCard } from 'components/interfaces/BranchManagement/WorkflowLogsCard'
@@ -331,6 +332,11 @@ const MergePage: NextPageWithLayout = () => {
         href: buildHref('edge-functions'),
         active: currentTab === 'edge-functions',
       },
+      {
+        label: 'Configuration',
+        href: buildHref('environment-variables'),
+        active: currentTab === 'environment-variables',
+      },
     ]
   }, [currentWorkflowRunId, currentTab])
 
@@ -579,8 +585,10 @@ const MergePage: NextPageWithLayout = () => {
             showRefreshButton={true}
             currentBranchRef={ref}
           />
-        ) : (
+        ) : currentTab === 'edge-functions' ? (
           <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
+        ) : (
+          <EnvironmentVariablesDiffPanel branchRef={ref} parentProjectRef={parentProjectRef} />
         )}
       </ScaffoldContainer>
 

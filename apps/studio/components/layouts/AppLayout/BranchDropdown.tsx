@@ -8,6 +8,7 @@ import {
   ListTree,
   MessageCircle,
   Plus,
+  Globe,
   Shield,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -33,15 +34,20 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { sanitizeRoute } from './ProjectDropdown'
+import { getDevBranchMemberId, isDevBranch } from 'components/interfaces/BranchManagement/branch-dev-utils'
 
 const BranchLink = ({
   branch,
   isSelected,
   setOpen,
+  isChild,
+  displayName,
 }: {
   branch: Branch
   isSelected: boolean
   setOpen: (value: boolean) => void
+  isChild?: boolean
+  displayName?: string
 }) => {
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
@@ -52,7 +58,10 @@ const BranchLink = ({
     <Link passHref href={href}>
       <CommandItem_Shadcn_
         value={branch.name.replaceAll('"', '')}
-        className="cursor-pointer w-full flex items-center justify-between"
+        className={cn(
+          'cursor-pointer w-full flex items-center justify-between',
+          isChild && 'pl-8'
+        )}
         onSelect={() => {
           setOpen(false)
           router.push(href)
@@ -63,7 +72,12 @@ const BranchLink = ({
       >
         <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
           {branch.is_default && <Shield size={14} className="text-amber-900" />}
-          {branch.name}
+          {displayName ?? branch.name}
+          {isChild && (
+            <Badge variant="default" className="ml-1">
+              Dev
+            </Badge>
+          )}
         </p>
         {isSelected && <Check size={14} strokeWidth={1.5} />}
       </CommandItem_Shadcn_>
@@ -142,6 +156,10 @@ export const BranchDropdown = () => {
                 <Badge variant="success" className="mt-[1px]">
                   Persistent
                 </Badge>
+              ) : selectedBranch && isDevBranch(selectedBranch.name) ? (
+                <Badge variant="default" className="mt-[1px]">
+                  Dev
+                </Badge>
               ) : (
                 <Badge variant="success" className="mt-[1px]">
                   Preview
@@ -172,14 +190,60 @@ export const BranchDropdown = () => {
 
                   <CommandGroup_Shadcn_>
                     <ScrollArea className="max-h-[210px] overflow-y-auto">
-                      {branchList.map((branch) => (
-                        <BranchLink
-                          key={branch.id}
-                          branch={branch}
-                          isSelected={branch.id === selectedBranch?.id || branches?.length === 0}
-                          setOpen={setOpen}
-                        />
-                      ))}
+                      {branchList
+                        .filter((branch) => !isDevBranch(branch.name))
+                        .map((branch) => {
+                          const childDevBranches = branchList.filter(
+                            (b) =>
+                              isDevBranch(b.name) &&
+                              b.name.startsWith(branch.name + '/env__')
+                          )
+                          return (
+                            <div key={branch.id}>
+                              <BranchLink
+                                branch={branch}
+                                isSelected={
+                                  branch.id === selectedBranch?.id || branches?.length === 0
+                                }
+                                setOpen={setOpen}
+                              />
+                              {childDevBranches.map((devBranch) => (
+                                <BranchLink
+                                  key={devBranch.id}
+                                  branch={devBranch}
+                                  isSelected={devBranch.id === selectedBranch?.id}
+                                  setOpen={setOpen}
+                                  isChild
+                                  displayName={
+                                    getDevBranchMemberId(devBranch.name) ?? devBranch.name
+                                  }
+                                />
+                              ))}
+                            </div>
+                          )
+                        })}
+                      {/* Orphan dev branches whose parent isn't in the list */}
+                      {branchList
+                        .filter((branch) => {
+                          if (!isDevBranch(branch.name)) return false
+                          const parentName = branch.name.substring(
+                            0,
+                            branch.name.indexOf('/env__')
+                          )
+                          return !branchList.some(
+                            (b) => !isDevBranch(b.name) && b.name === parentName
+                          )
+                        })
+                        .map((devBranch) => (
+                          <BranchLink
+                            key={devBranch.id}
+                            branch={devBranch}
+                            isSelected={devBranch.id === selectedBranch?.id}
+                            setOpen={setOpen}
+                            isChild
+                            displayName={getDevBranchMemberId(devBranch.name) ?? devBranch.name}
+                          />
+                        ))}
                     </ScrollArea>
                   </CommandGroup_Shadcn_>
 
@@ -216,6 +280,22 @@ export const BranchDropdown = () => {
                       >
                         <ListTree size={14} strokeWidth={1.5} />
                         <p>Manage branches</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={() => {
+                        setOpen(false)
+                        router.push(`/project/${ref}/environment-variables`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link
+                        href={`/project/${ref}/environment-variables`}
+                        className="w-full flex items-center gap-2"
+                      >
+                        <Globe size={14} strokeWidth={1.5} />
+                        <p>Environment variables</p>
                       </Link>
                     </CommandItem_Shadcn_>
                   </CommandGroup_Shadcn_>

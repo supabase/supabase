@@ -20,6 +20,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { BASE_PATH } from 'lib/constants'
 import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { getSecretsForAuthField } from 'components/interfaces/EnvironmentVariables/EnvironmentVariables.utils'
+import { useEnvironmentVariables } from 'components/interfaces/EnvironmentVariables/useEnvironmentVariables'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
@@ -37,6 +39,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { variables: envVars } = useEnvironmentVariables()
   const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
 
   const [open, setOpen] = useState(false)
@@ -219,6 +222,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                             ? isDisabledDueToPlan && !values[x]
                             : isDisabledDueToPlan
 
+                        const matchingEnvVars = getSecretsForAuthField(x, envVars)
+                        const isEnvVar = matchingEnvVars.length > 0
+
                         return (
                           <FormField
                             key={x}
@@ -226,6 +232,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                             setFieldValue={setFieldValue}
                             properties={properties}
                             formValues={values}
+                            isEnvVar={isEnvVar}
+                            envVarScopes={matchingEnvVars}
                             disabled={shouldDisableField(x) || !canUpdateConfig || shouldDisable}
                           />
                         )

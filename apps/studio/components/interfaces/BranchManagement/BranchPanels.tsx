@@ -6,7 +6,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { Branch } from 'data/branches/branches-query'
 import Link from 'next/link'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { WorkflowLogs } from './WorkflowLogs'
 
@@ -66,6 +66,8 @@ interface BranchRowProps {
   rowLink?: string
   external?: boolean
   rowActions?: ReactNode
+  isChild?: boolean
+  devMemberId?: string | null
 }
 
 export const BranchRow = ({
@@ -76,6 +78,8 @@ export const BranchRow = ({
   rowLink,
   external = false,
   rowActions,
+  isChild = false,
+  devMemberId,
 }: BranchRowProps) => {
   const router = useRouter()
   const page = router.pathname.split('/').pop()
@@ -91,8 +95,14 @@ export const BranchRow = ({
   const navigateUrl = rowLink ?? `/project/${branch.project_ref}`
 
   return (
-    <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
+    <div
+      className={cn(
+        'w-full flex items-center justify-between py-2.5 hover:bg-surface-100',
+        isChild ? 'pl-10 pr-4' : 'px-4'
+      )}
+    >
       <div className="flex items-center gap-x-3">
+        {isChild && <div className="w-4 h-px border-t border-default shrink-0" />}
         {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
@@ -115,9 +125,14 @@ export const BranchRow = ({
               target={external ? '_blank' : '_self'}
               rel={external ? 'noopener noreferrer' : undefined}
               href={navigateUrl}
-              className="flex items-center"
+              className="flex items-center gap-x-2"
             >
-              {label || branch.name}
+              {label || (devMemberId ? devMemberId : branch.name)}
+              {devMemberId && (
+                <Badge variant="default" className="mt-[1px]">
+                  Dev
+                </Badge>
+              )}
             </Link>
           </TooltipTrigger>
           {((page === 'branches' && !branch.is_default) || page === 'merge-requests') && (
