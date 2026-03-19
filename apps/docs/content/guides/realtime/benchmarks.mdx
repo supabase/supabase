@@ -1,22 +1,23 @@
 ---
 title: 'Benchmarks'
-subtitle: 'Benchmark results for Supabase Realtime.'
-description: 'Check out reference numbers for Supabase Realtime performance.'
+subtitle: 'Scalability Benchmarks for Supabase Realtime.'
+description: 'Scalability Benchmarks for Supabase Realtime.'
 ---
 
-This guide explores what can be expected from Realtime's Postgres Changes, broadcast and presence performance. A set of load tests demonstrates its scaling capabilities.
+This guide explores the scalability of Realtime's features: Broadcast, Presence, and Postgres Changes.
 
 ## Methodology
 
-The benchmarks were conducted using k6, an open-source load testing tool, against a Realtime Cluster deployed on AWS. The cluster configurations used 2-6 nodes, tested in both single-region and multi-region setups, all connected to a single Supabase project. The load generators (k6 servers) were also deployed on AWS to minimize network latency impact on the results. Tests were executed with the full load from the start without warm-up runs.
+- The benchmarks are conducted using k6, an open-source load testing tool, against a Realtime Cluster deployed on AWS.
+- The cluster configurations use 2-6 nodes, tested in both single-region and multi-region setups, all connected to a single Supabase project.
+- The load generators (k6 servers) are deployed on AWS to minimize network latency impact on the results.
+- Tests are executed with a full load from the start without warm-up runs.
 
-The metrics collected include message throughput, latency percentiles, CPU and memory utilization, and connection success rates. It's worth noting that performance in production environments may vary based on factors such as network conditions, hardware specifications, and specific usage patterns.
+The metrics collected include: message throughput, latency percentiles, CPU and memory utilization, and connection success rates. Note that performance in production environments may vary based on factors such as network conditions, hardware specifications, and specific usage patterns.
 
 ## Workloads
 
-The proposed workloads are designed to demonstrate Supabase Realtime's throughput and scalability capabilities. These benchmarks focus on core functionality and common usage patterns.
-
-The benchmarking results include the following workloads:
+The proposed workloads are designed to demonstrate Supabase Realtime's throughput and scalability. These benchmarks focus on core functionality and common usage patterns. The benchmarking results include the following workloads:
 
 1. **Broadcast Performance**
 2. **Payload Size Impact on Broadcast**
@@ -26,9 +27,9 @@ The benchmarking results include the following workloads:
 
 ## Results
 
-### Realtime broadcast performance
+### Broadcast: Using WebSockets
 
-This workload evaluates the system's capacity to handle multiple concurrent WebSocket connections and message broadcasting. Each virtual user (VU) in the test:
+This workload evaluates the system's capacity to handle multiple concurrent WebSocket connections and sending Broadcast messages via the WebSocket. Each virtual user (VU) in the test:
 
 - Establishes and maintains a WebSocket connection
 - Joins two distinct channels:
@@ -38,20 +39,45 @@ This workload evaluates the system's capacity to handle multiple concurrent WebS
 
 ![Broadcast Performance](/docs/img/guides/realtime/broadcast-performance.png)
 
-| Metric              | Value                     |
-| ------------------- | ------------------------- |
-| Concurrent Users    | 32_000                    |
-| Total Channel Joins | 64_000                    |
-| Message Throughput  | 224_000 msgs/sec          |
-| Median Latency      | 6 ms                      |
-| Latency (p95)       | 28 ms                     |
-| Latency (p99)       | 213 ms                    |
-| Data Received       | 47.2 MB/s (29.6 GB total) |
-| Data Sent           | 15.2 MB/s (9.6 GB total)  |
-| New Connection Rate | 320 conn/sec              |
-| Channel Join Rate   | 640 joins/sec             |
+| Metric              | Value                   |
+| ------------------- | ----------------------- |
+| Concurrent Users    | 32_000                  |
+| Total Channel Joins | 64_000                  |
+| Message Throughput  | 224_000 msgs/sec        |
+| Median Latency      | 6 ms                    |
+| Latency (p95)       | 28 ms                   |
+| Latency (p99)       | 213 ms                  |
+| Data Received       | 6.4 MB/s (7.9 GB total) |
+| Data Sent           | 23 KB/s (28 MB total)   |
+| New Connection Rate | 320 conn/sec            |
+| Channel Join Rate   | 640 joins/sec           |
 
-### Payload size impact
+### Broadcast: Using the database
+
+This workload evaluates the system's capacity to send Broadcast messages from the database using the `realtime.broadcast_changes` function. Each virtual user (VU) in the test:
+
+- Establishes and maintains a WebSocket connection
+- Joins a distinct channel:
+  - A single channel (100 users per channel) for group communication
+- Database has a trigger set to run `realtime.broadcast_changes` on every insert
+- Database triggers 10_000 inserts per second
+
+![Broadcast from Database Performance](/docs/img/guides/realtime/broadcast-from-database-performance.png)
+
+| Metric              | Value                  |
+| ------------------- | ---------------------- |
+| Concurrent Users    | 80_000                 |
+| Total Channel Joins | 160_000                |
+| Message Throughput  | 10_000 msgs/sec        |
+| Median Latency      | 46 ms                  |
+| Latency (p95)       | 132 ms                 |
+| Latency (p99)       | 159 ms                 |
+| Data Received       | 1.7 MB/s (42 GB total) |
+| Data Sent           | 0.4 MB/s (4 GB total)  |
+| New Connection Rate | 2000 conn/sec          |
+| Channel Join Rate   | 4000 joins/sec         |
+
+### Broadcast: Impact of payload size
 
 This workload tests the system's performance with different message payload sizes to understand how data volume affects throughput and latency. Each virtual user (VU) follows the same connection pattern as the broadcast test, but with varying message sizes:
 
@@ -86,15 +112,14 @@ This workload tests the system's performance with different message payload size
 
 > Note: The final column shows results with reduced load (2,000 users) for the 50KB payload test, demonstrating how the system performs with larger payloads under different concurrency levels.
 
-### Large-Scale broadcasting
+### Broadcast: Scalability scenarios
 
-This workload demonstrates Realtime's capability to handle high-scale scenarios with a large number of concurrent users and broadcast channels. The test simulates a scenario where each user participates in group communications with periodic message broadcasts:
+This workload demonstrates Realtime's capability to handle high-scale scenarios with a large number of concurrent users and broadcast channels. The test simulates a scenario where each user participates in group communications with periodic message broadcasts. Each virtual user (VU):
 
-- Each virtual user (VU):
-  - Establishes and maintains a WebSocket connection (30-120 minutes)
-  - Joins 2 broadcast channels
-  - Sends 1 message per minute to each joined channel
-  - Each message is broadcast to 100 other users
+- Establishes and maintains a WebSocket connection (30-120 minutes)
+- Joins 2 broadcast channels
+- Sends 1 message per minute to each joined channel
+- Each message is broadcast to 100 other users
 
 ![Large Broadcast Performance](/docs/img/guides/realtime/broadcast-large.png)
 
@@ -112,13 +137,12 @@ This workload demonstrates Realtime's capability to handle high-scale scenarios 
 
 ### Realtime Auth
 
-This workload demonstrates Realtime's capability to handle large amounts of new connections per second and channel joins per second with Authentication Row Level Security (RLS) enabled for these channels. The test simulates a scenario where large volumes of users connect to realtime and participate in auth protected communications:
+This workload demonstrates Realtime's capability to handle large amounts of new connections per second and channel joins per second with Authentication Row Level Security (RLS) enabled for these channels. The test simulates a scenario where large volumes of users connect to realtime and participate in auth protected communications. Each virtual user (VU):
 
-- Each virtual user (VU):
-  - Establishes and maintains a WebSocket connection (2.5 minutes)
-  - Joins 2 broadcast channels
-  - Sends 1 message per minute to each joined channel
-  - Each message is broadcast to 100 other users
+- Establishes and maintains a WebSocket connection (2.5 minutes)
+- Joins 2 broadcast channels
+- Sends 1 message per minute to each joined channel
+- Each message is broadcast to 100 other users
 
 ![Broadcast Auth Performance](/docs/img/guides/realtime/broadcast-auth.png)
 
@@ -134,7 +158,7 @@ This workload demonstrates Realtime's capability to handle large amounts of new 
 | Latency (p95)       | 49 ms             |
 | Latency (p99)       | 96 ms             |
 
-### Realtime's Postgres Changes
+### Postgres Changes
 
 Realtime systems usually require forethought because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. For instance, if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
 
@@ -150,4 +174,4 @@ Enter your database settings to estimate the maximum throughput for your instanc
 
 Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
-Supabase continues to make improvements to Realtime's Postgres Changes. If you are uncertain about your use case performance, reach out using the [Support Form](https://supabase.com/dashboard/support/new). The support team can advise on the best solution for each use-case.
+Supabase continues to make improvements to Realtime's Postgres Changes. If you are uncertain about your use case performance, reach out using the [Support Form](/dashboard/support/new). The support team can advise on the best solution for each use-case.

@@ -6,7 +6,6 @@ import {
 } from '@heroicons/react/solid'
 import dayjs from 'dayjs'
 import matter from 'gray-matter'
-import capitalize from 'lodash/capitalize'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
 import { MDXRemote } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -14,7 +13,7 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 
 import authors from 'lib/authors.json'
-import { isNotNullOrUndefined } from '~/lib/helpers'
+import { capitalize, isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
@@ -72,6 +71,7 @@ interface EventData {
   end_date?: string
   speakers: string
   speakers_label?: string
+  partners?: string
   og_image?: string
   thumb?: string
   thumb_light?: string
@@ -147,6 +147,10 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       return authors.find((author) => author.author_id === speakerId)
     })
     .filter(isNotNullOrUndefined) as Author[]
+  const partnersArray = event.partners
+    ?.split(',')
+    .map((p: string) => p.trim())
+    .filter(Boolean)
   const hadEndDate = event.end_date?.length
 
   const IS_REGISTRATION_OPEN =
@@ -395,6 +399,24 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               </aside>
             </main>
             <aside className="order-first lg:order-last">
+              {partnersArray && partnersArray.length > 0 && (
+                <div className="flex flex-col gap-4 mb-8">
+                  <h2 className="text-foreground-light text-sm font-mono uppercase">Partners</h2>
+                  <ul className="list-none flex flex-row flex-wrap gap-6 items-center">
+                    {partnersArray.map((partner) => (
+                      <li key={partner}>
+                        <NextImage
+                          src={`/images/logos/publicity/${partner}.svg`}
+                          alt={`${partner} logo`}
+                          width={80}
+                          height={24}
+                          className="object-contain"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {speakers && (
                 <div className="flex flex-col gap-4">
                   <h2 className="text-foreground-light text-sm font-mono uppercase">

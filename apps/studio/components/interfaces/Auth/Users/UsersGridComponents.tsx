@@ -1,6 +1,6 @@
 import { ChevronDown, SortAsc, SortDesc } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useRowSelection } from 'react-data-grid'
+import { useHeaderRowSelection } from 'react-data-grid'
 import {
   Button,
   DropdownMenu,
@@ -18,7 +18,7 @@ export const SelectHeaderCell = ({
   allRowsSelected: boolean
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [isRowSelected, onRowSelectionChange] = useRowSelection()
+  const { isRowSelected, onRowSelectionChange } = useHeaderRowSelection()
 
   const isIndeterminate = selectedUsers.size > 0 && !allRowsSelected
 
@@ -36,7 +36,7 @@ export const SelectHeaderCell = ({
           className="sb-grid-select-cell__header__input"
           disabled={false}
           checked={isRowSelected}
-          onChange={(e) => onRowSelectionChange({ type: 'HEADER', checked: e.target.checked })}
+          onChange={(e) => onRowSelectionChange({ checked: e.target.checked })}
         />
       </div>
     </div>
@@ -45,9 +45,11 @@ export const SelectHeaderCell = ({
 
 export const HeaderCell = ({
   col,
+  specificFilterColumn,
   setSortByValue,
 }: {
   col: any
+  specificFilterColumn: string
   setSortByValue: (value: string) => void
 }) => {
   const ref = useRef<number>(0)
@@ -62,7 +64,7 @@ export const HeaderCell = ({
       <div className="flex items-center gap-x-2">
         <p className="!text-foreground">{col.name}</p>
       </div>
-      {['created_at', 'email', 'phone'].includes(col.id) && (
+      {specificFilterColumn === 'freeform' && ['created_at', 'email', 'phone'].includes(col.id) && (
         <DropdownMenu
           open={open}
           onOpenChange={(val) => {

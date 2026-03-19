@@ -10,6 +10,7 @@ import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Accordion, Button, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
@@ -52,26 +53,28 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
         >
           {section[0].menuItems?.map((menuItem, menuItemIndex) => (
             <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
-              {menuItem.map((item) =>
-                !item.href ? (
-                  <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
-                    {item.label}
-                  </div>
-                ) : (
-                  <MenuItem
-                    href={item.href}
-                    title={item.label}
-                    community={item.community}
-                    icon={item.icon}
-                  />
-                )
-              )}
+              {menuItem
+                .filter((item) => item.enabled !== false)
+                .map((item) =>
+                  !item.href ? (
+                    <div className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none">
+                      {item.label}
+                    </div>
+                  ) : (
+                    <MenuItem
+                      href={item.href}
+                      title={item.label}
+                      community={item.community}
+                      icon={item.icon}
+                    />
+                  )
+                )}
             </Fragment>
           ))}
         </Accordion.Item>
       ) : (
         <Link
-          href={section[0].href}
+          href={section[0].href || '#'}
           className={cn(activeLabel === section[0].label && '!text-foreground', itemClassName)}
         >
           {section[0].label}
@@ -90,7 +93,7 @@ const Menu = () => (
     justified
     chevronAlign="right"
   >
-    {GLOBAL_MENU_ITEMS.map((section) => (
+    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section) => (
       <AccordionMenuItem section={section} />
     ))}
   </Accordion>
@@ -104,6 +107,8 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const pathname = usePathname()
+
+  const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -127,7 +132,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
               <Link href="/" className="flex items-center gap-2">
                 <Image
                   className="cursor-pointer hidden dark:block"
-                  src="/docs/supabase-dark.svg"
+                  src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
                   priority
                   width={96}
                   height={24}
@@ -135,7 +140,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 />
                 <Image
                   className="cursor-pointer block dark:hidden"
-                  src="/docs/supabase-light.svg"
+                  src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
                   priority
                   width={96}
                   height={24}
@@ -163,7 +168,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                 <>
                   {isLoggedIn ? (
                     <Button block size="medium" asChild>
-                      <Link href="/dashboard/projects">Dashboard</Link>
+                      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
                     </Button>
                   ) : (
                     <>

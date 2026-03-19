@@ -1,21 +1,13 @@
-import { noop } from 'lodash'
-
 import Table from 'components/to-be-cleaned/Table'
-import HookList from './HookList'
+
+import { HookList } from './HookList'
 
 interface SchemaTableProps {
   schema: string
   filterString: string
-  editHook: (hook: any) => void
-  deleteHook: (hook: any) => void
 }
 
-const SchemaTable = ({
-  schema,
-  filterString,
-  editHook = noop,
-  deleteHook = noop,
-}: SchemaTableProps) => {
+export const SchemaTable = ({ schema, filterString }: SchemaTableProps) => {
   return (
     <div key={schema}>
       <div className="sticky top-0 backdrop-blur backdrop-filter">
@@ -43,17 +35,8 @@ const SchemaTable = ({
             <Table.th key="buttons" className="w-[5%]"></Table.th>
           </>
         }
-        body={
-          <HookList
-            filterString={filterString}
-            schema={schema}
-            editHook={editHook}
-            deleteHook={deleteHook}
-          />
-        }
+        body={<HookList filterString={filterString} schema={schema} />}
       />
     </div>
   )
 }
-
-export default SchemaTable

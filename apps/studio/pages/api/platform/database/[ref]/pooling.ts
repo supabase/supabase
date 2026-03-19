@@ -20,8 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const project: any = {
     db_port: 6543,
-    pool_mode: null,
-    pgbouncer_enabled: false,
+    pool_mode: 'transaction',
+    pgbouncer_enabled: true,
     pgbouncer_status: 'COMING_UP',
   }
   return res.status(200).json({ project })

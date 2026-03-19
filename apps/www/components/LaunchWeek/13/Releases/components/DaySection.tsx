@@ -7,7 +7,6 @@ import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
 
 import { WeekDayProps } from '../data'
-import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
@@ -61,7 +60,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             )}
           >
             <div className="relative text-foreground-light p-4 sm:px-6 md:py-6 md:px-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
-              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
+              <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[cubic-bezier(.24,0,.22,.99)] duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>
                 <ArrowRightIcon className="w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -147,7 +146,6 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                   />
                 </g>
               </svg>
-              {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
             </div>
             <div>
               <Skeleton className="w-full h-3 max-w-xs rounded-full will-change-contents" />

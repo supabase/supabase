@@ -4,19 +4,21 @@ import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_
 import type { User } from 'data/auth/users-infinite-query'
 import { ChevronDown, User as IconUser } from 'lucide-react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
+import { RoleImpersonationSelector } from '.'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import RoleImpersonationSelector from './RoleImpersonationSelector'
 
 export interface RoleImpersonationPopoverProps {
   serviceRoleLabel?: string
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   align?: 'center' | 'start' | 'end'
+  disallowAuthenticatedOption?: boolean
 }
 
-const RoleImpersonationPopover = ({
+export const RoleImpersonationPopover = ({
   serviceRoleLabel,
   variant = 'regular',
   align = 'end',
+  disallowAuthenticatedOption = false,
 }: RoleImpersonationPopoverProps) => {
   const state = useRoleImpersonationStateSnapshot()
 
@@ -25,7 +27,7 @@ const RoleImpersonationPopover = ({
   const currentRole = state.role?.role ?? serviceRoleLabel ?? 'service role'
 
   return (
-    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen} modal={false}>
+    <Popover_Shadcn_ open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           size="tiny"
@@ -56,14 +58,15 @@ const RoleImpersonationPopover = ({
           </div>
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-full overflow-hidden" side="bottom" align={align}>
-        <RoleImpersonationSelector serviceRoleLabel={serviceRoleLabel} />
+      <PopoverContent_Shadcn_ className="p-0 overflow-hidden w-min" side="bottom" align={align}>
+        <RoleImpersonationSelector
+          serviceRoleLabel={serviceRoleLabel}
+          disallowAuthenticatedOption={disallowAuthenticatedOption}
+        />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )
 }
-
-export default RoleImpersonationPopover
 
 const UserRoleButtonSection = ({ user }: { user: User }) => {
   const avatarUrl = getAvatarUrl(user)

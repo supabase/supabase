@@ -1,3 +1,13 @@
+import { isFeatureEnabled } from 'common/enabled-features'
+
+const {
+  sdkCsharp: sdkCsharpEnabled,
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkPython: sdkPythonEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
+
 export const REFERENCES = {
   javascript: {
     type: 'sdk',
@@ -35,6 +45,7 @@ export const REFERENCES = {
         specFile: 'supabase_dart_v1',
       },
     },
+    enabled: sdkDartEnabled,
   },
   csharp: {
     type: 'sdk',
@@ -53,6 +64,7 @@ export const REFERENCES = {
         specFile: 'supabase_csharp_v0',
       },
     },
+    enabled: sdkCsharpEnabled,
   },
   swift: {
     type: 'sdk',
@@ -71,6 +83,7 @@ export const REFERENCES = {
         specFile: 'supabase_swift_v1',
       },
     },
+    enabled: sdkSwiftEnabled,
   },
   kotlin: {
     type: 'sdk',
@@ -93,6 +106,7 @@ export const REFERENCES = {
         specFile: 'supabase_kt_v1',
       },
     },
+    enabled: sdkKotlinEnabled,
   },
   python: {
     type: 'sdk',
@@ -107,6 +121,7 @@ export const REFERENCES = {
         specFile: 'supabase_py_v2',
       },
     },
+    enabled: sdkPythonEnabled,
   },
   cli: {
     type: 'cli',
@@ -160,7 +175,7 @@ export const REFERENCES = {
 } as const
 
 export const clientSdkIds = Object.keys(REFERENCES).filter(
-  (reference) => REFERENCES[reference].type === 'sdk'
+  (reference) => REFERENCES[reference].type === 'sdk' && REFERENCES[reference].enabled !== false
 )
 
 export const selfHostingServices = Object.keys(REFERENCES).filter(

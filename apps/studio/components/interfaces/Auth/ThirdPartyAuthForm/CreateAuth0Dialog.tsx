@@ -50,7 +50,7 @@ export const CreateAuth0IntegrationDialog = ({
   const isCreating = true
 
   const { ref: projectRef } = useParams()
-  const { mutate: createAuthIntegration, isLoading } = useCreateThirdPartyAuthIntegrationMutation({
+  const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Auth0 Auth integration.`)
       onClose()
@@ -169,10 +169,10 @@ export const CreateAuth0IntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isLoading} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isLoading} loading={isLoading}>
+          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

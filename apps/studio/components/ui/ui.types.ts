@@ -7,4 +7,5 @@ export interface Route {
   link?: string
   disabled?: boolean
   linkElement?: ReactNode
+  items?: any | Route[]
 }

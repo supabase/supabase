@@ -1,12 +1,11 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
-
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import {
   ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
 } from 'components/interfaces/Connect/ConnectTabs'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -19,10 +18,14 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
 
       <ConnectTabContent value=".env.local">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`
-NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
-        `}
+          {[
+            '',
+            `NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
+            projectKeys?.publishableKey
+              ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+              : `NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
+            '',
+          ].join('\n')}
         </SimpleCodeBlock>
       </ConnectTabContent>
 
@@ -32,7 +35,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'NEXT_PUBLIC_SUPABASE_ANON_KEY'};
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}
@@ -49,7 +52,7 @@ function Page() {
   const [todos, setTodos] = useState([])
 
   useEffect(() => {
-    function getTodos() {
+    async function getTodos() {
       const { data: todos } = await supabase.from('todos').select()
 
       if (todos.length > 1) {

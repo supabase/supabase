@@ -1,11 +1,6 @@
 import dayjs from 'dayjs'
-import { Clipboard, Trash, UserIcon } from 'lucide-react'
-import { UIEvent } from 'react'
+import { Copy, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
-
-import { User } from 'data/auth/users-infinite-query'
-import { BASE_PATH } from 'lib/constants'
-import { copyToClipboard } from 'lib/helpers'
 import {
   Checkbox_Shadcn_,
   cn,
@@ -14,20 +9,21 @@ import {
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
 } from 'ui'
+
+import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { ColumnConfiguration, UsersTableColumn } from './Users.constants'
 import { HeaderCell } from './UsersGridComponents'
-import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
+import { User } from '@/data/auth/users-infinite-query'
+import { BASE_PATH } from '@/lib/constants'
 
 const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
 const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
 
-export const isAtBottom = ({ currentTarget }: UIEvent<HTMLDivElement>): boolean => {
-  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
-}
-
 export const formatUsersData = (users: User[]) => {
   return users.map((user) => {
-    const provider: string = user.raw_app_meta_data?.provider ?? ''
+    const provider: string = (user.raw_app_meta_data?.provider as string) ?? ''
     const providers: string[] = user.providers.map((x: string) => {
       if (x.startsWith('sso')) return 'SAML'
       return x
@@ -82,10 +78,12 @@ const providers = {
     { google: 'google-icon' },
     { kakao: 'kakao-icon' },
     { keycloak: 'keycloak-icon' },
-    { linkedin: 'linkedin-icon' },
+    { linkedin_oidc: 'linkedin-icon' },
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
     { twitter: 'twitter-icon' },
+    { x: 'x-icon-light' },
+    { slack_oidc: 'slack-icon' },
     { slack: 'slack-icon' },
     { spotify: 'spotify-icon' },
     { workos: 'workos-icon' },
@@ -152,6 +150,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name,
     firstName,
     first_name,
+    name,
   } = user.raw_user_meta_data ?? {}
 
   const {
@@ -168,7 +167,7 @@ export function getDisplayName(user: User, fallback = '-'): string {
     last_name: cc_last_name,
     firstName: ccFirstName,
     first_name: cc_first_name,
-  } = custom_claims ?? {}
+  } = (custom_claims ?? {}) as any
 
   const last = toPrettyJsonString(
     familyName ||
@@ -196,7 +195,8 @@ export function getDisplayName(user: User, fallback = '-'): string {
 
   return (
     toPrettyJsonString(
-      displayName ||
+      name ||
+        displayName ||
         display_name ||
         ccDisplayName ||
         cc_display_name ||
@@ -253,21 +253,25 @@ export function getAvatarUrl(user: User): string | undefined {
 }
 
 export const formatUserColumns = ({
+  specificFilterColumn,
+  columns,
   config,
   users,
   visibleColumns = [],
   setSortByValue,
   onSelectDeleteUser,
 }: {
+  specificFilterColumn: string
+  columns: UsersTableColumn[]
   config: ColumnConfiguration[]
   users: User[]
   visibleColumns?: string[]
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
 }) => {
-  const columnOrder = config.map((c) => c.id) ?? USERS_TABLE_COLUMNS.map((c) => c.id)
+  const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
-  let gridColumns = USERS_TABLE_COLUMNS.map((col) => {
+  let gridColumns = columns.map((col) => {
     const savedConfig = config.find((c) => c.id === col.id)
     const res: Column<any> = {
       key: col.id,
@@ -284,12 +288,18 @@ export const formatUserColumns = ({
         // to support - the component is ready as such: Just pass selectedUsers and allRowsSelected as props from parent
         // <SelectHeaderCell selectedUsers={selectedUsers} allRowsSelected={allRowsSelected} />
         if (col.id === 'img') return undefined
-        return <HeaderCell col={col} setSortByValue={setSortByValue} />
+        return (
+          <HeaderCell
+            col={col}
+            specificFilterColumn={specificFilterColumn}
+            setSortByValue={setSortByValue}
+          />
+        )
       },
       renderCell: ({ row }) => {
         // This is actually a valid React component, so we can use hooks here
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [isRowSelected, onRowSelectionChange] = useRowSelection()
+        const { isRowSelected, onRowSelectionChange } = useRowSelection()
 
         const value = row?.[col.id]
         const user = users?.find((u) => u.id === row.id)
@@ -297,7 +307,16 @@ export const formatUserColumns = ({
           value !== null && ['created_at', 'last_sign_in_at'].includes(col.id)
             ? dayjs(value).format('ddd DD MMM YYYY HH:mm:ss [GMT]ZZ')
             : Array.isArray(value)
-              ? value.join(', ')
+              ? col.id === 'providers'
+                ? value
+                    .map((x) => {
+                      const meta = PROVIDERS_SCHEMAS.find(
+                        (y) => ('key' in y && y.key === x) || y.title.toLowerCase() === x
+                      )
+                      return meta?.title
+                    })
+                    .join(', ')
+                : value.join(', ')
               : value
         const isConfirmed = !!user?.confirmed_at
 
@@ -310,7 +329,6 @@ export const formatUserColumns = ({
                   e.stopPropagation()
                   onRowSelectionChange({
                     row,
-                    type: 'ROW',
                     checked: !isRowSelected,
                     isShiftClick: e.shiftKey,
                   })
@@ -344,6 +362,7 @@ export const formatUserColumns = ({
                     const provider = row.providers[idx]
                     return (
                       <div
+                        key={`${user?.id}-${provider}-wrapper`}
                         className="min-w-6 min-h-6 rounded-full border flex items-center justify-center bg-surface-75"
                         style={{
                           marginLeft: idx === 0 ? 0 : `-8px`,
@@ -355,7 +374,9 @@ export const formatUserColumns = ({
                           width={16}
                           src={icon}
                           alt={`${provider} auth icon`}
-                          className={cn(provider === 'github' && 'dark:invert')}
+                          className={cn(
+                            (provider === 'github' || provider === 'x') && 'dark:invert'
+                          )}
                         />
                       </div>
                     )
@@ -378,7 +399,7 @@ export const formatUserColumns = ({
                   copyToClipboard(value)
                 }}
               >
-                <Clipboard size={12} />
+                <Copy size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem_Shadcn_>
               <ContextMenuSeparator_Shadcn_ />

@@ -1,9 +1,9 @@
 'use client'
 
+import { AlertOctagon, AlertTriangle, CheckCircle, Info, X } from 'lucide-react'
 import React, { useState } from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
-import { AlertOctagon, CheckCircle, AlertTriangle, Info, X } from 'lucide-react'
 
 export interface AlertProps {
   variant?: AlertVariant
@@ -27,7 +27,7 @@ const icons: Record<AlertVariant, React.ReactElement> = {
 }
 
 /**
- * @deprecated Use Alert_Shadcn_. For studio use Admonition
+ * @deprecated Use `import { Alert_Shadcn_ } from "ui"` instead. For studio use `Admonition`
  */
 export function Alert({
   variant = 'neutral',

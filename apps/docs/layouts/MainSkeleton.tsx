@@ -2,20 +2,23 @@
 
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
-import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
+import { memo, type PropsWithChildren, type ReactNode, useEffect } from 'react'
+// End of third-party imports
 
+import { isFeatureEnabled } from 'common'
 import { cn } from 'ui'
-
+import type { NavMenuSection } from '~/components/Navigation/Navigation.types'
 import DefaultNavigationMenu, {
-  MenuId,
+  type MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
-import { type NavMenuSection } from '~/components/Navigation/Navigation.types'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+
+const footerEnabled = isFeatureEnabled('docs:footer')
 
 const levelsData = {
   home: {
@@ -77,6 +80,10 @@ const levelsData = {
   local_development: {
     icon: 'reference-cli',
     name: 'Local Development',
+  },
+  security: {
+    icon: 'platform',
+    name: 'Security',
   },
   platform: {
     icon: 'platform',
@@ -229,7 +236,7 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
         {mobileMenuOpen
           ? 'Close'
           : 'menuId' in props
-            ? levelsData[props.menuId]?.name ?? levelsData['home'].name
+            ? (levelsData[props.menuId]?.name ?? levelsData['home'].name)
             : props.menuName}
       </span>
     </div>
@@ -371,7 +378,7 @@ function SidebarSkeleton({
   menuId: _menuId,
   menuName,
   NavigationMenu,
-  hideFooter = false,
+  hideFooter = !footerEnabled,
   className,
   hideSideNav,
   additionalNavItems,
@@ -380,8 +387,6 @@ function SidebarSkeleton({
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
-
-  console.log('menuName', menuName, menuId)
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
@@ -425,4 +430,4 @@ function SidebarSkeleton({
   )
 }
 
-export { TopNavSkeleton, SidebarSkeleton }
+export { SidebarSkeleton, TopNavSkeleton }

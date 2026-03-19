@@ -1,8 +1,18 @@
-import { Button } from 'ui'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input_Shadcn_,
+  Label_Shadcn_,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 
 export default function TabsDemo() {
   return (

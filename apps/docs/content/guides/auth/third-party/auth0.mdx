@@ -9,7 +9,7 @@ Auth0 can be used as a third-party authentication provider alongside Supabase Au
 ## Getting started
 
 1. First you need to add an integration to connect your Supabase project with your Auth0 tenant. You will need your tenant ID (and in some cases region ID).
-2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth).
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/auth/third-party).
 3. Assign the `role: 'authenticated'` custom claim to all JWTs by using an Auth0 Action.
 4. Finally setup the Supabase client in your application.
 
@@ -31,19 +31,25 @@ const auth0 = new Auth0Client({
   },
 })
 
-const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
-  accessToken: async () => {
-    const accessToken = await auth0.getTokenSilently()
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      const accessToken = await auth0.getTokenSilently()
 
-    // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
-    // use an ID token instead.
+      // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
+      // use an ID token instead.
 
-    return accessToken
-  },
-})
+      return accessToken
+    },
+  }
+)
 ```
 
 </TabPanel>
+
+<$Show if="sdk:swift">
 
 <TabPanel id="swift" label="Swift (iOS)">
 
@@ -57,7 +63,7 @@ extension CredentialsManager {
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
-  supabaseKey: "SUPABASE_ANON_KEY",
+  supabaseKey: "SUPABASE_PUBLISHABLE_KEY",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {
@@ -69,6 +75,9 @@ let supabase = SupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:dart">
 
 <TabPanel id="dart" label="Flutter">
 
@@ -81,7 +90,7 @@ Future<void> main() async {
   final auth0 = Auth0('AUTH0_DOMAIN', 'AUTH0_CLIENT_ID');
   await Supabase.initialize(
     url: 'https://<supabase-project>.supabase.co',
-    anonKey: 'SUPABASE_ANON_KEY',
+    anonKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final credentials = await auth0.credentialsManager.credentials();
       return credentials.accessToken;
@@ -92,6 +101,9 @@ Future<void> main() async {
 ```
 
 </TabPanel>
+</$Show>
+
+<$Show if="sdk:kotlin">
 
 <TabPanel id="kotlin" label="Kotlin">
 
@@ -100,7 +112,7 @@ import com.auth0.android.result.Credentials
 
 val supabase = createSupabaseClient(
     "https://<supabase-project>.supabase.co",
-    "SUPABASE_ANON_KEY"
+    "SUPABASE_PUBLISHABLE_KEY"
 ) {
     accessToken = {
         val credentials: Credentials = ...; // Get credentials from Auth0
@@ -110,12 +122,13 @@ val supabase = createSupabaseClient(
 ```
 
 </TabPanel>
+</$Show>
 
 </Tabs>
 
 ## Add a new Third-Party Auth integration to your project
 
-In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/auth/third-party) and find the Third-Party Auth section to add a new integration.
 
 In the CLI add the following config to your `supabase/config.toml` file:
 

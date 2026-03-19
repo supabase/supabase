@@ -1,9 +1,10 @@
-import React from 'react'
 import PropTypes from 'prop-types'
+import React from 'react'
+
 import './Radio.css'
 
 /**
- * @deprecated Use ./RadioGroupItem_Shadcn_ and ./RadioGroup_Shadcn_ instead
+ * @deprecated Use `import { RadioGroup_Shadcn_, RadioGroupItem_Shadcn_ } from "ui"` instead
  */
 const Radio = ({ className = '', label = '', containerClassName = '', children, ...props }) => {
   return (

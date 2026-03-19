@@ -1,0 +1,9 @@
+stateDiagram-v2
+    [*] --> standby : A new key is created and advertized
+    standby --> in_use : Once all components have picked up the new key, new JWTs can be issued with it
+    in_use --> previously_used : Rotation, JWT remain accepted
+    previously_used --> revoked : Once all JWTs created with the previous key expire (or sooner)
+    revoked --> [*] : Delete permanently after 7 days
+
+    revoked --> standby
+    previously_used --> standby

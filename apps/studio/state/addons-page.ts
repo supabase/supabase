@@ -1,6 +1,6 @@
 import { useUrlState } from 'hooks/ui/useUrlState'
 
-export const ADDONS_PANEL_KEYS_ARRAY = ['computeInstance', 'pitr', 'customDomain', 'ipv4'] as const
+export const ADDONS_PANEL_KEYS_ARRAY = ['pitr', 'customDomain', 'ipv4'] as const
 
 export type ADDONS_PANEL_KEYS = undefined | (typeof ADDONS_PANEL_KEYS_ARRAY)[number]
 

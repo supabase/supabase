@@ -1,17 +1,22 @@
-import { Link } from 'lucide-react'
-
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { copyToClipboard } from 'lib/helpers'
-import { Badge } from 'ui'
-import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Link } from 'lucide-react'
+import { toast } from 'sonner'
+import { Badge, copyToClipboard } from 'ui'
+import {
+  useRegisterCommands,
+  useResetCommandMenu,
+  useSetCommandMenuOpen,
+} from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 
 export function useApiUrlCommand() {
   const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
 
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { data: settings } = useProjectSettingsV2Query(
     { projectRef: project?.ref },
     { enabled: !!project }
@@ -28,8 +33,11 @@ export function useApiUrlCommand() {
         id: 'api-url',
         name: 'Copy API URL',
         action: () => {
-          copyToClipboard(apiUrl ?? '')
+          copyToClipboard(apiUrl ?? '', () => {
+            toast.success('API URL copied to clipboard')
+          })
           setIsOpen(false)
+          resetCommandMenu()
         },
         icon: () => <Link />,
         badge: () => <Badge>Project: {project?.name}</Badge>,

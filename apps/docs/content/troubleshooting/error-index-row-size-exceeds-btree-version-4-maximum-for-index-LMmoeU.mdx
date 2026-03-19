@@ -39,13 +39,13 @@ One of the measures of index efficiency is the ratio of index entries to the wid
 The solution is simple: use some king of hashing to transfer the values to much narrower space. I.e. md5. The solution is simple, you build a functional index (=index by expression):
 
 ```sql
-CREATE INDEX ON table_name(MD5(column_name));
+create index on table_name (MD5(column_name));
 ```
 
 instead of:
 
 ```sql
-CREATE INDEX ON table_name(column_name);
+create index on table_name (column_name);
 ```
 
 Then you must modify you SELECTs to be using the same function (otherwise the functional index will not be used in SELECT queries). I.e.

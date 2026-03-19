@@ -12,11 +12,13 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 import HighlightColumns from '~/components/Sections/HighlightColumns'
 import ProductsNav from '~/components/Products/ProductsNav'
+import Image from 'next/image'
 
 const ExamplesCarousel = dynamic(() => import('~/components/Examples/ExamplesCarousel'))
 const GlobalPresenceSection = dynamic(
   () => import('~/components/Products/Functions/GlobalPresenceSection')
 )
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 const LocalDXGrid = dynamic(() => import('~/components/Products/Functions/LocalDXGrid'))
 const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta2'))
 const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
@@ -48,6 +50,27 @@ function EdgeFunctions() {
         <ProductHeader
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
+          footerPosition="bottom"
+        />
+        <SingleQuote
+          id="quote"
+          className="!pb-8 md:!pb-12 [&_q]:max-w-2xl"
+          quote={{
+            text: "Supabase gave us the flexibility and scalability needed at every growth stage. It's rare to find a tool that works just as well for startups as it does for large-scale operations.",
+            author: 'Zeno Rocha',
+            role: 'CEO at Resend',
+            link: '/customers/resend',
+            logo: (
+              <Image
+                draggable={false}
+                src="/images/blog/avatars/zeno-rocha.png"
+                alt="Zeno Rocha, CEO at Resend"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
         />
         <div className="overflow-hidden">
           <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0" id="examples">

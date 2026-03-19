@@ -1,117 +1,136 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-
+import { useQuery } from '@tanstack/react-query'
+import { paths } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import type { AnalyticsData, AnalyticsInterval } from './constants'
+import { UseCustomQueryOptions } from 'types'
+
+import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
 
-export type InfraMonitoringAttribute =
-  | 'max_cpu_usage'
-  | 'avg_cpu_usage'
-  | 'disk_io_budget'
-  | 'ram_usage'
-  | 'disk_io_consumption'
-  | 'pg_stat_database_num_backends'
-  | 'supavisor_connections_active'
+export type InfraMonitoringAttribute = NonNullable<
+  paths['/platform/projects/{ref}/infra-monitoring']['get']['parameters']['query']['attributes']
+>[number]
 
-export type InfraMonitoringVariables = {
-  projectRef?: string
-  attribute: InfraMonitoringAttribute
-  startDate?: string
-  endDate?: string
-  interval?: AnalyticsInterval
-  dateFormat?: string
-  databaseIdentifier?: string
-  modifier?: (x: number) => number
+export type InfraMonitoringSeriesMetadata = {
+  yAxisLimit: number
+  format: string
+  total: number
+  totalAverage: number | string
 }
 
-export async function getInfraMonitoring(
+// TODO(raulb): Remove InfraMonitoringSingleResponse once API always returns multi-attribute format.
+// Single-attribute response shape (when API receives 1 attribute)
+export type InfraMonitoringSingleResponse = InfraMonitoringSeriesMetadata & {
+  data: {
+    period_start: string
+    [attribute: string]: string | undefined
+  }[]
+}
+
+// Multi-attribute response shape (when API receives 2+ attributes)
+export type InfraMonitoringMultiResponse = {
+  data: {
+    period_start: string
+    values: Record<string, string | undefined>
+  }[]
+  series: Record<string, InfraMonitoringSeriesMetadata>
+}
+
+// TODO(raulb): Simplify to just InfraMonitoringMultiResponse once API always returns multi-attribute format.
+// API returns different shapes based on attribute count
+export type InfraMonitoringResponse = InfraMonitoringSingleResponse | InfraMonitoringMultiResponse
+
+type InfraMonitoringInterval = AnalyticsInterval | '2m'
+
+export type InfraMonitoringMultiVariables = {
+  projectRef?: string
+  attributes: InfraMonitoringAttribute[]
+  startDate?: string
+  endDate?: string
+  interval?: InfraMonitoringInterval
+  databaseIdentifier?: string
+}
+
+export async function getInfraMonitoringAttributes(
   {
     projectRef,
-    attribute,
+    attributes,
     startDate,
     endDate,
     interval = '1h',
     databaseIdentifier,
-  }: InfraMonitoringVariables,
+  }: InfraMonitoringMultiVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
-  if (!attribute) throw new Error('Attribute is required')
+  if (!attributes?.length) throw new Error('At least one attribute is required')
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('End date is required')
+
+  // Backend doesn't support 2m granularity, so request 1m and aggregate in frontend
+  const is2MinInterval = interval === '2m'
+  const requestInterval: AnalyticsInterval = is2MinInterval ? '1m' : (interval as AnalyticsInterval)
 
   const { data, error } = await get('/platform/projects/{ref}/infra-monitoring', {
     params: {
       path: { ref: projectRef },
+      // Attributes support is not yet reflected in the generated client types.
       query: {
-        attribute,
+        attributes,
         startDate,
         endDate,
-        interval,
+        interval: requestInterval,
         databaseIdentifier,
-      },
+      } as any,
     },
     signal,
   })
 
   if (error) handleError(error)
-  return data as unknown as AnalyticsData
+
+  const response = data as unknown as InfraMonitoringResponse & { _originalInterval?: '2m' }
+  if (is2MinInterval) {
+    response._originalInterval = '2m'
+  }
+
+  return response
 }
 
-export type InfraMonitoringData = Awaited<ReturnType<typeof getInfraMonitoring>>
 export type InfraMonitoringError = unknown
+export type InfraMonitoringMultiData = Awaited<ReturnType<typeof getInfraMonitoringAttributes>>
 
-export const useInfraMonitoringQuery = <TData = InfraMonitoringData>(
+export const useInfraMonitoringAttributesQuery = <TData = InfraMonitoringMultiData>(
   {
     projectRef,
-    attribute,
+    attributes,
     startDate,
     endDate,
     interval = '1h',
-    dateFormat = 'HH:mm DD MMM',
     databaseIdentifier,
-    modifier,
-  }: InfraMonitoringVariables,
+  }: InfraMonitoringMultiVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<InfraMonitoringData, InfraMonitoringError, TData> = {}
+  }: UseCustomQueryOptions<InfraMonitoringMultiData, InfraMonitoringError, TData> = {}
 ) =>
-  useQuery<InfraMonitoringData, InfraMonitoringError, TData>(
-    analyticsKeys.infraMonitoring(projectRef, {
-      attribute,
+  useQuery<InfraMonitoringMultiData, InfraMonitoringError, TData>({
+    queryKey: analyticsKeys.infraMonitoringGroup(projectRef, {
+      attributes,
       startDate,
       endDate,
       interval,
       databaseIdentifier,
     }),
-    ({ signal }) =>
-      getInfraMonitoring(
-        { projectRef, attribute, startDate, endDate, interval, databaseIdentifier },
+    queryFn: ({ signal }) =>
+      getInfraMonitoringAttributes(
+        { projectRef, attributes, startDate, endDate, interval, databaseIdentifier },
         signal
       ),
-    {
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof attribute !== 'undefined' &&
-        typeof startDate !== 'undefined' &&
-        typeof endDate !== 'undefined',
-      select(data) {
-        return {
-          ...data,
-          data: data.data.map((x) => {
-            return {
-              ...x,
-              [attribute]:
-                modifier !== undefined ? modifier(Number(x[attribute])) : Number(x[attribute]),
-              periodStartFormatted: dayjs(x.period_start).format(dateFormat),
-            }
-          }),
-        } as TData
-      },
-      staleTime: 1000 * 60, // default good for a minute
-      ...options,
-    }
-  )
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      !!attributes?.length &&
+      typeof startDate !== 'undefined' &&
+      typeof endDate !== 'undefined',
+    staleTime: 1000 * 60,
+    ...options,
+  })

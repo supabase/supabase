@@ -1,8 +1,8 @@
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 
-import { useParams } from 'common'
 import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
+import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
@@ -29,7 +29,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           users. You can read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth"
+            href={`${DOCS_URL}/guides/auth`}
           >
             documentation
           </a>
@@ -44,7 +44,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth"
+            href={`${DOCS_URL}/guides/auth`}
           >
             documentation
           </a>
@@ -58,7 +58,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           can read more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth/third-party/aws-cognito"
+            href={`${DOCS_URL}/guides/auth/third-party/aws-cognito`}
           >
             documentation
           </a>
@@ -73,13 +73,29 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
           more in the{' '}
           <a
             className="hover:decoration-brand underline hover:text-foreground transition"
-            href="https://supabase.com/docs/guides/auth/third-party/clerk"
+            href={`${DOCS_URL}/guides/auth/third-party/clerk`}
           >
             documentation
           </a>
           .
         </>
       )
+
+    case 'workos':
+      return (
+        <>
+          Allow users to use Supabase with WorkOS. Additional setup may be required. You can read
+          more in the{' '}
+          <a
+            className="hover:decoration-brand underline hover:text-foreground transition"
+            href={`${DOCS_URL}/guides/auth/third-party/workos`}
+          >
+            documentation
+          </a>
+          .
+        </>
+      )
+
     case 'custom':
     default:
       return 'Custom'
@@ -144,6 +160,14 @@ export const IntegrationTypeContent = ({
         </div>
       )
 
+    case 'workos':
+      return (
+        <div className="text-sm flex flex-row gap-x-4">
+          <span className="text-foreground-light w-36">Issuer URL</span>
+          <span className="text-foreground">{integration?.oidc_issuer_url ?? ''}</span>
+        </div>
+      )
+
     case 'custom':
     default:
       return <>Custom</>
@@ -184,14 +208,14 @@ export const IntegrationCard = ({
         </div>
         <div className="flex-1">
           {true ? (
-            <Badge className="space-x-1" size="large" variant="brand">
+            <Badge className="space-x-1" variant="success">
               <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
                 <Check className="h-2 w-2 text-background-overlay" strokeWidth={6} />
               </div>
               <span>Enabled</span>
             </Badge>
           ) : (
-            <Badge variant="warning" size="large">
+            <Badge variant="warning">
               <span>Disabled</span>
             </Badge>
           )}

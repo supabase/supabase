@@ -8,11 +8,10 @@ import {
 } from './Privileges.constants'
 import { usePrivilegesState } from './Privileges.utils'
 
-export interface PrivilegesTableProps
-  extends Pick<
-    ReturnType<typeof usePrivilegesState>,
-    'tableCheckedStates' | 'columnCheckedStates' | 'toggleTablePrivilege' | 'toggleColumnPrivilege'
-  > {
+export interface PrivilegesTableProps extends Pick<
+  ReturnType<typeof usePrivilegesState>,
+  'tableCheckedStates' | 'columnCheckedStates' | 'toggleTablePrivilege' | 'toggleColumnPrivilege'
+> {
   columnPrivileges: ColumnPrivilege[]
   disabled: boolean
   isApplyingChanges?: boolean

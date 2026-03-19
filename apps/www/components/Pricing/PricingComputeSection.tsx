@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronDownIcon } from '@heroicons/react/outline'
@@ -27,7 +29,7 @@ const PricingComputeSection = () => {
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-1">
                 <span className="border bg-alternative px-3 py-0.5 text-foreground text-sm rounded-full">
-                  Starts from $10/month
+                  Starts from <span translate="no">$10</span>/month
                 </span>
               </div>
               <h3 className="text-foreground text-2xl">
@@ -36,8 +38,9 @@ const PricingComputeSection = () => {
               </h3>
             </div>
             <p className="text-foreground-lighter text-[13px]">
-              Paid Plans include $10/month in compute credits. Additional compute power is available
-              if you need extra performance when scaling up Supabase.
+              Paid Plans include <span translate="no">$10</span>/month in compute credits.
+              Additional compute power is available if you need extra performance when scaling up
+              Supabase.
             </p>
           </div>
           <div className="flex items-center gap-4 mt-4">
@@ -55,7 +58,7 @@ const PricingComputeSection = () => {
       <hr className="border-0 border-t" />
       <div className="flex flex-col">
         <div
-          className="relative w-full overflow-hidden transition-all !ease-[.76,0,.23,1] duration-300"
+          className="relative w-full overflow-hidden transition-all !ease-[cubic-bezier(.76,0,.23,1)] duration-300"
           style={{ height: showTable ? `${height}px` : '200px' }}
         >
           <div
@@ -76,8 +79,8 @@ const PricingComputeSection = () => {
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Compute instances are billed hourly and you can scale up or down at any time. Paid
-                  Plans come with $10/month in compute credits to cover one Micro instance or offset
-                  the cost of any other instance.
+                  Plans come with <span translate="no">$10</span>/month in compute credits to cover
+                  one Micro instance or offset the cost of any other instance.
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Read more on{' '}

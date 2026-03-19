@@ -126,6 +126,10 @@
   --icon-md: 18px;
   --iconwidth-default: 1px;
   --panel: 2px;
+  --padding-x-sm: 1rem; /* px-4 */
+  --padding-x-md: 1.5rem; /* px-6 */
+  --card-padding-x: var(--padding-x-sm);
+  --card-padding-x-md: var(--padding-x-md);
   --datatable-headericon: 16px;
   --datatable-rowheight: 28px;
   --options-icon: 18px;

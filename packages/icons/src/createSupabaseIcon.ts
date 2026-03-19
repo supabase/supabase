@@ -1,11 +1,12 @@
 import {
-  forwardRef,
   createElement,
-  ReactSVG,
-  SVGProps,
+  forwardRef,
   ForwardRefExoticComponent,
+  ReactSVG,
   RefAttributes,
+  SVGProps,
 } from 'react'
+
 import defaultAttributes from './defaultAttributes'
 
 export type IconNode = [elementName: keyof ReactSVG, attrs: Record<string, string>][]
@@ -33,18 +34,41 @@ export const toKebabCase = (string: string) =>
     .toLowerCase()
     .trim()
 
-const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
+/**
+ * Converts kebab-case string to camelCase
+ * @param {string} string
+ * @returns {string} A camelCased string
+ */
+export const toCamelCase = (string: string) =>
+  string.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()).trim()
+
+/**
+ * Converts kebab-case attributes to camelCase for React compatibility
+ * @param {Record<string, string>} attrs
+ * @returns {Record<string, string>} Attributes with camelCase keys
+ */
+export const convertAttributesToCamelCase = (
+  attrs: Record<string, string>
+): Record<string, string> => {
+  const converted: Record<string, string> = {}
+
+  for (const [key, value] of Object.entries(attrs)) {
+    // Convert kebab-case to camelCase, but keep some special cases
+    const camelKey = key.includes('-') ? toCamelCase(key) : key
+    converted[camelKey] = value
+  }
+
+  return converted
+}
+
+const createLucideIcon = (
+  iconName: string,
+  iconNode: IconNode,
+  svgDefaults?: Record<string, string>
+): LucideIcon => {
   const Component = forwardRef<SVGSVGElement, LucideProps>(
     (
-      {
-        color = 'currentColor',
-        size = 24,
-        strokeWidth = 2,
-        absoluteStrokeWidth,
-        className = '',
-        children,
-        ...rest
-      },
+      { color, size = 24, strokeWidth, absoluteStrokeWidth, className = '', children, ...rest },
       ref
     ) => {
       return createElement(
@@ -52,17 +76,22 @@ const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
         {
           ref,
           ...defaultAttributes,
+          ...svgDefaults,
           width: size,
           height: size,
-          stroke: color,
-          strokeWidth: absoluteStrokeWidth
-            ? (Number(strokeWidth) * 24) / Number(size)
-            : strokeWidth,
+          ...(color !== undefined && { stroke: color }),
+          ...(strokeWidth !== undefined && {
+            strokeWidth: absoluteStrokeWidth
+              ? (Number(strokeWidth) * 24) / Number(size)
+              : strokeWidth,
+          }),
           className: ['lucide', `lucide-${toKebabCase(iconName)}`, className].join(' '),
           ...rest,
         },
         [
-          ...iconNode.map(([tag, attrs]) => createElement(tag, attrs)),
+          ...iconNode.map(([tag, attrs]) =>
+            createElement(tag, convertAttributesToCamelCase(attrs))
+          ),
           ...(Array.isArray(children) ? children : [children]),
         ]
       )

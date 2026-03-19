@@ -13,7 +13,7 @@ import {
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
 import { getRefMarkdown } from '~/features/docs/Reference.mdx'
-import type { MethodTypes } from '~/features/docs/Reference.typeSpec'
+import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { BASE_PATH } from '~/lib/constants'
 
@@ -29,8 +29,8 @@ export async function GET(request: Request) {
     slug = maybeVersion
   }
 
-  let section: AbbrevApiReferenceSection
-  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }>
+  let section: AbbrevApiReferenceSection | undefined
+  let sectionsWithUrl: Array<AbbrevApiReferenceSection & { url: URL }> = []
   try {
     const flattenedSections = (await getFlattenedSections(lib, version)) ?? []
     sectionsWithUrl = flattenedSections.map((section) => {
@@ -75,7 +75,7 @@ function htmlShell(
   body: string
 ) {
   const libraryName = REFERENCES[lib].name
-  let title = libraryName + ': ' + section.title ?? ''
+  let title = libraryName + ': ' + (section.title ?? '')
 
   return (
     '<!doctype html><html>' +
@@ -85,7 +85,6 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
-    (version ? '/' + version : '') +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +
@@ -107,7 +106,7 @@ function libraryNav(sections: Array<AbbrevApiReferenceSection & { url: URL }>) {
 
 async function sectionDetails(lib: string, version: string, section: AbbrevApiReferenceSection) {
   const libraryName = REFERENCES[lib].name
-  let result = '<h1>' + (libraryName + ': ' + section.title ?? '') + '</h1>'
+  let result = '<h1>' + (libraryName + ': ' + (section.title ?? '')) + '</h1>'
 
   if (section.type === 'markdown') {
     result += await markdown(lib, version, section)
@@ -137,7 +136,7 @@ async function functionDetails(
   const fn = fns!.find((fn) => fn.id === section.id)
   if (!fn) return ''
 
-  let types: MethodTypes | undefined
+  let types: MethodTypes | VariableTypes | undefined
   if (libraryMeta.typeSpec && '$ref' in fn) {
     types = await getTypeSpec(fn['$ref'] as string)
   }
@@ -157,9 +156,7 @@ async function functionDetails(
   return fullDescription + parameters + examples
 }
 
-function mdxToHtml(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replace(/(?<!\\)\{/g, '\\{').replace(/(?<!\\)\}/g, '\\}')
-
+function mdxToHtml(markdown: string): string {
   const mdast = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],
@@ -179,7 +176,7 @@ function mdxToHtml(markdownUnescaped: string): string {
   return html
 }
 
-function parametersToHtml(fn: any, types: MethodTypes | undefined) {
+function parametersToHtml(fn: any, types: MethodTypes | VariableTypes | undefined) {
   let result = '<h2 id="parameters">Parameters</h2>'
 
   if ('overwriteParams' in fn || 'params' in fn) {
@@ -203,7 +200,7 @@ function parametersToHtml(fn: any, types: MethodTypes | undefined) {
     return result
   }
 
-  if (!types?.params || types.params.length === 0) return ''
+  if (!types || !('params' in types) || !types.params || types.params.length === 0) return ''
 
   result +=
     '<ul>' +

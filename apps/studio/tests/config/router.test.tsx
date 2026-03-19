@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { routerMock } from 'tests/mocks/router'
+import { routerMock } from '../lib/route-mock'
 import { expect, suite, test } from 'vitest'
 import { RouterComponent } from './router'
 

@@ -1,4 +1,6 @@
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
+import { id } from 'common-tags'
+import { UseCustomQueryOptions } from 'types'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
@@ -11,7 +13,7 @@ type TableEditorArgs = {
 
 export type TableEditorVariables = TableEditorArgs & {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getTableEditor(
@@ -33,7 +35,7 @@ export async function getTableEditor(
     signal
   )
 
-  return (result[0]?.entity ?? undefined) as Entity | undefined
+  return (result[0]?.entity ?? null) as Entity | undefined
 }
 
 export type TableEditorData = Awaited<ReturnType<typeof getTableEditor>>
@@ -41,31 +43,35 @@ export type TableEditorError = ExecuteSqlError
 
 export const useTableEditorQuery = <TData = TableEditorData>(
   { projectRef, connectionString, id }: TableEditorVariables,
-  { enabled = true, ...options }: UseQueryOptions<TableEditorData, TableEditorError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
 ) =>
-  useQuery<TableEditorData, TableEditorError, TData>(
-    tableEditorKeys.tableEditor(projectRef, id),
-    ({ signal }) => getTableEditor({ projectRef, connectionString, id }, signal),
-    {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      ...options,
-    }
-  )
+  useQuery<TableEditorData, TableEditorError, TData>({
+    ...tableEditorQueryOptions({ projectRef, connectionString, id }),
+    enabled:
+      enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000,
+    ...options,
+  })
 
 export function prefetchTableEditor(
   client: QueryClient,
   { projectRef, connectionString, id }: TableEditorVariables
 ) {
-  return client.fetchQuery(tableEditorKeys.tableEditor(projectRef, id), ({ signal }) =>
-    getTableEditor(
-      {
-        projectRef,
-        connectionString,
-        id,
-      },
-      signal
-    )
-  )
+  return client.fetchQuery(tableEditorQueryOptions({ projectRef, connectionString, id }))
+}
+
+export const tableEditorQueryOptions = <TData = TableEditorData>({
+  projectRef,
+  connectionString,
+  id,
+}: TableEditorVariables) => {
+  return queryOptions<TableEditorData, TableEditorError, TData>({
+    queryKey: tableEditorKeys.tableEditor(projectRef, id),
+    queryFn: ({ signal }) => getTableEditor({ projectRef, connectionString, id }, signal),
+  })
 }

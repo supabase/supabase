@@ -2,8 +2,8 @@
 
 import type * as RadixPopoverTypes from '@radix-ui/react-popover'
 import * as RadixPopover from '@radix-ui/react-popover'
-import * as React from 'react'
 import { X } from 'lucide-react'
+import * as React from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
 
@@ -30,7 +30,7 @@ interface RootProps {
 }
 
 /**
- * @deprecated Use ./Popover_shadcn_ instead
+ * @deprecated Use `import { Popover_shadcn_ } from "ui"` instead
  */
 function Popover({
   align = 'center',

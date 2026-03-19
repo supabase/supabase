@@ -1,58 +1,37 @@
+import { generateUuid } from 'lib/api/snippets.browser'
 import { removeCommentsFromSql } from 'lib/helpers'
 import type { SnippetWithContent } from 'state/sql-editor-v2'
-import type { SqlSnippets, UserContent } from 'types'
-import {
-  NEW_SQL_SNIPPET_SKELETON,
-  destructiveSqlRegex,
-  sqlAiDisclaimerComment,
-} from './SQLEditor.constants'
-import { ContentDiff, DiffType } from './SQLEditor.types'
 
-/**
- * @deprecated
- */
-export const createSqlSnippetSkeleton = ({
-  id,
-  name,
-  sql,
-  owner_id,
-  project_id,
-}: {
-  id?: string
-  name?: string
-  sql?: string
-  owner_id?: number
-  project_id?: number
-} = {}): UserContent<SqlSnippets.Content> => {
-  return {
-    ...NEW_SQL_SNIPPET_SKELETON,
-    id,
-    ...(name && { name }),
-    ...(owner_id && { owner_id }),
-    ...(project_id && { project_id }),
-    content: {
-      ...NEW_SQL_SNIPPET_SKELETON.content,
-      content_id: id ?? '',
-      sql: sql ?? '',
-    },
-  }
-}
+import {
+  alterDatabasePreventConnectionStatements,
+  destructiveSqlRegex,
+  NEW_SQL_SNIPPET_SKELETON,
+  sqlAiDisclaimerComment,
+  updateWithoutWhereRegex,
+} from './SQLEditor.constants'
+import { ContentDiff } from './SQLEditor.types'
 
 export const createSqlSnippetSkeletonV2 = ({
-  id,
   name,
   sql,
   owner_id,
   project_id,
   folder_id,
+  idOverride,
 }: {
-  id: string
   name: string
   sql: string
   owner_id: number
   project_id: number
   folder_id?: string
+  /**
+   * Optionally, provide a specific snippetId to use for the snippet. This is used to ensure the snippet is created
+   * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
+   */
+  idOverride?: string
 }): SnippetWithContent => {
+  const id = idOverride ?? generateUuid([folder_id, `${name}.sql`])
+
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
@@ -68,32 +47,7 @@ export const createSqlSnippetSkeletonV2 = ({
       content_id: id ?? '',
       sql: sql ?? '',
     } as any,
-  }
-}
-
-export function getDiffTypeButtonLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Accept change'
-    case DiffType.Addition:
-      return 'Accept addition'
-    case DiffType.NewSnippet:
-      return 'Create new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
-  }
-}
-
-export function getDiffTypeDropdownLabel(diffType: DiffType) {
-  switch (diffType) {
-    case DiffType.Modification:
-      return 'Compare as change'
-    case DiffType.Addition:
-      return 'Compare as addition'
-    case DiffType.NewSnippet:
-      return 'Compare as new snippet'
-    default:
-      throw new Error(`Unknown diff type '${diffType}'`)
+    isNotSavedInDatabaseYet: true,
   }
 }
 
@@ -104,13 +58,21 @@ export function checkDestructiveQuery(sql: string) {
 
 // Function to check for UPDATE queries without WHERE clause
 export function isUpdateWithoutWhere(sql: string): boolean {
-  const updateWithoutWhereRegex =
-    /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
   const updateStatements = sql
     .split(';')
     .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
   return updateStatements.some(
     (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
+  )
+}
+
+export function checkAlterDatabaseConnection(sql: string): boolean {
+  const cleanedSql = removeCommentsFromSql(sql)
+  const statements = cleanedSql
+    .split(';')
+    .filter((statement) => statement.trim().toLowerCase().startsWith('alter database'))
+  return statements.some((statement) =>
+    alterDatabasePreventConnectionStatements.some((x) => statement.toLowerCase().includes(x))
   )
 }
 

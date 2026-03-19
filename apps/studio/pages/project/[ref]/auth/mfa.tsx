@@ -1,54 +1,72 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { MfaAuthSettingsForm } from 'components/interfaces/Auth'
+import { useParams } from 'common'
+import { MfaAuthSettingsForm } from 'components/interfaces/Auth/MfaAuthSettingsForm/MfaAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-const PageLayout: NextPageWithLayout = () => {
-  const isPermissionsLoaded = usePermissionsLoaded()
-  // TODO: check if these permissions cover third party auth as well
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+const MfaPage: NextPageWithLayout = () => {
+  const { ref } = useParams()
+  const showMFA = useIsFeatureEnabled('authentication:multi_factor')
+
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+
+  if (!showMFA) {
+    return <UnknownInterface urlBack={`/project/${ref}/auth/users`} />
+  }
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
+  }
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Multi-Factor Authentication (MFA)</ScaffoldTitle>
-          <ScaffoldDescription>
-            Requires users to provide additional verification factors to authenticate
-          </ScaffoldDescription>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Multi-Factor Authentication (MFA)</PageHeaderTitle>
+            <PageHeaderDescription>
+              Requires users to provide additional verification factors to authenticate
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
         {!isPermissionsLoaded ? (
-          <GenericSkeletonLoader />
-        ) : !canReadAuthSettings ? (
-          <NoPermission isFullPage resourceText="access your project's authentication settings" />
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
         ) : (
-          <>
-            <MfaAuthSettingsForm />
-          </>
+          <MfaAuthSettingsForm />
         )}
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }
 
-PageLayout.getLayout = (page) => {
-  return (
-    <DefaultLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </DefaultLayout>
-  )
-}
-export default PageLayout
+MfaPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout title="Multi-Factor">{page}</AuthLayout>
+  </DefaultLayout>
+)
+
+export default MfaPage

@@ -5,6 +5,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { Label } from '@ui/components/shadcn/ui/label'
 import { useParams } from 'common'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import {
@@ -19,7 +20,6 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Label } from '@ui/components/shadcn/ui/label'
 import { urlRegex } from '../Auth.constants'
 
 const MAX_URLS_LENGTH = 2 * 1024
@@ -32,7 +32,7 @@ interface AddNewURLModalProps {
 
 export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalProps) => {
   const { ref } = useParams()
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const FormSchema = z.object({
     urls: z

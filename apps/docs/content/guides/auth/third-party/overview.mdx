@@ -6,9 +6,11 @@ subtitle: 'First-class support for authentication providers'
 
 Supabase has first-class support for these third-party authentication providers:
 
+- [Clerk](/docs/guides/auth/third-party/clerk)
 - [Firebase Auth](/docs/guides/auth/third-party/firebase-auth)
 - [Auth0](/docs/guides/auth/third-party/auth0)
 - [AWS Cognito (with or without AWS Amplify)](/docs/guides/auth/third-party/aws-cognito)
+- [WorkOS](/docs/guides/auth/third-party/workos)
 
 You can use these providers alongside Supabase Auth, or on their own, to access the [Data API (REST and GraphQL)](/docs/guides/database), [Storage](/docs/guides/storage), [Realtime](/docs/guides/storage) and [Functions](/docs/guides/functions) from your existing apps.
 
@@ -24,12 +26,10 @@ This is made possible if the providers are using JWTs signed with asymmetric key
 
 There are some limitations you should be aware of when using third-party authentication providers with Supabase.
 
-1. The third-party provider must use asymmetrically signed JWTs (exposed as an OIDC Issuer Discovery URL by the third-party authentication provider). Using symmetrically signed JWTs is not possible at this time.
+1. The third-party provider must use asymmetrically signed JWTs (exposed as an OIDC Issuer Discovery URL by the third-party authentication provider). The signed JWTs must have a `kid` header parameter to identify which key must be used. Using symmetrically signed JWTs is not possible at this time.
 2. The JWT signing keys from the third-party provider are stored in the configuration of your project, and are checked for changes periodically. If you are rotating your keys (when supported) allow up to 30 minutes for the change to be picked up.
 3. It is not possible to disable Supabase Auth at this time.
 
-## Pricing
-
-<PricingMauThirdParty />
-
-For a detailed breakdown of how charges are calculated, refer to [Manage Monthly Active Third-Party Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party).
+<$Show if="billing:all">
+<$Partial path="billing/pricing/pricing_mau_third_party.mdx" />
+</$Show>

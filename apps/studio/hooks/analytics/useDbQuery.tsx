@@ -6,9 +6,9 @@ import {
   MetaQueryResponse,
   ReportQuery,
 } from 'components/interfaces/Reports/Reports.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export interface DbQueryHook<T = any> {
@@ -36,7 +36,7 @@ const useDbQuery = ({
   where?: string
   orderBy?: string
 }): DbQueryHook => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
@@ -50,12 +50,19 @@ const useDbQuery = ({
   const {
     data,
     error: rqError,
-    isLoading,
+    isPending,
     isRefetching,
     refetch,
-  } = useQuery(
-    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql, identifier }, where, orderBy],
-    ({ signal }) => {
+  } = useQuery({
+    queryKey: [
+      'projects',
+      project?.ref,
+      'db',
+      { ...params, sql: resolvedSql, identifier },
+      where,
+      orderBy,
+    ],
+    queryFn: ({ signal }) => {
       return executeSql(
         {
           projectRef: project?.ref,
@@ -65,18 +72,16 @@ const useDbQuery = ({
         signal
       ).then((res) => res.result) as Promise<MetaQueryResponse>
     },
-    {
-      enabled: Boolean(resolvedSql),
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    }
-  )
+    enabled: Boolean(resolvedSql),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  })
 
   const error = rqError || (typeof data === 'object' ? data?.error : '')
   return {
     error,
     data,
-    isLoading,
+    isLoading: isPending,
     isRefetching,
     params,
     runQuery: refetch,

@@ -1,91 +1,75 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
-
-import {
-  AccessTokenList,
-  NewAccessTokenButton,
-  NewTokenBanner,
-} from 'components/interfaces/Account'
+import { AccessTokenList } from 'components/interfaces/Account/AccessTokens/AccessTokenList'
+import { NewTokenButton } from 'components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
+import { AccessTokensLayout } from 'components/layouts/AccessTokens/AccessTokensLayout'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
+import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Search } from 'lucide-react'
+import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
+  const [searchString, setSearchString] = useState('')
 
   return (
-    // <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
-    //   <div className="flex flex-col md:flex-row md:items-center justify-between">
-    //     <div>
-    //       <FormHeader
-    //         title="Access Tokens"
-    //         description="Personal access tokens can be used with our Management API or CLI."
-    //       />
-    <ScaffoldContainer>
-      <ScaffoldHeader className="flex flex-col md:flex-row md:items-center justify-between">
-        <div className="flex flex-col">
-          <ScaffoldTitle>Access Tokens</ScaffoldTitle>
-          <ScaffoldDescription>
-            Personal access tokens can be used with our Management API or CLI.
-          </ScaffoldDescription>
-        </div>
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/reference/api/introduction"
-                target="_blank"
-                rel="noreferrer"
-              >
-                API Docs
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/reference/cli/start"
-                target="_blank"
-                rel="noreferrer"
-              >
-                CLI docs
-              </Link>
-            </Button>
-          </div>
-          <NewAccessTokenButton onCreateToken={setNewToken} />
-        </div>
-      </ScaffoldHeader>
-      <div className="flex flex-col">
-        <div className="flex items-center justify-between">
-          <Admonition
-            type="warning"
-            title="Personal access tokens can be used to control your whole account and use features added in the future. Be careful when sharing them!"
-            className="mb-6 w-full"
+    <AccessTokensLayout>
+      <div className="space-y-4">
+        {newToken && (
+          <AccessTokenNewBanner
+            token={newToken}
+            onClose={() => setNewToken(undefined)}
+            getTokenValue={(token) => token.token}
           />
+        )}
+        <div className="flex items-center justify-between gap-x-2 mb-3">
+          <Input
+            size="tiny"
+            autoComplete="off"
+            icon={<Search size={12} />}
+            value={searchString}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value)}
+            name="search"
+            id="search"
+            placeholder="Filter tokens"
+          />
+          <div className="flex items-center gap-x-2">
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a href={`${DOCS_URL}/reference/api/introduction`} target="_blank" rel="noreferrer">
+                API Docs
+              </a>
+            </Button>
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a href={`${DOCS_URL}/reference/cli/start`} target="_blank" rel="noreferrer">
+                CLI docs
+              </a>
+            </Button>
+            <NewTokenButton onCreateToken={setNewToken} />
+          </div>
         </div>
-        <div className="space-y-4">
-          {newToken && <NewTokenBanner token={newToken} />}
-          <AccessTokenList />
-        </div>
+        <AccessTokenList
+          searchString={searchString}
+          onDeleteSuccess={(id) => {
+            if (id === newToken?.id) setNewToken(undefined)
+          }}
+        />
       </div>
-    </ScaffoldContainer>
+    </AccessTokensLayout>
   )
 }
 
 UserAccessTokens.getLayout = (page) => (
-  <AccountLayout
-    title="Access Tokens"
-    breadcrumbs={[{ key: 'supabase-account-tokens', label: 'Access Tokens' }]}
-  >
-    {page}
-  </AccountLayout>
+  <AppLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Access Tokens">{page}</AccountLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default UserAccessTokens

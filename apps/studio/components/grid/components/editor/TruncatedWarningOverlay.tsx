@@ -1,4 +1,4 @@
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
+import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { Button, cn } from 'ui'
 
 export const TruncatedWarningOverlay = ({

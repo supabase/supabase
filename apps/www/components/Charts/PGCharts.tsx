@@ -1,3 +1,5 @@
+'use client'
+
 import { Tabs } from 'ui'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'

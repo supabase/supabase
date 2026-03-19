@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  "exclude": ["types", "exports"],
+  "ignore": [
+    "examples/**",
+    "**/*.mdx",
+    // skip supabase functions
+    "supabase/functions/**",
+    "**/*.test.ts",
+    // ignore studio public folder
+    "apps/studio/public/**",
+    // ignore studio components, they're dynamically imported
+    "apps/studio/components/interfaces/Connect/content/**",
+    // ignore registry blocks in ui-library
+    "apps/ui-library/registry/default/**",
+    "apps/ui-library/contentlayer.config.js",
+  ],
+}

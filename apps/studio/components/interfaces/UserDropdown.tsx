@@ -1,14 +1,15 @@
-import { Command, FlaskConical, Palette, Settings } from 'lucide-react'
+import { ProfileImage } from 'components/ui/ProfileImage'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
+import { useProfileNameAndPicture } from 'lib/profile'
+import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useSignOut } from 'lib/auth'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfile } from 'lib/profile'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -18,93 +19,100 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  SidebarMenuButton,
-  Theme,
-  cn,
   singleThemes,
+  Theme,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { ICON_SIZE, ICON_STROKE_WIDTH, SideBarNavLink } from './Sidebar'
 
-export const UserDropdown = () => {
-  const { profile } = useProfile()
-  const appStateSnapshot = useAppStateSnapshot()
-  const { theme, setTheme } = useTheme()
-  const signOut = useSignOut()
+import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
+  const { theme, setTheme } = useTheme()
+  const appStateSnapshot = useAppStateSnapshot()
+  const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <SidebarMenuButton
-          className={cn(
-            'text-sm',
-            'group-data-[state=expanded]:h-10',
-            'p-0.5 group-data-[state=expanded]:pr-2 group-data-[state=expanded]:pl-1'
-          )}
-          size={'default'}
-          hasIcon={false}
-          asChild
-          isActive={false}
+      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+        <Button
+          type="default"
+          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
         >
-          <button>
-            <div className="aspect-square h-7 w-7 rounded-md border flex-shrink-0">
-              <ProfileImage
-                alt={profile?.username}
-                src={profile?.profileImageUrl}
-                className="w-7 h-7 rounded-md"
-              />
+          {isLoading ? (
+            <div className="w-full h-full flex items-center justify-center">
+              <Loader2 className="animate-spin text-foreground-lighter" size={16} />
             </div>
-            <span className="flex flex-col gap-0">
-              {profile?.username}
-              <span className="text-foreground-lighter text-xs">{profile?.primary_email}</span>
-            </span>
-          </button>
-        </SidebarMenuButton>
+          ) : (
+            <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
+          )}
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start">
+
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {profile && (
+              {!!username ? (
                 <>
-                  <span
-                    title={profile.username}
-                    className="w-full text-left text-foreground truncate"
-                  >
-                    {profile.username}
+                  <span title={username} className="w-full text-left text-foreground truncate">
+                    {username}
                   </span>
-                  {profile.primary_email !== profile.username && (
+                  {primaryEmail !== username && profileShowEmailEnabled && (
                     <span
-                      title={profile.primary_email}
+                      title={primaryEmail}
                       className="w-full text-left text-foreground-light text-xs truncate"
                     >
-                      {profile.primary_email}
+                      {primaryEmail}
                     </span>
                   )}
                 </>
+              ) : (
+                <span title={primaryEmail} className="w-full text-left text-foreground truncate">
+                  {primaryEmail}
+                </span>
               )}
             </div>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2" asChild>
-                <Link href="/account/me">
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
+                <Link
+                  href="/account/me"
+                  onClick={() => {
+                    if (router.pathname !== '/account/me') {
+                      appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+                    }
+                  }}
+                >
                   <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Account preferences
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex gap-2"
-                onClick={() => appStateSnapshot.setShowFeaturePreviewModal(true)}
-                onSelect={() => appStateSnapshot.setShowFeaturePreviewModal(true)}
+                className="flex gap-2 cursor-pointer"
+                onClick={() => toggleFeaturePreviewModal(true)}
+                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" onClick={() => setCommandMenuOpen(true)}>
-                <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Command menu
+              <DropdownMenuItem className="flex gap-2" asChild>
+                <Link
+                  href="https://supabase.com/changelog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Changelog
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuGroup>
@@ -119,7 +127,11 @@ export const UserDropdown = () => {
             }}
           >
             {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+              <DropdownMenuRadioItem
+                key={theme.value}
+                value={theme.value}
+                className="cursor-pointer"
+              >
                 {theme.name}
               </DropdownMenuRadioItem>
             ))}
@@ -130,9 +142,9 @@ export const UserDropdown = () => {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={async () => {
-                  await signOut()
-                  await router.push('/sign-in')
+                className="cursor-pointer"
+                onSelect={() => {
+                  router.push('/logout')
                 }}
               >
                 Log out

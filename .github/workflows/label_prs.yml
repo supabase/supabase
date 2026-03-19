@@ -1,0 +1,16 @@
+name: 'Pull Request Labeler'
+
+# only docs uses the labeler at the moment
+on:
+  pull_request_target:
+    paths:
+      - 'apps/docs/**/*'
+
+jobs:
+  labeler:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1

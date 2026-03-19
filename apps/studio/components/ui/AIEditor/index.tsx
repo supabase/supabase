@@ -1,13 +1,15 @@
-import Editor, { DiffEditor, Monaco, OnMount } from '@monaco-editor/react'
-import { useCompletion } from 'ai/react'
+import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { constructHeaders } from 'data/fetchers'
 import { AnimatePresence, motion } from 'framer-motion'
+import { detectOS } from 'lib/helpers'
 import { Command } from 'lucide-react'
-import { editor as monacoEditor } from 'monaco-editor'
+import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
-import { constructHeaders } from 'data/fetchers'
-import { detectOS } from 'lib/helpers'
+import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
 
 interface AIEditorProps {
@@ -18,22 +20,27 @@ interface AIEditorProps {
   aiEndpoint?: string
   aiMetadata?: {
     projectRef?: string
-    connectionString?: string
-    includeSchemaMetadata?: boolean
+    connectionString?: string | null
+    orgSlug?: string
   }
   initialPrompt?: string
   readOnly?: boolean
+  autoFocus?: boolean
   className?: string
   options?: monacoEditor.IStandaloneEditorConstructionOptions
   onChange?: (value: string) => void
+  onClose?: () => void
+  closeShortcutEnabled?: boolean
+  openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
+  onMount?: (editor: monacoEditor.IStandaloneCodeEditor, monaco: Monaco) => void
 }
 
 // [Joshen] This has overlap with components/interfaces/SQLEditor/MonacoEditor
 // Can we try to de-dupe accordingly? Perhaps the SQL Editor could use this AIEditor
 // We have a tendency to create multiple versions of the monaco editor like RLSCodeEditor
 // so hoping to prevent that from snowballing
-const AIEditor = ({
+export const AIEditor = ({
   language = 'javascript',
   value,
   defaultValue = '',
@@ -41,14 +48,22 @@ const AIEditor = ({
   aiMetadata,
   initialPrompt,
   readOnly = false,
+  autoFocus = false,
   className = '',
   options = {},
   onChange,
+  onClose,
+  closeShortcutEnabled = true,
+  openAIAssistantShortcutEnabled = true,
   executeQuery,
+  onMount,
 }: AIEditorProps) => {
   const os = detectOS()
+  const { toggleSidebar } = useSidebarManagerSnapshot()
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<monacoEditor.IStandaloneDiffEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
@@ -67,29 +82,64 @@ const AIEditor = ({
   })
   const [promptInput, setPromptInput] = useState(initialPrompt || '')
 
-  const {
-    complete,
-    completion,
-    isLoading: isCompletionLoading,
-    setCompletion,
-  } = useCompletion({
-    api: aiEndpoint || '',
-    body: aiMetadata,
-    onResponse: (response) => {
-      if (!response.ok) throw new Error('Failed to generate completion')
+  const [isCompletionLoading, setIsCompletionLoading] = useState(false)
+
+  const complete = useCallback(
+    async (
+      prompt: string,
+      options?: {
+        headers?: Record<string, string>
+        body?: { completionMetadata?: any }
+      }
+    ) => {
+      try {
+        if (!aiEndpoint) throw new Error('AI endpoint is not configured')
+        setIsCompletionLoading(true)
+
+        const response = await fetch(aiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(options?.headers ?? {}),
+          },
+          body: JSON.stringify({
+            ...(aiMetadata ?? {}),
+            ...(options?.body ?? {}),
+          }),
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Failed to generate completion')
+        }
+
+        const text: string = await response.json()
+
+        const meta = options?.body?.completionMetadata ?? {}
+        const beforeSelection: string = meta.textBeforeCursor ?? ''
+        const afterSelection: string = meta.textAfterCursor ?? ''
+        const selection: string = meta.selection ?? ''
+
+        const original = beforeSelection + selection + afterSelection
+        const modified = beforeSelection + text + afterSelection
+
+        setDiffValue({ original, modified })
+        setIsDiffMode(true)
+      } catch (error: any) {
+        toast.error(`Failed to generate: ${error?.message ?? 'Unknown error'}`)
+      } finally {
+        setIsCompletionLoading(false)
+      }
     },
-    onError: (error) => {
-      toast.error(`Failed to generate: ${error.message}`)
-    },
-  })
+    [aiEndpoint, aiMetadata]
+  )
 
   const handleReset = useCallback(() => {
-    setCompletion('')
     setIsDiffMode(false)
     setPromptState((prev) => ({ ...prev, isOpen: false }))
     setPromptInput('')
     editorRef.current?.focus()
-  }, [setCompletion])
+  }, [])
 
   const handleAcceptDiff = useCallback(() => {
     if (diffValue.modified) {
@@ -104,11 +154,34 @@ const AIEditor = ({
     handleReset()
   }
 
+  const refreshCloseAction = useCallback(() => {
+    closeActionDisposableRef.current?.dispose()
+    closeActionDisposableRef.current = null
+
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+
+    if (!editor || !monaco || !onClose || !closeShortcutEnabled) return
+
+    const action = editor.addAction({
+      id: 'close-editor',
+      label: 'Close editor',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyE],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: onClose,
+    })
+
+    closeActionDisposableRef.current = action ?? null
+  }, [closeShortcutEnabled, onClose])
+
   const handleEditorOnMount: OnMount = (
     editor: monacoEditor.IStandaloneCodeEditor,
     monaco: Monaco
   ) => {
     editorRef.current = editor
+    monacoRef.current = monaco
+    onMount?.(editor, monaco)
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()
@@ -125,6 +198,31 @@ const AIEditor = ({
       }
     }
 
+    // [Joshen] Opting to ignore "Cannot find module" errors here as users are getting
+    // confused with the error highlighting when importing external modules
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+      diagnosticCodesToIgnore: [2792],
+    })
+
+    if (language === 'javascript' || language === 'typescript') {
+      // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
+      // Monaco editor.
+      import('public/deno/edge-runtime.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno edge-runtime typings:', error)
+        })
+      import('public/deno/lib.deno.d.ts' as string)
+        .then((module) => {
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+        })
+        .catch((error) => {
+          console.error('Failed to load Deno lib typings:', error)
+        })
+    }
+
     if (!!executeQueryRef.current) {
       editor.addAction({
         id: 'run-query',
@@ -133,6 +231,20 @@ const AIEditor = ({
         contextMenuGroupId: 'operation',
         contextMenuOrder: 0,
         run: () => executeQueryRef.current?.(),
+      })
+    }
+
+    refreshCloseAction()
+
+    // Add AI Assistant toggle keybinding (Cmd+I)
+    if (openAIAssistantShortcutEnabled) {
+      editor.addAction({
+        id: 'toggle-ai-assistant',
+        label: 'Toggle AI Assistant',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+        run: () => {
+          toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+        },
       })
     }
 
@@ -163,6 +275,11 @@ const AIEditor = ({
         })
       },
     })
+
+    if (autoFocus) {
+      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+      editor.focus()
+    }
   }
 
   const handlePrompt = async (
@@ -182,8 +299,10 @@ const AIEditor = ({
       }))
 
       const headerData = await constructHeaders()
+      const authorizationHeader = headerData.get('Authorization')
+
       await complete(prompt, {
-        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           ...aiMetadata,
           completionMetadata: {
@@ -238,20 +357,6 @@ const AIEditor = ({
   }, [isDiffMode])
 
   useEffect(() => {
-    if (!completion) {
-      setIsDiffMode(false)
-      return
-    }
-
-    const original =
-      promptState.beforeSelection + promptState.selection + promptState.afterSelection
-    const modified = promptState.beforeSelection + completion + promptState.afterSelection
-
-    setDiffValue({ original, modified })
-    setIsDiffMode(true)
-  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
-
-  useEffect(() => {
     const handleKeyboard = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         handleReset()
@@ -274,17 +379,12 @@ const AIEditor = ({
       {isDiffMode ? (
         <div className="w-full h-full">
           <DiffEditor
-            theme="vs-dark"
             language={language}
             original={diffValue.original}
             modified={diffValue.modified}
             onMount={(editor: monacoEditor.IStandaloneDiffEditor) => {
               diffEditorRef.current = editor
               setIsDiffEditorMounted(true)
-            }}
-            options={{
-              ...defaultOptions,
-              renderSideBySide: false,
             }}
           />
           {isDiffEditorMounted && (
@@ -312,6 +412,7 @@ const AIEditor = ({
         </div>
       ) : (
         <div className="w-full h-full relative">
+          {/* [Joshen] Refactor: Use CodeEditor.tsx instead, reduce duplicate declaration of Editor */}
           <Editor
             theme="supabase"
             language={language}
@@ -362,5 +463,3 @@ const AIEditor = ({
     </div>
   )
 }
-
-export default AIEditor

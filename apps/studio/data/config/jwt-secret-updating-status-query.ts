@@ -1,6 +1,9 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+
 import { get, handleError } from 'data/fetchers'
+import { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -22,14 +25,14 @@ export async function getJwtSecretUpdatingStatus(
     throw new Error('projectRef is required')
   }
 
-  const { data, error } = await get('/platform/props/project/{ref}/jwt-secret-update-status', {
+  const { data, error } = await get('/platform/projects/{ref}/config/secrets/update-status', {
     params: { path: { ref: projectRef } },
     signal,
   })
 
   if (error) handleError(error)
 
-  const meta = data.jwtSecretUpdateStatus
+  const meta = data.update_status
 
   return meta
     ? ({
@@ -42,37 +45,41 @@ export async function getJwtSecretUpdatingStatus(
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>
-export type JwtSecretUpdatingStatusError = unknown
+export type JwtSecretUpdatingStatusError = ResponseError
 
 export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusData>(
   { projectRef }: JwtSecretUpdatingStatusVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
+  }: UseCustomQueryOptions<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData> = {}
 ) => {
   const client = useQueryClient()
 
-  return useQuery<JwtSecretUpdatingStatusData, JwtSecretUpdatingStatusError, TData>(
-    configKeys.jwtSecretUpdatingStatus(projectRef),
-    ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      refetchInterval(data) {
-        if (!data) {
-          return false
-        }
+  const query = useQuery({
+    queryKey: configKeys.jwtSecretUpdatingStatus(projectRef),
+    queryFn: ({ signal }) => getJwtSecretUpdatingStatus({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchInterval: (query) => {
+      const data = query.state.data
+      if (!data) {
+        return false
+      }
 
-        const { jwtSecretUpdateStatus } = data as unknown as JwtSecretUpdatingStatusResponse
+      const { jwtSecretUpdateStatus } = data
 
-        const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
+      const interval = jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating ? 1000 : false
 
-        return interval
-      },
-      onSuccess() {
-        client.invalidateQueries(configKeys.postgrest(projectRef))
-      },
-      ...options,
-    }
-  )
+      return interval
+    },
+
+    ...options,
+  })
+
+  useEffect(() => {
+    if (!query.isSuccess) return
+    client.invalidateQueries({ queryKey: configKeys.postgrest(projectRef) })
+  }, [query.isSuccess, projectRef, client])
+
+  return query
 }

@@ -166,9 +166,9 @@ pre[class*='language-'] {
 }
 
 // ToC styles
-.toc__menu-item--active {
-  color: hsl(var(--brand-default)) !important;
-}
+// .toc__menu-item--active {
+//   color: hsl(var(--brand-default)) !important;
+// }
 
 .video-container {
   position: relative;
@@ -283,7 +283,7 @@ th code {
   @apply text-nowrap;
 }
 
-/* 
+/*
  * Prevents very long code lines (checksums, URLs, etc., from breaking table
  * widths
  */
@@ -310,42 +310,60 @@ th code {
   image-rendering: high-quality;
 }
 
-/* Loaders */
-
-.shimmering-loader {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--background-surface-200)) 25%,
-    hsl(var(--border-default)) 36%
-  );
-  background-size: 1000px 100%;
-}
-
-.dark .shimmering-loader {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--border-control)) 25%,
-    hsl(var(--border-default)) 36%
-  );
-  background-size: 1000px 100%;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
 .skip-link {
   @apply sr-only;
 }
 .skip-link:focus {
   @apply not-sr-only;
+}
+
+// Code blocks need margin applied when in content container
+.prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
+  margin-block: 2rem;
+}
+
+// Code block theme colors for use with Supabase Theme
+[data-theme='dark'],
+[data-theme='deep-dark'],
+.dark,
+.deep-dark {
+  --code-token-keyword: #bda4ff;
+  --code-foreground: #ffffff;
+  --code-token-constant: #3ecf8e;
+  --code-token-string: #ffcda1;
+  --code-token-comment: #7e7e7e;
+  --code-token-parameter: #ffffff;
+  --code-token-function: #3ecf8e;
+  --code-token-string-expression: #ffcda1;
+  --code-token-punctuation: #ffffff;
+  --code-token-link: #ffffff;
+  --code-token-number: #ffffff;
+  --code-token-property: #3ecf8e;
+  --code-highlight-color: #232323;
+}
+[data-theme='light'],
+.light {
+  --code-token-keyword: #6b35dc;
+  --code-foreground: hsl(var(--foreground-light) / 1);
+  --code-token-constant: #15593b;
+  --code-token-string: #f1a10d;
+  --code-token-comment: #7e7e7e;
+  --code-token-parameter: hsl(var(--foreground-light) / 1);
+  --code-token-function: #15593b;
+  --code-token-string-expression: #f1a10d;
+  --code-token-punctuation: hsl(var(--foreground-light) / 1);
+  --code-token-link: hsl(var(--foreground-light) / 1);
+  --code-token-number: hsl(var(--foreground-light) / 1);
+  --code-token-property: #15593b;
+  --code-highlight-color: #1c1c1c;
+}
+
+/* Word wrap styles for code blocks */
+.shiki[data-wrapped='true'] {
+  overflow-x: hidden !important;
+}
+
+.shiki[data-wrapped='true'] .code-content {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
 }

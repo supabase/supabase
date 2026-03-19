@@ -1,15 +1,15 @@
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { notFound } from 'next/navigation'
 import { relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 
-import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 export const dynamicParams = false
 
@@ -54,7 +54,8 @@ const pageMap = [
 
 type Params = { slug: string }
 
-const ActionDocs = async ({ params }: { params: Params }) => {
+const ActionDocs = async (props: { params: Promise<Params> }) => {
+  const params = await props.params
   const { meta, ...data } = await getContent(params)
 
   const options = {
@@ -81,9 +82,20 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  const response = await fetchRevalidatePerDay(
-    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
-  )
+  let response: Response
+  try {
+    response = await fetchRevalidatePerDay(
+      `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
+    )
+  } catch (err) {
+    throw new Error(`Failed to fetch CI docs from GitHub (network error): ${err}`)
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch CI docs from GitHub: ${response.status} ${response.statusText}`
+    )
+  }
 
   const content = removeRedundantH1(await response.text())
 
@@ -132,4 +144,4 @@ const generateStaticParams = () => pageMap.map(({ slug }) => ({ slug }))
 const generateMetadata = genGuideMeta(getContent)
 
 export default ActionDocs
-export { generateStaticParams, generateMetadata }
+export { generateMetadata, generateStaticParams }

@@ -53,7 +53,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     1. `supabase secrets set --env-file .env.local`
 
     ```ts supabase/functions/push/index.ts
-    import { createClient } from 'jsr:@supabase/supabase-js@2'
+    import { createClient } from 'npm:@supabase/supabase-js@2'
 
     console.log('Hello from Functions!')
 
@@ -105,7 +105,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     ## Create the database webhook
 
-    Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/project/_/database/hooks) in your Supabase Dashboard.
+    Navigate to the [Database Webhooks settings](/dashboard/project/_/integrations/webhooks/overview) in your Supabase Dashboard.
 
     1. Enable and create a new hook.
     1. Conditions to fire webhook: Select the `notifications` table and tick the `Insert` event.
@@ -116,7 +116,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     ## Send push notification
 
-    1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase Dashboard.
+    1. Navigate to the [table editor](/dashboard/project/_/editor) in your Supabase Dashboard.
     1. In your `notifications` table, insert a new row.
     1. Watch the magic happen 🪄
 
@@ -277,7 +277,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     ## Create the database webhook
 
-    Navigate to the [Database Webhooks settings](https://supabase.com/dashboard/project/_/database/hooks) in your Supabase Dashboard.
+    Navigate to the [Database Webhooks settings](/dashboard/project/_/database/hooks) in your Supabase Dashboard.
 
     1. Enable and create a new hook.
     1. Conditions to fire webhook: Select the `public.notifications` table and tick the `Insert` event.
@@ -288,7 +288,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     ## Send push notification
 
     1. Make sure you have a user with an FCM token in the `profiles` table.
-    1. Navigate to the [table editor](https://supabase.com/dashboard/project/_/editor) in your Supabase Dashboard.
+    1. Navigate to the [table editor](/dashboard/project/_/editor) in your Supabase Dashboard.
     1. In your `notifications` table, insert a new row.
     1. Watch the magic happen 🪄
 

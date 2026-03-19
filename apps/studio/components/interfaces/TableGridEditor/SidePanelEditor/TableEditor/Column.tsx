@@ -1,26 +1,25 @@
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { Link, Menu, Plus, Settings, X } from 'lucide-react'
+import { useState } from 'react'
 import {
   Badge,
   Button,
   Checkbox,
+  cn,
+  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
   Input,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  Separator,
-  cn,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
-import { useState } from 'react'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
@@ -72,7 +71,7 @@ const Column = ({
   onRemoveColumn,
   onEditForeignKey,
 }: ColumnProps) => {
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
@@ -116,6 +115,7 @@ const Column = ({
       <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
+            aria-label="Column name"
             size="small"
             value={column.name}
             title={column.name}
@@ -145,7 +145,7 @@ const Column = ({
               <PopoverContent_Shadcn_
                 className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
                 side="bottom"
-                align="end"
+                align="center"
               >
                 <div className="text-xs px-2 pt-2">
                   Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
@@ -172,7 +172,7 @@ const Column = ({
                               </div>
                             ) : (
                               <div className="flex items-center gap-x-2 truncate">
-                                <Badge variant={status === 'ADD' ? 'brand' : 'warning'}>
+                                <Badge variant={status === 'ADD' ? 'success' : 'warning'}>
                                   {status}
                                 </Badge>
                                 <p className="truncate">
@@ -242,6 +242,7 @@ const Column = ({
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
           <InputWithSuggestions
+            aria-label="Column default value"
             data-testid={`${column.name}-default-value`}
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
@@ -268,7 +269,13 @@ const Column = ({
         <Checkbox
           label=""
           checked={column.isPrimaryKey}
-          onChange={() => onUpdateColumn({ isPrimaryKey: !column.isPrimaryKey })}
+          onChange={() => {
+            const updatedValue = !column.isPrimaryKey
+            onUpdateColumn({
+              isPrimaryKey: updatedValue,
+              isNullable: updatedValue ? false : column.isNullable,
+            })
+          }}
         />
       </div>
       <div className={`${hasImportContent ? 'w-[10%]' : 'w-[0%]'}`} />
@@ -290,21 +297,18 @@ const Column = ({
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ align="end" className="w-96 p-0">
               <div className="flex items-center justify-center bg-surface-200 space-y-1 py-1.5 px-3 border-b border-overlay">
-                <h5 className="text-sm text-foreground">Extra options</h5>
+                <h5 className="text-foreground">Extra options</h5>
               </div>
 
               <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
                 {!column.isPrimaryKey && (
-                  <>
-                    <Checkbox
-                      label="Is Nullable"
-                      description="Specify if the column can assume a NULL value if no value is provided"
-                      checked={column.isNullable}
-                      className="p-4"
-                      onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                    />
-                    <Separator />
-                  </>
+                  <Checkbox
+                    label="Is Nullable"
+                    description="Specify if the column can assume a NULL value if no value is provided"
+                    checked={column.isNullable}
+                    className="p-4"
+                    onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                  />
                 )}
                 <Checkbox
                   label="Is Unique"
@@ -313,7 +317,6 @@ const Column = ({
                   className="p-4"
                   onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
                 />
-                <Separator />
                 {column.format.includes('int') && (
                   <Checkbox
                     label="Is Identity"

@@ -31,6 +31,19 @@ Setting up OAuth with Azure consists of four broad steps:
 
 ## Obtain a client ID and secret
 
+### Local development with Azure OAuth
+
+Azure does not allow `127.0.0.1` as a redirect URI hostname and requires
+the use of `localhost`.
+
+To enable Azure OAuth during local Supabase development, configure the
+Supabase API external URL in your `config.toml`:
+
+```toml
+[api]
+external_url = "http://localhost:54321"
+```
+
 - Once your app has been registered, the client ID can be found under the [list of app registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) under the column titled _Application (client) ID_.
 - You can also find it in the app overview screen.
 - Place the Client ID in the Azure configuration screen in the Supabase Auth dashboard.
@@ -43,6 +56,25 @@ Setting up OAuth with Azure consists of four broad steps:
 - Once the secret is generated place the _Value_ column (not _Secret ID_) in the Azure configuration screen in the Supabase Auth dashboard.
 
 ![Obtain the client secret](/docs/img/guides/auth-azure/azure-client-secret.png)
+
+You can also configure the Azure auth provider using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Configure Azure auth provider
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_azure_enabled": true,
+    "external_azure_client_id": "your-azure-client-id",
+    "external_azure_secret": "your-azure-client-secret",
+    "external_azure_url": "your-azure-url"
+  }'
+```
 
 ## Guarding against unverified email domains
 
@@ -125,11 +157,15 @@ Supabase Auth requires that Azure returns a valid email address. Therefore you m
 >
 <TabPanel id="js" label="JavaScript">
 
-<CreateClientSnippet />
+<$Partial path="create_client_snippet.mdx" />
 
 When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/auth-signinwithoauth) with `azure` as the `provider`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
@@ -157,6 +193,7 @@ Future<void> signInWithAzure() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Azure` as the `Provider`:
@@ -170,9 +207,10 @@ suspend fun signInWithAzure() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
-<OAuthPkceFlow />
+<$Partial path="oauth_pkce_flow.mdx" />
 
 <Tabs
   scrollable
@@ -186,6 +224,10 @@ suspend fun signInWithAzure() {
 When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signOut() {
   const { error } = await supabase.auth.signOut()
 }
@@ -203,6 +245,7 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -214,6 +257,7 @@ suspend fun signOut() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Obtain the provider refresh token
@@ -230,6 +274,10 @@ Azure OAuth2.0 doesn't return the `provider_refresh_token` by default. If you ne
 <TabPanel id="js" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+// ---cut---
 async function signInWithAzure() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'azure',
@@ -253,6 +301,7 @@ Future<void> signInWithAzure() async {
 ```
 
 </TabPanel>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -264,6 +313,7 @@ suspend fun signInWithAzure() {
 ```
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Resources

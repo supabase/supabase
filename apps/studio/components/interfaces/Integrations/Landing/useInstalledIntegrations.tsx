@@ -1,21 +1,40 @@
-import { useMemo } from 'react'
-
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from 'lib/void'
+import { useMemo } from 'react'
+import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
+
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
+import {
+  isInstalled as checkIsInstalled,
+  findStripeSchema,
+} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 export const useInstalledIntegrations = () => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
+  const allIntegrations = useMemo(() => {
+    return INTEGRATIONS.filter((integration) => {
+      if (
+        !integrationsWrappers &&
+        (integration.type === 'wrapper' || integration.id.endsWith('_wrapper'))
+      ) {
+        return false
+      }
+      return true
+    })
+  }, [integrationsWrappers])
 
   const {
     data,
     error: fdwError,
     isError: isErrorFDWs,
-    isLoading: isFDWLoading,
+    isPending: isFDWLoading,
     isSuccess: isSuccessFDWs,
   } = useFDWsQuery({
     projectRef: project?.ref,
@@ -25,7 +44,7 @@ export const useInstalledIntegrations = () => {
     data: extensions,
     error: extensionsError,
     isError: isErrorExtensions,
-    isLoading: isExtensionsLoading,
+    isPending: isExtensionsLoading,
     isSuccess: isSuccessExtensions,
   } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -36,7 +55,7 @@ export const useInstalledIntegrations = () => {
     data: schemas,
     error: schemasError,
     isError: isErrorSchemas,
-    isLoading: isSchemasLoading,
+    isPending: isSchemasLoading,
     isSuccess: isSuccessSchemas,
   } = useSchemasQuery({
     projectRef: project?.ref,
@@ -47,30 +66,33 @@ export const useInstalledIntegrations = () => {
   const wrappers = useMemo(() => data ?? EMPTY_ARR, [data])
 
   const installedIntegrations = useMemo(() => {
-    return INTEGRATIONS.filter((i) => {
-      // special handling for supabase webhooks
-      if (i.id === 'webhooks') {
-        return isHooksEnabled
-      }
-      if (i.type === 'wrapper') {
-        return wrappers.find((w) => wrapperMetaComparator(i.meta, w))
-      }
-      if (i.type === 'postgres_extension') {
-        return i.requiredExtensions.every((extName) => {
-          const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
-          return !!foundExtension?.installed_version
-        })
-      }
-      return false
-    }).sort((a, b) => a.name.localeCompare(b.name))
-  }, [wrappers, extensions, isHooksEnabled])
-
-  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
-  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
-  const availableIntegrations = useMemo(
-    () => INTEGRATIONS.sort((a, b) => a.name.localeCompare(b.name)),
-    []
-  )
+    return allIntegrations
+      .filter((integration) => {
+        // special handling for supabase webhooks
+        if (integration.id === 'webhooks') {
+          return isHooksEnabled
+        }
+        if (integration.id === 'data_api') {
+          return true
+        }
+        if (integration.id === 'stripe_sync_engine') {
+          const stripeSchema = findStripeSchema(schemas)
+          const parsedSchema = parseSchemaComment(stripeSchema?.comment)
+          return checkIsInstalled(parsedSchema.status)
+        }
+        if (integration.type === 'wrapper') {
+          return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))
+        }
+        if (integration.type === 'postgres_extension') {
+          return integration.requiredExtensions.every((extName) => {
+            const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
+            return !!foundExtension?.installed_version
+          })
+        }
+        return false
+      })
+      .sort((a, b) => a.name.localeCompare(b.name))
+  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled])
 
   const error = fdwError || extensionsError || schemasError
   const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
@@ -80,7 +102,6 @@ export const useInstalledIntegrations = () => {
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? EMPTY_ARR : installedIntegrations,
-    availableIntegrations: isLoading ? EMPTY_ARR : availableIntegrations,
     error,
     isError,
     isLoading,

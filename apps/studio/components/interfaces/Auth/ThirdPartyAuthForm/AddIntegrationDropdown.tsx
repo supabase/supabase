@@ -1,8 +1,5 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
-
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   cn,
@@ -13,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import {
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
@@ -21,6 +19,8 @@ import {
 
 interface AddIntegrationDropdownProps {
   buttonText?: string
+  align?: 'end' | 'center'
+  type?: 'primary' | 'default'
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
 
@@ -47,35 +47,23 @@ const ProviderDropdownItem = ({
 }
 
 export const AddIntegrationDropdown = ({
+  type = 'primary',
+  align = 'end',
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const selectedProject = useSelectedProject()
-
-  const isClerkTPAEnabledFlag = useFlag<string>('isClerkTPAEnabledOnProjects')
-  const isClerkTPAEnabled =
-    selectedProject?.ref &&
-    isClerkTPAEnabledFlag &&
-    isClerkTPAEnabledFlag
-      .split(',')
-      .map((it) => it.trim())
-      .includes(selectedProject.ref)
-
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="primary" iconRight={<ChevronDown size={14} strokeWidth={1} />}>
+        <Button type={type} iconRight={<ChevronDown />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Select Provider</DropdownMenuLabel>
+      <DropdownMenuContent align={align} className="w-56">
+        <DropdownMenuLabel>Select provider</DropdownMenuLabel>
         <DropdownMenuSeparator />
-
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
-
-        {isClerkTPAEnabled && (
-          <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
-        )}
+        <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>

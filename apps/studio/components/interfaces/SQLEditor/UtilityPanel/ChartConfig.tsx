@@ -1,15 +1,12 @@
-import dayjs from 'dayjs'
-import { ArrowUpDown, X } from 'lucide-react'
-import { useMemo } from 'react'
-
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import dayjs from 'dayjs'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { ArrowUpDown, X } from 'lucide-react'
 import Link from 'next/link'
+import { useMemo } from 'react'
 import {
   Badge,
   Button,
@@ -18,11 +15,11 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -39,6 +36,7 @@ export type ChartConfig = {
   yKey: string
   showLabels?: boolean
   showGrid?: boolean
+  logScale?: boolean
 }
 
 const getCumulativeResults = (results: Results, config: ChartConfig) => {
@@ -70,7 +68,6 @@ export const ChartConfig = ({
   onConfigChange,
 }: ChartConfigProps) => {
   const { ref } = useParams()
-  const supportSQLBlocks = useFlag('reportsV2')
 
   const [acknowledged, setAcknowledged] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED(ref as string),
@@ -108,6 +105,21 @@ export const ChartConfig = ({
 
   const resultToRender = config.cumulative ? cumulativeResults : results.rows
 
+  const getDateFormat = (key: any) => {
+    const value = resultToRender?.[0]?.[key] || ''
+    if (typeof value === 'number') return 'number'
+    if (dayjs(value).isValid()) return 'date'
+    return 'string'
+  }
+
+  const xKeyDateFormat = getDateFormat(config.xKey)
+
+  const onFlip = () => {
+    const newY = config.xKey
+    const newX = config.yKey
+    onConfigChange({ ...config, xKey: newX, yKey: newY })
+  }
+
   if (!resultKeys.length) {
     return (
       <div className="p-2">
@@ -119,75 +131,50 @@ export const ChartConfig = ({
     )
   }
 
-  const getDateFormat = (key: any) => {
-    const value = resultToRender?.[0]?.[key] || ''
-    if (typeof value === 'number') return 'number'
-    if (dayjs(value).isValid()) return 'date'
-    return 'string'
-  }
-
-  const xKeyDateFormat = getDateFormat(config.xKey)
-
-  const ChartPanel = () => {
-    if (!hasConfig) {
-      return (
-        <ResizablePanel className="p-4 h-full" defaultSize={75}>
-          <NoDataPlaceholder
-            size="normal"
-            title="Configure your chart"
-            description="Select your X and Y axis in the chart options panel"
-          />
-        </ResizablePanel>
-      )
-    }
-
-    if (config.type === 'bar') {
-      return (
-        <BarChart
-          showLegend
-          size="normal"
-          xAxisIsDate={xKeyDateFormat === 'date'}
-          data={resultToRender}
-          xAxisKey={config.xKey}
-          yAxisKey={config.yKey}
-          showGrid={config.showGrid}
-          XAxisProps={{
-            angle: 0,
-            interval: 'preserveStart',
-            hide: !config.showLabels,
-            tickFormatter: (idx: string) => {
-              const value = resultToRender[+idx][config.xKey]
-              if (xKeyDateFormat === 'date') {
-                return dayjs(value).format('MMM D YYYY HH:mm')
-              }
-              return value
-            },
-          }}
-          YAxisProps={{
-            tickFormatter: (value: number) => value.toLocaleString(),
-            hide: !config.showLabels,
-            domain: [0, 'dataMax'],
-          }}
-        />
-      )
-    }
-  }
-
-  const onFlip = () => {
-    const newY = config.xKey
-    const newX = config.yKey
-    onConfigChange({ ...config, xKey: newX, yKey: newY })
-  }
-
   return (
-    <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
-      <ResizablePanel className="p-4 h-full" defaultSize={75}>
-        <ChartPanel />
+    <ResizablePanelGroup orientation="horizontal" className="flex-grow h-full">
+      <ResizablePanel className="p-4 h-full" defaultSize="75">
+        {!hasConfig ? (
+          <ResizablePanel className="p-4 h-full" defaultSize="75">
+            <NoDataPlaceholder
+              size="normal"
+              title="Configure your chart"
+              description="Select your X and Y axis in the chart options panel"
+            />
+          </ResizablePanel>
+        ) : config.type === 'bar' ? (
+          <BarChart
+            showLegend
+            size="normal"
+            xAxisIsDate={xKeyDateFormat === 'date'}
+            data={resultToRender}
+            xAxisKey={config.xKey}
+            yAxisKey={config.yKey}
+            showGrid={config.showGrid}
+            XAxisProps={{
+              angle: 0,
+              interval: 'preserveStart',
+              hide: !config.showLabels,
+              tickFormatter: (idx: string) => {
+                const value = resultToRender[+idx][config.xKey]
+                if (xKeyDateFormat === 'date') {
+                  return dayjs(value).format('MMM D YYYY HH:mm')
+                }
+                return value
+              },
+            }}
+            YAxisProps={{
+              tickFormatter: (value: number) => value.toLocaleString(),
+              hide: !config.showLabels,
+              domain: [0, 'dataMax'],
+            }}
+          />
+        ) : null}
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel
-        defaultSize={25}
-        minSize={15}
+        defaultSize="25"
+        minSize="15"
         className="px-3 py-3 space-y-4 !overflow-y-auto"
       >
         <div className="flex justify-between items-center h-5">
@@ -214,27 +201,25 @@ export const ChartConfig = ({
           )}
         </div>
 
-        {supportSQLBlocks && !acknowledged && (
+        {!acknowledged && (
           <Admonition showIcon={false} type="tip" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-3 right-3 opacity-30 group-hover:opacity-100 transition-opacity"
               >
                 <X size={14} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
             <div className="flex items-center gap-x-2">
-              <Badge variant="success" className="text-xs rounded px-1">
-                NEW
-              </Badge>
+              <Badge variant="success">New</Badge>
               <p className="text-xs">Add this chart to custom reports</p>
             </div>
-            <p className="text-xs text-foreground-light mt-1">
+            <p className="text-xs text-foreground-light !mt-1">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" type="default" className="mt-2">
+            <Button asChild size="tiny" type="default" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>

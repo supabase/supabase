@@ -3,7 +3,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   buttonVariants,
@@ -33,12 +33,12 @@ type StorageTypeFieldProps = {
 
 export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) {
   const { control, trigger } = form
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const { ref: projectRef } = useParams()
 
   const isIo2Supported = IO2_AVAILABLE_REGIONS.includes(project?.region ?? '')
 
-  const { isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
+  const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   return (
     <FormField_Shadcn_
@@ -54,13 +54,23 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
               /**
                * Set default IOPS if not dirty
                * This is to ensure that the IOPS is set to the minimum value if the user has not changed it
+               *
+               * Only set it if the current configured IOPS is smaller than the min IOPS, otherwise leave at same IOPS
                */
               if (e === 'gp3') {
-                if (!form.getFieldState('provisionedIOPS').isDirty) {
+                if (
+                  !form.getFieldState('provisionedIOPS').isDirty &&
+                  (!form.getValues('provisionedIOPS') ||
+                    form.getValues('provisionedIOPS') < DISK_LIMITS[DiskType.GP3].minIops)
+                ) {
                   form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.GP3].minIops)
                 }
               } else {
-                if (!form.getFieldState('provisionedIOPS').isDirty) {
+                if (
+                  !form.getFieldState('provisionedIOPS').isDirty &&
+                  (!form.getValues('provisionedIOPS') ||
+                    form.getValues('provisionedIOPS') < DISK_LIMITS[DiskType.IO2].minIops)
+                ) {
                   form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.IO2].minIops)
                 }
               }
@@ -91,7 +101,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 {DISK_TYPE_OPTIONS.map((item) => {
                   const disableIo2 = item.type === 'io2' && !isIo2Supported
                   return (
-                    <Tooltip>
+                    <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
                         <SelectItem_Shadcn_
                           key={item.type}
@@ -100,16 +110,11 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                           className={cn(disableIo2 && '!pointer-events-auto')}
                         >
                           <div className="flex flex-col gap-0 items-start">
-                            <div className="flex gap-3 items-center">
+                            <div className="flex gap-2 items-center">
                               <span className="text-sm text-foreground">{item.name}</span>{' '}
-                              <div>
-                                <Badge
-                                  variant={'outline'}
-                                  className="font-mono bg-alternative bg-opacity-100"
-                                >
-                                  {item.type}
-                                </Badge>
-                              </div>
+                              <Badge variant="default" className="font-mono">
+                                {item.type}
+                              </Badge>
                             </div>
                             <p className="text-foreground-light">{item.description}</p>
                           </div>

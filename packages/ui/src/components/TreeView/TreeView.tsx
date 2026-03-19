@@ -1,19 +1,31 @@
 'use client'
 
+import { cva, VariantProps } from 'class-variance-authority'
 import { ChevronRight, FolderClosed, FolderOpen, Loader2 } from 'lucide-react'
-import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
+import {
+  ComponentPropsWithoutRef,
+  FocusEvent,
+  forwardRef,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
+
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
-import { cva, VariantProps } from 'class-variance-authority'
 
 const TreeView = TreeViewPrimitive
+
+const CHEVRON_ICON_SIZE = 14
+const ENTITY_ICON_SIZE = 16
 
 export type TreeViewItemVariantProps = VariantProps<typeof TreeViewItemVariant>
 export const TreeViewItemVariant = cva(
   // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
   // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
-  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-control data-[state=open]:bg-control', // data-[state=open]:bg-control bg state for context menu open
+  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-transparent data-[state=open]:bg-transparent', // data-[state=open]:bg-control bg state for context menu open
   {
     variants: {
       isSelected: {
@@ -50,9 +62,13 @@ const TreeViewItem = forwardRef<
     /** Specifies if the item is selected */
     isSelected?: boolean
     /** The horizontal padding of the item */
-    xPadding: number
+    xPadding?: number
     /** name of entity */
-    name: string
+    name: string | ReactNode
+    /** Optional description of entity */
+    description?: string
+    /** String name to use for title attribute when name is a ReactNode */
+    nameForTitle?: string
     /** icon of entity */
     icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
@@ -61,12 +77,16 @@ const TreeViewItem = forwardRef<
     onEditSubmit?: (value: string) => void
     /** For asynchronous loading */
     isLoading?: boolean
+    /** Callback for double-click */
+    onDoubleClick?: (e: React.MouseEvent) => void
+    /** Actions to render on the right end of the item */
+    actions?: ReactNode
   }
 >(
   (
     {
       level = 1,
-      levelPadding = 56,
+      levelPadding = 38,
       isExpanded = false,
       isOpened = false,
       isBranch = false,
@@ -75,144 +95,203 @@ const TreeViewItem = forwardRef<
       isLoading = false,
       xPadding = 16,
       name = '',
+      description,
+      nameForTitle,
       icon,
       isEditing = false,
       onEditSubmit,
+      onDoubleClick,
+      actions,
       ...props
     },
     ref
   ) => {
-    const [localValueState, setLocalValueState] = useState(name)
+    const nameString = nameForTitle ?? (typeof name === 'string' ? name : '')
+    const [localValueState, setLocalValueState] = useState(nameString)
     const inputRef = useRef<HTMLInputElement>(null)
-
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
-          onEditSubmit?.(localValueState)
-        }
-      }
-      if (isEditing) document.addEventListener('mousedown', handleClickOutside)
-      return () => {
-        if (isEditing) document.removeEventListener('mousedown', handleClickOutside)
-      }
-    }, [isEditing])
+    const timeRef = useRef<number>(0)
 
     useEffect(() => {
       if (isEditing) {
-        inputRef.current?.focus()
+        // [Ivan] This component is supposed to focus on its input when it's rendered. The focus doesn't work every time because
+        // the initial render is triggered by a dropdown menu which at the end of the closing animation, steals focus from the input
+        //  and triggers the blur event (which closes the input). The issue is reported at https://github.com/radix-ui/primitives/issues/3106.
+
+        // [Joshen] This is to prevent accidental onBlur callbacks by checking that the onBlur event is being triggered
+        // within 400ms of the input field being in an edit state. 400ms is just an arbitary value which I think
+        // represents an "accidental" on blur
+        timeRef.current = Number(new Date())
+
+        // The focus will be attempted after a slight delay to ensure that the dropdown closing animations are complete.
+        setTimeout(() => {
+          const input = inputRef.current
+          if (input) {
+            // If the input is not the active element, focus it
+            if (document.activeElement !== input) {
+              input.focus()
+            }
+
+            // Need a slight delay to ensure focus is established. When editing starts, select text up to the last dot
+            // When editing starts, select text up to the last dot
+            setTimeout(() => {
+              const fileName = input.value
+              const lastDotIndex = fileName.lastIndexOf('.')
+              const startPos = 0
+              const endPos = lastDotIndex > 0 ? lastDotIndex : fileName.length
+
+              try {
+                input.setSelectionRange(startPos, endPos)
+              } catch (e) {
+                console.error('Could not set selection range', e)
+              }
+            }, 50)
+          }
+        }, 200)
       } else {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isEditing])
+    }, [isEditing, nameString])
 
     useEffect(() => {
       if (!isLoading) {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isLoading])
+    }, [isLoading, nameString])
+
+    const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
+      const timestamp = Number(new Date())
+      const timeDiff = timestamp - timeRef.current
+
+      if (timeDiff < 400) {
+        e.preventDefault()
+        inputRef.current?.focus()
+      } else {
+        onEditSubmit?.(localValueState)
+      }
+    }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       onEditSubmit?.(localValueState)
     }
 
+    // [Joshen] These properties were causing console errors as they were getting passed as props to the parent div
+    const {
+      isDisabled,
+      isHalfSelected,
+      handleSelect,
+      handleExpand,
+      treeState,
+      dispatch,
+      ...divProps
+    } = props as any
+
+    const trimmedDescription = description?.trim()
+    const titleText = trimmedDescription ? `${nameString}\n${trimmedDescription}` : nameString
+
     return (
       <div
         ref={ref}
+        title={titleText}
+        {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
-        {...props}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
+        onDoubleClick={onDoubleClick}
+        className={cn(
+          TreeViewItemVariant({ isSelected, isOpened, isPreview }),
+          !!actions && 'pr-2',
+          !isEditing && !!actions && 'justify-between',
+          props.className
+        )}
         style={{
-          paddingLeft:
-            level === 1 && !isBranch
-              ? xPadding
-              : level
-                ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
-                : levelPadding,
+          paddingLeft: xPadding + ((level - 1) * levelPadding) / 2,
           ...props.style,
         }}
         data-treeview-is-branch={isBranch}
         data-treeview-level={level}
       >
-        {level && level > 1 && (
+        {Array.from({ length: level - 1 }).map((_, i) => (
           <div
+            key={i}
             style={{
-              left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
+              left: xPadding + (i * levelPadding) / 2 + CHEVRON_ICON_SIZE / 2,
             }}
-            className={
-              'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'
-            }
+            className={'absolute h-full w-px bg-border-strong'}
           ></div>
-        )}
-        {/* [Joshen] Temp fix as the white border on the left was not showing up via group-aria-selected */}
+        ))}
+
         {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
-        {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
-        {isBranch ? (
-          <>
-            {isLoading ? (
-              <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
-            ) : (
-              <ChevronRight
+
+        <div className="flex items-center gap-x-3 truncate">
+          {isBranch ? (
+            <>
+              {isLoading ? (
+                <Loader2 className={cn('text-foreground-muted animate-spin')} size={14} />
+              ) : (
+                <ChevronRight
+                  className={cn(
+                    'text-foreground-muted',
+                    'group-aria-selected:text-foreground-light',
+                    'group-aria-expanded:text-foreground-light',
+                    'transition-transform duration-200',
+                    'group-aria-expanded:rotate-90'
+                  )}
+                  size={CHEVRON_ICON_SIZE}
+                  strokeWidth={1.5}
+                />
+              )}
+              <TreeViewFolderIcon
                 className={cn(
-                  'text-foreground-muted',
+                  'transition-colors',
+                  ' text-foreground-muted',
                   'group-aria-selected:text-foreground-light',
-                  'group-aria-expanded:text-foreground-light',
-                  'transition-transform duration-200',
-                  'group-aria-expanded:rotate-90'
+                  'group-aria-expanded:text-foreground-light'
                 )}
-                size={14}
+                isOpen={isExpanded}
+                size={ENTITY_ICON_SIZE}
+                strokeWidth={1.5}
               />
-            )}
-            <TreeViewFolderIcon
-              className={cn(
-                'transition-colors',
-                ' text-foreground-muted',
-                'group-aria-selected:text-foreground-light',
-                'group-aria-expanded:text-foreground-light'
-              )}
-              isOpen={isExpanded}
-              size={16}
-              strokeWidth={1.5}
-            />
-          </>
-        ) : (
-          icon || (
-            <SQL_ICON
-              className={cn(
-                'transition-colors',
-                'fill-foreground-muted',
-                'group-aria-selected:fill-foreground',
-                'w-5 h-5 shrink-0',
-                '-ml-0.5'
-              )}
-              size={16}
-              strokeWidth={1.5}
-            />
-          )
-        )}
-        <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
-          {name}
-        </span>
-        <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
+            </>
+          ) : (
+            icon || (
+              <SQL_ICON
+                className={cn(
+                  'transition-colors',
+                  'fill-foreground-muted',
+                  'group-aria-selected:fill-foreground',
+                  'w-5 h-5 shrink-0'
+                )}
+                size={ENTITY_ICON_SIZE}
+                strokeWidth={1.5}
+              />
+            )
+          )}
+          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>{name}</span>
+        </div>
+
+        {!isEditing && actions}
+
+        <form onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
+            autoFocus
             ref={inputRef}
             onChange={(e) => {
               setLocalValueState(e.target.value)
             }}
+            onBlur={handleBlur}
             onKeyDownCapture={(e) => {
               // stop keyboard down bubbling up to TreeView.root
               // on enter key, send onEditSubmit callback
               if (e.key === 'Enter') {
-                onEditSubmit?.(localValueState)
+                inputRef.current?.blur()
               } else if (e.key === 'Escape') {
-                setLocalValueState(name)
-                onEditSubmit?.(name)
+                setLocalValueState(nameString)
+                onEditSubmit?.(nameString)
               } else {
                 e.stopPropagation()
               }
             }}
-            className="block w-full text-sm px-2 py-1 h-7 w"
+            className="block w-full text-sm px-2 py-1 h-7"
             value={localValueState}
           />
         </form>
@@ -254,4 +333,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree, SQL_ICON }
+export { flattenTree, SQL_ICON, TreeView, TreeViewFolderIcon, TreeViewItem }

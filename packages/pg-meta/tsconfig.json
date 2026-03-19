@@ -2,6 +2,7 @@
   "extends": "../tsconfig/base.json",
   "compilerOptions": {
     "module": "ESNext",
+    "target": "ES2021",
     "moduleResolution": "bundler"
   },
   "include": ["."],

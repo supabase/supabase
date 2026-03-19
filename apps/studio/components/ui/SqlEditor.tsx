@@ -2,8 +2,8 @@ import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { formatSql } from 'lib/formatSql'
+import { LogoLoader } from 'ui'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
 
@@ -28,7 +28,6 @@ const SqlEditor = ({
   onInputChange = noop,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
-  const { project } = useProjectContext()
   const editorRef = useRef<any>()
 
   useEffect(() => {
@@ -88,7 +87,7 @@ const SqlEditor = ({
       defaultLanguage={language}
       defaultValue={defaultValue}
       path={queryId}
-      loading={<Loading />}
+      loading={<LogoLoader />}
       options={{
         readOnly,
         tabSize: 2,

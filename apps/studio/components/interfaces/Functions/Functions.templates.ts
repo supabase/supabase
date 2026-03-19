@@ -14,7 +14,7 @@ console.info('server started');
 Deno.serve(async (req: Request) => {
   const { name }: reqPayload = await req.json();
   const data = {
-    message: \`Hello \${name} from foo!\`,
+    message: \`Hello \${name}!\`,
   };
 
   return new Response(
@@ -39,6 +39,7 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
+    // TODO: Change the table_name to your table
     const { data, error } = await supabase.from('table_name').select('*')
 
     if (error) {
@@ -50,7 +51,10 @@ Deno.serve(async (req) => {
       status: 200,
     })
   } catch (err) {
-    return new Response(String(err?.message ?? err), { status: 500 })
+    return new Response(JSON.stringify({ message: err?.message ?? err }), {
+      headers: { 'Content-Type': 'application/json' },
+      status: 500 
+    })
   }
 })`,
   },
@@ -61,6 +65,7 @@ Deno.serve(async (req) => {
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { randomUUID } from 'node:crypto'
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -70,11 +75,13 @@ const supabase = createClient(
 Deno.serve(async (req) => {
   const formData = await req.formData()
   const file = formData.get('file')
+  
+  // TODO: update your-bucket to the bucket you want to write files
   const { data, error } = await supabase
     .storage
     .from('your-bucket')
     .upload(
-      \`files/\${crypto.randomUUID()}\`,
+      \`\${file.name}-\${randomUUID()}\`,
       file,
       { contentType: file.type }
     )
@@ -120,38 +127,184 @@ import express from "npm:express@4.18.2";
 
 const app = express();
 
-app.get(/(.*)/, (req, res) => {
+// TODO: replace slug with Function's slug
+// https://supabase.com/docs/guides/functions/routing?queryGroups=framework&framework=expressjs
+app.get(/slug/(.*)/, (req, res) => {
   res.send("Welcome to Supabase");
 });
 
 app.listen(8000);`,
   },
   {
-    value: 'openai-completion',
-    name: 'OpenAI Text Completion',
-    description: 'Generate text completions using OpenAI GPT-3',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { Configuration, OpenAIApi } from 'npm:openai@3.3.0'
+    value: 'stream-text-with-ai-sdk',
+    name: 'Stream text with AI SDK',
+    description: 'Generate and stream text with Vercel AI SDK',
+    content: `/*
+ * Setup OPENAI_API_KEY secret to get started.
+ * For usage with useChat, point transport.api to this endpoint
+ * and include your publishable key as Authorization: Bearer <key> in transport.headers.
+ */
 
-const openAi = new OpenAIApi(
-  new Configuration({
-    apiKey: Deno.env.get('OPENAI_API_KEY')
-  })
-)
+import { createOpenAI } from 'npm:@ai-sdk/openai';
+import { convertToModelMessages, streamText } from 'npm:ai';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, content-type',
+  'Access-Control-Max-Age': '3600',
+  Vary: 'Access-Control-Request-Headers',
+};
+
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+class ClientError extends Error {}
+
+const openai = createOpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
+
+const SYSTEM_PROMPT = 'You are a helpful AI assistant.';
 
 Deno.serve(async (req) => {
-  const { prompt } = await req.json()
-  const completion = await openAi.createCompletion({
-    model: 'text-davinci-003',
-    prompt,
-    max_tokens: 200
-  })
-  return new Response(
-    JSON.stringify({ text: completion.data.choices[0].text }),
-    { headers: { 'Content-Type': 'application/json' }}
-  )
-})`,
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json().catch(() => {
+      throw new ClientError('Invalid JSON payload');
+    }) as { messages?: unknown; model?: unknown };
+
+    const { messages, model: modelName } = body;
+
+    if (!Array.isArray(messages)) {
+      throw new ClientError('Request must include a messages array');
+    }
+
+    const normalizedMessages = await convertToModelMessages(messages);
+
+    const model = openai(
+      typeof modelName === 'string' ? modelName : 'gpt-5.1-chat-latest',
+    );
+
+    const result = streamText({
+      model,
+      messages: normalizedMessages,
+      system: SYSTEM_PROMPT,
+    });
+
+    return result.toUIMessageStreamResponse({
+      headers: corsHeaders,
+      sendReasoning: true,
+      sendSources: true,
+    });
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return json(400, { error: err.message });
+    }
+
+    console.error('Assistant chat error:', err);
+    return json(500, {
+      error: 'Failed to process chat request',
+      details: err instanceof Error ? err.message : String(err),
+    });
+  }
+});`,
+  },
+  {
+    value: 'generate-recipes-with-ai-sdk',
+    name: 'Generate recipes with AI SDK',
+    description: 'Generate structured cooking recipes with Vercel AI SDK',
+    content: `/*
+* 1) Setup OPENAI_API_KEY secret to get started.
+* 2) Call this endpoint with { prompt, model? } to generate a recipe object matching the schema below.
+*/
+
+import { createOpenAI } from 'npm:@ai-sdk/openai';
+import { generateText, Output } from "npm:ai";
+import { z } from 'npm:zod';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, content-type',
+  'Access-Control-Max-Age': '3600',
+  Vary: 'Access-Control-Request-Headers',
+};
+
+const json = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+class ClientError extends Error {}
+
+const openai = createOpenAI({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+});
+
+const RecipeSchema = z.object({
+  recipe: z.object({
+    name: z.string(),
+    ingredients: z.array(z.string()),
+    steps: z.array(z.string()),
+  }),
+});
+
+const SYSTEM_PROMPT =
+  'You are a recipe generator. Always return a structured recipe matching the given schema.';
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  try {
+    const body = await req.json().catch(() => {
+      throw new ClientError('Invalid JSON payload');
+    }) as {
+      model?: unknown;
+      prompt?: unknown;
+    };
+
+    const { model: modelName, prompt } = body;
+
+    if (typeof prompt !== 'string' || !prompt.trim()) {
+      throw new ClientError('Request must include a non-empty prompt string');
+    }
+
+    const model = openai(
+      typeof modelName === 'string' ? modelName : 'gpt-5.1-chat-latest',
+    );
+
+    const result = await generateText({
+      model,
+      system: SYSTEM_PROMPT,
+      prompt,
+      output: Output.object({
+        schema: RecipeSchema,
+      }),
+    });
+
+    return json(200, result.output);
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return json(400, { error: err.message });
+    }
+
+    console.error('generateText error:', err);
+    return json(500, {
+      error: 'Failed to process generateText request',
+      details: err instanceof Error ? err.message : String(err),
+    });
+  }
+});`,
   },
   {
     value: 'stripe-webhook',
@@ -161,32 +314,38 @@ Deno.serve(async (req) => {
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import Stripe from 'npm:stripe@12.0.0'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY')!)
-const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')!
+const stripe = new Stripe(Deno.env.get('STRIPE_API_KEY') as string, {
+  // This is needed to use the Fetch API rather than relying on the Node http
+  // package.
+  apiVersion: '2024-11-20'
+})
 
-Deno.serve(async (req) => {
-  const signature = req.headers.get('stripe-signature')
+// This is needed in order to use the Web Crypto API in Deno.
+const cryptoProvider = Stripe.createSubtleCryptoProvider()
+
+console.log('Stripe Webhook Function booted!')
+
+Deno.serve(async (request) => {
+  const signature = request.headers.get('Stripe-Signature')
+
+  // First step is to verify the event. The .text() method must be used as the
+  // verification relies on the raw request body rather than the parsed JSON.
+  const body = await request.text()
+  let receivedEvent
   try {
-    const event = stripe.webhooks.constructEvent(
-      await req.text(),
+    receivedEvent = await stripe.webhooks.constructEventAsync(
+      body,
       signature!,
-      endpointSecret
+      Deno.env.get('STRIPE_WEBHOOK_SIGNING_SECRET')!,
+      undefined,
+      cryptoProvider
     )
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        // Handle successful payment
-        break
-    }
-    return new Response(JSON.stringify({ received: true }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: err.message }), 
-      { status: 400 }
-    )
+    return new Response(err.message, { status: 400 })
   }
-})`,
+  console.log(\`🔔 Event received: \${receivedEvent.id}\`)
+  return new Response(JSON.stringify({ ok: true }), { status: 200 })
+});`,
   },
   {
     value: 'resend-email',
@@ -247,37 +406,8 @@ Deno.serve(async (req) => {
 })`,
   },
   {
-    value: 'discord-bot',
-    name: 'Discord Bot Example',
-    description: 'Build a Slash Command Discord Bot',
-    content: `// Setup type definitions for built-in Supabase Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { verifyDiscordRequest } from './_shared/discord.ts'
-
-Deno.serve(async (req) => {
-  const { valid } = await verifyDiscordRequest(req)
-  if (!valid) {
-    return new Response('Invalid request', { status: 401 })
-  }
-  const message = await req.json()
-  if (message.type === 1) {
-    return new Response(
-      JSON.stringify({ type: 1 }),
-      { headers: { 'Content-Type': 'application/json' }}
-    )
-  }
-  return new Response(
-    JSON.stringify({
-      type: 4,
-      data: { content: 'Hello from Supabase Edge Functions!' }
-    }),
-    { headers: { 'Content-Type': 'application/json' }}
-  )
-})`,
-  },
-  {
     value: 'websocket-server',
-    name: 'Websocket Server Example',
+    name: 'WebSocket Server Example',
     description: 'Create a real-time WebSocket server',
     content: `// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";

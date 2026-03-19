@@ -4,8 +4,8 @@ description: PostgreSQL has a robust set of features which we can leverage to cr
 author: oli_rice
 author_url: https://github.com/olirice
 author_image_url: https://github.com/olirice.png
-image: supa-audit/postgres_auditing_in_150_lines_of_SQL.png
-thumb: supa-audit/postgres_auditing_in_150_lines_of_SQL.png
+imgSocial: supa-audit/postgres_auditing_in_150_lines_of_SQL.png
+imgThumb: supa-audit/postgres_auditing_in_150_lines_of_SQL.png
 categories:
   - postgres
 tags:
@@ -124,8 +124,8 @@ create table audit.record_version (
   <summary>Postgres version compatibility</summary>
   <p>
     The table above uses PostgreSQL's built-in
-    <a href="https://www.postgresql.org/docs/14/functions-uuid.html">uuid functionality</a>, which is
-    available from version 14. For backwards compatibility you can use the uuid-ossp extension.
+    <a href="https://www.postgresql.org/docs/14/functions-uuid.html">uuid functionality</a>, which
+    is available from version 14. For backwards compatibility you can use the uuid-ossp extension.
   </p>
   <p>
     <code>create extension if not exists "uuid-ossp";</code>

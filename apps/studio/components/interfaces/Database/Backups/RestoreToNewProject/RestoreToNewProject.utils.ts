@@ -56,7 +56,7 @@ export function projectSpecToMonthlyPrice({
 }
 
 function getComputeHourlyPrice(computeSize: InfraInstanceSize): number {
-  if (computeSize === 'nano') {
+  if (computeSize === 'pico' || computeSize === 'nano') {
     return 0
   }
 

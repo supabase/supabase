@@ -12,9 +12,9 @@ export interface DeleteAppModalProps {
   onClose: () => void
 }
 
-const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
+export const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
   const { slug } = useParams()
-  const { mutate: deleteOAuthApp, isLoading: isDeleting } = useOAuthAppDeleteMutation({
+  const { mutate: deleteOAuthApp, isPending: isDeleting } = useOAuthAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted the app "${selectedApp?.name}"`)
       onClose()
@@ -64,5 +64,3 @@ const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
     </Modal>
   )
 }
-
-export default DeleteAppModal

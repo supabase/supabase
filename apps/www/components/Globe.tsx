@@ -1,7 +1,7 @@
 import createGlobe from 'cobe'
 import { useCallback, useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
-import { debounce } from 'lodash'
+import { debounce } from 'lib/helpers'
 
 const Globe = () => {
   const { resolvedTheme } = useTheme()
@@ -52,8 +52,6 @@ const Globe = () => {
       onRender: (state) => {
         state.phi = rotation
         rotation += 0.0025
-        state.width = width * 2
-        state.height = width * 2
       },
     })
     setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)

@@ -1,12 +1,11 @@
 import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
-
 import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
   ConnectTabContent,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+  ConnectTabs,
 } from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { SimpleCodeBlock } from 'ui'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -21,7 +20,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>

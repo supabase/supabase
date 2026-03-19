@@ -4,7 +4,7 @@ import { cn } from 'ui'
 type TableProps = TableHTMLAttributes<HTMLTableElement>
 
 const Table = ({ children, ...props }: TableProps) => {
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [showShadow, setShowShadow] = useState(true)
 
   const handleScroll = () => {
@@ -18,8 +18,11 @@ const Table = ({ children, ...props }: TableProps) => {
   }
 
   useEffect(() => {
-    containerRef?.current?.addEventListener('scroll', handleScroll)
-    return () => containerRef?.current?.removeEventListener('scroll', handleScroll)
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   return (

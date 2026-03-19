@@ -100,6 +100,32 @@ export const DateRangePicker = ({
         break
       // all other time periods below are based on current date and time
       // they will generate flexible dynamic date ranges
+      case '10m':
+        onChange({
+          period_start: {
+            date: dayjs().subtract(10, 'minutes').format(DATE_FORMAT),
+            time_period: '1d',
+          },
+          period_end: {
+            date: today,
+            time_period: 'today',
+          },
+          interval: '1m',
+        })
+        break
+      case '30m':
+        onChange({
+          period_start: {
+            date: dayjs().subtract(30, 'minutes').format(DATE_FORMAT),
+            time_period: '1d',
+          },
+          period_end: {
+            date: today,
+            time_period: 'today',
+          },
+          interval: '1m',
+        })
+        break
       case '1d':
         onChange({
           period_start: {
@@ -136,7 +162,7 @@ export const DateRangePicker = ({
             date: today,
             time_period: 'today',
           },
-          interval: '5m',
+          interval: '1m',
         })
         break
       case '7d':
@@ -205,7 +231,6 @@ export const DateRangePicker = ({
           <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
         </Button>
       </DropdownMenuTrigger>
-
       <DropdownMenuContent side="bottom" align="start" className={cn(!footer && 'w-36', className)}>
         <DropdownMenuRadioGroup value={timePeriod} onValueChange={(x) => handleChange(x)}>
           {options.map((option) => {

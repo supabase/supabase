@@ -1,44 +1,62 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { SessionsAuthSettingsForm, SmtpForm, ThirdPartyAuthForm } from 'components/interfaces/Auth'
+import { SessionsAuthSettingsForm } from 'components/interfaces/Auth/SessionsAuthSettingsForm/SessionsAuthSettingsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-const PageLayout: NextPageWithLayout = () => {
-  const isPermissionsLoaded = usePermissionsLoaded()
-  // TODO: check if these permissions cover third party auth as well
-  const canReadAuthSettings = useCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+const SessionsPage: NextPageWithLayout = () => {
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'custom_config_gotrue'
+  )
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's authentication settings" />
+  }
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Sessions</ScaffoldTitle>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
-      <ScaffoldContainer className="flex flex-col gap-10" bottomPadding>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>User Sessions</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure settings for user sessions and refresh tokens
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+      <PageContainer size="default">
         {!isPermissionsLoaded ? (
-          <GenericSkeletonLoader />
-        ) : !canReadAuthSettings ? (
-          <NoPermission isFullPage resourceText="access your project's authentication settings" />
+          <PageSection>
+            <PageSectionContent>
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
         ) : (
           <SessionsAuthSettingsForm />
         )}
-      </ScaffoldContainer>
+      </PageContainer>
     </>
   )
 }
 
-PageLayout.getLayout = (page) => {
-  return (
-    <DefaultLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </DefaultLayout>
-  )
-}
-export default PageLayout
+SessionsPage.getLayout = (page) => (
+  <DefaultLayout>
+    <AuthLayout title="Sessions">{page}</AuthLayout>
+  </DefaultLayout>
+)
+
+export default SessionsPage

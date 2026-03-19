@@ -20,16 +20,16 @@ export const ProfileImage = ({ alt, src, placeholder, className }: ProfileImageP
       src={src}
       width="24"
       height="24"
-      className={cn('bg-foreground rounded-full', className)}
+      className={cn('aspect-square bg-foreground rounded-full object-cover', className)}
       onError={() => setHasInvalidImg(true)}
     />
   ) : (
-    placeholder ?? (
+    (placeholder ?? (
       <figure
         className={cn('bg-foreground rounded-full flex items-center justify-center', className)}
       >
         <User size={18} strokeWidth={1.5} className="text-background" />
       </figure>
-    )
+    ))
   )
 }

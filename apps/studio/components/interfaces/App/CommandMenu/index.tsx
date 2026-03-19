@@ -4,9 +4,7 @@ import { useCommandMenuInitiated } from 'ui-patterns/CommandMenu'
 
 const LazyCommandMenu = dynamic(() => import('./CommandMenu'), { ssr: false })
 
-const StudioCommandMenu = () => {
+export const StudioCommandMenu = () => {
   const isInitiated = useCommandMenuInitiated()
   return isInitiated && <LazyCommandMenu />
 }
-
-export { StudioCommandMenu }
