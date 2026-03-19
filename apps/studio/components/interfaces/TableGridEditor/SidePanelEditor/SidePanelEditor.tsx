@@ -1,5 +1,5 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import * as Sentry from '@sentry/nextjs'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
@@ -276,9 +276,7 @@ export const SidePanelEditor = ({
       // Queue the ADD_ROW operation if queue operations feature is enabled
       if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
         queueRowAddWithOptimisticUpdate({
-          queryClient,
           queueOperation: snap.queueOperation,
-          projectRef: project.ref,
           tableId: selectedTable.id,
           table: selectedTable as unknown as Entity,
           rowData: payload,
@@ -330,9 +328,7 @@ export const SidePanelEditor = ({
             const oldValue = row[changedColumn]
 
             queueCellEditWithOptimisticUpdate({
-              queryClient,
               queueOperation: snap.queueOperation,
-              projectRef: project.ref,
               tableId: selectedTable.id,
               // Cast to Entity - the queue save mutation only uses id, name, schema
               table: selectedTable as unknown as Entity,
