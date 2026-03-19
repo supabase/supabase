@@ -1,9 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -29,7 +26,6 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -46,7 +42,6 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import AlertError from '@/components/ui/AlertError'
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
@@ -54,7 +49,6 @@ import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functi
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -89,10 +83,6 @@ export const EdgeFunctionDetails = () => {
 
   const {
     data: selectedFunction,
-    error,
-    isPending: isLoading,
-    isError,
-    isSuccess,
   } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
@@ -114,10 +104,6 @@ export const EdgeFunctionDetails = () => {
   const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const hasImportMap = useMemo(
-    () => selectedFunction?.import_map || selectedFunction?.import_map_path,
-    [selectedFunction]
-  )
   const { managementCommands } = generateCLICommands({
     selectedFunction,
     functionUrl,
@@ -159,92 +145,6 @@ export const EdgeFunctionDetails = () => {
 
   return (
     <PageContainer size="small">
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Details</PageSectionTitle>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          {isLoading && <GenericSkeletonLoader />}
-          {isError && (
-            <AlertError
-              error={error}
-              subject="Failed to retrieve edge function details"
-              layout="vertical"
-            />
-          )}
-          {isSuccess && (
-            <dl className="grid grid-cols-1 @xl:grid-cols-[auto_1fr] gap-y-2 [&>dd]:mb-3 @xl:[&>dd]:mb-0 @xl:gap-y-4 gap-x-10">
-              <dt className="text-sm text-foreground-light">Slug</dt>
-              <dd className="text-sm @lg:text-left">{selectedFunction?.slug}</dd>
-
-              <dt className="text-sm text-foreground-light">Endpoint URL</dt>
-              <dd className="text-sm @lg:text-left">
-                <Input
-                  copy
-                  readOnly
-                  size="small"
-                  className="input-mono"
-                  value={functionUrl}
-                />
-              </dd>
-
-              {IS_PLATFORM && (
-                <>
-                  <dt className="text-sm text-foreground-light">Region</dt>
-                  <dd className="text-sm @lg:text-left">All functions are deployed globally</dd>
-                </>
-              )}
-
-              <dt className="text-sm text-foreground-light">Created at</dt>
-              <dd className="text-sm @lg:text-left">
-                {dayjs(selectedFunction?.created_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
-              </dd>
-
-              <dt className="text-sm text-foreground-light">Last updated at</dt>
-              <dd className="text-sm @lg:text-left">
-                {dayjs(selectedFunction?.updated_at ?? 0).format('dddd, MMMM D, YYYY h:mm A')}
-              </dd>
-
-              <dt className="text-sm text-foreground-light">Deployments</dt>
-              <dd className="text-sm @lg:text-left">{selectedFunction?.version ?? 0}</dd>
-
-              <dt className="text-sm text-foreground-light">Import Maps</dt>
-              <dd className="text-sm @lg:text-left">
-                <p>
-                  Import maps are{' '}
-                  <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>
-                    {hasImportMap ? 'used' : 'not used'}
-                  </span>{' '}
-                  for this function
-                </p>
-                <p className="text-foreground-light mt-1">
-                  Import maps allow the use of bare specifiers in functions instead of explicit
-                  import URLs
-                </p>
-                <div className="mt-4">
-                  <Button
-                    asChild
-                    type="default"
-                    size="tiny"
-                    icon={<ExternalLink strokeWidth={1.5} />}
-                  >
-                    <Link
-                      href={`${DOCS_URL}/guides/functions/dependencies`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      More about import maps
-                    </Link>
-                  </Button>
-                </div>
-              </dd>
-            </dl>
-          )}
-        </PageSectionContent>
-      </PageSection>
-
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
