@@ -81,9 +81,7 @@ export const EdgeFunctionDetails = () => {
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
 
-  const {
-    data: selectedFunction,
-  } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
   const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
@@ -184,14 +182,11 @@ export const EdgeFunctionDetails = () => {
                             layout="flex-row-reverse"
                             description={
                               <>
-                                Requires that a JWT signed{' '}
-                                <em className="text-brand not-italic">
-                                  only by the legacy JWT secret
-                                </em>{' '}
-                                is present in the <code>Authorization</code> header. The easy to
-                                obtain <code>anon</code> key can be used to satisfy this
-                                requirement. Recommendation: OFF with JWT and additional
-                                authorization logic implemented inside your function's code.
+                                Requires a JWT signed{' '}
+                                <em className="text-brand not-italic">only by the legacy secret</em>{' '}
+                                in the <code>Authorization</code> header. The <code>anon</code> key
+                                satisfies this. Recommended: OFF with JWT and custom auth logic in
+                                your function code.
                               </>
                             }
                           >

@@ -16,7 +16,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
-import { Clock, Download, FileArchive, Globe, Send } from 'lucide-react'
+import { Clock, Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
@@ -74,6 +74,7 @@ const EdgeFunctionDetailsLayout = ({
   )
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
   const {
     data: selectedFunction,
@@ -276,38 +277,40 @@ const EdgeFunctionDetailsLayout = ({
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
               <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
-                <span className="flex items-center gap-2">
-                  <Globe size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                  {functionUrl}
-                </span>
-                <HoverCard>
+                <span className="flex items-center gap-2">{functionUrl}</span>
+                <HoverCard
+                  openDelay={250}
+                  closeDelay={100}
+                  open={isTimestampHoverCardOpen}
+                  onOpenChange={setIsTimestampHoverCardOpen}
+                >
                   <HoverCardTrigger asChild>
-                    <span className="flex items-center gap-2">
+                    <button type="button" className="flex items-center gap-2 group">
                       <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                      {updatedRelative ? ` ${updatedRelative}` : ''}
-                    </span>
+                      <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
+                        {updatedRelative ?? 'Deploy status unavailable'}
+                      </span>
+                    </button>
                   </HoverCardTrigger>
-                  <HoverCardContent side="bottom" className="w-[260px]">
-                    <div className="flex flex-col gap-3">
-                      {createdRelative && (
-                        <div>
-                          <h4 className="heading-meta text-foreground-light">Created</h4>
-                          <p className="text-foreground">{createdRelative}</p>
-                        </div>
-                      )}
-                      {updatedRelative && (
-                        <div>
-                          <h4 className="heading-meta text-foreground-light">Last deployed</h4>
-                          <p className="text-foreground">{updatedRelative}</p>
-                        </div>
-                      )}
-                      {selectedFunction?.version !== undefined && (
-                        <div>
-                          <h4 className="heading-meta text-foreground-light">Deployments</h4>
-                          <p className="text-foreground">{selectedFunction.version}</p>
-                        </div>
-                      )}
-                    </div>
+                  <HoverCardContent side="bottom" align="start" className="w-[320px] p-0">
+                    {createdRelative && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Created</h3>
+                        <p className="text-foreground">{createdRelative}</p>
+                      </div>
+                    )}
+                    {updatedRelative && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Last deployed</h3>
+                        <p className="text-foreground">{updatedRelative}</p>
+                      </div>
+                    )}
+                    {selectedFunction?.version !== undefined && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Deployments</h3>
+                        <p className="text-foreground">{selectedFunction.version}</p>
+                      </div>
+                    )}
                   </HoverCardContent>
                 </HoverCard>
               </PageHeaderDescription>
