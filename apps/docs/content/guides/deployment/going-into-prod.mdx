@@ -32,8 +32,8 @@ Check and review issues in your database using [Security Advisor](/dashboard/pro
   - If using email+password sign-in, set up [MFA for your Supabase account](/docs/guides/platform/multi-factor-authentication#enable-mfa).
 - Enable [MFA enforcement on your organization](/docs/guides/platform/mfa/org-mfa-enforcement). This ensures all users must have a valid MFA-backed session to interact with organization and project resources.
 - Consider adding multiple owners on your Supabase org from [the **Organization > Team**](/dashboard/org/_/team) section of the Supabase Dashboard. This ensures that if one of the owners is unreachable or loses access to their account, you still have Owner access to your org.
-- Enable email confirmations in the [**Settings > Auth**](/dashboard/project/_/auth/providers) section of the dashboard.
-- Set the expiry in the [**Settings > Auth**](/dashboard/project/_/auth/providers) section of the dashboard for one-time passwords (OTPs) to a reasonable value that you are comfortable with.
+- Enable email confirmations in the [**Authentication > Providers**](/dashboard/project/_/auth/providers) section of the dashboard.
+- Set the expiry in the [**Authentication > Providers**](/dashboard/project/_/auth/providers) section of the dashboard for one-time passwords (OTPs) to a reasonable value that you are comfortable with.
   - We recommend setting this to 3600 seconds (1 hour) or lower.
   - Increase the length of the OTP if you need a higher level of entropy.
 - If your application requires a higher level of security, consider setting up [multi-factor authentication](/docs/guides/auth/auth-mfa) (MFA) for your users.
