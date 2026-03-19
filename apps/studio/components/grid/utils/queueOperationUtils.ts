@@ -166,7 +166,11 @@ export const formatGridDataWithOperationValues = ({
       )
       if (existingIndex >= 0) {
         // Update existing row in place
-        formattedRows[existingIndex] = { ...formattedRows[existingIndex], ...rowData, __tempId: tempId }
+        formattedRows[existingIndex] = {
+          ...formattedRows[existingIndex],
+          ...rowData,
+          __tempId: tempId,
+        }
       } else {
         const newRow: PendingAddRow = { ...rowData, idx, __tempId: tempId }
         formattedRows.unshift(newRow)
