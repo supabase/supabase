@@ -161,19 +161,16 @@ export const formatGridDataWithOperationValues = ({
       const idx = Number(tempId)
 
       // Check if row with this tempId already exists
-      const existingIndex = rows.findIndex((row) => isPendingAddRow(row) && row.__tempId === tempId)
+      const existingIndex = formattedRows.findIndex(
+        (row) => isPendingAddRow(row) && row.__tempId === tempId
+      )
       if (existingIndex >= 0) {
         // Update existing row in place
-        return rows.map((row, index) => {
-          if (index === existingIndex) {
-            return { ...row, ...rowData, __tempId: tempId }
-          }
-          return row
-        })
+        formattedRows[existingIndex] = { ...formattedRows[existingIndex], ...rowData, __tempId: tempId }
+      } else {
+        const newRow: PendingAddRow = { ...rowData, idx, __tempId: tempId }
+        formattedRows.unshift(newRow)
       }
-
-      const newRow: PendingAddRow = { ...rowData, idx, __tempId: tempId }
-      return [newRow, ...rows]
     } else if (op.type === QueuedOperationType.DELETE_ROW) {
       const { rowIdentifiers } = op.payload
       const rowMatches = rows.find((row) => rowMatchesIdentifiers(row, rowIdentifiers))

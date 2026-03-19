@@ -357,13 +357,37 @@ describe('formatGridDataWithOperationValues', () => {
     expect(result[2]).toEqual(rows[2])
   })
 
-  test('should handle ADD_ROW for a new row', () => {
+  test('should prepend new row for ADD_ROW operation', () => {
     const rows = [makeRow(0, { id: 1, name: 'Alice' })]
     const op = makeAddOp('-100', { name: 'New Row' })
 
     const result = formatGridDataWithOperationValues({ operations: [op], rows })
-    // ADD_ROW returns early from the forEach, so formattedRows is unmodified
-    expect(result).toEqual(rows)
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'New Row' })
+    expect(result[1]).toEqual(rows[0])
+  })
+
+  test('should update existing pending row for ADD_ROW with same tempId', () => {
+    const rows: SupaRow[] = [
+      { idx: -100, __tempId: '-100', name: 'Original' } as any,
+      makeRow(1, { id: 1, name: 'Alice' }),
+    ]
+    const op = makeAddOp('-100', { name: 'Updated' })
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'Updated' })
+  })
+
+  test('should handle multiple ADD_ROW operations', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const op1 = makeAddOp('-100', { name: 'Row 1' })
+    const op2 = makeAddOp('-200', { name: 'Row 2' })
+
+    const result = formatGridDataWithOperationValues({ operations: [op1, op2], rows })
+    expect(result).toHaveLength(3)
+    expect(result[0]).toMatchObject({ __tempId: '-200', name: 'Row 2' })
+    expect(result[1]).toMatchObject({ __tempId: '-100', name: 'Row 1' })
   })
 
   test('should handle EDIT_CELL_CONTENT with composite primary keys', () => {
