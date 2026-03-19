@@ -1,10 +1,12 @@
+import { getExposedFunctionsSql } from '@supabase/pg-meta'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 
 import { privilegeKeys } from './keys'
-import { getExposedFunctionsSql } from './privileges.sql'
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
+export const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
 export const EXPOSED_FUNCTIONS_PAGE_LIMIT = 50
 
 export type ExposedFunctionsVariables = {
@@ -38,7 +40,7 @@ export async function getExposedFunctions(
 
   const offset = page * limit
 
-  const sql = getExposedFunctionsSql({ search, offset, limit })
+  const sql = getExposedFunctionsSql({ search, offset, limit, ignoredSchemas: IGNORED_SCHEMAS })
 
   const { result } = await executeSql(
     {

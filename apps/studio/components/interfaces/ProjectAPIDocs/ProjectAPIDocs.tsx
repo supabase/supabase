@@ -57,7 +57,7 @@ export const ProjectAPIDocs = () => {
 
   const { anonKey } = getKeys(apiKeys)
   const apikey = showKeys
-    ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
+    ? (anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY')
     : 'SUPABASE_CLIENT_ANON_KEY'
 
   return (

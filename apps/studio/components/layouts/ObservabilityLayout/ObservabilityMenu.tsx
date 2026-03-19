@@ -20,9 +20,10 @@ import { cn, Menu } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 
+import { generateObservabilityMenuItems } from './ObservabilityMenu.utils'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
+import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -124,87 +125,14 @@ const ObservabilityMenu = () => {
 
   const reportMenuItems = getReportMenuItems()
 
-  const menuItems = [
-    {
-      title: 'GENERAL',
-      key: 'general-section',
-      items: [
-        ...(showOverview
-          ? [
-              {
-                name: 'Overview',
-                key: 'observability',
-                url: `/project/${ref}/observability${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(isSupamonitorEnabled
-          ? [
-              {
-                name: 'Query Insights',
-                key: 'query-insights',
-                url: `/project/${ref}/observability/query-insights${preservedQueryParams}`,
-              },
-            ]
-          : [
-              {
-                name: 'Query Performance',
-                key: 'query-performance',
-                url: `/project/${ref}/observability/query-performance${preservedQueryParams}`,
-              },
-            ]),
-        ...(IS_PLATFORM
-          ? [
-              {
-                name: 'API Gateway',
-                key: 'api-overview',
-                url: `/project/${ref}/observability/api-overview${preservedQueryParams}`,
-              },
-            ]
-          : []),
-      ],
-    },
-    {
-      title: 'PRODUCT',
-      key: 'product-section',
-      items: [
-        {
-          name: 'Database',
-          key: 'database',
-          url: `/project/${ref}/observability/database${preservedQueryParams}`,
-        },
-        {
-          name: 'Data API',
-          key: 'postgrest',
-          url: `/project/${ref}/observability/postgrest${preservedQueryParams}`,
-        },
-        {
-          name: 'Auth',
-          key: 'auth',
-          url: `/project/${ref}/observability/auth${preservedQueryParams}`,
-        },
-        {
-          name: 'Edge Functions',
-          key: 'edge-functions',
-          url: `/project/${ref}/observability/edge-functions${preservedQueryParams}`,
-        },
-        ...(storageSupported
-          ? [
-              {
-                name: 'Storage',
-                key: 'storage',
-                url: `/project/${ref}/observability/storage${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        {
-          name: 'Realtime',
-          key: 'realtime',
-          url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
-        },
-      ],
-    },
-  ]
+  const menuItems = generateObservabilityMenuItems({
+    ref,
+    preservedQueryParams,
+    showOverview,
+    isSupamonitorEnabled,
+    storageSupported,
+    isPlatform: IS_PLATFORM,
+  })
 
   return (
     <Menu type="pills" className="mt-6">

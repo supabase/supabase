@@ -1,10 +1,9 @@
 import { formatRelative } from 'date-fns'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BadgeCheck, RefreshCwIcon, Table2 } from 'lucide-react'
+import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -19,13 +18,11 @@ import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
-  const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
   const {
-    parsedSchema: { status: installationStatus },
+    schemaComment: { status: installationStatus },
     syncState,
-    isLoading: isLoadingInstallationStatus,
   } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -33,79 +30,92 @@ export const StripeSyncSettingsPage = () => {
   const installed = isInstalled(installationStatus)
   const isSyncing = isSyncRunning(syncState)
   const uninstalling = isUninstalling(installationStatus)
-  const tableEditorUrl = `/project/${project?.ref}/editor?schema=stripe`
+
+  if (!installed || uninstalling) {
+    return (
+      <PageContainer className="mx-0">
+        <PageSection>
+          <Admonition type="default" title="Stripe Sync Engine is not installed" />
+        </PageSection>
+      </PageContainer>
+    )
+  }
 
   return (
     <PageContainer className="mx-0">
-      {syncState && installed && !uninstalling && (
-        <PageSection id="sync-status">
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Sync Status</PageSectionTitle>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Admonition type="default" showIcon={false}>
-              <div className="flex items-center justify-between gap-2">
-                {isSyncing ? (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <RefreshCwIcon size={14} className="animate-spin" />
-                      <div>Sync in progress...</div>
-                    </div>
-                    <div className="text-foreground-light text-sm">
-                      Started{' '}
-                      {syncState.started_at
-                        ? formatRelative(new Date(syncState.started_at), new Date())
-                        : 'recently'}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <BadgeCheck size={14} className="text-brand" />
-                      <div>All up to date</div>
-                      <Button asChild type="text">
-                        <Link href={tableEditorUrl}>View data</Link>
-                      </Button>
-                    </div>
-                    <div className="text-foreground-light text-sm">
-                      Last synced{' '}
-                      {syncState.closed_at
-                        ? formatRelative(new Date(syncState.closed_at), new Date())
-                        : 'recently'}
-                    </div>
-                  </>
-                )}
-              </div>
-            </Admonition>
-          </PageSectionContent>
-        </PageSection>
-      )}
-      <PageSection id="stripe-schema">
+      <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Stripe Schema</PageSectionTitle>
+            <PageSectionTitle>Manage Stripe data</PageSectionTitle>
             <PageSectionDescription>
               Access and manage the synced Stripe data in your database.
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Card>
+          <Card className="max-w-4xl">
+            <CardHeader>
+              <CardTitle className="text-foreground-lighter">
+                {!syncState ? (
+                  <ShimmeringLoader className="py-2" />
+                ) : (
+                  <div className="flex items-center justify-between gap-2">
+                    {isSyncing ? (
+                      <>
+                        <div className="flex items-center gap-x-3 text-foreground-light">
+                          <RefreshCwIcon size={14} className="animate-spin" />
+                          <p>Sync in progress</p>
+                        </div>
+                        {syncState.started_at && (
+                          <p className="text-foreground-light">
+                            Started{' '}
+                            <TimestampInfo
+                              utcTimestamp={syncState.started_at}
+                              label={
+                                syncState.started_at
+                                  ? formatRelative(new Date(syncState.started_at), new Date())
+                                  : 'recently'
+                              }
+                            />
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-x-3 text-foreground-light">
+                          <BadgeCheck size={14} />
+                          <p>All up to date</p>
+                        </div>
+                        {syncState.closed_at && (
+                          <p className="text-foreground-light">
+                            Last synced{' '}
+                            <TimestampInfo
+                              utcTimestamp={syncState.closed_at}
+                              label={
+                                syncState.closed_at
+                                  ? formatRelative(new Date(syncState.closed_at), new Date())
+                                  : 'recently'
+                              }
+                            />
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </CardTitle>
+            </CardHeader>
             <CardContent className="@container">
               <div className="flex flex-col items-start justify-between gap-4 @md:flex-row @md:items-center">
-                <div className="flex gap-x-4">
-                  <Table2 className="w-5 h-5 shrink-0" />
-                  <div className="flex flex-col gap-1">
-                    <h5 className="text-sm mb-1">Open Stripe schema in Table Editor</h5>
-                    <p className="text-sm text-foreground-light text-balance">
-                      The Stripe Sync Engine stores all synced data in the{' '}
-                      <code className="text-code-inline !break-keep">stripe</code> schema. You can
-                      view and query this data directly in the Table Editor.
-                    </p>
-                  </div>
+                <div className="flex flex-col gap-1">
+                  <h5 className="text-sm">View Stripe data in Table Editor</h5>
+                  <p className="text-sm text-foreground-light text-balance">
+                    The Stripe Sync Engine stores all synced data in the{' '}
+                    <code className="text-code-inline !break-keep">stripe</code> schema. You can
+                    view and query this data directly in the Table Editor.
+                  </p>
                 </div>
+
                 <Button asChild type="default" className="ml-8 @md:ml-0">
                   <Link href={`/project/${project?.ref}/editor?schema=stripe`}>
                     Open Table Editor

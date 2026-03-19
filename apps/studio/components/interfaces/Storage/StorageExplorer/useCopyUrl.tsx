@@ -4,42 +4,32 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { copyToClipboard } from 'ui'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
-import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 export const useCopyUrl = () => {
-  const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
+  const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
 
   const { hostEndpoint, customEndpoint } = useProjectApiUrl({ projectRef })
   const isCustomDomainActive = !!customEndpoint
 
   const getFileUrl = useCallback(
-    (fileName: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      const pathToFile = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
-      const formattedPathToFile = [pathToFile, fileName].join('/')
-
-      return fetchFileUrl(
-        formattedPathToFile,
-        projectRef,
-        selectedBucket.id,
-        selectedBucket.public,
-        expiresIn
-      )
+    (filePath: string, expiresIn?: URL_EXPIRY_DURATION) => {
+      return fetchFileUrl(filePath, projectRef, selectedBucket.id, selectedBucket.public, expiresIn)
     },
-    [projectRef, selectedBucket, openedFolders]
+    [projectRef, selectedBucket]
   )
 
   const onCopyUrl = useCallback(
-    (name: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      const formattedUrl = getFileUrl(name, expiresIn).then((url) => {
+    (filePath: string, expiresIn?: URL_EXPIRY_DURATION) => {
+      const formattedUrl = getFileUrl(filePath, expiresIn).then((url) => {
         return isCustomDomainActive && hostEndpoint
           ? url.replace(hostEndpoint, customEndpoint)
           : url
       })
 
       return copyToClipboard(formattedUrl, () => {
-        toast.success(`Copied URL for ${name} to clipboard.`)
+        toast.success(`Copied URL for ${filePath} to clipboard.`)
       })
     },
     [customEndpoint, getFileUrl, hostEndpoint, isCustomDomainActive]

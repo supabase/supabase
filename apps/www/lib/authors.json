@@ -705,7 +705,7 @@
     "author": "Harry Roper",
     "position": "Founder and CEO",
     "company": "Imaginary Space",
-    "author_url": "https://www.linkedin.com/in/harry-roper",
+    "author_url": "https://www.linkedin.com/in/harryroper/",
     "author_image_url": "/images/avatars/harry-roper.png"
   },
   {
@@ -713,7 +713,7 @@
     "author": "Zimo Holdijk",
     "position": "Lead Product Builder",
     "company": "Brthrs",
-    "author_url": "https://www.linkedin.com/in/zimoholdijk",
+    "author_url": "https://www.linkedin.com/in/zimo-holdijk/",
     "author_image_url": "/images/avatars/zimo-holdijk.png"
   },
   {
@@ -865,5 +865,29 @@
     "position": "Head of Multigres",
     "author_url": "https://github.com/sougou",
     "author_image_url": "https://github.com/sougou.png"
+  },
+  {
+    "author_id": "gerardo_estaba",
+    "author": "Gerardo Estaba",
+    "username": "ge8",
+    "position": "Customer Solutions Architect",
+    "author_url": "https://github.com/ge8",
+    "author_image_url": "https://github.com/ge8.png"
+  },
+  {
+    "author_id": "michel_ferreira",
+    "author": "Michel Ferreira",
+    "position": "Designer Advocate",
+    "company": "Figma",
+    "author_url": "https://www.figma.com",
+    "author_image_url": "/images/blog/avatars/michel-ferreira.jpeg"
+  },
+  {
+    "author_id": "victor_orozco",
+    "author": "Victor Orozco",
+    "position": "CTO",
+    "company": "Performanze",
+    "author_url": "#",
+    "author_image_url": "/images/blog/avatars/victor-orozco.jpeg"
   }
 ]

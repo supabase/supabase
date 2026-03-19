@@ -49,7 +49,7 @@ export function useSupamonitorIndexAdvisor(rows: QueryPerformanceRow[]): QueryPe
       // undefined/pending means data hasn't arrived yet — store undefined so
       // classifyQuery can defer slow classification and avoid flicker.
       const isReady = result?.status === 'success' || result?.status === 'error'
-      return [query, isReady ? result.data ?? null : undefined]
+      return [query, isReady ? (result.data ?? null) : undefined]
     })
   )
 
@@ -57,6 +57,6 @@ export function useSupamonitorIndexAdvisor(rows: QueryPerformanceRow[]): QueryPe
     ...row,
     index_advisor_result: resultByQuery.has(row.query)
       ? resultByQuery.get(row.query)
-      : row.index_advisor_result ?? null,
+      : (row.index_advisor_result ?? null),
   }))
 }
