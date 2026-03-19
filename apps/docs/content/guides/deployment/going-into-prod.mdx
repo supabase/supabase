@@ -54,7 +54,7 @@ Check and review issues in your database using [Performance Advisor](/dashboard/
   - `pg_stat_statements` can help you [identify hot or slow queries](https://www.virtual-dba.com/blog/postgresql-performance-identifying-hot-and-slow-queries/).
 - Perform load testing (preferably on a staging env)
   - Tools like [k6](https://k6.io/) can simulate traffic from many different users.
-- Upgrade your database if you require more resources. If you need anything beyond what is listed, contact [enterprise@supabase.io](mailto:enterprise@supabase.io).
+- Upgrade your database if you require more resources. If you need anything beyond what is listed in [the compute and disk table](docs/guides/platform/compute-and-disk), contact [enterprise@supabase.io](mailto:enterprise@supabase.io).
 - If you are expecting a surge in traffic (for a big launch) and are on a Team or Enterprise Plan, [contact support](/dashboard/support/new) with more details about your launch and we'll help keep an eye on your project.
 - If you expect your database size to be > 4 GB, enable the Point in Time Recovery (PITR) add-on in the [**Settings > Add-ons**](/dashboard/project/_/settings/addons?panel=pitr) section of the dashboard. Daily backups can take up resources from your database when the backup is in progress. PITR is more resource efficient, since only the changes to the database are backed up.
 
