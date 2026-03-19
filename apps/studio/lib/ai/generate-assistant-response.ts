@@ -68,10 +68,10 @@ export async function generateAssistantResponse({
   const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
 
   const run = async (span?: Span) => {
-    // Only returns last 7 messages
+    // Only returns last 15 messages (increased from 7 to improve context retention for large schemas)
     // Filters out tools with invalid states
     // Filters out tool outputs based on opt-in level using renderingToolOutputParser
-    const messages = (rawMessages || []).slice(-7).map((msg) => {
+    const messages = (rawMessages || []).slice(-15).map((msg) => {
       if (msg && msg.role === 'assistant' && 'results' in msg) {
         const cleanedMsg = { ...msg }
         delete cleanedMsg.results
