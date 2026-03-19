@@ -212,4 +212,25 @@ describe('PlatformWebhooksEndpointSheet', () => {
       expect.anything()
     )
   })
+
+  it('submits custom headers added through the shared header editor', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet({
+      mode: 'edit',
+      endpoint: createEndpoint(),
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Add header' }))
+    await user.type(screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
+    await user.type(screen.getByPlaceholderText('Header value'), 'super-secret')
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customHeaders: [{ key: 'X-Webhook-Secret', value: 'super-secret' }],
+      }),
+      expect.anything()
+    )
+  })
 })
