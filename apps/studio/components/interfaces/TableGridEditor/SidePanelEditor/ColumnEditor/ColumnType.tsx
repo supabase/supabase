@@ -241,11 +241,16 @@ const ColumnType = ({
                             'relative',
                             option.format === value ? 'bg-surface-200' : ''
                           )}
-                          onSelect={(value: string) => {
+                          onSelect={() => {
                             // [Joshen] For camel case types specifically, format property includes escaped double quotes
-                            // which will cause the POST columns call to error out. So we strip it specifically in this context
+                            // which will cause the POST columns call to error out. So we strip it specifically in this context.
+                            // Note: We use option.format directly instead of the onSelect value parameter because
+                            // Radix UI's CommandItem lowercases the value, which breaks schema-qualified and
+                            // case-sensitive enum type names (fixes #30632)
                             onOptionSelect(
-                              option.schema === 'public' ? value.replaceAll('"', '') : value
+                              option.schema === 'public'
+                                ? option.format.replaceAll('"', '')
+                                : option.format
                             )
                             setOpen(false)
                           }}
