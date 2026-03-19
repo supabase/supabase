@@ -90,7 +90,7 @@ meta="name=lib/supabase/server.ts"
 
 Since Server Components can't write cookies, you need [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them. This is accomplished by:
 
-- Refreshing the Auth token with the call to `supabase.auth.getUser`.
+- Refreshing the Auth token with the call to `supabase.auth.getClaims`.
 - Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
 - Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
 
@@ -100,11 +100,13 @@ You could also add a matcher, so that the Proxy only runs on routes that access 
 
 Be careful when protecting pages. The server gets the user session from the cookies, which anyone can spoof.
 
-Always use `supabase.auth.getUser()` to protect pages and user data.
+Always use `supabase.auth.getClaims()` to protect pages and user data in proxy/middleware.
+
+Use `supabase.auth.getUser()` when you need to verify the user directly against the Auth server, for example before a sensitive server-side action.
 
 _Never_ trust `supabase.auth.getSession()` inside server code such as proxy. It isn't guaranteed to revalidate the Auth token.
 
-It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
+It's safe to trust `getClaims()` in proxy/middleware because it validates the JWT signature against the project's published public keys.
 
 </Admonition>
 
