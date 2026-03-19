@@ -31,14 +31,18 @@ export const handle: Handle = async ({ event, resolve }) => {
       data: { claims },
       error,
     } = await event.locals.supabase.auth.getClaims()
-    if (error || !claims) {
+    if (error || !claims?.sub) {
       return { session: null, user: null }
     }
 
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return { session, user: session?.user ?? null }
+    if (!session || session.user.id !== claims.sub) {
+      return { session: null, user: null }
+    }
+
+    return { session, user: session.user }
   }
   return resolve(event, {
     filterSerializedResponseHeaders(name: string) {
