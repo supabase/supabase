@@ -1548,6 +1548,11 @@ export const graphql: NavMenuConstant = {
     { name: 'Views', url: '/guides/graphql/views', items: [] },
     { name: 'Functions', url: '/guides/graphql/functions', items: [] },
     {
+      name: 'Computed Fields',
+      url: '/guides/graphql/computed-fields',
+      items: [],
+    },
+    {
       name: 'Configuration & Customization',
       url: '/guides/graphql/configuration',
       items: [],
