@@ -124,11 +124,11 @@ stripe projects env --sync`,
       description: 'Install the Stripe CLI and add Supabase to your project in minutes.',
       children: (
         <div className="flex flex-wrap gap-4 justify-center mt-4">
-          <a href="https://docs.stripe.com/stripe-cli" className="text-brand hover:underline">
+          <a href="https://docs.stripe.com/stripe-cli/install" className="text-brand hover:underline">
             Stripe CLI install docs
           </a>
           <a
-            href="https://docs.stripe.com/stripe-cli/projects"
+            href="https://docs.stripe.com/stripe-projects"
             className="text-brand hover:underline"
           >
             Stripe Projects docs
