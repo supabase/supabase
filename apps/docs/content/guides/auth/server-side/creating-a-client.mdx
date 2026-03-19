@@ -88,6 +88,19 @@ NUXT_PUBLIC_SUPABASE_URL=supabase_project_url
 NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=supabase_publishable_key
 ```
 
+In `nuxt.config.ts`, map these public env vars into runtime config keys used by the examples below:
+
+```ts nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
+      supabasePublishableKey: process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    },
+  },
+})
+```
+
 </TabPanel>
 <TabPanel id="react-router" label="React Router">
 
