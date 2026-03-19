@@ -865,5 +865,13 @@
     "position": "Head of Multigres",
     "author_url": "https://github.com/sougou",
     "author_image_url": "https://github.com/sougou.png"
+  },
+  {
+    "author_id": "alex_al",
+    "author": "Alex Al",
+    "username": "alex-al",
+    "position": "",
+    "author_url": "https://github.com/alex-al",
+    "author_image_url": "https://github.com/alex-al.png"
   }
 ]
