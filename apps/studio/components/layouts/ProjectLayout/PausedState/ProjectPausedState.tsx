@@ -175,10 +175,16 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         (until{' '}
                         <TimestampInfo
                           displayAs="local"
-                          utcTimestamp={dayjs()
-                            .utc()
-                            .add(pauseStatus.remaining_days_till_restore_disabled ?? 0, 'day')
-                            .toISOString()}
+                          utcTimestamp={
+                            pauseStatus.last_paused_on
+                              ? dayjs(pauseStatus.last_paused_on)
+                                  .add(pauseStatus.max_days_till_restore_disabled, 'day')
+                                  .toISOString()
+                              : dayjs()
+                                  .utc()
+                                  .add(pauseStatus.remaining_days_till_restore_disabled ?? 0, 'day')
+                                  .toISOString()
+                          }
                           className="text-sm text-foreground"
                           labelFormat="DD MMM YYYY"
                         />
