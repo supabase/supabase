@@ -1,3 +1,6 @@
+import type { components } from 'api-types'
+import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
+import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -25,9 +28,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
-import type { components } from 'api-types'
-import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
-import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
+
 import { PERMISSIONS } from './PrivateApps.constants'
 import { usePrivateApps } from './PrivateAppsContext'
 
@@ -152,7 +153,9 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
         className="!min-w-[600px] flex flex-col h-full gap-0"
       >
         <SheetHeader>
-          <SheetTitle>{step === 'details' ? 'Create private app' : 'Generate signing key'}</SheetTitle>
+          <SheetTitle>
+            {step === 'details' ? 'Create private app' : 'Generate signing key'}
+          </SheetTitle>
           <SheetDescription className="sr-only">
             {step === 'details'
               ? 'Create a private app to generate scoped access tokens for your organization.'
@@ -174,7 +177,6 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                       onChange={(e) => setName(e.target.value)}
                     />
                   </FormLayout>
-
                 </div>
 
                 <Separator />
@@ -245,7 +247,9 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
 
                   {selectedPermissions.length === 0 ? (
                     <div className="text-center py-8 border border-dashed border-border rounded-lg">
-                      <p className="text-sm text-foreground-light">No permissions configured yet.</p>
+                      <p className="text-sm text-foreground-light">
+                        No permissions configured yet.
+                      </p>
                     </div>
                   ) : (
                     <div className="border border-border rounded-lg">
@@ -326,68 +330,68 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
 
                 {/* Signing key */}
                 <div className="px-5 sm:px-6 py-6">
-                {generatedKey ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium">Private key</h3>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          type="default"
-                          size="tiny"
-                          icon={<Copy size={12} />}
-                          onClick={() => {
-                            navigator.clipboard.writeText(generatedKey.private_key)
-                            toast.success('Private key copied to clipboard')
-                          }}
-                        >
-                          Copy
-                        </Button>
-                        <Button
-                          type="default"
-                          size="tiny"
-                          icon={<Download size={12} />}
-                          onClick={() => {
-                            const blob = new Blob([generatedKey.private_key], {
-                              type: 'text/plain',
-                            })
-                            const url = URL.createObjectURL(blob)
-                            const a = document.createElement('a')
-                            a.href = url
-                            a.download = `${createdApp?.name.toLowerCase().replace(/\s+/g, '-')}-private-key.pem`
-                            a.click()
-                            URL.revokeObjectURL(url)
-                          }}
-                        >
-                          Download
-                        </Button>
+                  {generatedKey ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium">Private key</h3>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Copy size={12} />}
+                            onClick={() => {
+                              navigator.clipboard.writeText(generatedKey.private_key)
+                              toast.success('Private key copied to clipboard')
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Download size={12} />}
+                            onClick={() => {
+                              const blob = new Blob([generatedKey.private_key], {
+                                type: 'text/plain',
+                              })
+                              const url = URL.createObjectURL(blob)
+                              const a = document.createElement('a')
+                              a.href = url
+                              a.download = `${createdApp?.name.toLowerCase().replace(/\s+/g, '-')}-private-key.pem`
+                              a.click()
+                              URL.revokeObjectURL(url)
+                            }}
+                          >
+                            Download
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <textarea
-                      readOnly
-                      value={generatedKey.private_key}
-                      rows={8}
-                      className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
-                    />
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <Checkbox_Shadcn_
-                        id="key-copied"
-                        checked={keyCopied}
-                        onCheckedChange={(v) => setKeyCopied(Boolean(v))}
+                      <textarea
+                        readOnly
+                        value={generatedKey.private_key}
+                        rows={8}
+                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
                       />
-                      <span className="text-sm text-foreground-light cursor-pointer select-none">
-                        I have copied the key and stored it securely
-                      </span>
-                    </label>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Signing key</h3>
-                    <p className="text-sm text-foreground-light">
-                      Generate a signing key to authenticate requests made by this app. You'll only
-                      be able to view the private key once — store it securely.
-                    </p>
-                  </div>
-                )}
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <Checkbox_Shadcn_
+                          id="key-copied"
+                          checked={keyCopied}
+                          onCheckedChange={(v) => setKeyCopied(Boolean(v))}
+                        />
+                        <span className="text-sm text-foreground-light cursor-pointer select-none">
+                          I have copied the key and stored it securely
+                        </span>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-medium">Signing key</h3>
+                      <p className="text-sm text-foreground-light">
+                        Generate a signing key to authenticate requests made by this app. You'll
+                        only be able to view the private key once — store it securely.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </ScrollArea>

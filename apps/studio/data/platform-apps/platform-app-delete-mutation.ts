@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { del, handleError } from 'data/fetchers'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { platformAppKeys } from './keys'
 
 export type PlatformAppDeleteVariables = {
@@ -35,7 +35,9 @@ export const usePlatformAppDeleteMutation = ({
     mutationFn: (vars) => deletePlatformApp(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: platformAppKeys.list(variables.slug) })
-      await queryClient.invalidateQueries({ queryKey: platformAppKeys.installations(variables.slug) })
+      await queryClient.invalidateQueries({
+        queryKey: platformAppKeys.installations(variables.slug),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

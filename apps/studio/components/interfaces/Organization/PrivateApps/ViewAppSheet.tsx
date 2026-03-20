@@ -1,11 +1,17 @@
+import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
+import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
 import { formatDistanceToNow } from 'date-fns'
 import { Trash, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
+  cn,
   CriticalIcon,
   ScrollArea,
   Sheet,
@@ -17,15 +23,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
-  AlertDescription_Shadcn_,
-  cn,
 } from 'ui'
-import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
-import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
-import { PERMISSIONS } from './PrivateApps.constants'
+
 import { DeleteAppModal } from './DeleteAppModal'
+import { PERMISSIONS } from './PrivateApps.constants'
 import { PrivateApp, usePrivateApps } from './PrivateAppsContext'
 
 interface ViewAppSheetProps {
@@ -116,7 +117,9 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                               <p className="text-foreground-light">Created</p>
                             </TableCell>
                             <TableCell>
-                              <p>{formatDistanceToNow(new Date(app.created_at), { addSuffix: true })}</p>
+                              <p>
+                                {formatDistanceToNow(new Date(app.created_at), { addSuffix: true })}
+                              </p>
                             </TableCell>
                           </TableRow>
                         </TableBody>
@@ -160,7 +163,9 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                                     <p className="font-mono text-sm">{p!.label}</p>
                                   </TableCell>
                                   <TableCell>
-                                    <p className="text-foreground-light text-sm">{p!.description}</p>
+                                    <p className="text-foreground-light text-sm">
+                                      {p!.description}
+                                    </p>
                                   </TableCell>
                                 </TableRow>
                               ))
