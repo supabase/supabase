@@ -1,7 +1,7 @@
 import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
 import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
 import { formatDistanceToNow } from 'date-fns'
-import { Trash, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -89,16 +89,16 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
               <div className="flex flex-col gap-0">
                 {/* App info */}
                 <div className="px-5 sm:px-6 py-6 space-y-3">
-                  <h3 className="text-sm font-medium text-foreground">App Information</h3>
+                  <h3 className="text-sm font-medium text-foreground">Metadata</h3>
                   <Card className="w-full overflow-hidden bg-surface-100">
                     <CardContent className="p-0">
-                      <Table className="table-auto">
+                      <Table className="table-fixed w-full">
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[40%]">
+                            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[50%]">
                               Field
                             </TableHead>
-                            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                            <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[50%]">
                               Value
                             </TableHead>
                           </TableRow>
@@ -106,18 +106,18 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                         <TableBody>
                           <TableRow>
                             <TableCell>
-                              <p className="text-foreground-light">Name</p>
+                              <p className="text-foreground-light truncate">Name</p>
                             </TableCell>
                             <TableCell>
-                              <p className="font-medium">{app.name}</p>
+                              <p className="font-medium truncate">{app.name}</p>
                             </TableCell>
                           </TableRow>
                           <TableRow>
                             <TableCell>
-                              <p className="text-foreground-light">Created</p>
+                              <p className="text-foreground-light truncate">Created</p>
                             </TableCell>
                             <TableCell>
-                              <p>
+                              <p className="truncate">
                                 {formatDistanceToNow(new Date(app.created_at), { addSuffix: true })}
                               </p>
                             </TableCell>
@@ -136,13 +136,13 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                   ) : (
                     <Card className="w-full overflow-hidden bg-surface-100">
                       <CardContent className="p-0">
-                        <Table className="table-auto">
+                        <Table className="table-fixed w-full">
                           <TableHeader>
                             <TableRow>
                               <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[50%]">
                                 Permission
                               </TableHead>
-                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2">
+                              <TableHead className="text-left font-mono uppercase text-xs text-foreground-lighter h-auto py-2 w-[50%]">
                                 Description
                               </TableHead>
                             </TableRow>
@@ -160,10 +160,10 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                               permissions.map((p) => (
                                 <TableRow key={p!.id}>
                                   <TableCell>
-                                    <p className="font-mono text-sm">{p!.label}</p>
+                                    <p className="font-mono text-sm truncate">{p!.label}</p>
                                   </TableCell>
                                   <TableCell>
-                                    <p className="text-foreground-light text-sm">
+                                    <p className="text-foreground-light text-sm truncate">
                                       {p!.description}
                                     </p>
                                   </TableCell>
@@ -187,11 +187,7 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                       Permanently delete this app and all its installations.
                     </AlertDescription_Shadcn_>
                     <div className="mt-2">
-                      <Button
-                        type="danger"
-                        icon={<Trash size={14} />}
-                        onClick={() => setShowDeleteModal(true)}
-                      >
+                      <Button type="danger" onClick={() => setShowDeleteModal(true)}>
                         Delete app
                       </Button>
                     </div>
