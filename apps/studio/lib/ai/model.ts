@@ -46,7 +46,6 @@ export type GetModelParams =
       provider: 'bedrock'
       /** Used for consistent hashing across Bedrock regions. */
       routingKey: string
-      hasAccessToAdvanceModel?: boolean
     }
 
 /**

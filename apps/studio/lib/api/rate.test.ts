@@ -51,8 +51,7 @@ test('rate calls the tool sanitizer', async () => {
 
   vi.mock('lib/ai/model', () => ({
     getModel: vi.fn().mockResolvedValue({
-      model: {},
-      error: null,
+      modelParams: { model: {} },
     }),
   }))
 

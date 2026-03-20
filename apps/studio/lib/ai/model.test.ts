@@ -33,7 +33,6 @@ describe('getModel', () => {
     const { modelParams, error, promptProviderOptions } = await getModel({
       provider: 'bedrock',
       routingKey: 'test',
-      hasAccessToAdvanceModel: true,
     })
 
     expect(modelParams?.model).toEqual('bedrock-model')
