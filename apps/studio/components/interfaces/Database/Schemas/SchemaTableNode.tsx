@@ -64,7 +64,7 @@ export const TableNode = ({
         <header
           className={cn(
             'text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center',
-            hasEdgesSelected ? 'outline outline-brand-500 outline-2' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
           )}
         >
           {data.name}
@@ -81,7 +81,7 @@ export const TableNode = ({
         <div
           className={cn(
             'border-[0.5px] overflow-hidden rounded-[4px] shadow-sm',
-            hasEdgesSelected ? 'outline outline-brand-500 outline-2' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
           )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
         >

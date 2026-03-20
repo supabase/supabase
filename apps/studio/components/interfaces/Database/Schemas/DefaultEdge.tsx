@@ -138,7 +138,7 @@ const EdgeRelationInfo = ({
       <Badge
         ref={checkIfShouldBeDisplayed}
         className={cn(
-          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-brand-500 outline-2',
+          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-brand',
           show ? 'opacity-100' : 'opacity-0'
         )}
         style={{
