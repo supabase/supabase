@@ -8,6 +8,7 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -325,25 +326,24 @@ test.describe('SQL Editor', () => {
     await page.getByRole('menuitem', { name: 'Copy as markdown' }).click()
     // Make sure the dropdown has closed otherwise it would make the other assertions unstable
     await expect(page.getByRole('menuitem', { name: 'Copy as markdown' })).not.toBeVisible()
-    await expect(async () => {
-      const copiedMarkdownResult = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedMarkdownResult).toBe(`| ?column?    |
+    await expectClipboardValue({
+      page,
+      value: `| ?column?    |
 | ----------- |
-| hello world |`)
-    }).toPass({ timeout: 2000 })
+| hello world |`,
+    })
 
     // export as JSON
     await page.getByRole('button', { name: 'Export' }).click()
     await page.getByRole('menuitem', { name: 'Copy as JSON' }).click()
     await expect(page.getByRole('menuitem', { name: 'Copy as JSON' })).not.toBeVisible()
-    await expect(async () => {
-      const copiedJsonResult = await page.evaluate(() => navigator.clipboard.readText())
-      expect(copiedJsonResult).toBe(`[
+    await expectClipboardValue({
+      page,
+      value:`[
   {
     "?column?": "hello world"
   }
-]`)
-    }).toPass({ timeout: 2000 })
+]` })
 
     // export as CSV
     const downloadPromise = page.waitForEvent('download')
