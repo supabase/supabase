@@ -105,10 +105,55 @@ test.describe('Queue Table Operations', () => {
 
     await page.getByRole('button', { name: 'Revert', exact: true }).click()
 
+    const confirmDialog = page.getByRole('alertdialog')
+    await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
+    await confirmDialog.getByRole('button', { name: 'Discard changes' }).click()
+
     await expect(page.getByRole('gridcell', { name: 'keep this value' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'should be cancelled' })).not.toBeVisible()
 
     await expect(page.getByText('pending change')).not.toBeVisible()
+  })
+
+  test('revert can be cancelled via discard confirmation dialog', async ({ page, ref }) => {
+    const tableName = `${tableNamePrefix}_discard_cancel`
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName, [{ name: 'keep this value' }])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await enableQueueOperations(page)
+    await page.reload()
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    const cell = page.getByRole('gridcell', { name: 'keep this value' })
+    await cell.dblclick()
+    const editor = page.getByRole('textbox', { name: /Editor content/ })
+    await editor.fill('edited value')
+    await page.keyboard.press('Enter')
+
+    await expect(page.getByText('1 pending change')).toBeVisible()
+    await page.getByRole('button', { name: /Review/ }).click()
+
+    await page.getByRole('button', { name: 'Revert', exact: true }).click()
+
+    const confirmDialog = page.getByRole('alertdialog')
+    await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
+    await confirmDialog.getByRole('button', { name: 'Keep editing' }).click()
+
+    const sidePanel = page.getByRole('dialog')
+    await expect(sidePanel.getByText('Pending changes')).toBeVisible()
+    await expect(sidePanel.getByText('1 operation')).toBeVisible()
   })
 
   test('row inserts are queued and can be saved', async ({ page, ref }) => {
@@ -277,6 +322,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('dialog').getByText('Pending changes')).toBeVisible()
 
     await page.keyboard.press('ControlOrMeta+.')
+    await expect(page.getByRole('dialog')).not.toBeVisible()
     await expect(page.getByRole('button', { name: /Review/ })).toBeVisible()
 
     await page.keyboard.press('ControlOrMeta+s')
@@ -516,6 +562,10 @@ test.describe('Queue Table Operations', () => {
 
     await page.getByRole('button', { name: /Review/ }).click()
     await page.getByRole('button', { name: 'Revert', exact: true }).click()
+
+    const confirmDialog = page.getByRole('alertdialog')
+    await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
+    await confirmDialog.getByRole('button', { name: 'Discard changes' }).click()
 
     await expect(page.getByRole('gridcell', { name: 'should not be deleted' })).toBeVisible()
     await expect(page.getByText('pending change')).not.toBeVisible()
