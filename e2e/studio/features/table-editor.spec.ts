@@ -87,6 +87,7 @@ testRunner('table editor', () => {
     await expectClipboardValue({
       page,
       value: 'pw_table_actions',
+      exact: true,
     })
 
     // copies table schema to clipboard when copy schema option is clicked
@@ -105,6 +106,7 @@ testRunner('table editor', () => {
   pw_column text null,
   constraint pw_table_actions_pkey primary key (id)
 ) TABLESPACE pg_default;`,
+      exact: true,
     })
 
     // duplicates table
@@ -552,6 +554,7 @@ testRunner('table editor', () => {
     await expectClipboardValue({
       page,
       value: colName,
+      exact: true,
     })
   })
 
@@ -782,6 +785,7 @@ testRunner('table editor', () => {
     await expectClipboardValue({
       page,
       value: 'first_row_value',
+      exact: true,
     })
 
     // Right-click on the second row's cell to open context menu
@@ -796,6 +800,7 @@ testRunner('table editor', () => {
     await expectClipboardValue({
       page,
       value: 'second_row_value',
+      exact: true,
     })
   })
 
@@ -1266,6 +1271,7 @@ testRunner('table editor', () => {
   pw_column bigint null default '10'::bigint,
   constraint ${tableName}_pkey primary key (id)
 ) TABLESPACE pg_default;`,
+      exact: true,
     })
   })
 })

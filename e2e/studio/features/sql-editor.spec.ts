@@ -2,13 +2,13 @@ import fs from 'fs'
 import { expect, Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
 import { isCLI } from '../utils/is-cli.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponseWithTimeout } from '../utils/wait-for-response-with-timeout.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
-import { expectClipboardValue } from '../utils/clipboard.js'
 
 const sqlSnippetName = 'pw_sql_snippet'
 const sqlSnippetNameDuplicate = 'pw_sql_snippet (Duplicate)'
@@ -331,6 +331,7 @@ test.describe('SQL Editor', () => {
       value: `| ?column?    |
 | ----------- |
 | hello world |`,
+      exact: true,
     })
 
     // export as JSON
@@ -339,11 +340,13 @@ test.describe('SQL Editor', () => {
     await expect(page.getByRole('menuitem', { name: 'Copy as JSON' })).not.toBeVisible()
     await expectClipboardValue({
       page,
-      value:`[
+      value: `[
   {
     "?column?": "hello world"
   }
-]` })
+]`,
+      exact: true,
+    })
 
     // export as CSV
     const downloadPromise = page.waitForEvent('download')

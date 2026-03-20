@@ -40,12 +40,15 @@ test.describe('Database', () => {
       // copies schema definition to clipboard
       await page.getByRole('button', { name: 'Copy as SQL' }).click()
       await expect(page.getByTestId('copy-sql-ready')).toBeVisible()
-      await expectClipboardValue({ page, value: `CREATE TABLE public.${databaseTableName} (
+      await expectClipboardValue({
+        page,
+        value: `CREATE TABLE public.${databaseTableName} (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   ${databaseColumnName} text,
   CONSTRAINT ${databaseTableName}_pkey PRIMARY KEY (id)
-);` })
+);`,
+      })
 
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
@@ -116,7 +119,7 @@ test.describe('Database', () => {
       await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
       await page.getByRole('menuitem', { name: 'Copy name' }).click()
       await expect(page.getByRole('menuitem', { name: 'Copy name' })).not.toBeVisible()
-      await expectClipboardValue({ page, value: databaseTableName })
+      await expectClipboardValue({ page, value: databaseTableName, exact: true })
 
       await page.getByText(`${databaseTableName} actions`).click()
       await expect(page.getByRole('menuitem', { name: 'View in Table Editor' })).toBeVisible()
@@ -176,7 +179,7 @@ test.describe('Database', () => {
         .click({ force: true })
       await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
       await page.getByRole('menuitem', { name: 'Copy name' }).click()
-      await expectClipboardValue({ page, value: databaseColumnName })
+      await expectClipboardValue({ page, value: databaseColumnName, exact: true })
     })
   })
 
