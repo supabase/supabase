@@ -38,7 +38,7 @@ export const ConnectionIcon = ({
 
   return (
     <Image
-      className={cn('transition-all group-hover:scale-110', className)}
+      className={className}
       src={iconImgSrc}
       alt={`${icon} logo`}
       width={size}

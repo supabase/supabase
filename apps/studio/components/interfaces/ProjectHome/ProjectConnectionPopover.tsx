@@ -89,7 +89,9 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       {
         label: 'Project URL',
         value: projectUrl ?? '',
-        displayValue: isLoadingApiUrl ? 'Loading project URL...' : projectUrl ?? 'Project URL unavailable',
+        displayValue: isLoadingApiUrl
+          ? 'Loading project URL...'
+          : (projectUrl ?? 'Project URL unavailable'),
         disabled: isLoadingApiUrl || !projectUrl,
         icon: Link2,
       },
@@ -100,7 +102,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           isLoadingPermissions || isLoadingKeys
             ? 'Loading publishable key...'
             : canReadAPIKeys
-              ? publishableKey?.api_key ?? 'Publishable key unavailable'
+              ? (publishableKey?.api_key ?? 'Publishable key unavailable')
               : "You don't have permission to view API keys.",
         disabled:
           isLoadingPermissions || isLoadingKeys || !canReadAPIKeys || !publishableKey?.api_key,
