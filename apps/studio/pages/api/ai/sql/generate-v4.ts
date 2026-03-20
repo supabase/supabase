@@ -138,8 +138,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
+  const envThrottled = process.env.IS_THROTTLED !== 'false'
+
   let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
-  if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(effectiveModel)) {
+  if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
 
@@ -149,7 +151,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     promptProviderOptions,
   } = await getModel({
     provider: 'openai',
-    hasAccessToAdvanceModel,
     modelEntry: getAssistantModelEntry(effectiveModel)!,
   })
 

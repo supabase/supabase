@@ -35,11 +35,12 @@ export const ModelErrorMessage = 'No valid AI model available based on available
 export type GetModelParams =
   | {
       provider: 'openai'
-      hasAccessToAdvanceModel?: boolean
       /**
        * Specifies which OpenAI model to use and its reasoning effort.
        * Create entries via `openaiModelEntry()` — reasoning effort is validated against the model
        * at compile time. Use `DEFAULT_COMPLETION_MODEL` for simple endpoints (minimal reasoning).
+       * Callers are responsible for resolving the correct entry (including throttling/entitlement
+       * fallbacks) before calling getModel.
        */
       modelEntry: OpenAIModelEntry
     }
@@ -55,13 +56,13 @@ export type GetModelParams =
     }
 
 /**
- * Retrieves a LanguageModel from a specific provider and model.
- * - If hasAccessToAdvanceModel is false, uses the provider's default model.
- * - Returns promptProviderOptions that callers can attach to the system message.
+ * Retrieves a LanguageModel from a specific provider and model entry.
+ * Callers are responsible for resolving the correct model entry (including throttling/entitlement
+ * fallbacks) before calling this function.
+ * Returns promptProviderOptions that callers can attach to the system message.
  */
 export async function getModel(params: GetModelParams): Promise<ModelResponse> {
-  const { provider, hasAccessToAdvanceModel = false } = params
-  const envThrottled = process.env.IS_THROTTLED !== 'false'
+  const { provider } = params
 
   const providerRegistry = PROVIDERS[provider]
   if (!providerRegistry) {
@@ -71,8 +72,7 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
   const models = providerRegistry.models as Record<Model, ProviderModelConfig>
   const modelEntry = params.provider === 'openai' ? params.modelEntry : undefined
 
-  const useDefault =
-    !hasAccessToAdvanceModel || envThrottled || !modelEntry?.id || !models[modelEntry.id]
+  const useDefault = !modelEntry?.id || !models[modelEntry.id]
 
   const chosenModelId = useDefault ? getDefaultModelForProvider(provider) : modelEntry?.id
 
@@ -95,10 +95,9 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     const baseProviderOptions = providerRegistry.providerOptions?.openai ?? {}
-    const openaiProviderOptions =
-      !useDefault && modelEntry?.reasoningEffort
-        ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }
-        : baseProviderOptions
+    const openaiProviderOptions = modelEntry?.reasoningEffort
+      ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }
+      : baseProviderOptions
     return {
       modelParams: {
         model: openai(chosenModelId as OpenAIModelId),
