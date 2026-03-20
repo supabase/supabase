@@ -1,4 +1,4 @@
-import { ident } from '../../../pg-format'
+import { literal } from '../../../pg-format'
 
 export const getCreateVaultSecretSQL = ({
   secret,
@@ -11,9 +11,9 @@ export const getCreateVaultSecretSQL = ({
 }) => {
   const sql = /* SQL */ `
   select vault.create_secret(
-      new_secret := ${ident(secret)}
-    ${name ? `, new_name := ${ident(name)}` : ''}
-    ${description ? `, new_description := ${ident(description)}` : ''}
+      new_secret := ${literal(secret)}
+    ${name ? `, new_name := ${literal(name)}` : ''}
+    ${description ? `, new_description := ${literal(description)}` : ''}
   )
   `.trim()
 
@@ -33,10 +33,10 @@ export const getUpdateVaultSecretSQL = ({
 }) => {
   const sql = /* SQL */ `
 select vault.update_secret(
-    secret_id := ${ident(id)}
-  ${secret ? `, new_secret := ${ident(secret)}` : ''}
-  ${name ? `, new_name := ${ident(name)}` : ''}
-  ${description ? `, new_description := ${ident(description)}` : ''}
+    secret_id := ${literal(id)}
+  ${secret ? `, new_secret := ${literal(secret)}` : ''}
+  ${name ? `, new_name := ${literal(name)}` : ''}
+  ${description ? `, new_description := ${literal(description)}` : ''}
 )
 `.trim()
   return sql

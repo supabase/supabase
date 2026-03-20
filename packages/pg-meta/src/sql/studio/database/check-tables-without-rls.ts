@@ -1,4 +1,4 @@
-import { ident } from '../../../pg-format'
+import { literal } from '../../../pg-format'
 
 /**
  * Builds a SQL query that returns entities exposed through the Data API that
@@ -13,7 +13,7 @@ import { ident } from '../../../pg-format'
  * PostgREST config, so it works correctly when enabling the Data API.
  */
 export const getUnsafeEntitiesInApiSql = ({ schemas }: { schemas: Array<string> }) => {
-  const schemaList = schemas.map(ident).join(', ')
+  const schemaList = schemas.map(literal).join(', ')
 
   return /* SQL */ `
     select
