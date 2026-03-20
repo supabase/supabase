@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Handle, Node, NodeProps, useReactFlow } from '@xyflow/react'
+import { Handle, Node, NodeProps } from '@xyflow/react'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { TableEditor } from 'icons'
 import {
@@ -56,7 +56,7 @@ export const TableNode = ({
   const itemHeight = 'h-[22px]'
 
   const hasEdgesSelected =
-    schemaGraphContext.selectedEdge?.source == id || schemaGraphContext.selectedEdge?.target == id
+    schemaGraphContext.selectedEdge?.source === id || schemaGraphContext.selectedEdge?.target === id
 
   return (
     <article>
