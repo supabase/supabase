@@ -14,8 +14,7 @@ import { BASE_PATH } from 'lib/constants'
 import { useMemo } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
-import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
-import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
+import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -33,8 +32,6 @@ export const GitHubSection = () => {
 
   const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
     useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
-
-  const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
   const { data: connections } = useGitHubConnectionsQuery(
     { organizationId: organization?.id },
