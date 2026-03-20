@@ -30,8 +30,8 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import { PERMISSIONS } from './PrivateApps.constants'
-import { usePrivateApps } from './PrivateAppsContext'
+import { usePrivateApps } from '../PrivateAppsContext'
+import { PERMISSIONS } from './Apps.constants'
 
 type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppResponse']
 type CreatePlatformAppSigningKeyResponse =

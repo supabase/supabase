@@ -10,9 +10,9 @@ import type { components } from 'api-types'
 import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
 import { usePlatformAppUpdateMutation } from 'data/platform-apps/platform-app-update-mutation'
 import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
-import { PERMISSIONS } from './PrivateApps.constants'
+import { PERMISSIONS } from './Apps.constants'
 import { DeleteAppModal } from './DeleteAppModal'
-import { PrivateApp, usePrivateApps } from './PrivateAppsContext'
+import { PrivateApp, usePrivateApps } from '../PrivateAppsContext'
 
 interface AppDetailsProps {
   app: PrivateApp

@@ -1,4 +1,4 @@
-import { InstallationsList } from 'components/interfaces/Organization/PrivateApps/InstallationsList'
+import { InstallationsList } from 'components/interfaces/Organization/PrivateApps/Installations/InstallationsList'
 import { PrivateAppsProvider } from 'components/interfaces/Organization/PrivateApps/PrivateAppsContext'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
@@ -32,8 +32,8 @@ const InstallationsPage: NextPageWithLayout = () => {
 
 InstallationsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="App Installations">
+    <OrganizationLayout title="App Installations">
+      <OrganizationSettingsLayout>
         <PrivateAppsProvider>{page}</PrivateAppsProvider>
       </OrganizationSettingsLayout>
     </OrganizationLayout>

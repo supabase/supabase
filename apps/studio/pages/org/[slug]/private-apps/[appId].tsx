@@ -1,4 +1,4 @@
-import { AppDetails } from 'components/interfaces/Organization/PrivateApps/AppDetails'
+import { AppDetails } from 'components/interfaces/Organization/PrivateApps/Apps/AppDetails'
 import {
   PrivateAppsProvider,
   usePrivateApps,
@@ -53,8 +53,8 @@ const AppDetailsPage: NextPageWithLayout = () => {
 
 AppDetailsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="Private Apps">
+    <OrganizationLayout title="Private Apps">
+      <OrganizationSettingsLayout>
         <PrivateAppsProvider>{page}</PrivateAppsProvider>
       </OrganizationSettingsLayout>
     </OrganizationLayout>

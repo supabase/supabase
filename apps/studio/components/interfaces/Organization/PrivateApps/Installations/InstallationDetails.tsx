@@ -9,8 +9,8 @@ import CopyButton from 'components/ui/CopyButton'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { usePlatformAppInstallationDeleteMutation } from 'data/platform-apps/platform-app-installation-delete-mutation'
+import { Installation, usePrivateApps } from '../PrivateAppsContext'
 import { EditScopeModal } from './EditScopeModal'
-import { Installation, usePrivateApps } from './PrivateAppsContext'
 
 interface InstallationDetailsProps {
   installation: Installation

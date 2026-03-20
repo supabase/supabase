@@ -25,9 +25,9 @@ import {
   TableRow,
 } from 'ui'
 
+import { PrivateApp, usePrivateApps } from '../PrivateAppsContext'
+import { PERMISSIONS } from './Apps.constants'
 import { DeleteAppModal } from './DeleteAppModal'
-import { PERMISSIONS } from './PrivateApps.constants'
-import { PrivateApp, usePrivateApps } from './PrivateAppsContext'
 
 interface ViewAppSheetProps {
   app: PrivateApp | null

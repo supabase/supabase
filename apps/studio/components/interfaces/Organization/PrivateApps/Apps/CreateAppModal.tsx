@@ -17,8 +17,8 @@ import {
 } from 'ui'
 import type { components } from 'api-types'
 import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
-import { PERMISSIONS } from './PrivateApps.constants'
-import { usePrivateApps } from './PrivateAppsContext'
+import { usePrivateApps } from '../PrivateAppsContext'
+import { PERMISSIONS } from './Apps.constants'
 
 type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppResponse']
 

@@ -21,24 +21,11 @@ import {
 import { EmptyStatePresentational } from 'ui-patterns'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { PrivateApp, usePrivateApps } from '../PrivateAppsContext'
+import type { AppsSort } from './Apps.types'
+import { handleSortChange, sortApps } from './Apps.utils'
 import { DeleteAppModal } from './DeleteAppModal'
-import { PrivateApp, usePrivateApps } from './PrivateAppsContext'
 import { ViewAppSheet } from './ViewAppSheet'
-
-type AppsSort = 'created_at:asc' | 'created_at:desc'
-
-const handleSortChange = (
-  currentSort: AppsSort,
-  column: string,
-  setSort: (s: AppsSort) => void
-) => {
-  const [currentCol, currentOrder] = currentSort.split(':')
-  if (currentCol === column) {
-    setSort(`${column}:${currentOrder === 'asc' ? 'desc' : 'asc'}` as AppsSort)
-  } else {
-    setSort(`${column}:asc` as AppsSort)
-  }
-}
 
 interface AppsListProps {
   onCreateApp: () => void
@@ -59,13 +46,7 @@ export function AppsList({ onCreateApp }: AppsListProps) {
   const [viewApp, setViewApp] = useState<PrivateApp | null>(null)
   const [appToDelete, setAppToDelete] = useState<PrivateApp | null>(null)
 
-  const sortedApps = useMemo(() => {
-    const [, order] = sort.split(':')
-    return [...apps].sort((a, b) => {
-      const diff = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-      return order === 'asc' ? diff : -diff
-    })
-  }, [apps, sort])
+  const sortedApps = useMemo(() => sortApps(apps, sort), [apps, sort])
 
   function handleDelete() {
     if (!appToDelete || !slug) return

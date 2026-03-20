@@ -7,8 +7,8 @@ import { Button, Card } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { Installation, usePrivateApps } from '../PrivateAppsContext'
 import { CreateInstallationModal } from './CreateInstallationModal'
-import { Installation, usePrivateApps } from './PrivateAppsContext'
 
 export function InstallationsList() {
   const { installations, apps, slug, isLoadingInstallations, removeInstallation } = usePrivateApps()

@@ -1,5 +1,5 @@
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { PrivateApp } from './PrivateAppsContext'
+import { PrivateApp } from '../PrivateAppsContext'
 
 interface DeleteAppModalProps {
   app: PrivateApp | null

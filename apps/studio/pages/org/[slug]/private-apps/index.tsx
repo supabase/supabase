@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from 'ui'
-import { AppsList } from 'components/interfaces/Organization/PrivateApps/AppsList'
-import { InstallationsList } from 'components/interfaces/Organization/PrivateApps/InstallationsList'
-import { CreateAppSheet } from 'components/interfaces/Organization/PrivateApps/CreateAppSheet'
-import { PrivateAppsProvider, usePrivateApps } from 'components/interfaces/Organization/PrivateApps/PrivateAppsContext'
+import { AppsList } from 'components/interfaces/Organization/PrivateApps/Apps/AppsList'
+import { InstallationsList } from 'components/interfaces/Organization/PrivateApps/Installations/InstallationsList'
+import { CreateAppSheet } from 'components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet'
+import {
+  PrivateAppsProvider,
+  usePrivateApps,
+} from 'components/interfaces/Organization/PrivateApps/PrivateAppsContext'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
@@ -45,40 +48,44 @@ function PrivateAppsContent() {
       </PageHeader>
 
       <PageContainer size="default" className="pb-16">
-          <PageSection id="apps">
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Apps</PageSectionTitle>
-                <PageSectionDescription>
-                  Registered private apps and their credentials
-                </PageSectionDescription>
-              </PageSectionSummary>
-              {!isLoading && apps.length > 0 && (
-                <PageSectionAside>
-                  <Button type="primary" icon={<Plus size={14} />} onClick={() => setShowCreate(true)}>
-                    Create app
-                  </Button>
-                </PageSectionAside>
-              )}
-            </PageSectionMeta>
-            <PageSectionContent>
-              <AppsList onCreateApp={() => setShowCreate(true)} />
-            </PageSectionContent>
-          </PageSection>
+        <PageSection id="apps">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Apps</PageSectionTitle>
+              <PageSectionDescription>
+                Registered private apps and their credentials
+              </PageSectionDescription>
+            </PageSectionSummary>
+            {!isLoading && apps.length > 0 && (
+              <PageSectionAside>
+                <Button
+                  type="primary"
+                  icon={<Plus size={14} />}
+                  onClick={() => setShowCreate(true)}
+                >
+                  Create app
+                </Button>
+              </PageSectionAside>
+            )}
+          </PageSectionMeta>
+          <PageSectionContent>
+            <AppsList onCreateApp={() => setShowCreate(true)} />
+          </PageSectionContent>
+        </PageSection>
 
-          <PageSection id="installations">
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Installations</PageSectionTitle>
-                <PageSectionDescription>
-                  Install an app for your organization. You can only install one app at a time.
-                </PageSectionDescription>
-              </PageSectionSummary>
-            </PageSectionMeta>
-            <PageSectionContent>
-              <InstallationsList />
-            </PageSectionContent>
-          </PageSection>
+        <PageSection id="installations">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Installations</PageSectionTitle>
+              <PageSectionDescription>
+                Install an app for your organization. You can only install one app at a time.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <InstallationsList />
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
 
       <CreateAppSheet

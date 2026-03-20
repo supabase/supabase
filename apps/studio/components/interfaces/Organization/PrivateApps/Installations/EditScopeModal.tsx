@@ -13,7 +13,7 @@ import {
   RadioGroup_Shadcn_,
 } from 'ui'
 import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { Installation, usePrivateApps } from './PrivateAppsContext'
+import { Installation, usePrivateApps } from '../PrivateAppsContext'
 
 interface EditScopeModalProps {
   installation: Installation | null

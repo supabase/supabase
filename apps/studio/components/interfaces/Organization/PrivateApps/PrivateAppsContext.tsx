@@ -4,11 +4,8 @@ import { usePlatformAppsQuery } from 'data/platform-apps/platform-apps-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { createContext, PropsWithChildren, useContext, useMemo, useState } from 'react'
 
-export type PrivateApp = components['schemas']['ListPlatformAppsResponse']['apps'][number]
-export type Installation = components['schemas']['InstallPlatformAppResponse'] & {
-  // Project scope is not yet in the API — tracked locally for the UI
-  projectScope: 'all' | string[]
-}
+export type { Installation, PrivateApp } from './PrivateApps.types'
+import type { Installation, PrivateApp } from './PrivateApps.types'
 
 interface PrivateAppsContextValue {
   slug: string | undefined

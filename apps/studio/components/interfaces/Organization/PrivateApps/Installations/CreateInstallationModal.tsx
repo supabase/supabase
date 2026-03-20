@@ -17,7 +17,7 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { usePlatformAppInstallationCreateMutation } from 'data/platform-apps/platform-app-installation-create-mutation'
-import { usePrivateApps } from './PrivateAppsContext'
+import { usePrivateApps } from '../PrivateAppsContext'
 
 interface CreateInstallationModalProps {
   visible: boolean

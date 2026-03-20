@@ -12,7 +12,7 @@ import {
   DialogTitle,
   Label_Shadcn_,
 } from 'ui'
-import { PrivateApp } from './PrivateAppsContext'
+import { PrivateApp } from '../PrivateAppsContext'
 
 interface PrivateKeyModalProps {
   app: PrivateApp | null
