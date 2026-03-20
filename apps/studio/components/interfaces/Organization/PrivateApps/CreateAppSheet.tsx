@@ -217,6 +217,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                       key={perm.id}
                                       value={`${perm.id} ${perm.label}`}
                                       onSelect={() => toggle(perm.id)}
+                                      className="text-foreground"
                                     >
                                       <div className="flex items-center gap-3 w-full">
                                         <Checkbox_Shadcn_
@@ -225,14 +226,9 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                           onClick={(e) => e.stopPropagation()}
                                         />
                                         <Key size={12} className="text-foreground-lighter" />
-                                        <div className="flex flex-col text-left flex-1">
-                                          <span className="font-medium text-foreground font-mono text-sm">
-                                            {perm.label}
-                                          </span>
-                                          <span className="text-xs text-foreground-light">
-                                            {perm.description}
-                                          </span>
-                                        </div>
+                                        <span className="font-medium text-foreground">
+                                          {perm.label}
+                                        </span>
                                       </div>
                                     </CommandItem_Shadcn_>
                                   ))}
@@ -259,7 +255,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           <div key={id}>
                             <div className="flex items-center gap-3 p-3">
                               <div className="flex-1">
-                                <p className="text-sm font-mono font-medium">{perm?.label}</p>
+                                <p className="text-sm font-medium">{perm?.label}</p>
                                 <p className="text-xs text-foreground-light">{perm?.description}</p>
                               </div>
                               <Button

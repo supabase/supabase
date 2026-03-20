@@ -160,7 +160,7 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
                               permissions.map((p) => (
                                 <TableRow key={p!.id}>
                                   <TableCell>
-                                    <p className="font-mono text-sm truncate">{p!.label}</p>
+                                    <p className="text-sm truncate">{p!.label}</p>
                                   </TableCell>
                                   <TableCell>
                                     <p className="text-foreground-light text-sm truncate">
