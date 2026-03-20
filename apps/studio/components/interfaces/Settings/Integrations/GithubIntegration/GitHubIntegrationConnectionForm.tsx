@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
+import { InlineLink } from 'components/ui/InlineLink'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
@@ -46,10 +47,10 @@ import {
   PopoverTrigger_Shadcn_,
   Switch,
 } from 'ui'
-import { InlineLink } from 'components/ui/InlineLink'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 const GITHUB_ICON = (
@@ -65,14 +66,10 @@ const GITHUB_ICON = (
 )
 
 interface GitHubIntegrationConnectionFormProps {
-  disabled?: boolean
   connection?: GitHubConnection
 }
 
-const GitHubIntegrationConnectionForm = ({
-  disabled = false,
-  connection,
-}: GitHubIntegrationConnectionFormProps) => {
+const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnectionFormProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
@@ -460,7 +457,7 @@ const GitHubIntegrationConnectionForm = ({
                           <Button
                             type="default"
                             className="justify-start h-[34px] w-full"
-                            disabled={disabled || isLoadingGitHubRepos}
+                            disabled={isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
                               <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -568,7 +565,7 @@ const GitHubIntegrationConnectionForm = ({
                         {...field}
                         placeholder="supabase"
                         autoComplete="off"
-                        disabled={disabled || !canUpdateGitHubConnection}
+                        disabled={!canUpdateGitHubConnection}
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
@@ -591,7 +588,7 @@ const GitHubIntegrationConnectionForm = ({
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          disabled={disabled || !canUpdateGitHubConnection}
+                          disabled={!canUpdateGitHubConnection}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
@@ -601,7 +598,7 @@ const GitHubIntegrationConnectionForm = ({
                 <div
                   className={cn(
                     'space-y-4 pl-6 border-l',
-                    (!enableProductionSync || disabled) && 'opacity-25 pointer-events-none'
+                    !enableProductionSync && 'opacity-25 pointer-events-none'
                   )}
                 >
                   <FormField_Shadcn_
@@ -618,9 +615,7 @@ const GitHubIntegrationConnectionForm = ({
                             <Input_Shadcn_
                               {...field}
                               autoComplete="off"
-                              disabled={
-                                disabled || !canUpdateGitHubConnection || !enableProductionSync
-                              }
+                              disabled={!canUpdateGitHubConnection || !enableProductionSync}
                             />
                           </FormControl_Shadcn_>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
@@ -661,7 +656,7 @@ const GitHubIntegrationConnectionForm = ({
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          disabled={disabled || !canCreateGitHubConnection}
+                          disabled={!canCreateGitHubConnection}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
@@ -671,7 +666,7 @@ const GitHubIntegrationConnectionForm = ({
                 <div
                   className={cn(
                     'space-y-4 pl-6 border-l',
-                    (!newBranchPerPr || disabled) && 'opacity-25 pointer-events-none'
+                    !newBranchPerPr && 'opacity-25 pointer-events-none'
                   )}
                 >
                   <FormField_Shadcn_
@@ -688,7 +683,7 @@ const GitHubIntegrationConnectionForm = ({
                             {...field}
                             type="number"
                             autoComplete="off"
-                            disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
+                            disabled={!newBranchPerPr || !canUpdateGitHubConnection}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -708,7 +703,7 @@ const GitHubIntegrationConnectionForm = ({
                           <Switch
                             checked={field.value}
                             onCheckedChange={(val) => field.onChange(val)}
-                            disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
+                            disabled={!newBranchPerPr || !canUpdateGitHubConnection}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -737,7 +732,7 @@ const GitHubIntegrationConnectionForm = ({
                     onClick={() => {
                       githubSettingsForm.reset()
                     }}
-                    disabled={disabled || !canUpdateGitHubConnection}
+                    disabled={!canUpdateGitHubConnection}
                   >
                     Cancel
                   </Button>
@@ -746,7 +741,6 @@ const GitHubIntegrationConnectionForm = ({
                   type={promptProPlanUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
-                    disabled ||
                     (!connection && !canCreateGitHubConnection) ||
                     (connection && !canUpdateGitHubConnection) ||
                     isCheckingBranch ||
