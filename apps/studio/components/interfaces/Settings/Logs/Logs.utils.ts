@@ -181,7 +181,7 @@ limit ${limit}
   `
 
     case 'function_logs':
-      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.level from ${table}
+      return `select id, ${table}.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -205,7 +205,7 @@ ${orderBy}
 limit ${limit}
 `
       }
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
   ${orderBy}
