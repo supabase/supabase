@@ -428,7 +428,6 @@ export const GitHubIntegrationConnectionForm = ({
 
   const isLoading =
     isLoadingEntitlements || isCreatingConnection || isUpdatingConnection || isDeletingConnection
-  const repoSelected = selectedRepository || connection
 
   return (
     <>
@@ -472,7 +471,7 @@ export const GitHubIntegrationConnectionForm = ({
                               </span>
                             }
                           >
-                            {repoSelected
+                            {selectedRepository || connection
                               ? selectedRepository?.name || connection?.repository.name
                               : 'Choose GitHub Repository'}
                           </Button>
@@ -554,15 +553,13 @@ export const GitHubIntegrationConnectionForm = ({
             </CardContent>
 
             <AnimatePresence>
-              {repoSelected && (
+              {!!currentRepositoryId && (
                 <motion.div
                   initial={{ opacity: 0, y: -16 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -16 }}
                 >
-                  <CardContent
-                    className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}
-                  >
+                  <CardContent>
                     <FormField_Shadcn_
                       control={githubSettingsForm.control}
                       name="supabaseDirectory"
@@ -584,9 +581,7 @@ export const GitHubIntegrationConnectionForm = ({
                       )}
                     />
                   </CardContent>
-                  <CardContent
-                    className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}
-                  >
+                  <CardContent>
                     {/* Production Branch Sync Section */}
                     <div className="space-y-4">
                       <FormField_Shadcn_
@@ -644,11 +639,9 @@ export const GitHubIntegrationConnectionForm = ({
                       </div>
                     </div>
                   </CardContent>
-                  <CardContent
-                    className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}
-                  >
+                  <CardContent>
                     {hasAccessToBranching ? (
-                      <Admonition type="warning" title="Branching and billing">
+                      <Admonition type="warning" title="Branching and billing" className="mb-4">
                         Branching Compute is not covered by your organization&apos;s Spend Cap.
                         Costs should be closely monitored, as they may be incurred.{' '}
                         <InlineLink
