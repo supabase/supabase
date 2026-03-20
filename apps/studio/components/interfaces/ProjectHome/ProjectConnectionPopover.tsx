@@ -4,9 +4,9 @@ import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { pluckObjectFields } from 'lib/helpers'
-import { ChevronDown, Database, KeyRound, Link2, Terminal } from 'lucide-react'
+import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
@@ -35,6 +35,8 @@ interface ProjectConnectionPopoverProps {
 
 export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopoverProps) => {
   const [open, setOpen] = useState(false)
+  const [copiedItem, setCopiedItem] = useState<string | null>(null)
+  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
@@ -87,12 +89,19 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       {
         label: 'Project URL',
         value: projectUrl ?? '',
+        displayValue: isLoadingApiUrl ? 'Loading project URL...' : projectUrl ?? 'Project URL unavailable',
         disabled: isLoadingApiUrl || !projectUrl,
         icon: Link2,
       },
       {
         label: 'Publishable key',
         value: publishableKey?.api_key ?? '',
+        displayValue:
+          isLoadingPermissions || isLoadingKeys
+            ? 'Loading publishable key...'
+            : canReadAPIKeys
+              ? publishableKey?.api_key ?? 'Publishable key unavailable'
+              : "You don't have permission to view API keys.",
         disabled:
           isLoadingPermissions || isLoadingKeys || !canReadAPIKeys || !publishableKey?.api_key,
         icon: KeyRound,
@@ -100,12 +109,16 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       {
         label: 'Direct connection string',
         value: directConnectionString,
+        displayValue: isLoadingDatabases
+          ? 'Loading connection string...'
+          : directConnectionString || 'Connection string unavailable',
         disabled: isLoadingDatabases || !directConnectionString,
         icon: Database,
       },
       {
         label: 'CLI setup commands',
         value: cliCommands,
+        displayValue: cliCommands.replace(/\n/g, ' - '),
         disabled: !projectRef,
         icon: Terminal,
       },
@@ -123,6 +136,12 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       publishableKey?.api_key,
     ]
   )
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current)
+    }
+  }, [])
 
   return (
     <div className="mt-3 inline-flex max-w-full items-center gap-3 min-w-0">
@@ -146,22 +165,41 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             Copy
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-64 p-1">
+        <DropdownMenuContent side="bottom" align="end" className="w-80 p-1">
           {menuItems.map((item) => {
             const Icon = item.icon
 
             return (
               <DropdownMenuItem
                 key={item.label}
-                className="gap-2"
+                className="group relative items-center gap-3 pr-10"
                 disabled={item.disabled}
-                onClick={() => {
+                onSelect={(event) => {
+                  event.preventDefault()
+                  if (item.disabled) return
+
                   copyToClipboard(item.value)
-                  setOpen(false)
+                  setCopiedItem(item.label)
+
+                  if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current)
+                  copiedTimeoutRef.current = setTimeout(() => setCopiedItem(null), 1500)
                 }}
               >
-                <Icon size={14} />
-                <span>{item.label}</span>
+                <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm text-foreground">{item.label}</div>
+                  <div className="truncate text-sm text-foreground-lighter">
+                    {item.displayValue}
+                  </div>
+                </div>
+                <div
+                  className={cn(
+                    'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
+                    copiedItem === item.label && 'opacity-100 text-brand'
+                  )}
+                >
+                  {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}
+                </div>
               </DropdownMenuItem>
             )
           })}
@@ -176,7 +214,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 setShowConnect(true)
               }}
             >
-              Connect
+              Get Connected
             </Button>
           </div>
         </DropdownMenuContent>
