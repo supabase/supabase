@@ -33,7 +33,10 @@ export const OperationQueueSidePanel = ({ visible, closePanel }: OperationQueueS
 
   return (
     <Sheet open={visible} onOpenChange={(open) => !open && snap.closeSidePanel()}>
-      <SheetContent className="flex flex-col gap-y-0">
+      <SheetContent
+        className="flex flex-col gap-y-0"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+      >
         <SheetHeader>
           <SheetTitle>Pending changes</SheetTitle>
           <SheetDescription>
