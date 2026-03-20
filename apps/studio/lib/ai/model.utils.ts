@@ -33,16 +33,19 @@ function assistantModel<ModelId extends OpenAIModel>(config: {
   return config
 }
 
-// Single source of truth for Assistant chat model variants and their reasoning levels.
-// Add entries here when introducing new assistant models.
+// Models available to all users (free tier).
 export const ASSISTANT_MODELS_BASE = [
   assistantModel({ id: 'gpt-5-mini', reasoningEffort: 'minimal' }),
 ] as const
 
+// Models restricted to users with `assistant.advance_model` entitlement (paid plans).
 export const ASSISTANT_MODELS_ADVANCE_ONLY = [
   assistantModel({ id: 'gpt-5', reasoningEffort: 'minimal' }),
 ] as const
 
+// Single source of truth for all Assistant chat model variants and their reasoning levels.
+// To add a free-tier model: add to ASSISTANT_MODELS_BASE.
+// To add a paid-only model: add to ASSISTANT_MODELS_ADVANCE_ONLY.
 export const ASSISTANT_MODELS = [
   ...ASSISTANT_MODELS_BASE,
   ...ASSISTANT_MODELS_ADVANCE_ONLY,
@@ -55,9 +58,7 @@ export const DEFAULT_ASSISTANT_BASE_MODEL_ID = 'gpt-5-mini' satisfies AssistantB
 
 export const DEFAULT_ASSISTANT_ADVANCE_MODEL_ID = 'gpt-5' satisfies AssistantModelId
 
-export function defaultAssistantModelId(
-  hasAccessToAdvanceModel: boolean
-): AssistantModelId {
+export function defaultAssistantModelId(hasAccessToAdvanceModel: boolean): AssistantModelId {
   return hasAccessToAdvanceModel
     ? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
     : DEFAULT_ASSISTANT_BASE_MODEL_ID
