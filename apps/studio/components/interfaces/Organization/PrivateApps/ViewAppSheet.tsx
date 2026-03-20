@@ -36,7 +36,7 @@ interface ViewAppSheetProps {
 }
 
 export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetProps) {
-  const { slug } = usePrivateApps()
+  const { slug, removeInstallationsByAppId } = usePrivateApps()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const { data: detail, isLoading: isLoadingDetail } = usePlatformAppQuery(
@@ -45,8 +45,9 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
   )
 
   const { mutate: deleteApp, isPending: isDeleting } = usePlatformAppDeleteMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       toast.success(`Deleted "${app?.name}"`)
+      removeInstallationsByAppId(vars.appId)
       setShowDeleteModal(false)
       onClose()
       onDeleted()

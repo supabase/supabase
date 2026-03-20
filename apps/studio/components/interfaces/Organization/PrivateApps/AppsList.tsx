@@ -45,10 +45,11 @@ interface AppsListProps {
 }
 
 export function AppsList({ onCreateApp }: AppsListProps) {
-  const { apps, isLoading, slug } = usePrivateApps()
+  const { apps, isLoading, slug, removeInstallationsByAppId } = usePrivateApps()
   const { mutate: deleteApp, isPending: isDeleting } = usePlatformAppDeleteMutation({
     onSuccess: (_, vars) => {
       toast.success(`Deleted app`)
+      removeInstallationsByAppId(vars.appId)
       if (appToDelete?.id === vars.appId) setAppToDelete(null)
     },
   })

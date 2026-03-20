@@ -22,6 +22,7 @@ interface PrivateAppsContextValue {
     projectScope: 'all' | string[]
   ) => void
   removeInstallation: (id: string) => void
+  removeInstallationsByAppId: (appId: string) => void
   setProjectScope: (installationId: string, scope: 'all' | string[]) => void
 }
 
@@ -63,6 +64,10 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
     setLocalInstallations((prev) => prev.filter((i) => i.id !== id))
   }
 
+  function removeInstallationsByAppId(appId: string) {
+    setLocalInstallations((prev) => prev.filter((i) => i.app_id !== appId))
+  }
+
   function setProjectScope(installationId: string, scope: 'all' | string[]) {
     setScopeOverrides((prev) => ({ ...prev, [installationId]: scope }))
     setLocalInstallations((prev) =>
@@ -80,6 +85,7 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
         installations,
         addInstallation,
         removeInstallation,
+        removeInstallationsByAppId,
         setProjectScope,
       }}
     >
