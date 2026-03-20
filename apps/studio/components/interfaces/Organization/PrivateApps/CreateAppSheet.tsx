@@ -1,8 +1,9 @@
 import type { components } from 'api-types'
 import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
+import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
 import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -92,6 +93,11 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
   const [generatedKey, setGeneratedKey] = useState<CreatePlatformAppSigningKeyResponse | null>(null)
   const [keyCopied, setKeyCopied] = useState(false)
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
+  const step3Ref = useRef<HTMLDivElement>(null)
+
+  const { mutate: deleteApp, isPending: isDeleting } = usePlatformAppDeleteMutation({
+    onSuccess: () => handleClose(),
+  })
 
   const { mutate: createSigningKey, isPending: isCreatingKey } =
     usePlatformAppSigningKeyCreateMutation({
@@ -143,8 +149,14 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
   }
 
   const canCreate = name.trim().length > 0 && selectedPermissions.length > 0
-  const isLoading = isCreatingApp || isCreatingKey
+  const isLoading = isCreatingApp || isCreatingKey || isDeleting
   const keyRevealed = generatedKey !== null
+
+  useEffect(() => {
+    if (keyRevealed) {
+      step3Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [keyRevealed])
 
   return (
     <>
@@ -306,79 +318,81 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                 </div>
               </Step>
 
-              <Step
-                number={3}
-                title="Signing key"
-                description={
-                  isCreatingKey
-                    ? 'Generating your signing key...'
-                    : keyRevealed
-                      ? 'This is the only time you can view this key. Copy or download it and store it securely.'
-                      : "A signing key will be generated automatically when you create the app. You'll only be able to view it once."
-                }
-                isLast
-                disabled={createdApp === null && !isLoading}
-              >
-                {isCreatingKey && (
-                  <p className="text-sm text-foreground-light animate-pulse">
-                    Generating signing key...
-                  </p>
-                )}
-                {keyRevealed && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium">Private key</h3>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          type="default"
-                          size="tiny"
-                          icon={<Copy size={12} />}
-                          onClick={() => {
-                            navigator.clipboard.writeText(generatedKey.private_key)
-                            toast.success('Private key copied to clipboard')
-                          }}
-                        >
-                          Copy
-                        </Button>
-                        <Button
-                          type="default"
-                          size="tiny"
-                          icon={<Download size={12} />}
-                          onClick={() => {
-                            const blob = new Blob([generatedKey.private_key], {
-                              type: 'text/plain',
-                            })
-                            const url = URL.createObjectURL(blob)
-                            const a = document.createElement('a')
-                            a.href = url
-                            a.download = `${createdApp?.name.toLowerCase().replace(/\s+/g, '-')}-private-key.pem`
-                            a.click()
-                            URL.revokeObjectURL(url)
-                          }}
-                        >
-                          Download
-                        </Button>
+              <div ref={step3Ref}>
+                <Step
+                  number={3}
+                  title="Signing key"
+                  description={
+                    isCreatingKey
+                      ? 'Generating your signing key...'
+                      : keyRevealed
+                        ? 'This is the only time you can view this key. Copy or download it and store it securely.'
+                        : "A signing key will be generated automatically when you create the app. You'll only be able to view it once."
+                  }
+                  isLast
+                  disabled={createdApp === null && !isLoading}
+                >
+                  {isCreatingKey && (
+                    <p className="text-sm text-foreground-light animate-pulse">
+                      Generating signing key...
+                    </p>
+                  )}
+                  {keyRevealed && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium">Private key</h3>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Copy size={12} />}
+                            onClick={() => {
+                              navigator.clipboard.writeText(generatedKey.private_key)
+                              toast.success('Private key copied to clipboard')
+                            }}
+                          >
+                            Copy
+                          </Button>
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Download size={12} />}
+                            onClick={() => {
+                              const blob = new Blob([generatedKey.private_key], {
+                                type: 'text/plain',
+                              })
+                              const url = URL.createObjectURL(blob)
+                              const a = document.createElement('a')
+                              a.href = url
+                              a.download = `${createdApp?.name.toLowerCase().replace(/\s+/g, '-')}-private-key.pem`
+                              a.click()
+                              URL.revokeObjectURL(url)
+                            }}
+                          >
+                            Download
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <textarea
-                      readOnly
-                      value={generatedKey.private_key}
-                      rows={8}
-                      className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
-                    />
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <Checkbox_Shadcn_
-                        id="key-copied"
-                        checked={keyCopied}
-                        onCheckedChange={(v) => setKeyCopied(Boolean(v))}
+                      <textarea
+                        readOnly
+                        value={generatedKey.private_key}
+                        rows={8}
+                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
                       />
-                      <span className="text-sm text-foreground-light cursor-pointer select-none">
-                        I have copied the key and stored it securely
-                      </span>
-                    </label>
-                  </div>
-                )}
-              </Step>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <Checkbox_Shadcn_
+                          id="key-copied"
+                          checked={keyCopied}
+                          onCheckedChange={(v) => setKeyCopied(Boolean(v))}
+                        />
+                        <span className="text-sm text-foreground-light cursor-pointer select-none">
+                          I have copied the key and stored it securely
+                        </span>
+                      </label>
+                    </div>
+                  )}
+                </Step>
+              </div>
             </div>
           </ScrollArea>
 
@@ -422,12 +436,16 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
         onCancel={() => setShowCloseConfirm(false)}
         onConfirm={() => {
           setShowCloseConfirm(false)
-          handleClose()
+          if (createdApp && slug) {
+            deleteApp({ slug, appId: createdApp.id })
+          } else {
+            handleClose()
+          }
         }}
       >
         <p className="text-sm text-foreground-light py-2">
-          {keyRevealed
-            ? 'Your signing key has been generated but not saved. If you close now, you will lose access to it permanently.'
+          {createdApp
+            ? 'The app will be deleted and your signing key will be permanently lost.'
             : 'Any progress you have made will be lost.'}
         </p>
       </ConfirmationModal>
