@@ -13,7 +13,7 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -148,7 +148,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     })
   }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     messages: chatMessages,
@@ -240,17 +240,11 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           spanId: state.messageSpanIds[messageId],
         })
 
-        sendEvent({
-          action: 'assistant_message_rating_submitted',
-          properties: {
-            rating,
-            category: result.category,
-            ...(reason && { reason }),
-          },
-          groups: {
-            project: project.ref,
-            organization: selectedOrganization.slug,
-          },
+        track('assistant_message_rating_submitted', {
+          rating,
+          category: result.category,
+          ...(reason && { reason }),
+          chatId: state.activeChatId,
         })
       } catch (error) {
         console.error('Failed to rate message:', error)
@@ -261,7 +255,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent, state]
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state]
   )
 
   const isContextExceededError =
@@ -339,21 +333,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
-      sendEvent({
-        action: 'assistant_debug_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_debug_submitted', { chatId: snap.activeChatId })
     } else {
-      sendEvent({
-        action: 'assistant_prompt_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_prompt_submitted', { chatId: snap.activeChatId })
     }
   }
 

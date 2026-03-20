@@ -1,4 +1,4 @@
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
@@ -15,10 +15,7 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { QueuedOperation } from 'state/table-editor-operation-queue.types'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
-import {
-  useIsQueueOperationsEnabled,
-  useIsTableFilterBarEnabled,
-} from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
@@ -29,7 +26,7 @@ import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
-import { reapplyOptimisticUpdates } from './utils/queueOperationUtils'
+import { formatGridDataWithOperationValues } from './utils/queueOperationUtils'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -43,9 +40,6 @@ export const SupabaseGrid = ({
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
-
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -73,7 +67,6 @@ export const SupabaseGrid = ({
     isError,
     isPending: isLoading,
     isRefetching,
-    dataUpdatedAt,
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
@@ -100,39 +93,9 @@ export const SupabaseGrid = ({
     if (!mounted) setMounted(true)
   }, [])
 
-  // Re-apply optimistic updates when table data is loaded/refetched
-  // This ensures pending changes remain visible when switching tabs or after data refresh
-  // Skip re-applying during save to avoid race condition where refetch completes before queue clears
-  const isSaving = tableEditorSnap.operationQueue.status === 'saving'
-  useEffect(() => {
-    if (
-      isSuccess &&
-      project?.ref &&
-      tableId &&
-      isQueueOperationsEnabled &&
-      tableEditorSnap.hasPendingOperations &&
-      !isSaving
-    ) {
-      reapplyOptimisticUpdates({
-        queryClient,
-        projectRef: project.ref,
-        tableId,
-        operations: tableEditorSnap.operationQueue.operations as readonly QueuedOperation[],
-      })
-    }
-  }, [
-    isSuccess,
-    dataUpdatedAt,
-    project?.ref,
-    tableId,
-    isQueueOperationsEnabled,
-    tableEditorSnap.hasPendingOperations,
-    tableEditorSnap.operationQueue.operations,
-    queryClient,
-    isSaving,
-  ])
-
-  const rows = data?.rows ?? EMPTY_ARR
+  const operations = tableEditorSnap.operationQueue.operations as QueuedOperation[]
+  const baseRows = data?.rows ?? EMPTY_ARR
+  const rows = formatGridDataWithOperationValues({ operations, rows: baseRows })
 
   const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
 

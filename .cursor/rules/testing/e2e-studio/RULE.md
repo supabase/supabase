@@ -117,10 +117,6 @@ await waitForApiResponse(page, 'pg-meta', ref, 'tables')
 // ✅ Acceptable - waiting for client-side debounce
 await page.getByRole('textbox').fill('search term')
 await page.waitForTimeout(300) // Allow debounce to complete
-
-// ✅ Acceptable - waiting for clipboard API
-await page.evaluate(() => navigator.clipboard.readText())
-await page.waitForTimeout(500)
 ```
 
 ## Test Structure
@@ -272,6 +268,22 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+```
+
+### Use the existing assertions utilities
+
+#### Clipboard assertions
+
+```ts
+// ❌ Avoid - brittle hard coded timeout
+await page.evaluate(() => navigator.clipboard.readText())
+await page.waitForTimeout(500)
+
+// ✅ Good - this utility function uses Playwright auto-retries mechanisms
+await expectClipboardValue({
+  page,
+  value: 'expectedValue'
+})
 ```
 
 ## API Mocking
