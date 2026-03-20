@@ -138,7 +138,7 @@ const EdgeRelationInfo = ({
       <Badge
         ref={checkIfShouldBeDisplayed}
         className={cn(
-          'absolute pointer-events-auto z-50 p-2 rounded-[4px] gap-2 outline outline-brand outline-2',
+          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-brand-500 outline-2',
           show ? 'opacity-100' : 'opacity-0'
         )}
         style={{
@@ -194,7 +194,7 @@ const EdgeNodeData = ({
   const { selectedSchema } = useQuerySchemaState()
 
   return (
-    <Badge className="normal-case">
+    <Badge className="normal-case text-[8px]">
       {selectedSchema === schema ? '' : `${schema}.`}
       {table}.{column}
     </Badge>
