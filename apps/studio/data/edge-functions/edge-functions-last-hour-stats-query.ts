@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-
 import { get, handleError } from 'data/fetchers'
+import dayjs from 'dayjs'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsLastHourStatsVariables = { projectRef?: string }
@@ -75,7 +75,9 @@ export async function getEdgeFunctionsLastHourStats(
   }, {})
 }
 
-export type EdgeFunctionsLastHourStatsData = Awaited<ReturnType<typeof getEdgeFunctionsLastHourStats>>
+export type EdgeFunctionsLastHourStatsData = Awaited<
+  ReturnType<typeof getEdgeFunctionsLastHourStats>
+>
 export type EdgeFunctionsLastHourStatsError = ResponseError
 
 export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHourStatsData>(
