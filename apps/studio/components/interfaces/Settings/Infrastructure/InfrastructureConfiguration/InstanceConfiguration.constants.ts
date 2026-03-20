@@ -37,7 +37,7 @@ export type ReplicaNodeData = NodeData & {
   onSelectDropReplica: () => void
 }
 
-export type EdgeDaga = {
+export type EdgeData = {
   status: string
   identifier: string
   connectionString: string | null | undefined

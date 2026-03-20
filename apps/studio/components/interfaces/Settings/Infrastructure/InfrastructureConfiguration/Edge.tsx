@@ -5,7 +5,7 @@ import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { EdgeDaga, REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { EdgeData, REPLICA_STATUS } from './InstanceConfiguration.constants'
 
 export const SmoothstepEdge = ({
   id,
@@ -18,7 +18,7 @@ export const SmoothstepEdge = ({
   style = {},
   markerEnd,
   data,
-}: EdgeProps<Edge<EdgeDaga>>) => {
+}: EdgeProps<Edge<EdgeData>>) => {
   const { ref } = useParams()
   // [Joshen] Only applicable for replicas
   const { status, identifier, connectionString } = data || {}
