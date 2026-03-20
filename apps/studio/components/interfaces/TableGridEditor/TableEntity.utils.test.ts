@@ -24,7 +24,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES ('1', 'Person 1'), ('2', 'Person 2'), ('3', 'Person 3');`
+    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2'), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -48,7 +48,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES ('1', 'Person 1'), ('2', null), ('3', 'Person 3');`
+    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, null), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -155,7 +155,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES ('1', 'Person 1'), ('2', 'Person 2');`
+    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2');`
     expect(result).toBe(expected)
   })
 })
