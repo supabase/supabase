@@ -3,6 +3,7 @@ import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { RLS_PROMPT } from 'lib/ai/prompts'
 import { getTools } from 'lib/ai/tools'
@@ -93,7 +94,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
       routingKey: 'sql-policy',
-      reasoningEffort: 'none',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {

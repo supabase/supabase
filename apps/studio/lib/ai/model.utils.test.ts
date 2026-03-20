@@ -6,11 +6,13 @@ import {
   ASSISTANT_MODELS_BASE,
   DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  DEFAULT_COMPLETION_MODEL,
   defaultAssistantModelId,
   getAssistantModelEntry,
   getDefaultModelForProvider,
   isAdvanceOnlyModelId,
   isAssistantBaseModelId,
+  openaiModelEntry,
   PROVIDERS,
 } from './model.utils'
 import type { ProviderName } from './model.utils'
@@ -77,7 +79,7 @@ describe('model.utils', () => {
 
       providers.forEach((provider) => {
         const models = PROVIDERS[provider].models
-        Object.entries(models).forEach(([modelId, config]) => {
+        Object.entries(models).forEach(([_modelId, config]) => {
           expect(config).toHaveProperty('default')
           expect(typeof config.default).toBe('boolean')
         })
@@ -137,6 +139,21 @@ describe('model.utils', () => {
       expect(getAssistantModelEntry('gpt-5-mini')).toEqual(
         ASSISTANT_MODELS_BASE.find((m) => m.id === 'gpt-5-mini')
       )
+    })
+
+    it('DEFAULT_COMPLETION_MODEL is gpt-5-mini with no reasoning effort', () => {
+      expect(DEFAULT_COMPLETION_MODEL.id).toBe(DEFAULT_ASSISTANT_BASE_MODEL_ID)
+      expect(DEFAULT_COMPLETION_MODEL.reasoningEffort).toBeUndefined()
+    })
+
+    it('openaiModelEntry enforces valid reasoning effort at compile time', () => {
+      // Valid: supported effort level
+      const withEffort = openaiModelEntry({ id: 'gpt-5-mini', reasoningEffort: 'low' })
+      expect(withEffort.reasoningEffort).toBe('low')
+
+      // Valid: no effort
+      const withoutEffort = openaiModelEntry({ id: 'gpt-5-mini' })
+      expect(withoutEffort.reasoningEffort).toBeUndefined()
     })
   })
 })

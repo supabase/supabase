@@ -5,6 +5,7 @@ import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Messag
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -99,8 +100,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
       routingKey: 'feedback',
-      reasoningEffort: 'none',
-      hasAccessToAdvanceModel: false,
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {

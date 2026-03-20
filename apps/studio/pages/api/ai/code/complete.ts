@@ -5,6 +5,7 @@ import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   EDGE_FUNCTION_PROMPT,
@@ -71,7 +72,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     } = await getModel({
       provider: 'openai',
       routingKey: projectRef,
-      reasoningEffort: 'none',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {

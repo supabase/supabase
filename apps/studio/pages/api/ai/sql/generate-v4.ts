@@ -141,17 +141,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
 
-  const assistantConfig = getAssistantModelEntry(effectiveModel)
   const {
     modelParams,
     error: modelError,
     promptProviderOptions,
   } = await getModel({
     provider: 'openai',
-    model: effectiveModel,
     routingKey: projectRef,
     hasAccessToAdvanceModel,
-    reasoningEffort: assistantConfig?.reasoningEffort,
+    modelEntry: getAssistantModelEntry(effectiveModel)!,
   })
 
   if (modelError) {

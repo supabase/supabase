@@ -2,6 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as bedrockModule from './bedrock'
 import { getModel, ModelErrorMessage } from './model'
+import { openaiModelEntry } from './model.utils'
 
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
@@ -9,7 +10,7 @@ vi.mock('@ai-sdk/openai', () => ({
 
 vi.mock('./bedrock', async () => ({
   ...(await vi.importActual('./bedrock')),
-  createRoutedBedrock: vi.fn(() => async (modelId: string) => 'bedrock-model'),
+  createRoutedBedrock: vi.fn(() => async (_modelId: string) => 'bedrock-model'),
   checkAwsCredentials: vi.fn(),
 }))
 
@@ -86,9 +87,9 @@ describe('getModel', () => {
 
     const { modelParams, error } = await getModel({
       provider: 'openai',
-      model: 'gpt-5',
       routingKey: 'rk',
       hasAccessToAdvanceModel: true,
+      modelEntry: openaiModelEntry({ id: 'gpt-5', reasoningEffort: 'minimal' }),
     })
 
     expect(error).toBeUndefined()

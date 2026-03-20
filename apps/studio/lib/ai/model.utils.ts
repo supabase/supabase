@@ -2,7 +2,7 @@ export type ProviderName = 'bedrock' | 'openai' | 'anthropic'
 
 export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
 
-export type OpenAIModel = 'gpt-5' | 'gpt-5-mini'
+export type OpenAIModelId = 'gpt-5' | 'gpt-5-mini'
 
 export type AnthropicModel = 'claude-sonnet-4-20250514' | 'claude-3-5-haiku-20241022'
 
@@ -13,7 +13,7 @@ export type AnthropicModel = 'claude-sonnet-4-20250514' | 'claude-3-5-haiku-2024
 export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
 
 // Maps each known OpenAI model to the effort levels it supports.
-// Used to enforce valid combinations at compile time via assistantModel().
+// Used to enforce valid combinations at compile time via openaiModelEntry().
 // Note: newer models (e.g. gpt-5.4-nano, gpt-5.3-codex) support different sets of levels
 // (e.g. 'none'/'xhigh' may be available; 'minimal' may not). Add entries here when
 // introducing new models — check the per-model docs page and the community compatibility
@@ -23,8 +23,19 @@ type ModelReasoningSupport = {
   'gpt-5-mini': 'minimal' | 'low' | 'medium' | 'high'
 }
 
-// Helper that enforces a valid reasoningEffort for the given model ID at compile time.
-function assistantModel<ModelId extends OpenAIModel>(config: {
+/**
+ * Type-safe factory for an OpenAI model entry.
+ * `reasoningEffort` is validated against the model at compile time — invalid combinations
+ * (e.g. 'none' on gpt-5-mini) are type errors.
+ *
+ * Use entries from ASSISTANT_MODELS for the chat assistant, or create an inline entry:
+ * ```ts
+ * openaiModelEntry({ id: 'gpt-5-mini', reasoningEffort: 'low' })  // valid
+ * openaiModelEntry({ id: 'gpt-5-mini', reasoningEffort: 'none' }) // type error
+ * openaiModelEntry({ id: 'gpt-5-mini' })                          // no reasoning (DEFAULT_COMPLETION_MODEL)
+ * ```
+ */
+export function openaiModelEntry<ModelId extends OpenAIModelId>(config: {
   id: ModelId
   reasoningEffort?: ModelId extends keyof ModelReasoningSupport
     ? ModelReasoningSupport[ModelId]
@@ -33,14 +44,19 @@ function assistantModel<ModelId extends OpenAIModel>(config: {
   return config
 }
 
+export type OpenAIModelIdEntry = ReturnType<typeof openaiModelEntry>
+
+/** Default model entry for simple completion endpoints — gpt-5-mini with no reasoning effort. */
+export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({ id: 'gpt-5-mini' })
+
 // Models available to all users (free tier).
 export const ASSISTANT_MODELS_BASE = [
-  assistantModel({ id: 'gpt-5-mini', reasoningEffort: 'minimal' }),
+  openaiModelEntry({ id: 'gpt-5-mini', reasoningEffort: 'minimal' }),
 ] as const
 
 // Models restricted to users with `assistant.advance_model` entitlement (paid plans).
 export const ASSISTANT_MODELS_ADVANCE_ONLY = [
-  assistantModel({ id: 'gpt-5', reasoningEffort: 'minimal' }),
+  openaiModelEntry({ id: 'gpt-5', reasoningEffort: 'minimal' }),
 ] as const
 
 // Single source of truth for all Assistant chat model variants and their reasoning levels.
@@ -84,7 +100,7 @@ export function getAssistantModelEntry(
   return ASSISTANT_MODELS.find((m) => m.id === id)
 }
 
-export type Model = BedrockModel | OpenAIModel | AnthropicModel
+export type Model = BedrockModel | OpenAIModelId | AnthropicModel
 
 export type ProviderModelConfig = {
   /** Optional providerOptions to attach to the system message for this model */
@@ -99,7 +115,7 @@ export type ProviderRegistry = {
     providerOptions?: Record<string, any>
   }
   openai: {
-    models: Record<OpenAIModel, ProviderModelConfig>
+    models: Record<OpenAIModelId, ProviderModelConfig>
     providerOptions?: Record<string, any>
   }
   anthropic: {
