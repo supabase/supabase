@@ -1,5 +1,5 @@
-import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import * as Sentry from '@sentry/nextjs'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
@@ -1068,10 +1068,7 @@ export const SidePanelEditor = ({
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
       />
-      <OperationQueueSidePanel
-        visible={snap.sidePanel?.type === 'operation-queue'}
-        closePanel={snap.closeSidePanel}
-      />
+      <OperationQueueSidePanel />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
