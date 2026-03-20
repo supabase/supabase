@@ -64,7 +64,7 @@ const pageMap = [
       title: 'Computed Fields',
       subtitle: 'Using Postgres Computed Fields with GraphQL.',
     },
-    remoteFile: 'computed-fields.md',
+    remoteFile: 'computed_fields.md',
   },
   {
     slug: 'configuration',

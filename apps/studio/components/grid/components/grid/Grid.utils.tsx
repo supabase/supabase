@@ -131,9 +131,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       if (isQueueOperationsEnabled) {
         queueCellEditWithOptimisticUpdate({
-          queryClient,
           queueOperation: tableEditorSnap.queueOperation,
-          projectRef: project.ref,
           tableId: snap.table.id,
           table: snap.originalTable,
           row: previousRow,
@@ -167,7 +165,6 @@ export function useOnRowsChange(rows: SupaRow[]) {
       snap.originalTable,
       snap.table.id,
       tableEditorSnap,
-      queryClient,
     ]
   )
 }

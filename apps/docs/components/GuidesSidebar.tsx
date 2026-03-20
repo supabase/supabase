@@ -30,7 +30,15 @@ function AiTools({ className }: { className?: string }) {
 
     try {
       const res = await fetch(mdUrl)
-      const text = await res.text()
+      let text: string
+
+      if (res.ok) {
+        text = await res.text()
+      } else {
+        // Default to HTML content within the article when no .md file is available.
+        text = document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? ''
+      }
+
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)

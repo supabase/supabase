@@ -360,10 +360,22 @@ const getContent = async (params: Params) => {
     const repoPath = `${org}/${repo}/${tag}/${docsDir}/${remoteFile}`
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
 
-    const response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
-      cache: 'force-cache',
-      next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
-    })
+    let response: Response
+    try {
+      response = await fetch(`https://raw.githubusercontent.com/${repoPath}`, {
+        cache: 'force-cache',
+        next: { tags: [REVALIDATION_TAGS.WRAPPERS] },
+      })
+    } catch (err) {
+      throw new Error(`Failed to fetch wrappers docs from GitHub (network error): ${err}`)
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch wrappers docs from GitHub: ${response.status} ${response.statusText}`
+      )
+    }
+
     const rawContent = await response.text()
 
     assetsBaseUrl = `https://raw.githubusercontent.com/${org}/${repo}/${tag}/docs/assets/`

@@ -46,10 +46,10 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from 'hooks/misc/useDataApiGrantTogglesEnabled'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { buildStudioPageTitle } from 'lib/page-title'
 import { useProfile } from 'lib/profile'
@@ -339,7 +339,9 @@ const Wizard: NextPageWithLayout = () => {
       dbSql:
         [
           enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
-          isDataApiGrantTogglesEnabled && buildDefaultPrivilegesSql('revoke'),
+          // [Alaister]: temporarily disable the default secure sql
+          // To re-enable, remove the false &&
+          false && isDataApiGrantTogglesEnabled && buildDefaultPrivilegesSql('revoke'),
         ]
           .filter(Boolean)
           .join('\n') || undefined,
