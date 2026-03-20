@@ -66,7 +66,7 @@ describe('getModel', () => {
   })
 
   it('returns openai model with default model', async () => {
-    process.env.OPENAI_API_KEY = 'test-key'
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
 
     const { modelParams, promptProviderOptions } = await getModel({
       provider: 'openai',
@@ -79,7 +79,7 @@ describe('getModel', () => {
   })
 
   it('returns error when OPENAI_API_KEY is not available', async () => {
-    delete process.env.OPENAI_API_KEY
+    vi.stubEnv('OPENAI_API_KEY', '')
 
     const { error } = await getModel({
       provider: 'openai',
@@ -89,8 +89,8 @@ describe('getModel', () => {
   })
 
   it('returns openai gpt-5 when hasAccessToAdvanceModel and not throttled', async () => {
-    process.env.OPENAI_API_KEY = 'test-key'
-    process.env.IS_THROTTLED = 'false'
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
+    vi.stubEnv('IS_THROTTLED', 'false')
 
     const { modelParams, error } = await getModel({
       provider: 'openai',
@@ -104,7 +104,7 @@ describe('getModel', () => {
   })
 
   it('applies reasoningEffort from DEFAULT_COMPLETION_MODEL', async () => {
-    process.env.OPENAI_API_KEY = 'test-key'
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
 
     const { modelParams, error } = await getModel({
       provider: 'openai',
