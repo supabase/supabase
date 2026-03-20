@@ -258,7 +258,7 @@ const updateForeignKey = async ({
   })
 }
 
-const getUpdateIdentitySequenceSQL = ({
+export const getUpdateIdentitySequenceSQL = ({
   schema,
   table,
   column,
@@ -267,7 +267,7 @@ const getUpdateIdentitySequenceSQL = ({
   table: string
   column: string
 }) => {
-  return `SELECT setval('"${schema}"."${table}_${column}_seq"', (SELECT COALESCE(MAX("${column}"), 1) FROM "${schema}"."${table}"))`
+  return `SELECT setval(pg_get_serial_sequence('"${schema}"."${table}"', '${column}'), (SELECT COALESCE(MAX("${column}"), 1) FROM "${schema}"."${table}"))`
 }
 
 const getEnableRLSSQL = ({ schema, table }: { schema: string; table: string }) => {

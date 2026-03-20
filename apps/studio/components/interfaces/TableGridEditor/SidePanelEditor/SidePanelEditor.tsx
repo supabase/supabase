@@ -56,11 +56,13 @@ import {
   createTable,
   duplicateTable,
   getRowFromSidePanel,
+  getUpdateIdentitySequenceSQL,
   insertRowsViaSpreadsheet,
   insertTableRows,
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { SpreadsheetImport } from './SpreadsheetImport/SpreadsheetImport'
 import {
   useTableApiAccessHandlerWithHistory,
@@ -898,7 +900,28 @@ export const SidePanelEditor = ({
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
     })
+    // For identity columns, manually raise the sequences
+    const identityColumns = (selectedTable?.columns ?? []).filter((column: PostgresColumn) => column.is_identity)
+    if (identityColumns.length > 0) {
+      const updateSequenceSQL = identityColumns
+        .map((column: PostgresColumn) =>
+          getUpdateIdentitySequenceSQL({
+            schema: selectedTable.schema,
+            table: selectedTable.name,
+            column: column.name,
+          })
+        )
+        .join(';\n')
+      await executeSql({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: updateSequenceSQL,
+        queryKey: ['sequences', 'update-batch'],
+      })
+    }
+
     resolve()
+
     snap.closeSidePanel()
   }
 
