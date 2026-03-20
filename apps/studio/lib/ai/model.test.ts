@@ -70,7 +70,6 @@ describe('getModel', () => {
 
     const { modelParams, promptProviderOptions } = await getModel({
       provider: 'openai',
-      hasAccessToAdvanceModel: true,
       modelEntry: openaiModelEntry({ id: 'gpt-5-mini' }),
     })
 
@@ -95,7 +94,6 @@ describe('getModel', () => {
 
     const { modelParams, error } = await getModel({
       provider: 'openai',
-      hasAccessToAdvanceModel: true,
       modelEntry: openaiModelEntry({ id: 'gpt-5', reasoningEffort: 'minimal' }),
     })
 
