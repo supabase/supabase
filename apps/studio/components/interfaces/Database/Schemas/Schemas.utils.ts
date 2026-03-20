@@ -1,9 +1,9 @@
 import dagre from '@dagrejs/dagre'
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
-import { Edge, Node, Position } from 'reactflow'
+import { Edge, Node, Position } from '@xyflow/react'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { tryParseJson } from 'lib/helpers'
@@ -163,7 +163,7 @@ function findTablesHandleIds(
   return []
 }
 
-export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
+export const getLayoutedElementsViaDagre = (nodes: Node<TableNodeData>[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
@@ -204,7 +204,7 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
 }
 
 const getLayoutedElementsViaLocalStorage = (
-  nodes: Node[],
+  nodes: Node<TableNodeData>[],
   edges: Edge[],
   positions: { [key: string]: { x: number; y: number } }
 ) => {

@@ -1,13 +1,21 @@
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Background,
+  BackgroundVariant,
+  ColorMode,
+  MiniMap,
+  Node,
+  ReactFlow,
+  useReactFlow,
+} from '@xyflow/react'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -37,7 +45,7 @@ import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanel
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
-import { TableNode } from './SchemaTableNode'
+import { TableNode, TableNodeData } from './SchemaTableNode'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -115,7 +123,10 @@ export const SchemaGraph = () => {
     const nodes = reactFlowInstance.getNodes()
     const edges = reactFlowInstance.getEdges()
 
-    getLayoutedElementsViaDagre(nodes, edges)
+    getLayoutedElementsViaDagre(
+      nodes.filter((item) => item.type === 'table') as Node<TableNodeData>[],
+      edges
+    )
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
     setTimeout(() => reactFlowInstance.fitView({}))
@@ -369,6 +380,8 @@ export const SchemaGraph = () => {
             <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
               <div className="w-full h-full">
                 <ReactFlow
+                  // FIXME: https://github.com/xyflow/xyflow/issues/4876
+                  colorMode={'' as unknown as ColorMode}
                   defaultNodes={[]}
                   defaultEdges={[]}
                   defaultEdgeOptions={{

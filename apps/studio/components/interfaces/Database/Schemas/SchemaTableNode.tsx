@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Handle, Node, NodeProps } from '@xyflow/react'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { TableEditor } from 'icons'
 import {
@@ -13,7 +14,6 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Handle, NodeProps } from 'reactflow'
 import {
   Button,
   cn,
@@ -58,7 +58,7 @@ export const TableNode = ({
   targetPosition,
   sourcePosition,
   placeholder,
-}: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
+}: NodeProps<Node<TableNodeData>> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
