@@ -54,7 +54,8 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [schemaSearchTerm, setSchemaSearchTerm] = useState('')
+  const [tableSearchTerm, setTableSearchTerm] = useState('')
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -63,7 +64,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',
-    search: searchTerm,
+    search: tableSearchTerm,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -90,8 +91,12 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
     [entities?.pages]
   )
 
-  function handleSearchChange(value: string) {
-    setSearchTerm(value)
+  function handleSchemaSearchChange(value: string) {
+    setSchemaSearchTerm(value)
+  }
+
+  function handleTableSearchChange(value: string) {
+    setTableSearchTerm(value)
   }
 
   const columns = tableColumns?.[0]?.columns ?? []
@@ -158,8 +163,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       loading={isExecuting}
       confirmText="Create index"
     >
-      <div className="py-6 space-y-6">
-        <SidePanel.Content className="space-y-6">
+      <SidePanel.Content className="py-6 space-y-6">
           <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
             <Popover_Shadcn_
               modal={false}
@@ -188,9 +192,9 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               >
                 <Command_Shadcn_>
                   <CommandInput_Shadcn_
-                    placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
+                    placeholder="Find schema..."
+                    value={schemaSearchTerm}
+                    onValueChange={handleSchemaSearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
@@ -203,14 +207,16 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             onSelect={() => {
                               setSelectedSchema(schema.name)
                               setSchemaDropdownOpen(false)
+                              setSchemaSearchTerm('')
                             }}
                             onClick={() => {
                               setSelectedSchema(schema.name)
                               setSchemaDropdownOpen(false)
+                              setSchemaSearchTerm('')
                             }}
                           >
                             <span>{schema.name}</span>
-                            {selectedEntity === schema.name && (
+                            {selectedSchema === schema.name && (
                               <Check className="text-brand" strokeWidth={2} size={16} />
                             )}
                           </CommandItem_Shadcn_>
@@ -271,8 +277,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <Command_Shadcn_ shouldFilter={false}>
                   <CommandInput_Shadcn_
                     placeholder="Find table..."
-                    value={searchTerm}
-                    onValueChange={handleSearchChange}
+                    value={tableSearchTerm}
+                    onValueChange={handleTableSearchChange}
                   />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>
@@ -294,10 +300,12 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             onSelect={() => {
                               setSelectedEntity(entity.name)
                               setTableDropdownOpen(false)
+                              setTableSearchTerm('')
                             }}
                             onClick={() => {
                               setSelectedEntity(entity.name)
                               setTableDropdownOpen(false)
+                              setTableSearchTerm('')
                             }}
                           >
                             <span>{entity.name}</span>
@@ -416,7 +424,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             </div>
           </>
         )}
-      </div>
     </SidePanel>
   )
 }
+```
