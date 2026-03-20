@@ -2,7 +2,7 @@ import type { components } from 'api-types'
 import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
 import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
-import { useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -18,7 +18,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   ScrollArea,
-  Separator,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -27,6 +26,7 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import { PERMISSIONS } from './PrivateApps.constants'
@@ -36,36 +36,42 @@ type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppRespons
 type CreatePlatformAppSigningKeyResponse =
   components['schemas']['CreatePlatformAppSigningKeyResponse']
 
-const STEPS = [
-  { key: 'details', label: 'App details' },
-  { key: 'signing-key', label: 'Signing key' },
-] as const
-
-type Step = (typeof STEPS)[number]['key']
-
-function StepIndicator({ currentStep }: { currentStep: Step }) {
-  const currentIndex = STEPS.findIndex((s) => s.key === currentStep)
+function Step({
+  number,
+  title,
+  description,
+  isLast = false,
+  disabled = false,
+  children,
+}: PropsWithChildren<{
+  number: number
+  title: string
+  description: string
+  isLast?: boolean
+  disabled?: boolean
+}>) {
   return (
-    <div className="flex items-center gap-2">
-      {STEPS.map((step, i) => {
-        const isActive = i === currentIndex
-        const isDone = i < currentIndex
-        return (
-          <div key={step.key} className="flex items-center gap-2">
-            {i > 0 && <div className="w-4 h-px bg-border-strong" />}
-            <div className="flex items-center gap-1.5">
-              <div
-                className={`w-1.5 h-1.5 rounded-full transition-colors ${isActive || isDone ? 'bg-foreground' : 'bg-border-strong'}`}
-              />
-              <span
-                className={`text-xs transition-colors ${isActive ? 'text-foreground' : 'text-foreground-muted'}`}
-              >
-                {step.label}
-              </span>
-            </div>
+    <div
+      className={`flex items-start gap-6 self-stretch transition-opacity ${disabled ? 'opacity-40 pointer-events-none' : ''}`}
+    >
+      <div className="relative self-stretch shrink-0 w-6">
+        <div className="absolute inset-0 flex items-start justify-center">
+          {!isLast && (
+            <div
+              aria-hidden
+              className="absolute left-[calc(50%-1px)] w-px bg-border opacity-60 h-full"
+            />
+          )}
+          <div className="relative z-10 flex font-mono text-xs items-center justify-center min-w-6 w-6 h-6 border border-default rounded-md bg-surface-100 text-foreground-light">
+            {number}
           </div>
-        )
-      })}
+        </div>
+      </div>
+      <div className={`w-full ${isLast ? '' : 'pb-10'}`}>
+        <p className="text-sm font-medium text-foreground mb-1">{title}</p>
+        <p className="text-sm text-foreground-light mb-4">{description}</p>
+        {children}
+      </div>
     </div>
   )
 }
@@ -78,18 +84,14 @@ interface CreateAppSheetProps {
 
 export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetProps) {
   const { slug } = usePrivateApps()
-  const [step, setStep] = useState<Step>('details')
+
+  const [name, setName] = useState('')
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([])
+  const [permissionSearchOpen, setPermissionSearchOpen] = useState(false)
   const [createdApp, setCreatedApp] = useState<CreatePlatformAppResponse | null>(null)
   const [generatedKey, setGeneratedKey] = useState<CreatePlatformAppSigningKeyResponse | null>(null)
   const [keyCopied, setKeyCopied] = useState(false)
-
-  const { mutate: createApp, isPending: isCreatingApp } = usePlatformAppCreateMutation({
-    onSuccess: (data) => {
-      toast.success(`App "${data.name}" created`)
-      setCreatedApp(data)
-      setStep('signing-key')
-    },
-  })
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false)
 
   const { mutate: createSigningKey, isPending: isCreatingKey } =
     usePlatformAppSigningKeyCreateMutation({
@@ -98,15 +100,18 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
       },
     })
 
-  const [name, setName] = useState('')
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([])
-  const [permissionSearchOpen, setPermissionSearchOpen] = useState(false)
+  const { mutate: createApp, isPending: isCreatingApp } = usePlatformAppCreateMutation({
+    onSuccess: (data) => {
+      toast.success(`App "${data.name}" created`)
+      setCreatedApp(data)
+      createSigningKey({ slug: slug!, appId: data.id })
+    },
+  })
 
   function reset() {
     setName('')
     setSelectedPermissions([])
     setPermissionSearchOpen(false)
-    setStep('details')
     setCreatedApp(null)
     setGeneratedKey(null)
     setKeyCopied(false)
@@ -115,6 +120,10 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
   function handleClose() {
     reset()
     onClose()
+  }
+
+  function handleRequestClose() {
+    setShowCloseConfirm(true)
   }
 
   function handleCreate() {
@@ -127,11 +136,6 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
     })
   }
 
-  function handleGenerateKey() {
-    if (!slug || !createdApp) return
-    createSigningKey({ slug, appId: createdApp.id })
-  }
-
   function toggle(id: string) {
     setSelectedPermissions((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
@@ -139,50 +143,55 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
   }
 
   const canCreate = name.trim().length > 0 && selectedPermissions.length > 0
+  const isLoading = isCreatingApp || isCreatingKey
+  const keyRevealed = generatedKey !== null
 
   return (
-    <Sheet
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) handleClose()
-      }}
-    >
-      <SheetContent
-        showClose={false}
-        size="default"
-        className="!min-w-[600px] flex flex-col h-full gap-0"
+    <>
+      <Sheet
+        open={visible}
+        onOpenChange={(open) => {
+          if (!open) handleRequestClose()
+        }}
       >
-        <SheetHeader>
-          <SheetTitle>
-            {step === 'details' ? 'Create private app' : 'Generate signing key'}
-          </SheetTitle>
-          <SheetDescription className="sr-only">
-            {step === 'details'
-              ? 'Create a private app to generate scoped access tokens for your organization.'
-              : 'Generate a signing key for your new app.'}
-          </SheetDescription>
-        </SheetHeader>
+        <SheetContent
+          showClose={false}
+          size="default"
+          className="!min-w-[600px] flex flex-col h-full gap-0"
+        >
+          <SheetHeader>
+            <SheetTitle>Create private app</SheetTitle>
+            <SheetDescription className="sr-only">
+              Create a private app to generate scoped access tokens for your organization.
+            </SheetDescription>
+          </SheetHeader>
 
-        {step === 'details' ? (
-          <>
-            <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
-              <div className="flex flex-col gap-0">
-                {/* Basic info */}
-                <div className="px-5 sm:px-6 py-6 space-y-4">
-                  <FormLayout label="App name" id="app-name">
-                    <Input_Shadcn_
-                      id="app-name"
-                      placeholder="My integration"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </FormLayout>
-                </div>
+          <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
+            <div className="px-5 sm:px-6 py-6">
+              <Step
+                number={1}
+                title="App details"
+                description="Give your private app a name."
+                disabled={keyRevealed}
+              >
+                <FormLayout label="Name" id="app-name">
+                  <Input_Shadcn_
+                    id="app-name"
+                    placeholder="My integration"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </FormLayout>
+              </Step>
 
-                <Separator />
-
-                {/* Permissions */}
-                <div className="px-5 sm:px-6 py-6 space-y-4">
+              <Step
+                number={2}
+                title="Permissions"
+                description="Select the permissions this app requires."
+                disabled={keyRevealed}
+              >
+                <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Configure permissions</span>
                     <div className="flex items-center gap-2">
@@ -193,6 +202,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                           className="p-1"
                           icon={<RotateCcw size={16} />}
                           onClick={() => setSelectedPermissions([])}
+                          disabled={isLoading}
                         />
                       )}
                       <Popover_Shadcn_
@@ -201,7 +211,12 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         modal
                       >
                         <PopoverTrigger_Shadcn_ asChild>
-                          <Button type="default" size="tiny" icon={<Plus size={14} />}>
+                          <Button
+                            type="default"
+                            size="tiny"
+                            icon={<Plus size={14} />}
+                            disabled={isLoading}
+                          >
                             Add permission
                           </Button>
                         </PopoverTrigger_Shadcn_>
@@ -256,13 +271,18 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                             <div className="flex items-center gap-3 p-3">
                               <div className="flex-1">
                                 <p className="text-sm font-medium">{perm?.label}</p>
-                                <p className="text-xs text-foreground-light">{perm?.description}</p>
+                                {perm?.description && (
+                                  <p className="text-xs text-foreground-lighter">
+                                    {perm.description}
+                                  </p>
+                                )}
                               </div>
                               <Button
                                 type="text"
                                 size="tiny"
                                 className="p-1"
                                 icon={<X size={16} />}
+                                disabled={isLoading}
                                 onClick={() =>
                                   setSelectedPermissions((prev) => prev.filter((p) => p !== id))
                                 }
@@ -284,143 +304,133 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                     </span>
                   </div>
                 </div>
-              </div>
-            </ScrollArea>
+              </Step>
 
-            <SheetFooter className="!flex-row !justify-between items-center w-full mt-auto py-4 border-t">
-              <StepIndicator currentStep="details" />
-              <div className="flex gap-2">
-                <Button type="default" onClick={handleClose} disabled={isCreatingApp}>
-                  Cancel
+              <Step
+                number={3}
+                title="Signing key"
+                description={
+                  isCreatingKey
+                    ? 'Generating your signing key...'
+                    : keyRevealed
+                      ? 'This is the only time you can view this key. Copy or download it and store it securely.'
+                      : "A signing key will be generated automatically when you create the app. You'll only be able to view it once."
+                }
+                isLast
+                disabled={createdApp === null && !isLoading}
+              >
+                {isCreatingKey && (
+                  <p className="text-sm text-foreground-light animate-pulse">
+                    Generating signing key...
+                  </p>
+                )}
+                {keyRevealed && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-medium">Private key</h3>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="default"
+                          size="tiny"
+                          icon={<Copy size={12} />}
+                          onClick={() => {
+                            navigator.clipboard.writeText(generatedKey.private_key)
+                            toast.success('Private key copied to clipboard')
+                          }}
+                        >
+                          Copy
+                        </Button>
+                        <Button
+                          type="default"
+                          size="tiny"
+                          icon={<Download size={12} />}
+                          onClick={() => {
+                            const blob = new Blob([generatedKey.private_key], {
+                              type: 'text/plain',
+                            })
+                            const url = URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.href = url
+                            a.download = `${createdApp?.name.toLowerCase().replace(/\s+/g, '-')}-private-key.pem`
+                            a.click()
+                            URL.revokeObjectURL(url)
+                          }}
+                        >
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                    <textarea
+                      readOnly
+                      value={generatedKey.private_key}
+                      rows={8}
+                      className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
+                    />
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <Checkbox_Shadcn_
+                        id="key-copied"
+                        checked={keyCopied}
+                        onCheckedChange={(v) => setKeyCopied(Boolean(v))}
+                      />
+                      <span className="text-sm text-foreground-light cursor-pointer select-none">
+                        I have copied the key and stored it securely
+                      </span>
+                    </label>
+                  </div>
+                )}
+              </Step>
+            </div>
+          </ScrollArea>
+
+          <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
+            <div className="flex gap-2">
+              <Button type="default" onClick={handleRequestClose} disabled={isLoading}>
+                Cancel
+              </Button>
+              {keyRevealed ? (
+                <Button
+                  type="primary"
+                  disabled={!keyCopied}
+                  onClick={() => {
+                    onCreated(createdApp!)
+                    handleClose()
+                  }}
+                >
+                  Done
                 </Button>
+              ) : (
                 <Button
                   type="primary"
                   disabled={!canCreate}
-                  loading={isCreatingApp}
+                  loading={isLoading}
                   onClick={handleCreate}
                 >
                   Create app
                 </Button>
-              </div>
-            </SheetFooter>
-          </>
-        ) : (
-          <>
-            <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
-              <div className="flex flex-col gap-0">
-                {/* App info */}
-                <div className="px-5 sm:px-6 py-6">
-                  <div className="border border-border rounded-lg divide-y divide-border">
-                    <div className="flex items-center px-4 py-3 gap-4">
-                      <span className="text-sm text-foreground-light w-24 shrink-0">App name</span>
-                      <span className="text-sm font-medium">{createdApp?.name}</span>
-                    </div>
-                    <div className="flex items-center px-4 py-3 gap-4">
-                      <span className="text-sm text-foreground-light w-24 shrink-0">App ID</span>
-                      <span className="font-mono text-xs truncate">{createdApp?.id}</span>
-                    </div>
-                  </div>
-                </div>
+              )}
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-                <Separator />
-
-                {/* Signing key */}
-                <div className="px-5 sm:px-6 py-6">
-                  {generatedKey ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-medium">Private key</h3>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="default"
-                            size="tiny"
-                            icon={<Copy size={12} />}
-                            onClick={() => {
-                              navigator.clipboard.writeText(generatedKey.private_key)
-                              toast.success('Private key copied to clipboard')
-                            }}
-                          >
-                            Copy
-                          </Button>
-                          <Button
-                            type="default"
-                            size="tiny"
-                            icon={<Download size={12} />}
-                            onClick={() => {
-                              const blob = new Blob([generatedKey.private_key], {
-                                type: 'text/plain',
-                              })
-                              const url = URL.createObjectURL(blob)
-                              const a = document.createElement('a')
-                              a.href = url
-                              a.download = `${createdApp?.name.toLowerCase().replace(/\s+/g, '-')}-private-key.pem`
-                              a.click()
-                              URL.revokeObjectURL(url)
-                            }}
-                          >
-                            Download
-                          </Button>
-                        </div>
-                      </div>
-                      <textarea
-                        readOnly
-                        value={generatedKey.private_key}
-                        rows={8}
-                        className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
-                      />
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <Checkbox_Shadcn_
-                          id="key-copied"
-                          checked={keyCopied}
-                          onCheckedChange={(v) => setKeyCopied(Boolean(v))}
-                        />
-                        <span className="text-sm text-foreground-light cursor-pointer select-none">
-                          I have copied the key and stored it securely
-                        </span>
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-medium">Signing key</h3>
-                      <p className="text-sm text-foreground-light">
-                        Generate a signing key to authenticate requests made by this app. You'll
-                        only be able to view the private key once — store it securely.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </ScrollArea>
-
-            <SheetFooter className="!flex-row !justify-between items-center w-full mt-auto py-4 border-t">
-              <StepIndicator currentStep="signing-key" />
-              <div className="flex gap-2">
-                {generatedKey ? (
-                  <Button
-                    type="primary"
-                    disabled={!keyCopied}
-                    onClick={() => {
-                      onCreated(createdApp!)
-                      handleClose()
-                    }}
-                  >
-                    Done
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    icon={<Key size={14} />}
-                    loading={isCreatingKey}
-                    onClick={handleGenerateKey}
-                  >
-                    Generate signing key
-                  </Button>
-                )}
-              </div>
-            </SheetFooter>
-          </>
-        )}
-      </SheetContent>
-    </Sheet>
+      <ConfirmationModal
+        variant="destructive"
+        visible={showCloseConfirm}
+        title="Close without saving?"
+        confirmLabel="Close"
+        confirmLabelLoading="Closing..."
+        onCancel={() => setShowCloseConfirm(false)}
+        onConfirm={() => {
+          setShowCloseConfirm(false)
+          handleClose()
+        }}
+      >
+        <p className="text-sm text-foreground-light py-2">
+          {keyRevealed
+            ? 'Your signing key has been generated but not saved. If you close now, you will lose access to it permanently.'
+            : 'Any progress you have made will be lost.'}
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }
