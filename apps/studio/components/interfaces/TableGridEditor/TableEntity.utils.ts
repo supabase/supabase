@@ -56,6 +56,8 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           stringFormats.includes(format)
         ) {
           return `'${val.replaceAll("'", "''")}'`
+        } else if (typeof val === 'number' || typeof val === 'boolean') {
+          return `${val}`
         } else {
           return `'${val}'`
         }
@@ -108,7 +110,7 @@ const formatArrayForSql = (arr: unknown[]): string => {
     if (Array.isArray(item)) {
       result += formatArrayForSql(item)
     } else if (typeof item === 'string') {
-      result += `"${item.replace(/"/g, '""')}"`
+      result += `'${item.replaceAll("'", "''")}'`
     } else if (!!item && typeof item === 'object') {
       result += `${safeDollarQuote(JSON.stringify(item))}::json`
     } else {
