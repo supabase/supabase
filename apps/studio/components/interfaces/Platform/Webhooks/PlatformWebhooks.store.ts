@@ -8,6 +8,7 @@ import type {
   WebhookEndpoint,
   WebhookScope,
 } from './PlatformWebhooks.types'
+import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
 
 interface CreateEndpointOptions {
   now?: string
@@ -18,6 +19,10 @@ interface CreateEndpointOptions {
 
 interface UpdateEndpointOptions {
   headerIdFactory?: () => string
+}
+
+interface RetryDeliveryOptions {
+  now?: string
 }
 
 const secureRandomHex = (length: number) => {
@@ -38,6 +43,18 @@ const secureRandomHex = (length: number) => {
 }
 
 const randomId = (prefix: string) => `${prefix}-${secureRandomHex(8)}`
+const randomUuid = () => {
+  const cryptoApi = globalThis.crypto
+  if (cryptoApi?.randomUUID) return cryptoApi.randomUUID()
+
+  return [
+    secureRandomHex(8),
+    secureRandomHex(4),
+    `4${secureRandomHex(3)}`,
+    `${((parseInt(secureRandomHex(2), 16) & 0x3f) | 0x80).toString(16)}${secureRandomHex(2)}`,
+    secureRandomHex(12),
+  ].join('-')
+}
 
 const generateSigningSecret = () => `whsec_${secureRandomHex(16)}`
 
@@ -95,12 +112,11 @@ export const createWebhookEndpoint = (
   input: UpsertWebhookEndpointInput,
   options?: CreateEndpointOptions
 ): { state: PlatformWebhooksState; endpoint: WebhookEndpoint; signingSecret: string } => {
-  const endpointId = options?.endpointId ?? randomId('endpoint')
-  const internalName = input.name.trim().length > 0 ? input.name.trim() : endpointId
+  const endpointId = options?.endpointId ?? randomUuid()
   const signingSecret = options?.signingSecret ?? generateSigningSecret()
   const endpoint: WebhookEndpoint = {
     id: endpointId,
-    name: internalName,
+    name: input.name.trim(),
     url: input.url.trim(),
     description: input.description.trim(),
     enabled: input.enabled,
@@ -132,7 +148,7 @@ export const updateWebhookEndpoint = (
       endpoint.id === endpointId
         ? {
             ...endpoint,
-            name: input.name.trim().length > 0 ? input.name.trim() : endpoint.name,
+            name: input.name.trim(),
             url: input.url.trim(),
             description: input.description.trim(),
             enabled: input.enabled,
@@ -180,12 +196,38 @@ export const regenerateWebhookEndpointSecret = (
   }
 }
 
+export const retryWebhookDelivery = (
+  state: PlatformWebhooksState,
+  deliveryId: string,
+  options?: RetryDeliveryOptions
+) => {
+  const delivery = state.deliveries.find((item) => item.id === deliveryId)
+  if (!delivery || delivery.status === 'success') return state
+
+  const now = options?.now ?? new Date().toISOString()
+
+  return {
+    ...state,
+    deliveries: state.deliveries.map<WebhookDelivery>((delivery) => {
+      if (delivery.id !== deliveryId) return delivery
+
+      return {
+        ...delivery,
+        status: 'pending',
+        responseCode: undefined,
+        attemptAt: now,
+      }
+    }),
+  }
+}
+
 export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: string) => {
   const normalizedSearch = normalizeSearch(search)
   if (normalizedSearch.length === 0) return endpoints
 
   return endpoints.filter((endpoint) => {
-    const haystack = `${endpoint.name} ${endpoint.url} ${endpoint.description}`.toLowerCase()
+    const haystack =
+      `${getWebhookEndpointDisplayName(endpoint)} ${endpoint.url} ${endpoint.description}`.toLowerCase()
     return haystack.includes(normalizedSearch)
   })
 }
@@ -205,6 +247,7 @@ export const filterWebhookDeliveries = (
         `${delivery.eventType} ${delivery.status} ${delivery.responseCode ?? ''}`.toLowerCase()
       return haystack.includes(normalizedSearch)
     })
+    .sort((a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime())
 }
 
 export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
@@ -229,7 +272,7 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
   return {
     ...state,
     createEndpoint: (input: UpsertWebhookEndpointInput) => {
-      const endpointId = randomId('endpoint')
+      const endpointId = randomUuid()
       const now = new Date().toISOString()
       const signingSecret = generateSigningSecret()
       const createdBy = 'mock-user@supabase.io'
@@ -262,6 +305,9 @@ export const usePlatformWebhooksMockStore = (scope: WebhookScope) => {
 
       applyStateUpdate(() => next.state)
       return next.signingSecret
+    },
+    retryDelivery: (deliveryId: string) => {
+      applyStateUpdate((prev) => retryWebhookDelivery(prev, deliveryId))
     },
   }
 }

@@ -65,10 +65,11 @@ export const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const [isDismissedTableFilterBar, setIsDismissedTableFilterBar] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
+  const [isDismissedTableQueueOperations, setIsDismissedTableQueueOperations] =
+    useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
+      false
+    )
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const allFeaturePreviews = (
@@ -90,10 +91,10 @@ export const FeaturePreviewModal = () => {
     })
 
     if (
-      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR &&
-      !isDismissedTableFilterBar
+      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS &&
+      !isDismissedTableQueueOperations
     ) {
-      setIsDismissedTableFilterBar(true)
+      setIsDismissedTableQueueOperations(true)
     }
   }
 

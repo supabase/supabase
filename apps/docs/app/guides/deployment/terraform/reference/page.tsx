@@ -394,10 +394,19 @@ const TerraformReferencePage = async () => {
  * Fetch JSON schema from external repo
  */
 const getSchema = async () => {
-  let response = await fetchRevalidatePerDay(
-    `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${terraformDocsDocsDir}/schema.json`
-  )
-  if (!response.ok) throw Error('Failed to fetch Terraform JSON schema from GitHub')
+  let response: Response
+  try {
+    response = await fetchRevalidatePerDay(
+      `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${terraformDocsDocsDir}/schema.json`
+    )
+  } catch (err) {
+    throw new Error(`Failed to fetch Terraform JSON schema from GitHub (network error): ${err}`)
+  }
+
+  if (!response.ok)
+    throw Error(
+      `Failed to fetch Terraform JSON schema from GitHub: ${response.status} ${response.statusText}`
+    )
 
   const schema = await response.json()
 

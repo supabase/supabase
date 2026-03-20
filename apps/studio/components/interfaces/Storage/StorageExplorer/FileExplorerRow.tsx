@@ -202,7 +202,9 @@ export const FileExplorerRow = ({
                       {
                         name: 'Get URL',
                         icon: <Copy size={12} className="text-foreground-light" />,
-                        onClick: () => onCopyUrl(itemWithColumnIndex.name),
+                        onClick: () => {
+                          onCopyUrl(itemWithColumnIndex.path!)
+                        },
                       },
                     ]
                   : [
@@ -213,17 +215,17 @@ export const FileExplorerRow = ({
                           {
                             name: 'Expire in 1 week',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.WEEK),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.WEEK),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.MONTH),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.MONTH),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.YEAR),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.YEAR),
                           },
                           {
                             name: 'Custom expiry',
@@ -404,6 +406,7 @@ export const FileExplorerRow = ({
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
                   <MoreVertical size={16} strokeWidth={2} />
+                  <span className="sr-only">{item.name} actions</span>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">

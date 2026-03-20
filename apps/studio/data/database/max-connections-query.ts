@@ -1,13 +1,9 @@
+import { getMaxConnectionsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
-
-export const getMaxConnectionsSql = () => {
-  const sql = /* SQL */ `show max_connections`
-
-  return sql
-}
 
 export type MaxConnectionsVariables = {
   projectRef?: string

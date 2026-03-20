@@ -4,7 +4,7 @@ import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
 import { SidebarContent } from 'components/interfaces/Sidebar'
 import { UserDropdown } from 'components/interfaces/UserDropdown'
-import FloatingMobileToolbar from 'components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
+import { FloatingMobileToolbar } from 'components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
