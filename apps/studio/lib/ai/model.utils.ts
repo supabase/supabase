@@ -1,10 +1,8 @@
-export type ProviderName = 'bedrock' | 'openai' | 'anthropic'
+export type ProviderName = 'bedrock' | 'openai'
 
 export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
 
 export type OpenAIModelId = 'gpt-5' | 'gpt-5-mini'
-
-export type AnthropicModel = 'claude-sonnet-4-20250514' | 'claude-3-5-haiku-20241022'
 
 // Source: https://developers.openai.com/api/docs/guides/reasoning + per-model pages
 export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
@@ -88,7 +86,7 @@ export function getAssistantModelEntry(
   return ASSISTANT_MODELS.find((m) => m.id === id)
 }
 
-export type Model = BedrockModel | OpenAIModelId | AnthropicModel
+export type Model = BedrockModel | OpenAIModelId
 
 export type ProviderModelConfig = {
   /** Optional providerOptions to attach to the system message for this model */
@@ -104,10 +102,6 @@ export type ProviderRegistry = {
   }
   openai: {
     models: Record<OpenAIModelId, ProviderModelConfig>
-    providerOptions?: Record<string, any>
-  }
-  anthropic: {
-    models: Record<AnthropicModel, ProviderModelConfig>
     providerOptions?: Record<string, any>
   }
 }
@@ -138,12 +132,6 @@ export const PROVIDERS: ProviderRegistry = {
       openai: {
         store: false,
       },
-    },
-  },
-  anthropic: {
-    models: {
-      'claude-sonnet-4-20250514': { default: false },
-      'claude-3-5-haiku-20241022': { default: true },
     },
   },
 }

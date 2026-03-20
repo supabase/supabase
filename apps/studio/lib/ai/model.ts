@@ -48,10 +48,6 @@ export type GetModelParams =
       routingKey: string
       hasAccessToAdvanceModel?: boolean
     }
-  | {
-      provider: 'anthropic'
-      hasAccessToAdvanceModel?: boolean
-    }
 
 /**
  * Retrieves a LanguageModel from a specific provider and model entry.

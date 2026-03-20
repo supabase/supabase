@@ -29,11 +29,6 @@ describe('model.utils', () => {
       expect(result).toBe('gpt-5-mini')
     })
 
-    it('should return correct default for anthropic provider', () => {
-      const result = getDefaultModelForProvider('anthropic')
-      expect(result).toBe('claude-3-5-haiku-20241022')
-    })
-
     it('should return undefined for unknown provider', () => {
       const result = getDefaultModelForProvider('unknown' as ProviderName)
       expect(result).toBeUndefined()
@@ -57,15 +52,8 @@ describe('model.utils', () => {
       expect(Object.keys(PROVIDERS.openai.models)).toContain('gpt-5-mini')
     })
 
-    it('should have anthropic provider with models', () => {
-      expect(PROVIDERS.anthropic).toBeDefined()
-      expect(PROVIDERS.anthropic.models).toBeDefined()
-      expect(Object.keys(PROVIDERS.anthropic.models)).toContain('claude-sonnet-4-20250514')
-      expect(Object.keys(PROVIDERS.anthropic.models)).toContain('claude-3-5-haiku-20241022')
-    })
-
     it('should have exactly one default model per provider', () => {
-      const providers: ProviderName[] = ['bedrock', 'openai', 'anthropic']
+      const providers: ProviderName[] = ['bedrock', 'openai']
 
       providers.forEach((provider) => {
         const models = PROVIDERS[provider].models
@@ -75,7 +63,7 @@ describe('model.utils', () => {
     })
 
     it('should have valid model configurations', () => {
-      const providers: ProviderName[] = ['bedrock', 'openai', 'anthropic']
+      const providers: ProviderName[] = ['bedrock', 'openai']
 
       providers.forEach((provider) => {
         const models = PROVIDERS[provider].models
