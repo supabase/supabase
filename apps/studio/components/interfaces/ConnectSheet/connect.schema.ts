@@ -328,19 +328,7 @@ export const connectSchema: ConnectSchema = {
         },
       },
       orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
-      mcp: {
-        mcpClient: {
-          codex: [
-            codexAddServerStep,
-            codexEnableRemoteStep,
-            codexAuthenticateStep,
-            codexVerifyStep,
-            skillsInstallStep,
-          ],
-          'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
-          DEFAULT: [mcpConfigureStep, skillsInstallStep],
-        },
-      },
+      mcp: [mcpConfigureStep, skillsInstallStep],
       DEFAULT: [skillsInstallStep],
     },
   },

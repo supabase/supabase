@@ -159,7 +159,7 @@ export const MCP_CLIENTS: McpClient[] = [
   },
   {
     key: 'codex',
-    label: 'Codex',
+    label: 'OpenAI (Codex)',
     icon: 'openai',
     hasDistinctDarkIcon: true,
     configFile: '~/.codex/config.toml',
