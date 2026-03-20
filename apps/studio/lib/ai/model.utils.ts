@@ -44,7 +44,7 @@ export function openaiModelEntry<ModelId extends OpenAIModelId>(config: {
   return config
 }
 
-export type OpenAIModelIdEntry = ReturnType<typeof openaiModelEntry>
+export type OpenAIModelEntry = ReturnType<typeof openaiModelEntry>
 
 /** Default model entry for simple completion endpoints — gpt-5-mini with no reasoning effort. */
 export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({ id: 'gpt-5-mini' })

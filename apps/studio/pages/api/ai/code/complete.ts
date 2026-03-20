@@ -71,7 +71,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       promptProviderOptions,
     } = await getModel({
       provider: 'openai',
-      routingKey: projectRef,
       modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 

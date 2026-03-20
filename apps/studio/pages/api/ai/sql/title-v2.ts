@@ -41,7 +41,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      routingKey: 'sql',
       modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 

@@ -1,15 +1,15 @@
 import { openai } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
+
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
 import {
   BedrockModel,
-  Model,
-  OpenAIModelId,
-  OpenAIModelIdEntry,
-  PROVIDERS,
-  ProviderModelConfig,
-  ProviderName,
   getDefaultModelForProvider,
+  Model,
+  OpenAIModelEntry,
+  OpenAIModelId,
+  ProviderModelConfig,
+  PROVIDERS,
 } from './model.utils'
 
 type PromptProviderOptions = Record<string, any>
@@ -35,68 +35,54 @@ export const ModelErrorMessage = 'No valid AI model available based on available
 export type GetModelParams =
   | {
       provider: 'openai'
-      routingKey: string
       hasAccessToAdvanceModel?: boolean
       /**
        * Specifies which OpenAI model to use and its reasoning effort.
        * Create entries via `openaiModel()` — reasoning effort is validated against the model
        * at compile time. Use `DEFAULT_COMPLETION_MODEL` for simple endpoints (no reasoning).
        */
-      modelEntry: OpenAIModelIdEntry
+      modelEntry: OpenAIModelEntry
     }
   | {
-      provider?: 'bedrock' | 'anthropic' | undefined
+      provider: 'bedrock'
+      /** Used for consistent hashing across Bedrock regions. */
       routingKey: string
+      hasAccessToAdvanceModel?: boolean
+    }
+  | {
+      provider: 'anthropic'
       hasAccessToAdvanceModel?: boolean
     }
 
 /**
  * Retrieves a LanguageModel from a specific provider and model.
- * - If provider/model not specified, auto-selects based on available credentials (prefers Bedrock).
  * - If hasAccessToAdvanceModel is false, uses the provider's default model.
  * - Returns promptProviderOptions that callers can attach to the system message.
  */
 export async function getModel(params: GetModelParams): Promise<ModelResponse> {
-  const { provider, routingKey, hasAccessToAdvanceModel = false } = params
-  const modelEntry = params.provider === 'openai' ? params.modelEntry : undefined
+  const { provider, hasAccessToAdvanceModel = false } = params
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
-  let preferredProvider: ProviderName | undefined = provider
-
-  const hasAwsCredentials = await checkAwsCredentials()
-  const hasAwsBedrockRoleArn = !!process.env.AWS_BEDROCK_ROLE_ARN
-  const hasOpenAIKey = !!process.env.OPENAI_API_KEY
-
-  // Auto-pick a provider if not specified defaulting to Bedrock
-  if (!preferredProvider) {
-    if (hasAwsBedrockRoleArn && hasAwsCredentials) {
-      preferredProvider = 'bedrock'
-    } else if (hasOpenAIKey) {
-      preferredProvider = 'openai'
-    }
-  }
-
-  if (!preferredProvider) {
-    return { error: new Error(ModelErrorMessage) }
-  }
-
-  const providerRegistry = PROVIDERS[preferredProvider]
+  const providerRegistry = PROVIDERS[provider]
   if (!providerRegistry) {
-    return { error: new Error(`Unknown provider: ${preferredProvider}`) }
+    return { error: new Error(`Unknown provider: ${provider}`) }
   }
 
   const models = providerRegistry.models as Record<Model, ProviderModelConfig>
+  const modelEntry = params.provider === 'openai' ? params.modelEntry : undefined
 
   const useDefault =
     !hasAccessToAdvanceModel || envThrottled || !modelEntry?.id || !models[modelEntry.id]
 
-  const chosenModelId = useDefault ? getDefaultModelForProvider(preferredProvider) : modelEntry?.id
+  const chosenModelId = useDefault ? getDefaultModelForProvider(provider) : modelEntry?.id
 
-  if (preferredProvider === 'bedrock') {
+  if (provider === 'bedrock') {
+    const hasAwsCredentials = await checkAwsCredentials()
+    const hasAwsBedrockRoleArn = !!process.env.AWS_BEDROCK_ROLE_ARN
     if (!hasAwsBedrockRoleArn || !hasAwsCredentials) {
       return { error: new Error('AWS Bedrock credentials not available') }
     }
-    const bedrock = createRoutedBedrock(routingKey)
+    const bedrock = createRoutedBedrock(params.routingKey)
     const model = await bedrock(chosenModelId as BedrockModel)
     const promptProviderOptions = (
       providerRegistry.models as Record<BedrockModel, ProviderModelConfig>
@@ -104,8 +90,8 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
     return { modelParams: { model }, promptProviderOptions }
   }
 
-  if (preferredProvider === 'openai') {
-    if (!hasOpenAIKey) {
+  if (provider === 'openai') {
+    if (!process.env.OPENAI_API_KEY) {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     const baseProviderOptions = providerRegistry.providerOptions?.openai ?? {}
@@ -121,5 +107,5 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
     }
   }
 
-  return { error: new Error(`Unsupported provider: ${preferredProvider}`) }
+  return { error: new Error(`Unsupported provider: ${provider}`) }
 }

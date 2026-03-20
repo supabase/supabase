@@ -67,7 +67,6 @@ export default wrapper
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { modelParams, error: modelError } = await getModel({
     provider: 'openai',
-    routingKey: 'onboarding',
     modelEntry: DEFAULT_COMPLETION_MODEL,
   })
 

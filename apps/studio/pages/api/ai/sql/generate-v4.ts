@@ -147,7 +147,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     promptProviderOptions,
   } = await getModel({
     provider: 'openai',
-    routingKey: projectRef,
     hasAccessToAdvanceModel,
     modelEntry: getAssistantModelEntry(effectiveModel)!,
   })
