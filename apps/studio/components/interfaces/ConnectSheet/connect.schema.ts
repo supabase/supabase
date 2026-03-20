@@ -265,7 +265,7 @@ export const connectSchema: ConnectSchema = {
       label: 'Client',
       description: 'Choose the MCP client you are using.',
       options: { source: 'mcpClients' },
-      defaultValue: 'claude-code',
+      defaultValue: 'cursor',
     },
     mcpReadonly: {
       id: 'mcpReadonly',
@@ -328,19 +328,7 @@ export const connectSchema: ConnectSchema = {
         },
       },
       orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
-      mcp: {
-        mcpClient: {
-          codex: [
-            codexAddServerStep,
-            codexEnableRemoteStep,
-            codexAuthenticateStep,
-            codexVerifyStep,
-            skillsInstallStep,
-          ],
-          'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
-          DEFAULT: [mcpConfigureStep, skillsInstallStep],
-        },
-      },
+      mcp: [mcpConfigureStep, skillsInstallStep],
       DEFAULT: [skillsInstallStep],
     },
   },
