@@ -75,7 +75,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                   className="flex justify-between"
                 >
                   <span>{m.id}</span>
-                  {isAdvanceOnlyModelId(m.id) && !hasAccessToAdvanceModel ? (
+                  {isAdvanceOnlyModelId(m.id) && !hasAccessToAdvanceModel && !isLoadingEntitlements ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>

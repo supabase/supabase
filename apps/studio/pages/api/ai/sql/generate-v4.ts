@@ -109,6 +109,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
+    hasAccessToAdvanceModel = true
   }
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {

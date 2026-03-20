@@ -30,8 +30,6 @@ export type ModelError = {
 
 type ModelResponse = ModelSuccess | ModelError
 
-export const ModelErrorMessage = 'No valid AI model available based on available credentials.'
-
 export type GetModelParams =
   | {
       provider: 'openai'

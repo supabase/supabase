@@ -2,7 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as bedrockModule from './bedrock'
 import { getModel } from './model'
-import { openaiModelEntry } from './model.utils'
+import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
 
 vi.mock('@ai-sdk/openai', () => ({
   openai: vi.fn(() => 'openai-model'),
@@ -102,5 +102,19 @@ describe('getModel', () => {
     expect(error).toBeUndefined()
     expect(modelParams?.model).toEqual('openai-model')
     expect(openai).toHaveBeenCalledWith('gpt-5')
+    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('minimal')
+  })
+
+  it('applies reasoningEffort from DEFAULT_COMPLETION_MODEL', async () => {
+    process.env.OPENAI_API_KEY = 'test-key'
+
+    const { modelParams, error } = await getModel({
+      provider: 'openai',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
+    })
+
+    expect(error).toBeUndefined()
+    expect(openai).toHaveBeenCalledWith('gpt-5-mini')
+    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('minimal')
   })
 })
