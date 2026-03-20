@@ -14,7 +14,7 @@ interface SkillMetadata {
   description?: string
 }
 
-export interface SkillSummary {
+interface SkillSummary {
   name: string
   description: string
   installCommand: string
@@ -29,48 +29,52 @@ interface GitHubContentItem {
 async function fetchGitHubDirectory(path: string): Promise<GitHubContentItem[]> {
   const url = `https://api.github.com/repos/${SKILLS_REPO.org}/${SKILLS_REPO.repo}/contents/${path}?ref=${SKILLS_REPO.branch}`
 
+  let response: Response
   try {
-    const response = await fetch(url, {
+    response = await fetch(url, {
       headers: {
         Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'Supabase-Docs',
       },
       next: { revalidate: 3600 },
     })
-
-    if (!response.ok) {
-      throw new Error(`GitHub API error: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (!Array.isArray(data)) {
-      throw new Error('Expected directory listing')
-    }
-
-    return data
   } catch (err) {
-    console.error('Failed to fetch GitHub directory: %o', err)
-    return []
+    throw new Error(`Failed to fetch agent skills directory from GitHub (network error): ${err}`)
   }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch agent skills directory from GitHub: ${response.status} ${response.statusText}`
+    )
+  }
+
+  const data = await response.json()
+  if (!Array.isArray(data)) {
+    throw new Error('Expected directory listing from GitHub agent skills repo')
+  }
+
+  return data
 }
 
-async function fetchGitHubFile(path: string): Promise<string | null> {
+async function fetchGitHubFile(path: string): Promise<string> {
   const url = `https://raw.githubusercontent.com/${SKILLS_REPO.org}/${SKILLS_REPO.repo}/${SKILLS_REPO.branch}/${path}`
 
+  let response: Response
   try {
-    const response = await fetch(url, {
+    response = await fetch(url, {
       next: { revalidate: 3600 },
     })
-
-    if (!response.ok) {
-      throw new Error(`GitHub raw file error: ${response.status}`)
-    }
-
-    return await response.text()
   } catch (err) {
-    console.error('Failed to fetch GitHub file: %o', err)
-    return null
+    throw new Error(`Failed to fetch agent skill file from GitHub (network error): ${err}`)
   }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch agent skill file from GitHub: ${response.status} ${response.statusText}`
+    )
+  }
+
+  return await response.text()
 }
 
 async function getAiSkillsImpl(): Promise<SkillSummary[]> {
@@ -83,9 +87,6 @@ async function getAiSkillsImpl(): Promise<SkillSummary[]> {
 
     const skillPath = `${SKILLS_REPO.path}/${item.name}/SKILL.md`
     const rawContent = await fetchGitHubFile(skillPath)
-
-    if (!rawContent) continue
-
     const { data } = matter(rawContent) as { data: SkillMetadata }
 
     skills.push({

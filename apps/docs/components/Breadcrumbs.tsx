@@ -176,6 +176,7 @@ function useBreadcrumbs() {
     return breadcrumbs
   }
 
+  // TODO: Remove this patch once Breadcrumbs are properly fixed to handle these routes
   const isAiSkillsPage = pathname.startsWith('/guides/getting-started/ai-skills')
   if (isAiSkillsPage) {
     const breadcrumbs = [
