@@ -6,7 +6,13 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getModel } from 'lib/ai/model'
-import { ASSISTANT_MODELS, type AssistantModelId } from 'lib/ai/model.utils'
+import {
+  ASSISTANT_MODELS,
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  getAssistantModelEntry,
+  isAssistantBaseModelId,
+  type AssistantModelId,
+} from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -93,7 +99,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   const messages = messagesValidation.data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isLimited = false
+  let hasAccessToAdvanceModel = false
   let isHipaaEnabled = false
   let orgId: number | undefined
   let planId: string | undefined
@@ -107,7 +113,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       // Get organizations and compute opt in level server-side
       const {
         aiOptInLevel: orgAIOptInLevel,
-        isLimited: orgAILimited,
+        hasAccessToAdvanceModel: orgHasAccessToAdvanceModel,
         isHipaaEnabled: orgIsHipaaEnabled,
         orgId: fetchedOrgId,
         planId: fetchedPlanId,
@@ -118,7 +124,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       })
 
       aiOptInLevel = orgAIOptInLevel
-      isLimited = orgAILimited
+      hasAccessToAdvanceModel = orgHasAccessToAdvanceModel
       isHipaaEnabled = orgIsHipaaEnabled
       orgId = fetchedOrgId
       planId = fetchedPlanId
@@ -129,16 +135,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  const assistantConfig = ASSISTANT_MODELS.find((m) => m.id === requestedModel)
+  let effectiveModel: AssistantModelId =
+    (requestedModel as AssistantModelId | undefined) ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
+  if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(effectiveModel)) {
+    effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
+  }
+
+  const assistantConfig = getAssistantModelEntry(effectiveModel)
   const {
     modelParams,
     error: modelError,
     promptProviderOptions,
   } = await getModel({
     provider: 'openai',
-    model: (requestedModel ?? ASSISTANT_MODELS.find((m) => m.tier === 'free')!.id) as AssistantModelId,
+    model: effectiveModel,
     routingKey: projectRef,
-    isLimited,
+    hasAccessToAdvanceModel,
     reasoningEffort: assistantConfig?.reasoningEffort,
   })
 
@@ -197,7 +209,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       userId,
       orgId,
       planId,
-      requestedModel,
+      requestedModel: effectiveModel,
       promptProviderOptions,
       abortSignal: abortController.signal,
       onSpanCreated: (spanId) => {

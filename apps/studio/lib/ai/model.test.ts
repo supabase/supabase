@@ -31,7 +31,7 @@ describe('getModel', () => {
 
     const { modelParams, error, promptProviderOptions } = await getModel({
       routingKey: 'test',
-      isLimited: false,
+      hasAccessToAdvanceModel: true,
     })
 
     expect(modelParams?.model).toEqual('bedrock-model')
@@ -43,13 +43,12 @@ describe('getModel', () => {
     expect(error).toBeUndefined()
   })
 
-  it('should return bedrock model when throttled (limited) with default model', async () => {
+  it('should return bedrock model when throttled with default model', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
     vi.stubEnv('IS_THROTTLED', 'true')
 
     const { modelParams, error, promptProviderOptions } = await getModel({
       routingKey: 'test',
-      isLimited: true,
     })
 
     expect(modelParams?.model).toEqual('bedrock-model')
@@ -63,7 +62,7 @@ describe('getModel', () => {
 
     const { modelParams, promptProviderOptions } = await getModel({
       routingKey: 'test',
-      isLimited: false,
+      hasAccessToAdvanceModel: true,
     })
 
     expect(modelParams?.model).toEqual('openai-model')
@@ -76,7 +75,7 @@ describe('getModel', () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(false)
     delete process.env.OPENAI_API_KEY
 
-    const { error } = await getModel({ routingKey: 'test-key', isLimited: false })
+    const { error } = await getModel({ routingKey: 'test-key', hasAccessToAdvanceModel: true })
     expect(error).toEqual(new Error(ModelErrorMessage))
   })
 
@@ -89,7 +88,7 @@ describe('getModel', () => {
       provider: 'openai',
       model: 'gpt-5',
       routingKey: 'rk',
-      isLimited: false,
+      hasAccessToAdvanceModel: true,
     })
 
     expect(error).toBeUndefined()

@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import { ASSISTANT_MODELS, getDefaultModelForProvider, PROVIDERS } from './model.utils'
+import {
+  ASSISTANT_MODELS,
+  ASSISTANT_MODELS_ADVANCE_ONLY,
+  ASSISTANT_MODELS_BASE,
+  DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  defaultAssistantModelId,
+  getAssistantModelEntry,
+  getDefaultModelForProvider,
+  isAdvanceOnlyModelId,
+  isAssistantBaseModelId,
+  PROVIDERS,
+} from './model.utils'
 import type { ProviderName } from './model.utils'
 
 describe('model.utils', () => {
@@ -86,15 +98,45 @@ describe('model.utils', () => {
     })
   })
 
-  describe('ASSISTANT_MODELS', () => {
-    it('should be a non-empty list', () => {
-      expect(ASSISTANT_MODELS.length).toBeGreaterThan(0)
+  describe('assistant model registry', () => {
+    it('should have non-empty BASE and ADVANCE_ONLY', () => {
+      expect(ASSISTANT_MODELS_BASE.length).toBeGreaterThan(0)
+      expect(ASSISTANT_MODELS_ADVANCE_ONLY.length).toBeGreaterThan(0)
     })
 
-    it('should have all models present in the openai provider registry', () => {
+    it('ADVANCE should be superset: every BASE id appears in ADVANCE', () => {
+      const advanceIds = new Set(ASSISTANT_MODELS.map((m) => m.id))
+      ASSISTANT_MODELS_BASE.forEach((m) => {
+        expect(advanceIds.has(m.id)).toBe(true)
+      })
+    })
+
+    it('should have all models in openai provider registry', () => {
       ASSISTANT_MODELS.forEach((entry) => {
         expect(Object.keys(PROVIDERS.openai.models)).toContain(entry.id)
       })
+    })
+
+    it('defaults should satisfy unions', () => {
+      expect(DEFAULT_ASSISTANT_BASE_MODEL_ID).toBe('gpt-5-mini')
+      expect(DEFAULT_ASSISTANT_ADVANCE_MODEL_ID).toBe('gpt-5')
+      expect(defaultAssistantModelId(false)).toBe(DEFAULT_ASSISTANT_BASE_MODEL_ID)
+      expect(defaultAssistantModelId(true)).toBe(DEFAULT_ASSISTANT_ADVANCE_MODEL_ID)
+    })
+
+    it('isAssistantBaseModelId / isAdvanceOnlyModelId', () => {
+      expect(isAssistantBaseModelId('gpt-5-mini')).toBe(true)
+      expect(isAssistantBaseModelId('gpt-5')).toBe(false)
+      expect(isAdvanceOnlyModelId('gpt-5')).toBe(true)
+      expect(isAdvanceOnlyModelId('gpt-5-mini')).toBe(false)
+    })
+
+    it('getAssistantModelEntry returns config for known ids', () => {
+      expect(getAssistantModelEntry('gpt-5-mini')?.reasoningEffort).toBe('minimal')
+      expect(getAssistantModelEntry('gpt-5')?.reasoningEffort).toBe('minimal')
+      expect(getAssistantModelEntry('gpt-5-mini')).toEqual(
+        ASSISTANT_MODELS_BASE.find((m) => m.id === 'gpt-5-mini')
+      )
     })
   })
 })

@@ -26,8 +26,6 @@ type ModelReasoningSupport = {
 // Helper that enforces a valid reasoningEffort for the given model ID at compile time.
 function assistantModel<ModelId extends OpenAIModel>(config: {
   id: ModelId
-  /** Which user tier this model is available to */
-  tier: 'free' | 'pro'
   reasoningEffort?: ModelId extends keyof ModelReasoningSupport
     ? ModelReasoningSupport[ModelId]
     : never
@@ -37,12 +35,53 @@ function assistantModel<ModelId extends OpenAIModel>(config: {
 
 // Single source of truth for Assistant chat model variants and their reasoning levels.
 // Add entries here when introducing new assistant models.
-export const ASSISTANT_MODELS = [
-  assistantModel({ id: 'gpt-5-mini', tier: 'free', reasoningEffort: 'minimal' }),
-  assistantModel({ id: 'gpt-5', tier: 'pro', reasoningEffort: 'minimal' }),
+export const ASSISTANT_MODELS_BASE = [
+  assistantModel({ id: 'gpt-5-mini', reasoningEffort: 'minimal' }),
 ] as const
 
+export const ASSISTANT_MODELS_ADVANCE_ONLY = [
+  assistantModel({ id: 'gpt-5', reasoningEffort: 'minimal' }),
+] as const
+
+export const ASSISTANT_MODELS = [
+  ...ASSISTANT_MODELS_BASE,
+  ...ASSISTANT_MODELS_ADVANCE_ONLY,
+] as const
+
+export type AssistantBaseModelId = (typeof ASSISTANT_MODELS_BASE)[number]['id']
 export type AssistantModelId = (typeof ASSISTANT_MODELS)[number]['id']
+
+export const DEFAULT_ASSISTANT_BASE_MODEL_ID = 'gpt-5-mini' satisfies AssistantBaseModelId
+
+export const DEFAULT_ASSISTANT_ADVANCE_MODEL_ID = 'gpt-5' satisfies AssistantModelId
+
+export function defaultAssistantModelId(
+  hasAccessToAdvanceModel: boolean
+): AssistantModelId {
+  return hasAccessToAdvanceModel
+    ? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
+    : DEFAULT_ASSISTANT_BASE_MODEL_ID
+}
+
+const ASSISTANT_BASE_MODEL_IDS = new Set<string>(ASSISTANT_MODELS_BASE.map((m) => m.id))
+
+const ASSISTANT_ADVANCE_ONLY_MODEL_IDS = new Set<string>(
+  ASSISTANT_MODELS_ADVANCE_ONLY.map((m) => m.id)
+)
+
+export function isAssistantBaseModelId(id: string): id is AssistantBaseModelId {
+  return ASSISTANT_BASE_MODEL_IDS.has(id)
+}
+
+export function isAdvanceOnlyModelId(id: string): boolean {
+  return ASSISTANT_ADVANCE_ONLY_MODEL_IDS.has(id)
+}
+
+export function getAssistantModelEntry(
+  id: AssistantModelId
+): (typeof ASSISTANT_MODELS)[number] | undefined {
+  return ASSISTANT_MODELS.find((m) => m.id === id)
+}
 
 export type Model = BedrockModel | OpenAIModel | AnthropicModel
 

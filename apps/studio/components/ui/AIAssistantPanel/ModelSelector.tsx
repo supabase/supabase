@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from 'ui'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { ASSISTANT_MODELS } from 'lib/ai/model.utils'
+import { ASSISTANT_MODELS, isAdvanceOnlyModelId } from 'lib/ai/model.utils'
 import type { AssistantModelId } from 'lib/ai/model.utils'
 
 interface ModelSelectorProps {
@@ -35,16 +35,19 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
 
   const slug = organization?.slug ?? '_'
 
-  const upgradeHref = `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=ai-assistant-model`
+  const upgradeHref = `/org/${slug}/billing?panel=subscriptionPlan&source=ai-assistant-model`
 
-  const handleSelectModel = (model: AssistantModelId, tier: 'free' | 'pro') => {
-    if (tier === 'pro' && !hasAccessToAdvanceModel) {
+  const handleSelectModel = (modelId: AssistantModelId) => {
+    if (isLoadingEntitlements && isAdvanceOnlyModelId(modelId)) {
+      return
+    }
+    if (isAdvanceOnlyModelId(modelId) && !hasAccessToAdvanceModel) {
       setOpen(false)
       void router.push(upgradeHref)
       return
     }
 
-    onSelectModel(model)
+    onSelectModel(modelId)
     setOpen(false)
   }
 
@@ -67,11 +70,12 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                 <CommandItem_Shadcn_
                   key={m.id}
                   value={m.id}
-                  onSelect={() => handleSelectModel(m.id, m.tier)}
+                  disabled={isLoadingEntitlements && isAdvanceOnlyModelId(m.id)}
+                  onSelect={() => handleSelectModel(m.id)}
                   className="flex justify-between"
                 >
                   <span>{m.id}</span>
-                  {m.tier === 'pro' && !hasAccessToAdvanceModel ? (
+                  {isAdvanceOnlyModelId(m.id) && !hasAccessToAdvanceModel ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>

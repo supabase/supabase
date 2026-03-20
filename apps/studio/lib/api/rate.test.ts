@@ -45,7 +45,7 @@ test('rate calls the tool sanitizer', async () => {
   vi.mock('lib/ai/org-ai-details', () => ({
     getOrgAIDetails: vi.fn().mockResolvedValue({
       aiOptInLevel: 'schema_and_log_and_data',
-      isLimited: false,
+      hasAccessToAdvanceModel: true,
     }),
   }))
 

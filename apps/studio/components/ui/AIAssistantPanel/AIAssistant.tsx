@@ -19,8 +19,12 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  defaultAssistantModelId,
+  isAssistantBaseModelId,
+} from 'lib/ai/model.utils'
 import { IS_PLATFORM } from 'lib/constants'
-import { ASSISTANT_MODELS } from 'lib/ai/model.utils'
 import { uuidv4 } from 'lib/helpers'
 import type { AssistantModel } from 'state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
@@ -28,6 +32,7 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import type { SqlSnippet } from './AIAssistant.types'
@@ -70,24 +75,21 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('assistant.advance_model')
 
-  const freeModel = ASSISTANT_MODELS.find((m) => m.tier === 'free')!.id
-  const proModel = ASSISTANT_MODELS.find((m) => m.tier === 'pro')!.id
-
   const selectedModel = useMemo<AssistantModel>(() => {
     // While entitlements are loading, use the stored model without enforcing access
     if (isLoadingEntitlements) {
-      return snap.model ?? freeModel
+      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
     }
 
-    const defaultModel: AssistantModel = hasAccessToAdvanceModel ? proModel : freeModel
+    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
     const model = snap.model ?? defaultModel
 
-    if (!hasAccessToAdvanceModel && model === proModel) {
-      return freeModel
+    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
+      return DEFAULT_ASSISTANT_BASE_MODEL_ID
     }
 
     return model
-  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model, freeModel, proModel])
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -413,7 +415,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
           showMetadataWarning={showMetadataWarning}
           updatedOptInSinceMCP={updatedOptInSinceMCP}
-          isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
+          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
           aiOptInLevel={aiOptInLevel}
         />
         {hasMessages ? (

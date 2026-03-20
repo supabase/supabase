@@ -36,7 +36,7 @@ export type GetModelParams = {
   provider?: ProviderName
   model?: Model
   routingKey: string
-  isLimited?: boolean
+  hasAccessToAdvanceModel?: boolean
   /** Reasoning effort for OpenAI models. If omitted, OpenAI uses its model default. */
   reasoningEffort?: ReasoningEffort
 }
@@ -44,14 +44,14 @@ export type GetModelParams = {
 /**
  * Retrieves a LanguageModel from a specific provider and model.
  * - If provider/model not specified, auto-selects based on available credentials (prefers Bedrock).
- * - If isLimited is true, uses the provider's default model.
+ * - If hasAccessToAdvanceModel is false, uses the provider's default model.
  * - Returns promptProviderOptions that callers can attach to the system message.
  */
 export async function getModel({
   provider,
   model,
   routingKey,
-  isLimited = true,
+  hasAccessToAdvanceModel = false,
   reasoningEffort,
 }: GetModelParams): Promise<ModelResponse> {
   const envThrottled = process.env.IS_THROTTLED !== 'false'
@@ -82,7 +82,7 @@ export async function getModel({
 
   const models = providerRegistry.models as Record<Model, ProviderModelConfig>
 
-  const useDefault = isLimited || envThrottled || !model || !models[model]
+  const useDefault = !hasAccessToAdvanceModel || envThrottled || !model || !models[model]
 
   const chosenModelId = useDefault ? getDefaultModelForProvider(preferredProvider) : model
 
