@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -31,11 +32,13 @@ export function CreateInstallationModal({ visible, onClose }: CreateInstallation
 
   const { mutate: installApp, isPending: isInstalling } = usePlatformAppInstallationCreateMutation({
     onSuccess: (data) => {
+      const appName = availableApps.find((a) => a.id === selectedAppId)?.name
       if (data) {
         addInstallation(data, 'all')
       } else {
         console.warn('[CreateInstallationModal] POST succeeded but response body was empty')
       }
+      toast.success(`${appName ?? 'App'} installed successfully`)
       setSelectedAppId('')
       onClose()
     },
