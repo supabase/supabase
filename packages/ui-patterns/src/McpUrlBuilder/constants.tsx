@@ -176,7 +176,7 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `codex mcp add supabase --url "${mcpUrl}"`
+      const command = `codex mcp add supabase --url ${mcpUrl}`
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
@@ -190,11 +190,9 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
-    alternateInstructions: (_config, onCopy) => (
+    alternateInstructions: (config, onCopy) => (
       <div className="space-y-2">
-        <p className="text-xs text-foreground-light">
-          If Codex does not prompt you to authenticate while adding the server, run:
-        </p>
+        <p className="text-xs text-foreground-light">Then authenticate:</p>
         <CodeBlock
           value="codex mcp login supabase"
           language="bash"
@@ -203,7 +201,7 @@ export const MCP_CLIENTS: McpClient[] = [
           onCopyCallback={() => onCopy('command')}
         />
         <p className="text-xs text-foreground-light">
-          Then run <code>/mcp</code> inside Codex to confirm the server is connected.
+          Finally, run <code>/mcp</code> inside Codex to verify authentication.
         </p>
       </div>
     ),

@@ -5,7 +5,7 @@ import { useMcpUrl } from '@/components/interfaces/ConnectSheet/useMcpUrl'
 
 function CodexAddServerContent({ state, projectKeys }: StepContentProps) {
   const mcpUrl = useMcpUrl(state, projectKeys)
-  const command = `codex mcp add supabase --url "${mcpUrl}"`
+  const command = `codex mcp add supabase --url ${mcpUrl}`
 
   return (
     <CodeBlock

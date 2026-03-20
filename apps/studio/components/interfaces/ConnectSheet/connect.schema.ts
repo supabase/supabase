@@ -98,15 +98,15 @@ const codexAddServerStep: StepDefinition = {
 
 const codexAuthenticateStep: StepDefinition = {
   id: 'codex-authenticate',
-  title: 'Authenticate if needed',
-  description: "If Codex doesn't prompt you during setup, run this command.",
+  title: 'Authenticate',
+  description: 'Run the authentication command.',
   content: 'steps/mcp/codex/authenticate',
 }
 
 const codexVerifyStep: StepDefinition = {
   id: 'codex-verify',
-  title: 'Verify the server is connected',
-  description: 'Run /mcp inside Codex to confirm the server is connected.',
+  title: 'Verify authentication',
+  description: 'Run /mcp inside Codex to verify.',
   content: 'steps/mcp/codex/verify',
 }
 
