@@ -6,37 +6,24 @@ export type OpenAIModelId = 'gpt-5' | 'gpt-5-mini'
 
 export type AnthropicModel = 'claude-sonnet-4-20250514' | 'claude-3-5-haiku-20241022'
 
-// Reasoning effort levels supported by OpenAI models.
 // Source: https://developers.openai.com/api/docs/guides/reasoning + per-model pages
-// Community matrix: https://community.openai.com/t/request-for-compatibility-matrix-reasoning-effort-sampling-parameters-across-gpt-5-series/1371738/2
-// When adding a new model, check its individual docs page and update ModelReasoningSupport below.
 export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
 
-// Maps each known OpenAI model to the effort levels it supports.
-// Used to enforce valid combinations at compile time via openaiModelEntry().
-// Note: newer models (e.g. gpt-5.4-nano, gpt-5.3-codex) support different sets of levels
-// (e.g. 'none'/'xhigh' may be available; 'minimal' may not). Add entries here when
-// introducing new models — check the per-model docs page and the community compatibility
-// matrix: https://community.openai.com/t/request-for-compatibility-matrix-reasoning-effort-sampling-parameters-across-gpt-5-series/1371738/2
+// Per-model reasoning effort compatibility.
+// When adding a model, verify supported levels in the community matrix and add an entry:
+// https://community.openai.com/t/request-for-compatibility-matrix-reasoning-effort-sampling-parameters-across-gpt-5-series/1371738/2
 type ModelReasoningSupport = {
   'gpt-5': 'minimal' | 'low' | 'medium' | 'high'
   'gpt-5-mini': 'minimal' | 'low' | 'medium' | 'high'
 }
 
-/**
- * Type-safe factory for an OpenAI model entry.
- * `reasoningEffort` is validated against the model at compile time — invalid combinations
- * (e.g. 'none' on gpt-5-mini) are type errors.
- *
- * Use entries from ASSISTANT_MODELS for the chat assistant, or create an inline entry:
- * ```ts
- * openaiModelEntry({ id: 'gpt-5-mini', reasoningEffort: 'low' })  // valid
- * openaiModelEntry({ id: 'gpt-5-mini', reasoningEffort: 'none' }) // type error
- * openaiModelEntry({ id: 'gpt-5-mini' })                          // no reasoning (DEFAULT_COMPLETION_MODEL)
- * ```
- */
+/** Type-safe factory for configuring OpenAI models with compatible reasoning efforts. */
 export function openaiModelEntry<ModelId extends OpenAIModelId>(config: {
   id: ModelId
+  /**
+   * When omitted, OpenAI applies its own default reasoning effort for the model,
+   * which may not be zero. Use an explicit level to control cost and latency.
+   */
   reasoningEffort?: ModelId extends keyof ModelReasoningSupport
     ? ModelReasoningSupport[ModelId]
     : never
@@ -46,8 +33,11 @@ export function openaiModelEntry<ModelId extends OpenAIModelId>(config: {
 
 export type OpenAIModelEntry = ReturnType<typeof openaiModelEntry>
 
-/** Default model entry for simple completion endpoints — gpt-5-mini with no reasoning effort. */
-export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({ id: 'gpt-5-mini' })
+/** Default model entry for simple completion endpoints where latency is more important than reasoning. */
+export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({
+  id: 'gpt-5-mini',
+  reasoningEffort: 'minimal',
+})
 
 // Models available to all users (free tier).
 export const ASSISTANT_MODELS_BASE = [
@@ -60,8 +50,6 @@ export const ASSISTANT_MODELS_ADVANCE_ONLY = [
 ] as const
 
 // Single source of truth for all Assistant chat model variants and their reasoning levels.
-// To add a free-tier model: add to ASSISTANT_MODELS_BASE.
-// To add a paid-only model: add to ASSISTANT_MODELS_ADVANCE_ONLY.
 export const ASSISTANT_MODELS = [
   ...ASSISTANT_MODELS_BASE,
   ...ASSISTANT_MODELS_ADVANCE_ONLY,

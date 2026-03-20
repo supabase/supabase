@@ -38,8 +38,8 @@ export type GetModelParams =
       hasAccessToAdvanceModel?: boolean
       /**
        * Specifies which OpenAI model to use and its reasoning effort.
-       * Create entries via `openaiModel()` — reasoning effort is validated against the model
-       * at compile time. Use `DEFAULT_COMPLETION_MODEL` for simple endpoints (no reasoning).
+       * Create entries via `openaiModelEntry()` — reasoning effort is validated against the model
+       * at compile time. Use `DEFAULT_COMPLETION_MODEL` for simple endpoints (minimal reasoning).
        */
       modelEntry: OpenAIModelEntry
     }
@@ -95,7 +95,7 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     const baseProviderOptions = providerRegistry.providerOptions?.openai ?? {}
-    const openaiProviderOptions = modelEntry?.reasoningEffort
+    const openaiProviderOptions = !useDefault && modelEntry?.reasoningEffort
       ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }
       : baseProviderOptions
     return {

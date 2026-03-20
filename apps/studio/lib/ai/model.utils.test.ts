@@ -141,9 +141,9 @@ describe('model.utils', () => {
       )
     })
 
-    it('DEFAULT_COMPLETION_MODEL is gpt-5-mini with no reasoning effort', () => {
+    it('DEFAULT_COMPLETION_MODEL is gpt-5-mini with minimal reasoning effort', () => {
       expect(DEFAULT_COMPLETION_MODEL.id).toBe(DEFAULT_ASSISTANT_BASE_MODEL_ID)
-      expect(DEFAULT_COMPLETION_MODEL.reasoningEffort).toBeUndefined()
+      expect(DEFAULT_COMPLETION_MODEL.reasoningEffort).toBe('minimal')
     })
 
     it('openaiModelEntry enforces valid reasoning effort at compile time', () => {

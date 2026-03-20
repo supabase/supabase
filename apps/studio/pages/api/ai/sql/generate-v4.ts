@@ -8,6 +8,7 @@ import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getModel } from 'lib/ai/model'
 import {
   ASSISTANT_MODELS,
+  DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   getAssistantModelEntry,
   isAssistantBaseModelId,
@@ -60,7 +61,7 @@ const requestBodySchema = z.object({
   chatId: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
-  model: z.enum(ASSISTANT_MODELS.map((m) => m.id) as [string, ...string[]]).optional(),
+  model: z.enum(ASSISTANT_MODELS.map((m) => m.id) as [AssistantModelId, ...AssistantModelId[]]).optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
@@ -135,8 +136,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  let effectiveModel: AssistantModelId =
-    (requestedModel as AssistantModelId | undefined) ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
+  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
   if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(effectiveModel)) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
