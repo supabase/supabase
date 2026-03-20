@@ -61,7 +61,9 @@ const requestBodySchema = z.object({
   chatId: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
-  model: z.enum(ASSISTANT_MODELS.map((m) => m.id) as [AssistantModelId, ...AssistantModelId[]]).optional(),
+  model: z
+    .enum(ASSISTANT_MODELS.map((m) => m.id) as [AssistantModelId, ...AssistantModelId[]])
+    .optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {

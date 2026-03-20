@@ -95,9 +95,10 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
     const baseProviderOptions = providerRegistry.providerOptions?.openai ?? {}
-    const openaiProviderOptions = !useDefault && modelEntry?.reasoningEffort
-      ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }
-      : baseProviderOptions
+    const openaiProviderOptions =
+      !useDefault && modelEntry?.reasoningEffort
+        ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }
+        : baseProviderOptions
     return {
       modelParams: {
         model: openai(chosenModelId as OpenAIModelId),
