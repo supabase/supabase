@@ -777,7 +777,6 @@ testRunner('table editor', () => {
 
     // Click "Copy cell" from context menu
     await page.getByRole('menuitem', { name: 'Copy cell' }).click()
-    await page.waitForTimeout(500)
 
     // Verify first row value was copied
     await expectClipboardValue({
@@ -792,7 +791,6 @@ testRunner('table editor', () => {
 
     // Click "Copy cell" from context menu
     await page.getByRole('menuitem', { name: 'Copy cell' }).click()
-    await page.waitForTimeout(500)
 
     // Verify second row value was copied
     await expectClipboardValue({
