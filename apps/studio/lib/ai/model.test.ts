@@ -25,27 +25,9 @@ describe('getModel', () => {
     process.env = { ...originalEnv }
   })
 
-  it('returns bedrock model with promptProviderOptions', async () => {
+  it('returns bedrock model without promptProviderOptions', async () => {
     vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
     vi.stubEnv('AWS_BEDROCK_ROLE_ARN', 'test')
-    vi.stubEnv('IS_THROTTLED', 'false')
-
-    const { modelParams, error, promptProviderOptions } = await getModel({
-      provider: 'bedrock',
-      routingKey: 'test',
-    })
-
-    expect(modelParams?.model).toEqual('bedrock-model')
-    expect(promptProviderOptions === undefined || typeof promptProviderOptions === 'object').toBe(
-      true
-    )
-    expect(error).toBeUndefined()
-  })
-
-  it('returns bedrock default model when throttled', async () => {
-    vi.mocked(bedrockModule.checkAwsCredentials).mockResolvedValue(true)
-    vi.stubEnv('AWS_BEDROCK_ROLE_ARN', 'test')
-    vi.stubEnv('IS_THROTTLED', 'true')
 
     const { modelParams, error, promptProviderOptions } = await getModel({
       provider: 'bedrock',

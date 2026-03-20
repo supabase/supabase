@@ -94,10 +94,10 @@ describe('model.utils', () => {
       expect(ASSISTANT_MODELS_ADVANCE_ONLY.length).toBeGreaterThan(0)
     })
 
-    it('ADVANCE should be superset: every BASE id appears in ADVANCE', () => {
-      const advanceIds = new Set(ASSISTANT_MODELS.map((m) => m.id))
+    it('BASE and ADVANCE_ONLY should be disjoint', () => {
+      const advanceOnlyIds = new Set<string>(ASSISTANT_MODELS_ADVANCE_ONLY.map((m) => m.id))
       ASSISTANT_MODELS_BASE.forEach((m) => {
-        expect(advanceIds.has(m.id)).toBe(true)
+        expect(advanceOnlyIds.has(m.id)).toBe(false)
       })
     })
 
