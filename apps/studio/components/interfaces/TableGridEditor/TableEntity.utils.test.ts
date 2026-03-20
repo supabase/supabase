@@ -119,6 +119,23 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should escape fallback string formats outside text and varchar', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [{ name: 'email', dataType: 'USER-DEFINED', format: 'citext', position: 0 }],
+      name: 'users',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [{ email: "o'neil@example.com" }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "public"."users" ("email") VALUES ('o''neil@example.com');`
+    expect(result).toBe(expected)
+  })
+
   it('should return an empty string for empty rows', () => {
     const table: SupaTable = {
       id: 1,

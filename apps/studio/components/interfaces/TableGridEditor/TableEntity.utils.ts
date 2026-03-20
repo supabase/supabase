@@ -58,6 +58,8 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           return `'${val.replaceAll("'", "''")}'`
         } else if (typeof val === 'number' || typeof val === 'boolean') {
           return `${val}`
+        } else if (typeof val === 'string') {
+          return `'${val.replaceAll("'", "''")}'`
         } else {
           return `'${val}'`
         }
@@ -85,7 +87,7 @@ const generateRandomTag = (): `$${string}$` => {
 /**
  * Wrap a string in dollar-quote tags, ensuring the tag does not appear in the string
  *
- * @throws Error if unable to generate a unique tag after multiple attempts
+ * @throws Error if unable to generate a unique dollar-quote tag after multiple attempts
  */
 const safeDollarQuote = (str: string): string => {
   let tag = generateRandomTag()
