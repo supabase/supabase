@@ -10,9 +10,7 @@ export async function AiSkillsIndex() {
         <thead>
           <tr className="border-b border-default">
             <th className="text-left py-2 pr-4 text-foreground-lighter font-medium">Skill</th>
-            <th className="text-left py-2 pr-4 text-foreground-lighter font-medium">
-              Description
-            </th>
+            <th className="text-left py-2 pr-4 text-foreground-lighter font-medium">Description</th>
             <th className="text-right py-2 text-foreground-lighter font-medium">Install</th>
           </tr>
         </thead>
