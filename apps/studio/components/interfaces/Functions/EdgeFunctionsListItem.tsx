@@ -3,19 +3,31 @@ import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { copyToClipboard, TableCell, TableRow } from 'ui'
+import { type MouseEvent, useState } from 'react'
+import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
+import type { EdgeFunctionLastHourStats } from '@/data/edge-functions/edge-functions-last-hour-stats-query'
 import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
+  lastHourStats?: EdgeFunctionLastHourStats
 }
 
-export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
+function formatErrorRate(value: number) {
+  if (value === 0) return '0%'
+  if (value >= 100) return '100%'
+  if (value < 0.1) return '<0.1%'
+  return `${value.toFixed(1)}%`
+}
+
+export const EdgeFunctionsListItem = ({
+  function: item,
+  lastHourStats,
+}: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
@@ -48,8 +60,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           <button
             type="button"
             className="text-foreground-lighter hover:text-foreground transition"
-            onClick={(event: any) => {
-              function onCopy(value: any) {
+            onClick={(event: MouseEvent<HTMLButtonElement>) => {
+              function onCopy(value: string) {
                 setIsCopied(true)
                 copyToClipboard(value)
                 setTimeout(() => setIsCopied(false), 3000)
@@ -84,7 +96,30 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           label={dayjs(item.updated_at).fromNow()}
         />
       </TableCell>
-      <TableCell className="lg:table-cell">
+      <TableCell className="lg:table-cell whitespace-nowrap">
+        <p className="text-foreground-light">
+          {lastHourStats !== undefined ? lastHourStats.requestsCount.toLocaleString() : '-'}
+        </p>
+      </TableCell>
+      <TableCell className="lg:table-cell whitespace-nowrap">
+        {lastHourStats !== undefined ? (
+          <span
+            className={cn(
+              'text-sm',
+              lastHourStats.errorRate >= 1
+                ? 'text-destructive'
+                : lastHourStats.errorRate > 0.1
+                  ? 'text-warning'
+                  : 'text-foreground-light'
+            )}
+          >
+            {formatErrorRate(lastHourStats.errorRate)}
+          </span>
+        ) : (
+          <p className="text-foreground-lighter">-</p>
+        )}
+      </TableCell>
+      <TableCell className="hidden 2xl:table-cell">
         <p className="text-foreground-light">{item.version}</p>
         <button tabIndex={-1} className="sr-only">
           Go to function details
