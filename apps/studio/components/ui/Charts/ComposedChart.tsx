@@ -181,9 +181,8 @@ export function ComposedChart({
     width: 0,
   }
   const yAxisPadding = useMemo(() => {
-    if (!(normalizeVisibleStackToPercent && chartStyle !== 'bar')) {
-      return _YAxisProps.padding
-    }
+    const needsTopPadding = normalizeVisibleStackToPercent && chartStyle !== 'bar'
+    if (!needsTopPadding) return _YAxisProps.padding
 
     return {
       ..._YAxisProps.padding,
@@ -344,7 +343,10 @@ export function ComposedChart({
     return !attribute?.isMaxValue
   })
 
-  const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
+  const visibleAttributes = useMemo(
+    () => stackedAttributes.filter((att) => !hiddenAttributes.has(att.name)),
+    [stackedAttributes, hiddenAttributes]
+  )
   const displayData = useMemo(
     () =>
       normalizeVisibleStackToPercent
@@ -370,16 +372,10 @@ export function ComposedChart({
   const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
   const shouldFormatBytes =
     isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
-  //*
-  // Set the y-axis domain
-  // to the highest value in the chart data for percentage charts
-  // to vertically zoom in on the data
-  // */
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
   )
-  const yDomain = [0, yMaxFromVisible]
 
   const yAxisDomain = useMemo(
     () =>

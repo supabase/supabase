@@ -198,4 +198,27 @@ describe('normalizeStackedSeriesData', () => {
       })
     ).toEqual(empty)
   })
+
+  it('leaves data unchanged when attributeNames is empty', () => {
+    const data = [{ system: 50, user: 30, timestamp: 1000 }]
+
+    expect(
+      normalizeStackedSeriesData({
+        data,
+        attributeNames: [],
+      })
+    ).toEqual(data)
+  })
+
+  it('preserves non-stacked keys (timestamps, metadata) unchanged', () => {
+    const data = [{ system: 60, user: 80, period_start: '2024-01-01', timestamp: 1000 }]
+    const normalized = normalizeStackedSeriesData({
+      data,
+      attributeNames: ['system', 'user'],
+    })
+
+    expect(normalized[0].period_start).toBe('2024-01-01')
+    expect(normalized[0].timestamp).toBe(1000)
+    expect(Number(normalized[0].system) + Number(normalized[0].user)).toBeCloseTo(100)
+  })
 })
