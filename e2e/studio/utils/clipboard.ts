@@ -10,7 +10,6 @@ export const expectClipboardValue = ({
   timeout?: number
 }) =>
   expect(async () => {
-    const handle = await page.evaluateHandle(() => navigator.clipboard.readText())
+    await using handle = await page.evaluateHandle(() => navigator.clipboard.readText())
     expect(await handle.jsonValue()).toContain(value)
-    await handle.dispose()
   }).toPass({ timeout })
