@@ -173,7 +173,7 @@ export const connectSchema: ConnectSchema = {
       id: 'direct',
       label: 'Direct',
       description: 'Connection string',
-      fields: ['connectionMethod', 'useSharedPooler', 'connectionType'],
+      fields: ['connectionSource', 'connectionMethod', 'useSharedPooler', 'connectionType'],
     },
     {
       id: 'orm',
@@ -226,6 +226,13 @@ export const connectSchema: ConnectSchema = {
     },
 
     // Direct connection fields
+    connectionSource: {
+      id: 'connectionSource',
+      type: 'select',
+      label: 'Source',
+      options: { source: 'connectionSources' },
+      defaultValue: undefined,
+    },
     connectionMethod: {
       id: 'connectionMethod',
       type: 'radio-list',
