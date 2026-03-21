@@ -142,7 +142,7 @@ const FormField = ({
         />
       )
 
-    case 'multiline-string':
+case 'multiline-string':
       return (
         <Input.TextArea
           size="small"
@@ -151,6 +151,12 @@ const FormField = ({
           name={name}
           disabled={disabled}
           type={hidden ? 'password' : 'text'}
+          // FIX: Convert literal "\n" strings into actual newline characters for the UI
+          value={
+            typeof formValues[name] === 'string'
+              ? formValues[name].replace(/\\n/g, '\n')
+              : formValues[name]
+          }
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
@@ -184,6 +190,7 @@ const FormField = ({
         />
       )
 
+      
     case 'number':
       return (
         <InputNumber
