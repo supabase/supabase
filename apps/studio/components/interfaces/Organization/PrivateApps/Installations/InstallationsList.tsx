@@ -16,14 +16,14 @@ export function InstallationsList() {
     onSuccess: (_, vars) => {
       removeInstallation(vars.installationId)
       toast.success(`App uninstalled`)
-      setInstallationToDelete(null)
+      setInstallationToDelete(undefined)
     },
   })
 
   const [showCreate, setShowCreate] = useState(false)
-  const [installationToDelete, setInstallationToDelete] = useState<Installation | null>(null)
+  const [installationToDelete, setInstallationToDelete] = useState<Installation | undefined>()
 
-  const installation = installations[0] ?? null
+  const installation = installations[0]
 
   function getAppName(appId: string) {
     return apps.find((a) => a.id === appId)?.name ?? appId
@@ -45,7 +45,7 @@ export function InstallationsList() {
             </div>
             <div className="h-8 w-20 bg-surface-300 rounded animate-pulse" />
           </Card>
-        ) : installation === null ? (
+        ) : installation === undefined ? (
           <EmptyStatePresentational
             icon={LayoutGrid}
             title="No app installations yet"
@@ -74,11 +74,11 @@ export function InstallationsList() {
 
       <ConfirmationModal
         variant="destructive"
-        visible={installationToDelete !== null}
+        visible={!!installationToDelete}
         title={`Uninstall "${getAppName(installationToDelete?.app_id ?? '')}"`}
         confirmLabel="Uninstall"
         confirmLabelLoading="Uninstalling..."
-        onCancel={() => setInstallationToDelete(null)}
+        onCancel={() => setInstallationToDelete(undefined)}
         onConfirm={handleDelete}
       >
         <p className="text-sm text-foreground-light py-2">
