@@ -1,4 +1,4 @@
-import { AppDetails } from 'components/interfaces/Organization/PrivateApps/Apps/AppDetails'
+import { AppDetails } from 'components/interfaces/Organization/PrivateApps/Apps/AppDetails/AppDetails'
 import {
   PrivateAppsProvider,
   usePrivateApps,
