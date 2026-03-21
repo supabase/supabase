@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { getUpdateIdentitySequenceSQL } from '@supabase/pg-meta'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -9,6 +10,7 @@ import {
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -957,6 +959,30 @@ export const SidePanelEditor = ({
       if (res.error) {
         toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
         return resolve()
+      }
+    }
+
+    // For identity columns, manually raise the sequences to avoid unique key violations
+    const identityColumns = (selectedTable.columns ?? []).filter((col) => col.is_identity)
+    if (identityColumns.length > 0) {
+      const updateSequenceSQL = identityColumns
+        .map((col) =>
+          getUpdateIdentitySequenceSQL({
+            schema: selectedTable.schema,
+            table: selectedTable.name,
+            column: col.name,
+          })
+        )
+        .join(';\n')
+      try {
+        await executeSql({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          sql: updateSequenceSQL,
+          queryKey: ['sequences', 'update-batch'],
+        })
+      } catch (error) {
+        console.warn('Failed to update identity sequences after import:', error)
       }
     }
 
