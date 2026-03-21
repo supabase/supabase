@@ -21,43 +21,70 @@ describe('constants/api', () => {
 
   describe('PROJECT_REST_URL', () => {
     it('should construct URL from SUPABASE_PUBLIC_URL', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', '')
       vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://test.supabase.co')
       const { PROJECT_REST_URL } = await import('./api')
       expect(PROJECT_REST_URL).toBe('https://test.supabase.co/rest/v1/')
     })
 
     it('should use default localhost when SUPABASE_PUBLIC_URL is not set', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', '')
       vi.stubEnv('SUPABASE_PUBLIC_URL', '')
       const { PROJECT_REST_URL } = await import('./api')
       expect(PROJECT_REST_URL).toBe('http://localhost:8000/rest/v1/')
+    })
+
+    it('should prefer STUDIO_BROWSER_PUBLIC_URL when set', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', 'https://aiadmin.obadaalsehli.com')
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'http://100.126.179.44:8000')
+      const { PROJECT_REST_URL } = await import('./api')
+      expect(PROJECT_REST_URL).toBe('https://aiadmin.obadaalsehli.com/rest/v1/')
     })
   })
 
   describe('PROJECT_ENDPOINT', () => {
     it('should extract host from SUPABASE_PUBLIC_URL', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', '')
       vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://test.supabase.co:3000')
       const { PROJECT_ENDPOINT } = await import('./api')
       expect(PROJECT_ENDPOINT).toBe('test.supabase.co:3000')
     })
 
     it('should use default localhost host', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', '')
       vi.stubEnv('SUPABASE_PUBLIC_URL', '')
       const { PROJECT_ENDPOINT } = await import('./api')
       expect(PROJECT_ENDPOINT).toBe('localhost:8000')
+    })
+
+    it('should prefer host from STUDIO_BROWSER_PUBLIC_URL when set', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', 'https://aiadmin.obadaalsehli.com')
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'http://100.126.179.44:8000')
+      const { PROJECT_ENDPOINT } = await import('./api')
+      expect(PROJECT_ENDPOINT).toBe('aiadmin.obadaalsehli.com')
     })
   })
 
   describe('PROJECT_ENDPOINT_PROTOCOL', () => {
     it('should extract protocol without colon from SUPABASE_PUBLIC_URL', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', '')
       vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://test.supabase.co')
       const { PROJECT_ENDPOINT_PROTOCOL } = await import('./api')
       expect(PROJECT_ENDPOINT_PROTOCOL).toBe('https')
     })
 
     it('should use http for default localhost', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', '')
       vi.stubEnv('SUPABASE_PUBLIC_URL', '')
       const { PROJECT_ENDPOINT_PROTOCOL } = await import('./api')
       expect(PROJECT_ENDPOINT_PROTOCOL).toBe('http')
+    })
+
+    it('should prefer protocol from STUDIO_BROWSER_PUBLIC_URL when set', async () => {
+      vi.stubEnv('STUDIO_BROWSER_PUBLIC_URL', 'https://aiadmin.obadaalsehli.com')
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'http://100.126.179.44:8000')
+      const { PROJECT_ENDPOINT_PROTOCOL } = await import('./api')
+      expect(PROJECT_ENDPOINT_PROTOCOL).toBe('https')
     })
   })
 

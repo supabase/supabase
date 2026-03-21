@@ -1,13 +1,16 @@
 const PUBLIC_URL = new URL(process.env.SUPABASE_PUBLIC_URL || 'http://localhost:8000')
+const STUDIO_BROWSER_PUBLIC_URL = new URL(
+  process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.SUPABASE_PUBLIC_URL || 'http://localhost:8000'
+)
 
 // Use LOGFLARE_URL until analytics/v1/ routing is supported
 export const PROJECT_ANALYTICS_URL = process.env.LOGFLARE_URL
   ? `${process.env.LOGFLARE_URL}/api/`
   : undefined
 
-export const PROJECT_REST_URL = `${PUBLIC_URL.origin}/rest/v1/`
-export const PROJECT_ENDPOINT = PUBLIC_URL.host
-export const PROJECT_ENDPOINT_PROTOCOL = PUBLIC_URL.protocol.replace(':', '')
+export const PROJECT_REST_URL = `${STUDIO_BROWSER_PUBLIC_URL.origin}/rest/v1/`
+export const PROJECT_ENDPOINT = STUDIO_BROWSER_PUBLIC_URL.host
+export const PROJECT_ENDPOINT_PROTOCOL = STUDIO_BROWSER_PUBLIC_URL.protocol.replace(':', '')
 
 /**
  * @deprecated Use registry-backed endpoints instead.
