@@ -45,6 +45,47 @@ Supabase supports a suite of social providers. Follow these guides to configure 
   </NavData>
 </div>
 
+## Using PKCE with Social Logins
+
+When using social login with the PKCE (Proof Key for Code Exchange) flow, you need to explicitly configure your Supabase client to use PKCE. This is required for OAuth providers when you want to use the authorization code flow instead of the implicit flow.
+
+Without PKCE configuration, social login will use the implicit flow and return tokens in the URL fragment (e.g., `redirect_url#access_token=...`). With PKCE enabled, you'll receive an authorization code in the query parameters (e.g., `redirect_url?code=...`) that must be exchanged for tokens.
+
+### Client Configuration
+
+Configure your Supabase client with the `flowType: 'pkce'` option:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      flowType: 'pkce'
+    }
+  }
+)
+```
+
+### Code Exchange
+
+After the user completes the OAuth flow and your application receives the authorization code, exchange it for a session:
+
+```js
+// In your callback/redirect page
+const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+```
+
+<Admonition type="note">
+
+PKCE flow is recommended for server-side applications and provides enhanced security compared to the implicit flow. For more details, see the [PKCE authentication guide](/docs/guides/auth/server-side/oauth-pkce).
+
+Individual provider guides (like [Google](/docs/guides/auth/social-login/auth-google), [GitHub](/docs/guides/auth/social-login/auth-github), etc.) include specific examples and notes about PKCE configuration.
+
+</Admonition>
+
 ## Provider tokens
 
 You can use the provider token and provider refresh token returned to make API calls to the OAuth provider. For example, you can use the Google provider token to access Google APIs on behalf of your user.
