@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
-import { createProjectSupabaseClient } from 'lib/project-supabase-client'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { executeSql } from '../sql/execute-sql-query'
 
 export type AdminProject = {
   id: string
@@ -13,32 +13,33 @@ export type AdminProject = {
 
 export async function getAdminProjects({
   projectRef,
-  clientEndpoint,
+  connectionString,
 }: {
   projectRef: string | undefined
-  clientEndpoint: string | undefined
+  connectionString: string | null | undefined
 }): Promise<AdminProject[]> {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!clientEndpoint) throw new Error('Client endpoint is required')
+  if (!connectionString) throw new Error('Connection string is required')
 
-  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
+  const { result } = await executeSql<AdminProject[]>({
+    projectRef,
+    connectionString,
+    sql: /* SQL */ `
+      select id, name, schema_name, status, created_at
+      from _admin.projects
+      order by created_at asc;
+    `,
+  })
 
-  const { data, error } = await supabaseClient
-    .schema('_admin')
-    .from('projects')
-    .select('id, name, schema_name, status, created_at')
-    .order('created_at', { ascending: true })
-
-  if (error) throw error
-  return data as AdminProject[]
+  return result
 }
 
 export type AdminProjectsData = Awaited<ReturnType<typeof getAdminProjects>>
 export type AdminProjectsError = ResponseError
 
 const adminProjectKeys = {
-  list: (projectRef: string | undefined, clientEndpoint: string | undefined) =>
-    ['projects', projectRef, 'admin-projects', clientEndpoint] as const,
+  list: (projectRef: string | undefined, connectionString: string | null | undefined) =>
+    ['projects', projectRef, 'admin-projects', connectionString] as const,
 }
 
 export const useAdminProjectsQuery = <TData = AdminProjectsData>(
@@ -48,13 +49,14 @@ export const useAdminProjectsQuery = <TData = AdminProjectsData>(
     ...options
   }: UseCustomQueryOptions<AdminProjectsData, AdminProjectsError, TData> = {}
 ) => {
-  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
 
   return useQuery<AdminProjectsData, AdminProjectsError, TData>({
-    queryKey: adminProjectKeys.list(projectRef, clientEndpoint),
-    queryFn: () => getAdminProjects({ projectRef, clientEndpoint }),
+    queryKey: adminProjectKeys.list(projectRef, connectionString),
+    queryFn: () => getAdminProjects({ projectRef, connectionString }),
     enabled:
-      enabled && typeof projectRef !== 'undefined' && !!clientEndpoint,
+      enabled && typeof projectRef !== 'undefined' && !!connectionString,
     ...options,
   })
 }

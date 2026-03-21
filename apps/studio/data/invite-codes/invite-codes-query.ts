@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
-import { createProjectSupabaseClient } from 'lib/project-supabase-client'
+import { literal } from '@supabase/pg-meta/src/pg-format'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { executeSql } from '../sql/execute-sql-query'
 import { inviteCodeKeys } from './keys'
 
 export type InviteCode = {
@@ -16,30 +17,31 @@ export type InviteCode = {
 
 export type GetInviteCodesVariables = {
   projectRef: string | undefined
-  clientEndpoint: string | undefined
+  connectionString: string | null | undefined
   projectId: string | undefined
 }
 
 export async function getInviteCodes({
   projectRef,
-  clientEndpoint,
+  connectionString,
   projectId,
 }: GetInviteCodesVariables): Promise<InviteCode[]> {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!clientEndpoint) throw new Error('Client endpoint is required')
+  if (!connectionString) throw new Error('Connection string is required')
   if (!projectId) throw new Error('Project ID is required')
 
-  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
+  const { result } = await executeSql<InviteCode[]>({
+    projectRef,
+    connectionString,
+    sql: /* SQL */ `
+      select id, project_id, code, max_slots, remaining_slots, created_by, created_at
+      from _admin.invite_codes
+      where project_id = ${literal(projectId)}
+      order by created_at desc;
+    `,
+  })
 
-  const { data, error } = await supabaseClient
-    .schema('_admin')
-    .from('invite_codes')
-    .select('*')
-    .eq('project_id', projectId)
-    .order('created_at', { ascending: false })
-
-  if (error) throw error
-  return data as InviteCode[]
+  return result
 }
 
 export type InviteCodesData = Awaited<ReturnType<typeof getInviteCodes>>
@@ -55,15 +57,16 @@ export const useInviteCodesQuery = <TData = InviteCodesData>(
     ...options
   }: UseCustomQueryOptions<InviteCodesData, InviteCodesError, TData> = {}
 ) => {
-  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
 
   return useQuery<InviteCodesData, InviteCodesError, TData>({
-    queryKey: inviteCodeKeys.list(projectRef, clientEndpoint, projectId),
-    queryFn: () => getInviteCodes({ projectRef, clientEndpoint, projectId }),
+    queryKey: inviteCodeKeys.list(projectRef, connectionString, projectId),
+    queryFn: () => getInviteCodes({ projectRef, connectionString, projectId }),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
-      !!clientEndpoint &&
+      !!connectionString &&
       typeof projectId !== 'undefined',
     ...options,
   })

@@ -1,43 +1,50 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import { toast } from 'sonner'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
-import { createProjectSupabaseClient } from 'lib/project-supabase-client'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { ResponseError } from 'types'
+import { executeSql } from '../sql/execute-sql-query'
 import { inviteCodeKeys } from './keys'
 import type { InviteCode } from './invite-codes-query'
 
 export type CreateInviteCodeVariables = {
   projectRef: string | undefined
-  clientEndpoint: string | undefined
+  connectionString: string | null | undefined
   projectId: string
   maxSlots: number
 }
 
 export async function createInviteCode({
   projectRef,
-  clientEndpoint,
+  connectionString,
   projectId,
   maxSlots,
 }: CreateInviteCodeVariables): Promise<InviteCode> {
   if (!projectRef) throw new Error('Project reference is required')
-  if (!clientEndpoint) throw new Error('Client endpoint is required')
+  if (!connectionString) throw new Error('Connection string is required')
 
-  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
+  const normalizedMaxSlots = Math.trunc(maxSlots)
+  if (normalizedMaxSlots < 1) throw new Error('Max slots must be at least 1')
 
-  const { data, error } = await supabaseClient
-    .schema('_admin')
-    .from('invite_codes')
-    .insert({
-      project_id: projectId,
-      max_slots: maxSlots,
-      remaining_slots: maxSlots,
-      created_by: 'admin',
-    })
-    .select()
-    .single()
+  const { result } = await executeSql<InviteCode[]>({
+    projectRef,
+    connectionString,
+    sql: /* SQL */ `
+      insert into _admin.invite_codes (project_id, max_slots, remaining_slots, created_by)
+      values (
+        ${literal(projectId)},
+        ${normalizedMaxSlots},
+        ${normalizedMaxSlots},
+        ${literal('admin')}
+      )
+      returning id, project_id, code, max_slots, remaining_slots, created_by, created_at;
+    `,
+  })
 
-  if (error) throw error
-  return data as InviteCode
+  const [insertedInviteCode] = result
+  if (!insertedInviteCode) throw new Error('Failed to create invite code')
+
+  return insertedInviteCode
 }
 
 export type CreateInviteCodeData = Awaited<ReturnType<typeof createInviteCode>>
@@ -59,7 +66,8 @@ export const useCreateInviteCodeMutation = ({
   onError,
 }: CreateInviteCodeMutationOptions) => {
   const queryClient = useQueryClient()
-  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
+  const { data: project } = useSelectedProjectQuery()
+  const connectionString = project?.connectionString
 
   return useMutation<
     CreateInviteCodeData,
@@ -67,7 +75,7 @@ export const useCreateInviteCodeMutation = ({
     CreateInviteCodeMutationVariables
   >({
     mutationFn: ({ projectId, maxSlots }) =>
-      createInviteCode({ projectRef, clientEndpoint, projectId, maxSlots }),
+      createInviteCode({ projectRef, connectionString, projectId, maxSlots }),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
         queryKey: ['projects', projectRef, 'invite-codes'],

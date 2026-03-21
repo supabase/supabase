@@ -38,7 +38,7 @@ const InviteCodesPage: NextPageWithLayout = () => {
   if (isErrorProjects) {
     return (
       <div className="p-6">
-        <AlertError error={projectsError} subject="Failed to load company projects" />
+        <AlertError error={projectsError} subject={`Failed to load company projects. Error: ${projectsError?.message || JSON.stringify(projectsError)}`} />
       </div>
     )
   }
