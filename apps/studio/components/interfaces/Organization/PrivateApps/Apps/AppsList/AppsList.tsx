@@ -28,9 +28,10 @@ export function AppsList({ onCreateApp }: AppsListProps) {
   })
 
   const [sort, setSort] = useState<AppsSort>('created_at:desc')
-  const onSortChange = (column: string) => handleSortChange(sort, column, setSort)
   const [viewApp, setViewApp] = useState<PrivateApp | null>(null)
   const [appToDelete, setAppToDelete] = useState<PrivateApp | null>(null)
+
+  const onSortChange = (column: string) => handleSortChange(sort, column, setSort)
 
   const sortedApps = useMemo(() => sortApps(apps, sort), [apps, sort])
 
