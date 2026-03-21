@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { Button } from 'ui'
 import { AppsList } from 'components/interfaces/Organization/PrivateApps/Apps/AppsList/AppsList'
 import { InstallationsList } from 'components/interfaces/Organization/PrivateApps/Installations/InstallationsList'
-import { CreateAppSheet } from 'components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet'
+import { CreateAppSheet } from 'components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet/CreateAppSheet'
 import {
   PrivateAppsProvider,
   usePrivateApps,

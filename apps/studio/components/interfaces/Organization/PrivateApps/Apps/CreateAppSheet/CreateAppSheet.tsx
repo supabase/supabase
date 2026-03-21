@@ -3,7 +3,7 @@ import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-cr
 import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
 import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -30,52 +30,13 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import { usePrivateApps } from '../PrivateAppsContext'
-import { PERMISSIONS } from './Apps.constants'
+import { usePrivateApps } from '../../PrivateAppsContext'
+import { PERMISSIONS } from '../Apps.constants'
+import { CreateAppSheetStep } from './CreateAppSheetStep'
 
 type CreatePlatformAppResponse = components['schemas']['CreatePlatformAppResponse']
 type CreatePlatformAppSigningKeyResponse =
   components['schemas']['CreatePlatformAppSigningKeyResponse']
-
-function Step({
-  number,
-  title,
-  description,
-  isLast = false,
-  disabled = false,
-  children,
-}: PropsWithChildren<{
-  number: number
-  title: string
-  description: string
-  isLast?: boolean
-  disabled?: boolean
-}>) {
-  return (
-    <div
-      className={`flex items-start gap-6 self-stretch transition-opacity ${disabled ? 'opacity-40 pointer-events-none' : ''}`}
-    >
-      <div className="relative self-stretch shrink-0 w-6">
-        <div className="absolute inset-0 flex items-start justify-center">
-          {!isLast && (
-            <div
-              aria-hidden
-              className="absolute left-[calc(50%-1px)] w-px bg-border opacity-60 h-full"
-            />
-          )}
-          <div className="relative z-10 flex font-mono text-xs items-center justify-center min-w-6 w-6 h-6 border border-default rounded-md bg-surface-100 text-foreground-light">
-            {number}
-          </div>
-        </div>
-      </div>
-      <div className={`w-full ${isLast ? '' : 'pb-10'}`}>
-        <p className="text-sm font-medium text-foreground mb-1">{title}</p>
-        <p className="text-sm text-foreground-light mb-4">{description}</p>
-        {children}
-      </div>
-    </div>
-  )
-}
 
 interface CreateAppSheetProps {
   visible: boolean
@@ -180,7 +141,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
 
           <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
             <div className="px-5 sm:px-6 py-6">
-              <Step
+              <CreateAppSheetStep
                 number={1}
                 title="App details"
                 description="Give your private app a name."
@@ -195,9 +156,9 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                     disabled={isLoading}
                   />
                 </FormLayout>
-              </Step>
+              </CreateAppSheetStep>
 
-              <Step
+              <CreateAppSheetStep
                 number={2}
                 title="Permissions"
                 description="Select the permissions this app requires."
@@ -316,10 +277,10 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                     </span>
                   </div>
                 </div>
-              </Step>
+              </CreateAppSheetStep>
 
               <div ref={step3Ref}>
-                <Step
+                <CreateAppSheetStep
                   number={3}
                   title="Signing key"
                   description={
@@ -391,7 +352,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                       </label>
                     </div>
                   )}
-                </Step>
+                </CreateAppSheetStep>
               </div>
             </div>
           </ScrollArea>
