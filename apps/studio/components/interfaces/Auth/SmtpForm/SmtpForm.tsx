@@ -477,9 +477,9 @@ export const SmtpForm = () => {
                         </InlineLink>{' '}
                         after enabling custom SMTP
                       </>
-                    ) : (
+                    ) : isSmtpEnabled(authConfig) ? (
                       'Rate limit for sending emails will be reduced to 2 after disabling custom SMTP'
-                    )}
+                    ) : null}
                   </p>
                 )}
                 <div className="flex items-center gap-x-2">
