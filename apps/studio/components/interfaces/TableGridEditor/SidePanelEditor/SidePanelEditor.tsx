@@ -10,7 +10,6 @@ import {
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
@@ -22,6 +21,7 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { lintKeys } from 'data/lint/keys'
 import { privilegeKeys } from 'data/privileges/keys'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
@@ -983,6 +983,9 @@ export const SidePanelEditor = ({
         })
       } catch (error) {
         console.warn('Failed to update identity sequences after import:', error)
+        toast.warning(
+          'Data imported but identity sequences could not be updated. New inserts may need manual ID assignment until sequences are reset.'
+        )
       }
     }
 
