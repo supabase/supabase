@@ -114,10 +114,10 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
   const keyRevealed = generatedKey !== null
 
   useEffect(() => {
-    if (keyRevealed) {
+    if (generatedKey) {
       step3Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
-  }, [keyRevealed])
+  }, [generatedKey])
 
   return (
     <>
