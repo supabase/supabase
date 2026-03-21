@@ -4,9 +4,7 @@ import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import { AdvisorWidget } from 'components/interfaces/Home/AdvisorWidget'
-import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
-import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
-import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
+import { AdminFeatureHub } from 'components/interfaces/Home/AdminFeatureHub'
 import { NewProjectPanel } from 'components/interfaces/Home/NewProjectPanel/NewProjectPanel'
 import { ProjectUsageSection } from 'components/interfaces/Home/ProjectUsageSection'
 import { ServiceStatus } from 'components/interfaces/Home/ServiceStatus'
@@ -19,23 +17,12 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import {
-  Badge,
-  cn,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const Home = () => {
@@ -46,13 +33,9 @@ export const Home = () => {
   const snap = useAppStateSnapshot()
   const { ref, enableBranching } = useParams()
 
-  const { projectHomepageExampleProjects, projectHomepageClientLibraries: clientLibraries } =
-    useCustomContent(['project_homepage:example_projects', 'project_homepage:client_libraries'])
-
-  const {
-    projectHomepageShowInstanceSize: showInstanceSize,
-    projectHomepageShowExamples: showExamples,
-  } = useIsFeatureEnabled(['project_homepage:show_instance_size', 'project_homepage:show_examples'])
+  const { projectHomepageShowInstanceSize: showInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
@@ -206,6 +189,7 @@ export const Home = () => {
             </div>
           </div>
           <ProjectUpgradeFailedBanner />
+          {project?.status !== PROJECT_STATUS.INACTIVE && <AdminFeatureHub />}
         </div>
       </div>
 
@@ -216,68 +200,6 @@ export const Home = () => {
               <>{isNewProject ? <NewProjectPanel /> : <ProjectUsageSection />}</>
             )}
             {!isNewProject && project?.status !== PROJECT_STATUS.INACTIVE && <AdvisorWidget />}
-          </div>
-        </div>
-
-        <div className="bg-surface-100/5 py-16">
-          <div className="mx-auto max-w-7xl space-y-16 @container">
-            {project?.status !== PROJECT_STATUS.INACTIVE && (
-              <>
-                <div className="space-y-8">
-                  <h2 className="text-lg">Client libraries</h2>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-8 md:gap-12 mb-12 md:grid-cols-3">
-                    {clientLibraries!.map((library) => (
-                      // [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later.
-                      <ClientLibrary key={(library as any).language} {...(library as any)} />
-                    ))}
-                  </div>
-                </div>
-                {showExamples && (
-                  <div className="flex flex-col gap-y-8">
-                    <h4 className="text-lg">Example projects</h4>
-                    {!!projectHomepageExampleProjects ? (
-                      <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {/* [Alaister]: Looks like the useCustomContent has wonky types. I'll look at a fix later. */}
-                        {(projectHomepageExampleProjects as any)
-                          .sort((a: any, b: any) => a.title.localeCompare(b.title))
-                          .map((project: any) => (
-                            <ExampleProject key={project.url} {...project} />
-                          ))}
-                      </div>
-                    ) : (
-                      <div className="flex justify-center">
-                        <Tabs_Shadcn_ defaultValue="app" className="w-full">
-                          <TabsList_Shadcn_ className="flex gap-4 mb-8">
-                            <TabsTrigger_Shadcn_ value="app">App Frameworks</TabsTrigger_Shadcn_>
-                            <TabsTrigger_Shadcn_ value="mobile">
-                              Mobile Frameworks
-                            </TabsTrigger_Shadcn_>
-                          </TabsList_Shadcn_>
-                          <TabsContent_Shadcn_ value="app">
-                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                              {EXAMPLE_PROJECTS.filter((project) => project.type === 'app')
-                                .sort((a, b) => a.title.localeCompare(b.title))
-                                .map((project) => (
-                                  <ExampleProject key={project.url} {...project} />
-                                ))}
-                            </div>
-                          </TabsContent_Shadcn_>
-                          <TabsContent_Shadcn_ value="mobile">
-                            <div className="grid gap-2 md:gap-8 md:grid-cols-2 lg:grid-cols-3">
-                              {EXAMPLE_PROJECTS.filter((project) => project.type === 'mobile')
-                                .sort((a, b) => a.title.localeCompare(b.title))
-                                .map((project) => (
-                                  <ExampleProject key={project.url} {...project} />
-                                ))}
-                            </div>
-                          </TabsContent_Shadcn_>
-                        </Tabs_Shadcn_>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
           </div>
         </div>
       </>

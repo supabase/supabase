@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 
 import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { AdminFeatureHub } from 'components/interfaces/Home/AdminFeatureHub'
 import { ProjectUsageSection as ProjectUsageSectionV1 } from 'components/interfaces/Home/ProjectUsageSection'
 import { SortableSection } from 'components/interfaces/HomeNew/SortableSection'
 import { TopSection } from 'components/interfaces/HomeNew/TopSection'
@@ -97,6 +98,9 @@ export const HomeV2 = () => {
       {!isPaused && (
         <ScaffoldContainer size="large">
           <ScaffoldSection isFullWidth className="gap-16 pb-32">
+            <div className="pt-8">
+              <AdminFeatureHub />
+            </div>
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
               <SortableContext
                 items={sectionOrder.filter(

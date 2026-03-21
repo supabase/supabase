@@ -59,7 +59,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
   })
 
   return (
-    <Link href={`/project/${project.ref}/editor`}>
+    <Link href={`/project/${project.ref}`}>
       <Card
         className={cn(
           'p-4 transition-colors cursor-pointer',
@@ -85,6 +85,9 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
             <CalendarDays size={12} className="flex-shrink-0" />
             <span>{createdDate}</span>
           </div>
+          <p className="pt-2 text-xs text-brand">
+            Open dashboard shortcuts
+          </p>
         </div>
       </Card>
     </Link>

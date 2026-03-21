@@ -5,7 +5,7 @@ import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, FileText, KeyRound, Lightbulb, List, Settings, Telescope, Ticket } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
@@ -158,6 +158,20 @@ export const generateOtherRoutes = (
       disabled: false,
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
+    },
+    {
+      key: 'platform-credentials',
+      label: 'Platform Credentials',
+      disabled: !isProjectActive,
+      icon: <KeyRound size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/settings/credentials`),
+    },
+    {
+      key: 'invite-codes',
+      label: 'Invite Codes',
+      disabled: !isProjectActive,
+      icon: <Ticket size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/invite-codes`),
     },
     ...(apiDocsSidePanelEnabled
       ? [

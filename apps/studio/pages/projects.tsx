@@ -46,7 +46,8 @@ const ProjectsPage: NextPageWithLayout = () => {
           <div>
             <h1 className="text-xl font-semibold text-foreground">Projects</h1>
             <p className="text-sm text-foreground-light mt-0.5">
-              Manage your multi-tenant Supabase projects
+              Manage your multi-tenant Supabase projects. Open a project dashboard to reach
+              credentials, invite codes, admin tables, functions, and logs quickly.
             </p>
           </div>
           <Button icon={<Plus />} type="primary" onClick={() => setShowCreateModal(true)}>
