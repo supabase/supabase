@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { usePlatformAppQuery } from 'data/platform-apps/platform-app-query'
@@ -35,14 +35,18 @@ export function AppDetails({ app }: AppDetailsProps) {
     deleteApp({ slug, appId: app.id })
   }
 
-  const resolvedPermissions: Permission[] = detail
-    ? detail.permissions
-        .map((id) => PERMISSIONS.find((p) => p.id === id))
-        .filter((p): p is Permission => p !== undefined)
-    : []
+  const { orgPermissions, projectPermissions } = useMemo(() => {
+    const resolved: Permission[] = detail
+      ? detail.permissions
+          .map((id) => PERMISSIONS.find((p) => p.id === id))
+          .filter((p): p is Permission => p !== undefined)
+      : []
 
-  const orgPermissions = resolvedPermissions.filter((p) => p.group === 'organization')
-  const projectPermissions = resolvedPermissions.filter((p) => p.group === 'project')
+    return {
+      orgPermissions: resolved.filter((p) => p.group === 'organization'),
+      projectPermissions: resolved.filter((p) => p.group === 'project'),
+    }
+  }, [detail])
 
   return (
     <>
