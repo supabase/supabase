@@ -9,7 +9,7 @@ import { PrivateApp, usePrivateApps } from '../../PrivateAppsContext'
 import type { AppsSort } from '../Apps.types'
 import { handleSortChange, sortApps } from '../Apps.utils'
 import { DeleteAppModal } from '../DeleteAppModal'
-import { ViewAppSheet } from '../ViewAppSheet'
+import { ViewAppSheet } from '../ViewAppSheet/ViewAppSheet'
 import { AppsListLoading } from './AppsListLoading'
 import { AppsListTable } from './AppsListTable'
 
