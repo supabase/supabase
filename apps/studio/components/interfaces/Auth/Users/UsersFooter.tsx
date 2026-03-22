@@ -1,5 +1,4 @@
-import { OptimizedSearchColumns } from '@supabase/pg-meta'
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
+import { THRESHOLD_COUNT, type OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { formatEstimatedCount } from 'components/grid/components/footer/pagination/Pagination.utils'

@@ -1,7 +1,8 @@
+import { IS_PROD } from 'common'
 import { createHash } from 'crypto'
-import { IS_PLATFORM, IS_PROD } from 'common'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import z from 'zod'
+
+import { InternalServerError } from 'lib/api/apiHelpers'
 
 const INCIDENT_IO_BASE_URL = 'https://api.incident.io/v2'
 
@@ -14,13 +15,6 @@ const SENTINEL_VALUE_SHOW_BANNER = '1'
 const SENTINEL_VALUE_FORCE_BANNER = '100'
 
 const FALLBACK_METADATA = { affected_regions: null, affects_project_creation: false }
-
-/**
- * Cache on browser for 5 minutes
- * Cache on CDN for 5 minutes
- * Allow serving stale content for 1 minute while revalidating
- */
-const CACHE_CONTROL_SETTINGS = 'public, max-age=300, s-maxage=300, stale-while-revalidate=60'
 
 const MetadataSchema = z.object({
   affected_regions: z.union([z.array(z.string()), z.null()]),
@@ -51,9 +45,9 @@ interface IncidentIoListResponse {
   pagination_meta?: { after?: string }
 }
 
-type ShowBannerValue = true | 'force'
+export type ShowBannerValue = true | 'force'
 
-interface BannerIncident {
+export interface BannerIncident {
   id: string
   show_banner: ShowBannerValue
   metadata: z.infer<typeof MetadataSchema> & { force: boolean }
@@ -83,11 +77,18 @@ async function fetchAllIncidents(apiKey: string, mode: string): Promise<Array<In
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
+      next: { revalidate: 180 },
+      signal: AbortSignal.timeout(30_000),
     })
 
     if (!response.ok) {
-      const cause = await response.text()
-      throw new Error(`incident.io API responded with status ${response.status}`, { cause })
+      const retryAfter = response.headers.get('Retry-After') ?? undefined
+      const body = await response.text()
+      throw new InternalServerError(`incident.io API responded with ${response.status}`, {
+        status: response.status,
+        body,
+        ...(retryAfter !== undefined && { retryAfter }),
+      })
     }
 
     const data: IncidentIoListResponse = await response.json()
@@ -98,31 +99,20 @@ async function fetchAllIncidents(apiKey: string, mode: string): Promise<Array<In
   return incidents
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!IS_PLATFORM) {
-    return res.status(404).end()
-  }
-
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', ['GET'])
-    return res.status(405).json({ error: { message: `Method ${req.method} Not Allowed` } })
-  }
-
+/**
+ * Fetches active banner incidents from the incident.io API.
+ *
+ * @returns Array of banner incidents
+ * @throws Error if INCIDENT_IO_API_KEY is not set or the API returns an error
+ */
+export async function getBannerIncidents(): Promise<Array<BannerIncident>> {
   const apiKey = process.env.INCIDENT_IO_API_KEY
   if (!apiKey) {
-    console.error('INCIDENT_IO_API_KEY is not set')
-    return res.status(500).json({ error: { message: 'Internal server error' } })
+    throw new Error('INCIDENT_IO_API_KEY is not set')
   }
 
   const incidentMode = IS_PROD ? 'standard' : 'test'
-
-  let allIncidents: Array<Incident>
-  try {
-    allIncidents = await fetchAllIncidents(apiKey, incidentMode)
-  } catch (error) {
-    console.error('Error fetching incidents from incident.io: %O', error)
-    return res.status(502).json({ error: { message: 'Internal server error' } })
-  }
+  const allIncidents = await fetchAllIncidents(apiKey, incidentMode)
 
   const bannerIncidents: Array<BannerIncident> = []
 
@@ -152,8 +142,5 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
-  res.setHeader('Cache-Control', CACHE_CONTROL_SETTINGS)
-  return res.status(200).json({ incidents: bannerIncidents })
+  return bannerIncidents
 }
-
-export default handler

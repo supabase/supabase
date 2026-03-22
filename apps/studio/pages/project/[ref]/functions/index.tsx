@@ -128,6 +128,11 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                       <div className="flex items-center gap-2">
                         <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
                       </div>
+                      <span className="border-l border-default pl-2 text-xs text-foreground-light">
+                        {search && filteredFunctions.length !== functions.length
+                          ? `Viewing ${filteredFunctions.length} of ${functions.length} functions in total`
+                          : `Viewing ${functions.length} ${functions.length === 1 ? 'function' : 'functions'} in total`}
+                      </span>
                     </div>
                     <Card>
                       <Table>

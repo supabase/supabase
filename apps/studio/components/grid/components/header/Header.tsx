@@ -283,7 +283,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
       queueRowDeletesWithOptimisticUpdate({
         rows,
         table: snap.originalTable,
-        queryClient,
         queueOperation: tableEditorSnap.queueOperation,
         projectRef: project?.ref,
       })
