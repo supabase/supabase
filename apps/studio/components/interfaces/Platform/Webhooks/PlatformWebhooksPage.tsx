@@ -128,9 +128,18 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
+  const endpointPendingDeleteHasName = endpointPendingDelete
+    ? endpointPendingDelete.name.trim().length > 0
+    : false
   const endpointPendingDeleteDisplayName = endpointPendingDelete
     ? getWebhookEndpointDisplayName(endpointPendingDelete)
     : ''
+  let deleteEndpointDescription = 'This action cannot be undone.'
+  if (endpointPendingDelete) {
+    deleteEndpointDescription = endpointPendingDeleteHasName
+      ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
+      : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
+  }
 
   useEffect(() => {
     if (!platformWebhooksEnabled) {
@@ -233,7 +242,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       setDeliverySearch('')
     }
     setEndpointIdPendingDelete(null)
-    toast.success(`Deleted endpoint “${endpointPendingDeleteDisplayName}”`)
+    toast.success('Endpoint deleted')
   }
 
   const handleUpsertEndpoint = (values: EndpointFormValues) => {
@@ -417,34 +426,16 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         open={!!endpointPendingDelete}
         onOpenChange={(open) => !open && setEndpointIdPendingDelete(null)}
       >
-        <AlertDialogContent size="small" className="min-w-0">
-          <AlertDialogHeader className="min-w-0">
+        <AlertDialogContent>
+          <AlertDialogHeader>
             <AlertDialogTitle>Delete endpoint</AlertDialogTitle>
-            <div className="min-w-0 px-5 pt-3.5 pb-4">
-              <AlertDialogDescription className="p-0">
-                {endpointPendingDelete ? (
-                  endpointPendingDelete.name.trim().length > 0 ? (
-                    <>
-                      Deleting{' '}
-                      <span className="font-medium text-foreground">
-                        {endpointPendingDeleteDisplayName}
-                      </span>{' '}
-                      stops all deliveries to the following URL. This cannot be undone.
-                    </>
-                  ) : (
-                    'Deleting this endpoint stops all deliveries to the following URL. This cannot be undone.'
-                  )
-                ) : (
-                  'This action cannot be undone.'
-                )}
-              </AlertDialogDescription>
-              <div className="mt-5 w-full min-w-0 max-w-full overflow-x-auto text-code-block">
-                <code className="block w-max whitespace-nowrap break-normal">
-                  {endpointPendingDelete?.url}
-                </code>
-              </div>
-            </div>
+            <AlertDialogDescription>{deleteEndpointDescription}</AlertDialogDescription>
           </AlertDialogHeader>
+          {endpointPendingDelete && (
+            <pre className="mx-5 -mt-1 mb-5 overflow-auto whitespace-nowrap rounded-md border border-muted bg-surface-200 px-4 py-3 font-mono text-xs tracking-tight text-foreground">
+              {endpointPendingDelete.url}
+            </pre>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction variant="danger" onClick={handleDeleteEndpoint}>
