@@ -84,7 +84,7 @@ export default function ViewEntityAutofixSecurityModal({
             {isLoading && <GenericSkeletonLoader />}
             {isSuccess && (
               <SimpleCodeBlock>
-                {`create view ${table.schema}.${table.name} as\n ${data}`}
+                {`create view ${table.schema}.${table.name}${data?.viewOptions ? ` with (${data.viewOptions})` : ''} as\n ${data?.definition}`}
               </SimpleCodeBlock>
             )}
           </ScrollArea>
@@ -96,7 +96,7 @@ export default function ViewEntityAutofixSecurityModal({
             {isLoading && <GenericSkeletonLoader />}
             {isSuccess && (
               <SimpleCodeBlock>
-                {`create view ${table.schema}.${table.name} with (security_invoker = on) as\n ${data}`}
+                {`create view ${table.schema}.${table.name} with (security_invoker = on) as\n ${data?.definition}`}
               </SimpleCodeBlock>
             )}
           </ScrollArea>
