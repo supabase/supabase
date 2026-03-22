@@ -9,7 +9,7 @@ export function useMcpUrl(
   projectKeys: StepContentProps['projectKeys']
 ): string {
   const readonly = Boolean(state.mcpReadonly)
-  const baseUrl = IS_PLATFORM ? 'https://mcp.supabase.com' : projectKeys.apiUrl ?? ''
+  const baseUrl = IS_PLATFORM ? 'https://mcp.supabase.com' : (projectKeys.apiUrl ?? '')
 
   return useMemo(() => {
     const params = new URLSearchParams()

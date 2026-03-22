@@ -43,7 +43,7 @@ const formId = 'request-upgrade-form'
 interface RequestUpgradeToBillingOwnersProps {
   block?: boolean
   plan?: PlanRequest
-  addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+  addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
   /** Used in the default message template, e.g: "Upgrade to ..." */
   featureProposition?: string
   className?: string
@@ -82,7 +82,13 @@ export const RequestUpgradeToBillingOwners = ({
   })
 
   const formattedAddonName =
-    addon === 'pitr' ? 'PITR' : addon === 'customDomain' ? 'Custom Domain' : ''
+    addon === 'pitr'
+      ? 'PITR'
+      : addon === 'customDomain'
+        ? 'Custom domain'
+        : addon === 'ipv4'
+          ? 'dedicated IPv4 address'
+          : ''
 
   const target = !!project
     ? `for the project "${project?.name}"`

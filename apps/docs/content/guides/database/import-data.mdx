@@ -53,7 +53,6 @@ You can use it in conjunction with Supabase by following these steps:
    ```
 
    Customize the source and Supabase database URL and options to fit your specific use case:
-
    - `wal_buffers`: This parameter is set to '64MB' to allocate 64 megabytes of memory for write-ahead logging buffers. A larger value can help improve write performance by caching more data in memory before writing it to disk. This can be useful during data import operations to speed up the writing of transaction logs.
    - `max_wal_senders`: It is set to 0, to disable replication connections. This is done during the data import process to prevent replication-related conflicts and issues.
    - `statement_timeout`: The value is set to 0, which means it's disabled, allowing SQL statements to run without a time limit.

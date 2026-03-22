@@ -1,20 +1,20 @@
-import { Authenticated, Refine } from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { Authenticated, Refine } from '@refinedev/core'
+import { RefineKbar, RefineKbarProvider } from '@refinedev/kbar'
 import routerProvider, {
   CatchAllNavigate,
   DocumentTitleHandler,
   UnsavedChangesNotifier,
-} from "@refinedev/react-router";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+} from '@refinedev/react-router'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router'
 
-import { dataProvider, liveProvider } from "@refinedev/supabase";
-import authProvider from "./authProvider";
-import { supabaseClient } from "./utility";
+import { dataProvider, liveProvider } from '@refinedev/supabase'
+import authProvider from './authProvider'
+import { supabaseClient } from './utility'
 
-import Account from "./components/account";
-import Auth from "./components/auth";
+import Account from './components/account'
+import Auth from './components/auth'
 
-import "./App.css";
+import './App.css'
 
 function App() {
   return (
@@ -43,9 +43,7 @@ function App() {
             >
               <Route index element={<Account />} />
             </Route>
-            <Route
-              element={<Authenticated key="auth-pages" fallback={<Outlet />} />}
-            >
+            <Route element={<Authenticated key="auth-pages" fallback={<Outlet />} />}>
               <Route path="/login" element={<Auth />} />
             </Route>
           </Routes>
@@ -55,7 +53,7 @@ function App() {
         </Refine>
       </RefineKbarProvider>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App

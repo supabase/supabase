@@ -11,8 +11,8 @@ const page: GoPageInput = {
     ogImage: '/images/landing-pages/bolt-webinar/og.png',
   },
   hero: {
-    title: 'Thanks for watching',
-    subtitle: 'Vibe Coding, Done Right: AI Development in Production',
+    subtitle: 'Thanks for watching',
+    title: 'Vibe Coding, Done Right: AI Development in Production',
     description:
       'You saw how enterprise teams use Bolt and Supabase to build production apps with AI coding tools. Want to learn more, get hands-on, or talk to our team? Share your details below.',
     image: {

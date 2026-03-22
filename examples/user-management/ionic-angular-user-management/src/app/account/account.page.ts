@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Profile, SupabaseService } from '../supabase.service';
+import { Component, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
+import { Profile, SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-account',
@@ -13,9 +13,9 @@ export class AccountPage implements OnInit {
     username: '',
     avatar_url: '',
     website: '',
-  };
+  }
 
-  email = '';
+  email = ''
 
   constructor(
     private readonly supabase: SupabaseService,
@@ -23,47 +23,47 @@ export class AccountPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.getEmail();
-    this.getProfile();
+    this.getEmail()
+    this.getProfile()
   }
 
   async getEmail() {
-    this.email = await this.supabase.user.then((user) => user?.email || '');
+    this.email = await this.supabase.user.then((user) => user?.email || '')
   }
 
   async getProfile() {
     try {
-      const { data: profile, error, status } = await this.supabase.profile;
+      const { data: profile, error, status } = await this.supabase.profile
       if (error && status !== 406) {
-        throw error;
+        throw error
       }
       if (profile) {
-        this.profile = profile;
+        this.profile = profile
       }
     } catch (error: any) {
-      alert(error.message);
+      alert(error.message)
     }
   }
 
   async updateProfile(avatar_url: string = '') {
-    const loader = await this.supabase.createLoader();
-    await loader.present();
+    const loader = await this.supabase.createLoader()
+    await loader.present()
     try {
-      const { error } = await this.supabase.updateProfile({ ...this.profile, avatar_url });
+      const { error } = await this.supabase.updateProfile({ ...this.profile, avatar_url })
       if (error) {
-        throw error;
+        throw error
       }
-      await loader.dismiss();
-      await this.supabase.createNotice('Profile updated!');
+      await loader.dismiss()
+      await this.supabase.createNotice('Profile updated!')
     } catch (error: any) {
-      await loader.dismiss();
-      await this.supabase.createNotice(error.message);
+      await loader.dismiss()
+      await this.supabase.createNotice(error.message)
     }
   }
 
   async signOut() {
-    console.log('testing?');
-    await this.supabase.signOut();
-    this.router.navigate(['/'], { replaceUrl: true });
+    console.log('testing?')
+    await this.supabase.signOut()
+    this.router.navigate(['/'], { replaceUrl: true })
   }
 }

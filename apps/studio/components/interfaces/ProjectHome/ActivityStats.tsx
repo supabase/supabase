@@ -46,7 +46,7 @@ export const ActivityStats = () => {
     [migrationsData]
   )
   const migrationLabelText =
-    migrationsData.length === 0 ? 'No migrations' : latestMigration?.name ?? 'Unknown'
+    migrationsData.length === 0 ? 'No migrations' : (latestMigration?.name ?? 'Unknown')
 
   const { data: backupsData, isPending: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,

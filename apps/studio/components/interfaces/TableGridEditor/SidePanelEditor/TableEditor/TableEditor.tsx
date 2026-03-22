@@ -1,5 +1,4 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
@@ -30,7 +29,7 @@ import type { SaveTableParams } from '../SidePanelEditor'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './ApiAccessToggle'
-import ColumnManagement from './ColumnManagement'
+import { ColumnManagement } from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
 import { RLSDisableModalContent } from './RLSDisableModal'
@@ -43,7 +42,6 @@ import {
   validateFields,
 } from './TableEditor.utils'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
-import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
 
 type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
   SaveTableParams,
@@ -329,11 +327,6 @@ export const TableEditor = ({
 
   if (!tableFields) return null
 
-  const isExposed = isApiGrantTogglesEnabled
-    ? !!apiAccessToggleHandler.data?.schemaExposed &&
-      checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data.privileges)
-    : undefined
-
   return (
     <SidePanel
       data-testid="table-editor-side-panel"
@@ -358,19 +351,21 @@ export const TableEditor = ({
         <Input
           data-testid="table-name-input"
           label="Name"
+          id="name"
           layout="horizontal"
           type="text"
           error={errors.name ? String(errors.name) : undefined}
           value={tableFields?.name}
-          onChange={(event: any) => onUpdateField({ name: event.target.value })}
+          onChange={(event) => onUpdateField({ name: event.target.value })}
         />
         <Input
           label="Description"
+          id="description"
           placeholder="Optional"
           layout="horizontal"
           type="text"
           value={tableFields?.comment ?? ''}
-          onChange={(event: any) => onUpdateField({ comment: event.target.value })}
+          onChange={(event) => onUpdateField({ comment: event.target.value })}
         />
       </SidePanel.Content>
 

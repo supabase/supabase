@@ -1,15 +1,9 @@
+import { getDatabaseSizeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { databaseKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
 
-export const getDatabaseSizeSql = () => {
-  const sql = /* SQL */ `
-select sum(pg_database_size(pg_database.datname))::bigint as db_size from pg_database;
-`.trim()
-
-  return sql
-}
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
 export type DatabaseSizeVariables = {
   projectRef?: string

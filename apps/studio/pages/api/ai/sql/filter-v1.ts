@@ -1,4 +1,4 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -62,10 +62,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       options: property.options,
     }))
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
       providerOptions,
-      schema: filterGroupSchema,
+      output: Output.object({ schema: filterGroupSchema }),
       prompt: source`
         You are an expert Postgres filter builder. Convert the user's request into structured filters.
 
@@ -84,7 +84,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    const generatedFilters = result.object
+    const generatedFilters = result.output
 
     if (!validateFilterGroup(generatedFilters, normalizedFilterProperties)) {
       return res.status(400).json({

@@ -20,13 +20,13 @@ export const TaxIdBanner = () => {
     false
   )
 
-  const shouldFetch =
+  const shouldFetch = Boolean(
     !!slug &&
     org?.plan?.id !== 'free' &&
     isDismissLoaded &&
     !isDismissed &&
     !!org?.organization_missing_tax_id
-
+  )
   const { data: customerProfile } = useOrganizationCustomerProfileQuery(
     { slug },
     { enabled: shouldFetch, staleTime: 1000 * 60 * 30 }
@@ -53,7 +53,7 @@ export const TaxIdBanner = () => {
       title="Missing tax ID"
       description={
         <>
-          Registered businesses should{' '}
+          Registered businesses must{' '}
           <InlineLink href={`/org/${slug}/billing#address`}>add a tax ID</InlineLink> to their
           billing details
         </>

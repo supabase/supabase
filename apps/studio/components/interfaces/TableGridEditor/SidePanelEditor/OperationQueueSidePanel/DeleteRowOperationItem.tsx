@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Undo2 } from 'lucide-react'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Undo2 } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DeleteRowPayload } from '@/state/table-editor-operation-queue.types'
-import { Card, CardContent, CardHeader } from 'ui'
 
 interface DeleteRowOperationItemProps {
   operationId: string
@@ -47,7 +47,7 @@ export const DeleteRowOperationItem = ({
 
   return (
     <Card className="overflow-hidden border-destructive-500 bg-destructive-500/5">
-      <CardHeader className="pt-2.5 flex flex-row gap-2 border-b border-destructive-500">
+      <CardHeader className="py-2 px-3 flex flex-row gap-2 border-b border-destructive-500 space-y-0 items-center">
         <div className="min-w-0 flex-1 flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">
@@ -62,14 +62,13 @@ export const DeleteRowOperationItem = ({
         </div>
         <ButtonTooltip
           type="text"
-          size="tiny"
           aria-label="Revert change"
-          className="px-1.5"
+          className="w-7"
           icon={<Undo2 />}
           onClick={handleDelete}
           tooltip={{
             content: {
-              side: 'bottom',
+              side: 'left',
               align: 'end',
               text: 'Revert change',
             },
@@ -77,7 +76,7 @@ export const DeleteRowOperationItem = ({
         />
       </CardHeader>
 
-      <CardContent className="font-mono text-xs bg-destructive-100/30">
+      <CardContent className="py-2 px-3 font-mono text-xs bg-destructive-100/30">
         <div className="text-destructive py-0.5">Row will be deleted</div>
       </CardContent>
     </Card>

@@ -1,4 +1,4 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
 import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
@@ -110,10 +110,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model,
       providerOptions,
-      schema: rateMessageResponseSchema,
+      output: Output.object({ schema: rateMessageResponseSchema }),
       prompt: `
 Your job is to look at a Supabase Assistant conversation, which the user has given feedback on, and classify it.
 
@@ -148,7 +148,7 @@ Instructions:
         })
         logger?.updateSpan({
           id: spanId,
-          metadata: { feedbackCategory: object.category },
+          metadata: { feedbackCategory: output.category },
         })
       } catch (error) {
         console.error('Failed to log feedback to Braintrust:', error)
@@ -156,7 +156,7 @@ Instructions:
     }
 
     return res.json({
-      category: object.category,
+      category: output.category,
     })
   } catch (error) {
     if (error instanceof Error) {

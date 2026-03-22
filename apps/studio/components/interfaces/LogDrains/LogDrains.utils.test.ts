@@ -223,6 +223,18 @@ describe('otlpConfigSchema', () => {
       expect(result.success).toBe(false)
     })
 
+    it('rejects endpoint with an incomplete hostname', () => {
+      const config = {
+        type: 'otlp' as const,
+        endpoint: 'https://webhook',
+      }
+      const result = otlpConfigSchema.safeParse(config)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain('must be a valid URL')
+      }
+    })
+
     it('rejects wrong type field', () => {
       const config = {
         type: 'webhook' as const,

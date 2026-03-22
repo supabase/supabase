@@ -107,7 +107,7 @@ export const PolicyRow = ({
           )}
         </div>
       </TableCell>
-      <TableCell className="w-0 text-right whitespace-nowrap">
+      <TableCell className="text-right whitespace-nowrap">
         {!isLocked && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

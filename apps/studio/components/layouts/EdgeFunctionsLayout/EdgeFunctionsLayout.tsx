@@ -47,9 +47,8 @@ const EdgeFunctionsLayout = ({
 }: PropsWithChildren<EdgeFunctionsLayoutProps>) => {
   return (
     <ProjectLayout
-      title={title}
       product="Edge Functions"
-      browserTitle={browserTitle}
+      browserTitle={{ ...browserTitle, section: title }}
       productMenu={<EdgeFunctionsProductMenu />}
       isBlocking={false}
     >
