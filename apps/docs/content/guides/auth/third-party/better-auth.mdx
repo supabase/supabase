@@ -1,0 +1,137 @@
+---
+id: 'auth-third-party-better-auth'
+title: 'Better Auth'
+subtitle: 'Use Better Auth as your authentication layer with your Supabase Postgres database'
+---
+
+Better Auth can be used as a standalone authentication layer that connects directly to your Supabase Postgres database,
+replacing Supabase Auth entirely. This guide focuses on setting up Better Auth on NextJS apps however the general steps
+will be the same for any other stack.
+
+If you are using another framework, then see the full [installation docs](https://better-auth.com/docs/installation) for Better Auth. 
+
+## Getting started
+
+1. Install the `better-auth` and `pg` libraries.
+2. Set the environment variables: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `DATABASE_URL`.
+NOTE: Secrets must be 32 characters or more. You can use `openssl rand -base64 32` to generate one.
+3. Set up the server-side Better Auth instance.
+4. Generate and run the database migration to create the required auth tables.
+5. Create a catch-all route handler to expose the Better Auth API.
+6. Set up the client-side Better Auth instance to initiate auth operations such as `SignIn` and `SignUp`.
+
+## Install packages
+
+```bash
+npm install better-auth pg
+npm install --save-dev @types/pg # this may only be required if you run into type errors
+```
+## Configure environment variables
+
+```bash
+BETTER_AUTH_SECRET=<a-random-secret>
+BETTER_AUTH_URL=https://<your-app-domain>
+DATABASE_URL=postgresql://postgres:<password>@db.<supabase-project>.supabase.co:5432/postgres
+```
+
+The `DATABASE_URL` should use Supabase's direct connection string (port 5432), not
+the transaction pooler (port 6543).
+
+You can find your connection string in `connect` tab at the top of your project dashboard.
+
+## Set up the Better Auth server instance
+
+Create a `lib/auth.ts` file at the root of your project. This file should run server-side only
+and should never be imported by client components.
+
+```typescript
+import { betterAuth } from 'better-auth'
+import { Pool } from 'pg'
+
+export const auth = betterAuth({
+  database: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+  emailAndPassword: {
+    enabled: true,
+  },
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    },
+  },
+  plugins: [admin(), anonymous(), phoneNumber()],
+})
+```
+The above is only an example, there are additional plugins and configuration options to extend authentication
+capabilities which can be found [here]( https://better-auth.com/docs/plugins).
+
+## Generate and run the database migration
+
+Run these commands (or their equivalants) from the root of your project.
+
+```bash
+npx better-auth generate
+```
+
+```bash
+npx better-auth migrate
+```
+
+The generate command produces an SQL file. The migrate command will run this migration against your database.
+Running the migration will create whatever tables are required for your auth configuration.
+
+Create the catch-all route handler to handle all requests to /api/auth/*. The path varies by framework.
+
+```typescript
+// app/api/auth/[...all]/route.ts
+import { auth } from '@/lib/auth'
+import { toNextJsHandler } from 'better-auth/next-js'
+
+export const { GET, POST } = toNextJsHandler(auth)
+```
+
+```typescript
+// pages/api/auth/[...all].ts
+import { auth } from '@/lib/auth'
+import { toNextJsHandler } from 'better-auth/next-js'
+
+export default toNextJsHandler(auth)
+```
+
+## Set up the Better Auth client instance
+
+Create a `lib/auth-client.ts` file. This can be used client side to call the auth server and perform operations
+
+```typescript
+import { createAuthClient } from 'better-auth/react'
+
+export const authClient = createAuthClient({
+  baseURL: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
+  # only required if auth server is on a different domain than your frontend
+})
+```
+
+## Usage
+```typescript
+ import { authClient } from '@/lib/auth-client'
+
+const { data, error } = await authClient.signUp.email({
+  email: 'user@example.com',
+  password: 'password',
+  name: 'John Doe',
+})
+
+const { data, error } = await authClient.signIn.email({
+  email: 'user@example.com',
+  password: 'password',
+})
+await authClient.signOut()
+```
+
+## Limitations
+
+-  Better Auth connects to Postgres as a Superuser, bypassing RLS entirely, hence policies will have no effect. Instead, enforce access control in your server-side API routes by identifying the user from their session and filtering queries accordingly. 
+
+
