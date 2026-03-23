@@ -51,6 +51,7 @@ import {
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
+import CopyButton from '@/components/ui/CopyButton'
 
 dayjs.extend(relativeTime)
 
@@ -273,7 +274,11 @@ const EdgeFunctionDetailsLayout = ({
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
               <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
-                <span className="flex items-center gap-2">{functionUrl}</span>
+                <div className="flex items-center gap-x-2">
+                  <span className="flex items-center gap-2">{functionUrl}</span>
+                  <CopyButton iconOnly type="text" text={functionUrl} />
+                </div>
+
                 <HoverCard
                   openDelay={250}
                   closeDelay={100}

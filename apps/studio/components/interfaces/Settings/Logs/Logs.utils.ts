@@ -1,7 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { IS_PLATFORM } from 'common'
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
-import type { PlanId } from 'data/subscriptions/types'
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
@@ -205,7 +204,7 @@ ${orderBy}
 limit ${limit}
 `
       }
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -303,7 +302,7 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): string =>
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
-const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, string] => {
+const calcChartStart = (params: Partial): [Dayjs, string] => {
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   // todo @TzeYiing needs typing
   const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
@@ -775,7 +774,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
     .join('\n\n---\n\n')
 }
 
-const QUERY_TYPE_LABELS: Record<string, string> = {
+const QUERY_TYPE_LABELS: Record = {
   api: 'API Gateway (Edge Network)',
   database: 'Postgres Database',
   functions: 'Edge Functions',
@@ -791,7 +790,7 @@ const QUERY_TYPE_LABELS: Record<string, string> = {
   etl: 'ETL',
 }
 
-const LOG_TABLE_TO_SERVICE_LABEL: Record<string, string> = {
+const LOG_TABLE_TO_SERVICE_LABEL: Record = {
   edge_logs: 'API Gateway (Edge Network)',
   postgres_logs: 'Postgres Database',
   function_logs: 'Edge Functions',
@@ -808,10 +807,16 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<string, string> = {
   etl_replication_logs: 'ETL',
 }
 
+export function extractEdgeFunctionName(pathname: unknown): string {
+  if (typeof pathname !== 'string' || !pathname) return ''
+  const parts = pathname.split('/').filter(Boolean)
+  return parts[parts.length - 1] ?? ''
+}
+
 function extractServiceLabelFromSql(sql: string): string | null {
   const match = sql.match(/\bfrom\s+(\w+)/i)
   const tableName = match?.[1]
-  return tableName ? (LOG_TABLE_TO_SERVICE_LABEL[tableName] ?? null) : null
+  return tableName ? LOG_TABLE_TO_SERVICE_LABEL[tableName] ?? null : null
 }
 
 export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {

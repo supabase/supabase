@@ -1064,10 +1064,7 @@ export const SidePanelEditor = ({
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
       />
-      <OperationQueueSidePanel
-        visible={snap.sidePanel?.type === 'operation-queue'}
-        closePanel={snap.closeSidePanel}
-      />
+      <OperationQueueSidePanel />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )

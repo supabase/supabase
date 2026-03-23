@@ -65,17 +65,19 @@ export const HeaderNew = ({
 
   return (
     <div>
-      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100 px-1.5 py-1.5 gap-2">
+      <div className="flex flex-wrap min-h-10 items-center bg-dash-sidebar dark:bg-surface-100 py-1.5 gap-2">
         {customHeader ? (
-          customHeader
+          <div className="flex-1 px-1.5">{customHeader}</div>
         ) : snap.selectedRows.size > 0 ? (
-          <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+          <div className="flex-1 px-1.5">
+            <RowHeader tableQueriesEnabled={tableQueriesEnabled} />
+          </div>
         ) : (
-          <div className="flex-1 min-w-[300px] flex items-center gap-2">
+          <div className="w-full flex items-center gap-2 px-1.5 pb-1.5 border-b border-border">
             <FilterPopoverNew isRefetching={isRefetching} />
           </div>
         )}
-        <div className="flex items-center gap-2 overflow-x-auto">
+        <div className="flex items-center gap-2 overflow-x-auto px-1.5">
           {!customHeader && snap.selectedRows.size === 0 && (
             <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
           )}
