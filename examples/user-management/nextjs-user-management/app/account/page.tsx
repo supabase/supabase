@@ -5,8 +5,8 @@ export default async function Account() {
   const supabase = await createClient()
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: claimsData,
+  } = await supabase.auth.getClaims()
 
-  return <AccountForm user={user} />
+  return <AccountForm claims={claimsData?.claims ?? null} />
 }

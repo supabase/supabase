@@ -1,10 +1,11 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { type User } from '@supabase/supabase-js'
 import Avatar from './avatar'
 
-export default function AccountForm({ user }: { user: User | null }) {
+type Claims = { sub: string; email?: string; [key: string]: unknown }
+
+export default function AccountForm({ claims }: { claims: Claims | null }) {
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
@@ -19,7 +20,7 @@ export default function AccountForm({ user }: { user: User | null }) {
       const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
-        .eq('id', user?.id)
+        .eq('id', claims?.sub)
         .single()
 
       if (error && status !== 406) {
@@ -38,11 +39,11 @@ export default function AccountForm({ user }: { user: User | null }) {
     } finally {
       setLoading(false)
     }
-  }, [user, supabase])
+  }, [claims, supabase])
 
   useEffect(() => {
     getProfile()
-  }, [user, getProfile])
+  }, [claims, getProfile])
 
   async function updateProfile({
     username,
@@ -58,7 +59,7 @@ export default function AccountForm({ user }: { user: User | null }) {
       setLoading(true)
 
       const { error } = await supabase.from('profiles').upsert({
-        id: user?.id as string,
+        id: claims?.sub as string,
         full_name: fullname,
         username,
         website,
@@ -77,7 +78,7 @@ export default function AccountForm({ user }: { user: User | null }) {
   return (
     <div className="form-widget">
       <Avatar
-        uid={user?.id ?? null}
+        uid={claims?.sub ?? null}
         url={avatar_url}
         size={150}
         onUpload={(url) => {
@@ -87,7 +88,7 @@ export default function AccountForm({ user }: { user: User | null }) {
       />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user?.email} disabled />
+        <input id="email" type="text" value={claims?.email} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>
