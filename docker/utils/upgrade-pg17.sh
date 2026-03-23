@@ -489,7 +489,7 @@ run_complete() {
     docker rm -f "$COMPLETE_CONTAINER" >/dev/null 2>&1 || true
 }
 
-# --- Step 6: Swap data directories -----------------------------------------
+# --- Step 7: Swap data directories -----------------------------------------
 
 swap_data() {
     info "Swapping data directories"
