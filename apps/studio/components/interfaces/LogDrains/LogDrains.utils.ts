@@ -8,6 +8,11 @@ import { z } from 'zod'
 import { LogDrainType } from './LogDrains.constants'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
+export type LogDrainHeaderRow = {
+  key: string
+  value: string
+}
+
 /**
  * Get the description text for the custom headers section based on log drain type
  */
@@ -30,32 +35,68 @@ export function getHeadersSectionDescription(type: LogDrainType): string {
 export const HEADER_VALIDATION_ERRORS = {
   MAX_LIMIT: 'You can only have 20 custom headers',
   DUPLICATE: 'Header name already exists',
-  REQUIRED: 'Header name and value are required',
+  KEY_REQUIRED: 'Header name is required',
+  VALUE_REQUIRED: 'Header value is required',
 } as const
 
-/**
- * Validates if a new header can be added to the existing headers
- */
-export function validateNewHeader(
-  existingHeaders: Record<string, string>,
-  newHeader: { name: string; value: string }
-): { valid: boolean; error?: string } {
-  const headerKeys = Object.keys(existingHeaders)
-
-  if (headerKeys.length >= 20) {
-    return { valid: false, error: HEADER_VALIDATION_ERRORS.MAX_LIMIT }
-  }
-
-  if (headerKeys.includes(newHeader.name)) {
-    return { valid: false, error: HEADER_VALIDATION_ERRORS.DUPLICATE }
-  }
-
-  if (!newHeader.name || !newHeader.value) {
-    return { valid: false, error: HEADER_VALIDATION_ERRORS.REQUIRED }
-  }
-
-  return { valid: true }
+const DEFAULT_HEADERS_BY_TYPE: Partial<Record<LogDrainType, Record<string, string>>> = {
+  webhook: { 'Content-Type': 'application/json' },
+  otlp: { 'Content-Type': 'application/x-protobuf' },
 }
+
+export function getDefaultHeadersByType(type: LogDrainType): Record<string, string> {
+  return DEFAULT_HEADERS_BY_TYPE[type] ?? {}
+}
+
+export function headerRecordToRows(headers: Record<string, string> = {}): LogDrainHeaderRow[] {
+  return Object.entries(headers).map(([key, value]) => ({ key, value }))
+}
+
+export function headerRowsToRecord(rows: LogDrainHeaderRow[] = []): Record<string, string> {
+  return rows.reduce<Record<string, string>>((acc, row) => {
+    const key = row.key.trim()
+    const value = row.value.trim()
+
+    if (key && value) {
+      acc[key] = value
+    }
+
+    return acc
+  }, {})
+}
+
+export const logDrainHeaderEntriesSchema = z
+  .array(
+    z.object({
+      key: z.string().trim().min(1, HEADER_VALIDATION_ERRORS.KEY_REQUIRED),
+      value: z.string().trim().min(1, HEADER_VALIDATION_ERRORS.VALUE_REQUIRED),
+    })
+  )
+  .max(20, HEADER_VALIDATION_ERRORS.MAX_LIMIT)
+  .superRefine((rows, ctx) => {
+    const rowIndexesByKey = new Map<string, number[]>()
+
+    rows.forEach((row, index) => {
+      const key = row.key.trim()
+      if (!key) return
+
+      const existingIndexes = rowIndexesByKey.get(key) ?? []
+      existingIndexes.push(index)
+      rowIndexesByKey.set(key, existingIndexes)
+    })
+
+    rowIndexesByKey.forEach((indexes) => {
+      if (indexes.length < 2) return
+
+      indexes.forEach((index) => {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: HEADER_VALIDATION_ERRORS.DUPLICATE,
+          path: [index, 'key'],
+        })
+      })
+    })
+  })
 
 /**
  * Zod schema for OTLP log drain configuration
