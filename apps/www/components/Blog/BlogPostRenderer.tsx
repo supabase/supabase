@@ -146,7 +146,7 @@ const BlogPostRenderer = ({
           <div className="grid grid-cols-12 xl:gap-x-8 xl:gap-y-0">
 
             {/* Row 1, Col 1: Back button */}
-            <div className="col-span-12 xl:row-start-1 xl:col-start-1 xl:col-span-1 pt-16 xl:pt-20 flex items-start justify-start">
+            <div className="col-span-12 xl:row-start-1 xl:col-start-1 xl:col-span-1 pt-16 xl:pt-32 flex items-start justify-start">
               <Link
                 href="/blog"
                 className="text-foreground-lighter hover:text-foreground inline-flex cursor-pointer items-center text-sm transition"
@@ -157,7 +157,7 @@ const BlogPostRenderer = ({
             </div>
 
             {/* Row 1, Col 2: Title + meta */}
-            <div className="col-span-12 xl:row-start-1 xl:col-start-2 xl:col-span-7 pt-4 xl:pt-20 pb-6 space-y-4">
+            <div className="col-span-12 xl:row-start-1 xl:col-start-2 xl:col-span-7 pt-4 xl:pt-32 pb-6 space-y-4">
               <div className="space-y-4">
                 {(blogMetaData.tags as Tag[])?.length > 0 && (
                   <div className="flex flex-wrap gap-2">

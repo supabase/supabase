@@ -19,7 +19,7 @@ const customerStories = [
     bgColor: '#000000',
     bgGradient: 'linear-gradient(to bottom left, #0a0a0a 0%, #000000 100%)',
     dimBgColor: '#080808',
-    textColor: 'light' as const,
+    textColor: 'light' as 'light' | 'dark',
   },
   {
     name: 'Firecrawl',
@@ -35,7 +35,7 @@ const customerStories = [
     bgColor: '#7a3818',
     bgGradient: 'linear-gradient(to bottom left, #7a3818 0%, #4a1e08 100%)',
     dimBgColor: '#5a2a10',
-    textColor: 'light' as const,
+    textColor: 'light' as 'light' | 'dark',
   },
   {
     name: 'Hyper',
@@ -50,7 +50,7 @@ const customerStories = [
     bgColor: '#222222',
     bgGradient: 'linear-gradient(to bottom left, #2a2a2a 0%, #181818 100%)',
     dimBgColor: '#1e1e1e',
-    textColor: 'light' as const,
+    textColor: 'light' as 'light' | 'dark',
   },
   {
     name: 'E2B',
@@ -66,7 +66,7 @@ const customerStories = [
     bgColor: '#7a4400',
     bgGradient: 'linear-gradient(to bottom left, #7a4400 0%, #4a2800 100%)',
     dimBgColor: '#5a3200',
-    textColor: 'light' as const,
+    textColor: 'light' as 'light' | 'dark',
   },
   {
     name: 'Mobbin',
@@ -81,7 +81,7 @@ const customerStories = [
     bgColor: '#000000',
     bgGradient: 'linear-gradient(to bottom left, #0a0a0a 0%, #000000 100%)',
     dimBgColor: '#080808',
-    textColor: 'light' as const,
+    textColor: 'light' as 'light' | 'dark',
   },
 ]
 
