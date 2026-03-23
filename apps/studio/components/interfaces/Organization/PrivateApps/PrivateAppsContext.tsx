@@ -19,7 +19,6 @@ interface PrivateAppsContextValue {
   ) => void
   removeInstallation: (id: string) => void
   removeInstallationsByAppId: (appId: string) => void
-  setProjectScope: (installationId: string, scope: 'all' | string[]) => void
 }
 
 const PrivateAppsContext = createContext<PrivateAppsContextValue | null>(null)
@@ -37,18 +36,16 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
 
   // Local state fallback when GET installations endpoint is unavailable
   const [localInstallations, setLocalInstallations] = useState<Installation[]>([])
-  // Project scope overrides set locally (not in API yet)
-  const [scopeOverrides, setScopeOverrides] = useState<Record<string, 'all' | string[]>>({})
 
   const installations = useMemo<Installation[]>(() => {
     if (!installationsError && installationsData?.installations) {
       return installationsData.installations.map((inst) => ({
         ...(inst as components['schemas']['InstallPlatformAppResponse']),
-        projectScope: scopeOverrides[inst.id] ?? 'all',
+        projectScope: 'all' as const,
       }))
     }
     return localInstallations
-  }, [installationsData, installationsError, localInstallations, scopeOverrides])
+  }, [installationsData, installationsError, localInstallations])
 
   function addInstallation(
     data: components['schemas']['InstallPlatformAppResponse'],
@@ -65,13 +62,6 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
     setLocalInstallations((prev) => prev.filter((i) => i.app_id !== appId))
   }
 
-  function setProjectScope(installationId: string, scope: 'all' | string[]) {
-    setScopeOverrides((prev) => ({ ...prev, [installationId]: scope }))
-    setLocalInstallations((prev) =>
-      prev.map((i) => (i.id === installationId ? { ...i, projectScope: scope } : i))
-    )
-  }
-
   return (
     <PrivateAppsContext.Provider
       value={{
@@ -83,7 +73,6 @@ export function PrivateAppsProvider({ children }: PropsWithChildren) {
         addInstallation,
         removeInstallation,
         removeInstallationsByAppId,
-        setProjectScope,
       }}
     >
       {children}
