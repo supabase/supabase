@@ -185,3 +185,28 @@ If you run out of space mid-upgrade, the safest path is to roll back and free up
 ### pgsodium / vault errors
 
 The `db-config` named volume contains the pgsodium root encryption key at `/etc/postgresql-custom/pgsodium_root.key`. This volume is preserved during the upgrade. Never run `docker compose down -v` as this destroys named volumes and makes vault secrets unrecoverable.
+
+### "invalid secret key" on fresh Postgres 17 install
+
+If you are starting a **new** Postgres 17 deployment (not upgrading) and see `FATAL: invalid secret key`, a leftover `db-config` volume from a previous Postgres 15 installation may have incorrect file ownership. Postgres 15 and 17 use different user IDs, so the pgsodium key file created by PG15 is unreadable by PG17.
+
+To fix, either remove the old volume and let PG17 generate a new key:
+
+```sh
+docker compose down
+docker volume rm $(docker volume ls --filter "name=db-config" --format '{{.Name}}')
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+```
+
+Or fix the ownership:
+
+```sh
+docker run --rm \
+  -v "$(docker volume ls --filter 'name=db-config' --format '{{.Name}}'):/vol" \
+  supabase/postgres:17.6.1.084 \
+  chown -R postgres:postgres /vol/
+```
+
+<Admonition type="caution">
+Removing the `db-config` volume destroys the pgsodium root key. Only do this for fresh installations with no existing vault secrets.
+</Admonition>

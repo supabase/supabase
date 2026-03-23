@@ -4,6 +4,11 @@
 #   docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 #
 # For upgrading an existing Postgres 15 database, run utils/upgrade-pg17.sh first.
+#
+# Note: PG15 and PG17 use different postgres UIDs (105 vs 101). If starting
+# fresh with a leftover db-config volume from PG15, you may see
+# "FATAL: invalid secret key". Either remove the old volume or fix ownership.
+# See: docs/guides/self-hosting/postgres-upgrade-17#pgsodium--vault-errors
 
 services:
   db:
