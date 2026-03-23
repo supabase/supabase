@@ -55,6 +55,15 @@ const renderEndpointSheet = (
   return { onClose, onSubmit }
 }
 
+const submitForm = () =>
+  fireEvent.submit(document.getElementById('platform-webhook-endpoint-form')!)
+
+const getUrlInput = () => screen.getByPlaceholderText('https://api.example.com/webhooks/supabase')
+
+const findEventTypeCheckbox = (eventType: string) =>
+  screen.findByRole('checkbox', {
+    name: new RegExp(eventType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
+  })
 describe('PlatformWebhooksEndpointSheet', () => {
   afterEach(() => {
     vi.clearAllMocks()
@@ -85,7 +94,7 @@ describe('PlatformWebhooksEndpointSheet', () => {
 
     const nameInput = await screen.findByDisplayValue('Billing events')
     await user.clear(nameInput)
-    fireEvent.submit(document.getElementById('platform-webhook-endpoint-form')!)
+    submitForm()
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
     expect(onSubmit).toHaveBeenCalledWith(
@@ -93,6 +102,112 @@ describe('PlatformWebhooksEndpointSheet', () => {
         name: '',
         url: 'https://hooks.example.com/billing',
         description: 'Invoices and receipts',
+      }),
+      expect.anything()
+    )
+  })
+
+  it('blocks submit when the endpoint URL is empty', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.click(await findEventTypeCheckbox('project.updated'))
+    submitForm()
+
+    expect(await screen.findByText('Please provide a URL')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('blocks submit when the endpoint URL is malformed', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'https://not a url')
+    await user.click(await findEventTypeCheckbox('project.updated'))
+    submitForm()
+
+    expect(await screen.findByText('Please provide a valid URL')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('blocks submit when the endpoint URL uses an incomplete hostname', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'https://webhook')
+    await user.click(await findEventTypeCheckbox('project.updated'))
+    submitForm()
+
+    expect(await screen.findByText('Please provide a valid URL')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('blocks submit when the endpoint URL does not include a protocol', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'hooks.example.com/billing')
+    await user.click(await findEventTypeCheckbox('project.updated'))
+    submitForm()
+
+    expect(
+      await screen.findByText('Please prefix your URL with http:// or https://')
+    ).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('shows an error when no event types are selected', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'https://hooks.example.com/billing')
+    submitForm()
+
+    expect(await screen.findByText('Select at least one event type')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('clears the event type error after selecting an event and allows submit', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'https://hooks.example.com/billing')
+    submitForm()
+
+    expect(await screen.findByText('Select at least one event type')).toBeInTheDocument()
+
+    await user.click(await findEventTypeCheckbox('project.updated'))
+
+    await waitFor(() => {
+      expect(screen.queryByText('Select at least one event type')).not.toBeInTheDocument()
+    })
+
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://hooks.example.com/billing',
+        eventTypes: ['project.updated'],
+      }),
+      expect.anything()
+    )
+  })
+
+  it('allows submit when subscribe all is enabled', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet()
+
+    await user.type(getUrlInput(), 'https://hooks.example.com/billing')
+    await user.click(screen.getByRole('checkbox', { name: /subscribe to all events/i }))
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscribeAll: true,
+        eventTypes: PROJECT_EVENT_TYPES,
+        url: 'https://hooks.example.com/billing',
       }),
       expect.anything()
     )

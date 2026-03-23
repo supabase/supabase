@@ -3,6 +3,7 @@ import { draftMode } from 'next/headers'
 
 import BlogPostClient from './BlogPostClient'
 import { SITE_ORIGIN } from '@/lib/constants'
+import { getAbsoluteBlogSocialImage } from '@/lib/blog-images'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
@@ -40,7 +41,6 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  const { isEnabled: isDraft } = await draftMode()
   const matter = (await import('gray-matter')).default
 
   // Try to get static markdown post first
@@ -48,8 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const postContent = await getPostdata(slug, '_blog')
     const parsedContent = matter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
-    const blogImage = blogPost.imgThumb || blogPost.imgSocial
-    const metaImageUrl = blogImage && blogImage.startsWith('http') ? blogImage : undefined
+    const metaImageUrl = getAbsoluteBlogSocialImage(blogPost, SITE_ORIGIN)
 
     return {
       title: blogPost.title,

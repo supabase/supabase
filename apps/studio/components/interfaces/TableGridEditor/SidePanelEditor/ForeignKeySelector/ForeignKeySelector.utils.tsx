@@ -1,10 +1,22 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { isEqual } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import type { ForeignKey } from './ForeignKeySelector.types'
+
+export interface ForeignKeyDirtyState {
+  id?: number | string
+  name?: string
+  tableId?: number
+  schema: string
+  table: string
+  columns: { source: string; target: string }[]
+  deletionAction: string
+  updateAction: string
+}
 
 export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => {
   return fks.map((x) => {
@@ -19,6 +31,28 @@ export const formatForeignKeys = (fks: ForeignKeyConstraint[]): ForeignKey[] => 
       updateAction: x.update_action,
     }
   })
+}
+
+export const normalizeForeignKeyForDirtyCheck = (foreignKey: ForeignKey): ForeignKeyDirtyState => {
+  return {
+    id: foreignKey.id,
+    name: foreignKey.name,
+    tableId: foreignKey.tableId,
+    schema: foreignKey.schema,
+    table: foreignKey.table,
+    columns: foreignKey.columns.map(({ source, target }) => ({ source, target })),
+    deletionAction: foreignKey.deletionAction,
+    updateAction: foreignKey.updateAction,
+  }
+}
+
+export const hasForeignKeySelectorChanges = (
+  initialState: ForeignKeyDirtyState | undefined,
+  foreignKey: ForeignKey
+) => {
+  if (initialState === undefined) return false
+
+  return !isEqual(initialState, normalizeForeignKeyForDirtyCheck(foreignKey))
 }
 
 export const generateCascadeActionDescription = (

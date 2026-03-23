@@ -64,6 +64,61 @@ DROP CONSTRAINT IF EXISTS ${ident(relation.name)}
   )
 }
 
+export const getForeignKeyConstraintsSql = ({ schema }: { schema: string }) => {
+  if (!schema) throw new Error('schema is required')
+
+  const sql = /* SQL */ `
+SELECT 
+  con.oid as id, 
+  con.conname as constraint_name, 
+  con.confdeltype as deletion_action,
+  con.confupdtype as update_action,
+  rel.oid as source_id,
+  nsp.nspname as source_schema, 
+  rel.relname as source_table, 
+  (
+    SELECT 
+      array_agg(
+        att.attname 
+        ORDER BY 
+          un.ord
+      ) 
+    FROM 
+      unnest(con.conkey) WITH ORDINALITY un (attnum, ord) 
+      INNER JOIN pg_attribute att ON att.attnum = un.attnum 
+    WHERE 
+      att.attrelid = rel.oid
+  ) source_columns, 
+  frel.oid as target_id,
+  fnsp.nspname as target_schema, 
+  frel.relname as target_table, 
+  (
+    SELECT 
+      array_agg(
+        att.attname 
+        ORDER BY 
+          un.ord
+      ) 
+    FROM 
+      unnest(con.confkey) WITH ORDINALITY un (attnum, ord) 
+      INNER JOIN pg_attribute att ON att.attnum = un.attnum 
+    WHERE 
+      att.attrelid = frel.oid
+  ) target_columns 
+FROM 
+  pg_constraint con 
+  INNER JOIN pg_class rel ON rel.oid = con.conrelid 
+  INNER JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace 
+  INNER JOIN pg_class frel ON frel.oid = con.confrelid 
+  INNER JOIN pg_namespace fnsp ON fnsp.oid = frel.relnamespace 
+WHERE 
+  con.contype = 'f'
+  AND nsp.nspname = '${schema}'
+`.trim()
+
+  return sql
+}
+
 export interface ForeignKey {
   id?: number | string
   name?: string

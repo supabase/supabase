@@ -1,20 +1,14 @@
+import { getOngoingQueriesSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
+import { UseCustomQueryOptions } from 'types'
+
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { sqlKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
 type OngoingQuery = {
   pid: number
   query: string
   query_start: string
-}
-
-export const getOngoingQueriesSql = () => {
-  const sql = /* SQL */ `
-select pid, query, query_start from pg_stat_activity where state = 'active' and datname = 'postgres';
-`.trim()
-
-  return sql
 }
 
 export type OngoingQueriesVariables = {
@@ -26,7 +20,7 @@ export async function getOngoingQueries(
   { projectRef, connectionString }: OngoingQueriesVariables,
   signal?: AbortSignal
 ) {
-  const sql = getOngoingQueriesSql().trim()
+  const sql = getOngoingQueriesSql()
 
   const { result } = await executeSql(
     { projectRef, connectionString, sql, queryKey: ['ongoing-queries'] },

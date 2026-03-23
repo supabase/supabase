@@ -83,9 +83,20 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  const response = await fetchRevalidatePerDay(
-    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
-  )
+  let response: Response
+  try {
+    response = await fetchRevalidatePerDay(
+      `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
+    )
+  } catch (err) {
+    throw new Error(`Failed to fetch Python vecs docs from GitHub (network error): ${err}`)
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch Python vecs docs from GitHub: ${response.status} ${response.statusText}`
+    )
+  }
 
   let content = await response.text()
   content = removeRedundantH1(content)
