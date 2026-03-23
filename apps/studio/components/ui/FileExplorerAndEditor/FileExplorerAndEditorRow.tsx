@@ -7,11 +7,11 @@ import {
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  INodeRendererProps,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TreeViewItem,
+  type INodeRendererProps,
 } from 'ui'
 
 import { FileData } from './FileExplorerAndEditor.types'
