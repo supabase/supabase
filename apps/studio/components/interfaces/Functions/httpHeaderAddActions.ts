@@ -6,7 +6,7 @@ interface BuildEdgeFunctionHeaderAddActionsParams<TRow> {
   createRow: (name: string, value: string) => TRow
 }
 
-export const buildEdgeFunctionHeaderAddActions = <TRow,>({
+export const buildEdgeFunctionHeaderAddActions = <TRow>({
   apiKey,
   includeApiKeyHeader = false,
   createRow,
