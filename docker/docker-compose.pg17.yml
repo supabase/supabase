@@ -7,4 +7,4 @@
 
 services:
   db:
-    image: supabase/postgres:17.6.1.063
+    image: supabase/postgres:17.6.1.084

@@ -41,7 +41,7 @@ done
 
 # --- Configuration ----------------------------------------------------------
 
-PG17_IMAGE="supabase/postgres:17.6.1.063"
+PG17_IMAGE="supabase/postgres:17.6.1.084"
 DB_CONTAINER="supabase-db"
 UPGRADE_CONTAINER="supabase-pg-upgrade"
 COMPLETE_CONTAINER="supabase-pg-complete"
