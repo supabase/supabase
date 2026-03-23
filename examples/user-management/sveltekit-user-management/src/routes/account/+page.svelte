@@ -4,7 +4,7 @@
     import Avatar from './Avatar.svelte'
 
 	let { data, form } = $props()
-	let { session, supabase, profile } = $derived(data)
+	let { claims, supabase, profile } = $derived(data)
 	let profileForm: HTMLFormElement
 	let loading = $state(false)
 	let fullName: string = profile?.full_name ?? ''
@@ -46,7 +46,7 @@
         />
 		<div>
 			<label for="email">Email</label>
-			<input id="email" type="text" value={session.user.email} disabled />
+			<input id="email" type="text" value={claims.email} disabled />
 		</div>
 
 		<div>
