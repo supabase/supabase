@@ -1,17 +1,113 @@
+import type { StripeAddressElementChangeEvent, StripeAddressElementOptions } from '@stripe/stripe-js'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { UpdateBillingAddressModal } from 'components/interfaces/App/UpdateBillingAddressModal'
+import type { ReactNode } from 'react'
 import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+type MockAddressElementProps = {
+  onChange?: (event: StripeAddressElementChangeEvent) => void
+  options?: StripeAddressElementOptions
+}
+
+const emitAddressEvent = (
+  props: MockAddressElementProps,
+  event: Pick<StripeAddressElementChangeEvent, 'complete' | 'value'>
+) =>
+  props.onChange?.({
+    elementType: 'address',
+    elementMode: 'billing',
+    empty: false,
+    isNewAddress: false,
+    ...event,
+  })
+
+vi.mock('@stripe/react-stripe-js', () => ({
+  Elements: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  AddressElement: (props: MockAddressElementProps) => (
+    <div>
+      <div data-testid="stripe-address-element" />
+      <button
+        type="button"
+        onClick={() =>
+          emitAddressEvent(props, {
+            complete: true,
+            value: {
+              name: 'Updated Company',
+              address: {
+                line1: '500 Market St',
+                line2: '',
+                city: 'San Francisco',
+                state: 'CA',
+                postal_code: '94105',
+                country: 'US',
+              },
+            },
+          })
+        }
+      >
+        Emit valid US address
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          emitAddressEvent(props, {
+            complete: false,
+            value: {
+              name: 'Updated Company',
+              address: {
+                line1: '500 Market St',
+                line2: '',
+                city: 'San Francisco',
+                state: 'CA',
+                postal_code: '',
+                country: 'US',
+              },
+            },
+          })
+        }
+      >
+        Emit invalid address
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          emitAddressEvent(props, {
+            complete: true,
+            value: {
+              name: 'Updated GmbH',
+              address: {
+                line1: 'Stephansplatz 1',
+                line2: '',
+                city: 'Vienna',
+                state: 'Vienna',
+                postal_code: '1010',
+                country: 'AT',
+              },
+            },
+          })
+        }
+      >
+        Emit valid AT address
+      </button>
+    </div>
+  ),
+  useElements: () => null,
+  useStripe: () => null,
+}))
+vi.mock('@stripe/stripe-js', () => ({
+  loadStripe: vi.fn(() => Promise.resolve(null)),
+}))
+
 vi.mock('lib/constants', async (importOriginal) => {
-  const original = (await importOriginal()) as any
+  const original = (await importOriginal()) as typeof import('lib/constants')
   return { ...original, IS_PLATFORM: true }
 })
 
 const mockFlag = vi.fn(() => true)
 vi.mock('common', async (importOriginal) => {
-  const original = (await importOriginal()) as any
+  const original = (await importOriginal()) as typeof import('common')
   return {
     ...original,
     useFlag: (_name: string) => mockFlag(),
@@ -19,7 +115,9 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-const mockOrg = vi.fn(() =>
+const mockOrg = vi.fn<
+  () => ReturnType<typeof createMockOrganization> | undefined
+>(() =>
   createMockOrganization({
     slug: 'test-org',
     organization_missing_address: true,
@@ -153,7 +251,7 @@ describe('UpdateBillingAddressModal', () => {
   })
 
   it('does not render when no org is selected', () => {
-    mockOrg.mockReturnValue(undefined as any)
+    mockOrg.mockReturnValue(undefined)
     render(<UpdateBillingAddressModal />)
     expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
   })
@@ -187,5 +285,31 @@ describe('UpdateBillingAddressModal', () => {
     await waitFor(() => {
       expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
     })
+  })
+
+  it('enables submit after the address element reports a valid change', async () => {
+    render(<UpdateBillingAddressModal />)
+
+    expect(await screen.findByText('Billing address required')).toBeInTheDocument()
+
+    expect(screen.getByRole('button', { name: 'Save address' })).toBeDisabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Emit valid US address' }))
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save address' })).toBeEnabled()
+    )
+  })
+
+  it('filters tax ID options using the current address country', async () => {
+    render(<UpdateBillingAddressModal />)
+
+    expect(await screen.findByText('Billing address required')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Emit valid AT address' }))
+    await userEvent.click(screen.getByRole('combobox'))
+
+    expect(await screen.findByText('Austria - AT VAT')).toBeInTheDocument()
+    expect(screen.queryByText('United States - US EIN')).not.toBeInTheDocument()
   })
 })
