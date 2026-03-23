@@ -63,10 +63,7 @@ export const JitDbAccessConfiguration = () => {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const [enabled, setEnabled] = useState(false)
-  const [showCreateRuleSheet, setShowCreateRuleSheet] = useQueryState(
-    'jit_new',
-    parseAsBoolean.withDefault(false)
-  )
+  const [, setShowCreateRuleSheet] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)
@@ -171,7 +168,6 @@ export const JitDbAccessConfiguration = () => {
     [users, ruleIdToEdit]
   )
 
-  const sheetOpen = showCreateRuleSheet || !!ruleIdToEdit
   const sheetMode: SheetMode = ruleIdToEdit ? 'edit' : 'add'
 
   const membersWithRules = useMemo(() => new Set(users.map((user) => user.memberId)), [users])
