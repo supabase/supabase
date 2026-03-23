@@ -13,10 +13,10 @@ From the [**AWS docs**](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/A
 
 There are a few options to work around this limit if you have already used your four modifications and need to make further adjustments:
 
-1.  **Restore to a new project**: This spins up a new instance with a new disk, bypassing the the 24-hour quota entirely. It’s a great option if you're okay with a new project and project refactoring. [**Docs: restoring to a new project**](/docs/guides/platform/backups#restore-to-a-new-project).
-2.  **pg_upgrade**: Our [**pg_upgrade**](/docs/guides/platform/upgrading) implementation migrates your data to a new disk, which resets the modification count. The main requirement here is that the database must be operational - it can't run it if your DB is in a degraded or inaccessible state.
+1.  **Restore to a new project**: This spins up a new instance with a new disk, bypassing the 24-hour quota entirely. It’s a great option if you're okay with a new project and project refactoring. [**Docs: restoring to a new project**](/docs/guides/platform/backups#restore-to-a-new-project).
+2.  **pg_upgrade**: Our [**pg_upgrade**](/docs/guides/platform/upgrading) implementation migrates your data to a new disk, which resets the modification count. The main requirement here is that the database must be operational - pg_upgrade can't run if your database is in a degraded or inaccessible state.
 3.  **Pause and Restore**: This also migrates to a new disk but is only available for projects on the Free plan. If you're not on the Free plan, you'd need to [**transfer your project to an organization on the Free plan**](/docs/guides/platform/project-transfer) first.
 
-If the database is down or locked in a bad state (e.g corrupted or stuck during resize), and you have hit the modification limit, the only path forward is to wait until the rolling 24-hour window allows for another modification.
+If the database is down or locked in a bad state (e.g., corrupted or stuck during resize), and you have hit the modification limit, the only path forward is to wait until the rolling 24-hour window allows for another modification.
 
 More on this in our doc here: [**https://supabase.com/docs/guides/platform/database-size#disk-size**](/docs/guides/platform/database-size#disk-size).
