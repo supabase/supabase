@@ -242,8 +242,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                       copy
                       readOnly
                       value={`${endpoint}/auth/v1/callback`}
-                      onChange={() => {}}
-                      onCopy={() => console.log('Copied to clipboard')}
                     />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
