@@ -35,7 +35,10 @@ export type KeyValueFieldArrayAction<TItem> = {
 export interface KeyValueFieldArrayProps<
   TFieldValues extends FieldValues,
   TFieldArrayName extends FieldArrayPath<TFieldValues>,
-  TItem extends FieldArray<TFieldValues, TFieldArrayName> = FieldArray<TFieldValues, TFieldArrayName>,
+  TItem extends FieldArray<TFieldValues, TFieldArrayName> = FieldArray<
+    TFieldValues,
+    TFieldArrayName
+  >,
 > {
   control: Control<TFieldValues>
   name: TFieldArrayName
@@ -67,13 +70,9 @@ const appendRows = <
   TFieldArrayName extends FieldArrayPath<TFieldValues>,
 >(
   append: (
-    value:
-      | FieldArray<TFieldValues, TFieldArrayName>
-      | FieldArray<TFieldValues, TFieldArrayName>[]
+    value: FieldArray<TFieldValues, TFieldArrayName> | FieldArray<TFieldValues, TFieldArrayName>[]
   ) => void,
-  rows:
-    | FieldArray<TFieldValues, TFieldArrayName>
-    | FieldArray<TFieldValues, TFieldArrayName>[]
+  rows: FieldArray<TFieldValues, TFieldArrayName> | FieldArray<TFieldValues, TFieldArrayName>[]
 ) => {
   append(Array.isArray(rows) && rows.length === 1 ? rows[0] : rows)
 }
