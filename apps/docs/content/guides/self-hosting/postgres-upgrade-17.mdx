@@ -124,6 +124,7 @@ Supabase Self-Hosted: Postgres 15 -> 17 Upgrade
 
   Current image:    supabase/postgres:15.8.1.085
   Target image:     supabase/postgres:17.6.1.084
+  Upgrade image:    supabase/postgres:17.6.1.063
 Proceed with the upgrade? (y/N) y
 
 ==> Pulling Postgres 17 image
@@ -147,10 +148,12 @@ After a successful upgrade, always use both compose files:
 docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 ```
 
-The original Postgres 15 data is preserved at `./volumes/db/data.bak.pg15`. The upgrade tarball is cached at `./volumes/db/pg17_upgrade_bin.tar.gz` so re-runs skip the build step. Once you have verified that everything works, you can reclaim disk space:
+To update to a newer Postgres 17 image later, just change the tag in `docker-compose.pg17.yml` and restart - no `pg_upgrade` is needed for minor version bumps within Postgres 17.
+
+The original Postgres 15 data is preserved at `./volumes/db/data.bak.pg15`. The upgrade tarball is cached at `./volumes/db/pg17_upgrade_bin_*.tar.gz` so re-runs skip the build step. Once you have verified that everything works, you can reclaim disk space:
 
 ```sh
-rm -rf ./volumes/db/data.bak.pg15 ./volumes/db/data_migration ./volumes/db/pg17_upgrade_bin.tar.gz
+rm -rf ./volumes/db/data.bak.pg15 ./volumes/db/data_migration ./volumes/db/pg17_upgrade_bin_*.tar.gz
 ```
 
 ### Rollback
@@ -161,10 +164,14 @@ If you need to revert to Postgres 15:
 docker compose down
 rm -rf ./volumes/db/data
 mv ./volumes/db/data.bak.pg15 ./volumes/db/data
+docker run --rm \
+  -v "$(docker volume ls --filter 'name=db-config' --format '{{.Name}}'):/vol" \
+  supabase/postgres:15.8.1.085 \
+  chown -R postgres:postgres /vol/
 docker compose up -d
 ```
 
-This restores the original data directory and starts with the default Postgres 15 image.
+This restores the original data directory, fixes file ownership on the `db-config` volume (Postgres 15 and 17 use different user IDs), and starts with the default Postgres 15 image.
 
 <Admonition type="caution">
 Do not delete `data.bak.pg15` until you have verified the upgrade. Rollback is only possible while the backup exists.
@@ -196,7 +203,7 @@ docker compose -f docker-compose.yml -f docker-compose.pg17.yml run --rm db \
 ### Disk space issues during upgrade
 
 The upgrade needs space for:
-- The upgrade tarball (~2 GB compressed, deleted after use)
+- The upgrade tarball (~1.2 GB compressed, cached for re-runs)
 - A full copy of your database (created by `pg_upgrade`)
 - The original data (kept as backup)
 
