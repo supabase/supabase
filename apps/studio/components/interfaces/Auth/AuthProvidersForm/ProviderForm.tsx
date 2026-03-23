@@ -151,9 +151,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   useEffect(() => {
     if (open) {
-      form.reset(INITIAL_VALUES)
+      form.reset()
     }
-  }, [open, INITIAL_VALUES, form])
+  }, [open, form])
 
   const formId = `provider-${provider.title}-form`
 
