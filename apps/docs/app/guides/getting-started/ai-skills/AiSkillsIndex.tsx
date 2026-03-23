@@ -2,8 +2,21 @@ import { getAiSkills } from './AiSkills.utils'
 import { CopyButton } from './CopyButton'
 
 export async function AiSkillsIndex() {
-  const skills = await getAiSkills()
+  let skills: Awaited<ReturnType<typeof getAiSkills>> = []
 
+  try {
+    skills = await getAiSkills()
+  } catch {
+    // Swallow errors from getAiSkills to keep the page usable
+  }
+
+  if (!skills.length) {
+    return (
+      <div className="not-prose text-sm text-foreground-lighter">
+        Unable to load AI skills at the moment.
+      </div>
+    )
+  }
   return (
     <div className="not-prose overflow-x-auto">
       <table className="w-full text-sm border-collapse">
