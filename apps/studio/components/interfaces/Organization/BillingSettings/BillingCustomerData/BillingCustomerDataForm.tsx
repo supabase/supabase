@@ -84,23 +84,18 @@ export const BillingCustomerDataForm = ({
     )
   }, [addressCountry])
 
-  const addressElementOptions: StripeAddressElementOptions = useMemo(
-    () => ({
-      ...addressOptions,
-      ...(disabled ? { readOnly: true } : {}),
-    }),
-    [addressOptions, disabled]
-  )
-
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
-      <AddressElement
-        key={`billing-address-${resetKey}`}
-        options={addressElementOptions}
-        onChange={onAddressChange}
-      />
+      <div className={cn('relative', disabled && 'opacity-50')}>
+        <AddressElement
+          key={`billing-address-${resetKey}`}
+          options={addressOptions}
+          onChange={onAddressChange}
+        />
+        {disabled && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
+      </div>
 
-      <div className="grid grid-cols-2 gap-x-6 w-full items-end">
+      <div className={cn('grid grid-cols-2 gap-x-6 w-full items-end', disabled && 'opacity-50')}>
         <FormField
           name="tax_id_name"
           control={form.control}
@@ -204,7 +199,13 @@ export const BillingCustomerDataForm = ({
               )}
             />
 
-            <Button type="text" className="px-1" icon={<X />} onClick={() => onRemoveTaxId()} />
+            <Button
+              type="text"
+              className="px-1"
+              icon={<X />}
+              disabled={disabled}
+              onClick={() => onRemoveTaxId()}
+            />
           </div>
         )}
       </div>
