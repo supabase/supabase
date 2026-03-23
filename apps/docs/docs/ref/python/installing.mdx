@@ -57,11 +57,13 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/spec
   <RefSubLayout.Examples>
 
     ```sql
-    -- Grant access to tables
-    grant all on public.your_table to anon, authenticated, service_role;
+    -- Grant least-privilege access to tables
+    grant select on public.your_table to anon;
+    grant select, insert, update, delete on public.your_table to authenticated;
+    grant all on public.your_table to service_role;
 
-    -- Grant access to functions
-    grant execute on function public.your_function to anon, authenticated, service_role;
+    -- Grant execute on functions
+    grant execute on function public.your_function to authenticated, service_role;
     ```
 
   </RefSubLayout.Examples>

@@ -38,8 +38,15 @@ create table
     task text check (char_length(task) > 3)
   );
 
--- Enable Data API access for anon, authenticated, and service_role roles
-grant all on public.todos to anon, authenticated, service_role;
+-- Enable Data API access with least-privilege grants
+-- Allow read-only access for anonymous clients
+grant select on public.todos to anon;
+-- Allow full CRUD for authenticated clients
+grant select, insert, update, delete on public.todos to authenticated;
+-- Allow unrestricted access for the server-side service role
+grant all on public.todos to service_role;
+-- Important: enable Row Level Security and create appropriate policies
+-- before granting write access to client roles (see RLS guide)
 ```
 
 </TabPanel>

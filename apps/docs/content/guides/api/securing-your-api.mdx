@@ -10,11 +10,13 @@ To control access to your data, you can use [Policies](/docs/guides/auth#policie
 
 ## Add RLS policies
 
-Enable Row Level Security (RLS) on all tables, views, and functions you have exposed via the Data API. You can then write RLS policies to grant users access to specific database rows or functions based on their authentication token.
+Enable Row Level Security (RLS) on all tables and views you have exposed via the Data API. You can then write RLS policies to grant users access to specific database rows based on their authentication token.
+
+For functions, RLS does not apply. Instead, control access by granting `EXECUTE` privileges only to the roles that should be able to call the function, and review any `SECURITY DEFINER` functions carefully.
 
 <Admonition type="danger">
 
-Always enable Row Level Security on tables, views, and functions you expose via the Data API to protect your data.
+Always enable Row Level Security on tables and views you expose via the Data API to protect your data. For functions, restrict access by granting `EXECUTE` only to appropriate roles.
 
 </Admonition>
 
