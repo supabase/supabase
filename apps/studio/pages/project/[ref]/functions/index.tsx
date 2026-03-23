@@ -48,7 +48,11 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-  const { data: lastHourStats } = useEdgeFunctionsLastHourStatsQuery(
+  const {
+    data: lastHourStats,
+    isPending: isStatsPending,
+    isError: isStatsError,
+  } = useEdgeFunctionsLastHourStatsQuery(
     { projectRef: ref },
     { enabled: IS_PLATFORM }
   )
@@ -147,8 +151,14 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                             <TableHead>URL</TableHead>
                             <TableHead className="hidden 2xl:table-cell">Created</TableHead>
                             <TableHead className="lg:table-cell">Updated</TableHead>
-                            <TableHead className="lg:table-cell">Total requests (1h)</TableHead>
-                            <TableHead className="lg:table-cell">Error rate (1h)</TableHead>
+                            {IS_PLATFORM && (
+                              <>
+                                <TableHead className="lg:table-cell">
+                                  Total requests (1h)
+                                </TableHead>
+                                <TableHead className="lg:table-cell">5xx error rate (1h)</TableHead>
+                              </>
+                            )}
                             <TableHead className="hidden 2xl:table-cell">Deployments</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -161,11 +171,13 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                                   key={item.id}
                                   function={item}
                                   lastHourStats={lastHourStats?.[item.id]}
+                                  isStatsPending={IS_PLATFORM && isStatsPending}
+                                  isStatsError={IS_PLATFORM && isStatsError}
                                 />
                               ))
                             ) : (
                               <TableRow>
-                                <TableCell colSpan={7}>
+                                <TableCell colSpan={IS_PLATFORM ? 7 : 5}>
                                   <p className="text-sm text-foreground">No results found</p>
                                   <p className="text-sm text-foreground-light">
                                     Your search for "{search}" did not return any results

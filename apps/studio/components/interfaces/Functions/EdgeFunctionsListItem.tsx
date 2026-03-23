@@ -5,28 +5,27 @@ import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { type MouseEvent, useState } from 'react'
 import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
 import type { EdgeFunctionLastHourStats } from '@/data/edge-functions/edge-functions-last-hour-stats-query'
 import { createNavigationHandler } from '@/lib/navigation'
 
+import { formatErrorRate } from './EdgeFunctionsListItem.utils'
+
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
   lastHourStats?: EdgeFunctionLastHourStats
-}
-
-function formatErrorRate(value: number) {
-  if (value === 0) return '0%'
-  if (value >= 100) return '100%'
-  if (value < 0.1) return '<0.1%'
-  return `${value.toFixed(1)}%`
+  isStatsPending?: boolean
+  isStatsError?: boolean
 }
 
 export const EdgeFunctionsListItem = ({
   function: item,
   lastHourStats,
+  isStatsPending = false,
+  isStatsError = false,
 }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -96,29 +95,47 @@ export const EdgeFunctionsListItem = ({
           label={dayjs(item.updated_at).fromNow()}
         />
       </TableCell>
-      <TableCell className="lg:table-cell whitespace-nowrap">
-        <p className="text-foreground-light">
-          {lastHourStats !== undefined ? lastHourStats.requestsCount.toLocaleString() : '-'}
-        </p>
-      </TableCell>
-      <TableCell className="lg:table-cell whitespace-nowrap">
-        {lastHourStats !== undefined ? (
-          <span
-            className={cn(
-              'text-sm',
-              lastHourStats.errorRate >= 1
-                ? 'text-destructive'
-                : lastHourStats.errorRate > 0.1
-                  ? 'text-warning'
-                  : 'text-foreground-light'
+      {IS_PLATFORM && (
+        <>
+          <TableCell className="lg:table-cell whitespace-nowrap">
+            {isStatsPending ? (
+              <ShimmeringLoader className="w-12" />
+            ) : isStatsError ? (
+              <p className="text-foreground-lighter" title="Failed to load stats">
+                -
+              </p>
+            ) : (
+              <p className="text-foreground-light">
+                {lastHourStats !== undefined ? lastHourStats.requestsCount.toLocaleString() : '-'}
+              </p>
             )}
-          >
-            {formatErrorRate(lastHourStats.errorRate)}
-          </span>
-        ) : (
-          <p className="text-foreground-lighter">-</p>
-        )}
-      </TableCell>
+          </TableCell>
+          <TableCell className="lg:table-cell whitespace-nowrap">
+            {isStatsPending ? (
+              <ShimmeringLoader className="w-12" />
+            ) : isStatsError ? (
+              <p className="text-foreground-lighter" title="Failed to load stats">
+                -
+              </p>
+            ) : lastHourStats !== undefined ? (
+              <span
+                className={cn(
+                  'text-sm',
+                  lastHourStats.errorRate >= 1
+                    ? 'text-destructive'
+                    : lastHourStats.errorRate > 0.1
+                      ? 'text-warning'
+                      : 'text-foreground-light'
+                )}
+              >
+                {formatErrorRate(lastHourStats.errorRate)}
+              </span>
+            ) : (
+              <p className="text-foreground-lighter">-</p>
+            )}
+          </TableCell>
+        </>
+      )}
       <TableCell className="hidden 2xl:table-cell">
         <p className="text-foreground-light">{item.version}</p>
         <button tabIndex={-1} className="sr-only">
