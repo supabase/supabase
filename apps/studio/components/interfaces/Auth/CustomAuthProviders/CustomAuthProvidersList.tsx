@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   Badge,
   Button,
@@ -36,8 +37,11 @@ import AlertError from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { toast } from 'sonner'
+import { Admonition } from 'ui-patterns/admonition'
 
 const CUSTOM_PROVIDERS_SORT_VALUES = [
   'name:asc',
@@ -86,6 +90,23 @@ export const CustomAuthProvidersList = () => {
   const nextPlan = getNextPlanForCustomProviders(organization?.plan?.id)
   const isCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
   const providerLimit = authConfig?.CUSTOM_OAUTH_MAX_PROVIDERS || 0
+
+  const queryClient = useQueryClient()
+  const { mutate: updateAuthConfig, isPending: isEnabling } = useAuthConfigUpdateMutation({
+    onSuccess: () => {
+      toast.success('Custom providers have been enabled')
+      // Invalidate and refetch custom providers query so it retries after enabling
+      queryClient.invalidateQueries({
+        queryKey: ['projects', projectRef, 'oauth-custom-providers'],
+      })
+    },
+  })
+
+  const handleEnableCustomProviders = () => {
+    if (projectRef) {
+      updateAuthConfig({ projectRef, config: { CUSTOM_OAUTH_ENABLED: true } })
+    }
+  }
 
   const [selectedProviderToEdit, setSelectedProviderToEdit] = useState<string | null>(null)
   const [selectedProviderToDelete, setSelectedProviderToDelete] = useState<string | null>(null)
@@ -201,7 +222,44 @@ export const CustomAuthProvidersList = () => {
     return <GenericSkeletonLoader />
   }
 
+  if (!isCustomProvidersEnabled) {
+    return (
+      <Admonition
+        type="default"
+        title="Custom providers are not enabled"
+        description="Enable custom OAuth/OIDC providers to configure your own identity providers for authentication."
+      >
+        <Button
+          type="primary"
+          loading={isEnabling}
+          disabled={isEnabling}
+          onClick={handleEnableCustomProviders}
+        >
+          Enable Custom Providers
+        </Button>
+      </Admonition>
+    )
+  }
+
   if (isError) {
+    if (error?.message?.includes('Custom providers are not enabled')) {
+      return (
+        <Admonition
+          type="default"
+          title="Custom providers are not enabled"
+          description="Enable custom OAuth/OIDC providers to configure your own identity providers for authentication."
+        >
+          <Button
+            type="primary"
+            loading={isEnabling}
+            disabled={isEnabling}
+            onClick={handleEnableCustomProviders}
+          >
+            Enable Custom Providers
+          </Button>
+        </Admonition>
+      )
+    }
     return <AlertError error={error} subject="Failed to retrieve Custom Auth Providers" />
   }
 
@@ -267,7 +325,18 @@ export const CustomAuthProvidersList = () => {
                   className="text-xs flex flex-col gap-y-2 bg-alternative items-start"
                 >
                   {!isCustomProvidersEnabled ? (
-                    'Custom providers are not enabled for this project. Please contact support to enable this feature.'
+                    <div className="flex flex-col gap-y-2">
+                      <p>Custom providers are not enabled for this project.</p>
+                      <Button
+                        type="primary"
+                        size="tiny"
+                        loading={isEnabling}
+                        disabled={isEnabling}
+                        onClick={handleEnableCustomProviders}
+                      >
+                        Enable Custom Providers
+                      </Button>
+                    </div>
                   ) : (
                     <>
                       <p>You've reached the limit of {providerLimit} providers for your plan.</p>

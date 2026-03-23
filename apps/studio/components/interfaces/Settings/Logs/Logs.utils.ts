@@ -205,7 +205,7 @@ ${orderBy}
 limit ${limit}
 `
       }
-      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
+      return `select id, ${table}.timestamp, event_message, response.status_code, request.method, request.pathname, m.function_id, m.execution_time_ms, m.deployment_id, m.version from ${table}
   ${joins}
   ${where}
   ${orderBy}
@@ -806,6 +806,12 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<string, string> = {
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
   etl_replication_logs: 'ETL',
+}
+
+export function extractEdgeFunctionName(pathname: unknown): string {
+  if (typeof pathname !== 'string' || !pathname) return ''
+  const parts = pathname.split('/').filter(Boolean)
+  return parts[parts.length - 1] ?? ''
 }
 
 function extractServiceLabelFromSql(sql: string): string | null {

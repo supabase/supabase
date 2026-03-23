@@ -53,6 +53,13 @@ const frameworkShadcnStep: StepDefinition = {
   content: 'steps/shadcn/command',
 }
 
+const frameworkShadcnEnvStep: StepDefinition = {
+  id: 'shadcn-env',
+  title: 'Set env variables',
+  description: 'Add the following values to your env file.',
+  content: 'steps/shadcn/env',
+}
+
 const frameworkShadcnExploreStep: StepDefinition = {
   id: 'shadcn-explore',
   title: 'Check out more UI components',
@@ -297,6 +304,7 @@ export const connectSchema: ConnectSchema = {
               true: [
                 frameworkInstallStep,
                 frameworkShadcnStep,
+                frameworkShadcnEnvStep,
                 frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],
@@ -308,6 +316,7 @@ export const connectSchema: ConnectSchema = {
               true: [
                 frameworkInstallStep,
                 frameworkShadcnStep,
+                frameworkShadcnEnvStep,
                 frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],
