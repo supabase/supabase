@@ -1,13 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, Undo2 } from 'lucide-react'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { Undo2 } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { AddRowPayload } from '@/state/table-editor-operation-queue.types'
-import { Card, CardContent, CardHeader } from 'ui'
 
 interface AddRowOperationItemProps {
   operationId: string
@@ -49,7 +49,7 @@ export const AddRowOperationItem = ({
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="pt-2.5 flex flex-row gap-2">
+      <CardHeader className="py-2 px-3 flex flex-row gap-2 space-y-0 items-center">
         <div className="min-w-0 flex-1 flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">
@@ -62,14 +62,13 @@ export const AddRowOperationItem = ({
         </div>
         <ButtonTooltip
           type="text"
-          size="tiny"
           aria-label="Revert change"
-          className="px-1.5"
+          className="w-7"
           icon={<Undo2 />}
           onClick={handleDelete}
           tooltip={{
             content: {
-              side: 'bottom',
+              side: 'left',
               align: 'end',
               text: 'Revert change',
             },
@@ -77,7 +76,12 @@ export const AddRowOperationItem = ({
         />
       </CardHeader>
 
-      <CardContent className="font-mono text-xs space-y-1 text-brand-link">
+      <CardContent className="py-2 px-3 font-mono text-xs text-brand-link">
+        {previewColumns.length === 0 && (
+          <span className="text-foreground-light">
+            No data provided, default values will be used
+          </span>
+        )}
         {previewColumns.map(([key, value]) => (
           <div key={key} className="flex gap-2 py-0.5">
             <span className="text-brand-link select-none font-medium">+</span>

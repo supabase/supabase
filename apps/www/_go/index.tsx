@@ -22,8 +22,10 @@ import pgconfDevContestThankYou from './events/pgconf-dev-2026/contest-thank-you
 import aiEngineerEuropeContest from './events/ai-engineer-europe-2026/contest'
 import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/contest-thank-you'
 import startupGrindContest from './events/startup-grind-2026/contest'
+import exampleLeadGen from './lead-gen/example-lead-gen'
 
 const pages: GoPageInput[] = [
+  exampleLeadGen,
   byocEarlyAccess,
   amoe,
   amoeThankYou,

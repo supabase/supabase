@@ -57,11 +57,12 @@ test('rate calls the tool sanitizer', async () => {
   }))
 
   vi.mock('ai', () => ({
-    generateObject: vi.fn().mockResolvedValue({
-      object: {
+    generateText: vi.fn().mockResolvedValue({
+      output: {
         category: 'sql_generation',
       },
     }),
+    Output: { object: vi.fn() },
   }))
 
   vi.mock('components/ui/AIAssistantPanel/Message.utils', () => ({

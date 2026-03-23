@@ -15,7 +15,7 @@ export type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
+
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
@@ -101,7 +101,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: true,
       isNew: true,
       isPlatformOnly: false,
-      isDefaultOptIn: tableEditorNewFilterBar,
+      isDefaultOptIn: true,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
