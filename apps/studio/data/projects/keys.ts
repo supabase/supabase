@@ -31,8 +31,7 @@ export const projectKeys = {
   pauseStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'pause-status'] as const,
 
-  orgProjects: (slug: string | undefined) => ['projects', 'org', slug] as const,
-  projectmembers: (projectRef: string | undefined) => ['project', projectRef, 'members'] as const,
+  projectMembers: (projectRef: string | undefined) => ['project', projectRef, 'members'] as const,
 
   // Clone to new project
   listCloneBackups: (projectRef: string | undefined) =>

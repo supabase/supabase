@@ -10,7 +10,7 @@ type JitDbAccessRevokeVariables = {
   userId: string
 }
 
-export async function revokeJitDbAccess({ projectRef, userId }: JitDbAccessRevokeVariables) {
+async function revokeJitDbAccess({ projectRef, userId }: JitDbAccessRevokeVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!userId) throw new Error('userId is required')
 

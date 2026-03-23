@@ -5,15 +5,12 @@ import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
 
-export type JitDbAccessUpdateVariables = {
+type JitDbAccessUpdateVariables = {
   projectRef: string
   requestedConfig: { state: 'enabled' | 'disabled' | 'unavailable' }
 }
 
-export async function updateJitDbAccess({
-  projectRef,
-  requestedConfig,
-}: JitDbAccessUpdateVariables) {
+async function updateJitDbAccess({ projectRef, requestedConfig }: JitDbAccessUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await put(`/v1/projects/{ref}/jit-access`, {

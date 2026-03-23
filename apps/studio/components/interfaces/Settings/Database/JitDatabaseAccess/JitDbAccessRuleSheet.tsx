@@ -1,5 +1,7 @@
+import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -25,6 +27,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { JitMemberOption, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
+import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 
 type JitDbAccessRuleSheetFormValues = {
   memberId: string
@@ -51,8 +54,8 @@ interface JitDbAccessRuleSheetProps {
 export function JitDbAccessRuleSheet({
   open,
   mode,
-  draft,
   memberOptions,
+  draft,
   availableMembersForAddCount,
   showInlineValidation,
   inlineValidation,
@@ -216,7 +219,7 @@ export function JitDbAccessRuleSheet({
           <Button type="default" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="primary" onClick={onSave} disabled={isSubmitting}>
+          <Button type="primary" onClick={onSave} loading={isSubmitting}>
             {mode === 'edit' ? 'Save rule' : 'Create rule'}
           </Button>
         </SheetFooter>

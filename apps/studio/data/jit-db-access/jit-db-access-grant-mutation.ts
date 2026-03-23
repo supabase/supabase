@@ -5,7 +5,7 @@ import type { ResponseError } from 'types'
 
 import { jitDbAccessKeys } from './keys'
 
-export type JitDbAccessGrantVariables = {
+type JitDbAccessGrantVariables = {
   projectRef: string
   userId: string
   roles: Array<{
@@ -18,7 +18,7 @@ export type JitDbAccessGrantVariables = {
   }>
 }
 
-export async function grantJitDbAccess({ projectRef, userId, roles }: JitDbAccessGrantVariables) {
+async function grantJitDbAccess({ projectRef, userId, roles }: JitDbAccessGrantVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!userId) throw new Error('userId is required')
   if (!roles || roles.length === 0) throw new Error('At least one role is required')

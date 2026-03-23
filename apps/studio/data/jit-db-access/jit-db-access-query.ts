@@ -4,9 +4,9 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
 
-export type JitDbAccessVariables = { projectRef?: string }
+type JitDbAccessVariables = { projectRef?: string }
 
-export async function getJitDbAccessConfiguration(
+async function getJitDbAccessConfiguration(
   { projectRef }: JitDbAccessVariables,
   signal?: AbortSignal
 ) {
@@ -37,17 +37,13 @@ export async function getJitDbAccessConfiguration(
   return data
 }
 
-export type JitDbAccessData = Awaited<ReturnType<typeof getJitDbAccessConfiguration>>
-export type JitDbAccessError = ResponseError
+type JitDbAccessData = Awaited<ReturnType<typeof getJitDbAccessConfiguration>>
 
 export const useJitDbAccessQuery = <TData = JitDbAccessData>(
   { projectRef }: JitDbAccessVariables,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<JitDbAccessData, JitDbAccessError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<JitDbAccessData, ResponseError, TData> = {}
 ) =>
-  useQuery<JitDbAccessData, JitDbAccessError, TData>({
+  useQuery<JitDbAccessData, ResponseError, TData>({
     queryKey: jitDbAccessKeys.list(projectRef),
     queryFn: ({ signal }) => getJitDbAccessConfiguration({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',

@@ -4,9 +4,9 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { jitDbAccessKeys } from './keys'
 
-export type JitDbAccessMembersVariables = { projectRef?: string }
+type JitDbAccessMembersVariables = { projectRef?: string }
 
-export async function getJitDbAccessMembers(
+async function getJitDbAccessMembers(
   { projectRef }: JitDbAccessMembersVariables,
   signal?: AbortSignal
 ) {
@@ -25,7 +25,7 @@ export async function getJitDbAccessMembers(
 }
 
 export type JitDbAccessMembersData = Awaited<ReturnType<typeof getJitDbAccessMembers>>
-export type JitDbAccessMembersError = ResponseError
+type JitDbAccessMembersError = ResponseError
 
 export const useJitDbAccessMembersQuery = <TData = JitDbAccessMembersData>(
   { projectRef }: JitDbAccessMembersVariables,

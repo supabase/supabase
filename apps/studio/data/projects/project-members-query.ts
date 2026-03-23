@@ -34,7 +34,7 @@ export const useProjectMembersQuery = <TData = ProjectMembersData>(
   }: UseCustomQueryOptions<ProjectMembersData, ProjectMembersError, TData> = {}
 ) =>
   useQuery<ProjectMembersData, ProjectMembersError, TData>({
-    queryKey: projectKeys.projectmembers(projectRef),
+    queryKey: projectKeys.projectMembers(projectRef),
     queryFn: ({ signal }) => getProjectMembers({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,

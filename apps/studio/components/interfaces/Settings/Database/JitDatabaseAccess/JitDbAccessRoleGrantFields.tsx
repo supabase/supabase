@@ -49,16 +49,14 @@ export function JitDbAccessRoleGrantFields({
             const isEnabled = value === true
 
             if (!isEnabled) {
-              onChange({ ...grant, enabled: false })
-              return
+              return onChange({ ...grant, enabled: false })
             }
 
             if (
               (grant.hasExpiry && grant.expiry) ||
               (!grant.hasExpiry && grant.expiryMode === 'never')
             ) {
-              onChange({ ...grant, enabled: true })
-              return
+              return onChange({ ...grant, enabled: true })
             }
 
             onChange({
@@ -131,23 +129,21 @@ export function JitDbAccessRoleGrantFields({
                       const nextMode = value as JitRoleGrantDraft['expiryMode']
 
                       if (nextMode === 'never') {
-                        onChange({
+                        return onChange({
                           ...grant,
                           expiryMode: nextMode,
                           hasExpiry: false,
                           expiry: '',
                         })
-                        return
                       }
 
                       if (nextMode === 'custom') {
-                        onChange({
+                        return onChange({
                           ...grant,
                           expiryMode: nextMode,
                           hasExpiry: true,
                           expiry: grant.expiry || getRelativeDatetimeByMode('1h'),
                         })
-                        return
                       }
 
                       onChange({

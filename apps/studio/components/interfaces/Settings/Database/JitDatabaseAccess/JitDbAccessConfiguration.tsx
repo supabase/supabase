@@ -75,7 +75,7 @@ export const JitDbAccessConfiguration = () => {
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
   const [showInlineValidation, setShowInlineValidation] = useState(false)
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
-  const [userPendingDelete, setUserPendingDelete] = useState<JitUserRule | null>(null)
+  const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)
   const [draft, setDraft] = useState(() => createDraft([]))
 
   const {
@@ -108,12 +108,63 @@ export const JitDbAccessConfiguration = () => {
   const { can: canUpdateJitDbAccess } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+    { resource: { project_id: project?.id } }
   )
+
+  const { mutate: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
+    useJitDbAccessUpdateMutation({
+      onSuccess: (_, variables) => {
+        const nextEnabled = variables.requestedConfig.state === 'enabled'
+
+        if (nextEnabled) {
+          toast.success('JIT access enabled')
+        } else {
+          toast.success(
+            activeRuleCount > 0
+              ? `JIT access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request temporary database access.`
+              : 'JIT access disabled'
+          )
+        }
+      },
+      onError: (error) => {
+        setEnabled(initialIsEnabled ?? false)
+        toast.error(`Failed to update just-in-time (JIT) database access: ${error.message}`)
+      },
+    })
+
+  const { mutate: grantUserAccess, isPending: isGrantingAccess } = useJitDbAccessGrantMutation({
+    onSuccess: () => {
+      toast.success(
+        sheetMode === 'edit'
+          ? 'Successfully updated user access'
+          : 'Successfully granted user access'
+      )
+      resetSheetState()
+    },
+    onError: (error) => {
+      toast.error(
+        `Failed to ${sheetMode === 'edit' ? 'update' : 'grant'} user access: ${error.message}`
+      )
+    },
+  })
+
+  const { mutate: revokeUserAccess, isPending: isRevokingAccess } = useJitDbAccessRevokeMutation({
+    onSuccess: (_, variables) => {
+      toast.success('Successfully revoked user access')
+      setSelectedUserToDelete(null)
+
+      if (ruleIdToEdit === variables.userId) {
+        resetSheetState()
+      }
+    },
+    onError: (error) => {
+      toast.error(`Failed to revoke user access: ${error.message}`)
+    },
+  })
+
+  const isMutating = isUpdatingJitDbAccess || isGrantingAccess || isRevokingAccess
+  const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
+  const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
 
   const initialIsEnabled =
     isSuccessConfiguration &&
@@ -128,12 +179,6 @@ export const JitDbAccessConfiguration = () => {
     'isUnavailable' in jitDbAccessConfiguration &&
     jitDbAccessConfiguration.isUnavailable
   )
-
-  useEffect(() => {
-    if (!isLoadingConfiguration && jitDbAccessConfiguration) {
-      setEnabled(initialIsEnabled ?? false)
-    }
-  }, [initialIsEnabled, isLoadingConfiguration, jitDbAccessConfiguration])
 
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
   const roleIds = useMemo(() => roleOptions.map((role) => role.id), [roleOptions])
@@ -226,95 +271,29 @@ export const JitDbAccessConfiguration = () => {
   }, [draft.grants, draft.memberId, enabledRoleCount, isDuplicateSelectedMember])
 
   const resetSheetState = () => {
-    void setShowCreateRuleSheet(false)
-    void setRuleIdToEdit(null)
+    setShowCreateRuleSheet(false)
+    setRuleIdToEdit(null)
     setShowInlineValidation(false)
   }
 
-  const closeSheet = () => {
-    resetSheetState()
-  }
-
   const submitJitToggle = (nextEnabled: boolean) => {
-    if (!ref) {
-      console.error('Project ref is required')
-      return
-    }
+    if (!ref) return console.error('Project ref is required')
 
     setEnabled(nextEnabled)
-
     updateJitDbAccess({
       projectRef: ref,
       requestedConfig: { state: nextEnabled ? 'enabled' : 'disabled' },
     })
   }
 
-  const { mutate: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
-    useJitDbAccessUpdateMutation({
-      onSuccess: (_, variables) => {
-        const nextEnabled = variables.requestedConfig.state === 'enabled'
-
-        if (nextEnabled) {
-          toast.success('JIT access enabled')
-        } else {
-          toast.success(
-            activeRuleCount > 0
-              ? `JIT access disabled. ${activeRuleCount} configured member${activeRuleCount === 1 ? '' : 's'} can no longer request temporary database access.`
-              : 'JIT access disabled'
-          )
-        }
-      },
-      onError: (error) => {
-        setEnabled(initialIsEnabled ?? false)
-        toast.error(`Failed to update just-in-time (JIT) database access: ${error.message}`)
-      },
-    })
-
-  const { mutate: grantUserAccess, isPending: isGrantingAccess } = useJitDbAccessGrantMutation({
-    onSuccess: () => {
-      toast.success(
-        sheetMode === 'edit'
-          ? 'Successfully updated user access'
-          : 'Successfully granted user access'
-      )
-      resetSheetState()
-    },
-    onError: (error) => {
-      toast.error(
-        `Failed to ${sheetMode === 'edit' ? 'update' : 'grant'} user access: ${error.message}`
-      )
-    },
-  })
-
-  const { mutate: revokeUserAccess, isPending: isRevokingAccess } = useJitDbAccessRevokeMutation({
-    onSuccess: (_, variables) => {
-      toast.success('Successfully revoked user access')
-      setUserPendingDelete(null)
-
-      if (ruleIdToEdit === variables.userId) {
-        resetSheetState()
-      }
-    },
-    onError: (error) => {
-      toast.error(`Failed to revoke user access: ${error.message}`)
-    },
-  })
-
-  const isMutating = isUpdatingJitDbAccess || isGrantingAccess || isRevokingAccess
-  const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
-  const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
-
   const handleJitToggleChange = (checked: boolean) => {
     if (!hasAccessToJitDbAccess || !canUpdateJitDbAccess) return
 
     if (checked && !enabled) {
       if (activeRuleCount > 0) {
-        setShowEnableJitDialog(true)
-        return
+        return setShowEnableJitDialog(true)
       }
-
-      submitJitToggle(true)
-      return
+      return submitJitToggle(true)
     }
 
     if (!checked && enabled) {
@@ -330,34 +309,33 @@ export const JitDbAccessConfiguration = () => {
   const openAddRuleSheet = () => {
     if (!canUpdateJitDbAccess) return
 
-    void setRuleIdToEdit(null)
+    setRuleIdToEdit(null)
     setDraft(createDraft(roleIds))
     setShowInlineValidation(false)
-    void setShowCreateRuleSheet(true)
+    setShowCreateRuleSheet(true)
   }
 
   const openEditRuleSheet = (user: JitUserRule) => {
     if (!canUpdateJitDbAccess) return
 
-    void setShowCreateRuleSheet(false)
-    void setRuleIdToEdit(user.id)
+    console.log(user)
+
+    setShowCreateRuleSheet(false)
+    setRuleIdToEdit(user.id)
     setDraft(draftFromRule(user, roleIds))
     setShowInlineValidation(false)
   }
 
   const openDeleteDialog = (user: JitUserRule) => {
     if (!canUpdateJitDbAccess) return
-    setUserPendingDelete(user)
+    setSelectedUserToDelete(user)
   }
 
   const handleSaveRule = () => {
     setShowInlineValidation(true)
-    if (inlineValidation.member || inlineValidation.roles) return
 
-    if (!ref) {
-      console.error('Project ref is required')
-      return
-    }
+    if (inlineValidation.member || inlineValidation.roles) return
+    if (!ref) return console.error('Project ref is required')
 
     const roles = serializeDraftRolesForGrantMutation(draft)
     if (roles.length === 0) return
@@ -370,19 +348,12 @@ export const JitDbAccessConfiguration = () => {
   }
 
   const handleConfirmDelete = () => {
-    if (!ref || !userPendingDelete) {
-      if (!ref) console.error('Project ref is required')
-      return
-    }
-
-    revokeUserAccess({
-      projectRef: ref,
-      userId: userPendingDelete.memberId,
-    })
+    if (!ref) return console.error('Project ref is required')
+    if (!selectedUserToDelete) return toast.error('User is required')
+    revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
   }
 
   const switchDisabled = isLoadingConfiguration || isUpdatingJitDbAccess || !canUpdateJitDbAccess
-
   const switchTooltipText = !canUpdateJitDbAccess ? 'Additional permissions required' : undefined
 
   const showToggleFailedWarning =
@@ -391,20 +362,17 @@ export const JitDbAccessConfiguration = () => {
     'appliedSuccessfully' in jitDbAccessConfiguration &&
     !jitDbAccessConfiguration.appliedSuccessfully
 
-  const jitToggleSwitch = (
-    <Switch
-      size="large"
-      checked={enabled}
-      onCheckedChange={handleJitToggleChange}
-      disabled={switchDisabled}
-    />
-  )
+  useEffect(() => {
+    if (!isLoadingConfiguration && jitDbAccessConfiguration) {
+      setEnabled(initialIsEnabled ?? false)
+    }
+  }, [initialIsEnabled, isLoadingConfiguration, jitDbAccessConfiguration])
 
   useEffect(() => {
     if (!ruleIdToEdit || isLoadingJitMembers || isLoadingProjectMembers || editingUser) return
 
     toast('JIT access rule not found')
-    void setRuleIdToEdit(null)
+    setRuleIdToEdit(null)
   }, [editingUser, isLoadingJitMembers, isLoadingProjectMembers, ruleIdToEdit, setRuleIdToEdit])
 
   return (
@@ -442,7 +410,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {hasAccessToJitDbAccess && (
+          {!isErrorJitDbAccessConfiguration && hasAccessToJitDbAccess && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
@@ -458,17 +426,22 @@ export const JitDbAccessConfiguration = () => {
                         size={16}
                       />
                     )}
-                    {switchTooltipText ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                          <div>{jitToggleSwitch}</div>
-                        </TooltipTrigger>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                        <div>
+                          <Switch
+                            size="large"
+                            checked={enabled}
+                            onCheckedChange={handleJitToggleChange}
+                            disabled={switchDisabled}
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      {switchTooltipText && (
                         <TooltipContent side="bottom">{switchTooltipText}</TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      jitToggleSwitch
-                    )}
+                      )}
+                    </Tooltip>
                   </div>
                 </FormLayout>
               </CardContent>
@@ -533,17 +506,14 @@ export const JitDbAccessConfiguration = () => {
         inlineValidation={inlineValidation}
         isSubmitting={isGrantingAccess}
         onDraftChange={setDraft}
-        onCancel={closeSheet}
+        onCancel={resetSheetState}
         onSave={handleSaveRule}
       />
 
       <JitDbAccessDeleteDialog
-        user={userPendingDelete}
-        open={userPendingDelete !== null}
+        user={selectedUserToDelete}
         isDeleting={isRevokingAccess}
-        onOpenChange={(open) => {
-          if (!open) setUserPendingDelete(null)
-        }}
+        onClose={() => setSelectedUserToDelete(null)}
         onConfirm={handleConfirmDelete}
       />
 

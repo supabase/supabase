@@ -24,7 +24,7 @@ export function getRelativeDatetimeByMode(mode: JitExpiryMode) {
   return ''
 }
 
-export function inferExpiryMode(grant: Pick<JitRoleGrantDraft, 'hasExpiry'>): JitExpiryMode {
+function inferExpiryMode(grant: Pick<JitRoleGrantDraft, 'hasExpiry'>): JitExpiryMode {
   if (!grant.hasExpiry) return 'never'
   return 'custom'
 }
@@ -41,11 +41,11 @@ export function createEmptyGrant(roleId: string): JitRoleGrantDraft {
   }
 }
 
-export function createEmptyGrants(roleIds: string[]) {
+function createEmptyGrants(roleIds: string[]) {
   return roleIds.map((roleId) => createEmptyGrant(roleId))
 }
 
-export function cloneGrants(grants: JitRoleGrantDraft[]) {
+function cloneGrants(grants: JitRoleGrantDraft[]) {
   return grants.map((grant) => ({ ...grant }))
 }
 
@@ -53,7 +53,7 @@ export function createDraft(roleIds: string[]): JitUserRuleDraft {
   return { memberId: '', grants: createEmptyGrants(roleIds) }
 }
 
-export function mergeRoleIds(baseRoleIds: string[], extraRoleIds: string[]) {
+function mergeRoleIds(baseRoleIds: string[], extraRoleIds: string[]) {
   const seen = new Set<string>()
   const merged: string[] = []
 
@@ -149,7 +149,7 @@ export function getJitStatusDisplay(status: JitStatus): { badges: JitStatusBadge
   return { badges }
 }
 
-export function toUnixSeconds(datetimeIso: string) {
+function toUnixSeconds(datetimeIso: string) {
   const value = dayjs(datetimeIso)
   if (!value.isValid()) return undefined
   return value.unix()

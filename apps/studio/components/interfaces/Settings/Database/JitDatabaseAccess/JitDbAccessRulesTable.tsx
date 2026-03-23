@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Skeleton,
   Table,
@@ -185,6 +186,7 @@ export function JitDbAccessRulesTable({
                             <Pencil size={14} className="text-foreground-lighter" />
                             Edit
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="gap-x-2"
                             onClick={(event) => {
