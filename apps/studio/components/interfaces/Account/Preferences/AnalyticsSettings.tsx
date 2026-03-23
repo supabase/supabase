@@ -1,16 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useConsentState } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { InlineLink } from 'components/ui/InlineLink'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useConsentState } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
-import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Badge } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
+import { Card, CardContent, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -20,6 +19,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
 export const PrivacyUpdateBanner = () => {
   const [privacyUpdateAcknowledged, setPrivacyUpdateAcknowledged] = useLocalStorageQuery(
@@ -30,25 +30,20 @@ export const PrivacyUpdateBanner = () => {
   if (privacyUpdateAcknowledged) return null
 
   return (
-    <Alert_Shadcn_ className="mb-4 relative">
-      <AlertTitle_Shadcn_>
-        <Badge variant="default" className="mr-2">
-          NOTICE
-        </Badge>
-        Privacy Policy Update – Effective March 16, 2026
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
-        We've updated our{' '}
-        <a href="https://supabase.com/privacy" target="_blank" className="text hover:text-brand">
-          Privacy Policy
-        </a>{' '}
-        to clarify our use of analytics, cookies, and advertising audience management tools. By
-        continuing to use Supabase after March 16, you agree to the new terms. Questions? Contact{' '}
-        <a href="mailto:privacy@supabase.com" target="_blank" className="text hover:text-brand">
-          our team
-        </a>
-        .
-      </AlertDescription_Shadcn_>
+    <Admonition
+      type="note"
+      title="Updates to our privacy policy"
+      description={
+        <>
+          We’ve clarified how we use analytics, cookies, and advertising tools in our{' '}
+          <InlineLink href="https://supabase.com/privacy">privacy policy</InlineLink>, effective
+          March 16, 2026. By continuing to use Supabase, you agree to the updated terms.{' '}
+          <InlineLink href="mailto:privacy@supabase.com">Contact us</InlineLink> with any
+          questions.{' '}
+        </>
+      }
+      className="mb-10 relative"
+    >
       <ButtonTooltip
         type="text"
         icon={<X />}
@@ -56,7 +51,7 @@ export const PrivacyUpdateBanner = () => {
         onClick={() => setPrivacyUpdateAcknowledged(true)}
         tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
       />
-    </Alert_Shadcn_>
+    </Admonition>
   )
 }
 
