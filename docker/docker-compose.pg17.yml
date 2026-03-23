@@ -1,0 +1,10 @@
+# Postgres 17 override for self-hosted Supabase.
+#
+# Usage (new install or after upgrade):
+#   docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+#
+# For upgrading an existing Postgres 15 database, run utils/upgrade-pg17.sh first.
+
+services:
+  db:
+    image: supabase/postgres:17.6.1.063

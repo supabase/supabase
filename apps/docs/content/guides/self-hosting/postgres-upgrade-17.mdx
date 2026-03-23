@@ -1,0 +1,187 @@
+---
+title: 'Upgrade to Postgres 17'
+description: 'Start a new self-hosted Supabase deployment with Postgres 17, or upgrade an existing Postgres 15 installation.'
+subtitle: 'Start a new self-hosted Supabase deployment with Postgres 17, or upgrade an existing Postgres 15 installation.'
+---
+
+Self-hosted Supabase ships with Postgres 15 by default. This guide covers two scenarios:
+
+- **New deployment** - start fresh with Postgres 17 (no existing data)
+- **Upgrade existing deployment** - migrate from Postgres 15 to Postgres 17 using `pg_upgrade`
+
+## Before you begin
+
+- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
+- Make sure you have Docker with Docker Compose (`docker compose`, not `docker-compose`)
+- Your current database image should be `supabase/postgres:15.x` (check with `docker inspect supabase-db --format '{{.Config.Image}}'`)
+
+## New deployment with Postgres 17
+
+If you are starting a new self-hosted Supabase instance with no existing data, use the Postgres 17 compose override:
+
+```sh
+cd docker
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+```
+
+This uses the `docker-compose.pg17.yml` override file which swaps the database image:
+
+```yaml name=docker-compose.pg17.yml
+services:
+  db:
+    image: supabase/postgres:17.6.1.063
+```
+
+<Admonition type="tip">
+Always include both compose files when running commands. If you omit the override, Docker Compose falls back to the Postgres 15 image defined in `docker-compose.yml`.
+</Admonition>
+
+The rest of the setup is the same as the standard Docker guide. All init scripts (`roles.sql`, `jwt.sql`, `webhooks.sql`, etc.) are compatible with Postgres 17.
+
+## Upgrade an existing Postgres 15 deployment
+
+Upgrading an existing deployment uses `pg_upgrade` to migrate data in place. The included upgrade script automates the full process.
+
+### What the upgrade does
+
+1. Pulls the Postgres 17 image and extracts upgrade binaries
+2. Stops all Supabase services
+3. Runs `pg_upgrade` via `initiate.sh` inside a temporary Postgres 15 container
+4. Runs `complete.sh` inside a temporary Postgres 17 container (re-enables extensions, applies patches, runs `VACUUM ANALYZE`)
+5. Swaps data directories (the original is kept as a backup)
+6. Starts Supabase with Postgres 17
+7. Applies additional role migrations (new in Postgres 17)
+
+<Admonition type="danger">
+**Back up your data before upgrading.** The script preserves the original data directory as `./volumes/db/data.bak.pg15`, but you should also have an independent backup in case of disk failure or other issues.
+</Admonition>
+
+### Requirements
+
+- At least **2x your current database size + 5 GB** of free disk space (`pg_upgrade` copies the data directory; the upgrade tarball is ~2 GB compressed)
+- The script prompts for confirmation at each major step (use `--yes` to skip prompts)
+- All Supabase services must be running before starting the upgrade
+- Requires `bash` (the upgrade scripts from the Postgres repo depend on it)
+
+### Extensions removed in Postgres 17
+
+The following extensions are not available in Postgres 17 builds. If any are installed, the upgrade script will prompt you to drop them:
+
+| Extension | Notes |
+| --- | --- |
+| `timescaledb` | Not built for Postgres 17 |
+| `plv8` | Not built for Postgres 17 |
+| `plcoffee` | Companion to plv8 |
+| `plls` | Companion to plv8 |
+
+None of these are installed by default in the self-hosted setup. If you have installed any of them manually and need to keep them, do not proceed with the upgrade.
+
+### Run the upgrade
+
+```sh
+cd docker
+bash utils/upgrade-pg17.sh
+```
+
+To skip confirmation prompts (for scripted/CI use):
+
+```sh
+bash utils/upgrade-pg17.sh --yes
+```
+
+The script walks you through each step with confirmation prompts. A typical run looks like:
+
+```
+Supabase Self-Hosted: Postgres 15 -> 17 Upgrade
+================================================
+
+==> Running pre-flight checks
+  Data size:       124 MB
+  Available space: 48201 MB
+  Estimated need:  5248 MB
+
+==> Checking for incompatible extensions
+
+  Current image:    supabase/postgres:15.8.1.085
+  Target image:     supabase/postgres:17.6.1.063
+Proceed with the upgrade? (y/N) y
+
+==> Pulling Postgres 17 image
+==> Building upgrade tarball from Postgres 17 image
+==> Stopping all Supabase services
+==> Running initiate.sh (pg_upgrade: Postgres 15 -> 17)
+==> Starting PG17 container for complete.sh
+==> Running complete.sh (post-upgrade patches, vacuum analyze)
+==> Swapping data directories
+==> Starting Supabase with Postgres 17
+==> Applying Postgres 17 role migrations
+
+==> Upgrade complete!
+```
+
+### After the upgrade
+
+After a successful upgrade, always use both compose files:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+```
+
+The original Postgres 15 data is preserved at `./volumes/db/data.bak.pg15`. The upgrade tarball is cached at `./volumes/db/pg17_upgrade_bin.tar.gz` so re-runs skip the build step. Once you have verified that everything works, you can reclaim disk space:
+
+```sh
+rm -rf ./volumes/db/data.bak.pg15 ./volumes/db/data_migration ./volumes/db/pg17_upgrade_bin.tar.gz
+```
+
+### Rollback
+
+If you need to revert to Postgres 15:
+
+```sh
+docker compose down
+rm -rf ./volumes/db/data
+mv ./volumes/db/data.bak.pg15 ./volumes/db/data
+docker compose up -d
+```
+
+This restores the original data directory and starts with the default Postgres 15 image.
+
+<Admonition type="caution">
+Do not delete `data.bak.pg15` until you have verified the upgrade. Rollback is only possible while the backup exists.
+</Admonition>
+
+## Troubleshooting
+
+### pg_upgrade fails with "could not load library"
+
+This usually means an extension's shared library is missing from the Postgres 17 build. Check the error message for the library name - it's likely one of the incompatible extensions listed above. Drop the extension and re-run the upgrade.
+
+### Services fail to connect after upgrade
+
+Restart all services to pick up the new database:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml restart
+```
+
+### "Permission denied" on the data directory
+
+The upgrade script fixes file ownership automatically (Postgres 15 and 17 use different UIDs). If you still see permission errors, run:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml run --rm db \
+  chown -R postgres:postgres /var/lib/postgresql/data
+```
+
+### Disk space issues during upgrade
+
+The upgrade needs space for:
+- The upgrade tarball (~2 GB compressed, deleted after use)
+- A full copy of your database (created by `pg_upgrade`)
+- The original data (kept as backup)
+
+If you run out of space mid-upgrade, the safest path is to roll back and free up disk space before retrying.
+
+### pgsodium / vault errors
+
+The `db-config` named volume contains the pgsodium root encryption key at `/etc/postgresql-custom/pgsodium_root.key`. This volume is preserved during the upgrade. Never run `docker compose down -v` as this destroys named volumes and makes vault secrets unrecoverable.
