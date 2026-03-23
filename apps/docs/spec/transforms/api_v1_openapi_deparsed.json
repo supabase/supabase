@@ -20653,9 +20653,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -20729,9 +20734,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -29558,9 +29568,14 @@
           "status": {
             "type": "string",
             "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+          },
+          "completed_on": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
-        "required": ["name", "status"]
+        "required": ["name", "status", "completed_on"]
       },
       "V1UndoBody": {
         "type": "object",
