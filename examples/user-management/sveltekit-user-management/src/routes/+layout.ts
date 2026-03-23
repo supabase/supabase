@@ -29,7 +29,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
    * faster and safer than `getSession`, which does not validate the JWT.
    */
   const { data: claimsData, error } = await supabase.auth.getClaims()
-  const claims = error ? null : claimsData.claims
+  const claims = error ? null : claimsData?.claims
 
   return { supabase, claims }
 }

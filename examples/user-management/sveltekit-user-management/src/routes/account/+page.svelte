@@ -14,8 +14,9 @@
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true
-		return async () => {
+		return async ({ update }) => {
 			loading = false
+			update()
 		}
 	}
 
@@ -44,6 +45,7 @@
                 profileForm.requestSubmit();
             }}
         />
+		<input type="hidden" name="avatarUrl" value={avatarUrl} />
 		<div>
 			<label for="email">Email</label>
 			<input id="email" type="text" value={claims.email} disabled />
