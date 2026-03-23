@@ -176,7 +176,8 @@ function useBreadcrumbs() {
     return breadcrumbs
   }
 
-  // TODO: Remove this patch once Breadcrumbs are properly fixed to handle these routes
+  // TODO: Breadcrumbs currently can't infer the "AI Tools" parent for /guides/getting-started/ai-* routes,
+  // so we special-case these paths here. Remove when Breadcrumbs can derive this hierarchy from NavigationMenu.
   const isAiSkillsPage = pathname.startsWith('/guides/getting-started/ai-skills')
   if (isAiSkillsPage) {
     const breadcrumbs = [
