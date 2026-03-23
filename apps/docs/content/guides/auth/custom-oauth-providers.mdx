@@ -253,9 +253,8 @@ const { data, error } = await supabase.auth.admin.customProviders.updateProvider
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const { data, error } = await supabase.auth.admin.customProviders.deleteProvider(
-  'custom:my-provider'
-)
+const { data, error } =
+  await supabase.auth.admin.customProviders.deleteProvider('custom:my-provider')
 ```
 
 </TabPanel>
@@ -306,16 +305,16 @@ By default, providers must return an email address. Set `email_optional` to `tru
 
 ### OIDC-specific options
 
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| `discovery_url` | `string` | `null` | Override the discovery document URL if the provider uses a non-standard location. |
-| `skip_nonce_check` | `bool` | `false` | Skip nonce validation on ID tokens. Use only for providers that do not support nonce. |
+| Field              | Type     | Default | Description                                                                           |
+| ------------------ | -------- | ------- | ------------------------------------------------------------------------------------- |
+| `discovery_url`    | `string` | `null`  | Override the discovery document URL if the provider uses a non-standard location.     |
+| `skip_nonce_check` | `bool`   | `false` | Skip nonce validation on ID tokens. Use only for providers that do not support nonce. |
 
 ## Error reference
 
-| Error code | HTTP status | Description |
-| --- | --- | --- |
-| `validation_failed` | 400 | Invalid parameters: missing required fields, bad format, reserved params, or invalid URLs. |
-| `conflict` | 400 | A provider with the same identifier already exists. |
-| `over_custom_provider_quota` | 400 | Maximum number of custom providers reached. |
-| `custom_provider_not_found` | 404 | No provider exists with the given identifier. |
+| Error code                   | HTTP status | Description                                                                                |
+| ---------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `validation_failed`          | 400         | Invalid parameters: missing required fields, bad format, reserved params, or invalid URLs. |
+| `conflict`                   | 400         | A provider with the same identifier already exists.                                        |
+| `over_custom_provider_quota` | 400         | Maximum number of custom providers reached.                                                |
+| `custom_provider_not_found`  | 404         | No provider exists with the given identifier.                                              |
