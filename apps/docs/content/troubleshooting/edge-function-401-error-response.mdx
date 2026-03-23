@@ -8,14 +8,12 @@ http_status_code = 401
 message = "Invalid JWT"
 ---
 
-
 A 401 response from an Edge Function means either:
 
 - The function failed the [legacy auth verification check](/docs/guides/functions/development-tips#skipping-authorization-checks)
 - Your function's logic deliberately returned a 401 response
 
 ## Quick triage
-
 
 Check the response body returned by the request
 
@@ -44,56 +42,51 @@ Go to: [Your function returned a 401](#your-function-returned-a-401)
 Run this query in [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++++cast%28timestamp+AS+datetime%29++AS+timestamp%2C%0A++++req.pathname+++++++++++++++++AS+function_name%2C%0A%0A++++CASE%0A++++++++WHEN+metadata.execution_id+IS+NOT+NULL%0A++++++++++++THEN+%27your_code_returned_401%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+%28new_auth.prefix+IS+NOT+NULL+OR+legacy_payload.algorithm+<>+%27HS256%27%29%0A++++++++++++THEN+%27incompatible_keys%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A++++++++AND+%0A++++++++++++%28%0A++++++++++++++++%28legacy_auth_data.invalid+IS+NOT+NULL+OR+new_auth.error+IS+NOT+NULL%29%0A++++++++++++++++++++OR%0A++++++++++++++++legacy_payload.algorithm+%3D+%27HS256%27%0A++++++++++++%29%0A++++++++++++THEN+%27invalid_key%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+legacy_auth_data+++++++IS+NULL%0A+++++++++AND+new_auth.prefix+IS+NULL%0A++++++++++++THEN+%27missing_auth_header%27%0A++++END+AS+cause%0A%0AFROM+function_edge_logs%0A%0A++++--+unnesting+metadata%0A++++CROSS+JOIN+UNNEST%28metadata%29++++++++++AS+metadata%0A++++CROSS+JOIN+UNNEST%28metadata.request%29++AS+req%0A++++CROSS+JOIN+UNNEST%28metadata.response%29+AS+res%0A++++--+unnesting+auth+details%0A++++LEFT+JOIN+UNNEST%28req.sb%29++++++++++++++++++++AS+sb%0A++++LEFT+JOIN+UNNEST%28sb.apikey%29+++++++++++++++++AS+apikey%0A++++LEFT+JOIN+UNNEST%28apikey.authorization%29++++++AS+new_auth%0A++++LEFT+JOIN+UNNEST%28sb.jwt%29++++++++++++++++++++AS+legacy_jwt%0A++++LEFT+JOIN+UNNEST%28legacy_jwt.authorization%29++AS+legacy_auth_data%0A++++LEFT+JOIN+UNNEST%28legacy_auth_data.payload%29++AS+legacy_payload%0A%0AWHERE+res.status_code+%3D+401%0AORDER+BY+timestamp+DESC%0ALIMIT+200) to classify recent 401s:
 
 ```sql
-SELECT
-    cast(timestamp AS datetime)  AS timestamp,
-    req.pathname                 AS function_name,
-    CASE
-        WHEN metadata.execution_id IS NOT NULL
-            THEN 'your_code_returned_401'
-        WHEN metadata.execution_id IS NULL
-         AND (new_auth.prefix IS NOT NULL OR legacy_payload.algorithm <> 'HS256')
-            THEN 'incompatible_keys'
-        WHEN metadata.execution_id IS NULL
-        AND 
-            (
-                (legacy_auth_data.invalid IS NOT NULL OR new_auth.error IS NOT NULL)
-                    OR
-                legacy_payload.algorithm = 'HS256'
-            )
-            THEN 'invalid_key'
-        WHEN metadata.execution_id IS NULL
-         AND legacy_auth_data       IS NULL
-         AND new_auth.prefix IS NULL
-            THEN 'missing_auth_header'
-    END AS cause
-
-FROM function_edge_logs
-
-    -- unnesting metadata
-    CROSS JOIN UNNEST(metadata)          AS metadata
-    CROSS JOIN UNNEST(metadata.request)  AS req
-    CROSS JOIN UNNEST(metadata.response) AS res
-    -- unnesting auth details
-    LEFT JOIN UNNEST(req.sb)                    AS sb
-    LEFT JOIN UNNEST(sb.apikey)                 AS apikey
-    LEFT JOIN UNNEST(apikey.authorization)      AS new_auth
-    LEFT JOIN UNNEST(sb.jwt)                    AS legacy_jwt
-    LEFT JOIN UNNEST(legacy_jwt.authorization)  AS legacy_auth_data
-    LEFT JOIN UNNEST(legacy_auth_data.payload)  AS legacy_payload
-
-WHERE res.status_code = 401
-ORDER BY timestamp DESC
-LIMIT 50
+select
+  cast(timestamp as datetime) as timestamp,
+  req.pathname as function_name,
+  case
+    when metadata.execution_id is not null then 'your_code_returned_401'
+    when metadata.execution_id is null
+    and (
+      new_auth.prefix is not null
+      or legacy_payload.algorithm != 'HS256'
+    ) then 'incompatible_keys'
+    when metadata.execution_id is null
+    and (
+      (legacy_auth_data.invalid is not null or new_auth.error is not null)
+      or legacy_payload.algorithm = 'HS256'
+    ) then 'invalid_key'
+    when metadata.execution_id is null
+    and legacy_auth_data is null
+    and new_auth.prefix is null then 'missing_auth_header'
+  end as cause
+from
+  function_edge_logs
+  -- unnesting metadata
+  cross join UNNEST(metadata) as metadata
+  cross join UNNEST(metadata.request) as req
+  cross join UNNEST(metadata.response) as res
+  -- unnesting auth details
+  left join UNNEST(req.sb) as sb
+  left join UNNEST(sb.apikey) as apikey
+  left join UNNEST(apikey.authorization) as new_auth
+  left join UNNEST(sb.jwt) as legacy_jwt
+  left join UNNEST(legacy_jwt.authorization) as legacy_auth_data
+  left join UNNEST(legacy_auth_data.payload) as legacy_payload
+where res.status_code = 401
+order by timestamp desc
+limit 50;
 ```
 
 Depending on the output, you can use this table to find the appropriate debugging section:
 
-| Value | Go to |
-|---|---|
+| Value                    | Go to                                                         |
+| ------------------------ | ------------------------------------------------------------- |
 | `your_code_returned_401` | [Your function returned a 401](#your-function-returned-a-401) |
-| `incompatible_keys` | [Incompatible key format](#incompatible-key-format) |
-| `invalid_key` | [Invalid key](#invalid-key) |
-| `missing_auth_header` | [Missing Authorization header](#missing-authorization-header) |
+| `incompatible_keys`      | [Incompatible key format](#incompatible-key-format)           |
+| `invalid_key`            | [Invalid key](#invalid-key)                                   |
+| `missing_auth_header`    | [Missing Authorization header](#missing-authorization-header) |
 
 ---
 
@@ -107,7 +100,7 @@ Your function ran, and somewhere in your code, its logic returned a 401.
 return new Response(JSON.stringify(data), {
   headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   status: 401, // <-- you set this
-});
+})
 ```
 
 **How to fix:**
@@ -117,7 +110,7 @@ return new Response(JSON.stringify(data), {
 3. Add logging before the return so future occurrences leave a trace:
 
 ```js
-console.error('Returning 401 - reason:', reason);
+console.error('Returning 401 - reason:', reason)
 ```
 
 See: [Error handling in Edge Functions](/docs/guides/functions/error-handling)
@@ -138,7 +131,7 @@ The subsections below cover specific failure modes.
 
 ### Incompatible key format
 
-Your project uses the [new asymmetric keys](/blog/jwt-signing-keys) for authentication. However, the [legacy auth verification check](/docs/guides/functions/development-tips#skipping-authorization-checks) only understands the legacy format. 
+Your project uses the [new asymmetric keys](/blog/jwt-signing-keys) for authentication. However, the [legacy auth verification check](/docs/guides/functions/development-tips#skipping-authorization-checks) only understands the legacy format.
 
 **Fix:** Disable the built-in JWT check using one of the below methods and optionally [handle auth in your function code](/docs/guides/functions/auth)
 
@@ -174,7 +167,9 @@ Redeploy the edge function from the [Supabase CLI](/docs/guides/functions/quicks
 ```sh
 supabase functions deploy YOUR_FUNCTION_NAME --no-verify-jwt
 ```
+
     </AccordionItem>
+
   </div>
   <div className="border-b mt-3 pb-3">
     <AccordionItem
@@ -194,6 +189,7 @@ curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME' \
   --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
   --data '{"verify_jwt": false}'
 ```
+
     </AccordionItem>
 
   </div>
@@ -208,12 +204,8 @@ The built-in check is enabled and the key you sent doesn't match your project's 
 **Fix (alternative):** If you want to keep the built-in check, ensure you're sending a valid key. Use one of your [legacy API keys](/dashboard/project/_/settings/api-keys/legacy) with the [Supabase client library](/docs/guides/api/rest/client-libs) when making your request.
 
 ```js
-const supabase = createClient(
-    'https://xyzcompany.supabase.co', 
-    'anon-key-or-service_role-key'
-)
+const supabase = createClient('https://xyzcompany.supabase.co', 'anon-key-or-service_role-key')
 ```
-
 
 ### Missing authorization header
 
@@ -242,4 +234,4 @@ Alternatively, you can disable the built-in check entirely (see [Incompatible ke
 ## Still stuck?
 
 - Check the [Discord](https://discord.com/channels/839993398554656828/1006358244786196510), [Supabase GitHub Discussions](https://github.com/orgs/supabase/discussions), and [Reddit page](https://www.reddit.com/r/Supabase/) for similar reports that can help with debugging
-- Open a [support ticket](/dashboard/support/new) for your project if the problem persists and you believe it is a platform issue 
+- Open a [support ticket](/dashboard/support/new) for your project if the problem persists and you believe it is a platform issue
