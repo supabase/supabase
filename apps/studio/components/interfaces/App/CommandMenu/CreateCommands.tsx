@@ -363,17 +363,20 @@ export function useCreateCommands(options?: CommandOptions) {
       .filter(Boolean) as ICommand[]
   }, [ref, allIntegrations, installedIntegrationIds])
 
+  // Observability commands are only available on the platform, not for self-hosted/CLI
   const observabilityCommands = useMemo(
     () => [
-      ...(IS_PLATFORM && reportsEnabled
-        ? ([
-            {
-              id: 'create-observability-report',
-              name: 'Create Custom Report',
-              route: `/project/${ref}/observability/api-overview?newReport=true`,
-              icon: () => <Telescope />,
-            },
-          ].filter(Boolean) as ICommand[])
+      ...(IS_PLATFORM
+        ? reportsEnabled
+          ? ([
+              {
+                id: 'create-observability-report',
+                name: 'Create Custom Report',
+                route: `/project/${ref}/observability/api-overview?newReport=true`,
+                icon: () => <Telescope />,
+              },
+            ].filter(Boolean) as ICommand[])
+          : []
         : []),
     ],
     [ref, reportsEnabled]

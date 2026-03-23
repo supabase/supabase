@@ -204,7 +204,7 @@ export const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
-          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
+          const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
 
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
@@ -280,7 +280,7 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
       const formattedSql = formatSql(sql)
 
@@ -318,7 +318,7 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
 
       const hasDestructiveOperations = checkDestructiveQuery(sql)
@@ -418,7 +418,7 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
 
       // Check for multiple statements - EXPLAIN only works on a single statement
@@ -881,7 +881,7 @@ export const SQLEditor = () => {
                       snippetName={
                         urlId === 'new'
                           ? generatedNewSnippetName
-                          : snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName
+                          : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
                       }
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}

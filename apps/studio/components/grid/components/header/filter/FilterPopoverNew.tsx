@@ -207,7 +207,7 @@ export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) =
         actions={actions}
         isLoading={isGenerating}
         variant="pill"
-        className="bg-transparent border-0 overflow-visible"
+        className="bg-transparent border-0 overflow-visible px-1.5"
         icon={icon}
       />
     </div>

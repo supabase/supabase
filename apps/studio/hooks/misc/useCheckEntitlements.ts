@@ -75,7 +75,7 @@ export function useHasEntitlementAccess(organizationSlug?: string) {
   return useCallback(
     (key: string) =>
       IS_PLATFORM
-        ? entitlementsData?.entitlements.find((e) => e.feature.key === key)?.hasAccess ?? false
+        ? (entitlementsData?.entitlements.find((e) => e.feature.key === key)?.hasAccess ?? false)
         : true,
     [entitlementsData]
   )
@@ -130,7 +130,7 @@ export function useCheckEntitlements(
     : isSuccessEntitlements
 
   return {
-    hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
+    hasAccess: IS_PLATFORM ? (entitlement?.hasAccess ?? false) : true,
     isLoading: IS_PLATFORM ? isLoading : false,
     isSuccess: IS_PLATFORM ? isSuccess : true,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),

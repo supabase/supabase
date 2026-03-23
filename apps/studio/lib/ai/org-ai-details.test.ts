@@ -47,9 +47,8 @@ describe('ai/org-ai-details', () => {
     const subscriptionQuery = await import('data/subscriptions/org-subscription-query')
     const settingsQuery = await import('data/config/project-settings-v2-query')
     const aiHook = await import('hooks/misc/useOrgOptedIntoAi')
-    const subscriptionUtils = await import(
-      'components/interfaces/Billing/Subscription/Subscription.utils'
-    )
+    const subscriptionUtils =
+      await import('components/interfaces/Billing/Subscription/Subscription.utils')
     const entitlementsQuery = await import('data/entitlements/entitlements-query')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
