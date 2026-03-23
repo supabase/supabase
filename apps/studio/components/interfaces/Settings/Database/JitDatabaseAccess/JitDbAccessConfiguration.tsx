@@ -5,7 +5,6 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { InlineLinkClassName } from 'components/ui/InlineLink'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useJitDbAccessGrantMutation } from 'data/jit-db-access/jit-db-access-grant-mutation'
 import { useJitDbAccessMembersQuery } from 'data/jit-db-access/jit-db-access-members-query'
 import { useJitDbAccessQuery } from 'data/jit-db-access/jit-db-access-query'
 import { useJitDbAccessRevokeMutation } from 'data/jit-db-access/jit-db-access-revoke-mutation'
@@ -50,13 +49,9 @@ import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import type { JitUserRule, SheetMode } from './JitDbAccess.types'
 import {
-  createDraft,
-  draftFromRule,
   getAssignableJitRoleOptions,
-  getInvalidCidrs,
   getJitMemberOptions,
   mapJitMembersToUserRules,
-  serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
@@ -70,13 +65,11 @@ export const JitDbAccessConfiguration = () => {
   const [enabled, setEnabled] = useState(false)
   const [showCreateRuleSheet, setShowCreateRuleSheet] = useQueryState(
     'jit_new',
-    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+    parseAsBoolean.withDefault(false)
   )
   const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
-  const [showInlineValidation, setShowInlineValidation] = useState(false)
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)
-  const [draft, setDraft] = useState(() => createDraft([]))
 
   const {
     data: jitDbAccessConfiguration,
@@ -132,37 +125,18 @@ export const JitDbAccessConfiguration = () => {
       },
     })
 
-  const { mutate: grantUserAccess, isPending: isGrantingAccess } = useJitDbAccessGrantMutation({
-    onSuccess: () => {
-      toast.success(
-        sheetMode === 'edit'
-          ? 'Successfully updated user access'
-          : 'Successfully granted user access'
-      )
-      resetSheetState()
-    },
-    onError: (error) => {
-      toast.error(
-        `Failed to ${sheetMode === 'edit' ? 'update' : 'grant'} user access: ${error.message}`
-      )
-    },
-  })
-
   const { mutate: revokeUserAccess, isPending: isRevokingAccess } = useJitDbAccessRevokeMutation({
     onSuccess: (_, variables) => {
       toast.success('Successfully revoked user access')
       setSelectedUserToDelete(null)
-
-      if (ruleIdToEdit === variables.userId) {
-        resetSheetState()
-      }
+      if (ruleIdToEdit === variables.userId) resetSheetState()
     },
     onError: (error) => {
       toast.error(`Failed to revoke user access: ${error.message}`)
     },
   })
 
-  const isMutating = isUpdatingJitDbAccess || isGrantingAccess || isRevokingAccess
+  const isMutating = isUpdatingJitDbAccess || isRevokingAccess
   const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
   const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
 
@@ -181,7 +155,6 @@ export const JitDbAccessConfiguration = () => {
   )
 
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
-  const roleIds = useMemo(() => roleOptions.map((role) => role.id), [roleOptions])
 
   const users = useMemo(
     () => mapJitMembersToUserRules(jitMembers, projectMembers, roleOptions),
@@ -224,56 +197,14 @@ export const JitDbAccessConfiguration = () => {
     ]
   }, [sheetMode, availableMembersForAdd, allMembers, editingUser])
 
-  const isDuplicateSelectedMember =
-    sheetMode === 'add' && draft.memberId !== '' && membersWithRules.has(draft.memberId)
-
-  const enabledRoleCount = useMemo(
-    () => draft.grants.filter((grant) => grant.enabled).length,
-    [draft.grants]
-  )
-
   const activeRuleCount = useMemo(
     () => users.filter((user) => user.status.active > 0).length,
     [users]
   )
 
-  const inlineValidation = useMemo(() => {
-    let invalidIpGrant: (typeof draft.grants)[number] | undefined
-    let invalidCidrs: string[] = []
-
-    for (const grant of draft.grants) {
-      if (!grant.enabled) continue
-
-      const nextInvalidCidrs = getInvalidCidrs(grant.ipRanges)
-      if (nextInvalidCidrs.length === 0) continue
-
-      invalidIpGrant = grant
-      invalidCidrs = nextInvalidCidrs
-      break
-    }
-
-    const invalidPreview = invalidCidrs.slice(0, 3).join(', ')
-    const hasOverflowInvalidCidrs = invalidCidrs.length > 3
-
-    return {
-      member: !draft.memberId
-        ? 'Select a member for this JIT access rule.'
-        : isDuplicateSelectedMember
-          ? 'This member already has a JIT access rule. Edit their existing rule from the list.'
-          : undefined,
-      roles:
-        enabledRoleCount === 0
-          ? 'Select at least one role.'
-          : invalidIpGrant
-            ? `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${invalidIpGrant.roleId}": ${invalidPreview}${hasOverflowInvalidCidrs ? ', ...' : ''}`
-            : undefined,
-    }
-  }, [draft.grants, draft.memberId, enabledRoleCount, isDuplicateSelectedMember])
-
   const resetSheetState = () => {
     setShowCreateRuleSheet(false)
     setRuleIdToEdit(null)
-    setShowInlineValidation(false)
   }
 
   const submitJitToggle = (nextEnabled: boolean) => {
@@ -308,43 +239,19 @@ export const JitDbAccessConfiguration = () => {
 
   const openAddRuleSheet = () => {
     if (!canUpdateJitDbAccess) return
-
     setRuleIdToEdit(null)
-    setDraft(createDraft(roleIds))
-    setShowInlineValidation(false)
     setShowCreateRuleSheet(true)
   }
 
   const openEditRuleSheet = (user: JitUserRule) => {
     if (!canUpdateJitDbAccess) return
-
-    console.log(user)
-
     setShowCreateRuleSheet(false)
     setRuleIdToEdit(user.id)
-    setDraft(draftFromRule(user, roleIds))
-    setShowInlineValidation(false)
   }
 
   const openDeleteDialog = (user: JitUserRule) => {
     if (!canUpdateJitDbAccess) return
     setSelectedUserToDelete(user)
-  }
-
-  const handleSaveRule = () => {
-    setShowInlineValidation(true)
-
-    if (inlineValidation.member || inlineValidation.roles) return
-    if (!ref) return console.error('Project ref is required')
-
-    const roles = serializeDraftRolesForGrantMutation(draft)
-    if (roles.length === 0) return
-
-    grantUserAccess({
-      projectRef: ref,
-      userId: draft.memberId,
-      roles,
-    })
   }
 
   const handleConfirmDelete = () => {
@@ -367,13 +274,6 @@ export const JitDbAccessConfiguration = () => {
       setEnabled(initialIsEnabled ?? false)
     }
   }, [initialIsEnabled, isLoadingConfiguration, jitDbAccessConfiguration])
-
-  useEffect(() => {
-    if (!ruleIdToEdit || isLoadingJitMembers || isLoadingProjectMembers || editingUser) return
-
-    toast('JIT access rule not found')
-    setRuleIdToEdit(null)
-  }, [editingUser, isLoadingJitMembers, isLoadingProjectMembers, ruleIdToEdit, setRuleIdToEdit])
 
   return (
     <>
@@ -497,17 +397,9 @@ export const JitDbAccessConfiguration = () => {
       </PageSection>
 
       <JitDbAccessRuleSheet
-        open={sheetOpen}
-        mode={sheetMode}
-        draft={draft}
         memberOptions={memberOptionsForSheet}
+        membersWithRules={membersWithRules}
         availableMembersForAddCount={availableMembersForAdd.length}
-        showInlineValidation={showInlineValidation}
-        inlineValidation={inlineValidation}
-        isSubmitting={isGrantingAccess}
-        onDraftChange={setDraft}
-        onCancel={resetSheetState}
-        onSave={handleSaveRule}
       />
 
       <JitDbAccessDeleteDialog

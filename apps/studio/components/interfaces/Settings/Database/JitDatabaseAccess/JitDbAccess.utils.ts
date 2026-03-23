@@ -41,16 +41,12 @@ export function createEmptyGrant(roleId: string): JitRoleGrantDraft {
   }
 }
 
-function createEmptyGrants(roleIds: string[]) {
-  return roleIds.map((roleId) => createEmptyGrant(roleId))
-}
-
 function cloneGrants(grants: JitRoleGrantDraft[]) {
   return grants.map((grant) => ({ ...grant }))
 }
 
 export function createDraft(roleIds: string[]): JitUserRuleDraft {
-  return { memberId: '', grants: createEmptyGrants(roleIds) }
+  return { memberId: '', grants: roleIds.map((roleId) => createEmptyGrant(roleId)) }
 }
 
 function mergeRoleIds(baseRoleIds: string[], extraRoleIds: string[]) {

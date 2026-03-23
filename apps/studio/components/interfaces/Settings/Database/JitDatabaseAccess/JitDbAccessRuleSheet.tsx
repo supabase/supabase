@@ -1,9 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { DOCS_URL } from 'lib/constants'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Form_Shadcn_,
@@ -24,206 +26,321 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
-import type { JitMemberOption, JitUserRuleDraft, SheetMode } from './JitDbAccess.types'
+import type {
+  JitExpiryMode,
+  JitMemberOption,
+  JitUserRuleDraft,
+  SheetMode,
+} from './JitDbAccess.types'
+import {
+  createDraft,
+  draftFromRule,
+  getAssignableJitRoleOptions,
+  getInvalidCidrs,
+  mapJitMembersToUserRules,
+  serializeDraftRolesForGrantMutation,
+} from './JitDbAccess.utils'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useJitDbAccessGrantMutation } from '@/data/jit-db-access/jit-db-access-grant-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
+import { useProjectMembersQuery } from '@/data/projects/project-members-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
-type JitDbAccessRuleSheetFormValues = {
-  memberId: string
-  roles: string
+const grantSchema = z.object({
+  roleId: z.string(),
+  enabled: z.boolean(),
+  expiryMode: z.custom<JitExpiryMode>(),
+  hasExpiry: z.boolean(),
+  expiry: z.string(),
+  hasIpRestriction: z.boolean(),
+  ipRanges: z.string(),
+})
+
+function createJitRuleSchema(mode: SheetMode, membersWithRules: Set<string>) {
+  return z
+    .object({
+      memberId: z.string().min(1, 'Select a member for this JIT access rule.'),
+      grants: z.array(grantSchema),
+    })
+    .superRefine((data, ctx) => {
+      if (mode === 'add' && membersWithRules.has(data.memberId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['memberId'],
+          message:
+            'This member already has a JIT access rule. Edit their existing rule from the list.',
+        })
+      }
+
+      const enabledGrants = data.grants.filter((g) => g.enabled)
+      if (enabledGrants.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['grants'],
+          message: 'Select at least one role.',
+        })
+        return
+      }
+
+      for (const grant of enabledGrants) {
+        const invalidCidrs = getInvalidCidrs(grant.ipRanges)
+        if (invalidCidrs.length > 0) {
+          const preview = invalidCidrs.slice(0, 3).join(', ')
+          const overflow = invalidCidrs.length > 3
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['grants'],
+            message: `Invalid CIDR range${invalidCidrs.length > 1 ? 's' : ''} for role "${grant.roleId}": ${preview}${overflow ? ', ...' : ''}`,
+          })
+          break
+        }
+      }
+    })
 }
 
 interface JitDbAccessRuleSheetProps {
-  open: boolean
-  mode: SheetMode
-  draft: JitUserRuleDraft
   memberOptions: JitMemberOption[]
+  membersWithRules: Set<string>
   availableMembersForAddCount: number
-  showInlineValidation: boolean
-  inlineValidation: {
-    member?: string
-    roles?: string
-  }
-  isSubmitting?: boolean
-  onDraftChange: (next: JitUserRuleDraft) => void
-  onCancel: () => void
-  onSave: () => void
 }
 
+/**
+ * [Joshen] Form schema can be further refactored to simplify
+ * It's weird that we're rendering the role options based on the form, when it's just based on
+ * the available database roles - should decouple
+ */
+
 export function JitDbAccessRuleSheet({
-  open,
-  mode,
   memberOptions,
-  draft,
+  membersWithRules,
   availableMembersForAddCount,
-  showInlineValidation,
-  inlineValidation,
-  isSubmitting = false,
-  onDraftChange,
-  onCancel,
-  onSave,
 }: JitDbAccessRuleSheetProps) {
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
+  const [isNewRule, setIsNewRule] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
+  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
+
+  const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+  })
+  const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
+  const roleIds = useMemo(() => roleOptions.map((role) => role.id), [roleOptions])
+
+  const { data: jitMembers, isSuccess: isSuccessJitMembers } = useJitDbAccessMembersQuery({
+    projectRef,
+  })
+  const { data: projectMembers, isSuccess: isSuccessProjectMembers } = useProjectMembersQuery({
+    projectRef,
+  })
+  const users = useMemo(
+    () => mapJitMembersToUserRules(jitMembers, projectMembers, roleOptions),
+    [jitMembers, projectMembers, roleOptions]
+  )
+  const user = users.find((x) => x.id === ruleIdToEdit)
+  const mode: SheetMode = !!user ? 'edit' : 'add'
+
+  const isDataReady = isSuccessDatabaseRoles && isSuccessJitMembers && isSuccessProjectMembers
+  const open = isNewRule || (!!ruleIdToEdit && !!user)
+
+  const defaultValues = !isNewRule && !!user ? draftFromRule(user, roleIds) : createDraft(roleIds)
+  const FormSchema = useMemo(
+    () => createJitRuleSchema(mode, membersWithRules),
+    [mode, membersWithRules]
+  )
+  const form = useForm<JitUserRuleDraft>({
+    defaultValues,
+    resolver: zodResolver(FormSchema),
+  })
+  const grants = form.watch('grants')
+
+  const onCloseSheet = () => {
+    setIsNewRule(false)
+    setRuleIdToEdit(null)
+  }
+
+  const {
+    confirmOnClose,
+    handleOpenChange,
+    modalProps: closeConfirmationModalProps,
+  } = useConfirmOnClose({
+    checkIsDirty: () => form.formState.isDirty,
+    onClose: onCloseSheet,
+  })
+
+  const { mutate: grantUserAccess, isPending: isSubmitting } = useJitDbAccessGrantMutation({
+    onSuccess: () => {
+      toast.success(
+        mode === 'edit' ? 'Successfully updated user access' : 'Successfully granted user access'
+      )
+      onCloseSheet()
+    },
+    onError: (error) => {
+      toast.error(`Failed to ${mode === 'edit' ? 'update' : 'grant'} user access: ${error.message}`)
+    },
+  })
+
   const updateGrant = (
     roleId: string,
     updater: (grant: JitUserRuleDraft['grants'][number]) => JitUserRuleDraft['grants'][number]
   ) => {
-    onDraftChange({
-      ...draft,
-      grants: draft.grants.map((grant) => (grant.roleId === roleId ? updater(grant) : grant)),
-    })
+    const nextGrants = grants.map((grant) => (grant.roleId === roleId ? updater(grant) : grant))
+    form.setValue('grants', nextGrants, { shouldDirty: true })
   }
 
-  const form = useForm<JitDbAccessRuleSheetFormValues>({
-    defaultValues: {
-      memberId: draft.memberId,
-      roles: '',
-    },
-  })
+  const handleSaveRule = (data: z.infer<typeof FormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    const roles = serializeDraftRolesForGrantMutation(data)
+    if (roles.length === 0) return
+
+    grantUserAccess({ projectRef, userId: data.memberId, roles })
+  }
 
   useEffect(() => {
-    form.setValue('memberId', draft.memberId, { shouldDirty: false })
-  }, [draft.memberId, form])
+    if (!!ruleIdToEdit && isDataReady && !user) {
+      toast('Access rule cannot be found')
+      setRuleIdToEdit(null)
+    }
+  }, [isDataReady, ruleIdToEdit, setRuleIdToEdit, user])
 
   useEffect(() => {
-    if (!showInlineValidation) {
-      form.clearErrors(['memberId', 'roles'])
-      return
-    }
-
-    if (inlineValidation.member) {
-      form.setError('memberId', { type: 'manual', message: inlineValidation.member })
-    } else {
-      form.clearErrors('memberId')
-    }
-
-    if (inlineValidation.roles) {
-      form.setError('roles', { type: 'manual', message: inlineValidation.roles })
-    } else {
-      form.clearErrors('roles')
-    }
-  }, [form, inlineValidation.member, inlineValidation.roles, showInlineValidation])
+    if (open && isDataReady) form.reset(defaultValues)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isDataReady])
 
   return (
-    <Sheet open={open} onOpenChange={(nextOpen) => !nextOpen && onCancel()}>
-      <SheetContent
-        showClose={false}
-        size="default"
-        className="flex h-full w-full max-w-full flex-col gap-0 sm:!w-[560px] sm:max-w-[560px]"
-      >
-        <SheetHeader>
-          <SheetTitle>
-            {mode === 'edit' ? 'Edit JIT access rule' : 'New JIT access rule'}
-          </SheetTitle>
-          <SheetDescription className="sr-only">
-            Configure which database roles a user can request with JIT access.
-          </SheetDescription>
-        </SheetHeader>
+    <>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
+        <SheetContent
+          showClose={false}
+          size="default"
+          className="flex h-full w-full max-w-full flex-col gap-0 sm:!w-[560px] sm:max-w-[560px]"
+        >
+          <SheetHeader>
+            <SheetTitle>
+              {mode === 'edit' ? 'Edit JIT access rule' : 'New JIT access rule'}
+            </SheetTitle>
+            <SheetDescription className="sr-only">
+              Configure which database roles a user can request with JIT access.
+            </SheetDescription>
+          </SheetHeader>
 
-        <Form_Shadcn_ {...form}>
-          <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
-            <div className="space-y-8 px-5 py-6 sm:px-6">
-              <FormField_Shadcn_
-                control={form.control}
-                name="memberId"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Member">
-                    <FormControl_Shadcn_>
-                      <Select_Shadcn_
-                        value={field.value}
-                        disabled={
-                          mode === 'edit' || (mode === 'add' && availableMembersForAddCount === 0)
-                        }
-                        onValueChange={(value) => {
-                          field.onChange(value)
-                          onDraftChange({ ...draft, memberId: value })
-                        }}
-                      >
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ placeholder="Select a member" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          {memberOptions.map((member) => (
-                            <SelectItem_Shadcn_ key={member.id} value={member.id}>
-                              {member.name ? (
-                                <>
-                                  {member.name}{' '}
-                                  <span className="text-foreground-lighter">({member.email})</span>
-                                </>
-                              ) : (
-                                member.email
-                              )}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl_Shadcn_>
-
-                    {mode === 'add' && availableMembersForAddCount === 0 && (
-                      <p className="mt-2 text-foreground-lighter">
-                        All project members already have JIT access rules. Edit an existing rule
-                        from the table above.
-                      </p>
-                    )}
-                  </FormItemLayout>
-                )}
-              />
-
-              <FormField_Shadcn_
-                control={form.control}
-                name="roles"
-                render={() => (
-                  <FormItemLayout
-                    layout="vertical"
-                    label="Roles and settings"
-                    description={
-                      <>
-                        Use{' '}
-                        <InlineLink
-                          href={`${DOCS_URL}/guides/database/postgres/roles`}
-                          className="decoration-foreground-muted"
+          <Form_Shadcn_ {...form}>
+            <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
+              <div className="space-y-8 px-5 py-6 sm:px-6">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="memberId"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label="Member">
+                      <FormControl_Shadcn_>
+                        <Select_Shadcn_
+                          value={field.value}
+                          disabled={
+                            mode === 'edit' || (mode === 'add' && availableMembersForAddCount === 0)
+                          }
+                          onValueChange={field.onChange}
                         >
-                          custom Postgres roles
-                        </InlineLink>{' '}
-                        with narrow permissions to reduce the impact of direct database access.
-                      </>
-                    }
-                  >
-                    {draft.grants.length === 0 ? (
-                      <Admonition
-                        type="note"
-                        title="No assignable roles found"
-                        className="bg-background"
-                      />
-                    ) : (
-                      <div className="overflow-hidden rounded-md border">
-                        {draft.grants.map((grant, index) => (
-                          <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
-                            <JitDbAccessRoleGrantFields
-                              role={{ id: grant.roleId, label: grant.roleId }}
-                              grant={grant}
-                              onChange={(next) => updateGrant(grant.roleId, () => next)}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </FormItemLayout>
-                )}
-              />
-            </div>
-          </ScrollArea>
-        </Form_Shadcn_>
+                          <SelectTrigger_Shadcn_>
+                            <SelectValue_Shadcn_ placeholder="Select a member" />
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            {memberOptions.map((member) => (
+                              <SelectItem_Shadcn_ key={member.id} value={member.id}>
+                                {member.name ? (
+                                  <>
+                                    {member.name}{' '}
+                                    <span className="text-foreground-lighter">
+                                      ({member.email})
+                                    </span>
+                                  </>
+                                ) : (
+                                  member.email
+                                )}
+                              </SelectItem_Shadcn_>
+                            ))}
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormControl_Shadcn_>
 
-        <SheetFooter className="mt-auto w-full border-t py-4">
-          <Button type="default" onClick={onCancel} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button type="primary" onClick={onSave} loading={isSubmitting}>
-            {mode === 'edit' ? 'Save rule' : 'Create rule'}
-          </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+                      {mode === 'add' && availableMembersForAddCount === 0 && (
+                        <p className="mt-2 text-foreground-lighter">
+                          All project members already have JIT access rules. Edit an existing rule
+                          from the table above.
+                        </p>
+                      )}
+                    </FormItemLayout>
+                  )}
+                />
+
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="grants"
+                  render={() => (
+                    <FormItemLayout
+                      layout="vertical"
+                      label="Roles and settings"
+                      description={
+                        <>
+                          Use{' '}
+                          <InlineLink
+                            href={`${DOCS_URL}/guides/database/postgres/roles`}
+                            className="decoration-foreground-muted"
+                          >
+                            custom Postgres roles
+                          </InlineLink>{' '}
+                          with narrow permissions to reduce the impact of direct database access.
+                        </>
+                      }
+                    >
+                      {grants.length === 0 ? (
+                        <Admonition
+                          type="note"
+                          title="No assignable roles found"
+                          className="bg-background"
+                        />
+                      ) : (
+                        <div className="overflow-hidden rounded-md border">
+                          {grants.map((grant, index) => (
+                            <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
+                              <JitDbAccessRoleGrantFields
+                                role={{ id: grant.roleId, label: grant.roleId }}
+                                grant={grant}
+                                onChange={(next) => updateGrant(grant.roleId, () => next)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+            </ScrollArea>
+          </Form_Shadcn_>
+
+          <SheetFooter className="mt-auto w-full border-t py-4">
+            <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              onClick={form.handleSubmit(handleSaveRule)}
+              loading={isSubmitting}
+            >
+              {mode === 'edit' ? 'Save rule' : 'Create rule'}
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+    </>
   )
 }
