@@ -15,15 +15,15 @@ export function CopyButton({ text }: { text: string }) {
 
   return (
     <button
+      type="button"
       onClick={handleCopy}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs transition-colors',
+        'inline-flex items-center rounded-md border p-1.5 transition-colors',
         'border-default bg-surface-100 text-foreground-lighter hover:bg-surface-200 hover:text-foreground'
       )}
-      title={`Copy: ${text}`}
+      title={copied ? 'Copied!' : 'Copy to clipboard'}
     >
       {copied ? <Check size={14} /> : <Copy size={14} />}
-      {copied ? 'Copied' : 'Copy'}
     </button>
   )
 }

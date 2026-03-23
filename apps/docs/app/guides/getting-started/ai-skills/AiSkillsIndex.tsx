@@ -11,7 +11,7 @@ export async function AiSkillsIndex() {
           <tr className="border-b border-default">
             <th className="text-left py-2 pr-4 text-foreground-lighter font-medium">Skill</th>
             <th className="text-left py-2 pr-4 text-foreground-lighter font-medium">Description</th>
-            <th className="text-right py-2 text-foreground-lighter font-medium">Install</th>
+            <th className="text-left py-2 text-foreground-lighter font-medium">Install command</th>
           </tr>
         </thead>
         <tbody>
@@ -28,8 +28,15 @@ export async function AiSkillsIndex() {
                 </a>
               </td>
               <td className="py-3 pr-4 text-foreground-lighter">{skill.description}</td>
-              <td className="py-3 text-right">
-                <CopyButton text={skill.installCommand} />
+              <td className="w-px p-0">
+                <div className="h-full max-w-xs overflow-x-auto flex items-center py-3">
+                  <div className="flex items-center gap-2 whitespace-nowrap">
+                    <CopyButton text={skill.installCommand} />
+                    <code className="font-mono text-xs text-foreground-lighter">
+                      {skill.installCommand}
+                    </code>
+                  </div>
+                </div>
               </td>
             </tr>
           ))}

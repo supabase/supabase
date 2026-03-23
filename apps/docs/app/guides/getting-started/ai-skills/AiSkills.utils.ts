@@ -39,7 +39,9 @@ async function fetchGitHubDirectory(path: string): Promise<GitHubContentItem[]> 
       next: { revalidate: 3600 },
     })
   } catch (err) {
-    throw new Error(`Failed to fetch agent skills directory from GitHub (network error): ${err}`)
+    throw new Error(`Failed to fetch agent skills directory from GitHub (network error)`, {
+      cause: err,
+    })
   }
 
   if (!response.ok) {
@@ -65,7 +67,7 @@ async function fetchGitHubFile(path: string): Promise<string> {
       next: { revalidate: 3600 },
     })
   } catch (err) {
-    throw new Error(`Failed to fetch agent skill file from GitHub (network error): ${err}`)
+    throw new Error(`Failed to fetch agent skill file from GitHub (network error)`, { cause: err })
   }
 
   if (!response.ok) {
@@ -79,22 +81,21 @@ async function fetchGitHubFile(path: string): Promise<string> {
 
 async function getAiSkillsImpl(): Promise<SkillSummary[]> {
   const directories = await fetchGitHubDirectory(SKILLS_REPO.path)
+  const skillDirs = directories.filter((item) => item.type === 'dir')
 
-  const skills: SkillSummary[] = []
+  const skills = await Promise.all(
+    skillDirs.map(async (item) => {
+      const skillPath = `${SKILLS_REPO.path}/${item.name}/SKILL.md`
+      const rawContent = await fetchGitHubFile(skillPath)
+      const { data } = matter(rawContent) as { data: SkillMetadata }
 
-  for (const item of directories) {
-    if (item.type !== 'dir') continue
-
-    const skillPath = `${SKILLS_REPO.path}/${item.name}/SKILL.md`
-    const rawContent = await fetchGitHubFile(skillPath)
-    const { data } = matter(rawContent) as { data: SkillMetadata }
-
-    skills.push({
-      name: item.name,
-      description: data.description || '',
-      installCommand: `npx skills add supabase/agent-skills --skill ${item.name}`,
+      return {
+        name: item.name,
+        description: data.description || '',
+        installCommand: `npx skills add supabase/agent-skills --skill ${item.name}`,
+      }
     })
-  }
+  )
 
   return skills.sort((a, b) => a.name.localeCompare(b.name))
 }
