@@ -48,7 +48,7 @@
 		<input type="hidden" name="avatarUrl" value={avatarUrl} />
 		<div>
 			<label for="email">Email</label>
-			<input id="email" type="text" value={claims.email} disabled />
+			<input id="email" type="text" value={claims?.email ?? ''} disabled />
 		</div>
 
 		<div>
