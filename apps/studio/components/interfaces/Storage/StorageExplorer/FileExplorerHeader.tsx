@@ -12,7 +12,7 @@ import {
   Edit2,
   FolderPlus,
   List,
-  Loader,
+  LoaderCircle,
   RefreshCw,
   Search,
   Upload,
@@ -61,7 +61,7 @@ const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: a
     >
       {loading.isLoading ? (
         <div className="ml-2 flex items-center gap-x-3">
-          <Loader size={14} strokeWidth={2} className="animate-spin" />
+          <LoaderCircle size={14} strokeWidth={2} className="animate-spin" />
           <p className="text-sm text-foreground-light">{loading.message}</p>
         </div>
       ) : (
@@ -113,7 +113,7 @@ const HeaderBreadcrumbs = ({
 
   return loading.isLoading ? (
     <div className="ml-2 flex items-center">
-      <Loader size={16} strokeWidth={2} className="animate-spin" />
+      <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
       <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (

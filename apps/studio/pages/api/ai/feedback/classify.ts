@@ -1,4 +1,4 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -41,11 +41,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model,
       providerOptions,
-      schema: z.object({
-        feedback_category: z.enum(['support', 'feedback', 'unknown']),
+      output: Output.object({
+        schema: z.object({
+          feedback_category: z.enum(['support', 'feedback', 'unknown']),
+        }),
       }),
       temperature: 0,
       prompt: `
@@ -97,7 +99,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   `,
     })
 
-    return res.json({ feedback_category: object.feedback_category })
+    return res.json({ feedback_category: output.feedback_category })
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Classifying this feedback failed`)

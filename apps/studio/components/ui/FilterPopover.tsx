@@ -31,6 +31,7 @@ interface FilterPopoverProps<T> {
   clearButtonText?: string
   className?: string
   isMinimized?: boolean
+  showOnlyButton?: boolean
   onSaveFilters: (options: string[]) => void
 
   // [Joshen] These props are to support async data with infinite loading if applicable
@@ -69,6 +70,7 @@ export const FilterPopover = <T extends Record<string, any>>({
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   isMinimized = false,
+  showOnlyButton = true,
   onSaveFilters,
 
   search,
@@ -117,15 +119,17 @@ export const FilterPopover = <T extends Record<string, any>>({
           }}
         />
         <div className="flex-1">{label}</div>
-        <button
-          className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.preventDefault()
-            setSelectedOptions([value])
-          }}
-        >
-          Only
-        </button>
+        {showOnlyButton && (
+          <button
+            className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => {
+              e.preventDefault()
+              setSelectedOptions([value])
+            }}
+          >
+            Only
+          </button>
+        )}
       </div>
     )
   }

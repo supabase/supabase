@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
+import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { AlertCircle } from 'lucide-react'
@@ -15,11 +15,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Button,
   cn,
   Radio,
   SidePanel,
@@ -29,7 +27,6 @@ import { DocsButton } from '@/components/ui/DocsButton'
 
 const CustomDomainSidePanel = () => {
   const { ref: projectRef } = useParams()
-  const { data: organization } = useSelectedOrganizationQuery()
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const [selectedOption, setSelectedOption] = useState<string>('cd_none')
@@ -215,28 +212,19 @@ const CustomDomainSidePanel = () => {
 
           {hasChanges && selectedOption !== 'cd_none' && (
             <p className="text-sm text-foreground-light">
-              There are no immediate charges. The addon is billed at the end of your billing cycle
+              There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.
             </p>
           )}
 
           {!hasAccessToCustomDomain && (
-            <Alert
-              withIcon
-              variant="info"
-              title="Custom domains are unavailable on the Free Plan"
-              actions={
-                <Button asChild type="default">
-                  <Link
-                    href={`/org/${organization?.slug}/billing?panel=subscriptionPlan&source=customDomainSidePanel`}
-                  >
-                    View available plans
-                  </Link>
-                </Button>
-              }
-            >
-              Upgrade your plan to add a custom domain to your project
-            </Alert>
+            <UpgradeToPro
+              addon="customDomain"
+              source="customDomainSidePanel"
+              featureProposition="enable custom domains"
+              primaryText="Custom domains are a Pro Plan add-on"
+              secondaryText="Enable the add-on to serve your project on your own domain name."
+            />
           )}
         </div>
       </SidePanel.Content>

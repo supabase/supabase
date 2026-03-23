@@ -115,9 +115,20 @@ const getContent = async ({ slug }: Params) => {
     `${terraformDocsOrg}/${terraformDocsRepo}/blob/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
   )
 
-  let response = await fetchRevalidatePerDay(
-    `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
-  )
+  let response: Response
+  try {
+    response = await fetchRevalidatePerDay(
+      `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
+    )
+  } catch (err) {
+    throw new Error(`Failed to fetch Terraform docs from GitHub (network error): ${err}`)
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch Terraform docs from GitHub: ${response.status} ${response.statusText}`
+    )
+  }
 
   let rawContent = await response.text()
   // Strip out HTML comments

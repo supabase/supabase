@@ -1,0 +1,7 @@
+[
+  { "slug": "goal-completion", "name": "Goal Completion" },
+  { "slug": "conciseness", "name": "Conciseness" },
+  { "slug": "completeness", "name": "Completeness" },
+  { "slug": "docs-faithfulness", "name": "Docs Faithfulness" },
+  { "slug": "url-validity", "name": "URL Validity" }
+]

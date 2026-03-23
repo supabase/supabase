@@ -64,8 +64,14 @@ import {
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
-import { DiffType, IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
 import {
+  DiffType,
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+  type PotentialIssues,
+} from './SQLEditor.types'
+import {
+  checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
@@ -123,9 +129,8 @@ export const SQLEditor = () => {
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
-  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
-  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
-  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
+  const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
+
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
@@ -199,7 +204,7 @@ export const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
-          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
+          const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
 
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
@@ -275,7 +280,7 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
       const formattedSql = formatSql(sql)
 
@@ -313,26 +318,23 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
 
-      let queryHasIssues = false
+      const hasDestructiveOperations = checkDestructiveQuery(sql)
+      const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
+      const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
 
-      const destructiveOperations = checkDestructiveQuery(sql)
-      if (!force && destructiveOperations) {
-        setShowPotentialIssuesModal(true)
-        setQueryHasDestructiveOperations(true)
-        queryHasIssues = true
-      }
-
-      const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
-      if (!force && updateWithoutWhereClause) {
-        setShowPotentialIssuesModal(true)
-        setQueryHasUpdateWithoutWhere(true)
-        queryHasIssues = true
-      }
+      const queryHasIssues =
+        !force &&
+        (hasDestructiveOperations || hasUpdateWithoutWhere || hasAlterDatabasePreventConnection)
 
       if (queryHasIssues) {
+        setPotentialIssues({
+          hasDestructiveOperations,
+          hasUpdateWithoutWhere,
+          hasAlterDatabasePreventConnection,
+        })
         return
       }
 
@@ -416,7 +418,7 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
 
       // Check for multiple statements - EXPLAIN only works on a single statement
@@ -801,21 +803,16 @@ export const SQLEditor = () => {
   return (
     <>
       <RunQueryWarningModal
-        visible={showPotentialIssuesModal}
-        hasDestructiveOperations={queryHasDestructiveOperations}
-        hasUpdateWithoutWhere={queryHasUpdateWithoutWhere}
+        visible={!!potentialIssues}
+        potentialIssues={potentialIssues}
         onCancel={() => {
           clearPendingRunRefocus()
-          setShowPotentialIssuesModal(false)
-          setQueryHasDestructiveOperations(false)
-          setQueryHasUpdateWithoutWhere(false)
+          setPotentialIssues(undefined)
           refocusEditor()
         }}
         onConfirm={() => {
           shouldRefocusAfterRunRef.current = true
-          setShowPotentialIssuesModal(false)
-          setQueryHasDestructiveOperations(false)
-          setQueryHasUpdateWithoutWhere(false)
+          setPotentialIssues(undefined)
           refocusEditor()
           void executeQuery(true)
         }}
@@ -884,7 +881,7 @@ export const SQLEditor = () => {
                       snippetName={
                         urlId === 'new'
                           ? generatedNewSnippetName
-                          : snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName
+                          : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
                       }
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}

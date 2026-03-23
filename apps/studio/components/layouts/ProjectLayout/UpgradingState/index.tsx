@@ -36,7 +36,7 @@ export const UpgradingState = () => {
     {
       projectRef: ref,
       projectStatus: project?.status,
-      trackingId: queryParams.get('trackingId'),
+      trackingId: queryParams?.get('trackingId'),
     },
     {
       enabled: IS_PLATFORM,

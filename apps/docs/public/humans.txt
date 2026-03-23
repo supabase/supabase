@@ -51,6 +51,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colum Ferry
 Craig Cannon
 Cuong Do
 Daniel Velázquez Lara
@@ -59,6 +60,7 @@ Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
 David Birdsong
+David Camacho Cateura
 David Weitzman
 Deepthi Sigireddi
 Deji I
@@ -115,6 +117,8 @@ Jim Chanco Jr
 Joakim Ahrlin
 Joaquim Moreno
 Joel Low
+Joey Freeland
+John Fitzgerald
 Joel Martin
 Johan Bergström
 John Pena

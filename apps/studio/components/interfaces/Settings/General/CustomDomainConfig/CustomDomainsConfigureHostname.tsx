@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import CopyButton from 'components/ui/CopyButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
@@ -70,6 +71,7 @@ export const CustomDomainsConfigureHostname = () => {
   }
 
   const domain = form.watch('domain')
+  const trimmedDomain = domain.trim()
   const isSubmitting = isCheckingRecord || isCreating
 
   return (
@@ -112,12 +114,31 @@ export const CustomDomainsConfigureHostname = () => {
               {domain ? <code className="text-code-inline">{domain}</code> : 'your custom domain'}{' '}
               resolving to{' '}
               {endpoint ? (
-                <code className="text-code-inline">{endpoint}</code>
+                <span className="inline-flex items-center gap-x-1">
+                  <code className="text-code-inline">{endpoint}</code>
+                  <CopyButton
+                    iconOnly
+                    type="text"
+                    className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
+                    text={endpoint}
+                  />
+                </span>
               ) : (
                 "your project's API URL"
               )}{' '}
               with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
               disable the proxy option.
+              <br />
+              {trimmedDomain.includes('.') ? (
+                <>
+                  Some DNS providers expect only the subdomain label{' '}
+                  <code className="text-code-inline">{trimmedDomain.split('.')[0]}</code>, while
+                  others accept the full hostname{' '}
+                  <code className="text-code-inline whitespace-nowrap">{trimmedDomain}</code>.
+                </>
+              ) : (
+                'Some DNS providers expect only the subdomain label, while others accept the full hostname.'
+              )}
             </p>
           </CardContent>
 

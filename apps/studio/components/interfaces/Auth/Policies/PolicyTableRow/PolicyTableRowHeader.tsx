@@ -16,6 +16,7 @@ interface PolicyTableRowHeaderProps {
   table: PolicyTable
   isLocked: boolean
   hasApiAccess: boolean
+  isLoadingApiAccess: boolean
   onSelectToggleRLS: (table: PolicyTable) => void
   onSelectCreatePolicy: (table: PolicyTable) => void
 }
@@ -24,6 +25,7 @@ export const PolicyTableRowHeader = ({
   table,
   isLocked,
   hasApiAccess,
+  isLoadingApiAccess,
   onSelectToggleRLS = noop,
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
@@ -59,7 +61,7 @@ export const PolicyTableRowHeader = ({
               RLS Disabled
             </Badge>
           )}
-          {!hasApiAccess && (
+          {!isLoadingApiAccess && !hasApiAccess && (
             <Badge variant="default" className="shrink-0">
               API Disabled
             </Badge>

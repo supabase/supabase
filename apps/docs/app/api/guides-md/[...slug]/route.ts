@@ -14,7 +14,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   try {
     const content = await fs.readFile(filePath, 'utf-8')
     return new NextResponse(content, {
-      headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+      headers: {
+        'Content-Type': 'text/markdown; charset=utf-8',
+        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=3600',
+      },
     })
   } catch {
     return new NextResponse('Not found', { status: 404 })

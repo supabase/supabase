@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
-import { isValidHttpUrl } from '@/lib/helpers'
+import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const httpRequestSchema = z.object({
   function_type: z.literal('http_request'),
-  http_url: z
-    .string()
-    .min(1, 'Please provide a URL')
-    .refine((val) => val.startsWith('http'), 'Please prefix your URL with http or https')
-    .refine((val) => isValidHttpUrl(val), 'Please provide a valid URL'),
+  http_url: httpEndpointUrlSchema({
+    requiredMessage: 'Please provide a URL',
+    invalidMessage: 'Please provide a valid URL',
+    prefixMessage: 'Please prefix your URL with http:// or https://',
+  }),
 })
 
 const supabaseFunctionSchema = z.object({

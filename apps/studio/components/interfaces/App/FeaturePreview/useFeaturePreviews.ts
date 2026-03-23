@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
-type FeaturePreview = {
+export type FeaturePreview = {
   key: string
   name: string
   discussionsUrl?: string
@@ -15,8 +15,9 @@ type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
+
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
+  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
 
   return [
@@ -100,7 +101,16 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: true,
       isNew: true,
       isPlatformOnly: false,
-      isDefaultOptIn: tableEditorNewFilterBar,
+      isDefaultOptIn: true,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
+      name: 'Floating Mobile Toolbar',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/43721',
+      enabled: showFloatingMobileToolbar,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: true,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

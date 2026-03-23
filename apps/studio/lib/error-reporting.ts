@@ -51,7 +51,7 @@ export function captureCriticalError(
     return
   }
 
-  handleUnknownError(error, context)
+  handleUnknownAPIResponseError(error, context)
 }
 
 function handleResponseError(error: ResponseError, context: string) {
@@ -85,7 +85,7 @@ function handleError(error: Error, context: string) {
   })
 }
 
-function handleUnknownError(error: unknown, context: string) {
+function handleUnknownAPIResponseError(error: unknown, context: string) {
   if (
     error &&
     typeof error === 'object' &&
