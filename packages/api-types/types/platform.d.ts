@@ -4653,17 +4653,8 @@ export interface components {
         name: string
         slug: string
       }
-      name?: string
-      orchestrator: {
-        stripe?: {
-          account: string
-          organization?: string
-        }
-        type: string
-      }
-      scopes?: string[]
       /** @enum {string} */
-      status: 'pending' | 'complete' | 'expired'
+      status: 'pending' | 'complete' | 'expired' | 'error'
     }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
