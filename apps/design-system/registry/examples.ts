@@ -1108,6 +1108,12 @@ export const examples: Registry = [
     files: ['example/form-item-layout-demo.tsx'],
   },
   {
+    name: 'key-value-field-array-demo',
+    type: 'components:example',
+    registryDependencies: ['button', 'form', 'input'],
+    files: ['example/key-value-field-array-demo.tsx'],
+  },
+  {
     name: 'field-choice-card',
     type: 'components:example',
     files: ['example/field-choice-card.tsx'],
