@@ -64,13 +64,13 @@ export function Avatar({
 
   return (
     <div className="avatar">
-      <div className="avatar_wrapper" onClick={uploadAvatar}>
+      <button type="button" className="avatar_wrapper" onClick={uploadAvatar}>
         {avatarUrl ? (
-          <img src={avatarUrl} />
+          <img src={avatarUrl} alt="User avatar" />
         ) : (
           <IonIcon icon={person} className="no-avatar" />
         )}
-      </div>
+      </button>
     </div>
   );
 }
