@@ -146,7 +146,9 @@ describe('KeyValueFieldArray', () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
 
-    render(<KeyValueForm defaultValues={{ headers: [{ key: '', value: '' }] }} onSubmit={onSubmit} />)
+    render(
+      <KeyValueForm defaultValues={{ headers: [{ key: '', value: '' }] }} onSubmit={onSubmit} />
+    )
 
     await user.type(screen.getByPlaceholderText('Header name'), 'X-Test-Header')
     await user.type(screen.getByPlaceholderText('Header value'), 'test-value')
