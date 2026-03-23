@@ -17,10 +17,11 @@ export type EdgeFunctionLastHourStats = {
 export type EdgeFunctionsLastHourStatsResponse = Record<string, EdgeFunctionLastHourStats>
 
 const EDGE_FUNCTIONS_LAST_HOUR_STATS_SQL = `
+-- edge-functions-last-hour-stats
 select
   function_id,
-  count(*) as requests_count,
-  count(case when response.status_code >= 500 then 1 end) as server_err_count
+  count(distinct id) as requests_count,
+  count(distinct case when response.status_code >= 500 then id end) as server_err_count
 from
   function_edge_logs
   cross join unnest(metadata) as m
@@ -52,7 +53,9 @@ export async function getEdgeFunctionsLastHourStats(
     signal,
   })
 
-  if (error) handleError(error)
+  if (error || data?.error) {
+    handleError(error ?? data?.error)
+  }
 
   const result = (data?.result ?? []) as {
     function_id: string
@@ -96,5 +99,7 @@ export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHour
     queryFn: ({ signal }) => getEdgeFunctionsLastHourStats({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     ...options,
   })
