@@ -162,16 +162,16 @@ meta="name=src/routes/+page.server.ts"
 
 Change the email template to support a server-side authentication flow.
 
-Before we proceed, let's change the email template to support sending a token hash:
+Before proceeding, change the email template to support sending a token hash:
 
 - Go to the [**Auth** > **Emails**](/dashboard/project/_/auth/templates) page in the project dashboard.
 - Select the **Confirm signup** template.
 - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 - Repeat the previous step for **Magic link** template.
 
-<Admonition type="tip">
+<Admonition type="tip" label="Did you know?">
 
-**Did you know?** You can also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+You can also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
 </Admonition>
 
