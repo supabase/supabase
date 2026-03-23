@@ -59,10 +59,7 @@ export const actions: Actions = {
     }
   },
   signout: async ({ locals: { supabase } }) => {
-    const { data, error } = await supabase.auth.getClaims()
-    if (!error && data?.claims) {
-      await supabase.auth.signOut()
-      redirect(303, '/')
-    }
+    await supabase.auth.signOut()
+    redirect(303, '/')
   },
 }
