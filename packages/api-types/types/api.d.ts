@@ -132,40 +132,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/installations/{installation_id}/token': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /** Create new installation access token */
-    post: operations['v1-create-installation-access-token']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v1/installations/token': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /** Revoke the installation access token used to authenticate this request */
-    delete: operations['v1-revoke-installation-access-token']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v1/oauth/authorize': {
     parameters: {
       query?: never
@@ -2581,15 +2547,6 @@ export interface components {
         [key: string]: string
       }
       with_data?: boolean
-    }
-    CreateInstallationAccessTokenBody: {
-      project_ref: string
-    }
-    CreateInstallationAccessTokenResponse: {
-      /** Format: date-time */
-      expires_at: string
-      project_ref?: string
-      token: string
     }
     CreateOrganizationV1: {
       name: string
@@ -5222,48 +5179,6 @@ export interface operations {
       }
       /** @description Failed to restore database branch */
       500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  'v1-create-installation-access-token': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        installation_id: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateInstallationAccessTokenBody']
-      }
-    }
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['CreateInstallationAccessTokenResponse']
-        }
-      }
-    }
-  }
-  'v1-revoke-installation-access-token': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
         headers: {
           [name: string]: unknown
         }

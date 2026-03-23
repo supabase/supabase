@@ -4,6 +4,7 @@ import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-de
 import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
 import { toast } from 'sonner'
 import {
   Button,
@@ -46,6 +47,7 @@ interface CreateAppSheetProps {
 
 export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetProps) {
   const { slug } = usePrivateApps()
+  const { copy } = useCopyToClipboard()
 
   const [name, setName] = useState('')
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([])
@@ -307,10 +309,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                             type="default"
                             size="tiny"
                             icon={<Copy size={12} />}
-                            onClick={() => {
-                              navigator.clipboard.writeText(generatedKey.private_key)
-                              toast.success('Private key copied to clipboard')
-                            }}
+                            onClick={() => copy(generatedKey.private_key, { withToast: true })}
                           >
                             Copy
                           </Button>
