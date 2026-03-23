@@ -117,10 +117,8 @@ export function BuiltWithSupabaseSection() {
       </div>
 
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
-      <div className="border border-border rounded-md overflow-clip">
         {/* Featured row - 2 large cells */}
-        <div className="border-b border-border">
-          <div className="grid grid-cols-1 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {featuredExamples.map((example) => {
               const logo = EXAMPLE_LOGO[example.title]
               const Skeleton = SKELETON_CONTENT[example.title]
@@ -129,24 +127,9 @@ export function BuiltWithSupabaseSection() {
                   key={example.title}
                   href={example.repo_url ?? '#'}
                   target="_blank"
-                  className="group flex flex-col border-b md:border-b-0 md:border-r border-border last:border-r-0 last:border-b-0 hover:bg-surface-75/50 transition-colors"
+                  className="group flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden hover:bg-surface-100 transition-colors"
                 >
-                  <div className="flex-1 flex items-center justify-center px-6 pt-16 pb-0 overflow-hidden">
-                    {/* Browser frame */}
-                    <div className="w-full rounded-t-lg border border-b-0 border-border-stronger/50 shadow-lg -mb-[10%]">
-                      {/* Title bar */}
-                      <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-border">
-                        <span className="size-2.5 rounded-full bg-foreground-muted/30" />
-                        <span className="size-2.5 rounded-full bg-foreground-muted/30" />
-                        <span className="size-2.5 rounded-full bg-foreground-muted/30" />
-                      </div>
-                      {/* Skeleton content */}
-                      <div className="h-[240px] flex items-center justify-center">
-                        {Skeleton ? <Skeleton /> : null}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="px-6 py-5 border-t border-border bg-surface-100 flex flex-col gap-2.5">
+                  <div className="px-6 py-5 flex flex-col gap-2.5">
                     {logo && (
                       <img
                         src={logo.src}
@@ -161,15 +144,28 @@ export function BuiltWithSupabaseSection() {
                       </p>
                     </div>
                   </div>
+                  <div className="flex-1 flex items-center justify-center px-6 pt-4 pb-0 overflow-hidden">
+                    {/* Browser frame */}
+                    <div className="w-full rounded-t-lg border border-b-0 border-border-stronger/50 shadow-lg -mb-[10%]">
+                      {/* Title bar */}
+                      <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-border">
+                        <span className="size-2.5 rounded-full bg-foreground-muted/30" />
+                        <span className="size-2.5 rounded-full bg-foreground-muted/30" />
+                        <span className="size-2.5 rounded-full bg-foreground-muted/30" />
+                      </div>
+                      {/* Skeleton content */}
+                      <div className="h-[240px] flex items-center justify-center bg-foreground/[0.03]">
+                        {Skeleton ? <Skeleton /> : null}
+                      </div>
+                    </div>
+                  </div>
                 </Link>
               )
             })}
           </div>
-        </div>
 
         {/* Grid row - 4 smaller cells */}
-        <div className="">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
             {gridExamples.map((example) => {
               const logo = EXAMPLE_LOGO[example.title]
               return (
@@ -177,7 +173,7 @@ export function BuiltWithSupabaseSection() {
                   key={example.title}
                   href={example.repo_url ?? '#'}
                   target="_blank"
-                  className="group flex flex-col border-b sm:border-b-0 sm:border-r border-border last:border-r-0 last:border-b-0 px-6 py-10 hover:bg-surface-75/50 transition-colors"
+                  className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-10 hover:bg-surface-100 transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-3">
                     {logo && (
@@ -196,8 +192,6 @@ export function BuiltWithSupabaseSection() {
               )
             })}
           </div>
-        </div>
-      </div>
       </div>
     </div>
   )
