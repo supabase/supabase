@@ -1,10 +1,11 @@
 import type { components } from 'api-types'
 import { usePlatformAppCreateMutation } from 'data/platform-apps/platform-app-create-mutation'
 import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
+import { usePlatformAppInstallationCreateMutation } from 'data/platform-apps/platform-app-installation-create-mutation'
 import { usePlatformAppSigningKeyCreateMutation } from 'data/platform-apps/platform-app-signing-key-create-mutation'
+import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
 import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
 import { toast } from 'sonner'
 import {
   Button,
@@ -46,7 +47,7 @@ interface CreateAppSheetProps {
 }
 
 export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetProps) {
-  const { slug } = usePrivateApps()
+  const { slug, installations, addInstallation } = usePrivateApps()
   const { copy } = useCopyToClipboard()
 
   const [name, setName] = useState('')
@@ -62,10 +63,19 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
     onSuccess: () => handleClose(),
   })
 
+  const { mutate: installApp } = usePlatformAppInstallationCreateMutation({
+    onSuccess: (data) => {
+      if (data) addInstallation(data, 'all')
+    },
+  })
+
   const { mutate: createSigningKey, isPending: isCreatingKey } =
     usePlatformAppSigningKeyCreateMutation({
-      onSuccess: (keyData) => {
+      onSuccess: (keyData, vars) => {
         if (keyData) setGeneratedKey(keyData)
+        if (installations.length === 0 && slug) {
+          installApp({ slug, app_id: vars.appId })
+        }
       },
     })
 
@@ -146,7 +156,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
               <CreateAppSheetStep
                 number={1}
                 title="App details"
-                description="Give your private app a name."
+                description="The first app you create will be automatically installed."
                 disabled={keyRevealed}
               >
                 <FormLayout label="Name" id="app-name">
@@ -339,13 +349,13 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         rows={8}
                         className="w-full rounded-md border border-control bg-surface-200 px-3 py-2 text-xs font-mono resize-none focus:outline-none"
                       />
-                      <label className="flex items-center gap-3 cursor-pointer">
+                      <label className="flex items-center gap-3 cursor-pointer bg-warning-200 border border-warning-400 rounded-md px-3 py-2">
                         <Checkbox_Shadcn_
                           id="key-copied"
                           checked={keyCopied}
                           onCheckedChange={(v) => setKeyCopied(Boolean(v))}
                         />
-                        <span className="text-sm text-foreground-light cursor-pointer select-none">
+                        <span className="text-sm text-warning cursor-pointer select-none">
                           I have copied the key and stored it securely
                         </span>
                       </label>

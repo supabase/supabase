@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from 'ui'
 import { AppsList } from 'components/interfaces/Organization/PrivateApps/Apps/AppsList/AppsList'
-import { InstallationsList } from 'components/interfaces/Organization/PrivateApps/Installations/InstallationsList'
 import { CreateAppSheet } from 'components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet/CreateAppSheet'
 import {
   PrivateAppsProvider,
@@ -29,6 +28,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 
 function PrivateAppsContent() {
   const { apps, isLoading } = usePrivateApps()
@@ -70,20 +70,6 @@ function PrivateAppsContent() {
           </PageSectionMeta>
           <PageSectionContent>
             <AppsList onCreateApp={() => setShowCreate(true)} />
-          </PageSectionContent>
-        </PageSection>
-
-        <PageSection id="installations">
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Installations</PageSectionTitle>
-              <PageSectionDescription>
-                Install an app for your organization. You can only install one app at a time.
-              </PageSectionDescription>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <InstallationsList />
           </PageSectionContent>
         </PageSection>
       </PageContainer>
