@@ -1,8 +1,12 @@
 import type { GoPageInput } from 'marketing'
 
 import byocEarlyAccess from './pre-release/byoc-early-access'
+import figmaWebinarMay2026 from './webinar/figma-webinar-may2026'
+import figmaWebinarMay2026ThankYou from './webinar/figma-webinar-may2026-thankyou'
 import boltWebinar from './webinar/bolt-webinar'
 import boltWebinarThankYou from './webinar/bolt-webinar-thank-you'
+import amoe from './legal/amoe'
+import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
 import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-thank-you'
@@ -18,10 +22,16 @@ import pgconfDevContestThankYou from './events/pgconf-dev-2026/contest-thank-you
 import aiEngineerEuropeContest from './events/ai-engineer-europe-2026/contest'
 import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/contest-thank-you'
 import startupGrindContest from './events/startup-grind-2026/contest'
+import exampleLeadGen from './lead-gen/example-lead-gen'
 
 const pages: GoPageInput[] = [
+  exampleLeadGen,
   byocEarlyAccess,
+  amoe,
+  amoeThankYou,
   contestRules,
+  figmaWebinarMay2026,
+  figmaWebinarMay2026ThankYou,
   boltWebinar, // remove after March 31, 2026
   boltWebinarThankYou, // remove after March 31, 2026
   stripeExecDinner, // remove after May 31, 2026

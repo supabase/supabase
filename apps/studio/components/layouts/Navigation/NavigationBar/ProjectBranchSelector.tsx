@@ -58,15 +58,8 @@ export function ProjectBranchSelector() {
 
   const isMobile = useBreakpoint('md')
 
-  if (isLoadingProject || !displayProject) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <ShimmeringLoader className="w-full py-3" />
-        </SidebarMenuItem>
-      </SidebarMenu>
-    )
-  }
+  if (isLoadingProject || !displayProject)
+    return <ShimmeringLoader className="w-[120px] ml-1 md:py-3" />
 
   if (!IS_PLATFORM) {
     return (

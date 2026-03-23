@@ -1548,6 +1548,11 @@ export const graphql: NavMenuConstant = {
     { name: 'Views', url: '/guides/graphql/views', items: [] },
     { name: 'Functions', url: '/guides/graphql/functions', items: [] },
     {
+      name: 'Computed Fields',
+      url: '/guides/graphql/computed-fields',
+      items: [],
+    },
+    {
       name: 'Configuration & Customization',
       url: '/guides/graphql/configuration',
       items: [],
@@ -2835,6 +2840,7 @@ export const self_hosting: NavMenuConstant = {
     {
       name: 'How-to Guides',
       items: [
+        { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
         { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         {
           name: 'Add Reverse Proxy with HTTPS',

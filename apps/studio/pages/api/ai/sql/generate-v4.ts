@@ -206,6 +206,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
     result.pipeUIMessageStreamToResponse(res, {
       sendReasoning: true,
+      headers: { 'Content-Encoding': 'none' },
       onError: (error) => {
         if (error == null) {
           return 'unknown error'

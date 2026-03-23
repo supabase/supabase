@@ -5,7 +5,7 @@ import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,
 } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
-import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import { resolveStoredTaxId } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
 import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
@@ -47,13 +47,13 @@ export function UpdateBillingAddressModal() {
 
   const shouldShow = Boolean(
     IS_PLATFORM &&
-      showMissingAddressModal &&
-      org &&
-      org.plan.id !== 'free' &&
-      org.organization_missing_address &&
-      !org.billing_partner &&
-      permissionsLoaded &&
-      canBillingWrite
+    showMissingAddressModal &&
+    org &&
+    org.plan.id !== 'free' &&
+    org.organization_missing_address &&
+    !org.billing_partner &&
+    permissionsLoaded &&
+    canBillingWrite
   )
 
   const {
@@ -82,9 +82,8 @@ export function UpdateBillingAddressModal() {
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,
       tax_id_name: taxId
-        ? TAX_IDS.find(
-            (option) => option.type === taxId.type && option.countryIso2 === taxId.country
-          )?.name || ''
+        ? (resolveStoredTaxId(taxId.type, taxId.country, customerProfile?.address?.country)?.name ??
+          '')
         : '',
     }),
     [customerProfile, taxId]

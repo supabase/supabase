@@ -31,7 +31,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { ErrorCodeTooltip } from '../../Settings/Logs/ErrorCodeTooltip'
+import { ErrorCodeTooltip } from 'components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,

@@ -6,14 +6,17 @@ import { EdgeFunctionTesterSheet } from 'components/interfaces/Functions/EdgeFun
 import { APIDocsButton } from 'components/ui/APIDocsButton'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from 'data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
-import { Download, FileArchive, Send } from 'lucide-react'
+import { Clock, Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
@@ -24,6 +27,9 @@ import {
   BreadcrumbList_Shadcn_ as BreadcrumbList,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   NavMenu,
   NavMenuItem,
   Popover_Shadcn_,
@@ -36,6 +42,7 @@ import {
   PageHeader,
   PageHeaderAside,
   PageHeaderBreadcrumb,
+  PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderNavigationTabs,
   PageHeaderSummary,
@@ -44,6 +51,9 @@ import {
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
+import CopyButton from '@/components/ui/CopyButton'
+
+dayjs.extend(relativeTime)
 
 interface EdgeFunctionDetailsLayoutProps {
   title: string
@@ -65,12 +75,14 @@ const EdgeFunctionDetailsLayout = ({
   )
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
   const {
     data: selectedFunction,
     error,
     isError,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
+  const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
 
   const { data: functionBody = { version: 0, files: [] }, error: filesError } =
     useEdgeFunctionBodyQuery(
@@ -91,6 +103,14 @@ const EdgeFunctionDetailsLayout = ({
     )
 
   const name = selectedFunction?.name || ''
+  const functionUrl =
+    endpoint && selectedFunction?.slug ? `${endpoint}/functions/v1/${selectedFunction.slug}` : ''
+  const createdRelative = selectedFunction?.created_at
+    ? dayjs(selectedFunction.created_at).fromNow()
+    : undefined
+  const updatedRelative = selectedFunction?.updated_at
+    ? dayjs(selectedFunction.updated_at).fromNow()
+    : undefined
   const browserTitle = {
     entity: functionSlug ? name || functionSlug : undefined,
     section: title,
@@ -126,12 +146,12 @@ const EdgeFunctionDetailsLayout = ({
             ]
           : []),
         {
-          label: 'Details',
-          href: `/project/${ref}/functions/${functionSlug}/details`,
-        },
-        {
           label: 'Code',
           href: `/project/${ref}/functions/${functionSlug}/code`,
+        },
+        {
+          label: 'Settings',
+          href: `/project/${ref}/functions/${functionSlug}/details`,
         },
       ]
     : []
@@ -219,11 +239,7 @@ const EdgeFunctionDetailsLayout = ({
 
   if (!isLoading && !canReadFunctions) {
     return (
-      <ProjectLayout
-        title={title || 'Edge Functions'}
-        product="Edge Functions"
-        browserTitle={browserTitle}
-      >
+      <ProjectLayout product="Edge Functions" browserTitle={browserTitle}>
         <NoPermission isFullPage resourceText="access your project's edge functions" />
       </ProjectLayout>
     )
@@ -232,7 +248,7 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full" className="sticky top-0 z-10 bg-background">
+        <PageHeader size="full" className="sticky top-0 z-10 bg-surface-75">
           {breadcrumbItems.length > 0 && (
             <PageHeaderBreadcrumb>
               <BreadcrumbList>
@@ -257,6 +273,48 @@ const EdgeFunctionDetailsLayout = ({
           <PageHeaderMeta>
             <PageHeaderSummary>
               <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
+              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
+                <div className="flex items-center gap-x-2">
+                  <span className="flex items-center gap-2">{functionUrl}</span>
+                  <CopyButton iconOnly type="text" text={functionUrl} />
+                </div>
+
+                <HoverCard
+                  openDelay={250}
+                  closeDelay={100}
+                  open={isTimestampHoverCardOpen}
+                  onOpenChange={setIsTimestampHoverCardOpen}
+                >
+                  <HoverCardTrigger asChild>
+                    <button type="button" className="flex items-center gap-2 group">
+                      <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                      <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
+                        {updatedRelative ?? 'Deploy status unavailable'}
+                      </span>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent side="bottom" align="start" className="w-[320px] p-0">
+                    {createdRelative && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Created</h3>
+                        <p className="text-foreground">{createdRelative}</p>
+                      </div>
+                    )}
+                    {updatedRelative && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Last deployed</h3>
+                        <p className="text-foreground">{updatedRelative}</p>
+                      </div>
+                    )}
+                    {selectedFunction?.version !== undefined && (
+                      <div className="px-4 py-2 space-y-1">
+                        <h3 className="heading-meta text-foreground-light">Deployments</h3>
+                        <p className="text-foreground">{selectedFunction.version}</p>
+                      </div>
+                    )}
+                  </HoverCardContent>
+                </HoverCard>
+              </PageHeaderDescription>
             </PageHeaderSummary>
 
             <PageHeaderAside>

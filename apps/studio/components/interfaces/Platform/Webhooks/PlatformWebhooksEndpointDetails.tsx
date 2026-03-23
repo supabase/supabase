@@ -1,7 +1,7 @@
-import { Search } from 'lucide-react'
-
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { RotateCcw, Search } from 'lucide-react'
 import {
   Badge,
   Card,
@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 
@@ -37,6 +38,7 @@ interface PlatformWebhooksEndpointDetailsProps {
   selectedEndpoint: WebhookEndpoint
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
+  onRetryDelivery: (deliveryId: string) => void
 }
 
 export const PlatformWebhooksEndpointDetails = ({
@@ -45,8 +47,11 @@ export const PlatformWebhooksEndpointDetails = ({
   selectedEndpoint,
   onDeliverySearchChange,
   onOpenDelivery,
+  onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
+  const hasName = selectedEndpoint.name.trim().length > 0
+  const hasDescription = selectedEndpoint.description.trim().length > 0
 
   return (
     <div className="space-y-16">
@@ -55,11 +60,15 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
+              {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
+
               <DetailItem label="URL" ddClassName="text-sm break-all">
                 {selectedEndpoint.url}
               </DetailItem>
 
-              <DetailItem label="Description">{selectedEndpoint.description || '-'}</DetailItem>
+              {hasDescription && (
+                <DetailItem label="Description">{selectedEndpoint.description}</DetailItem>
+              )}
 
               <DetailItem label="Event types" ddClassName="flex flex-wrap gap-2">
                 {(selectedEndpoint.eventTypes.includes('*')
@@ -122,6 +131,9 @@ export const PlatformWebhooksEndpointDetails = ({
                 <TableHead>Event type</TableHead>
                 <TableHead>Response</TableHead>
                 <TableHead>Attempted</TableHead>
+                <TableHead className="w-1">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -159,11 +171,32 @@ export const PlatformWebhooksEndpointDetails = ({
                     <TableCell>
                       <TimestampInfo className="text-sm" utcTimestamp={delivery.attemptAt} />
                     </TableCell>
+                    <TableCell className="w-1 text-right">
+                      <div className="flex h-full items-center justify-end">
+                        {delivery.status !== 'success' && (
+                          <ButtonTooltip
+                            type="default"
+                            className="w-7 shrink-0 hit-area-2"
+                            icon={<RotateCcw size={14} />}
+                            aria-label={`Retry ${delivery.id}`}
+                            tooltip={{ content: { side: 'top', text: 'Retry' } }}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onRetryDelivery(delivery.id)
+                            }}
+                            onKeyDown={(event) => event.stopPropagation()}
+                          />
+                        )}
+                        {delivery.status === 'success' && (
+                          <span aria-hidden className="size-7 shrink-0" />
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4}>No deliveries found</TableCell>
+                  <TableCell colSpan={5}>No deliveries found</TableCell>
                 </TableRow>
               )}
             </TableBody>

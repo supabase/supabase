@@ -265,7 +265,7 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 py-1 bg-muted group shrink-0',
+        'flex items-stretch px-0 h-[26px] bg-muted group shrink-0',
         variant === 'pill' ? 'rounded border' : 'border-r',
         isHighlighted && 'ring-2 ring-primary'
       )}

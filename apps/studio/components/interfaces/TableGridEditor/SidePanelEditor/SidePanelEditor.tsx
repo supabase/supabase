@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -275,9 +276,7 @@ export const SidePanelEditor = ({
       // Queue the ADD_ROW operation if queue operations feature is enabled
       if (isQueueOperationsEnabled && selectedTable.primary_keys.length > 0) {
         queueRowAddWithOptimisticUpdate({
-          queryClient,
           queueOperation: snap.queueOperation,
-          projectRef: project.ref,
           tableId: selectedTable.id,
           table: selectedTable as unknown as Entity,
           rowData: payload,
@@ -329,9 +328,7 @@ export const SidePanelEditor = ({
             const oldValue = row[changedColumn]
 
             queueCellEditWithOptimisticUpdate({
-              queryClient,
               queueOperation: snap.queueOperation,
-              projectRef: project.ref,
               tableId: selectedTable.id,
               // Cast to Entity - the queue save mutation only uses id, name, schema
               table: selectedTable as unknown as Entity,
@@ -680,66 +677,137 @@ export const SidePanelEditor = ({
 
     try {
       if (action === 'create') {
-        toastId = toast.loading(`Creating new table: ${payload.name}...`)
+        await Sentry.startSpan(
+          {
+            name: 'Create Table',
+            op: 'db.table.create',
+          },
+          async (createTableSpan) => {
+            toastId = toast.loading(`Creating new table: ${payload.name}...`)
 
-        const { table, failedPolicies } = await createTable({
-          projectRef: project?.ref!,
-          connectionString: project?.connectionString,
-          toastId,
-          payload,
-          columns,
-          foreignKeyRelations,
-          isRLSEnabled,
-          importContent,
-          organizationSlug: org?.slug,
-          generatedPolicies,
-          onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
-        })
+            // Get existing table count from cache — try entity types first (always loaded
+            // by the Table Editor sidebar), then fall back to tables query cache.
+            // Entity types uses useInfiniteQuery, so the cache shape is { pages: [...] }.
+            // Each page has data.count (total count from SQL count(*) over()).
+            const entityTypesEntries = queryClient.getQueriesData<{
+              pages?: Array<{ data?: { count?: number } }>
+            }>({
+              queryKey: ['projects', project?.ref, 'entity-types'],
+            })
+            const existingTableCount =
+              entityTypesEntries
+                .map(([, data]) => data?.pages?.[0]?.data?.count)
+                .find((count) => typeof count === 'number') ??
+              queryClient.getQueryData<unknown[]>(
+                tableKeys.list(project?.ref, payload.schema, true)
+              )?.length ??
+              queryClient.getQueryData<unknown[]>(
+                tableKeys.list(project?.ref, payload.schema, false)
+              )?.length
 
-        if (isRealtimeEnabled) await updateTableRealtime(table, true)
+            createTableSpan.setAttributes({
+              'table.name': payload.name,
+              'table.schema': payload.schema ?? 'public',
+              'table.columns_count': columns.length,
+              'table.has_rls': isRLSEnabled ? 1 : 0,
+              'table.has_foreign_keys': foreignKeyRelations.length > 0 ? 1 : 0,
+              'table.has_import': importContent !== undefined ? 1 : 0,
+              'table.generated_policies_count': generatedPolicies.length,
+              'project.region': project?.region ?? 'local',
+              ...(project?.cloud_provider && {
+                'project.cloud_provider': project.cloud_provider,
+              }),
+              ...(existingTableCount != null && {
+                'project.existing_table_count': String(existingTableCount),
+              }),
+            })
 
-        if (isApiGrantTogglesEnabled) {
-          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-            ? apiAccessToggleHandler.data.privileges
-            : undefined
-          if (privilegesToSet) {
-            await updateTableApiAccess(table, privilegesToSet)
-          }
-        }
+            try {
+              const { table, failedPolicies } = await createTable({
+                projectRef: project?.ref!,
+                connectionString: project?.connectionString,
+                toastId,
+                payload,
+                columns,
+                foreignKeyRelations,
+                isRLSEnabled,
+                importContent,
+                organizationSlug: org?.slug,
+                generatedPolicies,
+                onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
+              })
 
-        // Invalidate queries for table creation
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
-          }),
-          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
-          queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(project?.ref) }),
-          queryClient.invalidateQueries({
-            queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
-          }),
-          queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
-        ])
+              createTableSpan.setAttribute('table.created', 1)
+              createTableSpan.setAttribute('table.failed_policies', failedPolicies.length)
 
-        // Show success toast after everything is complete
-        if (failedPolicies.length > 0) {
-          toast.success(
-            `Table ${table.name} is created successfully, but we ran into issues creating ${failedPolicies.length} policie${failedPolicies.length > 1 ? 's' : ''}`,
-            {
-              id: toastId,
-              description: (
-                <ul className="list-disc pl-6">
-                  {failedPolicies.map((x) => (
-                    <li key={x.name}>{x.name}</li>
-                  ))}
-                </ul>
-              ),
+              await Sentry.startSpan(
+                { name: 'create_table.post_creation', op: 'db.table.post_creation' },
+                async () => {
+                  if (isRealtimeEnabled) await updateTableRealtime(table, true)
+
+                  if (isApiGrantTogglesEnabled) {
+                    const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+                      ? apiAccessToggleHandler.data.privileges
+                      : undefined
+                    if (privilegesToSet) {
+                      await updateTableApiAccess(table, privilegesToSet)
+                    }
+                  }
+                }
+              )
+
+              // Invalidate queries for table creation
+              await Sentry.startSpan(
+                { name: 'create_table.cache_invalidation', op: 'cache.invalidate' },
+                async () => {
+                  await Promise.all([
+                    queryClient.invalidateQueries({
+                      queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+                    }),
+                    queryClient.invalidateQueries({
+                      queryKey: entityTypeKeys.list(project?.ref),
+                    }),
+                    queryClient.invalidateQueries({
+                      queryKey: databasePoliciesKeys.list(project?.ref),
+                    }),
+                    queryClient.invalidateQueries({
+                      queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
+                    }),
+                    queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
+                  ])
+                }
+              )
+
+              // Show success toast after everything is complete
+              if (failedPolicies.length > 0) {
+                toast.success(
+                  `Table ${table.name} is created successfully, but we ran into issues creating ${failedPolicies.length} policie${failedPolicies.length > 1 ? 's' : ''}`,
+                  {
+                    id: toastId,
+                    description: (
+                      <ul className="list-disc pl-6">
+                        {failedPolicies.map((x) => (
+                          <li key={x.name}>{x.name}</li>
+                        ))}
+                      </ul>
+                    ),
+                  }
+                )
+              } else {
+                toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+              }
+
+              onTableCreated(table)
+            } catch (error) {
+              createTableSpan.setAttribute('table.error', 1)
+              Sentry.captureException(error, {
+                tags: { workflow: 'create-table' },
+              })
+              saveTableError = true
+              throw error
             }
-          )
-        } else {
-          toast.success(`Table ${table.name} is good to go!`, { id: toastId })
-        }
-
-        onTableCreated(table)
+          }
+        )
       } else if (action === 'duplicate' && !!selectedTable) {
         const tableToDuplicate = selectedTable
         toastId = toast.loading(`Duplicating table: ${tableToDuplicate.name}...`)
@@ -996,10 +1064,7 @@ export const SidePanelEditor = ({
         closePanel={onClosePanel}
         updateEditorDirty={setIsEdited}
       />
-      <OperationQueueSidePanel
-        visible={snap.sidePanel?.type === 'operation-queue'}
-        closePanel={snap.closeSidePanel}
-      />
+      <OperationQueueSidePanel />
       <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
