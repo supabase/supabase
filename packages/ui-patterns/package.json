@@ -646,6 +646,10 @@
       "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
       "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
     },
+    "./form/SingleValueFieldArray/SingleValueFieldArray": {
+      "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx",
+      "types": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx"
+    },
     "./form/FormLayout2": {
       "import": "./src/form/FormLayout2.tsx",
       "types": "./src/form/FormLayout2.tsx"

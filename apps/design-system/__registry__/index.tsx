@@ -445,6 +445,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "single-value-field-array-demo": {
+      name: "single-value-field-array-demo",
+      type: "components:example",
+      registryDependencies: ["button","form","input"],
+      component: React.lazy(() => import("@/registry/default/example/single-value-field-array-demo")),
+      source: "",
+      files: ["registry/default/example/single-value-field-array-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "checkbox-demo": {
       name: "checkbox-demo",
       type: "components:example",

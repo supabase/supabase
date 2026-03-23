@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash } from 'lucide-react'
 import { useEffect } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -13,13 +12,11 @@ import {
   cn,
   DialogSectionSeparator,
   Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
   Modal,
   ScrollArea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import { urlRegex } from '../Auth.constants'
 
 const MAX_URLS_LENGTH = 2 * 1024
@@ -54,14 +51,11 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-
-  const { fields, append, remove } = useFieldArray({
-    name: 'urls',
-    control: form.control,
-  })
+  const urls = form.watch('urls')
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const dedupedData = [...new Set(data.urls.map((url) => url.value))]
+    const addedCount = data.urls.length
     const payload = allowList.concat(dedupedData.map((url) => url.replace(/,\s*$/, ''))).toString()
 
     if (payload.length > MAX_URLS_LENGTH) {
@@ -74,7 +68,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             toast.error(`Failed to add URL(s): ${error?.message}`)
           },
           onSuccess: () => {
-            toast.success(`Successfully added ${fields.length} URL${fields.length > 1 ? 's' : ''}`)
+            toast.success(`Successfully added ${addedCount} URL${addedCount > 1 ? 's' : ''}`)
             form.reset(initialValues)
             onClose()
           },
@@ -104,44 +98,24 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Modal.Content className="flex flex-col gap-y-2 px-0">
             <Label className="px-5">URL</Label>
-            <ScrollArea className={cn(fields.length > 4 ? 'h-[220px]' : '')}>
-              <div className="px-5 py-1 flex flex-col gap-y-2">
-                {fields.map((field, index) => (
-                  <FormField_Shadcn_
+            <ScrollArea className={cn(urls.length > 4 ? 'h-[220px]' : '')}>
+              <div className="px-5 py-1">
+                <FormItemLayout className="[&>div>div]:mt-0">
+                  <SingleValueFieldArray
                     control={form.control}
-                    key={field.id}
-                    name={`urls.${index}.value`}
-                    render={({ field: inputField }) => (
-                      <FormItemLayout className="[&>div>div]:mt-0">
-                        <FormControl_Shadcn_>
-                          <div className="flex items-center gap-x-2 [&>div]:w-full">
-                            <Input placeholder="https://mydomain.com" {...inputField} />
-                            <Button
-                              type="default"
-                              size="small"
-                              icon={<Trash />}
-                              className="px-2"
-                              disabled={fields.length === 1}
-                              onClick={() => remove(index)}
-                            />
-                          </div>
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
+                    name="urls"
+                    valueFieldName="value"
+                    createEmptyRow={() => ({ value: '' })}
+                    placeholder="https://mydomain.com"
+                    addLabel="Add URL"
+                    removeLabel="Remove URL"
+                    minimumRows={1}
+                    rowsClassName="space-y-2"
+                    addButtonClassName="w-min"
                   />
-                ))}
+                </FormItemLayout>
               </div>
             </ScrollArea>
-            <div className="px-5">
-              <Button
-                type="default"
-                className="w-min"
-                icon={<Plus strokeWidth={1.5} />}
-                onClick={() => append({ value: '' })}
-              >
-                Add URL
-              </Button>
-            </div>
           </Modal.Content>
           <DialogSectionSeparator />
           <Modal.Content>

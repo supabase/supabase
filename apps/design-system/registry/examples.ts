@@ -235,6 +235,12 @@ export const examples: Registry = [
     registryDependencies: ['calendar', 'form', 'popover'],
     files: ['example/calendar-form.tsx'],
   },
+  {
+    name: 'single-value-field-array-demo',
+    type: 'components:example',
+    registryDependencies: ['button', 'form', 'input'],
+    files: ['example/single-value-field-array-demo.tsx'],
+  },
   // {
   //   name: 'card-demo',
   //   type: 'components:example',

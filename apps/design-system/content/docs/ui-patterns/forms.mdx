@@ -34,7 +34,11 @@ The form previews above include both repeated-field patterns used across Studio:
 - **Field Array** for repeated single-value rows such as redirect URIs.
 - **Key/Value Field Array** for repeated text pairs such as headers, parameters, and config entries.
 
-Use the shared [Key/Value Field Array](../fragments/key-value-field-array) fragment when each row is two text inputs managed by `react-hook-form`. Keep using a plain field array when each row is just one input, and build a custom row when the cells are mixed controls.
+Use the shared [Single Value Field Array](../fragments/single-value-field-array) fragment when each row is one text input managed by `react-hook-form`.
+
+Use the shared [Key/Value Field Array](../fragments/key-value-field-array) fragment when each row is two text inputs managed by `react-hook-form`.
+
+Build a custom row when the cells are mixed controls, such as an input paired with a `Select`.
 
 ## Best Practices
 
