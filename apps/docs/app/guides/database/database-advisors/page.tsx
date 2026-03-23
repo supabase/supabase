@@ -143,26 +143,6 @@ const urlTransform: (lints: Array<{ path: string }>) => UrlTransformFunction = (
  * Fetch lint remediation Markdown from external repo
  */
 const getLints = async () => {
-<<<<<<< HEAD
-  const octokit = new Octokit({ request: { fetch: fetchRevalidatePerDay } })
-
-  let response: Awaited<ReturnType<typeof octokit.request>>
-  try {
-    response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-      owner: org,
-      repo: repo,
-      path: docsDir,
-      ref: branch,
-      headers: {
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
-    })
-  } catch (err) {
-    throw new Error(
-      `Failed to fetch database advisors lint list from GitHub (network error): ${err}`
-    )
-  }
-=======
   const response = await octokit().request('GET /repos/{owner}/{repo}/contents/{path}', {
     owner: org,
     repo: repo,
@@ -172,7 +152,6 @@ const getLints = async () => {
       'X-GitHub-Api-Version': '2022-11-28',
     },
   })
->>>>>>> c5112565c2 (chore: Reuse already existing Octokit utility.)
 
   if (response.status >= 400) {
     throw new Error(
