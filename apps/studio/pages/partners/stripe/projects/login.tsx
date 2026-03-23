@@ -114,8 +114,7 @@ const StripeProjectsLoginPage = () => {
             <h2 className="py-2 text-lg font-medium">Stripe Account Authorization</h2>
             <p className="text-center text-foreground-light">
               Stripe wants to link a Supabase organization for{' '}
-              <strong>{accountRequest.email}</strong>
-              {accountRequest.name && <> ({accountRequest.name})</>}.
+              <strong>{accountRequest.email}</strong>.
             </p>
 
             {!emailMatches ? (
