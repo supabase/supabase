@@ -533,41 +533,39 @@ start_pg17() {
     esac
 }
 
-# --- Step 9: Apply role migrations not covered by complete.sh --------------
+# --- Step 9: Apply migrations not covered by complete.sh -------------------
+#
+# These PG17 migrations run on fresh installs via initdb but not after
+# pg_upgrade (init scripts don't rerun when PG_VERSION already exists).
+# complete.sh doesn't cover them either.
+#
+# Source: postgres/migrations/db/migrations/
+#   - 20250710151649_supabase_read_only_user_default_transaction_read_only.sql
+#   - 20251001204436_predefined_role_grants.sql (supabase_etl_admin + pg_monitor)
+#   - 20251105172723_grant_pg_reload_conf_to_postgres.sql
+#   - 20251121132723_correct_search_path_pgbouncer.sql
 
 apply_role_migrations() {
-    info "Applying Postgres 17 role migrations"
+    info "Applying Postgres 17 migrations"
 
-    echo "  Creating supabase_etl_admin role"
-    run_sql_on "$DB_CONTAINER" <<'EOSQL' || true
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'supabase_etl_admin') THEN
-        CREATE USER supabase_etl_admin WITH LOGIN REPLICATION;
-        GRANT pg_read_all_data TO supabase_etl_admin;
-        GRANT CREATE ON DATABASE postgres TO supabase_etl_admin;
-    END IF;
-END
-$$;
-EOSQL
+    # Run the migration files directly from the PG17 container image.
+    # They're idempotent (IF EXISTS / IF NOT EXISTS guards).
+    local migration_dir="/docker-entrypoint-initdb.d/migrations"
+    local migrations="
+        20250710151649_supabase_read_only_user_default_transaction_read_only.sql
+        20251001204436_predefined_role_grants.sql
+        20251105172723_grant_pg_reload_conf_to_postgres.sql
+        20251121132723_correct_search_path_pgbouncer.sql
+    "
 
-    echo "  Configuring supabase_read_only_user"
-    run_sql_on "$DB_CONTAINER" -c \
-        "ALTER ROLE supabase_read_only_user SET default_transaction_read_only = on;" || true
-
-    echo "  Granting pg_monitor"
-    run_sql_on "$DB_CONTAINER" <<'EOSQL' || true
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'supabase_etl_admin') THEN
-        GRANT pg_monitor TO supabase_etl_admin;
-    END IF;
-    IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'supabase_read_only_user') THEN
-        GRANT pg_monitor TO supabase_read_only_user;
-    END IF;
-END
-$$;
-EOSQL
+    for m in $migrations; do
+        echo "  Running: $m"
+        docker exec -i \
+            -e PGPASSWORD="$pg_password" \
+            "$DB_CONTAINER" \
+            psql -h localhost -U supabase_admin -d postgres \
+                -f "${migration_dir}/${m}" || warn "  $m failed (non-fatal)"
+    done
 }
 
 # --- Step 10: Verify ------------------------------------------------------
