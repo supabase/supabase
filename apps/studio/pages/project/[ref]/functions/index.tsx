@@ -17,8 +17,8 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useEdgeFunctionsLastHourStatsQuery } from 'data/edge-functions/edge-functions-last-hour-stats-query'
+import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { ExternalLink, Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -52,10 +52,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     data: lastHourStats,
     isPending: isStatsPending,
     isError: isStatsError,
-  } = useEdgeFunctionsLastHourStatsQuery(
-    { projectRef: ref },
-    { enabled: IS_PLATFORM }
-  )
+  } = useEdgeFunctionsLastHourStatsQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const [sort, setSortQueryParam] = useQueryState(
@@ -153,9 +150,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                             <TableHead className="lg:table-cell">Updated</TableHead>
                             {IS_PLATFORM && (
                               <>
-                                <TableHead className="lg:table-cell">
-                                  Total requests (1h)
-                                </TableHead>
+                                <TableHead className="lg:table-cell">Total requests (1h)</TableHead>
                                 <TableHead className="lg:table-cell">5xx error rate (1h)</TableHead>
                               </>
                             )}
