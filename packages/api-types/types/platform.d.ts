@@ -4763,7 +4763,7 @@ export interface components {
         slug: string
       }
       /** @enum {string} */
-      status: 'pending' | 'complete' | 'expired'
+      status: 'pending' | 'complete' | 'expired' | 'error'
     }
     AddAwsAccountToPrivateLinkBody: {
       account_name?: string
