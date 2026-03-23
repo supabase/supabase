@@ -38,6 +38,26 @@ Always include both compose files when running commands. If you omit the overrid
 
 The rest of the setup is the same as the standard Docker guide. All init scripts (`roles.sql`, `jwt.sql`, `webhooks.sql`, etc.) are compatible with Postgres 17.
 
+### Custom Postgres configuration
+
+The Postgres 17 image loads any `.conf` files from `/etc/postgresql-custom/conf.d/` on startup. This directory is on the `db-config` named volume, so changes persist across restarts.
+
+To add custom Postgres settings, create a `.conf` file in the volume:
+
+```sh
+docker exec supabase-db bash -c 'cat > /etc/postgresql-custom/conf.d/custom.conf << EOF
+# Example: increase work_mem
+work_mem = 64MB
+EOF'
+
+# Reload to apply (no restart needed for most settings)
+docker exec supabase-db psql -h localhost -U supabase_admin -d postgres -c "SELECT pg_reload_conf();"
+```
+
+<Admonition type="note">
+This is a Postgres 17 feature. The Postgres 15 image does not load files from `conf.d/`.
+</Admonition>
+
 ## Upgrade an existing Postgres 15 deployment
 
 Upgrading an existing deployment uses `pg_upgrade` to migrate data in place. The included upgrade script automates the full process.
