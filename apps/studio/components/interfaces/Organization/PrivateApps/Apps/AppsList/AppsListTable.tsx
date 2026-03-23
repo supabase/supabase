@@ -87,10 +87,7 @@ export function AppsListTable({
                         View permissions
                       </DropdownMenuItem>
                       {!isInstalled && (
-                        <DropdownMenuItem
-                          className="gap-x-2"
-                          onClick={() => onPromoteApp(app)}
-                        >
+                        <DropdownMenuItem className="gap-x-2" onClick={() => onPromoteApp(app)}>
                           <ArrowUpCircle size={14} />
                           Promote to installed
                         </DropdownMenuItem>

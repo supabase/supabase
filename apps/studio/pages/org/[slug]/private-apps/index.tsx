@@ -29,7 +29,6 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-
 function PrivateAppsContent() {
   const { apps, isLoading } = usePrivateApps()
   const [showCreate, setShowCreate] = useState(false)

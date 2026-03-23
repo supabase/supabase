@@ -1,4 +1,10 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, CriticalIcon } from 'ui'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  CriticalIcon,
+} from 'ui'
 
 interface ViewAppSheetDangerZoneProps {
   onDelete: () => void

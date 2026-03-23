@@ -1,5 +1,15 @@
 import { formatDistanceToNow } from 'date-fns'
-import { Badge, Card, CardContent, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Badge,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import type { PrivateApp } from '../../PrivateAppsContext'
 
 interface ViewAppSheetInfoProps {
@@ -49,9 +59,13 @@ export function ViewAppSheetInfo({ app, isInstalled }: ViewAppSheetInfoProps) {
                 </TableCell>
                 <TableCell>
                   {isInstalled ? (
-                    <Badge variant="success" className="uppercase">Installed</Badge>
+                    <Badge variant="success" className="uppercase">
+                      Installed
+                    </Badge>
                   ) : (
-                    <Badge variant="default" className="uppercase">Uninstalled</Badge>
+                    <Badge variant="default" className="uppercase">
+                      Uninstalled
+                    </Badge>
                   )}
                 </TableCell>
               </TableRow>
