@@ -34,19 +34,19 @@ export function octokit() {
   return octokitInstance
 }
 
-async function getGitHubFileContents({
+export async function getGitHubFileContents({
   org,
   repo,
   path,
   branch,
-  options: { onError, fetch },
+  options: { onError, fetch } = {},
 }: {
   org: string
   repo: string
   path: string
   branch: string
-  options: {
-    onError: (err?: unknown) => void
+  options?: {
+    onError?: (err?: unknown) => void
     /**
      *
      * A custom fetch implementation to control Next.js caching.
@@ -60,8 +60,12 @@ async function getGitHubFileContents({
     path = path.slice(1)
   }
 
+  const client = octokit()
+  let response: Awaited<
+    ReturnType<typeof client.request<'GET /repos/{owner}/{repo}/contents/{path}'>>
+  >
   try {
-    const response = await octokit().request('GET /repos/{owner}/{repo}/contents/{path}', {
+    response = await client.request('GET /repos/{owner}/{repo}/contents/{path}', {
       owner: org,
       repo: repo,
       path: path,
@@ -70,19 +74,34 @@ async function getGitHubFileContents({
         fetch: fetch ?? fetchRevalidatePerDay,
       },
     })
-    if (response.status !== 200 || !response.data) {
-      throw Error(`Could not find contents of ${path} in ${org}/${repo}`)
-    }
-    if (!('type' in response.data) || response.data.type !== 'file') {
-      throw Error(`${path} in ${org}/${repo} is not a file`)
-    }
-    const content = Buffer.from(response.data.content, 'base64').toString('utf-8')
-    return content
   } catch (err) {
-    console.error('Error fetching GitHub file: %o', err)
-    onError?.(err)
+    const error = new Error(
+      `getGitHubFileContents: request failed for ${org}/${repo}/${path}@${branch}`,
+      { cause: err }
+    )
+    console.error(error)
+    onError?.(error)
     return ''
   }
+
+  if (Array.isArray(response.data)) {
+    const error = new Error(
+      `getGitHubFileContents: ${path} in ${org}/${repo} is a directory, not a file`
+    )
+    console.error(error)
+    onError?.(error)
+    return ''
+  }
+  if (!('content' in response.data) || response.data.type !== 'file') {
+    const error = new Error(
+      `getGitHubFileContents: unexpected response for ${path} in ${org}/${repo} (type: ${'type' in response.data ? response.data.type : 'unknown'})`
+    )
+    console.error(error)
+    onError?.(error)
+    return ''
+  }
+
+  return Buffer.from(response.data.content, 'base64').toString('utf-8')
 }
 
 export async function getGitHubFileContentsImmutableOnly({

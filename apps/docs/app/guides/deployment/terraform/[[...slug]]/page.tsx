@@ -4,7 +4,7 @@ import rehypeSlug from 'rehype-slug'
 
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
-import { fetchGitHubFile } from '~/features/helpers.fetch'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -115,11 +115,11 @@ const getContent = async ({ slug }: Params) => {
     `${terraformDocsOrg}/${terraformDocsRepo}/blob/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
   )
 
-  let rawContent = await fetchGitHubFile({
-    owner: terraformDocsOrg,
+  let rawContent = await getGitHubFileContents({
+    org: terraformDocsOrg,
     repo: terraformDocsRepo,
     path: useRoot ? remoteFile : `${terraformDocsDocsDir}/${remoteFile}`,
-    ref: terraformDocsBranch,
+    branch: terraformDocsBranch,
   })
   // Strip out HTML comments
   rawContent = rawContent.replace(/<!--.*?-->/, '')

@@ -13,7 +13,7 @@ import {
 
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { fetchGitHubFile } from '~/features/helpers.fetch'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import {
   terraformDocsBranch,
@@ -395,11 +395,11 @@ const TerraformReferencePage = async () => {
  */
 const getSchema = async () => {
   const schema = JSON.parse(
-    await fetchGitHubFile({
-      owner: terraformDocsOrg,
+    await getGitHubFileContents({
+      org: terraformDocsOrg,
       repo: terraformDocsRepo,
       path: `${terraformDocsDocsDir}/schema.json`,
-      ref: terraformDocsBranch,
+      branch: terraformDocsBranch,
     })
   )
 

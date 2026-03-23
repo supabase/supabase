@@ -4,7 +4,7 @@ import rehypeSlug from 'rehype-slug'
 
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
-import { fetchGitHubFile } from '~/features/helpers.fetch'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -83,7 +83,7 @@ const getContent = async ({ slug }: Params) => {
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
   const content = removeRedundantH1(
-    await fetchGitHubFile({ owner: org, repo, path: `${docsDir}/${remoteFile}`, ref: branch })
+    await getGitHubFileContents({ org, repo, path: `${docsDir}/${remoteFile}`, branch })
   )
 
   return {
