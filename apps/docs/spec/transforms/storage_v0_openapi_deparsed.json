@@ -2353,6 +2353,54 @@
         "parameters": [
           {
             "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 100,
+            "in": "query",
+            "name": "height",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 100,
+            "in": "query",
+            "name": "width",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["cover", "contain", "fill"]
+            },
+            "in": "query",
+            "name": "resize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["origin", "avif"]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "quality",
+            "required": false
+          },
+          {
+            "schema": {
               "type": "string"
             },
             "example": "avatars",
@@ -2412,6 +2460,54 @@
         "tags": ["object"],
         "description": "Object Info",
         "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 100,
+            "in": "query",
+            "name": "height",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 100,
+            "in": "query",
+            "name": "width",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["cover", "contain", "fill"]
+            },
+            "in": "query",
+            "name": "resize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["origin", "avif"]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "quality",
+            "required": false
+          },
           {
             "schema": {
               "type": "string"
@@ -2766,6 +2862,54 @@
         "tags": ["object"],
         "description": "returns object info",
         "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 100,
+            "in": "query",
+            "name": "height",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "example": 100,
+            "in": "query",
+            "name": "width",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["cover", "contain", "fill"]
+            },
+            "in": "query",
+            "name": "resize",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["origin", "avif"]
+            },
+            "in": "query",
+            "name": "format",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 20,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "quality",
+            "required": false
+          },
           {
             "schema": {
               "type": "string"

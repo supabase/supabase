@@ -665,7 +665,7 @@ testRunner('table editor', () => {
     const downloadSqlPath = await downloadSql.path()
     const sqlContent = fs.readFileSync(downloadSqlPath, 'utf-8')
     expect(sqlContent).toBe(
-      `INSERT INTO "public"."${tableNameDataActions}" ("id", "created_at", "pw_column") VALUES ('4', '2025-01-01 12:00:00+00', 'value 4 to export'), ('5', '2025-01-01 12:00:00+00', 'value 5 to export'), ('6', '2025-01-01 12:00:00+00', 'value 6 to export');`
+      `INSERT INTO "public"."${tableNameDataActions}" ("id", "created_at", "pw_column") VALUES (4, '2025-01-01 12:00:00+00', 'value 4 to export'), (5, '2025-01-01 12:00:00+00', 'value 5 to export'), (6, '2025-01-01 12:00:00+00', 'value 6 to export');`
     )
     await page.waitForTimeout(1000) // wait for event processing to complete
     fs.unlinkSync(downloadSqlPath)
