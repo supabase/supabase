@@ -7,10 +7,11 @@ import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { getAddressElementAppearanceOptions, STRIPE_ELEMENT_FONTS } from 'components/interfaces/Billing/Payment/Payment.utils'
 import {
-  BillingCustomerDataForm,
-} from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
+  getAddressElementAppearanceOptions,
+  STRIPE_ELEMENT_FONTS,
+} from 'components/interfaces/Billing/Payment/Payment.utils'
+import { BillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
 import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
@@ -126,7 +127,6 @@ export function UpdateBillingAddressModal() {
       }) as any,
     [resolvedTheme]
   )
-
 
   return (
     <Dialog

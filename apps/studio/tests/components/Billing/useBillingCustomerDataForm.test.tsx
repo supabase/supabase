@@ -6,7 +6,9 @@ import { useBillingCustomerDataForm } from 'components/interfaces/Organization/B
 import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 
 type BillingProfile = ReturnType<typeof makeCustomerProfile>
-type CustomerChangeHandler = Parameters<typeof useBillingCustomerDataForm>[0]['onCustomerDataChange']
+type CustomerChangeHandler = Parameters<
+  typeof useBillingCustomerDataForm
+>[0]['onCustomerDataChange']
 
 type HookPropsWithTaxId = {
   customerProfile: BillingProfile

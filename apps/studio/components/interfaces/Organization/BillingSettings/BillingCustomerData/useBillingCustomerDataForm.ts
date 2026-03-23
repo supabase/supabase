@@ -186,18 +186,21 @@ export function useBillingCustomerDataForm({
   }
 }
 
-function isAddressEqual(
-  current: StripeAddressValue,
-  original: StripeAddressValue
-): boolean {
+function isAddressEqual(current: StripeAddressValue, original: StripeAddressValue): boolean {
   return (
     normalizeForComparison(current.name) === normalizeForComparison(original.name) &&
-    normalizeForComparison(current.address.line1) === normalizeForComparison(original.address.line1) &&
-    normalizeForComparison(current.address.line2) === normalizeForComparison(original.address.line2) &&
-    normalizeForComparison(current.address.city) === normalizeForComparison(original.address.city) &&
-    normalizeForComparison(current.address.state) === normalizeForComparison(original.address.state) &&
-    normalizeForComparison(current.address.postal_code) === normalizeForComparison(original.address.postal_code) &&
-    normalizeForComparison(current.address.country) === normalizeForComparison(original.address.country)
+    normalizeForComparison(current.address.line1) ===
+      normalizeForComparison(original.address.line1) &&
+    normalizeForComparison(current.address.line2) ===
+      normalizeForComparison(original.address.line2) &&
+    normalizeForComparison(current.address.city) ===
+      normalizeForComparison(original.address.city) &&
+    normalizeForComparison(current.address.state) ===
+      normalizeForComparison(original.address.state) &&
+    normalizeForComparison(current.address.postal_code) ===
+      normalizeForComparison(original.address.postal_code) &&
+    normalizeForComparison(current.address.country) ===
+      normalizeForComparison(original.address.country)
   )
 }
 

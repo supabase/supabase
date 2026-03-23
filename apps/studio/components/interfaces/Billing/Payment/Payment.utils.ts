@@ -30,8 +30,7 @@ export const getStripeElementsAppearanceOptions = (
       colorBackground: resolvedTheme?.includes('dark')
         ? 'hsl(0deg 0% 14.1%)'
         : 'hsl(0deg 0% 95.3%)',
-      fontFamily:
-        'CustomFont, Helvetica Neue, Helvetica, Arial, sans-serif',
+      fontFamily: 'CustomFont, Helvetica Neue, Helvetica, Arial, sans-serif',
     },
     rules: {
       '.TermsText': {
@@ -70,14 +69,11 @@ export const getAddressElementAppearanceOptions = (
         ? 'hsl(0deg 0% 14.1%)'
         : 'hsl(0deg 0% 95.3%)',
       borderRadius: '4px',
-      fontFamily:
-        'CustomFont, Helvetica Neue, Helvetica, Arial, sans-serif',
+      fontFamily: 'CustomFont, Helvetica Neue, Helvetica, Arial, sans-serif',
     },
     rules: {
       '.Input': {
-        boxShadow: resolvedTheme?.includes('dark')
-          ? 'none'
-          : 'inset 0 0 0 1px hsl(0deg 0% 80%)',
+        boxShadow: resolvedTheme?.includes('dark') ? 'none' : 'inset 0 0 0 1px hsl(0deg 0% 80%)',
         height: '34px',
         lineHeight: '16px',
         padding: '8px 12px',

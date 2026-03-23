@@ -79,9 +79,9 @@ export const BillingCustomerDataForm = ({
   const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
   const availableTaxIds = useMemo(() => {
-    return TAX_IDS.filter(
-      (taxId) => !addressCountry || taxId.countryIso2 === addressCountry
-    ).sort((a, b) => a.country.localeCompare(b.country))
+    return TAX_IDS.filter((taxId) => !addressCountry || taxId.countryIso2 === addressCountry).sort(
+      (a, b) => a.country.localeCompare(b.country)
+    )
   }, [addressCountry])
 
   const addressElementOptions: StripeAddressElementOptions = useMemo(

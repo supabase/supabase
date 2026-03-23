@@ -1,4 +1,7 @@
-import type { StripeAddressElementChangeEvent, StripeAddressElementOptions } from '@stripe/stripe-js'
+import type {
+  StripeAddressElementChangeEvent,
+  StripeAddressElementOptions,
+} from '@stripe/stripe-js'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { UpdateBillingAddressModal } from 'components/interfaces/App/UpdateBillingAddressModal'
@@ -115,9 +118,7 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-const mockOrg = vi.fn<
-  () => ReturnType<typeof createMockOrganization> | undefined
->(() =>
+const mockOrg = vi.fn<() => ReturnType<typeof createMockOrganization> | undefined>(() =>
   createMockOrganization({
     slug: 'test-org',
     organization_missing_address: true,
@@ -296,9 +297,7 @@ describe('UpdateBillingAddressModal', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Emit valid US address' }))
 
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Save address' })).toBeEnabled()
-    )
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save address' })).toBeEnabled())
   })
 
   it('filters tax ID options using the current address country', async () => {
