@@ -135,4 +135,38 @@ describe('generateQueryPerformanceSql', () => {
       expect(result.sql).toBeDefined()
     }
   })
+
+  it('clamps page=0 to page=1 (no negative offset)', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 0, pageSize: 20 })
+    expect(result.sql).toContain('offset 0')
+    expect(result.sql).not.toMatch(/offset -\d/)
+  })
+
+  it('clamps negative page to page=1', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: -5, pageSize: 20 })
+    expect(result.sql).toContain('offset 0')
+  })
+
+  it('clamps pageSize above 100 to 100', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 1, pageSize: 9999 })
+    expect(result.sql).toContain('limit 100')
+    expect(result.sql).not.toContain('limit 9999')
+  })
+
+  it('applies LIMIT and OFFSET for page 2', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 2, pageSize: 20 })
+    expect(result.sql).toContain('limit 20 offset 20')
+  })
+
+  it('does not produce NaN in SQL when page is NaN', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: NaN, pageSize: 20 })
+    expect(result.sql).not.toContain('NaN')
+    expect(result.sql).toContain('offset 0')
+  })
+
+  it('does not produce NaN in SQL when pageSize is NaN', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 1, pageSize: NaN })
+    expect(result.sql).not.toContain('NaN')
+    expect(result.sql).toContain('limit 20')
+  })
 })
