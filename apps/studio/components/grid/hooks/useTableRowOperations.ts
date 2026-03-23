@@ -40,6 +40,16 @@ export interface AddRowParams {
   enumArrayColumns?: string[]
 }
 
+export interface UpdateRowParams {
+  table: Entity
+  tableId: number
+  row: SupaRow
+  rowIdentifiers: Dictionary<unknown>
+  payload: Dictionary<unknown>
+  enumArrayColumns?: string[]
+  onSuccess?: () => void
+}
+
 export interface DeleteRowsParams {
   rows: SupaRow[]
   table: Entity
@@ -85,13 +95,13 @@ export function useTableRowOperations() {
         return { previousRowsQueries }
       },
       onError(error, _variables, context) {
-        const { previousRowsQueries } = context as {
-          previousRowsQueries: [QueryKey, { result: any[] } | undefined][]
+        const { previousRowsQueries } = (context ?? { previousRowsQueries: [] }) as {
+          previousRowsQueries: [QueryKey, TableRowsData | undefined][]
         }
 
         previousRowsQueries.forEach(([queryKey, previousRows]) => {
           if (previousRows) {
-            queryClient.setQueriesData({ queryKey }, previousRows)
+            queryClient.setQueriesData<TableRowsData>({ queryKey }, previousRows)
           }
           queryClient.invalidateQueries({ queryKey })
         })
@@ -134,6 +144,42 @@ export function useTableRowOperations() {
         table: params.table,
         configuration: { identifiers: params.rowIdentifiers },
         payload: updatedData,
+        enumArrayColumns: params.enumArrayColumns ?? [],
+        roleImpersonationState: getImpersonatedRoleState(),
+      })
+      params.onSuccess?.()
+    },
+    [isQueueEnabled, project, tableEditorSnap, mutateUpdateTableRow, getImpersonatedRoleState]
+  )
+
+  const updateRow = useCallback(
+    async (params: UpdateRowParams) => {
+      if (isQueueEnabled) {
+        // Queue individual cell edits per changed column
+        for (const columnName of Object.keys(params.payload)) {
+          queueCellEditWithOptimisticUpdate({
+            queueOperation: tableEditorSnap.queueOperation,
+            tableId: params.tableId,
+            table: params.table,
+            row: params.row,
+            rowIdentifiers: params.rowIdentifiers,
+            columnName,
+            oldValue: params.row[columnName],
+            newValue: params.payload[columnName],
+            enumArrayColumns: params.enumArrayColumns,
+          })
+        }
+        return
+      }
+
+      if (!project) return
+
+      await mutateUpdateTableRow({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        table: params.table,
+        configuration: { identifiers: params.rowIdentifiers },
+        payload: params.payload,
         enumArrayColumns: params.enumArrayColumns ?? [],
         roleImpersonationState: getImpersonatedRoleState(),
       })
@@ -198,6 +244,7 @@ export function useTableRowOperations() {
 
   return {
     editCell,
+    updateRow,
     addRow,
     deleteRows,
     isQueueEnabled,

@@ -196,7 +196,7 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
-  const { editCell, addRow, isEditPending } = useTableRowOperations()
+  const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
 
@@ -268,14 +268,6 @@ export const SidePanelEditor = ({
       const hasChanges = !isEmpty(payload)
       if (hasChanges) {
         if (selectedTable.primary_keys.length > 0) {
-          const changedColumn = Object.keys(payload)[0]
-          if (!changedColumn) {
-            saveRowError = new Error('No changed column')
-            toast.error('No changed column')
-            onComplete(saveRowError)
-            return
-          }
-
           const row = getRowFromSidePanel(snap.sidePanel)
 
           if (!row) {
@@ -286,14 +278,12 @@ export const SidePanelEditor = ({
           }
 
           try {
-            await editCell({
+            await updateRow({
               tableId: selectedTable.id,
               table: selectedTable as unknown as Entity,
               row,
               rowIdentifiers: configuration.identifiers,
-              columnName: changedColumn,
-              oldValue: row[changedColumn],
-              newValue: payload[changedColumn],
+              payload,
               enumArrayColumns,
               onSuccess: () => toast.success('Successfully updated row'),
             })
