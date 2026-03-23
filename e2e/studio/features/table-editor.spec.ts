@@ -1234,6 +1234,173 @@ testRunner('table editor', () => {
     await expect(page.getByRole('gridcell', { name: 'drag drop value 1' })).toBeVisible()
   })
 
+  test('row insert via side panel saves immediately', async ({ page, ref }) => {
+    const tableName = 'pw_table_row_insert'
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Open side panel to insert a new row
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId(`${columnName}-input`).fill('immediate insert')
+
+    // Wait for the POST mutation to complete when saving
+    const insertPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByTestId('action-bar-save-row').click()
+    await insertPromise
+
+    // Should show success toast
+    await expect(
+      page.getByText('Successfully created row'),
+      'Success toast should appear after immediate row creation'
+    ).toBeVisible({ timeout: 10000 })
+
+    // Row should be visible in the grid
+    await expect(
+      page.getByRole('gridcell', { name: 'immediate insert' }),
+      'Newly inserted row should be visible in the grid'
+    ).toBeVisible()
+
+    // Should NOT show pending changes (queue is off)
+    await expect(
+      page.getByText('pending change'),
+      'No pending changes should appear when queue is disabled'
+    ).not.toBeVisible()
+  })
+
+  test('row edit via side panel saves immediately', async ({ page, ref }) => {
+    const tableName = 'pw_table_row_edit'
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName, [{ name: 'original value' }])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    await expect(page.getByRole('gridcell', { name: 'original value' })).toBeVisible()
+
+    // Right-click to open context menu and edit the row
+    const cell = page.getByRole('gridcell', { name: 'original value' })
+    await cell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit row' }).click()
+
+    // Update the value in the side panel
+    const input = page.getByTestId(`${columnName}-input`)
+    await expect(input).toBeVisible()
+    await input.clear()
+    await input.fill('updated value')
+
+    // Wait for the POST mutation to complete when saving
+    const updatePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByTestId('action-bar-save-row').click()
+    await updatePromise
+
+    // Updated value should be visible in the grid after immediate save
+    await expect(
+      page.getByRole('gridcell', { name: 'updated value' }),
+      'Updated value should be visible in the grid'
+    ).toBeVisible()
+
+    // Original value should be gone
+    await expect(
+      page.getByRole('gridcell', { name: 'original value' }),
+      'Original value should no longer be visible'
+    ).not.toBeVisible()
+
+    // Should NOT show pending changes (queue is off)
+    await expect(
+      page.getByText('pending change'),
+      'No pending changes should appear when queue is disabled'
+    ).not.toBeVisible()
+  })
+
+  test('row delete via context menu shows confirmation dialog', async ({ page, ref }) => {
+    const tableName = 'pw_table_row_delete'
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName, [{ name: 'row to delete' }])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    await expect(page.getByRole('gridcell', { name: 'row to delete' })).toBeVisible()
+
+    // Right-click to open context menu and delete the row
+    const cell = page.getByRole('gridcell', { name: 'row to delete' })
+    await cell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete row' }).click()
+
+    // In non-queue mode, a confirmation dialog should appear
+    const confirmDialog = page.getByRole('dialog', { name: 'Confirm to delete the selected row' })
+    await expect(
+      confirmDialog,
+      'Confirmation dialog should appear for non-queue row deletion'
+    ).toBeVisible({ timeout: 10000 })
+
+    // Confirm the deletion
+    const deletePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await confirmDialog.getByRole('button', { name: 'Delete' }).click()
+    await deletePromise
+
+    // Row should be gone
+    await expect(
+      page.getByRole('gridcell', { name: 'row to delete' }),
+      'Deleted row should no longer be visible'
+    ).not.toBeVisible()
+
+    // Should show 0 records
+    await expect(
+      page.getByText('0 records'),
+      'Table should show 0 records after deletion'
+    ).toBeVisible()
+
+    // Should NOT show pending changes (queue is off)
+    await expect(
+      page.getByText('pending change'),
+      'No pending changes should appear when queue is disabled'
+    ).not.toBeVisible()
+  })
+
   test('create a table in a single transaction', async ({ page, ref }) => {
     const tableName = 'pw_table_create_transaction'
 
