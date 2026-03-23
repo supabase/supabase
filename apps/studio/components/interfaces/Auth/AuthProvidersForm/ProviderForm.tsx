@@ -123,7 +123,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         onSuccess: (newValues) => {
           setOpen(false)
           setUrlProvider(null)
-          form.reset()
           toast.success('Successfully updated settings')
         },
       }
@@ -147,7 +146,14 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
     resolver: yupResolver(provider.validationSchema),
+    shouldUnregister: true,
   })
+
+  useEffect(() => {
+    if (open) {
+      form.reset(INITIAL_VALUES)
+    }
+  }, [open, INITIAL_VALUES, form])
 
   const formId = `provider-${provider.title}-form`
 
@@ -238,11 +244,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   }
                 >
                   <FormControl_Shadcn_>
-                    <Input
-                      copy
-                      readOnly
-                      value={`${endpoint}/auth/v1/callback`}
-                    />
+                    <Input copy readOnly value={`${endpoint}/auth/v1/callback`} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -268,7 +270,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   form={formId}
                   htmlType="submit"
                   loading={isUpdatingConfig}
-                  disabled={isUpdatingConfig || !canUpdateConfig}
+                  disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
                   tooltip={{
                     content: {
                       side: 'bottom',

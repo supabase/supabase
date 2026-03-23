@@ -1,9 +1,9 @@
-import { useFormContext } from '@ui/components/Form/FormContext'
 import { Markdown } from 'components/interfaces/Markdown'
 import { format } from 'date-fns'
 import { BASE_PATH } from 'lib/constants'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
-import type { Control } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
@@ -49,10 +49,9 @@ const FormField = ({
   hasAccess,
   disabled: disabledProp,
 }: FormFieldProps) => {
-  const { values } = useFormContext()
   const { data: organization } = useSelectedOrganizationQuery()
-
-  const { description: originalDescription, entitlementKey } = properties
+  const { watch } = useFormContext()
+  const { description: originalDescription } = properties
   let description = originalDescription
 
   if (originalDescription && projectRef) {
@@ -61,16 +60,21 @@ const FormField = ({
       `(/project/${projectRef}/auth/$1)`
     )
   }
+
+  const fieldValue = useWatch_Shadcn_({ control, name })
   if (!hasAccess) {
-    description = `${originalDescription} Only available on [Pro plan](/org/${organization?.slug}/billing?panel=subscriptionPlan) and above.`
+    const planMessage = `Only available on [Pro plan](/org/${organization?.slug}/billing?panel=subscriptionPlan) and above.`
+    description = originalDescription ? `${originalDescription} ${planMessage}` : planMessage
   }
   const disabled =
-    disabledProp || properties.type === 'boolean' ? !hasAccess && !values[name] : !hasAccess
+    disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
 
   const showValue = useWatch_Shadcn_({
+    control,
     name: properties.show?.key,
     disabled: properties.show == null,
   })
+
   if (properties.show) {
     if (properties.show.matches) {
       if (!properties.show.matches.includes(showValue)) {
@@ -111,14 +115,16 @@ const FormField = ({
                           icon={<CalendarIcon className="h-4 w-4" />}
                           size="small"
                         >
-                          {field.value ? format(field.value, 'PPP') : 'Pick a date'}
+                          {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
                         </Button>
                       </PopoverTrigger_Shadcn_>
                       <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            field.onChange(date?.toISOString())
+                          }}
                           initialFocus
                         />
                       </PopoverContent_Shadcn_>
