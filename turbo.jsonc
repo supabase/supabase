@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**/*", "!.next/dev/**/*"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**/*", "!.next/dev/**/*"],
     },
     "design-system#build": {
       "dependsOn": ["^build"],
@@ -18,9 +18,9 @@
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
     },
     "studio#build": {
       "dependsOn": ["^build"],
@@ -117,16 +117,16 @@
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
-		"LIVE_SUPABASE_SECRET_KEY"
+        "LIVE_SUPABASE_SECRET_KEY",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",
         "SNIPPETS_MANAGEMENT_FOLDER",
-        "EDGE_FUNCTIONS_MANAGEMENT_FOLDER"
+        "EDGE_FUNCTIONS_MANAGEMENT_FOLDER",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"],
     },
     "www#build": {
       "dependsOn": ["^build"],
@@ -196,9 +196,9 @@
         "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY"
+        "CUSTOMERIO_APP_API_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
     },
     "ui-library#build": {
       "dependsOn": ["^build"],
@@ -221,26 +221,26 @@
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_USERCENTRICS_RULESET_ID",
         "SUPABASE_MANAGEMENT_API_TOKEN",
-        "OPENAI_API_KEY"
+        "OPENAI_API_KEY",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
     },
     "clean": {
       "outputs": [],
-      "cache": false
+      "cache": false,
     },
     "dev": {
-      "cache": false
+      "cache": false,
     },
     "test": {
-      "cache": false
+      "cache": false,
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
-      "outputs": []
-    }
-  }
+      "outputs": [],
+    },
+  },
 }
