@@ -174,6 +174,45 @@ export function computeYAxisDomain({
   return [0, Math.max(maxRefValue, maxStackedTotal)]
 }
 
+export function normalizeStackedSeriesData<T extends Record<string, unknown>>({
+  data,
+  attributeNames,
+  totalTarget = 100,
+}: {
+  data: T[]
+  attributeNames: string[]
+  totalTarget?: number
+}): T[] {
+  return data.map((point) => {
+    const values = attributeNames.map((name) => ({
+      name,
+      value: typeof point[name] === 'number' ? point[name] : 0,
+    }))
+    const total = values.reduce((sum, entry) => sum + entry.value, 0)
+
+    if (total <= 0) return point
+
+    const largestEntry = values.reduce((largest, entry) =>
+      entry.value > largest.value ? entry : largest
+    )
+
+    let normalizedTotal = 0
+    const nextPoint: Record<string, unknown> = { ...point }
+
+    values.forEach(({ name, value }) => {
+      if (name === largestEntry.name) return
+
+      const normalizedValue = (value / total) * totalTarget
+      nextPoint[name] = normalizedValue
+      normalizedTotal += normalizedValue
+    })
+
+    nextPoint[largestEntry.name] = Math.max(0, totalTarget - normalizedTotal)
+
+    return nextPoint as T
+  })
+}
+
 /**
  * Hook to create common wrapping components, perform data transformations
  * returns a Container component and the minHeight set
