@@ -103,7 +103,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByText('1 pending change')).toBeVisible()
     await page.getByRole('button', { name: /Review/ }).click()
 
-    await page.getByRole('button', { name: 'Revert', exact: true }).click()
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
@@ -145,7 +145,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByText('1 pending change')).toBeVisible()
     await page.getByRole('button', { name: /Review/ }).click()
 
-    await page.getByRole('button', { name: 'Revert', exact: true }).click()
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
@@ -561,7 +561,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByText('1 pending change')).toBeVisible()
 
     await page.getByRole('button', { name: /Review/ }).click()
-    await page.getByRole('button', { name: 'Revert', exact: true }).click()
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()

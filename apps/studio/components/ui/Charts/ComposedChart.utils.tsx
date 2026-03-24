@@ -1,6 +1,7 @@
 'use client'
 
 import dayjs from 'dayjs'
+import { guessLocalTimezone } from 'lib/dayjs'
 import { formatBytes } from 'lib/helpers'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
@@ -193,7 +194,7 @@ export const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const localTimeZone = dayjs.tz.guess()
+    const localTimeZone = guessLocalTimezone()
 
     const rawPayload = payload.map((entry: any) => ({
       ...entry,

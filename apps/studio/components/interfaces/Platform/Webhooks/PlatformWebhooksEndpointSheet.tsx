@@ -4,7 +4,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { ChevronDown, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -30,6 +30,7 @@ import {
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import * as z from 'zod'
 
 import type {
@@ -169,11 +170,6 @@ export const PlatformWebhooksEndpointSheet = ({
   } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose,
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'customHeaders',
   })
 
   const subscribeAll = form.watch('subscribeAll')
@@ -549,57 +545,16 @@ export const PlatformWebhooksEndpointSheet = ({
                   layout="vertical"
                   className="gap-3"
                 >
-                  {fields.length > 0 && (
-                    <div className="overflow-hidden rounded-md border divide-y mb-3 bg-surface-100">
-                      {fields.map((customHeaderField, index) => (
-                        <div key={customHeaderField.id} className="px-3 py-3">
-                          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center">
-                            <FormField_Shadcn_
-                              control={form.control}
-                              name={`customHeaders.${index}.key`}
-                              render={({ field }) => (
-                                <FormControl_Shadcn_>
-                                  <InputField
-                                    {...field}
-                                    placeholder="Header name"
-                                    className="font-mono text-xs"
-                                  />
-                                </FormControl_Shadcn_>
-                              )}
-                            />
-                            <FormField_Shadcn_
-                              control={form.control}
-                              name={`customHeaders.${index}.value`}
-                              render={({ field }) => (
-                                <FormControl_Shadcn_>
-                                  <InputField
-                                    {...field}
-                                    placeholder="Header value"
-                                    className="font-mono text-xs"
-                                  />
-                                </FormControl_Shadcn_>
-                              )}
-                            />
-                            <Button
-                              type="text"
-                              htmlType="button"
-                              onClick={() => remove(index)}
-                              icon={<Trash2 size={14} />}
-                              className="justify-self-start sm:justify-self-auto h-full"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <Button
-                    type="default"
-                    htmlType="button"
-                    onClick={() => append({ key: '', value: '' })}
-                  >
-                    Add header
-                  </Button>
+                  <KeyValueFieldArray
+                    control={form.control}
+                    name="customHeaders"
+                    keyFieldName="key"
+                    valueFieldName="value"
+                    createEmptyRow={() => ({ key: '', value: '' })}
+                    keyPlaceholder="Header name"
+                    valuePlaceholder="Header value"
+                    addLabel="Add header"
+                  />
                 </FormItemLayout>
               </div>
             </form>
