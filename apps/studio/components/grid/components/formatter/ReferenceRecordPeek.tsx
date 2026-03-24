@@ -1,7 +1,7 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { COLUMN_MIN_WIDTH, REFERENCE_PEEK_CONTEXT_MENU_ID } from 'components/grid/constants'
+import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import type { SupaColumn, SupaRow } from 'components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
@@ -13,15 +13,22 @@ import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Copy, Key } from 'lucide-react'
 import { useCallback, useMemo, useRef } from 'react'
-import { Item, ItemParams, Menu } from 'react-contexify'
 import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
-import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
-import { Button, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
+  copyToClipboard,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { formatClipboardValue } from '../../utils/common'
-import { PeekRowRenderer } from '../grid/RowRenderer'
 import { BinaryFormatter } from './BinaryFormatter'
 import { DefaultFormatter } from './DefaultFormatter'
 import { JsonFormatter } from './JsonFormatter'
@@ -54,7 +61,7 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
   )
 
   const rows = useMemo(() => data?.rows ?? [], [data?.rows])
-  const selectedCellRef = useRef<{ idx: number } | null>(null)
+  const selectedCellRef = useRef<{ idx: number; rowIdx: number } | null>(null)
 
   const primaryKeys = useMemo(() => table.primary_keys.map((x) => x.name), [table.primary_keys])
 
@@ -103,23 +110,20 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     })
   }, [table?.columns, primaryKeys])
 
-  const onCopyCellContent = useCallback(
-    (p: ItemParams<{ rowIdx: number }>) => {
-      const rowIdx = p.props?.rowIdx
-      if (selectedCellRef.current === null || rowIdx === undefined || rowIdx === null) return
+  const onCopyCellContent = useCallback(() => {
+    if (selectedCellRef.current === null) return
 
-      const row = rows[rowIdx]
-      const columnKey = columns[selectedCellRef.current.idx]?.key
-      if (!row || !columnKey) return
+    const { idx, rowIdx } = selectedCellRef.current
+    const row = rows[rowIdx]
+    const columnKey = columns[idx]?.key
+    if (!row || !columnKey) return
 
-      const cellValue = row[columnKey]
-      const text = formatClipboardValue(cellValue)
+    const cellValue = row[columnKey]
+    const text = formatClipboardValue(cellValue)
 
-      copyToClipboard(text)
-      toast.success('Copied cell value to clipboard')
-    },
-    [rows, columns]
-  )
+    copyToClipboard(text)
+    toast.success('Copied cell value to clipboard')
+  }, [rows, columns])
 
   return (
     <>
@@ -130,49 +134,51 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
         </span>
         :
       </p>
-      <DataGrid
-        className="h-32 rounded-b border-0"
-        columns={columns}
-        rows={rows}
-        onSelectedCellChange={(args: {
-          column: CalculatedColumn<SupaRow, unknown>
-          rowIdx: number
-          row: SupaRow
-        }) => {
-          selectedCellRef.current = { idx: args.column.idx }
-        }}
-        onCellDoubleClick={(_, e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-        renderers={{
-          renderRow: PeekRowRenderer,
-          noRowsFallback: (
-            <div className="w-96 px-2">
-              {isLoading && (
-                <div className="py-2">
-                  <ShimmeringLoader />
-                </div>
-              )}
-              {isError && (
-                <p className="text-foreground-light">
-                  Failed to find referencing row: {error.message}
-                </p>
-              )}
-              {isSuccess && <p className="text-foreground-light">No results were returned</p>}
-            </div>
-          ),
-        }}
-      />
-      {createPortal(
-        <Menu id={REFERENCE_PEEK_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
-          <Item onClick={onCopyCellContent}>
+      <ContextMenu_Shadcn_>
+        <ContextMenuTrigger_Shadcn_ asChild>
+          <div>
+            <DataGrid
+              className="h-32 rounded-b border-0"
+              columns={columns}
+              rows={rows}
+              onSelectedCellChange={(args: {
+                column: CalculatedColumn<SupaRow, unknown>
+                rowIdx: number
+                row: SupaRow
+              }) => {
+                selectedCellRef.current = { idx: args.column.idx, rowIdx: args.rowIdx }
+              }}
+              onCellDoubleClick={(_, e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+              renderers={{
+                noRowsFallback: (
+                  <div className="w-96 px-2">
+                    {isLoading && (
+                      <div className="py-2">
+                        <ShimmeringLoader />
+                      </div>
+                    )}
+                    {isError && (
+                      <p className="text-foreground-light">
+                        Failed to find referencing row: {error.message}
+                      </p>
+                    )}
+                    {isSuccess && <p className="text-foreground-light">No results were returned</p>}
+                  </div>
+                ),
+              }}
+            />
+          </div>
+        </ContextMenuTrigger_Shadcn_>
+        <ContextMenuContent_Shadcn_ className="min-w-36">
+          <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={onCopyCellContent}>
             <Copy size={12} />
-            <span className="ml-2 text-xs">Copy cell</span>
-          </Item>
-        </Menu>,
-        document.body
-      )}
+            <span className="text-xs">Copy cell</span>
+          </ContextMenuItem_Shadcn_>
+        </ContextMenuContent_Shadcn_>
+      </ContextMenu_Shadcn_>
       <div className="flex items-center justify-end px-2 py-1">
         <EditorTablePageLink
           href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
