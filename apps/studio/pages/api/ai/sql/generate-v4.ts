@@ -214,7 +214,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       userId,
       orgId,
       planId,
-      requestedModel: effectiveModel,
+      requestedModel,
       promptProviderOptions,
       abortSignal: abortController.signal,
       onSpanCreated: (spanId) => {
