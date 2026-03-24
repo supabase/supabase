@@ -20,6 +20,12 @@ const page: GoPageInput = {
     subtitle: 'An intimate executive dinner hosted by Supabase',
     description:
       'Join Supabase product and engineering leaders for a dinner conversation about where Postgres is headed -- from scaling beyond single-node limits to managing globally distributed workloads. Expect sharp perspectives, good food, and the opportunity to connect with other engineering leaders.',
+    image: {
+      src: '/images/landing-pages/stripe-sessions/spruce-dining-room.png',
+      alt: 'Private dining room at Spruce restaurant, San Francisco',
+      width: 600,
+      height: 450,
+    },
     ctas: [
       {
         label: 'Reserve your seat',
