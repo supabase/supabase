@@ -296,7 +296,7 @@ build_tarball() {
                 case "$name" in .*-wrapped) continue ;; esac
 
                 # Check for ELF
-                if [ -x "$f" ] && file -b "$f" | grep -q 'ELF .* executable'; then
+                if [ -x "$f" ] && file -b "$f" | grep -q "ELF .* executable"; then
                     cp "$f" /export/17/bin/"$name"
                 else
                     # Shell wrapper - extract the real .xxx-wrapped ELF path

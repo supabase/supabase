@@ -73,7 +73,26 @@ Upgrading an existing deployment uses `pg_upgrade` to migrate data in place. The
 7. Applies additional role migrations (new in Postgres 17)
 
 <Admonition type="danger">
-**Back up your data before upgrading.** The script preserves the original data directory as `./volumes/db/data.bak.pg15`, but you should also have an independent backup in case of disk failure or other issues.
+**Back up your data before upgrading.** The script preserves the original data directory as `./volumes/db/data.bak.pg15`, but you should create your own independent backup in case of disk failure or other issues.
+</Admonition>
+
+### Create a backup
+
+The upgrade script automatically preserves the original data directory by renaming it. However, this is on the same disk - it won't help with disk failure or accidental deletion. Create an independent backup before starting:
+
+```sh
+# 1. Back up the database data directory
+cp -a ./volumes/db/data ./volumes/db/data-manual-backup
+
+# 2. Back up the pgsodium encryption key (stored in a Docker named volume)
+docker compose run --rm db cat /etc/postgresql-custom/pgsodium_root.key > ./pgsodium_root.key.backup
+
+# 3. Optionally, take a logical backup too
+docker exec supabase-db pg_dumpall -h localhost -U supabase_admin > ./pg15_dump.sql
+```
+
+<Admonition type="caution">
+The `db-config` Docker named volume contains the pgsodium root encryption key. If you lose this key and have vault secrets, they become unrecoverable. The `cp -a` above backs up the data directory but NOT the named volume. Step 2 extracts the key to a file you can store safely.
 </Admonition>
 
 ### Requirements
@@ -182,6 +201,19 @@ Do not delete `data.bak.pg15` until you have verified the upgrade. Rollback is o
 ### pg_upgrade fails with "could not load library"
 
 This usually means an extension's shared library is missing from the Postgres 17 build. Check the error message for the library name - it's likely one of the incompatible extensions listed above. Drop the extension and re-run the upgrade.
+
+### pg_upgrade fails with replication slot errors
+
+`pg_upgrade` cannot proceed if there are active replication slots. Default self-hosted installs don't have any, but if you set up logical replication or have custom replication configurations, drop the slots before upgrading:
+
+```sh
+docker exec supabase-db psql -h localhost -U supabase_admin -d postgres -c "
+    SELECT pg_drop_replication_slot(slot_name)
+    FROM pg_replication_slots;
+"
+```
+
+Then re-run the upgrade script. Replication slots will need to be recreated after the upgrade.
 
 ### Services fail to connect after upgrade
 
