@@ -1,4 +1,11 @@
 import type { GoPageInput } from 'marketing'
+import Image from 'next/image'
+
+import authors from '@/lib/authors.json'
+
+const sugu = authors.find((a) => a.author_id === 'sugu_sougoumarane')
+const deepthi = authors.find((a) => a.author_id === 'deepthi_sigireddi')
+const joe = authors.find((a) => a.author_id === 'joe_sciarrino')
 
 const page: GoPageInput = {
   template: 'lead-gen',
@@ -41,21 +48,56 @@ const page: GoPageInput = {
       children: (
         <div className="border border-muted rounded-xl overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-3">
-            <div className="p-6 sm:p-8 md:border-r border-muted max-md:border-b">
-              <h3 className="text-foreground font-medium text-base">Nate Asp</h3>
-              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">VP, Supabase</p>
+            <div className="flex flex-col items-center gap-4 p-6 sm:p-8 md:border-r border-muted max-md:border-b text-center">
+              {sugu?.author_image_url && (
+                <Image
+                  src={sugu.author_image_url}
+                  alt={sugu.author}
+                  width={192}
+                  height={192}
+                  className="rounded-full object-cover aspect-square w-48 h-48"
+                />
+              )}
+              <div className="flex flex-col items-center gap-0">
+                <p className="text-foreground font-medium text-base">{sugu?.author}</p>
+                <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
+                  {sugu?.position && `${sugu.position}, `}Supabase
+                </p>
+              </div>
             </div>
-            <div className="p-6 sm:p-8 md:border-r border-muted max-md:border-b">
-              <h3 className="text-foreground font-medium text-base">Deepthi Sigireddi</h3>
-              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
-                Head of Databases, Supabase
-              </p>
+            <div className="flex flex-col items-center gap-4 p-6 sm:p-8 md:border-r border-muted max-md:border-b text-center">
+              {deepthi?.author_image_url && (
+                <Image
+                  src={deepthi.author_image_url}
+                  alt={deepthi.author}
+                  width={192}
+                  height={192}
+                  className="rounded-full object-cover aspect-square w-48 h-48"
+                />
+              )}
+              <div className="flex flex-col items-center gap-0">
+                <p className="text-foreground font-medium text-base">{deepthi?.author}</p>
+                <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
+                  {deepthi?.position && `${deepthi.position}, `}Supabase
+                </p>
+              </div>
             </div>
-            <div className="p-6 sm:p-8">
-              <h3 className="text-foreground font-medium text-base">Sugu Sougoumarane</h3>
-              <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
-                Head of Multigres, Supabase
-              </p>
+            <div className="flex flex-col items-center gap-4 p-6 sm:p-8 text-center">
+              {joe?.author_image_url && (
+                <Image
+                  src={joe.author_image_url}
+                  alt={joe.author}
+                  width={192}
+                  height={192}
+                  className="rounded-full object-cover aspect-square w-48 h-48"
+                />
+              )}
+              <div className="flex flex-col items-center gap-0">
+                <p className="text-foreground font-medium text-base">{joe?.author}</p>
+                <p className="text-foreground-lighter text-sm mt-2 leading-relaxed">
+                  {joe?.position}
+                </p>
+              </div>
             </div>
           </div>
         </div>

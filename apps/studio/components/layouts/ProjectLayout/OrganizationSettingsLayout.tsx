@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
 import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
@@ -12,6 +12,7 @@ interface OrganizationSettingsMenuItemsProps {
   showSsoSettings?: boolean
   showLegalDocuments?: boolean
   showPlatformWebhooks?: boolean
+  showPrivateApps?: boolean
 }
 
 interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
@@ -26,6 +27,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showSsoSettings = true,
   showLegalDocuments = true,
   showPlatformWebhooks = true,
+  showPrivateApps = false,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -87,6 +89,7 @@ export const generateOrganizationSettingsSections = ({
   showSsoSettings = true,
   showLegalDocuments = true,
   showPlatformWebhooks = true,
+  showPrivateApps = false,
 }: OrganizationSettingsSectionsProps): SidebarSection[] => {
   const isLinkActive = (key: string, href: string) =>
     key === 'webhooks'
@@ -125,6 +128,15 @@ export const generateOrganizationSettingsSections = ({
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+    ...(showPrivateApps
+      ? [
+          {
+            key: 'private-apps',
+            label: 'Private Apps',
+            href: `/org/${slug}/private-apps`,
+          },
+        ]
+      : []),
     ...(showPlatformWebhooks
       ? [
           {
@@ -184,6 +196,7 @@ export const generateOrganizationSettingsSections = ({
 export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const { slug } = useParams()
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
+  const showPrivateApps = useFlag('privateApps')
   const fullCurrentPath = useCurrentPath()
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
 
@@ -204,6 +217,7 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     showSsoSettings,
     showLegalDocuments,
     showPlatformWebhooks,
+    showPrivateApps,
   })
 
   // Browser titles for org settings routes are set by OrganizationLayout.

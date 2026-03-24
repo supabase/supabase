@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SubMenu } from 'components/ui/ProductMenu/SubMenu'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -22,6 +22,7 @@ export function OrganizationSettingsMenu({ onCloseSheet }: OrganizationSettingsM
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const currentPath = normalizeOrganizationSettingsPath(pathname)
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
+  const showPrivateApps = useFlag('privateApps')
 
   const {
     organizationShowSsoSettings: showSsoSettings,
@@ -40,6 +41,7 @@ export function OrganizationSettingsMenu({ onCloseSheet }: OrganizationSettingsM
     showSsoSettings,
     showLegalDocuments,
     showPlatformWebhooks,
+    showPrivateApps,
   })
 
   const page = currentPath.split('/').filter(Boolean).pop()

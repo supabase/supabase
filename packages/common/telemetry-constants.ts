@@ -291,10 +291,10 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
-  /**
-   * the instance size selected in the project creation form
-   */
   properties: {
+    /**
+     * The instance size selected in the project creation form.
+     */
     instanceSize?: string
     /**
      * Whether the automatic RLS event trigger option was enabled
@@ -322,6 +322,14 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean
+    /**
+     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
+     * meaning the project was created with default public schema grants revoked.
+     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
+     * false = user is outside the rollout (default grants left intact)
+     * omitted = PostHog flags had not loaded at the time of project creation
+     */
+    tableEditorApiAccessToggleEnabled?: boolean
   }
   groups: TelemetryGroups
 }
@@ -342,6 +350,29 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
     instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User toggled Data API access on a table via the switch in the table editor side panel.
+ * Only fires for new tables — editing existing tables links out to the settings page instead.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableApiAccessToggleClickedEvent {
+  action: 'table_api_access_toggle_clicked'
+  properties: {
+    /**
+     * The resulting state of the toggle after the click.
+     */
+    newState: 'enabled' | 'disabled'
+    /**
+     * The schema containing the table being created.
+     */
+    schemaName: string
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -636,6 +667,10 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  */
 export interface AssistantPromptSubmittedEvent {
   action: 'assistant_prompt_submitted'
+  properties: {
+    /** UUID of the chat session in which the prompt was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -647,6 +682,10 @@ export interface AssistantPromptSubmittedEvent {
  */
 export interface AssistantDebugSubmittedEvent {
   action: 'assistant_debug_submitted'
+  properties: {
+    /** UUID of the chat session in which the debug request was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -1448,6 +1487,10 @@ export interface AssistantMessageRatingSubmittedEvent {
       | 'debugging'
       | 'general_help'
       | 'other'
+    /** Optional reason provided by the user when rating negatively */
+    reason?: string
+    /** UUID of the chat session in which the message was rated */
+    chatId?: string
   }
   groups: TelemetryGroups
 }
@@ -2560,6 +2603,7 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2590,6 +2634,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2761,7 +2806,7 @@ export interface RequestUpgradeModalOpenedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
     /** Feature context driving the upgrade request */
@@ -2782,7 +2827,7 @@ export interface RequestUpgradeSubmittedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
   }
@@ -3034,6 +3079,7 @@ export type TelemetryEvent =
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | TableApiAccessToggleClickedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent

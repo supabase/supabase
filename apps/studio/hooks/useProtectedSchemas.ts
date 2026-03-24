@@ -1,3 +1,4 @@
+import { QUEUES_SCHEMA } from '@supabase/pg-meta'
 import {
   SUPABASE_TARGET_SCHEMA_OPTION,
   WRAPPERS,
@@ -11,7 +12,6 @@ import { uniq, uniqBy } from 'lodash'
 import { useMemo } from 'react'
 
 import { useSelectedProjectQuery } from './misc/useSelectedProject'
-import { QUEUES_SCHEMA } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
 
 /**
  * A list of system schemas that users should not interact with

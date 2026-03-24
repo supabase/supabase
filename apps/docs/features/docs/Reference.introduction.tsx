@@ -10,13 +10,13 @@ import commonClientLibSections from '~/spec/common-client-libs-sections.json' wi
 function hasIntro(sections: typeof commonClientLibSections, excludeName?: string) {
   return Boolean(
     sections[0]?.type === 'markdown' &&
-      sections[0]?.slug === 'introduction' &&
-      (!excludeName ||
-        !(
-          'excludes' in sections[0] &&
-          Array.isArray(sections[0].excludes) &&
-          sections[0].excludes?.includes(excludeName)
-        ))
+    sections[0]?.slug === 'introduction' &&
+    (!excludeName ||
+      !(
+        'excludes' in sections[0] &&
+        Array.isArray(sections[0].excludes) &&
+        sections[0].excludes?.includes(excludeName)
+      ))
   )
 }
 

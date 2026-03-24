@@ -85,7 +85,7 @@ export const EdgeFunctionBlock = ({
       onDragStart={onDragStart}
       actions={
         hideDeployButton || !onDeploy ? (
-          actions ?? null
+          (actions ?? null)
         ) : (
           <>
             <Button

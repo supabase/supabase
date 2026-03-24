@@ -1,10 +1,9 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
 import {
-  enforceAndLogicalOperator,
-  filterGroupSchema,
+  filterGroupSchemaForAI,
   requestSchema,
   serializeOperators,
   serializeOptions,
@@ -62,10 +61,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       options: property.options,
     }))
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
       providerOptions,
-      schema: filterGroupSchema,
+      output: Output.object({ schema: filterGroupSchemaForAI }),
       prompt: source`
         You are an expert Postgres filter builder. Convert the user's request into structured filters.
 
@@ -74,7 +73,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         Rules:
         - Use only the provided property names and operators for each property.
-        - Prefer logical operator "AND" unless the user explicitly asks for "OR".
         - When unsure, default to simple equality comparisons with reasonable values.
         - Values should respect property types: booleans must be true/false, dates should be ISO date strings (YYYY-MM-DD), and numbers must be numbers.
         - If options are provided for a property, choose from those values when appropriate.
@@ -84,7 +82,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    const generatedFilters = result.object
+    const generatedFilters = result.output
 
     if (!validateFilterGroup(generatedFilters, normalizedFilterProperties)) {
       return res.status(400).json({
@@ -92,7 +90,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
     }
 
-    return res.json(enforceAndLogicalOperator(generatedFilters))
+    return res.json(generatedFilters)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI filter generation failed: ${error.message}`)

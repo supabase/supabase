@@ -294,7 +294,9 @@ export const RestoreToNewProject = () => {
         <div className="flex flex-col gap-2">
           <h3 className="text-sm font-medium">Previous restorations</h3>
           <Panel className="flex flex-col divide-y divide-border">
-            {previousClones?.map((c) => <PreviousRestoreItem key={c.inserted_at} clone={c} />)}
+            {previousClones?.map((c) => (
+              <PreviousRestoreItem key={c.inserted_at} clone={c} />
+            ))}
           </Panel>
         </div>
       ) : null}

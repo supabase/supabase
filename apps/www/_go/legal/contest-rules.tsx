@@ -143,7 +143,7 @@ const page: GoPageInput = {
 
   © 2026 Supabase Inc.
 
-  [Privacy Policy](https://supabase.com/privacy) · [Terms of Service](https://supabase.com/terms)
+  [Privacy Policy](https://supabase.com/privacy) · [Terms of Service](https://supabase.com/terms) · [Alternative Mode of Entry](/go/legal/amoe)
 `,
 }
 
