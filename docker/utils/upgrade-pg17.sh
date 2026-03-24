@@ -20,14 +20,15 @@
 #
 # Backup:
 #   The original Postgres 15 data directory is preserved as
-#   ./volumes/db/data.bak.pg15 during the upgrade. Do not delete it
-#   until you have verified the upgrade was successful.
+#   ./volumes/db/data.bak.pg15 during the upgrade.
+#   DO NOT DELETE it until you have verified the upgrade was successful.
 #
 # Rollback (if the upgrade fails or you want to revert):
-#   docker compose down
-#   rm -rf ./volumes/db/data
-#   mv ./volumes/db/data.bak.pg15 ./volumes/db/data
-#   docker compose up -d
+#   1. docker compose down
+#   2. rm -rf ./volumes/db/data
+#   3. mv ./volumes/db/data.bak.pg15 ./volumes/db/data
+#   4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/
+#   5. docker compose up -d
 #
 
 set -euo pipefail
@@ -166,13 +167,19 @@ preflight() {
 
     if [ -d "$BACKUP_DIR" ]; then
         warn "Backup directory already exists: $BACKUP_DIR"
-        warn "This may be from a previous upgrade attempt."
-        confirm "Remove it and continue?"
+        warn "This is likely from a previous upgrade attempt."
+        warn "If you haven't verified that previous upgrade, roll back first:"
+        warn "  1. docker compose down"
+        warn "  2. rm -rf $DATA_DIR"
+        warn "  3. mv $BACKUP_DIR $DATA_DIR"
+        warn "  4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
+        warn "  5. docker compose up -d"
+        echo ""
+        warn "Continuing will DELETE the existing backup permanently."
+        confirm "Delete $BACKUP_DIR and start a fresh upgrade?"
         rm -rf "$BACKUP_DIR"
     fi
     if [ -d "$MIGRATION_DIR" ]; then
-        warn "Migration directory already exists: $MIGRATION_DIR"
-        confirm "Remove it and continue?"
         rm -rf "$MIGRATION_DIR"
     fi
 
@@ -213,12 +220,12 @@ preflight() {
     echo ""
     echo "This script will:"
     echo "  1. Pull the Postgres 17 image"
-    echo "  2. Build an upgrade tarball from the PG17 image (~2 GB compressed, temporary)"
+    echo "  2. Build an upgrade tarball from the image (~1.2 GB compressed, temporary)"
     echo "  3. Stop all Supabase services"
-    echo "  4. Run pg_upgrade (Postgres 15 -> 17) via initiate.sh"
-    echo "  5. Apply post-upgrade patches via complete.sh"
+    echo "  4. Run pg_upgrade (Postgres 15 -> 17)"
+    echo "  5. Apply post-upgrade patches"
     echo "  6. Start Supabase with Postgres 17"
-    echo "  7. Apply additional role migrations"
+    echo "  7. Apply additional migrations"
     echo ""
     echo "  Current image:    $current_image"
     echo "  Target image:     $PG17_TARGET_IMAGE"
@@ -254,7 +261,7 @@ build_tarball() {
     echo "  Staging directory: $staging_dir"
 
     # Download upgrade scripts from the supabase/postgres repo (pinned to PG17_SCRIPTS_REF).
-    # These are no longer bundled in the PG17 Docker image.
+    # These are no longer bundled in the latest PG17 Docker images.
     info "Downloading upgrade scripts (ref: $PG17_SCRIPTS_REF)"
     local scripts_base="https://raw.githubusercontent.com/supabase/postgres/${PG17_SCRIPTS_REF}/ansible/files/admin_api_scripts/pg_upgrade_scripts"
     mkdir -p "$staging_dir/scripts"
@@ -284,11 +291,12 @@ build_tarball() {
             BIN_DIR=$(dirname $(readlink -f /usr/lib/postgresql/bin/postgres))
             for f in "$BIN_DIR"/*; do
                 name=$(basename "$f")
+
                 # Skip nix wrapper-internal files
                 case "$name" in .*-wrapped) continue ;; esac
-                # Check ELF magic bytes (0x7f ELF)
-                magic=$(dd if="$f" bs=4 count=1 2>/dev/null | od -A n -t x1 | tr -d " ")
-                if [ "$magic" = "7f454c46" ]; then
+
+                # Check for ELF
+                if [ -x "$f" ] && file -b "$f" | grep -q 'ELF .* executable'; then
                     cp "$f" /export/17/bin/"$name"
                 else
                     # Shell wrapper - extract the real .xxx-wrapped ELF path
@@ -565,7 +573,7 @@ start_pg17() {
     info "Starting Supabase with Postgres 17"
 
     # Ensure db-config volume has correct ownership and structure for PG17.
-    # complete.sh does this too, but belt-and-suspenders in case of partial
+    # complete.sh does this too, but just in case of partial
     # failures from previous runs.
     local db_config_vol
     db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -1)
@@ -679,11 +687,9 @@ verify() {
     echo "    1. docker compose down"
     echo "    2. rm -rf $DATA_DIR"
     echo "    3. mv $BACKUP_DIR $DATA_DIR"
-    echo "    4. docker run --rm \\"
-    echo "        -v \"\$(docker volume ls --filter 'name=db-config' --format '{{.Name}}'):/vol\" \\"
-    echo "        supabase/postgres:15.8.1.085 \\"
-    echo "        chown -R postgres:postgres /vol/"
+    echo "    4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
     echo "    5. docker compose up -d"
+    echo ""
 }
 
 # --- Main -------------------------------------------------------------------
