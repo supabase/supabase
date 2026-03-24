@@ -1,0 +1,238 @@
+---
+title: Real-World Patterns
+description: Combining Realtime features to build reactive apps
+---
+
+The previous chapters covered each Realtime feature individually. In practice, most apps combine them. This chapter walks through a few common patterns that bring Database Changes, Broadcast, and Presence together.
+
+## Chat
+
+Chat is the classic real-time use case. Messages are stored in the database (so they persist), while typing indicators and online status are handled with Broadcast and Presence.
+
+### The setup
+
+```js
+const channel = supabase.channel('chat:room-123')
+
+// Persist messages in the database, listen for new ones
+channel.on(
+  'postgres_changes',
+  {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'messages',
+    filter: 'room_id=eq.room-123',
+  },
+  (payload) => {
+    addMessage(payload.new)
+  }
+)
+
+// Typing indicators via Broadcast
+channel.on('broadcast', { event: 'typing' }, (payload) => {
+  showTypingIndicator(payload.payload.user_name)
+})
+
+// Online users via Presence
+channel.on('presence', { event: 'sync' }, () => {
+  updateOnlineUsers(Object.values(channel.presenceState()).flat())
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    await channel.track({
+      user_id: user.id,
+      name: user.name,
+      avatar: user.avatar_url,
+    })
+  }
+})
+```
+
+### Sending a message
+
+Messages go through the database so they're persisted and protected by RLS:
+
+```js
+const { error } = await supabase
+  .from('messages')
+  .insert({ room_id: 'room-123', user_id: user.id, content: text })
+```
+
+The Database Changes listener picks it up and adds it to the UI for everyone in the room.
+
+### Typing indicator
+
+Typing status is ephemeral — no need to store it:
+
+```js
+function handleInputChange() {
+  channel.send({
+    type: 'broadcast',
+    event: 'typing',
+    payload: { user_name: user.name },
+  })
+}
+```
+
+On the receiving end, you'd show the indicator for a few seconds and then hide it if no new typing events come in.
+
+## Live dashboard
+
+Dashboards that update in real time are useful for monitoring — order counts, active users, system metrics. The pattern is: load the initial data with a query, then subscribe to changes.
+
+```js
+// Load current data
+const { data: orders } = await supabase
+  .from('orders')
+  .select('*')
+  .order('created_at', { ascending: false })
+  .limit(50)
+
+// Listen for new orders
+const channel = supabase
+  .channel('dashboard-orders')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'orders' },
+    (payload) => {
+      orders.unshift(payload.new)
+      updateDashboard(orders)
+    }
+  )
+  .subscribe()
+```
+
+For dashboards, you typically only need Database Changes — Broadcast and Presence aren't relevant unless you want to show who else is viewing the dashboard.
+
+### Handling updates and deletes
+
+If orders can change status (pending, shipped, delivered), listen for updates too:
+
+```js
+channel.on(
+  'postgres_changes',
+  { event: 'UPDATE', schema: 'public', table: 'orders' },
+  (payload) => {
+    const index = orders.findIndex((o) => o.id === payload.new.id)
+    if (index !== -1) {
+      orders[index] = payload.new
+      updateDashboard(orders)
+    }
+  }
+)
+```
+
+## Collaborative editing
+
+When multiple users are working on the same document, you need to show who's present and stream their changes.
+
+### Who's here
+
+Use Presence to show which users are currently viewing the document:
+
+```js
+const channel = supabase.channel('document:doc-456')
+
+channel.on('presence', { event: 'sync' }, () => {
+  const users = Object.values(channel.presenceState()).flat()
+  showCollaborators(users)
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    await channel.track({
+      user_id: user.id,
+      name: user.name,
+      color: user.cursor_color,
+    })
+  }
+})
+```
+
+### Live cursors
+
+Use Broadcast to stream cursor positions:
+
+```js
+// Send cursor position (throttled)
+let lastSent = 0
+function handleMouseMove(e) {
+  if (Date.now() - lastSent < 50) return
+  lastSent = Date.now()
+
+  channel.send({
+    type: 'broadcast',
+    event: 'cursor',
+    payload: { user_id: user.id, x: e.clientX, y: e.clientY },
+  })
+}
+
+// Receive other cursors
+channel.on('broadcast', { event: 'cursor' }, (payload) => {
+  updateCursor(payload.payload.user_id, payload.payload.x, payload.payload.y)
+})
+```
+
+### Saving changes
+
+The actual document content should be saved to the database. When one user saves, others see the update through Database Changes:
+
+```js
+channel.on(
+  'postgres_changes',
+  {
+    event: 'UPDATE',
+    schema: 'public',
+    table: 'documents',
+    filter: 'id=eq.doc-456',
+  },
+  (payload) => {
+    updateDocumentContent(payload.new.content)
+  }
+)
+```
+
+For full collaborative editing (where multiple users type simultaneously and changes merge in real time), you'd need a conflict resolution strategy like CRDTs or operational transforms on top of this. That's beyond what Supabase Realtime handles on its own, but the underlying transport (Broadcast and Database Changes) provides the foundation.
+
+## Notifications
+
+For in-app notifications that appear instantly, subscribe to a user-specific filter:
+
+```js
+const channel = supabase
+  .channel('notifications')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${user.id}`,
+    },
+    (payload) => {
+      showNotification(payload.new)
+    }
+  )
+  .subscribe()
+```
+
+Notifications are stored in the database (so they persist and can be marked as read), and the real-time subscription ensures they appear immediately without polling.
+
+## Choosing the right feature
+
+A quick reference for which Realtime feature to use:
+
+| What you need | Feature | Persisted? |
+|---|---|---|
+| React to database changes | Database Changes | Yes |
+| Send messages between clients | Broadcast | No |
+| Track who's online | Presence | No |
+| Show typing indicators | Broadcast | No |
+| Live cursors | Broadcast | No |
+| Chat messages | Database Changes | Yes |
+| Online user list | Presence | No |
+| Live dashboard | Database Changes | Yes |
+| Notifications | Database Changes | Yes |
+
+The general rule: if the data needs to survive a page refresh, it goes through the database and you use Database Changes. If it's live and ephemeral, use Broadcast or Presence.

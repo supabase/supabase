@@ -1,0 +1,60 @@
+---
+title: Key Postgres Extensions
+description: pg_cron, pgvector, PostGIS, and query analysis
+---
+
+One of the things that makes Postgres so powerful is that it's extensible. An **extension** is a package that adds new features to your database — new data types, new functions, or entirely new capabilities that Postgres doesn't include by default. You install an extension with a single SQL command, and from that point on you can use its features just like anything else built into Postgres.
+
+Think of extensions like plugins. Postgres on its own is a relational database. But with the right extensions, it can also be a job scheduler, a vector search engine, or a geospatial database — all without leaving Postgres or adding another service to your stack.
+
+## Enabling an extension
+
+In Supabase, you can enable extensions from the Dashboard under **Database > Extensions**, or with SQL:
+
+```sql
+create extension if not exists pg_cron;
+```
+
+Supabase comes with a large set of extensions pre-installed and ready to enable. You don't need to download or install anything — just turn them on when you need them.
+
+Here are some of the most commonly used extensions:
+
+## pg_cron — scheduled jobs
+
+`pg_cron` lets you run SQL on a recurring schedule, like a cron job but inside your database. Common uses include cleaning up expired rows, refreshing summary tables, and aggregating daily stats. You define a schedule using standard cron syntax (e.g., "every hour" or "every day at midnight"), and Postgres runs the SQL automatically at those times.
+
+This is useful when you need something to happen reliably on a timer without setting up an external scheduler or background worker.
+
+## pgvector — vector search for AI
+
+`pgvector` adds a vector data type to Postgres, which lets you store and search **embeddings** — the numeric representations that AI models use to understand text, images, and other data. If you're building anything with semantic search, recommendations, or RAG (retrieval-augmented generation), this is the extension you need.
+
+With `pgvector`, you can store embeddings alongside your regular data in the same database, then query for "similar" items by comparing vectors. This means you don't need a separate vector database — Postgres handles it.
+
+The AI and Vectors section of this course covers `pgvector` in much more detail.
+
+## PostGIS — geospatial data
+
+`PostGIS` turns Postgres into a geospatial database. If your application works with locations, maps, boundaries, or distances, PostGIS gives you the data types and functions to handle it natively.
+
+You can store latitude/longitude coordinates, calculate distances between points, find all records within a radius, and work with geographic boundaries — all in SQL. It's widely used in logistics, real estate, delivery apps, and anything that involves a map.
+
+PostGIS is a large extension with hundreds of functions, but you can get surprisingly far with just a handful of them.
+
+## pg_stat_statements — query performance
+
+`pg_stat_statements` tracks how your SQL queries are performing. It records things like how many times a query has run, how long it takes on average, and how many rows it processes. This is essential for finding slow queries and understanding where your database is spending its time.
+
+Supabase also surfaces this data in the Dashboard under **Query Performance**, which gives you the same insights in a visual format. When your app feels slow, this is a good first place to look.
+
+## Other useful extensions
+
+Supabase supports dozens of extensions. Here are a few more you might reach for:
+
+- **`pg_trgm`** — fuzzy text matching and similarity search. Useful for "did you mean?" style searches and autocomplete.
+- **`pgcrypto`** — cryptographic functions like hashing and encryption.
+- **`http`** — make HTTP requests directly from SQL. Useful for calling webhooks from triggers.
+- **`pg_jsonschema`** — validate JSONB data against a JSON Schema. Useful when you want the flexibility of JSONB but still want to enforce structure.
+- **`pg_net`** — make asynchronous HTTP requests from SQL without blocking the transaction. Good for fire-and-forget notifications.
+
+You don't need to install any of these right now. The point is that when you hit a problem — scheduling jobs, searching by location, analyzing performance — there's often a Postgres extension that solves it without adding another service to your architecture.

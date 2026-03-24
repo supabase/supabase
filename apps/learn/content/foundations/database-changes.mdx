@@ -1,0 +1,147 @@
+---
+title: Database Changes
+description: Subscribing to inserts, updates, and deletes in real time
+---
+
+Database Changes (also called Postgres Changes) lets your app subscribe to changes on your tables in real time. When a row is inserted, updated, or deleted, the event is pushed to any client that's listening. This is the most commonly used Realtime feature.
+
+## Listening for changes
+
+To subscribe to changes on a table, create a channel and add a Postgres Changes listener:
+
+```js
+const channel = supabase
+  .channel('todos-changes')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'todos' }, // * means all events (INSERT, UPDATE, DELETE)
+    (payload) => {
+      console.log('Change received:', payload)
+    }
+  )
+  .subscribe()
+```
+
+This listens for all (`*`) events (inserts, updates, deletes) on the `todos` table. The callback fires every time something changes, with the event details in `payload`.
+
+## Filtering by event type
+
+You don't have to listen for everything. You can subscribe to specific events:
+
+```js
+// Only new rows
+.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'todos' }, (payload) => {
+  console.log('New todo:', payload.new)
+})
+
+// Only updates
+.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'todos' }, (payload) => {
+  console.log('Updated:', payload.old, '->', payload.new)
+})
+
+// Only deletes
+.on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'todos' }, (payload) => {
+  console.log('Deleted:', payload.old)
+})
+```
+
+You can attach multiple listeners to the same channel — one for inserts, another for deletes — and they'll each fire for their respective events.
+
+## Filtering by column values
+
+For tables with lots of activity, you probably don't want every change — just the ones relevant to the current user or view. You can filter by column values:
+
+```js
+.on(
+  'postgres_changes',
+  {
+    event: '*',
+    schema: 'public',
+    table: 'messages',
+    filter: 'room_id=eq.abc-123',
+  },
+  (payload) => {
+    console.log('Message in this room:', payload)
+  }
+)
+```
+
+This only fires for changes to rows where `room_id` equals `abc-123`. The filter syntax uses the same operators as the PostgREST API — `eq`, `neq`, `in`, `lt`, `gt`, etc.
+
+A few more examples:
+
+```js
+// Only changes for the current user
+filter: 'user_id=eq.some-uuid'
+
+// Only changes where status is 'active' or 'pending'
+filter: 'status=in.(active,pending)'
+```
+
+## The event payload
+
+When an event fires, the payload contains:
+
+- **`eventType`** — `INSERT`, `UPDATE`, or `DELETE`
+- **`new`** — the new row data (present for `INSERT` and `UPDATE`)
+- **`old`** — the previous row data (present for `UPDATE` and `DELETE`)
+- **`schema`** — the schema name
+- **`table`** — the table name
+- **`commit_timestamp`** — when the change was committed
+
+For `INSERT`, `old` is empty. For `DELETE`, `new` is empty. For `UPDATE`, you get both, which is useful for showing what changed.
+
+### A note on old record data
+
+By default, `DELETE` and `UPDATE` events only include the `id` column in `old`. To receive full row data for `old`, you need to set the table's replica identity to `full`:
+
+```sql
+alter table public.todos replica identity full;
+```
+
+Without this, you'll only know _which_ row was deleted or what its previous state was by its ID. For many apps this is fine — you just remove the row from your local state by ID. But if you need to know the full previous state (for example, to show "this message was edited from X to Y"), set replica identity to full.
+
+## RLS and security
+
+Database Changes respects Row Level Security. A client only receives events for rows they'd be able to query normally. If a user can't `SELECT` a row through RLS, they won't receive change events for it either.
+
+This means you don't need to build a separate authorization layer for Realtime — the same policies you've already written protect your real-time events.
+
+## A practical example
+
+Here's a complete example for a chat app that listens for new messages in a specific room:
+
+```js
+const channel = supabase
+  .channel('chat-room-123')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'room_id=eq.room-123',
+    },
+    (payload) => {
+      // Add the new message to the UI
+      addMessage(payload.new)
+    }
+  )
+  .subscribe()
+```
+
+When you're done (the user leaves the chat room):
+
+```js
+supabase.removeChannel(channel)
+```
+
+## Enabling Realtime on a table
+
+Database Changes uses Postgres's built-in replication system to detect changes. You need to enable replication for each table you want to subscribe to. You can do this in the Dashboard from the Table Editor or with SQL:
+
+```sql
+alter publication supabase_realtime add table public.todos;
+```
+
+If you try to subscribe to a table that isn't in the publication, you won't receive any events.

@@ -1,0 +1,41 @@
+---
+title: Replication
+description: Read replicas, ETL, and logical replication
+---
+
+As your application grows, a single database handling every read and write can become a bottleneck. Replication is how you distribute that work — by keeping copies of your data in other places, whether that's another Postgres instance in a different region, a data warehouse for analytics, or an external system entirely.
+
+This chapter introduces the core replication concepts. You don't need to set any of this up right away — it's useful to know these options exist for when your project reaches the point where they matter.
+
+## Read replicas
+
+A **read replica** is a copy of your database that stays up to date with the primary. It handles read queries (selects) but not writes (inserts, updates, deletes) — those still go to the primary database.
+
+Read replicas are useful for two main reasons:
+
+- **Reducing load** — you can send read-heavy queries (dashboards, reports, search) to a replica, freeing up your primary database for writes
+- **Reducing latency** — you can place a replica in a region closer to a group of users, so their reads are faster
+
+Supabase supports read replicas on the Pro plan and above. You can spin one up from the Dashboard, and the Supabase client libraries can be configured to route reads to the replica automatically.
+
+The tradeoff is that replicas are **eventually consistent** — there's a small delay (usually milliseconds) between a write on the primary and the replica catching up. For most read operations this is fine, but if a user just created a record and immediately tries to read it back, you'd want that read to hit the primary.
+
+## Common use cases
+
+- **Analytics pipelines** — replicate your Supabase data to a warehouse like BigQuery or Snowflake so you can run heavy analytical queries without affecting your production database
+- **Multi-region deployments** — place read replicas in regions close to your users for lower latency reads
+- **ETL (Extract, Transform, Load)** — move data from your database to external systems automatically as it changes, rather than running periodic batch jobs
+- **Syncing with external services** — keep another system in sync with your data, like feeding changes to a search index or an external reporting tool
+
+## When to think about replication
+
+For most new projects, you won't need replication. A single Supabase database can handle a lot of traffic, and adding replicas introduces complexity.
+
+Consider replication when:
+
+- Your database is under heavy read load and you need to spread it out
+- You have users in multiple regions and latency matters
+- You need to feed your data into an analytics or reporting system
+- You're running expensive queries (reports, aggregations) that slow down your production database
+
+When you get there, Supabase makes it straightforward to add read replicas from the Dashboard, and logical replication can be configured with SQL.

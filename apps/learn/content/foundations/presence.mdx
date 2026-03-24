@@ -1,0 +1,151 @@
+---
+title: Presence
+description: Tracking online users and shared state
+---
+
+Presence tracks which users are currently connected to a channel and lets them share state — like their name, avatar, or current status. It handles synchronization automatically, so when someone joins, leaves, or updates their state, every other client on the channel is notified.
+
+## How Presence works
+
+Presence is a shared, synchronized map of who's connected. Each client "tracks" themselves on a channel with some state, and Presence handles:
+
+- **Sync** — when you first subscribe, you get the full list of who's currently present
+- **Join** — when a new client connects, everyone else is notified
+- **Leave** — when a client disconnects (or their connection drops), everyone else is notified
+
+The leave detection is automatic — if a client closes the tab, loses their connection, or crashes, the Realtime server detects the disconnection and broadcasts a leave event. You don't need to handle cleanup yourself.
+
+## Tracking presence
+
+To track a user's presence, create a channel and call `track()` after subscribing:
+
+```js
+const channel = supabase.channel('document-456')
+
+channel
+  .on('presence', { event: 'sync' }, () => {
+    const state = channel.presenceState()
+    console.log('Currently online:', state)
+  })
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      await channel.track({
+        user_id: user.id,
+        name: user.name,
+        avatar: user.avatar_url,
+        online_at: new Date().toISOString(),
+      })
+    }
+  })
+```
+
+The object you pass to `track()` is the state that other clients will see. It can contain whatever you want — user info, a cursor color, their current page, anything.
+
+## Presence events
+
+There are three events you can listen for:
+
+### sync
+
+Fires whenever the presence state changes — joins, leaves, or state updates. This is the simplest way to keep your UI in sync because it fires for every change:
+
+```js
+channel.on('presence', { event: 'sync' }, () => {
+  const state = channel.presenceState()
+  updateOnlineUsers(state)
+})
+```
+
+`presenceState()` returns the full current state — a map of all connected clients and their tracked data.
+
+### join
+
+Fires when a new client joins the channel:
+
+```js
+channel.on('presence', { event: 'join' }, ({ key, newPresences }) => {
+  console.log('Joined:', newPresences)
+})
+```
+
+### leave
+
+Fires when a client disconnects:
+
+```js
+channel.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+  console.log('Left:', leftPresences)
+})
+```
+
+For most apps, listening to `sync` alone is enough — it gives you the complete picture every time anything changes. The `join` and `leave` events are useful if you want to show notifications ("Alice just joined") or trigger animations.
+
+## Reading presence state
+
+`presenceState()` returns an object where each key is a presence ID and the value is an array of states (a single user might have multiple tabs open):
+
+```js
+const state = channel.presenceState()
+
+// {
+//   'abc-123': [{ user_id: 'abc-123', name: 'Alice', online_at: '...' }],
+//   'def-456': [{ user_id: 'def-456', name: 'Bob', online_at: '...' }],
+// }
+```
+
+To get a flat list of online users:
+
+```js
+const onlineUsers = Object.values(state).flat()
+```
+
+## Updating presence state
+
+If a user's state changes (they switch to a different page, change their status, move their cursor), call `track()` again with the new state:
+
+```js
+await channel.track({
+  user_id: user.id,
+  name: user.name,
+  avatar: user.avatar_url,
+  status: 'away',
+})
+```
+
+This replaces their previous state. Other clients receive a `sync` event with the updated data.
+
+## Building a "who's online" indicator
+
+Here's a complete example that shows an online user list:
+
+```js
+const channel = supabase.channel('app-online')
+
+let onlineUsers = []
+
+channel
+  .on('presence', { event: 'sync' }, () => {
+    onlineUsers = Object.values(channel.presenceState()).flat()
+    renderOnlineList(onlineUsers)
+  })
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      await channel.track({
+        user_id: user.id,
+        name: user.name,
+        avatar: user.avatar_url,
+      })
+    }
+  })
+```
+
+The `renderOnlineList` function receives an array of user objects and updates the UI — maybe showing avatars in a row, a count badge, or a sidebar list. It's called every time someone joins, leaves, or updates their state.
+
+## Presence vs Broadcast
+
+Presence and Broadcast are both real-time features that don't touch the database, but they serve different purposes:
+
+- **Presence** is about *who is here and what's their state*. It's synchronized — every client sees the same state. It handles joins and leaves automatically.
+- **Broadcast** is about *sending events between clients*. It's fire-and-forget — messages aren't stored or synchronized.
+
+Use Presence when you need to show a live snapshot of connected users. Use Broadcast when you need to stream events between them. Many apps use both on the same channel — Presence to show who's online and Broadcast to stream their cursor positions.

@@ -2,78 +2,42 @@
 title: Supabase Foundations
 description: Learn the foundations of Supabase, the Postgres development platform.
 
-explore:
-  - title: Supabase Docs
-    link: https://supabase.com/docs
-    itemType: doc
-
 courseHero:
   title: Supabase Foundations
   subtitle: Learn the foundations of Supabase, the Postgres development platform.
-  description: In this short course, you'll explore how Supabase brings together **Database**, **Auth**, **Storage**, **Edge Functions**, and **Realtime** into a unified developer platform.
+  description: A comprehensive guide to building on Supabase — from your first project to production. Covers **Database**, **Auth**, **Row Level Security**, **Storage**, **Realtime**, **Edge Functions**, **AI and Vectors**, and more.
   stats:
-    - label: 5 Chapters
+    - label: 9 Sections
       icon: book-open
       accent: emerald
-    - label: ~1 hour
-      icon: clock
-      accent: blue
     - label: Beginner
       icon: zap
       accent: amber
 ---
 
-In this short course, you'll explore how Supabase brings together **Database**, **Auth**, **Storage**, **Edge Functions**, and **Realtime** into a unified developer platform.
-
-By the end, you'll understand how each piece of Supabase fits together, how to persist and protect your data, and how to start confidently building your own applications.
+A comprehensive guide to building on Supabase — from your first project to production. You'll learn how Database, Auth, Storage, Realtime, and Edge Functions work together, and how to use them confidently in your own applications.
 
 ## What you'll learn
 
-- **Architecture**: how Supabase's core products work together.
-- **Data fundamentals**: create tables, insert and retrieve data, and explore our generated APIs.
-- **Authentication**: create and sign in users, and make secure requests.
-- **Security**: enable Row Level Security (RLS) and write policies to protect your data.
-- **Storage**: upload and serve files using buckets.
-- **Edge Functions**: run custom backend logic close to your users, using Deno and Supabase's serverless runtime.
-- **Vector search**: store and query embeddings for AI-powered search and recommendations.
+- **Platform Architecture** — how Supabase is structured, when to choose it, setting up projects, and local development workflows.
+- **Database Design & Postgres** — schema design, data types, functions, triggers, extensions, migrations, and replication.
+- **Authentication & Users** — sign-up and login flows, authentication methods, user management, and security considerations.
+- **Row Level Security** — RLS fundamentals, policy patterns, auth helpers, multi-tenancy, performance, and common pitfalls.
+- **Storage** — architecture, access control, file operations, image transformations, and integration patterns.
+- **Realtime** — subscribing to database changes, broadcast, presence, and real-world patterns.
+- **Edge Functions** — architecture, development workflow, common patterns, database integration, and AI/LLM integration.
+- **AI and Vectors** — vector fundamentals, indexing strategies, search patterns, and RAG implementation.
+- **Production Readiness** — performance optimization, monitoring, security hardening, backups, and deployment patterns.
 
 ---
 
 ## Prerequisites
 
 - A [Supabase account](https://supabase.com/) (free)
-- Basic familiarity with a terminal to run queries.
-
----
-
-## Course outline
-
-The course is split into 7 chapters, each approximately 10 minutes long.
-
-1. **What is Supabase?**
-   Get an overview of Supabase's architecture and core products. Create your first project and make a simple API call.
-2. **Your First Table**
-   Create a Postgres table in Supabase, insert data, and query it through the REST API.
-3. **Authentication Basics**
-   Add users, sign them in, and understand how Supabase secures your APIs with JWTs.
-4. **Secure Your Data with Row-Level Security**
-   Enable Row-Level Security and write policies to ensure users only access their own data.
-5. **Storage**
-   Store files in Supabase Storage and upload and serve files from your buckets.
-6. **Edge Functions**
-   Deploy simple functions to run backend logic close to your users using Deno.
-7. **Vector Search**
-   Store and query embeddings for AI-powered search and recommendations using Supabase Vector.
+- Basic familiarity with a terminal
 
 ---
 
 ## Before you begin
 
-Create a new project at [supabase.com](https://supabase.com), open the **Supabase Dashboard**, and grab your **API URL** and **anon key** from the [Connect dialog](https://supabase.com/dashboard/project/_/settings/api?showConnect=true&connectTab=frameworks).
-You'll use them throughout the course to send real requests to your database and APIs.
-
----
-
-## Duration
-
-Approx. **1 hour** — a fast, hands-on introduction to the Supabase platform.
+Create a new project at [supabase.com](https://supabase.com), open the **Supabase Dashboard**, and grab your **API URL** and **API key** from the [Connect dialog](https://supabase.com/dashboard/project/_/settings/api?showConnect=true&connectTab=frameworks). You'll use them throughout the course to send real requests to your database and APIs.

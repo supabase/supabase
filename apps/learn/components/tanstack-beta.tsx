@@ -1,7 +1,7 @@
 import { TriangleAlert } from 'lucide-react'
 import { Callout } from './callout'
 
-export default function TanStackBeta() {
+const TanStackBeta = () => {
   return (
     <div className="mt-4">
       <Callout>
@@ -27,3 +27,5 @@ export default function TanStackBeta() {
     </div>
   )
 }
+
+export { TanStackBeta }

@@ -1,0 +1,201 @@
+---
+title: Authentication Methods
+description: Email, magic links, social providers, and phone auth
+---
+
+Supabase Auth is flexible and supports all the common authentication methods that modern apps use today — email and password, magic links, one-time passwords, social logins, phone-based auth, and anonymous sessions. You can offer one method or combine several — a user might sign up with email and password today and later link their Google account for faster login.
+
+This chapter walks through each authentication method, what it looks like from the user's perspective, and how to set it up with the Supabase client library.
+
+## Email and password
+
+The most straightforward method. A user provides their email address and a password to create an account, then uses the same credentials to sign in.
+
+### Sign up
+
+```js
+const { data, error } = await supabase.auth.signUp({
+  email: 'user@example.com',
+  password: 'their-password',
+})
+```
+
+By default, Supabase sends a confirmation email with a link the user must click before their account is active. You can disable email confirmation in the Dashboard under **Authentication > Providers > Email**, but it's recommended to keep it on for production apps.
+
+### Sign in
+
+```js
+const { data, error } = await supabase.auth.signInWithPassword({
+  email: 'user@example.com',
+  password: 'their-password',
+})
+```
+
+If the credentials are valid, this returns a session with an access token and refresh token. The Supabase client library stores the session automatically.
+
+### Password reset
+
+When a user forgets their password, you can send them a reset email:
+
+```js
+const { error } = await supabase.auth.resetPasswordForEmail('user@example.com')
+```
+
+This sends an email with a link. When the user clicks it, they're redirected to your app where you can let them set a new password:
+
+```js
+const { error } = await supabase.auth.updateUser({
+  password: 'new-password',
+})
+```
+
+## Magic links
+
+Magic links let users sign in without a password. They enter their email address, receive a link in their inbox, and clicking the link signs them in. There's nothing to remember.
+
+```js
+const { error } = await supabase.auth.signInWithOtp({
+  email: 'user@example.com',
+})
+```
+
+This sends an email with a sign-in link. When the user clicks it, they're redirected to your app with an active session. If the email doesn't belong to an existing account, one is created automatically.
+
+Magic links are popular for apps where reducing friction matters more than having users remember a password. The tradeoff is that sign-in is only as fast as checking your email.
+
+## One-time passwords (OTP)
+
+Similar to magic links, but instead of clicking a link, the user enters a 6-digit code. This works over email or SMS.
+
+### Email OTP
+
+```js
+const { error } = await supabase.auth.signInWithOtp({
+  email: 'user@example.com',
+})
+```
+
+The user receives an email with a code. Your app collects the code and verifies it:
+
+```js
+const { data, error } = await supabase.auth.verifyOtp({
+  email: 'user@example.com',
+  token: '123456',
+  type: 'email',
+})
+```
+
+### Phone / SMS OTP
+
+```js
+const { error } = await supabase.auth.signInWithOtp({
+  phone: '+15551234567',
+})
+```
+
+The user receives an SMS with a code. Verify it the same way:
+
+```js
+const { data, error } = await supabase.auth.verifyOtp({
+  phone: '+15551234567',
+  token: '123456',
+  type: 'sms',
+})
+```
+
+Phone auth requires a third-party SMS provider (like Twilio or MessageBird), which you configure in the Dashboard under **Authentication > Providers > Phone**.
+
+## Social providers (OAuth)
+
+Social login lets users sign in with an existing account from a provider like Google, GitHub, Apple, or Microsoft. The user clicks a button, is redirected to the provider to grant permission, and then is redirected back to your app with an active session.
+
+```js
+const { error } = await supabase.auth.signInWithOAuth({
+  provider: 'google',
+})
+```
+
+This redirects the user to Google's sign-in page. After they approve, Google redirects them back to your app. Supabase handles the token exchange and creates (or updates) the user in `auth.users`.
+
+### Supported providers
+
+Supabase supports a wide range of OAuth providers, including:
+
+- Google
+- GitHub
+- Apple
+- Microsoft / Azure
+- Discord
+- Slack
+- Twitter / X
+- Facebook
+- Spotify
+- And many more
+
+Each provider requires some setup — typically creating an OAuth app in the provider's developer console and adding the client ID and secret to the Supabase Dashboard under **Authentication > Providers**.
+
+### Redirect URLs
+
+OAuth requires a redirect URL — the page in your app that users land on after authenticating with the provider. You configure the allowed redirect URLs in the Dashboard under **Authentication > URL Configuration**.
+
+For local development, this is usually something like `http://localhost:3000/auth/callback`. For production, it's your actual domain.
+
+### Scopes and user data
+
+When a user signs in with a provider, Supabase requests basic profile information (email, name, avatar). This data is stored in the user's `raw_user_meta_data` field in `auth.users`, which you can access in your app or in trigger functions.
+
+You can request additional data by specifying scopes:
+
+```js
+const { error } = await supabase.auth.signInWithOAuth({
+  provider: 'github',
+  options: {
+    scopes: 'repo',
+  },
+})
+```
+
+The available scopes depend on the provider.
+
+## Anonymous authentication
+
+Sometimes you want users to interact with your app before they create an account — like adding items to a cart, saving preferences, or trying out a feature. Anonymous auth creates a temporary user with no email or password, that can later be converted to a regular user.
+
+```js
+const { data, error } = await supabase.auth.signInAnonymously()
+```
+
+This creates a real user in `auth.users` with a UUID and a session, but no identifying information. The user can interact with your app normally, and RLS policies work the same way — `auth.uid()` returns their anonymous ID.
+
+Later, when the user decides to create a full account, you can link their anonymous session to a permanent identity:
+
+```js
+const { error } = await supabase.auth.updateUser({
+  email: 'user@example.com',
+  password: 'their-password',
+})
+```
+
+This converts the anonymous user into a regular user while keeping their existing data and UUID. No data migration needed.
+
+## Signing out
+
+Regardless of which method the user signed in with, signing out works the same way:
+
+```js
+const { error } = await supabase.auth.signOut()
+```
+
+This clears the local session. The user will need to sign in again to access protected data.
+
+## Choosing an authentication method
+
+There's no single right answer — it depends on your app and your users. Here are some general guidelines:
+
+- **Email/password** — the most familiar option. Good default for most apps.
+- **Magic links** — lower friction, no password to remember. Good for apps where ease of access matters.
+- **Social providers** — fast sign-in with one click, and you get profile data. Good when your users are likely to have accounts with those providers.
+- **Phone/SMS** — useful for apps where users are more reachable by phone than email, or as a second factor.
+- **Anonymous** — useful when you want users to try your app before committing to an account.
+
+You can combine multiple methods. Many apps offer email/password alongside one or two social providers, giving users a choice.

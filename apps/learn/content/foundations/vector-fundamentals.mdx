@@ -1,0 +1,208 @@
+---
+title: Embeddings and Vector Search
+description: Storing embeddings in Postgres and searching by meaning
+---
+
+Traditional database queries match on exact values — find rows where `status = 'active'` or `name like '%alice%'`. But what if you want to find content that's *similar in meaning*? A user searches for "how to reset my password" and you want to return a help article titled "Recovering your account credentials," even though the words don't match.
+
+This is what embeddings and vector search are for. You turn text (or images, or any content) into numeric vectors that capture meaning, store them in your Postgres database, and search by similarity instead of keywords.
+
+## What embeddings are
+
+An embedding is an array of numbers (a vector) that represents the meaning of a piece of content. Two pieces of text that mean similar things will have vectors that are close together; unrelated text will have vectors far apart.
+
+For example, the sentences "The cat sat on the mat" and "A kitten was resting on the rug" would have similar embeddings, even though they share almost no words. The sentence "Quarterly revenue exceeded projections" would have an embedding far away from both.
+
+You don't create embeddings yourself — you send text to an embedding model (like OpenAI's `text-embedding-3-small`) and it returns the vector. The model has been trained on large amounts of text to understand meaning.
+
+## Setting up pgvector
+
+Supabase includes the `pgvector` extension, which adds vector storage and search to Postgres. Enable it with:
+
+```sql
+create extension if not exists vector;
+```
+
+Then add a vector column to your table:
+
+```sql
+create table documents (
+  id uuid primary key default gen_random_uuid(),
+  content text not null,
+  embedding vector(1536),
+  created_at timestamptz default now()
+);
+```
+
+The number in `vector(1536)` is the dimension — it must match the embedding model you're using. OpenAI's `text-embedding-3-small` produces 1536-dimensional vectors. Other models use different dimensions (e.g., 384, 768, 1024).
+
+## Chunking: don't embed entire documents
+
+An important detail: you don't embed a whole document as a single vector. A full page of documentation or a long article would produce a vector that's too general — it captures the overall topic but loses the specifics. When a user searches for something precise, a general vector won't match well.
+
+Instead, you break documents into smaller **chunks** — a few paragraphs each — and embed each chunk separately. This way, a search for "how to reset a password" can match the specific section about password resets, not just a page that happens to mention it somewhere.
+
+The RAG Pipeline chapter goes deeper into chunking strategies, but the key idea is simple: smaller, focused chunks produce better search results than large, general ones.
+
+## Generating and storing embeddings
+
+You generate embeddings by calling an embedding model, typically through an Edge Function:
+
+```ts
+import OpenAI from 'npm:openai@4'
+import { createClient } from 'npm:@supabase/supabase-js@2'
+
+const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! })
+
+Deno.serve(async (req) => {
+  const { content } = await req.json()
+
+  // Generate the embedding
+  const response = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: content,
+  })
+
+  const embedding = response.data[0].embedding
+
+  // Store it in the database
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SECRET_KEY')!
+  )
+
+  const { error } = await supabase
+    .from('documents')
+    .insert({ content, embedding })
+
+  return new Response(JSON.stringify({ success: !error }), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+You can use any embedding provider — OpenAI, Cohere, Voyage, or open-source models. The process is the same: send text in, get a vector back, store it.
+
+## Searching by similarity
+
+To find similar content, you generate an embedding for the search query and compare it to the stored embeddings. Create a Postgres function for this:
+
+```sql
+create or replace function match_documents(
+  query_embedding vector(1536),
+  match_threshold float default 0.7,
+  match_count int default 5
+)
+returns table (id uuid, content text, similarity float)
+language sql
+as $$
+  select
+    id,
+    content,
+    1 - (embedding <=> query_embedding) as similarity
+  from documents
+  where 1 - (embedding <=> query_embedding) > match_threshold
+  order by embedding <=> query_embedding
+  limit match_count;
+$$;
+```
+
+The `<=>` operator calculates cosine distance between two vectors. Lower distance means more similar. The function converts this to a similarity score (1 = identical, 0 = unrelated) and filters by a threshold.
+
+Call it from your app:
+
+```js
+const { data: matches } = await supabase.rpc('match_documents', {
+  query_embedding: queryEmbedding,
+  match_threshold: 0.7,
+  match_count: 5,
+})
+```
+
+## Indexing for performance
+
+Without an index, every search compares the query vector to every row in the table — fine for thousands of rows, but slow for hundreds of thousands or more. pgvector provides two index types:
+
+### HNSW
+
+HNSW (Hierarchical Navigable Small World) is the recommended index for most cases. It's fast, accurate, and doesn't require a build step after adding new data:
+
+```sql
+create index on documents
+using hnsw (embedding vector_cosine_ops);
+```
+
+You can tune it with parameters:
+
+```sql
+create index on documents
+using hnsw (embedding vector_cosine_ops)
+with (m = 16, ef_construction = 64);
+```
+
+- **`m`** — how many connections each node has in the graph. Higher values improve recall but use more memory.
+- **`ef_construction`** — how thorough the index build is. Higher values produce a better index but take longer to build.
+
+The defaults work well for most datasets. Tune them if you're working with millions of vectors and need to optimize the accuracy/speed tradeoff.
+
+### IVFFlat
+
+IVFFlat divides vectors into clusters and searches the most relevant clusters. It can be faster than HNSW for very large datasets but needs to be rebuilt periodically as data changes:
+
+```sql
+create index on documents
+using ivfflat (embedding vector_cosine_ops)
+with (lists = 100);
+```
+
+The `lists` parameter controls how many clusters to create. A common guideline is the square root of your row count — so 100 lists for 10,000 rows, 1000 lists for 1,000,000 rows.
+
+### When to index
+
+- **Under ~10,000 rows** — you probably don't need an index. Exact search is fast enough.
+- **10,000 to 100,000 rows** — add an HNSW index.
+- **Over 100,000 rows** — HNSW or IVFFlat, depending on your accuracy and speed requirements.
+
+Both index types do approximate nearest-neighbor search, which means they trade a small amount of accuracy for a large speed improvement. For most applications, the difference is imperceptible.
+
+## Hybrid search
+
+Sometimes vector search alone isn't enough. A user searches for "error 403" and you want to match on the exact error code *and* the meaning of the surrounding text. Hybrid search combines keyword matching (using Postgres full-text search) with vector similarity:
+
+```sql
+create or replace function hybrid_search(
+  search_query text,
+  query_embedding vector(1536),
+  match_count int default 5
+)
+returns table (id uuid, content text, similarity float)
+language sql
+as $$
+  select
+    id,
+    content,
+    1 - (embedding <=> query_embedding) as similarity
+  from documents
+  where
+    to_tsvector('english', content) @@ plainto_tsquery('english', search_query)
+  order by embedding <=> query_embedding
+  limit match_count;
+$$;
+```
+
+This filters by keyword match first (narrowing the results to documents that contain the search terms), then ranks by vector similarity. You get the precision of keyword matching with the understanding of semantic search.
+
+## Filtering with metadata
+
+You can combine vector search with regular column filters. For example, searching only within a specific category or date range:
+
+```sql
+select id, content, 1 - (embedding <=> query_embedding) as similarity
+from documents
+where category = 'support'
+  and created_at > now() - interval '30 days'
+order by embedding <=> query_embedding
+limit 5;
+```
+
+This is just a normal `WHERE` clause alongside the vector search. Postgres handles both together. Make sure to index the columns you're filtering on for best performance.

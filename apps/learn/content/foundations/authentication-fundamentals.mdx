@@ -1,0 +1,99 @@
+---
+title: Authentication Fundamentals
+description: Auth architecture, JWT tokens, and session management
+---
+
+Authentication is how your application knows who someone is. When a user signs up or logs in, Supabase Auth verifies their identity and gives them a **session** — a set of tokens that prove who they are on every subsequent request. This is what makes features like "show me my data" and "only let me edit my own posts" possible.
+
+This chapter covers how Supabase Auth works under the hood — the architecture, tokens, and sessions. The next chapters cover the practical side: sign-up flows, authentication methods, and user management.
+
+## How Supabase Auth works
+
+Supabase Auth runs as a separate service alongside your database and handles everything related to identity: creating accounts, verifying credentials, issuing tokens, and managing sessions. This service is called GoTrue.
+
+When a user signs up or logs in, here's what happens:
+
+1. Your app sends the user's credentials (email/password, OAuth token, magic link, etc.) to the Auth service
+2. GoTrue verifies the credentials
+3. If valid, GoTrue creates (or updates) a user record in the `auth.users` table in your database
+4. GoTrue returns a **session** to your app, which includes an access token and a refresh token
+
+From that point on, your app includes the access token in every request to the Supabase API. The API uses the token to identify the user and enforce Row Level Security policies.
+
+## JWTs — how tokens work
+
+The access token that Supabase Auth issues is a **JWT** (JSON Web Token). A JWT is a small, encoded string that contains information about the user. It's not encrypted — anyone can read its contents — but it's **signed**, which means Supabase can verify it hasn't been tampered with.
+
+## Access tokens and refresh tokens
+
+A session consists of two tokens:
+
+**Access token** — a short-lived JWT (defaults to 1 hour) that's included with every API request. Because it expires quickly, a stolen access token has a limited window of use.
+
+**Refresh token** — a longer-lived token that's used to get a new access token when the current one expires. The refresh token is only sent to the Auth service, not to your database or API.
+
+The Supabase client libraries handle this cycle automatically. When the access token is about to expire, the library uses the refresh token to get a fresh one — your app doesn't need to do anything. If the refresh token itself expires (or is revoked), the user is signed out and needs to log in again.
+
+## The auth schema
+
+Just as you store your application data in your own tables in the `public` schema, Supabase Auth stores its data in a dedicated `auth` schema in your database. You can read from these tables, but you shouldn't write to them directly — let the Auth service manage them.
+
+The key tables are:
+
+- **`auth.users`** — one row per user. Contains the user's ID, email, phone, metadata, and when they were created. This is the table you reference with foreign keys in your own tables (e.g., `user_id uuid references auth.users(id)`).
+- **`auth.sessions`** — active sessions for each user. A user can have multiple sessions (one per device or browser).
+- **`auth.identities`** — links users to their authentication methods. A single user might have an email/password identity and a Google OAuth identity, both pointing to the same `auth.users` row.
+
+This is one of the benefits of Supabase's architecture — auth data lives in the same database as your application data. You can join `auth.users` with your own tables, reference it in foreign keys, and use it in RLS policies, all without an external API call.
+
+## Auth helpers in SQL
+
+Supabase provides helper functions you can use in SQL and RLS policies to access information about the current user:
+
+- **`auth.uid()`** — returns the current user's UUID (from the `sub` claim in the JWT)
+- **`auth.jwt()`** — returns the full JWT payload as JSON, so you can access any claim
+- **`auth.role()`** — returns the current role (`authenticated`, `anon`, etc.)
+
+These are used most often in Row Level Security policies:
+
+```sql
+-- Only let users read their own rows
+create policy "Users can view their own data"
+on todos for select
+using (user_id = auth.uid());
+```
+
+The `auth.uid()` function reads the user's ID from the JWT that was sent with the request. If the `user_id` column on the row matches, the policy allows the read. This is how Supabase connects authentication to authorization — the JWT identifies who the user is, and the RLS policy decides what they can access.
+
+## Authenticated vs anonymous requests
+
+Every request to the Supabase API has a role, determined by the token:
+
+- **`authenticated`** — the request includes a valid JWT from a signed-in user. The user's identity is available through `auth.uid()` and `auth.jwt()`.
+- **`anon`** — the request was made with the Publishable Key but no user token. This is what unauthenticated requests look like. `auth.uid()` returns `null`. (The role is still called `anon` in Postgres, even though the key is now called the Publishable Key.)
+
+Your RLS policies control what each role can do. A common pattern is to allow `anon` users to read public data but require `authenticated` for anything else:
+
+```sql
+-- Anyone can read published posts
+create policy "Public posts are visible to everyone"
+on posts for select
+using (is_published = true);
+
+-- Only the author can update their posts
+create policy "Authors can update their own posts"
+on posts for update
+using (user_id = auth.uid());
+```
+
+## How it all connects
+
+Here's the full picture:
+
+1. A user signs in through your app
+2. Supabase Auth verifies their identity and returns a JWT
+3. Your app stores the JWT and includes it in every API request
+4. The Supabase API reads the JWT to determine who the user is and what role they have
+5. Row Level Security policies use `auth.uid()` and `auth.jwt()` to decide what data the user can see and modify
+
+The Supabase client libraries handle steps 2-4 automatically. Your main job is to set up the sign-in flow and write RLS policies — which are covered in the next chapters.

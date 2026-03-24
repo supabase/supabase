@@ -1,0 +1,80 @@
+---
+title: Storage Architecture
+description: Bucket types, CDN, and storage limits
+---
+
+Supabase Storage lets you store and serve files — images, videos, documents, anything — alongside your database. It's built on top of S3-compatible object storage, with a simple API and tight integration with the rest of Supabase. Access control uses the same RLS policies you already know from the database.
+
+## Buckets
+
+Files in Supabase Storage are organized into **buckets**. A bucket is like a top-level folder — you might have one for `avatars`, another for `documents`, and another for `uploads`. Each bucket has its own access settings.
+
+### Creating a bucket
+
+You can create buckets in the Dashboard under **Storage**, or with the client library:
+
+```js
+const { data, error } = await supabase.storage.createBucket('avatars', {
+  public: true,
+})
+```
+
+### Public vs private buckets
+
+The main decision when creating a bucket is whether it's **public** or **private**:
+
+- **Public buckets** — files are accessible to anyone with the URL. No authentication required. Good for things like profile images, marketing assets, or anything that doesn't need to be restricted.
+- **Private buckets** — files require authentication to access. You control who can see what using RLS policies or signed URLs. Good for user documents, uploads, or sensitive files.
+
+Public doesn't mean unprotected — you can still use RLS policies to control who can *upload* or *delete* files in a public bucket. It just means the files themselves are readable by anyone.
+
+## Objects
+
+Inside a bucket, each file is an **object**. Objects are identified by their path, which can include folders:
+
+```
+avatars/user-123/profile.jpg
+documents/2024/report.pdf
+uploads/image.png
+```
+
+Folders aren't a separate concept — they're just part of the object path. You don't need to create folders ahead of time; they're created implicitly when you upload a file to a path that includes them.
+
+Each object has metadata attached to it, including its MIME type, size, and any custom metadata you add at upload time.
+
+## How storage connects to your database
+
+This is one of the key things about Supabase Storage — it's backed by tables in your database. The `storage` schema contains tables like `storage.buckets` and `storage.objects` that track every bucket and file. This means:
+
+- You can write RLS policies on `storage.objects` just like you would on any other table
+- You can join storage metadata with your own tables in SQL queries
+- You can use database triggers to react to file uploads or deletions
+
+This is different from most file storage services, where access control is a separate system. In Supabase, it's all Postgres.
+
+## CDN and caching
+
+Files served from Supabase Storage go through a CDN (Content Delivery Network), which caches them at edge locations around the world. This means:
+
+- Files load fast regardless of where your users are
+- Repeated requests for the same file are served from the cache, not from storage
+- You can control caching with cache headers
+
+For public buckets, the CDN URL is the simplest way to serve files. For private buckets, you'll use signed URLs (covered in the next chapter) which also go through the CDN.
+
+## Storage limits
+
+A few limits to be aware of:
+
+- **File size** — the default maximum is 50MB per upload. You can increase this in the Dashboard under **Storage > Settings**. For very large files, use resumable uploads (covered in the File Operations chapter).
+- **Bucket count** — there's no hard limit on the number of buckets, but keeping it reasonable (tens, not thousands) is a good practice.
+- **Storage quota** — depends on your Supabase plan. The free tier includes 1GB of storage. Paid plans include more, and you can add additional storage as needed.
+
+## When to use Storage vs the database
+
+A common question: should I store this in Storage or in the database?
+
+- **Storage** — binary files like images, videos, PDFs, CSVs, and anything large. Storage is optimized for serving files over HTTP with caching.
+- **Database** — structured data, small text content, JSON. The database is optimized for queries, joins, and transactions.
+
+As a rule of thumb: if you'd put it in a file on your computer, use Storage. If you'd put it in a spreadsheet, use the database.

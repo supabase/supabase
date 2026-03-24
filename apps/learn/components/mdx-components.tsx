@@ -1,6 +1,5 @@
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
-
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -8,9 +7,10 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   cn,
 } from 'ui'
+
 import { Callout } from './callout'
 import { CopyButton } from './copy-button'
-import TanStackBeta from './tanstack-beta'
+import { TanStackBeta } from './tanstack-beta'
 
 const components = {
   Accordion,
@@ -23,7 +23,7 @@ const components = {
   h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       className={cn(
-        'font-heading mt-12 scroll-m-20 text-2xl font-medium tracking-tight first:mt-0',
+        'font-heading mt-12 scroll-m-20 text-xl font-medium tracking-tight first:mt-0',
         className
       )}
       {...props}
@@ -31,13 +31,13 @@ const components = {
   ),
   h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
-      className={cn('font-heading mt-8 scroll-m-20 text-xl tracking-tight', className)}
+      className={cn('font-heading mt-8 scroll-m-20 text-lg tracking-tight', className)}
       {...props}
     />
   ),
   h4: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h4
-      className={cn('font-heading mt-8 scroll-m-20 text-lg tracking-tight', className)}
+      className={cn('font-heading mt-8 scroll-m-20 text-base tracking-tight', className)}
       {...props}
     />
   ),
@@ -139,10 +139,7 @@ const components = {
   },
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <code
-      className={cn(
-        'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm',
-        className
-      )}
+      className={cn('relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)}
       {...props}
     />
   ),

@@ -1,0 +1,128 @@
+---
+title: Access Control
+description: Storage RLS policies and signed URLs
+---
+
+Storage access control works the same way as database access control — through Row Level Security policies. Since every file is tracked as a row in `storage.objects`, you write policies on that table to control who can upload, download, and delete files.
+
+## Storage RLS policies
+
+When you create a bucket, RLS is enabled on `storage.objects` by default. You need to add policies to allow any access.
+
+### Allowing public reads
+
+For a public bucket like `avatars`, you might want anyone to read files but only authenticated users to upload:
+
+```sql
+-- Anyone can view files in the avatars bucket
+create policy "Public avatar access"
+on storage.objects for select
+using (bucket_id = 'avatars');
+
+-- Authenticated users can upload their own avatar
+create policy "Users can upload their own avatar"
+on storage.objects for insert
+with check (
+  bucket_id = 'avatars'
+  and (select auth.uid()) is not null
+);
+```
+
+### User-specific file access
+
+For private buckets, a common pattern is to use folder paths that include the user's ID. Each user uploads files to their own folder, and policies enforce the boundary:
+
+```sql
+-- Users can read their own files
+create policy "Users can read their own files"
+on storage.objects for select
+using (
+  bucket_id = 'documents'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+
+-- Users can upload to their own folder
+create policy "Users can upload to their own folder"
+on storage.objects for insert
+with check (
+  bucket_id = 'documents'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+```
+
+The `storage.foldername(name)` function returns the folder path as an array. If a file is stored at `user-123/report.pdf`, the first element is `user-123`. By comparing that to `auth.uid()`, you ensure users can only access files in their own folder.
+
+### Delete policies
+
+Don't forget delete policies — without one, users can't remove their own files:
+
+```sql
+create policy "Users can delete their own files"
+on storage.objects for delete
+using (
+  bucket_id = 'documents'
+  and (select auth.uid())::text = (storage.foldername(name))[1]
+);
+```
+
+## Signed URLs
+
+Signed URLs give temporary access to files in private buckets. Instead of requiring the user to authenticate with every request, you generate a URL that's valid for a limited time:
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .createSignedUrl('user-123/report.pdf', 3600) // valid for 1 hour
+```
+
+The returned URL includes a token that grants access. Anyone with the URL can download the file until it expires — no authentication needed. This is useful for:
+
+- Sharing a file via a link that expires
+- Serving private files in contexts where you can't pass auth headers (like an `<img>` tag or a download link)
+- Giving temporary access to a third party
+
+You can also generate signed URLs in bulk:
+
+```js
+const { data, error } = await supabase.storage
+  .from('documents')
+  .createSignedUrls(['file1.pdf', 'file2.pdf', 'file3.pdf'], 3600)
+```
+
+## Public URLs
+
+For files in public buckets, you don't need signed URLs — you can get a permanent public URL:
+
+```js
+const { data } = supabase.storage
+  .from('avatars')
+  .getPublicUrl('user-123/profile.jpg')
+```
+
+This URL doesn't expire and doesn't require authentication. It's served through the CDN, so it's fast.
+
+## Uploads with the Secret Key
+
+For server-side operations — like processing uploads in an API route or migrating files — you can use the Secret Key to bypass RLS entirely:
+
+```js
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+)
+
+const { error } = await supabaseAdmin.storage
+  .from('documents')
+  .upload('admin/report.pdf', file)
+```
+
+As with database operations, the Secret Key should only be used in server-side code. Never expose it to the browser.
+
+## A practical approach
+
+For most apps, a good starting point is:
+
+- **One public bucket** for files that anyone can see (avatars, thumbnails, public assets)
+- **One private bucket** for user files, organized by user ID in the path
+- **RLS policies** that match the folder structure to user identity
+- **Signed URLs** when you need to share private files temporarily

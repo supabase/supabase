@@ -1,5 +1,3 @@
-'use client'
-
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import { ChevronDown, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'

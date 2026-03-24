@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
-type Course = 'foundations' | 'smart-office' | 'performance-scaling' | 'debugging-operations'
+type Course = 'foundations'
 type CourseContextType = {
   course: Course
   setCourse: (course: Course) => void
@@ -16,18 +16,13 @@ export function FrameworkProvider({ children }: { children: React.ReactNode }) {
   // Initialize from localStorage on mount (client-side only)
   useEffect(() => {
     const storedCourse = localStorage.getItem('preferredCourse')
-    const validCourses: Course[] = [
-      'foundations',
-      'smart-office',
-      'performance-scaling',
-      'debugging-operations',
-    ]
+    const validCourses: Course[] = ['foundations']
     if (storedCourse && validCourses.includes(storedCourse as Course)) {
       setCourseState(storedCourse as Course)
     }
   }, [])
 
-  // Update localStorage when framework changes
+  // Update localStorage when course changes
   const setCourse = (newCourse: Course) => {
     setCourseState(newCourse)
     localStorage.setItem('preferredCourse', newCourse)

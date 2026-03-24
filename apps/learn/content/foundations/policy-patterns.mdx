@@ -1,0 +1,222 @@
+---
+title: RLS Patterns
+description: Common patterns for access control, multi-tenancy, and troubleshooting
+---
+
+The previous chapter covered the mechanics of RLS — enabling it, writing policies, and using auth helper functions. This chapter covers the patterns you'll actually use in real applications: user-owned data, team access, admin roles, multi-tenancy, and the common mistakes that trip people up.
+
+## User-owned data
+
+The most common pattern. Each row belongs to a user, and only that user can access it:
+
+```sql
+create policy "Users can read their own documents"
+on public.documents for select
+using (user_id = (select auth.uid()));
+
+create policy "Users can create their own documents"
+on public.documents for insert
+with check (user_id = (select auth.uid()));
+
+create policy "Users can update their own documents"
+on public.documents for update
+using (user_id = (select auth.uid()))
+with check (user_id = (select auth.uid()));
+
+create policy "Users can delete their own documents"
+on public.documents for delete
+using (user_id = (select auth.uid()));
+```
+
+This works for any table with a `user_id` column. Splitting policies by operation makes it easy to adjust later — for example, if you want users to read each other's documents but only edit their own, you just change the `select` policy.
+
+## Public vs authenticated access
+
+Some data should be readable by anyone (even unauthenticated visitors), while writes are restricted to signed-in users:
+
+```sql
+-- Anyone can read published posts
+create policy "Published posts are public"
+on public.posts for select
+using (published = true);
+
+-- Only authenticated users can create posts
+create policy "Authenticated users can create posts"
+on public.posts for insert
+with check ((select auth.uid()) is not null);
+```
+
+The first policy doesn't check `auth.uid()` at all — it applies to every request, including anonymous ones. The second requires a signed-in user.
+
+## Team and organization access
+
+Many apps have shared resources — a project that belongs to a team, a document shared with collaborators. The typical pattern uses a membership table:
+
+```sql
+create table public.teams (
+  id uuid primary key default gen_random_uuid(),
+  name text not null
+);
+
+create table public.team_members (
+  team_id uuid references public.teams(id) on delete cascade,
+  user_id uuid references auth.users(id) on delete cascade,
+  role text not null default 'member',
+  primary key (team_id, user_id)
+);
+
+create table public.projects (
+  id uuid primary key default gen_random_uuid(),
+  team_id uuid references public.teams(id) on delete cascade,
+  name text not null
+);
+```
+
+Now you can write policies that check team membership:
+
+```sql
+-- Team members can view their team's projects
+create policy "Team members can view projects"
+on public.projects for select
+using (
+  exists (
+    select 1 from public.team_members
+    where team_members.team_id = projects.team_id
+    and team_members.user_id = (select auth.uid())
+  )
+);
+```
+
+The `exists` subquery checks whether the current user is a member of the team that owns the project. If they're not a member, the row is invisible.
+
+### Role-based team access
+
+You can extend this to check roles within the team:
+
+```sql
+-- Only team admins can delete projects
+create policy "Team admins can delete projects"
+on public.projects for delete
+using (
+  exists (
+    select 1 from public.team_members
+    where team_members.team_id = projects.team_id
+    and team_members.user_id = (select auth.uid())
+    and team_members.role = 'admin'
+  )
+);
+```
+
+## Admin bypass
+
+Sometimes you need certain users to have full access to a table, regardless of who owns the data. You can do this with a roles table:
+
+```sql
+create policy "Admins have full access"
+on public.posts for all
+using (
+  exists (
+    select 1 from public.user_roles
+    where user_id = (select auth.uid())
+    and role = 'admin'
+  )
+);
+```
+
+Since policies are combined with OR, this works alongside other policies. A regular user sees their own posts; an admin sees all of them.
+
+## Multi-tenancy
+
+Multi-tenancy is really an extension of the team pattern. Each row belongs to a tenant (organization, workspace, account), and users only see data for their tenant:
+
+```sql
+create policy "Tenant isolation"
+on public.invoices for all
+using (
+  tenant_id in (
+    select tenant_id from public.tenant_members
+    where user_id = (select auth.uid())
+  )
+)
+with check (
+  tenant_id in (
+    select tenant_id from public.tenant_members
+    where user_id = (select auth.uid())
+  )
+);
+```
+
+This is the same `exists` or `in` pattern — the only difference is that you're filtering by `tenant_id` instead of `team_id`. The key point is that tenant isolation happens at the database level, not in your application code. Even if your app has a bug that forgets to filter by tenant, the policy catches it.
+
+### Index your foreign keys
+
+For multi-tenancy and team patterns, make sure the columns you filter on are indexed:
+
+```sql
+create index on public.invoices (tenant_id);
+create index on public.tenant_members (user_id);
+```
+
+Without these indexes, the policy subqueries do full table scans on every request, which gets slow as your data grows.
+
+## Performance tips
+
+RLS policies run on every query, so they need to be efficient. A few things to keep in mind:
+
+- **Use `(select auth.uid())`** instead of `auth.uid()` — the subselect ensures the function is evaluated once per query, not once per row.
+- **Index the columns used in policies** — especially `user_id`, `team_id`, or `tenant_id`. If a policy does a lookup against another table, index the join columns there too.
+- **Keep policies simple** — a single `exists` subquery is fine. Deeply nested subqueries or multiple joins in a policy can get expensive.
+- **Use `security definer` functions sparingly** — they bypass RLS, which can be useful for admin operations, but they're easy to misuse. Only use them when you have a specific reason to skip policy checks.
+
+## Common pitfalls
+
+### Forgetting to enable RLS
+
+If RLS isn't enabled on a table, every row is accessible to anyone with the API key. This is the most common security mistake. Always enable RLS on tables that contain user data:
+
+```sql
+alter table public.todos enable row level security;
+```
+
+### Policies that are too broad
+
+A policy like `using (true)` grants access to every row for that operation. This is occasionally intentional (for truly public data), but if you see it on a table with private data, it's a bug.
+
+### Forgetting WITH CHECK on inserts
+
+If you only have a `using` clause on an insert policy, it won't work — inserts need `with check` because there's no existing row to evaluate `using` against. You'll get a "new row violates row-level security policy" error.
+
+### Testing as the wrong role
+
+When testing policies in the SQL Editor, remember that you're running as the `postgres` role by default, which bypasses RLS entirely. To test policies as a real user would experience them, use the API or set the role in your SQL session.
+
+### Policies on joined tables
+
+RLS only applies to the table the policy is on. If your policy does a subquery against another table (like `team_members`), that other table needs its own RLS policies too. Otherwise, someone could query `team_members` directly to see data they shouldn't.
+
+## A good starting point
+
+For most tables, start with this pattern and adjust from there:
+
+```sql
+alter table public.your_table enable row level security;
+
+create policy "Users can read their own data"
+on public.your_table for select
+using (user_id = (select auth.uid()));
+
+create policy "Users can insert their own data"
+on public.your_table for insert
+with check (user_id = (select auth.uid()));
+
+create policy "Users can update their own data"
+on public.your_table for update
+using (user_id = (select auth.uid()))
+with check (user_id = (select auth.uid()));
+
+create policy "Users can delete their own data"
+on public.your_table for delete
+using (user_id = (select auth.uid()));
+```
+
+This covers the basics for user-owned data. From here, you can add public access, team membership, or admin overrides as your app requires.

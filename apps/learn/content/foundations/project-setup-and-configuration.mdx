@@ -1,0 +1,98 @@
+---
+title: Project Setup and Configuration
+description: Creating projects, managing API keys, and configuring your Supabase environment
+---
+
+Every Supabase app starts with a project. This page walks through creating one, choosing a region, understanding your API keys, and setting up your environment for development and production.
+
+## Creating a project
+
+### From the Dashboard
+
+1. Go to [supabase.com/dashboard](https://supabase.com/dashboard) and sign in
+2. Click **New Project**
+3. Choose an **organization** (or create one)
+4. Give your project a **name**
+5. Set a **database password** — save this somewhere safe, you can reset it later if you forget it
+6. Select a **region** (more on this below)
+7. Click **Create new project**
+
+Once your project is created, you'll land on the project Dashboard where you can access the Table Editor, SQL Editor, and your API credentials.
+
+## API keys
+
+Every Supabase project comes with two API keys. Understanding the difference between them is important for keeping your app secure.
+
+### Publishable Key
+
+The **Publishable Key** is safe to use in client-side code (browsers, mobile apps). It's included in every request to identify your project, but it doesn't grant any special access. All requests made with the Publishable Key go through your Row Level Security policies — so users can only access data your policies allow.
+
+Think of it like a public identifier that says "this request is from my app." The actual permissions come from RLS.
+
+### Secret Key
+
+The **Secret Key** bypasses Row Level Security entirely. It has full read/write access to every table in your database. This key should **never** be exposed in client-side code. It should only be used in a server environment.
+
+Use the Secret Key only in:
+
+- Server-side code (API routes, Edge Functions)
+- Admin scripts and migrations that you create locally
+- Backend microservices that you manage that need unrestricted access
+
+<Callout>
+  If your Secret Key is ever exposed publicly, rotate it immediately from **Project Settings > API
+  Keys** in the Dashboard.
+</Callout>
+
+### Where to find your keys
+
+Your API URL and keys are available in the Dashboard under **Project Settings > API**, or from the [Connect dialog](https://supabase.com/dashboard/project/_/settings/api?showConnect=true&connectTab=frameworks) which also provides copy-paste snippets for popular frameworks.
+
+## Region selection
+
+When you create a project, you choose a region for your database. Pick the region closest to where your users are — this reduces latency for every API call and database query.
+
+Some things to keep in mind:
+
+- **You can't change the region after creating a project.** If you need to move, you'll need to create a new project and migrate your data.
+- **Edge Functions run globally**, so they'll be fast regardless of your database region. But they still connect to your database in the selected region for data access.
+- **If your users are spread across multiple regions**, pick the region closest to the majority of them, or consider using a read replica (available on Pro and above) to reduce latency for reads.
+
+## Environment management
+
+Most apps need at least two environments: one for development and one for production. Supabase gives you a few ways to handle this.
+
+### Separate projects
+
+The simplest approach is to create a separate Supabase project for each environment. You might have:
+
+- `my-app-dev` — for local development and testing
+- `my-app-prod` — for your live application
+
+Each project has its own database, API keys, and configuration. You switch between them by swapping the environment variables in your app.
+
+### Environment variables
+
+Store your Supabase URL and Publishable Key in environment variables so you can easily switch between projects:
+
+```bash
+# .env.local (development)
+NEXT_PUBLIC_SUPABASE_URL=https://your-dev-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-dev-publishable-key
+SUPABASE_SECRET_KEY=your-dev-secret-key
+
+# .env.production (production)
+NEXT_PUBLIC_SUPABASE_URL=https://your-prod-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-prod-publishable-key
+SUPABASE_SECRET_KEY=your-prod-secret-key
+```
+
+Never commit your `.env` files to version control. Add them to `.gitignore` and share credentials securely with your team.
+
+### Branching (Pro plan)
+
+On the Pro plan, you can use **Supabase Branching** to create preview environments that mirror your production database schema. Each branch gets its own isolated database, making it safe to test migrations and schema changes before applying them to production. This pairs naturally with Git-based workflows and preview deployments.
+
+## Next steps
+
+Once your project is created and your keys are configured, you're ready to start building. If you want to set up a local development workflow with the Supabase CLI, continue to [Local Development Workflow](/foundations/local-development-workflow).

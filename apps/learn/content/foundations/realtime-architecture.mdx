@@ -1,0 +1,81 @@
+---
+title: Realtime Architecture
+description: How Supabase Realtime works under the hood
+---
+
+Supabase Realtime lets your app react to changes as they happen — a new message appears instantly, a dashboard updates without refreshing, a user's online status shows up the moment they connect. It works over WebSockets, so the connection stays open and events are pushed to your app in real time.
+
+Realtime has three main features, each covered in its own chapter:
+
+- **Database Changes** — subscribe to inserts, updates, and deletes on your tables
+- **Broadcast** — send messages between connected clients in real time
+- **Presence** — track which users are currently online and share their state
+
+This chapter covers how the system works and how connections are managed. The following chapters cover each feature in detail.
+
+## How it works
+
+Supabase Realtime is a separate server that sits alongside your database and API. It's built on Phoenix (an Elixir framework known for handling massive numbers of concurrent WebSocket connections).
+
+When your app subscribes to a channel, here's what happens:
+
+1. The Supabase client library opens a WebSocket connection to the Realtime server
+2. Your app joins a **channel** — a named stream of events (like `room:chat` or `table:todos`)
+3. The Realtime server pushes events to your app as they occur
+4. Your app handles those events (update the UI, play a sound, etc.)
+
+The client library manages the connection lifecycle for you — opening the socket, joining channels, handling reconnection if the connection drops, and cleaning up when you unsubscribe.
+
+## Channels
+
+Everything in Realtime revolves around **channels**. A channel is a named topic that clients subscribe to. You can think of it like a room — everyone subscribed to the same channel receives the same events.
+
+```js
+const channel = supabase.channel('my-channel')
+```
+
+Channel names are arbitrary strings. You choose names that make sense for your app — `chat:room-123`, `dashboard:metrics`, `game:lobby`. Different features (database changes, broadcast, presence) can all be used on the same channel.
+
+A channel doesn't do anything until you subscribe to it:
+
+```js
+channel.subscribe()
+```
+
+And when you're done:
+
+```js
+supabase.removeChannel(channel)
+```
+
+## Connection lifecycle
+
+The WebSocket connection is managed automatically by the client library:
+
+- **Connect** — the first time you subscribe to a channel, the library opens a WebSocket connection
+- **Reconnect** — if the connection drops (network change, server restart, timeout), the library reconnects automatically with exponential backoff
+- **Heartbeat** — the library sends periodic heartbeats to keep the connection alive and detect disconnections early
+- **Disconnect** — when you remove all channels, the connection is closed
+
+You generally don't need to manage the connection yourself. The one thing to be aware of is that events that happen while disconnected are missed — Realtime doesn't replay past events. If your app needs to catch up after a reconnection, you'll want to fetch the latest state from the database.
+
+## Rate limits and quotas
+
+Realtime has usage limits that depend on your plan:
+
+- **Concurrent connections** — the number of simultaneous WebSocket connections. The free tier allows a limited number; paid plans allow more.
+- **Messages per second** — how many events can be sent through a channel. High-frequency updates (like cursor positions) can hit this limit if you're not careful.
+- **Channel count** — the number of active channels. Each unique channel name counts.
+
+For most apps, the defaults are fine. If you're building something with high throughput (a live game, a busy chat app), check the limits for your plan and consider throttling high-frequency events on the client side.
+
+## When to use Realtime
+
+Realtime is a good fit when your UI needs to reflect changes immediately:
+
+- A message appears in a chat without refreshing
+- A task board updates when a teammate moves a card
+- A dashboard shows live metrics
+- Users can see who else is currently viewing a page
+
+It's not a replacement for normal data fetching — you still load initial data with a regular query. Realtime handles what happens *after* the initial load, pushing updates as they occur.

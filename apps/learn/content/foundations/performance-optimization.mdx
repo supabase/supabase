@@ -1,0 +1,88 @@
+---
+title: Performance Optimization
+description: Query analysis, indexing, and caching strategies
+---
+
+As your app grows, you may notice some queries getting slower as they work against more data and handle more traffic. Well-designed queries and proper indexing can prevent most of this, but you need the right tools to spot issues and know where to look. This chapter covers how to find and fix performance problems in a Supabase project.
+
+## Finding slow queries
+
+### Query Performance and Index Advisor
+
+The best place to start is the **Query Performance** tool in the Supabase Dashboard (under **Advisors > Query Performance**). It shows you your slowest and most frequently run queries, ranked by total execution time, so you can immediately see what's worth optimizing.
+
+The tool also includes an **Index Advisor** that analyzes your queries and suggests indexes that would improve them. If a query is doing a sequential scan on a large table, the advisor will recommend the specific index to create. For most performance issues, this is all you need — check the Dashboard, see what's slow, and follow the index recommendations.
+
+## Indexing strategy
+
+Indexes are the most common fix for slow queries. They let Postgres find rows without scanning the entire table.
+
+### When to add an index
+
+Add an index on columns that appear in:
+
+- `WHERE` clauses — `where user_id = ...`
+- `JOIN` conditions — `join on orders.user_id = users.id`
+- `ORDER BY` clauses — `order by created_at desc`
+- Foreign keys — Postgres doesn't automatically index foreign key columns
+
+### Creating indexes
+
+```sql
+-- Single column
+create index on orders (user_id);
+
+-- Multiple columns (for queries that filter on both)
+create index on orders (user_id, status);
+
+-- Partial index (only indexes rows matching a condition)
+create index on orders (created_at)
+where status = 'pending';
+```
+
+Partial indexes are useful when you frequently query a subset of the data — they're smaller and faster than full indexes.
+
+### Don't over-index
+
+Every index speeds up reads but slows down writes (because the index needs to be updated on every insert, update, or delete). Don't add indexes speculatively — add them when you have a slow query that needs one.
+
+## Connection pooling
+
+Every connection to your database uses memory. When your app has many users making requests simultaneously, you can run out of connections. Supabase includes a connection pooler (Supavisor) that sits between your app and the database, sharing a smaller number of database connections across many client connections.
+
+You can connect through the pooler by using the pooled connection string, which is available in the Dashboard under **Project Settings > Database**. There are two modes:
+
+- **Transaction mode** — each query gets a connection for the duration of the transaction, then releases it. This supports the most concurrent clients and is the default for most apps.
+- **Session mode** — a connection is held for the entire session. Use this if you need features that require a persistent connection (like prepared statements or `LISTEN/NOTIFY`).
+
+For most apps using the Supabase client library (which makes individual API requests), the pooler handles everything automatically. Connection pooling matters more when you're connecting directly to the database from server-side code.
+
+## Caching
+
+### Client-side caching
+
+The simplest caching happens in your app. If you fetch a list of categories that rarely changes, cache it locally instead of fetching it on every page load. Libraries like React Query or SWR handle this well — they cache responses and refetch in the background.
+
+### CDN caching for Storage
+
+Files served from Supabase Storage go through a CDN and are cached at edge locations automatically. Transformed images are cached after the first request. You don't need to configure this — it happens by default.
+
+### Database-level caching
+
+Postgres has its own internal cache (shared buffers) that keeps frequently accessed data in memory. You don't configure this directly on Supabase — it's tuned based on your compute size. Upgrading to a larger compute instance gives Postgres more memory for caching, which can significantly improve performance for read-heavy workloads.
+
+## Read replicas
+
+When your app is read-heavy (many more reads than writes), you can distribute the load by adding read replicas. A read replica is a copy of your database that stays in sync with the primary. Reads can be directed to the replica, leaving the primary to handle writes.
+
+Supabase supports read replicas on Pro plans and above. You can create them in the Dashboard and configure your app to use the replica connection string for read queries.
+
+Read replicas are also useful for running analytics queries without affecting your production database's performance — point your reporting tools at the replica instead of the primary.
+
+## A practical approach
+
+1. **Don't optimize prematurely** — start by writing clear, correct queries. Most performance issues don't show up until you have real data and real traffic.
+2. **Use EXPLAIN ANALYZE** when a query feels slow. It tells you exactly what's happening.
+3. **Add indexes** for the columns you filter, join, and sort on. Check that they're being used with EXPLAIN.
+4. **Use the connection pooler** when you have many concurrent connections.
+5. **Add read replicas** when reads are the bottleneck and you've already optimized your queries and indexes.

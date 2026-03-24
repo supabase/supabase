@@ -1,0 +1,198 @@
+---
+title: Building a RAG Pipeline
+description: Retrieval-augmented generation with Supabase and LLMs
+---
+
+RAG (Retrieval-Augmented Generation) is a pattern that makes LLMs more useful by grounding their responses in your own data. Instead of asking an LLM to answer from its training data (which might be outdated or wrong), you find relevant content from your database and include it in the prompt. The LLM generates an answer based on that context.
+
+This is how most AI-powered support bots, documentation search tools, and knowledge base assistants work. The previous chapter covered embeddings and vector search — RAG is what you build on top of them.
+
+## How RAG works
+
+The flow is straightforward:
+
+1. A user asks a question
+2. You generate an embedding for the question
+3. You search your database for content that's similar to the question
+4. You include that content in the prompt to the LLM
+5. The LLM generates an answer using the provided context
+
+The key insight is that the LLM doesn't need to "know" the answer from its training. It just needs to be good at reading the context you provide and synthesizing a response.
+
+## Preparing your content
+
+Before you can search your data, you need to break it into chunks and generate embeddings for each chunk. This is the pipeline you run once (and then incrementally as content changes).
+
+### Chunking
+
+Most documents are too long to embed as a single unit — a full article or page of documentation would produce a vector that's too general to match specific questions well. The solution is to split content into smaller chunks.
+
+```ts
+function chunkText(text: string, chunkSize = 500, overlap = 50): string[] {
+  const chunks: string[] = []
+  let start = 0
+
+  while (start < text.length) {
+    const end = Math.min(start + chunkSize, text.length)
+    chunks.push(text.slice(start, end))
+    start += chunkSize - overlap
+  }
+
+  return chunks
+}
+```
+
+A few guidelines for chunk size:
+
+- **Too small** (under 100 characters) — not enough context for the embedding to capture meaning
+- **Too large** (over 2000 characters) — the embedding becomes too general and matches too broadly
+- **A good starting point** — 300 to 800 characters, with some overlap between chunks so you don't lose context at the boundaries
+
+The overlap ensures that if a relevant sentence spans the boundary between two chunks, it appears in both.
+
+### Storing chunks with metadata
+
+Store each chunk alongside metadata about where it came from, so you can cite sources in your answers:
+
+```sql
+create table document_chunks (
+  id uuid primary key default gen_random_uuid(),
+  document_id uuid references documents(id) on delete cascade,
+  content text not null,
+  embedding vector(1536),
+  metadata jsonb default '{}',
+  created_at timestamptz default now()
+);
+
+create index on document_chunks
+using hnsw (embedding vector_cosine_ops);
+```
+
+The `metadata` column can hold whatever's useful — the page title, section heading, URL, or any other information you want to include when displaying results.
+
+### Generating embeddings in batch
+
+For an initial import or a large content update, generate embeddings in batch:
+
+```ts
+async function embedChunks(chunks: { id: string; content: string }[]) {
+  // Process in batches to avoid rate limits
+  const batchSize = 100
+
+  for (let i = 0; i < chunks.length; i += batchSize) {
+    const batch = chunks.slice(i, i + batchSize)
+
+    const response = await openai.embeddings.create({
+      model: 'text-embedding-3-small',
+      input: batch.map((c) => c.content),
+    })
+
+    const updates = batch.map((chunk, index) => ({
+      id: chunk.id,
+      embedding: response.data[index].embedding,
+    }))
+
+    // Update the database with the embeddings
+    for (const update of updates) {
+      await supabase
+        .from('document_chunks')
+        .update({ embedding: update.embedding })
+        .eq('id', update.id)
+    }
+  }
+}
+```
+
+OpenAI's embedding API accepts multiple inputs in a single request, which is much faster than one request per chunk.
+
+## Retrieval
+
+When a user asks a question, search for the most relevant chunks:
+
+```sql
+create or replace function match_chunks(
+  query_embedding vector(1536),
+  match_threshold float default 0.7,
+  match_count int default 5
+)
+returns table (id uuid, document_id uuid, content text, metadata jsonb, similarity float)
+language sql
+as $$
+  select
+    id,
+    document_id,
+    content,
+    metadata,
+    1 - (embedding <=> query_embedding) as similarity
+  from document_chunks
+  where 1 - (embedding <=> query_embedding) > match_threshold
+  order by embedding <=> query_embedding
+  limit match_count;
+$$;
+```
+
+## Generating the answer
+
+Combine the retrieved chunks into a prompt and send it to the LLM:
+
+```ts
+Deno.serve(async (req) => {
+  const { question } = await req.json()
+
+  // Generate embedding for the question
+  const embeddingResponse = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: question,
+  })
+
+  // Find relevant chunks
+  const { data: chunks } = await supabase.rpc('match_chunks', {
+    query_embedding: embeddingResponse.data[0].embedding,
+    match_threshold: 0.7,
+    match_count: 5,
+  })
+
+  // Build the context from retrieved chunks
+  const context = chunks.map((c) => c.content).join('\n\n---\n\n')
+
+  // Ask the LLM with the context
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: `You are a helpful assistant. Answer the user's question based on the following context. If the context doesn't contain enough information to answer, say so.\n\nContext:\n${context}`,
+      },
+      { role: 'user', content: question },
+    ],
+  })
+
+  return new Response(
+    JSON.stringify({
+      answer: completion.choices[0].message.content,
+      sources: chunks.map((c) => c.metadata),
+    }),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+```
+
+Returning the sources alongside the answer lets your UI show where the information came from — linking back to the original document or section.
+
+## Keeping content fresh
+
+Your RAG pipeline needs to stay in sync with your content. A few strategies:
+
+- **On update** — when a document changes, re-chunk and re-embed it. Use a database trigger or a webhook to trigger the pipeline.
+- **On schedule** — for content that comes from external sources (like a help desk or CMS), run the pipeline periodically with a cron job.
+- **Incremental** — track which documents have changed since the last run and only process those.
+
+For most apps, re-embedding on update is the simplest and most reliable approach.
+
+## Practical tips
+
+- **Start with a small dataset** and test the quality of results before scaling up. If the answers aren't good, the issue is usually chunk size or the similarity threshold — not the LLM.
+- **Tune the similarity threshold** — too high and you'll miss relevant results; too low and you'll include noise. Start at 0.7 and adjust based on your content.
+- **Include the system prompt** — tell the LLM to only answer based on the provided context. This reduces hallucination and makes the responses more grounded.
+- **Return "I don't know"** — if no chunks match above the threshold, it's better to say nothing was found than to let the LLM guess.
+- **Monitor costs** — embedding generation and LLM calls have per-token costs. Batch operations where possible and cache results for repeated queries.

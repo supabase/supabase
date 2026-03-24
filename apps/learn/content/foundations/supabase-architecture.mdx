@@ -1,0 +1,72 @@
+---
+title: Supabase Architecture
+description: How Postgres, auto-generated APIs, and services like Auth, Storage, and Realtime work together
+---
+
+Supabase is a collection of open source tools built around Postgres. Understanding how these pieces fit together will help you make better decisions as you build.
+
+## Postgres is the core
+
+Everything in Supabase starts with Postgres — the world's most popular open source database, with over 35 years of active development behind it. It's not a wrapper or abstraction layer — your Supabase project **is** a full Postgres database. You can connect to it with any Postgres client, run raw SQL, use extensions, and manage it exactly like you would any other Postgres instance.
+
+This is a deliberate design choice. Instead of building a proprietary database, Supabase builds services on top of Postgres. The benefit is that nothing is hidden from you. Your tables, views, functions, and policies are all standard Postgres — and they'll work the same way anywhere Postgres runs.
+
+## The service layer
+
+Supabase provides a set of services on top of Postgres that handle common backend needs. Each one connects directly to your database, and you can adopt them independently — use one, a few, or all of them.
+
+![database plus services](/img/content/db-plus-services.png)
+
+### Auth
+
+Supabase Auth handles user sign-up, login, and session management. It supports email/password, magic links, OAuth providers (Google, GitHub, etc.), and phone/SMS. Auth stores user data in a dedicated `auth` schema in your database, which means you can reference users directly in your tables and RLS policies.
+
+### Storage
+
+Supabase Storage lets you upload, organize, and serve files like images, videos, and documents. Files are stored in **buckets** and can be secured with RLS policies — the same system you use to protect database rows. Storage also supports on-the-fly image transformations for resizing and optimization.
+
+### Realtime
+
+Supabase Realtime pushes live updates to your clients over WebSockets. It supports three modes:
+
+- **Database changes** — subscribe to inserts, updates, and deletes on your tables
+- **Broadcast** — send ephemeral messages between clients (like chat messages)
+- **Presence** — track which users are currently online and share state between them (like avatars in a chat room)
+
+### Edge Functions
+
+Edge Functions let you run server-side TypeScript/Deno code without managing infrastructure. They're useful for things like processing webhooks, calling third-party APIs like Stripe or OpenAI, or running logic that should run on a server. Edge Functions can connect to your database using the Supabase client library, just like your frontend code does.
+
+## Auto-generated APIs
+
+One of Supabase's most distinctive features is that you get an API as soon as you create a table. This is powered by [PostgREST](https://postgrest.org), which reads your database schema and generates a RESTful API automatically.
+
+When you create a table called `todos`, you immediately get endpoints to:
+
+- **Read** rows with filtering, sorting, and pagination
+- **Insert** new rows
+- **Update** existing rows
+- **Delete** rows
+
+The API respects your Row Level Security policies, so it's safe to call directly from the client. You don't need to write any backend code to get a fully functional, authenticated API.
+
+The Supabase client libraries (`supabase-js`, `supabase-flutter`, etc.) wrap these APIs with a clean, chainable interface:
+
+```js
+const { data } = await supabase
+  .from('todos')
+  .select('*')
+  .eq('user_id', userId)
+  .order('created_at', { ascending: false })
+```
+
+## How it all fits together
+
+Here's the mental model: your Postgres database is the source of truth. Every other service — Auth, Storage, Realtime, Edge Functions, and the REST API — reads from or writes to that same database. This means:
+
+- Auth users live in your database and can be joined with your own tables
+- Storage policies use the same RLS system as your data
+- Realtime listens to your actual database changes
+- Edge Functions query the same tables your frontend does
+
+There's no separate data layer to sync. Postgres is the single source of truth, and everything else is a service that connects to it.

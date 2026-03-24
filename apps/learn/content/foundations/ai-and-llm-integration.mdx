@@ -1,0 +1,253 @@
+---
+title: Integrate AI and LLMs
+description: Using Edge Functions to integrate AI services
+---
+
+Edge Functions are a common way to integrate AI and LLM services into your Supabase app. Since calls to providers like OpenAI require secret API keys and often involve streaming responses, a server-side function is the right place for them.
+
+## Calling an LLM
+
+A basic function that sends a prompt to OpenAI and returns the response:
+
+```ts
+import OpenAI from 'npm:openai@4'
+
+const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! })
+
+Deno.serve(async (req) => {
+  const { prompt } = await req.json()
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  return new Response(
+    JSON.stringify({ reply: completion.choices[0].message.content }),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+```
+
+Set your API key as a secret:
+
+```bash
+supabase secrets set OPENAI_API_KEY=sk-...
+```
+
+This pattern works with any LLM provider — Anthropic, Google, Mistral, or any service with a REST API.
+
+## Streaming responses
+
+LLM responses can take several seconds to generate fully. Streaming returns the response token by token so the user sees text appearing immediately instead of waiting for the whole thing.
+
+```ts
+import OpenAI from 'npm:openai@4'
+
+const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! })
+
+Deno.serve(async (req) => {
+  const { prompt } = await req.json()
+
+  const stream = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [{ role: 'user', content: prompt }],
+    stream: true,
+  })
+
+  const encoder = new TextEncoder()
+  const body = new ReadableStream({
+    async start(controller) {
+      for await (const chunk of stream) {
+        const text = chunk.choices[0]?.delta?.content || ''
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`))
+      }
+      controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+      controller.close()
+    },
+  })
+
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+    },
+  })
+})
+```
+
+On the client side, you can read the stream with the Fetch API:
+
+```js
+const response = await fetch(
+  'https://your-project.supabase.co/functions/v1/chat',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ prompt: 'Explain RLS in one paragraph' }),
+  }
+)
+
+const reader = response.body.getReader()
+const decoder = new TextDecoder()
+
+while (true) {
+  const { done, value } = await reader.read()
+  if (done) break
+  const text = decoder.decode(value)
+  // Parse and display each chunk
+}
+```
+
+## Generating embeddings
+
+Embeddings turn text into numeric vectors that capture meaning. They're the foundation of semantic search — instead of matching keywords, you find content that's similar in meaning.
+
+```ts
+import OpenAI from 'npm:openai@4'
+
+const openai = new OpenAI({ apiKey: Deno.env.get('OPENAI_API_KEY')! })
+
+Deno.serve(async (req) => {
+  const { text } = await req.json()
+
+  const response = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: text,
+  })
+
+  const embedding = response.data[0].embedding
+
+  // Store the embedding in your database
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SECRET_KEY')!
+  )
+
+  const { error } = await supabase
+    .from('documents')
+    .insert({ content: text, embedding })
+
+  return new Response(
+    JSON.stringify({ success: !error }),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+```
+
+Supabase has built-in support for vector storage through the `pgvector` extension. You enable it and create a column to hold embeddings:
+
+```sql
+enable extension vector;
+
+alter table documents
+add column embedding vector(1536);
+```
+
+The dimension (1536) needs to match the embedding model you're using.
+
+## Semantic search
+
+Once you have embeddings stored, you can search by meaning. Create a Postgres function that compares an input embedding to stored ones:
+
+```sql
+create or replace function match_documents(
+  query_embedding vector(1536),
+  match_threshold float default 0.7,
+  match_count int default 5
+)
+returns table (id uuid, content text, similarity float)
+language sql
+as $$
+  select
+    id,
+    content,
+    1 - (embedding <=> query_embedding) as similarity
+  from documents
+  where 1 - (embedding <=> query_embedding) > match_threshold
+  order by embedding <=> query_embedding
+  limit match_count;
+$$;
+```
+
+Then call it from an Edge Function:
+
+```ts
+// Generate embedding for the search query
+const response = await openai.embeddings.create({
+  model: 'text-embedding-3-small',
+  input: searchQuery,
+})
+
+const queryEmbedding = response.data[0].embedding
+
+// Find similar documents
+const { data: matches } = await supabase.rpc('match_documents', {
+  query_embedding: queryEmbedding,
+  match_threshold: 0.7,
+  match_count: 5,
+})
+```
+
+## RAG (Retrieval-Augmented Generation)
+
+RAG combines semantic search with an LLM. Instead of asking the LLM to answer from its training data (which might be wrong or outdated), you find relevant content from your own database and include it in the prompt.
+
+The pattern is:
+
+1. User asks a question
+2. Generate an embedding for the question
+3. Search your database for relevant content
+4. Include that content in the prompt to the LLM
+5. Return the LLM's answer
+
+```ts
+Deno.serve(async (req) => {
+  const { question } = await req.json()
+
+  // Step 1: Generate embedding for the question
+  const embeddingResponse = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: question,
+  })
+
+  // Step 2: Find relevant documents
+  const { data: documents } = await supabase.rpc('match_documents', {
+    query_embedding: embeddingResponse.data[0].embedding,
+    match_count: 3,
+  })
+
+  // Step 3: Build a prompt with context
+  const context = documents.map((d) => d.content).join('\n\n')
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: `Answer the question based on the following context:\n\n${context}`,
+      },
+      { role: 'user', content: question },
+    ],
+  })
+
+  return new Response(
+    JSON.stringify({ answer: completion.choices[0].message.content }),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+```
+
+This gives the LLM grounded, accurate context from your own data instead of relying on its general knowledge.
+
+## Choosing a pattern
+
+- **Direct LLM call** — simplest. Good for chatbots, text generation, summarization.
+- **Streaming** — same as above but with a better user experience for longer responses.
+- **Embeddings + search** — for finding similar content. Good for search, recommendations, and deduplication.
+- **RAG** — for question-answering over your own data. Good for documentation bots, support tools, and knowledge bases.
+
+Start with a direct call to get something working, then add streaming for UX and RAG for accuracy as your needs grow.

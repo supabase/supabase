@@ -1,0 +1,152 @@
+---
+title: Migrations and Version Control
+description: Creating, managing, and applying database migrations
+---
+
+The [Local Development Workflow](/foundations/local-development-workflow) chapter introduced migrations — what they are, how to create them, and how to push them to production. This chapter goes deeper into how to manage migrations well as your project grows, how to work with them in a team, and how to handle common situations you'll run into.
+
+## Quick recap
+
+A migration is a SQL file that describes a change to your database schema. Migrations live in the `supabase/migrations/` directory and are applied in order based on their timestamp. The core commands are:
+
+- **`supabase migration new <name>`** — creates a new empty migration file
+- **`supabase db reset`** — drops your local database and replays all migrations from scratch
+- **`supabase db push`** — applies new migrations to your hosted project
+- **`supabase db diff -f <name>`** — captures changes you've made in the Dashboard or SQL editor into a migration file
+
+If any of this is unfamiliar, start with the [Local Development Workflow](/foundations/local-development-workflow) chapter first.
+
+## One change per migration
+
+As a general goal, try to keep each migration focused on one logical change. "Create the todos table and its RLS policy" makes sense as a single migration — those are closely related. "Create the todos table, create a profiles table, add three indexes, and update a function" is probably trying to do too much. The idea isn't strict one-statement-per-file, it's about keeping related things together and unrelated things separate.
+
+Small, focused migrations are easier to:
+
+- **Understand** — when you read the file name, you know exactly what it does
+- **Debug** — if something goes wrong, you know which change caused it
+- **Review** — your teammates can read the file quickly in a pull request
+- **Roll back** — if you need to undo a change, you're undoing one thing, not four
+
+Here's what a typical set of migration files might look like:
+
+```
+supabase/migrations/
+├── 20260210100000_create_profiles_table.sql
+├── 20260210100100_create_projects_table.sql
+├── 20260210100200_create_tasks_table.sql
+├── 20260210100300_add_rls_to_profiles.sql
+├── 20260210100400_add_rls_to_projects.sql
+├── 20260211090000_add_status_to_tasks.sql
+└── 20260212140000_add_index_on_tasks_project_id.sql
+```
+
+Each file is small, descriptive, and does one thing.
+
+## Naming conventions
+
+Migration names should describe what the migration does, written in snake_case. Good names read like a short sentence:
+
+- `create_todos_table`
+- `add_status_column_to_tasks`
+- `add_rls_policy_for_projects`
+- `create_handle_new_user_function`
+- `add_index_on_posts_user_id`
+
+Avoid vague names like `update_schema`, `fix_stuff`, or `changes`. When you're looking at a list of 30 migration files six months from now, descriptive names make all the difference.
+
+## Writing migrations that work going forward
+
+Migrations run once and are never modified after they've been applied. This is important — once a migration has been pushed to production or shared with your team, treat it as locked. If you need to change something, write a new migration.
+
+A few practical guidelines:
+
+### Use `if not exists` and `if exists` for safety
+
+```sql
+-- Safe to run even if the table already exists
+create table if not exists todos (
+  id uuid primary key default gen_random_uuid(),
+  title text not null
+);
+
+-- Safe to run even if the column already exists
+alter table todos add column if not exists due_date date;
+```
+
+This prevents migrations from failing if they're run against a database that's in a slightly different state than expected.
+
+### Use `create or replace` for functions and triggers
+
+```sql
+create or replace function set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+```
+
+`create or replace` updates the function if it already exists. This is safer than `create function`, which fails if the function is already there.
+
+## Pulling changes from the Dashboard
+
+It's a good habit to make the Dashboard "push only", so that all changes are captured in migrations and reflected (_not created_), in the Dashboard. Sometimes you'll make changes in the Dashboard — maybe you used the Table Editor to add a column, or ran some SQL in the SQL Editor. Those changes exist in your running database but aren't captured in a migration file yet.
+
+Use `supabase db diff` to generate a migration from those changes:
+
+```bash
+supabase db diff -f describe_your_change
+```
+
+This compares your running local database against your migration files and generates SQL for the difference. Always review the generated file before committing it — `db diff` captures everything that's different, so it might include changes you didn't intend.
+
+## Migrations and version control
+
+Migration files should always be committed to Git. They're the source of truth for your database schema, and they should go through the same review process as your application code.
+
+A typical workflow looks like this:
+
+1. Create a branch for your feature
+2. Write your migration files locally
+3. Test them with `supabase db reset` to make sure they apply cleanly
+4. Commit the migration files along with your application code
+5. Open a pull request — reviewers can see exactly what database changes your feature requires
+6. After merging, apply the migrations to production with `supabase db push`
+
+This gives you a complete, reviewable history of every schema change. If something goes wrong in production, you can look at the migration files to see exactly what changed and when.
+
+## Handling migration conflicts
+
+When multiple people are working on the same project, you might end up with migration files that conflict. The most common case is two developers creating migrations with overlapping timestamps or changes that touch the same table.
+
+The Supabase CLI applies migrations in order based on the timestamp in the filename. As long as each migration file has a unique timestamp (which `supabase migration new` handles for you), they'll apply in order.
+
+If two migrations make conflicting changes — like both trying to add a column with the same name — the second one will fail. The fix is straightforward: reset your local database with `supabase db reset`, see which migration fails, and update it to account for the other developer's changes.
+
+This is one more reason to keep migrations small. When conflicts happen, small migrations are much easier to resolve than large ones.
+
+## Squashing migrations
+
+Over time, your `migrations/` directory can grow to dozens or hundreds of files. This is fine — Postgres applies them quickly — but it can make the directory harder to navigate.
+
+You can squash multiple migrations into a single file:
+
+```bash
+supabase migration squash
+```
+
+This combines all your migration files into one. It's most useful early in a project, before you've pushed to production, when you've been iterating on your schema and have many small experimental migrations. Once migrations have been applied to production, squashing requires more care since the remote database has already recorded which migrations it has run.
+
+## Summary
+
+The key principles to remember:
+
+- **One change per migration** — keep them small and focused
+- **Descriptive names** — future you will thank present you
+- **Never modify a migration after it's been applied** — write a new one instead
+- **Commit migrations to Git** — they're the source of truth for your schema
+- **Test with `supabase db reset`** — make sure your migrations apply cleanly from scratch
+- **Use `supabase db diff`** — to capture Dashboard changes into migration files

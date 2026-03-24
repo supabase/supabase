@@ -1,0 +1,144 @@
+---
+title: Image Transformations
+description: On-the-fly image resizing and optimization
+---
+
+Supabase Storage can resize and optimize images on the fly. Instead of generating multiple versions of an image at upload time, you request the size you need through URL parameters and Storage returns a transformed version. The result is cached, so subsequent requests for the same transformation are fast.
+
+## How it works
+
+You add transformation parameters when requesting an image — either through the client library or by appending query parameters to the URL. The original file is never modified; transformations produce a new version that's cached at the CDN.
+
+```js
+const { data } = supabase.storage
+  .from('avatars')
+  .getPublicUrl('user-123/profile.jpg', {
+    transform: {
+      width: 200,
+      height: 200,
+    },
+  })
+```
+
+This returns a URL for a 200x200 version of the image. The first request triggers the transformation; after that, it's served from the cache.
+
+## Transformation options
+
+### Resize
+
+Set the `width` and/or `height` in pixels:
+
+```js
+transform: {
+  width: 400,
+  height: 300,
+}
+```
+
+If you provide both dimensions and they don't match the image's aspect ratio, the `resize` option controls what happens:
+
+- **`cover`** (default) — scales and crops to fill the dimensions exactly, maintaining aspect ratio
+- **`contain`** — scales to fit within the dimensions, maintaining aspect ratio (may leave empty space)
+- **`fill`** — stretches to fill the dimensions exactly (may distort the image)
+
+```js
+transform: {
+  width: 400,
+  height: 300,
+  resize: 'contain',
+}
+```
+
+If you only provide one dimension, the other scales proportionally — no cropping or distortion.
+
+### Quality
+
+Control the compression level for lossy formats (JPEG, WebP):
+
+```js
+transform: {
+  width: 800,
+  quality: 75,
+}
+```
+
+Quality ranges from 20 to 100. Lower values produce smaller files but more compression artifacts. The default is 80, which is a good balance for most uses.
+
+### Format conversion
+
+You can convert images to a different format:
+
+```js
+transform: {
+  width: 800,
+  format: 'webp',
+}
+```
+
+WebP typically produces smaller files than JPEG or PNG at comparable quality. This is useful for serving optimized images to browsers that support it.
+
+## Using transformations with signed URLs
+
+Transformations work with signed URLs too, so you can serve resized private images:
+
+```js
+const { data } = await supabase.storage
+  .from('documents')
+  .createSignedUrl('user-123/photo.jpg', 3600, {
+    transform: {
+      width: 400,
+      height: 400,
+    },
+  })
+```
+
+## Practical examples
+
+### Avatars
+
+Avatars are a great use case — users upload a full-size image once, and you request the size you need:
+
+```js
+// Thumbnail for a comment thread
+const small = supabase.storage
+  .from('avatars')
+  .getPublicUrl('user-123/profile.jpg', {
+    transform: { width: 40, height: 40 },
+  })
+
+// Larger version for a profile page
+const large = supabase.storage
+  .from('avatars')
+  .getPublicUrl('user-123/profile.jpg', {
+    transform: { width: 200, height: 200 },
+  })
+```
+
+### Responsive images
+
+You can generate multiple sizes for responsive layouts:
+
+```js
+const sizes = [320, 640, 1024, 1440]
+
+const srcSet = sizes.map((w) => {
+  const { data } = supabase.storage
+    .from('photos')
+    .getPublicUrl('hero.jpg', {
+      transform: { width: w },
+    })
+  return `${data.publicUrl} ${w}w`
+}).join(', ')
+```
+
+## Supported formats
+
+Image transformations work with JPEG, PNG, WebP, GIF, and AVIF. The input and output formats don't need to match — you can upload a PNG and serve it as WebP.
+
+Transformations are only available for image files. Other file types (PDFs, videos, etc.) are served as-is.
+
+## Caching
+
+Transformed images are cached at the CDN. The first request for a specific transformation triggers the processing; subsequent requests are served from the cache. Different transformation parameters produce different cache entries, so requesting the same image at 200px and 400px generates two cached versions.
+
+You don't need to manage the cache — it's handled automatically. If you update the original image (upload a new file to the same path with `upsert: true`), the cache is invalidated and the next request triggers a fresh transformation.
