@@ -736,6 +736,53 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'pending in table 2' })).toBeVisible()
   })
 
+  test('pending row changes do not leak across tables', async ({ page, ref }) => {
+    const tableName1 = `${tableNamePrefix}_leak1`
+    const tableName2 = `${tableNamePrefix}_leak2`
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName1, columnName)
+        await createTable(tableName2, columnName)
+      },
+      async () => {
+        await dropTable(tableName1)
+        await dropTable(tableName2)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await enableQueueOperations(page)
+    await page.reload()
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId(`${columnName}-input`).fill('only in table 1')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(page.getByText('1 pending change')).toBeVisible()
+
+    // Navigate to table 2 — pending row from table 1 should not appear
+    await page.getByRole('button', { name: `View ${tableName2}`, exact: true }).click()
+    await expect(page.getByRole('gridcell', { name: 'only in table 1' })).not.toBeVisible()
+
+    // Add a row in table 2
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId(`${columnName}-input`).fill('only in table 2')
+    await page.getByTestId('action-bar-save-row').click()
+
+    // Navigate back to table 1 — pending row from table 2 should not appear
+    await page.getByRole('button', { name: `View ${tableName1}`, exact: true }).click()
+    await expect(page.getByRole('gridcell', { name: 'only in table 1' })).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'only in table 2' })).not.toBeVisible()
+  })
+
   test('editing multiple columns via side panel queues all changes', async ({ page, ref }) => {
     const tableName = `${tableNamePrefix}_multi_col`
 
