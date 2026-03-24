@@ -50,7 +50,7 @@ import {
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
-import HeaderTitle from './HeaderTitle'
+import { HeaderTitle } from './HeaderTitle'
 
 export interface ColumnEditorProps {
   column?: Readonly<PostgresColumn>
