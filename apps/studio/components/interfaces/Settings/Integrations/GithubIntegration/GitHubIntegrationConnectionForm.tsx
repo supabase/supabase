@@ -6,9 +6,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
@@ -51,7 +48,7 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 import { openInstallGitHubIntegrationWindow } from '@/lib/github'
 import { EMPTY_ARR } from '@/lib/void'
 
@@ -85,8 +82,8 @@ export const GitHubIntegrationConnectionForm = ({
 
   const { hasAccess: hasAccessToGitHubIntegration, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('integrations.github_connections')
-  const promptProPlanUpgrade =
-    IS_PLATFORM && !isLoadingEntitlements && !hasAccessToGitHubIntegration
+
+  const { hasAccess: hasAccessToBranching } = useCheckEntitlements('branching_limit')
 
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -463,7 +460,7 @@ export const GitHubIntegrationConnectionForm = ({
                           <Button
                             type="default"
                             className="justify-start h-[34px] w-full"
-                            disabled={disabled || isLoadingGitHubRepos}
+                            disabled={isLoadingGitHubRepos}
                             loading={isLoadingGitHubRepos}
                             icon={
                               <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
@@ -556,213 +553,244 @@ export const GitHubIntegrationConnectionForm = ({
                 )}
               />
             </CardContent>
-            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
-              <FormField_Shadcn_
-                control={githubSettingsForm.control}
-                name="supabaseDirectory"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Working directory"
-                    description="Path to working directory with your supabase folder"
-                  >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        {...field}
-                        placeholder="supabase"
-                        autoComplete="off"
-                        disabled={disabled || !canUpdateGitHubConnection}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </CardContent>
-            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
-              {/* Production Branch Sync Section */}
-              <div className="space-y-4">
-                <FormField_Shadcn_
-                  control={githubSettingsForm.control}
-                  name="enableProductionSync"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Deploy to production"
-                      description="Deploy changes to production on push including PR merges"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={disabled || !canUpdateGitHubConnection}
-                        />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
 
-                <div
-                  className={cn(
-                    'space-y-4 pl-6 border-l',
-                    (!enableProductionSync || disabled) && 'opacity-25 pointer-events-none'
-                  )}
+            <AnimatePresence>
+              {!!currentRepositoryId && (
+                <motion.div
+                  initial={{ opacity: 0, y: -16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
                 >
-                  <FormField_Shadcn_
-                    control={githubSettingsForm.control}
-                    name="branchName"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Production branch name"
-                        description="The GitHub branch to sync with your production database (e.g., main, master)"
-                      >
-                        <div className="relative w-full">
+                  <CardContent>
+                    <FormField_Shadcn_
+                      control={githubSettingsForm.control}
+                      name="supabaseDirectory"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Working directory"
+                          description="Path to working directory with your supabase folder"
+                        >
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
+                              placeholder="supabase"
                               autoComplete="off"
-                              disabled={
-                                disabled || !canUpdateGitHubConnection || !enableProductionSync
-                              }
+                              disabled={!canUpdateGitHubConnection}
                             />
                           </FormControl_Shadcn_>
-                          <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                            {isCheckingBranch && <Loader2 size={14} className="animate-spin" />}
-                          </div>
-                        </div>
-                      </FormItemLayout>
-                    )}
-                  />
-                </div>
-              </div>
-            </CardContent>
-            <CardContent className={cn(!currentRepositoryId && 'opacity-25 pointer-events-none')}>
-              <Alert_Shadcn_ variant="warning" className="mb-4">
-                <AlertTitle_Shadcn_>Branching and billing</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Branching Compute is not covered by your organization&apos;s Spend Cap. Costs
-                  should be closely monitored, as they may be incurred.{' '}
-                  <InlineLink
-                    href={`${DOCS_URL}/guides/platform/cost-control#usage-items-not-covered-by-the-spend-cap`}
-                  >
-                    Learn more
-                  </InlineLink>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-              {/* Automatic Branching Section */}
-              <div className="space-y-4">
-                <FormField_Shadcn_
-                  control={githubSettingsForm.control}
-                  name="new_branch_per_pr"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Automatic branching"
-                      description="Create preview branches for every pull request"
-                    >
-                      <FormControl_Shadcn_>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={disabled || !canCreateGitHubConnection}
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    {/* Production Branch Sync Section */}
+                    <div className="space-y-4">
+                      <FormField_Shadcn_
+                        control={githubSettingsForm.control}
+                        name="enableProductionSync"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="flex-row-reverse"
+                            label="Deploy to production"
+                            description="Deploy changes to production on push including PR merges"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!canUpdateGitHubConnection}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <div
+                        className={cn(
+                          'space-y-4 pl-6 border-l',
+                          !enableProductionSync && 'opacity-25 pointer-events-none'
+                        )}
+                      >
+                        <FormField_Shadcn_
+                          control={githubSettingsForm.control}
+                          name="branchName"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Production branch name"
+                              description="The GitHub branch to sync with your production database (e.g., main, master)"
+                            >
+                              <div className="relative w-full">
+                                <FormControl_Shadcn_>
+                                  <Input_Shadcn_
+                                    {...field}
+                                    autoComplete="off"
+                                    disabled={!canUpdateGitHubConnection || !enableProductionSync}
+                                  />
+                                </FormControl_Shadcn_>
+                                <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                                  {isCheckingBranch && (
+                                    <Loader2 size={14} className="animate-spin" />
+                                  )}
+                                </div>
+                              </div>
+                            </FormItemLayout>
+                          )}
                         />
-                      </FormControl_Shadcn_>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <div
-                  className={cn(
-                    'space-y-4 pl-6 border-l',
-                    (!newBranchPerPr || disabled) && 'opacity-25 pointer-events-none'
-                  )}
-                >
-                  <FormField_Shadcn_
-                    control={githubSettingsForm.control}
-                    name="branchLimit"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Branch limit"
-                        description="Maximum number of preview branches"
-                      >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            autoComplete="off"
-                            disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardContent>
+                    {hasAccessToBranching ? (
+                      <Admonition type="warning" title="Branching and billing" className="mb-4">
+                        Branching Compute is not covered by your organization&apos;s Spend Cap.
+                        Costs should be closely monitored, as they may be incurred.{' '}
+                        <InlineLink
+                          href={`${DOCS_URL}/guides/platform/cost-control#usage-items-not-covered-by-the-spend-cap`}
+                        >
+                          Learn more
+                        </InlineLink>
+                      </Admonition>
+                    ) : (
+                      <UpgradeToPro
+                        className="mb-4"
+                        layout="vertical"
+                        source="projectIntegrations"
+                        featureProposition="automatically create preview branches from pull requests"
+                        primaryText="Branching with GitHub integration"
+                        secondaryText="Upgrade to the Pro Plan to enable branching and automatically create preview branches for every pull request"
+                        docsUrl={`${DOCS_URL}/guides/deployment/branching`}
+                      />
                     )}
-                  />
 
-                  <FormField_Shadcn_
-                    control={githubSettingsForm.control}
-                    name="supabaseChangesOnly"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Supabase changes only"
-                        description="Only create branches when Supabase files change"
+                    {/* Automatic Branching Section */}
+                    <div className="space-y-4">
+                      <FormField_Shadcn_
+                        disabled={!hasAccessToBranching}
+                        control={githubSettingsForm.control}
+                        name="new_branch_per_pr"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="flex-row-reverse"
+                            label="Automatic branching"
+                            className={cn(!hasAccessToBranching && 'opacity-25')}
+                            description="Create preview branches for every pull request"
+                          >
+                            <FormControl_Shadcn_>
+                              <Switch
+                                checked={!hasAccessToBranching ? false : field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={!hasAccessToBranching || !canCreateGitHubConnection}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <div
+                        className={cn(
+                          'space-y-4 pl-6 border-l',
+                          (!hasAccessToBranching || !newBranchPerPr) &&
+                            'opacity-25 pointer-events-none'
+                        )}
                       >
-                        <FormControl_Shadcn_>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={(val) => field.onChange(val)}
-                            disabled={!newBranchPerPr || disabled || !canUpdateGitHubConnection}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
-                    )}
-                  />
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between items-center">
-              <div>
-                {connection && (
-                  <Button
-                    type="outline"
-                    onClick={handleRemoveIntegration}
-                    disabled={isDeletingConnection}
-                    loading={isDeletingConnection}
-                  >
-                    Disable integration
-                  </Button>
-                )}
-              </div>
-              <div className="flex space-x-2">
-                {githubSettingsForm.formState.isDirty && (
-                  <Button
-                    type="default"
-                    onClick={() => {
-                      githubSettingsForm.reset()
-                    }}
-                    disabled={disabled || !canUpdateGitHubConnection}
-                  >
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  type={promptProPlanUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
-                  disabled={
-                    disabled ||
-                    (!connection && !canCreateGitHubConnection) ||
-                    (connection && !canUpdateGitHubConnection) ||
-                    isCheckingBranch ||
-                    isLoading ||
-                    (!connection && !githubSettingsForm.getValues().repositoryId) ||
-                    (connection && !githubSettingsForm.formState.isDirty)
-                  }
-                  loading={isCheckingBranch || isLoading}
-                >
-                  {connection ? 'Save changes' : 'Enable integration'}
-                </Button>
-              </div>
-            </CardFooter>
+                        <FormField_Shadcn_
+                          control={githubSettingsForm.control}
+                          name="branchLimit"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Branch limit"
+                              description="Maximum number of preview branches"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  {...field}
+                                  type="number"
+                                  autoComplete="off"
+                                  value={!hasAccessToBranching ? 0 : field.value}
+                                  disabled={
+                                    !hasAccessToBranching ||
+                                    !newBranchPerPr ||
+                                    !canUpdateGitHubConnection
+                                  }
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+
+                        <FormField_Shadcn_
+                          control={githubSettingsForm.control}
+                          name="supabaseChangesOnly"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Supabase changes only"
+                              description="Only create branches when Supabase files change"
+                            >
+                              <FormControl_Shadcn_>
+                                <Switch
+                                  checked={!hasAccessToBranching ? false : field.value}
+                                  onCheckedChange={(val) => field.onChange(val)}
+                                  disabled={
+                                    !hasAccessToBranching ||
+                                    !newBranchPerPr ||
+                                    !canUpdateGitHubConnection
+                                  }
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between items-center">
+                    <div>
+                      {connection && (
+                        <Button
+                          type="outline"
+                          onClick={handleRemoveIntegration}
+                          disabled={isDeletingConnection}
+                          loading={isDeletingConnection}
+                        >
+                          Disable integration
+                        </Button>
+                      )}
+                    </div>
+                    <div className="flex space-x-2">
+                      {githubSettingsForm.formState.isDirty && (
+                        <Button
+                          type="default"
+                          onClick={() => githubSettingsForm.reset()}
+                          disabled={!canUpdateGitHubConnection}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                      <Button
+                        type="default"
+                        htmlType="submit"
+                        disabled={
+                          !hasAccessToGitHubIntegration ||
+                          (!connection && !canCreateGitHubConnection) ||
+                          (connection && !canUpdateGitHubConnection) ||
+                          isCheckingBranch ||
+                          isLoading ||
+                          (!connection && !githubSettingsForm.getValues().repositoryId) ||
+                          (connection && !githubSettingsForm.formState.isDirty)
+                        }
+                        loading={isCheckingBranch || isLoading}
+                      >
+                        {connection ? 'Save changes' : 'Enable integration'}
+                      </Button>
+                    </div>
+                  </CardFooter>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         </form>
       </Form_Shadcn_>
