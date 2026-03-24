@@ -774,6 +774,12 @@ export const auth: NavMenuConstant = {
         },
 
         {
+          name: 'Custom OAuth/OIDC Providers',
+          url: '/guides/auth/custom-oauth-providers',
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
           name: 'Anonymous Sign-Ins',
           url: '/guides/auth/auth-anonymous',
           enabled: allAuthProvidersEnabled,

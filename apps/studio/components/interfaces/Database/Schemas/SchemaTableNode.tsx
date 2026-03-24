@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Handle, Node, NodeProps } from '@xyflow/react'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { TableEditor } from 'icons'
 import {
@@ -13,7 +14,6 @@ import {
   Table2,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Handle, NodeProps } from 'reactflow'
 import {
   Button,
   cn,
@@ -28,6 +28,7 @@ import {
 } from 'ui'
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
+import { TableNodeData } from './Schemas.constants'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -35,30 +36,13 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 export const TABLE_NODE_WIDTH = 320
 export const TABLE_NODE_ROW_HEIGHT = 40
 
-export type TableNodeData = {
-  id: number
-  schema: string
-  name: string
-  ref?: string
-  isForeign: boolean
-  description: string
-  columns: {
-    id: string
-    isPrimary: boolean
-    isNullable: boolean
-    isUnique: boolean
-    isIdentity: boolean
-    name: string
-    format: string
-  }[]
-}
-
 export const TableNode = ({
+  id,
   data,
   targetPosition,
   sourcePosition,
   placeholder,
-}: NodeProps<TableNodeData> & { placeholder?: boolean }) => {
+}: NodeProps<Node<TableNodeData>> & { placeholder?: boolean }) => {
   // Important styles is a nasty hack to use Handles (required for edges calculations), but do not show them in the UI.
   // ref: https://github.com/wbkd/react-flow/discussions/2698
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
@@ -71,10 +55,18 @@ export const TableNode = ({
   const router = useRouter()
   const itemHeight = 'h-[22px]'
 
+  const hasEdgesSelected =
+    schemaGraphContext.selectedEdge?.source === id || schemaGraphContext.selectedEdge?.target === id
+
   return (
-    <>
+    <article>
       {data.isForeign ? (
-        <header className="text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center">
+        <header
+          className={cn(
+            'text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center',
+            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+          )}
+        >
           {data.name}
           {targetPosition && (
             <Handle
@@ -87,7 +79,10 @@ export const TableNode = ({
         </header>
       ) : (
         <div
-          className="border-[0.5px] overflow-hidden rounded-[4px] shadow-sm"
+          className={cn(
+            'border-[0.5px] overflow-hidden rounded-[4px] shadow-sm',
+            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+          )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
         >
           <header
@@ -216,7 +211,13 @@ export const TableNode = ({
               </div>
               <div className="flex w-full justify-between min-w-0">
                 <span
-                  className="text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]"
+                  className={cn(
+                    'text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]',
+                    schemaGraphContext.selectedEdge?.sourceHandle === column.id ||
+                      schemaGraphContext.selectedEdge?.targetHandle === column.id
+                      ? 'text-brand'
+                      : undefined
+                  )}
                   title={column.name}
                 >
                   {column.name}
@@ -230,7 +231,7 @@ export const TableNode = ({
                   type="target"
                   id={column.id}
                   position={targetPosition}
-                  className={cn(hiddenNodeConnector, '!left-0')}
+                  className={cn(hiddenNodeConnector)}
                 />
               )}
               {sourcePosition && (
@@ -238,7 +239,7 @@ export const TableNode = ({
                   type="source"
                   id={column.id}
                   position={sourcePosition}
-                  className={cn(hiddenNodeConnector, '!right-0')}
+                  className={cn(hiddenNodeConnector)}
                 />
               )}
               <DropdownMenu>
@@ -289,6 +290,6 @@ export const TableNode = ({
           ))}
         </div>
       )}
-    </>
+    </article>
   )
 }

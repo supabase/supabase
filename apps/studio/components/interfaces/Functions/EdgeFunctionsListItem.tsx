@@ -73,9 +73,11 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
         </div>
       </TableCell>
       <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
-        <p className="text-foreground-light">
-          {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
-        </p>
+        <TimestampInfo
+          className="text-sm text-foreground-light whitespace-nowrap"
+          utcTimestamp={item.created_at}
+          label={dayjs(item.created_at).fromNow()}
+        />
       </TableCell>
       <TableCell className="lg:table-cell">
         <TimestampInfo

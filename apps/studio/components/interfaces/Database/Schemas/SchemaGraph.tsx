@@ -1,13 +1,23 @@
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Background,
+  BackgroundVariant,
+  ColorMode,
+  Edge,
+  MiniMap,
+  Node,
+  OnSelectionChangeParams,
+  ReactFlow,
+  useReactFlow,
+} from '@xyflow/react'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -34,10 +44,13 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { DefaultEdge } from './DefaultEdge'
 import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
+import { EdgeData, TableNodeData } from './Schemas.constants'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -67,6 +80,12 @@ export const SchemaGraph = () => {
   const nodeTypes = useMemo(
     () => ({
       table: TableNode,
+    }),
+    []
+  )
+  const edgeTypes = useMemo(
+    () => ({
+      default: DefaultEdge,
     }),
     []
   )
@@ -115,14 +134,17 @@ export const SchemaGraph = () => {
     const nodes = reactFlowInstance.getNodes()
     const edges = reactFlowInstance.getEdges()
 
-    getLayoutedElementsViaDagre(nodes, edges)
+    getLayoutedElementsViaDagre(
+      nodes.filter((item) => item.type === 'table') as Node<TableNodeData>[],
+      edges
+    )
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
     setTimeout(() => reactFlowInstance.fitView({}))
     saveNodePositions()
   }
 
-  const saveNodePositions = () => {
+  const saveNodePositions = useStaticEffectEvent(() => {
     if (schema === undefined) return console.error('Schema is required')
 
     const nodes = reactFlowInstance.getNodes()
@@ -132,7 +154,18 @@ export const SchemaGraph = () => {
       }, {})
       setStoredPositions(nodesPositionData)
     }
-  }
+  })
+
+  const [selectedEdge, setSelectedEdge] = useState<Edge | undefined>(undefined)
+  const handleSelectionChange = useStaticEffectEvent(
+    (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
+      if (params.edges.length === 1) {
+        setSelectedEdge(params.edges[0])
+        return
+      }
+      setSelectedEdge(undefined)
+    }
+  )
 
   const downloadImage = (format: 'png' | 'svg') => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
@@ -223,6 +256,7 @@ export const SchemaGraph = () => {
 
   const schemaGraphPanelEditorContext = useMemo<SchemaGraphContextType>(
     () => ({
+      selectedEdge,
       isDownloading,
       onEditColumn: (tableId, columnId) => {
         const table = tables.find((table) => table.id === tableId)
@@ -242,7 +276,7 @@ export const SchemaGraph = () => {
         snap.onEditTable()
       },
     }),
-    [tables, snap, isDownloading]
+    [tables, snap, isDownloading, selectedEdge]
   )
 
   return (
@@ -368,20 +402,24 @@ export const SchemaGraph = () => {
           ) : (
             <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
               <div className="w-full h-full">
-                <ReactFlow
+                <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
+                  // FIXME: https://github.com/xyflow/xyflow/issues/4876
+                  colorMode={'' as unknown as ColorMode}
                   defaultNodes={[]}
                   defaultEdges={[]}
                   defaultEdgeOptions={{
-                    type: 'smoothstep',
+                    type: 'default',
                     animated: true,
                     deletable: false,
                   }}
                   nodeTypes={nodeTypes}
+                  edgeTypes={edgeTypes}
                   fitView
                   minZoom={0.8}
                   maxZoom={1.8}
                   proOptions={{ hideAttribution: true }}
-                  onNodeDragStop={() => saveNodePositions()}
+                  onNodeDragStop={saveNodePositions}
+                  onSelectionChange={handleSelectionChange}
                 >
                   <Background
                     gap={16}

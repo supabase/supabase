@@ -25,7 +25,6 @@ type RowContextMenuProps = {
 type RowContextMenuItemProps = ItemParams<{ rowIdx: number }, string>
 
 export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -46,7 +45,6 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       queueRowDeletesWithOptimisticUpdate({
         rows: [row],
         table: snap.originalTable,
-        queryClient,
         queueOperation: tableEditorSnap.queueOperation,
         projectRef: project?.ref,
       })
