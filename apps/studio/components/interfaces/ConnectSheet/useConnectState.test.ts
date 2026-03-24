@@ -371,6 +371,7 @@ describe('useConnectState', () => {
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
       expect(stepIds).toContain('shadcn-add')
+      expect(stepIds).toContain('shadcn-env')
     })
   })
 

@@ -2,10 +2,11 @@ import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueu
 import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button } from 'ui'
-import { useEffect, useRef, useState } from 'react'
+
 import { getModKeyLabel } from '@/lib/helpers'
 
 export const SaveQueueActionBar = () => {
@@ -13,7 +14,6 @@ export const SaveQueueActionBar = () => {
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave } = useOperationQueueActions()
-  const [leftPosition, setLeftPosition] = useState<string>('50%')
 
   useOperationQueueShortcuts()
 
@@ -24,46 +24,10 @@ export const SaveQueueActionBar = () => {
   const isVisible =
     isQueueOperationsEnabled && snap.hasPendingOperations && !isOperationQueuePanelOpen
 
-  // Center position relative to grid container (viewport alignment)
-  useEffect(() => {
-    if (!isVisible) return
-
-    const gridContainer = document.querySelector('.sb-grid')
-    const updatePosition = () => {
-      if (!gridContainer) {
-        setLeftPosition('50%')
-        return
-      }
-
-      const gridRect = gridContainer.getBoundingClientRect()
-      const gridCenter = gridRect.left + gridRect.width / 2
-      setLeftPosition(`${gridCenter}px`)
-    }
-
-    updatePosition()
-
-    if (!gridContainer) return
-
-    const resizeObserver = new ResizeObserver(updatePosition)
-    resizeObserver.observe(gridContainer)
-
-    window.addEventListener('resize', updatePosition)
-    window.addEventListener('scroll', updatePosition, true)
-
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', updatePosition)
-      window.removeEventListener('scroll', updatePosition, true)
-    }
-  }, [isVisible])
-
   const content = (
     <AnimatePresence>
       {isVisible && (
-        <div
-          className="fixed bottom-12 z-50 transform-gpu will-change-transform"
-          style={{ left: leftPosition, transform: 'translateX(-50%)' }}
-        >
+        <div className="fixed bottom-12 z-50 left-1/2 -translate-x-1/2">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}

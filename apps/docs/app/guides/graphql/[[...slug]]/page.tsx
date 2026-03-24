@@ -64,7 +64,7 @@ const pageMap = [
       title: 'Computed Fields',
       subtitle: 'Using Postgres Computed Fields with GraphQL.',
     },
-    remoteFile: 'computed-fields.md',
+    remoteFile: 'computed_fields.md',
   },
   {
     slug: 'configuration',
@@ -136,10 +136,21 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  const response = await fetch(
-    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`,
-    { cache: 'force-cache', next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
-  )
+  let response: Response
+  try {
+    response = await fetch(
+      `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`,
+      { cache: 'force-cache', next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
+    )
+  } catch (err) {
+    throw new Error(`Failed to fetch GraphQL docs from GitHub (network error): ${err}`)
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch GraphQL docs from GitHub: ${response.status} ${response.statusText}`
+    )
+  }
 
   const content = await response.text()
 

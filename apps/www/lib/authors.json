@@ -889,5 +889,21 @@
     "company": "Performanze",
     "author_url": "#",
     "author_image_url": "/images/blog/avatars/victor-orozco.jpeg"
+  },
+  {
+    "author_id": "ana_mogul",
+    "author": "Ana Mogul",
+    "username": "ana1337x",
+    "position": "Product Marketing Manager",
+    "author_url": "https://linkedin.com/in/amogul",
+    "author_image_url": "/images/blog/avatars/ana-mogul.jpeg"
+  },
+  {
+    "author_id": "gregor_vand",
+    "author": "Gregor Vand",
+    "username": "gregorvand",
+    "position": "Technical Program Manager",
+    "author_url": "https://www.linkedin.com/in/gregorvand/",
+    "author_image_url": "https://github.com/gregorvand.png"
   }
 ]
