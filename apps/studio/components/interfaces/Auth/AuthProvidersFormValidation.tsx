@@ -16,7 +16,7 @@ const PROVIDER_EMAIL = {
   link: `${DOCS_URL}/guides/auth/passwords`,
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
-      title: 'Enable Email provider',
+      title: 'Enable email provider',
       description: 'Allow email-based sign up and log in for your application.',
       type: 'boolean',
     },
@@ -47,7 +47,7 @@ const PROVIDER_EMAIL = {
     },
     PASSWORD_REQUIRED_CHARACTERS: {
       type: 'select',
-      title: 'Password Requirements',
+      title: 'Password requirements',
       description: 'Passwords that do not have at least one of each will be rejected as weak.',
       enum: [
         {
@@ -71,13 +71,13 @@ const PROVIDER_EMAIL = {
     },
 
     MAILER_OTP_EXP: {
-      title: 'Email OTP Expiration',
+      title: 'Email OTP expiration',
       type: 'number',
       description: 'Duration before an email OTP / link expires.',
       units: 'seconds',
     },
     MAILER_OTP_LENGTH: {
-      title: 'Email OTP Length',
+      title: 'Email OTP length',
       type: 'number',
       description: 'Number of digits in the email OTP.',
       units: 'number',
