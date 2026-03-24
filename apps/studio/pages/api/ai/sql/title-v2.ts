@@ -1,10 +1,9 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 const titleSchema = z.object({
   title: z
@@ -39,7 +38,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel({
+    const {
+      model,
+      error: modelError,
+      providerOptions,
+    } = await getModel({
       provider: 'openai',
       routingKey: 'sql',
     })
@@ -48,9 +51,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const result = await generateObject({
+    const result = await generateText({
       model,
-      schema: titleSchema,
+      providerOptions,
+      output: Output.object({ schema: titleSchema }),
       prompt: source`
         Generate a short title and summarized description for this Postgres SQL snippet:
 
@@ -60,7 +64,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.object)
+    return res.json(result.output)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI title generation failed: ${error.message}`)

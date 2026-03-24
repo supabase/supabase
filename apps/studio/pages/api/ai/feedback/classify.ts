@@ -1,8 +1,8 @@
-import { generateObject } from 'ai'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
+import { generateText, Output } from 'ai'
 import { getModel } from 'lib/ai/model'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { z } from 'zod'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -28,7 +28,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel({
+    const {
+      model,
+      error: modelError,
+      providerOptions,
+    } = await getModel({
       provider: 'openai',
       routingKey: 'feedback',
     })
@@ -37,10 +41,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const { object } = await generateObject({
+    const { output } = await generateText({
       model,
-      schema: z.object({
-        feedback_category: z.enum(['support', 'feedback', 'unknown']),
+      providerOptions,
+      output: Output.object({
+        schema: z.object({
+          feedback_category: z.enum(['support', 'feedback', 'unknown']),
+        }),
       }),
       temperature: 0,
       prompt: `
@@ -92,7 +99,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   `,
     })
 
-    return res.json({ feedback_category: object.feedback_category })
+    return res.json({ feedback_category: output.feedback_category })
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Classifying this feedback failed`)

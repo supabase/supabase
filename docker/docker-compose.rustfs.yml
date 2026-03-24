@@ -1,0 +1,47 @@
+services:
+
+  rustfs:
+    image: rustfs/rustfs
+    environment:
+      RUSTFS_ACCESS_KEY: ${MINIO_ROOT_USER}
+      RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CORS_ALLOWED_ORIGINS: "*"
+      RUSTFS_CONSOLE_CORS_ALLOWED_ORIGINS: "*"
+    security_opt:
+      - "no-new-privileges:true"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://rustfs:9000/health" ]
+      interval: 2s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - rustfs-data:/data
+
+  rustfs-createbucket:
+    image: rustfs/rc
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -ec "
+      rc alias set supa-rustfs http://rustfs:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+      rc mb --ignore-existing supa-rustfs/${GLOBAL_S3_BUCKET}
+      "
+
+  storage:
+    depends_on:
+      rustfs-createbucket:
+        condition: service_completed_successfully
+      rustfs:
+        condition: service_healthy
+    environment:
+      STORAGE_BACKEND: s3
+      GLOBAL_S3_ENDPOINT: http://rustfs:9000
+      GLOBAL_S3_PROTOCOL: http
+      GLOBAL_S3_FORCE_PATH_STYLE: true
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+
+volumes:
+  rustfs-data:

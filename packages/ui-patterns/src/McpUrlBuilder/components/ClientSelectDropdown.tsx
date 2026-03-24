@@ -4,22 +4,22 @@ import { Bot, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
 } from 'ui'
+
 import type { McpClient } from '../types'
 import { ConnectionIcon } from './ConnectionIcon'
 
 interface ClientSelectDropdownProps {
-  basePath: string
   theme?: 'light' | 'dark'
   label?: string
   clients: McpClient[]
@@ -28,7 +28,6 @@ interface ClientSelectDropdownProps {
 }
 
 export const ClientSelectDropdown = ({
-  basePath,
   theme = 'light',
   label = 'Client',
   clients,
@@ -63,11 +62,9 @@ export const ClientSelectDropdown = ({
             <div className="flex items-center gap-2">
               {selectedClient?.icon ? (
                 <ConnectionIcon
-                  basePath={basePath}
-                  iconFolder="mcp-clients"
                   connection={selectedClient.icon}
                   theme={theme}
-                  supportsDarkMode={true}
+                  hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
                 />
               ) : (
                 <Bot size={12} aria-hidden={true} />
@@ -77,7 +74,7 @@ export const ClientSelectDropdown = ({
           </Button>
         </PopoverTrigger_Shadcn_>
       </div>
-      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start" portal>
+      <PopoverContent_Shadcn_ className="mt-0 p-0 max-w-48" side="bottom" align="start">
         <Command_Shadcn_>
           <CommandInput_Shadcn_ placeholder="Search..." />
           <CommandList_Shadcn_>
@@ -95,11 +92,9 @@ export const ClientSelectDropdown = ({
                 >
                   {client.icon ? (
                     <ConnectionIcon
-                      basePath={basePath}
-                      iconFolder="mcp-clients"
                       connection={client.icon}
                       theme={theme}
-                      supportsDarkMode={true}
+                      hasDistinctDarkIcon={client.hasDistinctDarkIcon}
                     />
                   ) : (
                     <Bot size={12} aria-hidden={true} />

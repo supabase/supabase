@@ -1,5 +1,18 @@
-import { ChevronRight, EllipsisVertical, Shield } from 'lucide-react'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { ChevronRight, EllipsisVertical, Pencil, Shield, Trash2 } from 'lucide-react'
+import {
+  Button,
+  Card,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 
 const policies = [
   {
@@ -22,11 +35,13 @@ const policies = [
   },
 ]
 
+// Studio: See also createNavigationHandler in apps/studio/lib/navigation.ts
+// It handles all of the below, plus modifier clicks and middle mouse button clicks.
 const handlePolicyNavigation = (
-  bucketId: string,
+  policyId: string,
   event: React.MouseEvent | React.KeyboardEvent
 ) => {
-  const url = `/${bucketId}`
+  const url = `/${policyId}`
   if (event.metaKey || event.ctrlKey) {
     // window.open(`${url}`, '_blank') Disabled for demo purposes
   } else {
@@ -80,19 +95,36 @@ export default function TableRowLinkActions() {
               </TableCell>
               <TableCell className="text-foreground-lighter">{policy.appliedTo}</TableCell>
               <TableCell className="flex justify-end items-center h-full gap-3">
-                <Button
-                  icon={<EllipsisVertical />}
-                  aria-label={`More actions`}
-                  type="default"
-                  size="tiny"
-                  className="w-7"
-                />
-                <div>
+                <div
+                  className="flex justify-end items-center h-full gap-3"
+                  onClick={(event) => event.stopPropagation()}
+                  onKeyDown={(event) => event.stopPropagation()}
+                >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="default"
+                        icon={<EllipsisVertical />}
+                        aria-label="More actions"
+                        className="w-7 hit-area-2"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end" className="w-40">
+                      <DropdownMenuItem className="gap-x-2">
+                        <Pencil size={14} />
+                        <span>Edit policy</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="gap-x-2">
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
+                  <button tabIndex={-1} className="sr-only">
+                    Go to policy
+                  </button>
                 </div>
-                <button tabIndex={-1} className="sr-only">
-                  Go to policy
-                </button>
               </TableCell>
             </TableRow>
           ))}

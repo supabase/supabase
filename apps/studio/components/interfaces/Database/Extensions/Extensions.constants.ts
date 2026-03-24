@@ -14,6 +14,7 @@ export const HIDDEN_EXTENSIONS = [
   'intagg',
   'xml2',
   'pg_tle',
+  'pg_stat_monitor',
 ]
 
 export const SEARCH_TERMS: Record<string, string[]> = {
@@ -22,4 +23,9 @@ export const SEARCH_TERMS: Record<string, string[]> = {
 
 export const EXTENSION_DISABLE_WARNINGS: Record<string, string> = {
   pg_cron: 'Disabling this extension will delete all scheduled jobs. This cannot be undone.',
+}
+
+// Extensions that have recommended schemas (rather than required schemas)
+export const extensionsWithRecommendedSchemas: Record<string, string> = {
+  wrappers: 'extensions',
 }

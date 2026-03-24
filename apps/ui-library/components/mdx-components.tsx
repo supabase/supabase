@@ -1,7 +1,5 @@
 import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
-
-import type { Style } from '@/registry/styles'
 import {
   Accordion_Shadcn_ as Accordion,
   AccordionContent_Shadcn_ as AccordionContent,
@@ -9,15 +7,19 @@ import {
   AccordionTrigger_Shadcn_ as AccordionTrigger,
   cn,
 } from 'ui'
+
 import { BlockItem } from './block-item'
 import { BlockPreview } from './block-preview'
 import { Callout } from './callout'
 import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
 import { DualRealtimeChat } from './dual-realtime-chat'
+import { DualRealtimeMonaco } from './dual-realtime-monaco'
 import { RegistryBlock } from './registry-block'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
+import { TanstackDBGenerator } from './tanstack-db-generator'
+import type { Style } from '@/registry/styles'
 
 const components = {
   RegistryBlock,
@@ -181,6 +183,8 @@ const components = {
   BlockItem,
   BlockPreview,
   DualRealtimeChat,
+  DualRealtimeMonaco,
+  TanstackDBGenerator,
 }
 
 interface MdxProps {

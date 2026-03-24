@@ -1,18 +1,18 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { z } from 'zod'
-import { install, uninstall } from 'stripe-experiment-sync/supabase'
-import { VERSION } from 'stripe-experiment-sync'
 import { waitUntil } from '@vercel/functions'
-
-const ENABLE_FLAG_KEY = 'enableStripeSyncEngineIntegration'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { VERSION } from 'stripe-experiment-sync'
+import { install, uninstall } from 'stripe-experiment-sync/supabase'
+import { z } from 'zod'
 
 const InstallBodySchema = z.object({
   projectRef: z.string().min(1),
   stripeSecretKey: z.string().min(1),
+  startTime: z.number().positive().optional(),
 })
 
 const UninstallBodySchema = z.object({
   projectRef: z.string().min(1),
+  startTime: z.number().positive().optional(),
 })
 
 async function isStripeSyncEnabled() {
@@ -26,6 +26,10 @@ function getBearerToken(req: NextApiRequest) {
   if (!authHeader || Array.isArray(authHeader)) return null
   const match = authHeader.match(/^Bearer\s+(.+)$/i)
   return match?.[1]?.trim() ?? null
+}
+
+export const config = {
+  maxDuration: 300, // 5 minutes, since the installation process can take a while even if happening in background
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -61,7 +65,7 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       .status(400)
       .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
-  const { projectRef } = parsed.data
+  const { projectRef, startTime } = parsed.data
 
   waitUntil(
     uninstall({
@@ -69,6 +73,7 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
       supabaseProjectRef: projectRef,
       baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
       supabaseManagementUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
+      startTime,
     }).catch((error) => {
       console.error('Stripe Sync Engine uninstallation failed.', error)
       throw error
@@ -94,7 +99,7 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       .status(400)
       .json({ data: null, error: { message: 'Bad Request: Invalid request body' } })
   }
-  const { projectRef, stripeSecretKey } = parsed.data
+  const { projectRef, stripeSecretKey, startTime } = parsed.data
 
   // Validate the Stripe API key before proceeding with installation
   try {
@@ -112,13 +117,15 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
         errorData.error?.message || `Invalid Stripe API key (HTTP ${stripeResponse.status})`
       return res.status(400).json({
         data: null,
-        error: { message: `Invalid Stripe API key: ${errorMessage}` },
+        error: { message: errorMessage },
       })
     }
-  } catch (error: any) {
+  } catch (error) {
+    const normalizedErrorMessage = error instanceof Error ? error.message : String(error)
+
     return res.status(400).json({
       data: null,
-      error: { message: `Failed to validate Stripe API key: ${error.message}` },
+      error: { message: `Failed to validate Stripe API key: ${normalizedErrorMessage}` },
     })
   }
   waitUntil(
@@ -129,6 +136,7 @@ async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiRes
       baseProjectUrl: process.env.NEXT_PUBLIC_CUSTOMER_DOMAIN,
       supabaseManagementUrl: process.env.NEXT_PUBLIC_API_DOMAIN,
       packageVersion: VERSION,
+      startTime,
     }).catch((error) => {
       console.error('Stripe Sync Engine installation failed.', error)
       throw error

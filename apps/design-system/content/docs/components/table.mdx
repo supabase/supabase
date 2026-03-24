@@ -177,6 +177,8 @@ When adding icon columns to your table, use [Accessibility](../accessibility) ma
 
 Action should be placed in the last column of each Table Row to maintain a logical reading flow. Users scan table data from left to right, so positioning actions on the right ensures they encounter the primary information first before reaching interactive controls.
 
+For compact controls in action cells, add the `hit-area-2` utility to increase the tap target by `8px` on each side without changing visual layout. When actions sit next to each other, keep at least `gap-x-2` spacing: with two adjacent `hit-area-2` buttons, hit areas meet at the midpoint but do not overlap.
+
 #### Multiple actions
 
 When multiple actions are available for a row, display one primary action as a button and place additional options in an overflow menu. This keeps the table clean and scannable while providing access to all necessary actions without overwhelming the user.
@@ -199,11 +201,13 @@ Avoid adding other actions when using row-level navigation, as multiple interact
 
 <ComponentPreview name="table-row-link" />
 
-When implementing row-level navigation, pay close attention to [Accessibility](/accessibility#focus-management) requirements. The row must be keyboard accessible with proper focus management, including:
+When implementing row-level navigation, pay close attention to [Accessibility](/accessibility#focus-management) requirements. The row must be keyboard accessible with proper focus management. Also consider these affordances:
 
-- Handling `Enter` and `Space` key presses for activation
-- Providing visual focus indicators using classes like `inset-focus`
-- Supporting modifier keys (`Ctrl`/`Cmd`) for opening links in new tabs
+- Handle `Enter` and `Space` key presses for activation
+- Provide visual focus indicators using classes like `inset-focus`
+- Support modifier keys (`Ctrl`/`Cmd`, middle-click) for opening links in new tabs
+  - Consider using the shared `createNavigationHandler` function to handle modifier keys
+- Avoid bubbling up action events from _within_ the row
 
 #### Row navigation with actions
 

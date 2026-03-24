@@ -2,7 +2,7 @@ import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eraser, Info, Pencil, X } from 'lucide-react'
+import { Eraser, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -13,7 +13,7 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -40,6 +40,9 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import AlertError from '../AlertError'
+import { ASSISTANT_ERRORS } from './AiAssistant.constants'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -63,18 +66,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
-  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('assistant.advance_model')
 
   const selectedModel = useMemo<AssistantModel>(() => {
-    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    // While entitlements are loading, use the stored model without enforcing access
+    if (isLoadingEntitlements) {
+      return snap.model ?? 'gpt-5-mini'
+    }
+
+    const defaultModel: AssistantModel = hasAccessToAdvanceModel ? 'gpt-5' : 'gpt-5-mini'
     const model = snap.model ?? defaultModel
 
-    if (!isPaidPlan && model === 'gpt-5') {
+    if (!hasAccessToAdvanceModel && model === 'gpt-5') {
       return 'gpt-5-mini'
     }
 
     return model
-  }, [isPaidPlan, snap.model])
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -133,7 +142,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     })
   }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     messages: chatMessages,
@@ -222,19 +231,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
           reason,
+          spanId: state.messageSpanIds[messageId],
         })
 
-        sendEvent({
-          action: 'assistant_message_rating_submitted',
-          properties: {
-            rating,
-            category: result.category,
-            ...(reason && { reason }),
-          },
-          groups: {
-            project: project.ref,
-            organization: selectedOrganization.slug,
-          },
+        track('assistant_message_rating_submitted', {
+          rating,
+          category: result.category,
+          ...(reason && { reason }),
+          chatId: state.activeChatId,
         })
       } catch (error) {
         console.error('Failed to rate message:', error)
@@ -245,7 +249,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state]
   )
 
   const isContextExceededError =
@@ -323,21 +327,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
-      sendEvent({
-        action: 'assistant_debug_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_debug_submitted', { chatId: snap.activeChatId })
     } else {
-      sendEvent({
-        action: 'assistant_prompt_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_prompt_submitted', { chatId: snap.activeChatId })
     }
   }
 
@@ -407,57 +399,53 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
-                <div className="border rounded-md px-2 py-2 flex items-center justify-between gap-x-4">
-                  <div className="flex items-start gap-2 text-foreground-light text-sm">
-                    <div>
-                      <Info size={16} className="mt-0.5" />
-                    </div>
-                    <div>
-                      {isContextExceededError ? (
-                        <p>
-                          This conversation has become too long for the Assistant to process. Please
-                          start a new chat to continue.
-                        </p>
-                      ) : (
-                        <p>
-                          Sorry, I'm having trouble responding right now. If the error persists
-                          while retrying, you may try creating a new chat and try again.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-x-2">
-                    {isContextExceededError ? (
-                      <Button
-                        type="default"
-                        size="tiny"
-                        onClick={() => snap.newChat()}
-                        className="text-xs"
-                      >
-                        New chat
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          type="default"
-                          size="tiny"
-                          onClick={() => regenerate()}
-                          className="text-xs"
-                        >
-                          Retry
-                        </Button>
-                        <ButtonTooltip
-                          type="default"
-                          size="tiny"
-                          onClick={handleClearMessages}
-                          className="w-7 h-7"
-                          icon={<Eraser />}
-                          tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                        />
-                      </>
-                    )}
-                  </div>
-                </div>
+                <>
+                  <AlertError
+                    error={
+                      isContextExceededError
+                        ? ASSISTANT_ERRORS['context-exceeded']
+                        : IS_PLATFORM
+                          ? ASSISTANT_ERRORS['default']
+                          : error
+                    }
+                    showErrorPrefix={false}
+                    showInstructions={false}
+                    subject="Sorry, I'm having trouble responding right now."
+                    additionalActions={
+                      <div className="flex items-center gap-x-2 mr-auto">
+                        {isContextExceededError ? (
+                          <Button
+                            type="default"
+                            size="tiny"
+                            onClick={() => snap.newChat()}
+                            className="text-xs"
+                          >
+                            New chat
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              type="default"
+                              size="tiny"
+                              onClick={() => regenerate()}
+                              className="text-xs"
+                            >
+                              Retry
+                            </Button>
+                            <ButtonTooltip
+                              type="default"
+                              size="tiny"
+                              onClick={handleClearMessages}
+                              className="w-7 h-7"
+                              icon={<Eraser />}
+                              tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                            />
+                          </>
+                        )}
+                      </div>
+                    }
+                  />
+                </>
               )}
               {isChatLoading && (
                 <motion.span
@@ -557,12 +545,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={
-              !isApiKeySet ||
-              disablePrompts ||
-              isLoadingOrganization ||
-              (isChatLoading && !editingMessageId)
-            }
+            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
             placeholder={
               hasMessages
                 ? 'Ask a follow up question...'

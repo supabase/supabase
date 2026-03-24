@@ -18,8 +18,10 @@ import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { BlockKeys } from '../common/BlockKeys'
 
-interface BaseEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface BaseEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   type: 'date' | 'datetime' | 'datetimetz'
   isNullable: boolean
 }
@@ -76,7 +78,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           {value === null ? 'NULL' : value}
         </div>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal align="start" className="p-0 rounded-none w-64">
+      <PopoverContent_Shadcn_ align="start" className="p-0 rounded-none w-64">
         <BlockKeys
           ignoreOutsideClicks
           value={inputValue}

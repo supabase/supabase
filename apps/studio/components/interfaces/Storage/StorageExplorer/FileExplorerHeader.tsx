@@ -1,4 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { compact, isEqual, noop } from 'lodash'
 import {
   Check,
@@ -8,18 +12,13 @@ import {
   Edit2,
   FolderPlus,
   List,
-  Loader,
+  LoaderCircle,
   RefreshCw,
   Search,
   Upload,
   X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
@@ -34,6 +33,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
+
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 
 const VIEW_OPTIONS = [
@@ -61,7 +61,7 @@ const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: a
     >
       {loading.isLoading ? (
         <div className="ml-2 flex items-center gap-x-3">
-          <Loader size={14} strokeWidth={2} className="animate-spin" />
+          <LoaderCircle size={14} strokeWidth={2} className="animate-spin" />
           <p className="text-sm text-foreground-light">{loading.message}</p>
         </div>
       ) : (
@@ -113,7 +113,7 @@ const HeaderBreadcrumbs = ({
 
   return loading.isLoading ? (
     <div className="ml-2 flex items-center">
-      <Loader size={16} strokeWidth={2} className="animate-spin" />
+      <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
       <p className="ml-3 text-sm">{loading.message}</p>
     </div>
   ) : (
@@ -457,6 +457,7 @@ export const FileExplorerHeader = ({
               icon={<Search />}
               actions={[
                 <Button
+                  key="cancel"
                   size="tiny"
                   type="text"
                   icon={<X />}

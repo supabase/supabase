@@ -1,8 +1,9 @@
+import { z } from 'zod'
+
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { ident, literal } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
-import { z } from 'zod'
 
 const pgColumnZod = z.object({
   id: z.string(),
@@ -119,6 +120,7 @@ function create({
   is_unique = false,
   comment,
   check,
+  no_transaction = false,
 }: {
   schema: string
   table: string
@@ -133,6 +135,7 @@ function create({
   is_unique?: boolean
   comment?: string
   check?: string
+  no_transaction?: boolean
 }): { sql: string } {
   let defaultValueClause = ''
   if (is_identity) {
@@ -164,17 +167,24 @@ function create({
       : `COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
 
   const sql = `
-BEGIN;
   ALTER TABLE ${ident(schema)}.${ident(table)} ADD COLUMN ${ident(name)} ${typeIdent(type)}
     ${defaultValueClause}
     ${isNullableClause}
     ${isPrimaryKeyClause}
     ${isUniqueClause}
     ${checkSql};
-  ${commentSql};
-COMMIT;`
+  ${commentSql};`
 
-  return { sql }
+  if (no_transaction) {
+    return { sql }
+  }
+
+  return {
+    sql: `
+  BEGIN;
+    ${sql};
+  COMMIT;`,
+  }
 }
 
 // TODO: make this more robust - use type_id or type_schema + type_name instead of just type.

@@ -1,8 +1,9 @@
+import { getAbortQuerySQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { sqlKeys } from './keys'
 
 export type QueryAbortVariables = {
@@ -12,7 +13,7 @@ export type QueryAbortVariables = {
 }
 
 export async function abortQuery({ pid, projectRef, connectionString }: QueryAbortVariables) {
-  const sql = /* SQL */ `select pg_terminate_backend(${pid})`
+  const sql = getAbortQuerySQL({ pid })
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

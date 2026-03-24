@@ -816,13 +816,6 @@
             "type": "function"
           },
           {
-            "id": "send-mobile-otp",
-            "title": "Send a one-time passcode",
-            "slug": "auth-api-sendmobileotp",
-            "product": "auth-server",
-            "type": "function"
-          },
-          {
             "id": "update-user-by-id",
             "title": "Update a user",
             "slug": "auth-admin-updateuserbyid",
@@ -833,13 +826,6 @@
             "id": "auth-js-gotrueadminapi-signout",
             "title": "Sign out a user (admin)",
             "slug": "auth-admin-signout",
-            "product": "auth-admin",
-            "type": "function"
-          },
-          {
-            "id": "mfa-list-factors",
-            "title": "List all factors for a user",
-            "slug": "auth-admin-mfa-listfactors",
             "product": "auth-admin",
             "type": "function"
           },
@@ -924,6 +910,20 @@
         "slug": "functions-invoke",
         "product": "functions",
         "type": "function"
+      },
+      {
+        "id": "cors-headers",
+        "title": "CORS headers for Edge Functions",
+        "slug": "functions-cors-headers",
+        "product": "functions",
+        "type": "function"
+      },
+      {
+        "id": "functions-setauth",
+        "title": "Update authorization token",
+        "slug": "functions-setauth",
+        "product": "functions",
+        "type": "function"
       }
     ]
   },
@@ -997,6 +997,13 @@
         "id": "broadcast-message",
         "title": "Broadcast a message",
         "slug": "broadcastmessage",
+        "product": "realtime",
+        "type": "function"
+      },
+      {
+        "id": "realtime-setauth",
+        "title": "Set authentication token",
+        "slug": "realtime-setauth",
         "product": "realtime",
         "type": "function"
       }

@@ -1,9 +1,9 @@
+import { getCreateVaultSecretSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
-import { quoteLiteral } from 'lib/pg-format'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions, VaultSecret } from 'types'
+
 import { vaultSecretsKeys } from './keys'
 
 export type VaultSecretCreateVariables = {
@@ -17,13 +17,9 @@ export async function createVaultSecret({
   ...newSecret
 }: VaultSecretCreateVariables) {
   const { name, description, secret } = newSecret
-  const sql = /* SQL */ `
-select vault.create_secret(
-    new_secret := ${quoteLiteral(secret)}
-  ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
-  ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
-)
-`
+
+  if (!secret) throw new Error('Secret value is required')
+  const sql = getCreateVaultSecretSQL({ secret, name, description })
 
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result

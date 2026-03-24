@@ -1,14 +1,9 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { isEmpty, noop } from 'lodash'
-import { ExternalLink, Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-
 import { useParams } from 'common'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
-  CONSTRAINT_TYPE,
   Constraint,
+  CONSTRAINT_TYPE,
   useTableConstraintsQuery,
 } from 'data/database/constraints-query'
 import {
@@ -19,8 +14,22 @@ import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
+import { isEmpty, noop } from 'lodash'
+import { ExternalLink, Plus } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import type { Dictionary } from 'types'
-import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
+import {
+  Button,
+  Checkbox,
+  Input,
+  SidePanel,
+  Toggle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -41,7 +50,7 @@ import {
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
-import HeaderTitle from './HeaderTitle'
+import { HeaderTitle } from './HeaderTitle'
 
 export interface ColumnEditorProps {
   column?: Readonly<PostgresColumn>
@@ -56,6 +65,7 @@ export interface ColumnEditorProps {
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      createMore?: boolean
     },
     resolve: any
   ) => void
@@ -76,6 +86,7 @@ export const ColumnEditor = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [createMore, setCreateMore] = useState(false)
   const [placeholder, setPlaceholder] = useState(
     getPlaceholderText(columnFields?.format, columnFields?.name)
   )
@@ -182,8 +193,20 @@ export const ColumnEditor = ({
           primaryKey,
           foreignKeyRelations: fkRelations,
           existingForeignKeyRelations: foreignKeys,
+          createMore,
         }
-        saveChanges(payload, isNewRecord, configuration, resolve)
+        saveChanges(payload, isNewRecord, configuration, (err?: any) => {
+          resolve()
+          if (!err && createMore && isNewRecord) {
+            const freshColumnFields = generateColumnField({
+              schema: selectedTable.schema,
+              table: selectedTable.name,
+            })
+            setColumnFields(freshColumnFields)
+            setFkRelations([])
+            setErrors({})
+          }
+        })
       } else {
         resolve()
       }
@@ -206,12 +229,30 @@ export const ColumnEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
-        />
+          visible={visible}
+        >
+          {isNewRecord && (
+            <div className="flex items-center gap-x-2">
+              <Toggle
+                size="tiny"
+                checked={createMore}
+                onChange={() => setCreateMore(!createMore)}
+              />
+              <label
+                className="text-foreground-light text-sm cursor-pointer select-none"
+                onClick={() => setCreateMore(!createMore)}
+              >
+                Create more
+              </label>
+            </div>
+          )}
+        </ActionBar>
       }
     >
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <Input
+            id="name"
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
@@ -221,6 +262,7 @@ export const ColumnEditor = ({
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
           />
           <Input
+            id="description"
             label="Description"
             labelOptional="Optional"
             type="text"
@@ -345,20 +387,49 @@ export const ColumnEditor = ({
             label="Is Primary Key"
             descriptionText="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"
             checked={columnFields?.isPrimaryKey ?? false}
-            onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
+            onChange={() =>
+              onUpdateField({
+                isPrimaryKey: !columnFields?.isPrimaryKey,
+                isUnique: false,
+                isNullable: false,
+              })
+            }
           />
-          <Toggle
-            label="Allow Nullable"
-            descriptionText="Allow the column to assume a NULL value if no value is provided"
-            checked={columnFields.isNullable}
-            onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
-          />
-          <Toggle
-            label="Is Unique"
-            descriptionText="Enforce values in the column to be unique across rows"
-            checked={columnFields.isUnique}
-            onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
-          />
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle
+                  label="Allow Nullable"
+                  disabled={columnFields.isPrimaryKey}
+                  descriptionText="Allow the column to assume a NULL value if no value is provided"
+                  checked={columnFields.isNullable}
+                  onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" align="start">
+              Column is a primary key and hence cannot be NULL
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle
+                  label="Is Unique"
+                  disabled={columnFields.isPrimaryKey}
+                  descriptionText="Enforce values in the column to be unique across rows"
+                  checked={columnFields.isUnique}
+                  onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" align="start">
+              Column is a primary key and hence already unique
+            </TooltipContent>
+          </Tooltip>
+
           <Input
             label="CHECK Constraint"
             labelOptional="Optional"

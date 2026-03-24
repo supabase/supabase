@@ -11,11 +11,16 @@ export type BranchMergeVariables = {
   branchProjectRef: string
   baseProjectRef: string
   migration_version?: string
+  pgdelta?: boolean
 }
 
-export async function mergeBranch({ branchProjectRef, migration_version }: BranchMergeVariables) {
+export async function mergeBranch({
+  branchProjectRef,
+  migration_version,
+  pgdelta,
+}: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchRef: branchProjectRef })
+  const diffContent = await getBranchDiff({ branchRef: branchProjectRef, pgdelta })
 
   let migrationCreated = false
 

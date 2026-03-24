@@ -1,8 +1,8 @@
 'use client'
 
-import * as React from 'react'
 import * as SwitchPrimitives from '@radix-ui/react-switch'
 import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -37,7 +37,8 @@ const switchThumbVariants = cva(
 )
 
 export interface SwitchProps
-  extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
+  extends
+    React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
     VariantProps<typeof switchVariants> {}
 
 const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, SwitchProps>(

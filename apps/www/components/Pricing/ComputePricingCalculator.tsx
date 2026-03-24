@@ -1,3 +1,5 @@
+'use client'
+
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import { ChevronDown, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -206,7 +208,7 @@ const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivi
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
                 {plans.map((plan: any) => (
-                  <DropdownMenuItem key="custom-expiry" onClick={() => setActivePlan(plan)}>
+                  <DropdownMenuItem key={plan.name} onClick={() => setActivePlan(plan)}>
                     {plan.name}
                   </DropdownMenuItem>
                 ))}

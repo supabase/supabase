@@ -2,14 +2,14 @@
 
 import { xor } from 'lodash'
 import {
-  type Dispatch,
-  type PropsWithChildren,
-  type SetStateAction,
   createContext,
   useCallback,
   useContext,
   useMemo,
   useState,
+  type Dispatch,
+  type PropsWithChildren,
+  type SetStateAction,
 } from 'react'
 
 export interface TabGroup {
