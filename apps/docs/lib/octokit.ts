@@ -34,13 +34,7 @@ export function octokit() {
   return octokitInstance
 }
 
-export async function getGitHubFileContents({
-  org,
-  repo,
-  path,
-  branch,
-  options: { onError, fetch } = {},
-}: {
+type GithubFileRequest = {
   org: string
   repo: string
   path: string
@@ -55,7 +49,15 @@ export async function getGitHubFileContents({
      */
     fetch?: (info: RequestInfo, init?: RequestInit) => Promise<Response>
   }
-}) {
+}
+
+export async function getGitHubFileContents({
+  org,
+  repo,
+  path,
+  branch,
+  options: { onError, fetch } = {},
+}: GithubFileRequest) {
   if (path.startsWith('/')) {
     path = path.slice(1)
   }
@@ -109,17 +111,8 @@ export async function getGitHubFileContentsImmutableOnly({
   repo,
   branch,
   path,
-  options: { onError, fetch },
-}: {
-  org: string
-  repo: string
-  branch: string
-  path: string
-  options: {
-    onError: (error: unknown) => void
-    fetch: (url: string) => Promise<Response>
-  }
-}): Promise<string> {
+  options: { onError, fetch } = {},
+}: GithubFileRequest): Promise<string> {
   const isImmutableCommit = await checkForImmutableCommit({
     org,
     repo,
