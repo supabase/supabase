@@ -13,6 +13,7 @@ import {
   Card,
   CardContent,
   CardFooter,
+  CardHeader,
   cn,
   CodeBlock,
   copyToClipboard,
@@ -182,11 +183,22 @@ export const EdgeFunctionDetails = () => {
                             layout="flex-row-reverse"
                             description={
                               <>
-                                Requires a JWT signed{' '}
-                                <em className="text-brand not-italic">only by the legacy secret</em>{' '}
-                                in the <code>Authorization</code> header. The <code>anon</code> key
-                                satisfies this. Recommended: OFF with JWT and custom auth logic in
-                                your function code.
+                                <p className="mb-2">
+                                  Requires a JWT signed{' '}
+                                  <em className="text-foreground not-italic">
+                                    only by the legacy secret
+                                  </em>{' '}
+                                  in the{' '}
+                                  <code className="text-code-inline !break-keep">
+                                    Authorization
+                                  </code>{' '}
+                                  header. The <code className="text-code-inline">anon</code> key
+                                  satisfies this.
+                                </p>
+                                <p>
+                                  Recommended: OFF with JWT and custom auth logic in your function
+                                  code.
+                                </p>
                               </>
                             }
                           >
@@ -265,15 +277,16 @@ export const EdgeFunctionDetails = () => {
                   })
 
                   return (
-                    <TabsContent key={tab.id} value={tab.id} className="mt-4 px-6">
+                    <TabsContent key={tab.id} value={tab.id}>
                       <CodeBlock
                         value={code}
+                        wrapperClassName="[&>div]:top-0 [&>div]:right-3 px-6"
                         className={cn(
-                          'p-0 text-xs !mt-0 border-none [&>code]:!whitespace-pre-wrap',
+                          'p-0 text-xs !mt-0 border-none ',
                           showKey ? '[&>code]:break-all' : '[&>code]:break-words'
                         )}
                         language={tab.language}
-                        wrapLines={true}
+                        wrapLines={false}
                         hideLineNumbers={tab.hideLineNumbers}
                         handleCopy={() => {
                           copyToClipboard(
@@ -313,7 +326,7 @@ export const EdgeFunctionDetails = () => {
                         description: 'Download the function to your local machine',
                         jsx: () => (
                           <>
-                            <span className="text-brand-600">supabase</span> functions download{' '}
+                            <span className="text-brand">supabase</span> functions download{' '}
                             {selectedFunction?.slug}
                           </>
                         ),
