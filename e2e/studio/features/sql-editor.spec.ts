@@ -1,6 +1,8 @@
-import { expect, Page } from '@playwright/test'
 import fs from 'fs'
+import { expect, Page } from '@playwright/test'
+
 import { env } from '../env.config.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
 import { isCLI } from '../utils/is-cli.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
@@ -189,12 +191,8 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal blocks execution
-    await expect(
-      page.getByRole('heading', { name: 'Potential issue detected with' })
-    ).toBeVisible()
-    await expect(
-      page.getByText('Query will prevent connections to your database')
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
+    await expect(page.getByText('Query will prevent connections to your database')).toBeVisible()
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -233,12 +231,8 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal blocks execution
-    await expect(
-      page.getByRole('heading', { name: 'Potential issue detected with' })
-    ).toBeVisible()
-    await expect(
-      page.getByText('Query will prevent connections to your database')
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
+    await expect(page.getByText('Query will prevent connections to your database')).toBeVisible()
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -277,9 +271,7 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal blocks execution
-    await expect(
-      page.getByRole('heading', { name: 'Potential issue detected with' })
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
     await expect(page.getByText('Query uses update without a where clause')).toBeVisible()
     expect(queryDispatched).toBe(false)
 
@@ -332,27 +324,35 @@ test.describe('SQL Editor', () => {
     // export as markdown
     await page.getByRole('button', { name: 'Export' }).click()
     await page.getByRole('menuitem', { name: 'Copy as markdown' }).click()
-    await page.waitForTimeout(500)
-    const copiedMarkdownResult = await page.evaluate(() => navigator.clipboard.readText())
-    expect(copiedMarkdownResult).toBe(`| ?column?    |
+    // Make sure the dropdown has closed otherwise it would make the other assertions unstable
+    await expect(page.getByRole('menuitem', { name: 'Copy as markdown' })).not.toBeVisible()
+    await expectClipboardValue({
+      page,
+      value: `| ?column?    |
 | ----------- |
-| hello world |`)
+| hello world |`,
+      exact: true,
+    })
 
     // export as JSON
     await page.getByRole('button', { name: 'Export' }).click()
     await page.getByRole('menuitem', { name: 'Copy as JSON' }).click()
-    await page.waitForTimeout(500)
-    const copiedJsonResult = await page.evaluate(() => navigator.clipboard.readText())
-    expect(copiedJsonResult).toBe(`[
+    await expect(page.getByRole('menuitem', { name: 'Copy as JSON' })).not.toBeVisible()
+    await expectClipboardValue({
+      page,
+      value: `[
   {
     "?column?": "hello world"
   }
-]`)
+]`,
+      exact: true,
+    })
 
     // export as CSV
     const downloadPromise = page.waitForEvent('download')
     await page.getByRole('button', { name: 'Export' }).click()
     await page.getByRole('menuitem', { name: 'Download CSV' }).click()
+    await expect(page.getByRole('menuitem', { name: 'Download CSV' })).not.toBeVisible()
     const download = await downloadPromise
     expect(download.suggestedFilename()).toContain('.csv')
     const downloadPath = await download.path()

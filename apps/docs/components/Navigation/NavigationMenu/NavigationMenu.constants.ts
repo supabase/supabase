@@ -774,6 +774,12 @@ export const auth: NavMenuConstant = {
         },
 
         {
+          name: 'Custom OAuth/OIDC Providers',
+          url: '/guides/auth/custom-oauth-providers',
+          enabled: allAuthProvidersEnabled,
+        },
+
+        {
           name: 'Anonymous Sign-Ins',
           url: '/guides/auth/auth-anonymous',
           enabled: allAuthProvidersEnabled,
@@ -1547,6 +1553,11 @@ export const graphql: NavMenuConstant = {
     { name: 'API', url: '/guides/graphql/api', items: [] },
     { name: 'Views', url: '/guides/graphql/views', items: [] },
     { name: 'Functions', url: '/guides/graphql/functions', items: [] },
+    {
+      name: 'Computed Fields',
+      url: '/guides/graphql/computed-fields',
+      items: [],
+    },
     {
       name: 'Configuration & Customization',
       url: '/guides/graphql/configuration',

@@ -642,6 +642,10 @@
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
       "types": "./src/form/FormItemLayout/FormItemLayout.tsx"
     },
+    "./form/KeyValueFieldArray/KeyValueFieldArray": {
+      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
+      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
+    },
     "./form/FormLayout2": {
       "import": "./src/form/FormLayout2.tsx",
       "types": "./src/form/FormLayout2.tsx"

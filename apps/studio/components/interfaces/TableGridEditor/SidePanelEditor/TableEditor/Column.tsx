@@ -1,25 +1,28 @@
-import { Link, Menu, Plus, Settings, X } from 'lucide-react'
-import {
-  Badge,
-  Button,
-  Checkbox,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Command_Shadcn_,
-  Input,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
-} from 'ui'
-
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
+import { Link, Menu, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
+import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  Checkbox_Shadcn_,
+  cn,
+  Command_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
+  Input,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
@@ -53,20 +56,20 @@ interface ColumnProps {
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
-  dragHandleProps?: any
+  dragHandleProps?: DraggableProvidedDragHandleProps | null
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
   onEditForeignKey: (relation?: ForeignKey) => void
 }
 
-const Column = ({
+export const Column = ({
   column = EMPTY_OBJ as ColumnField,
   relations = EMPTY_ARR as ForeignKey[],
   enumTypes = EMPTY_ARR as EnumeratedType[],
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
-  dragHandleProps = EMPTY_OBJ,
+  dragHandleProps,
   onUpdateColumn,
   onRemoveColumn,
   onEditForeignKey,
@@ -115,6 +118,7 @@ const Column = ({
       <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
+            aria-label="Column name"
             size="small"
             value={column.name}
             title={column.name}
@@ -124,7 +128,7 @@ const Column = ({
               '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
               hasImportContent ? 'opacity-50' : ''
             )}
-            onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
+            onChange={(event) => onUpdateColumn({ name: event.target.value })}
           />
           {relations.filter((r) => !r.toRemove).length === 0 ? (
             <Button
@@ -241,6 +245,7 @@ const Column = ({
       <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'}`}>
         <div className="w-[95%]">
           <InputWithSuggestions
+            aria-label="Column default value"
             data-testid={`${column.name}-default-value`}
             placeholder={
               typeof column.defaultValue === 'string' && column.defaultValue.length === 0
@@ -256,7 +261,7 @@ const Column = ({
             suggestions={suggestions}
             suggestionsHeader="Suggested expressions"
             suggestionsTooltip="Suggested expressions"
-            onChange={(event: any) => onUpdateColumn({ defaultValue: event.target.value })}
+            onChange={(event) => onUpdateColumn({ defaultValue: event.target.value })}
             onSelectSuggestion={(suggestion: Suggestion) =>
               onUpdateColumn({ defaultValue: suggestion.value })
             }
@@ -293,54 +298,79 @@ const Column = ({
                 <Settings size={16} strokeWidth={1} />
               </div>
             </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ align="end" className="w-96 p-0">
-              <div className="flex items-center justify-center bg-surface-200 space-y-1 py-1.5 px-3 border-b border-overlay">
+            <PopoverContent_Shadcn_ align="end" className="w-80 p-0">
+              <div className="flex items-center justify-center bg-surface-200 gap-y-1 py-1.5 px-3 border-b border-overlay">
                 <h5 className="text-foreground">Extra options</h5>
               </div>
 
-              <div className="flex flex-col space-y-1" key={`${column.id}_configuration`}>
+              <div className="flex flex-col gap-y-4 p-4" key={`${column.id}_configuration`}>
                 {!column.isPrimaryKey && (
-                  <Checkbox
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="isNullable"
                     label="Is Nullable"
                     description="Specify if the column can assume a NULL value if no value is provided"
-                    checked={column.isNullable}
-                    className="p-4"
-                    onChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
-                  />
+                  >
+                    <Checkbox_Shadcn_
+                      id="isNullable"
+                      checked={column.isNullable}
+                      onCheckedChange={() => onUpdateColumn({ isNullable: !column.isNullable })}
+                    />
+                  </FormItemLayout>
                 )}
-                <Checkbox
-                  label="Is Unique"
-                  description="Enforce if values in the column should be unique across rows"
-                  checked={column.isUnique}
-                  className="p-4"
-                  onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
-                />
+                {!column.isPrimaryKey && (
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="isUnique"
+                    label="Is Unique"
+                    description="Enforce if values in the column should be unique across rows"
+                  >
+                    <Checkbox_Shadcn_
+                      id="isUnique"
+                      checked={column.isUnique}
+                      onCheckedChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
+                    />
+                  </FormItemLayout>
+                )}
                 {column.format.includes('int') && (
-                  <Checkbox
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="isIdentity"
                     label="Is Identity"
                     description="Automatically assign a sequential unique number to the column"
-                    checked={column.isIdentity}
-                    className="p-4"
-                    onChange={() => {
-                      const isIdentity = !column.isIdentity
-                      const isArray = isIdentity ? false : column.isArray
-                      onUpdateColumn({ isIdentity, isArray })
-                    }}
-                  />
+                  >
+                    <Checkbox_Shadcn_
+                      id="isIdentity"
+                      checked={column.isIdentity}
+                      onCheckedChange={() => {
+                        const isIdentity = !column.isIdentity
+                        const isArray = isIdentity ? false : column.isArray
+                        onUpdateColumn({ isIdentity, isArray })
+                      }}
+                    />
+                  </FormItemLayout>
                 )}
-
                 {!column.isPrimaryKey && (
-                  <Checkbox
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="flex"
+                    id="defineAsArray"
                     label="Define as Array"
                     description="Define your column as a variable-length multidimensional array"
-                    checked={column.isArray}
-                    className="p-4"
-                    onChange={() => {
-                      const isArray = !column.isArray
-                      const isIdentity = isArray ? false : column.isIdentity
-                      onUpdateColumn({ isArray, isIdentity })
-                    }}
-                  />
+                  >
+                    <Checkbox_Shadcn_
+                      id="defineAsArray"
+                      checked={column.isArray}
+                      onCheckedChange={() => {
+                        const isArray = !column.isArray
+                        const isIdentity = isArray ? false : column.isIdentity
+                        onUpdateColumn({ isArray, isIdentity })
+                      }}
+                    />
+                  </FormItemLayout>
                 )}
               </div>
             </PopoverContent_Shadcn_>
@@ -357,5 +387,3 @@ const Column = ({
     </div>
   )
 }
-
-export default Column

@@ -1,4 +1,4 @@
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/query/table-row-query'
+import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
