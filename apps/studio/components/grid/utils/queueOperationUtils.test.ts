@@ -390,10 +390,7 @@ describe('formatGridDataWithOperationValues', () => {
   })
 
   test('should correctly delete a row after adding a new row (ADD then DELETE)', () => {
-    const rows = [
-      makeRow(0, { id: 1, name: 'Alice' }),
-      makeRow(1, { id: 2, name: 'Bob' }),
-    ]
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
     const addOp = makeAddOp('-100', { name: 'New Row' })
     const deleteOp = makeDeleteOp({ id: 1 }, rows[0])
 
