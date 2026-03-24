@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
+import { useTableSort } from 'components/grid/hooks/useTableSort'
 import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import {
@@ -218,7 +218,6 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()

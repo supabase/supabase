@@ -58,7 +58,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     }
 
     const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
-      return { ...a, [b.name]: (row as any)[b.name] }
+      return { ...a, [b.name]: row[b.name as keyof typeof row] }
     }, {})
 
     getCellValue(
