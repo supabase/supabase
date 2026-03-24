@@ -302,7 +302,9 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): string =>
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
-const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, 'minute' | 'hour' | 'day'] => {
+const calcChartStart = (
+  params: Partial<LogsEndpointParams>
+): [Dayjs, 'minute' | 'hour' | 'day'] => {
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   // todo @TzeYiing needs typing
   const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()

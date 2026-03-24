@@ -132,50 +132,50 @@ export const EdgeFunctionRecentErrors = ({
   const recentErrorGroupsBase = useMemo<RecentErrorGroupBase[]>(() => {
     const grouped = recentErrorInvocations.reduce<Record<string, RecentErrorGroupBase>>(
       (acc, item) => {
-      const statusCode = String(item.status_code ?? '')
-      const method = String(item.method ?? '')
-      const message =
-        parseEdgeFunctionEventMessage(
-          String(item.event_message ?? ''),
-          method || undefined,
-          statusCode
-        ) || 'Unknown error'
-      const executionId = String(item.execution_id ?? '')
-      const timestamp = Number(item.timestamp ?? 0)
-      const current = acc[message]
+        const statusCode = String(item.status_code ?? '')
+        const method = String(item.method ?? '')
+        const message =
+          parseEdgeFunctionEventMessage(
+            String(item.event_message ?? ''),
+            method || undefined,
+            statusCode
+          ) || 'Unknown error'
+        const executionId = String(item.execution_id ?? '')
+        const timestamp = Number(item.timestamp ?? 0)
+        const current = acc[message]
 
-      if (!current) {
-        acc[message] = {
-          message,
-          count: 1,
-          lastSeen: timestamp,
-          lastExecutionId: executionId || undefined,
-          lastStatusCode: statusCode || undefined,
-          lastMethod: method || undefined,
-          executionTime:
+        if (!current) {
+          acc[message] = {
+            message,
+            count: 1,
+            lastSeen: timestamp,
+            lastExecutionId: executionId || undefined,
+            lastStatusCode: statusCode || undefined,
+            lastMethod: method || undefined,
+            executionTime:
+              item.execution_time_ms !== undefined
+                ? `${Math.round(Number(item.execution_time_ms))}ms`
+                : undefined,
+            executionIds: executionId ? [executionId] : [],
+          }
+          return acc
+        }
+
+        current.count += 1
+        if (executionId && !current.executionIds.includes(executionId)) {
+          current.executionIds.push(executionId)
+        }
+
+        if (timestamp > current.lastSeen) {
+          current.lastSeen = timestamp
+          current.lastExecutionId = executionId || undefined
+          current.lastStatusCode = statusCode || undefined
+          current.lastMethod = method || undefined
+          current.executionTime =
             item.execution_time_ms !== undefined
               ? `${Math.round(Number(item.execution_time_ms))}ms`
-              : undefined,
-          executionIds: executionId ? [executionId] : [],
+              : undefined
         }
-        return acc
-      }
-
-      current.count += 1
-      if (executionId && !current.executionIds.includes(executionId)) {
-        current.executionIds.push(executionId)
-      }
-
-      if (timestamp > current.lastSeen) {
-        current.lastSeen = timestamp
-        current.lastExecutionId = executionId || undefined
-        current.lastStatusCode = statusCode || undefined
-        current.lastMethod = method || undefined
-        current.executionTime =
-          item.execution_time_ms !== undefined
-            ? `${Math.round(Number(item.execution_time_ms))}ms`
-            : undefined
-      }
 
         return acc
       },
@@ -183,9 +183,7 @@ export const EdgeFunctionRecentErrors = ({
     )
 
     return Object.values(grouped)
-      .sort(
-        (a: RecentErrorGroupBase, b: RecentErrorGroupBase) => b.lastSeen - a.lastSeen
-      )
+      .sort((a: RecentErrorGroupBase, b: RecentErrorGroupBase) => b.lastSeen - a.lastSeen)
       .slice(0, MAX_RECENT_ERROR_GROUPS)
   }, [recentErrorInvocations])
 
