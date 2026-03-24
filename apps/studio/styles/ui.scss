@@ -396,7 +396,7 @@
     background: hsl(var(--foreground-muted));
 
     .dark & {
-      -webkit-box-shadow: inset 0 0 6px var(--colors-slate12);
+      -webkit-box-shadow: inset 0 0 6px hsl(var(--foreground-default));
     }
   }
 }

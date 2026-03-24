@@ -1,13 +1,10 @@
 import '@/styles/globals.css'
-import '../../studio/styles/typography.scss'
 
 import type { Metadata, Viewport } from 'next'
 
-import { customFont, sourceCodePro } from './fonts'
+import { fontVariableClassName, rootFontVariablesStyle } from './fonts'
 import { ThemeProvider } from './Providers'
 import { SonnerToaster } from './SonnerToast'
-
-const className = `${customFont.variable} ${sourceCodePro.variable}`
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
@@ -121,12 +118,12 @@ interface RootLayoutProps {
 
 export default async function Layout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning className={className}>
+    <html lang="en" suppressHydrationWarning className={fontVariableClassName}>
       <head>
         {/* [Danny]: This has to be an inline style tag here and not a separate component due to next/font */}
         <style
           dangerouslySetInnerHTML={{
-            __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+            __html: rootFontVariablesStyle,
           }}
         />
       </head>

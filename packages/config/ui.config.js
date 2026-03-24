@@ -25,7 +25,7 @@ const excludedRadixColors = [
 
 // generates fixed scales
 // based on the root/light mode version
-const fixedOptions = ['scale', 'scaleA']
+const fixedOptions = ['scale']
 
 function radixColorKeys() {
   let keys = Object.keys(radixUiColors)
@@ -50,7 +50,7 @@ function radixColorKeys() {
 }
 
 function generateColorClasses() {
-  const brandColors = ['scale', 'scaleA']
+  const brandColors = ['scale']
   const colors = [...radixColorKeys(), ...brandColors]
 
   let mappedColors = {}

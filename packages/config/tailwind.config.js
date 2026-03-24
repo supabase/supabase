@@ -2,86 +2,10 @@ const ui = require('./ui.config.js')
 const deepMerge = require('deepmerge')
 const plugin = require('tailwindcss/plugin')
 
-const color = require('./../ui/build/css/tw-extend/color')
-
-/**
- *
- */
-let colorExtend = {}
-Object.values(color).map((x, i) => {
-  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
-})
-
-// console.log('colorExtend', colorExtend)
-// console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
-
-// console.log('colorExtend', kebabToNested(colorExtend).colors.gray)
-
-/**
- * Generates Tailwind colors for the theme
- * adds <alpha-value> as part of the hsl value
- */
-function generateTwColorClasses(globalKey, twAttributes) {
-  let classes = {}
-  Object.values(twAttributes).map((attr, i) => {
-    const attrKey = Object.keys(twAttributes)[i]
-
-    if (attrKey.includes(globalKey)) {
-      const keySplit = attrKey.split('-').splice(1).join('-')
-
-      let payload = {
-        [keySplit]: `hsl(${attr.cssVariable} / <alpha-value>)`,
-      }
-
-      if (keySplit == 'DEFAULT') {
-        // includes a 'default' duplicate
-        // this allows for classes like `border-default` which is the same as `border`
-        payload = {
-          ...payload,
-          default: `hsl(${attr.cssVariable} / <alpha-value>)`,
-        }
-      }
-
-      classes = {
-        ...classes,
-        ...payload,
-      }
-    }
-  })
-  /**
-   * mutate object into nested object for tailwind theme structure
-   */
-  const nestedClasses = kebabToNested(classes)
-  // return, but nest the keys if they are kebab case named
-  return nestedClasses
-}
-
-/**
- * Helper to convert kebab named keys in object to nested nodes
- */
-function kebabToNested(obj) {
-  const result = {}
-  for (const [key, value] of Object.entries(obj)) {
-    const parts = key.split('-')
-    let currentObj = result
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i] === 'DEFAULT' ? parts[i] : parts[i].toLowerCase() // convert key to lowercase
-      if (!currentObj[part]) {
-        currentObj[part] = {}
-      }
-      if (i === parts.length - 1) {
-        if (typeof value === 'object') {
-          currentObj[part] = kebabToNested(value) // recursively convert nested objects
-        } else {
-          currentObj[part] = value.toString().toLowerCase() // convert value to lowercase
-        }
-      } else {
-        currentObj = currentObj[part]
-      }
-    }
-  }
-  return result
-}
+const {
+  buildTailwindCategoryColors,
+  buildTailwindColorExtend,
+} = require('./../ui/styles/color-registry')
 
 /**
  * Main theme config
@@ -95,11 +19,11 @@ const uiConfig = ui({
      */
     textColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('foreground', color),
+      ...buildTailwindCategoryColors('foreground'),
     }),
     backgroundColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('background', color),
+      ...buildTailwindCategoryColors('background'),
       /*
        * custom background re-maps
        */
@@ -107,11 +31,11 @@ const uiConfig = ui({
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      ...generateTwColorClasses('border', color),
+      ...buildTailwindCategoryColors('border'),
     }),
     extend: {
       colors: {
-        ...kebabToNested(colorExtend),
+        ...buildTailwindColorExtend(),
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
@@ -171,7 +95,7 @@ const uiConfig = ui({
             },
             h5: {
               // h5 not included in --tw-prose-headings
-              color: theme('colors.scale[1200]'),
+              color: 'hsl(var(--foreground-default))',
             },
             'h1, h2, h3, h4, h5, h6': {
               fontWeight: '400',
@@ -373,9 +297,32 @@ const uiConfig = ui({
       screens: {
         xs: '480px',
       },
+      fontSize: {
+        xs: ['var(--font-size-xs)', { lineHeight: 'var(--line-height-xs)' }],
+        sm: ['var(--font-size-sm)', { lineHeight: 'var(--line-height-sm)' }],
+        base: ['var(--font-size-base)', { lineHeight: 'var(--line-height-base)' }],
+        lg: ['var(--font-size-lg)', { lineHeight: 'var(--line-height-lg)' }],
+        xl: ['var(--font-size-xl)', { lineHeight: 'var(--line-height-xl)' }],
+        '2xl': ['var(--font-size-2xl)', { lineHeight: 'var(--line-height-2xl)' }],
+        '3xl': ['var(--font-size-3xl)', { lineHeight: 'var(--line-height-3xl)' }],
+        '4xl': ['var(--font-size-4xl)', { lineHeight: 'var(--line-height-4xl)' }],
+      },
       fontFamily: {
-        sans: 'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
-        mono: 'var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace)',
+        sans: 'var(--font-sans)',
+        mono: 'var(--font-mono)',
+      },
+      fontWeight: {
+        normal: 'var(--font-weight-normal)',
+        medium: 'var(--font-weight-medium)',
+        semibold: 'var(--font-weight-semibold)',
+        bold: 'var(--font-weight-bold)',
+        extrabold: 'var(--font-weight-extrabold)',
+      },
+      letterSpacing: {
+        tight: 'var(--tracking-tight)',
+        normal: 'var(--tracking-normal)',
+        wide: 'var(--tracking-wide)',
+        wider: 'var(--tracking-wider)',
       },
 
       // shadcn defaults START

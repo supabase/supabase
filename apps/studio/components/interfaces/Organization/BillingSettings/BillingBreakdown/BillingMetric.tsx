@@ -152,12 +152,12 @@ export const BillingMetric = ({
                     strokeWidth={4}
                     className={
                       isUsageBillingEnabled
-                        ? 'text-gray-dark-800'
+                        ? 'text-foreground-light'
                         : isExceededLimit
                           ? 'text-red-900'
                           : isApproachingLimit
                             ? 'text-yellow-1000'
-                            : 'text-gray-dark-800'
+                            : 'text-foreground-light'
                     }
                   />
                 </svg>

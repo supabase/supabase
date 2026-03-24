@@ -1,14 +1,33 @@
 # Tailwind theming
 
-Supabase is migrating to use tailwind classes that use CSS properties.
-This is to support the concept of theming, so that:
+Supabase uses Tailwind classes backed by CSS custom properties so theme values can change without rewriting component classes.
+
+The source of truth for shared theme variables is `styles/tokens.css`, and the shared Tailwind token registry is `styles/color-registry.js`.
+
+This setup supports theming so that:
 
 1. It is easy for the team to update the theme without changing 100s of files.
 2. We could offer custom or additional themes in future.
 
-## Primitives
+## Source
 
-We (the Supabase Design team ✨) define primitive color values using Figma Variables.
+Apps and packages should import the canonical stylesheet directly:
+
+```css
+@import './../../../packages/ui/styles/tokens.css';
+```
+
+The canonical stylesheet currently supports:
+- `[data-theme='light'], .light`
+- `[data-theme='dark'], .dark`
+- `[data-theme='deep-dark'], .deep-dark`
+- `[data-theme='classic-dark'], .classic-dark`
+
+Legacy `packages/ui/build/css/*` paths still exist as temporary wrappers during the migration, but new code should import `ui/styles/tokens.css`.
+
+Typography is also variable-driven. Shared font families, weights, sizes, line-heights, and heading/text shorthands live in `styles/typography.css`, and the Tailwind config maps `font-sans`, `font-mono`, and the default size/weight utilities to those CSS variables.
+
+## Primitives
 
 - `foreground`
 - `background`
@@ -17,7 +36,7 @@ We (the Supabase Design team ✨) define primitive color values using Figma Vari
 - `destructive`
 - `warning`
 
-These values are exported from Figma as a .json file and transformed into tailwind utilities through some scripts under `packages/ui/internals/tokens`.
+The variable contract is intentionally stable. Existing tokens such as `--foreground-default`, `--background-surface-100`, `--brand-default`, and `--border-default` should be preserved when changing theme values.
 
 Primitives work the same way as any other color. They should follow some basic usage patterns such as _foreground_ on text and _background_ on surfaces, but they can also be combined with any tailwind utility to achieve more advanced layouts.
 

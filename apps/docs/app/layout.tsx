@@ -6,6 +6,7 @@ import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
 import { TelemetryTagManager } from 'common'
+import { fontVariableClassName, rootFontVariablesStyle } from 'common/fonts'
 
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
@@ -52,7 +53,14 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={fontVariableClassName}>
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: rootFontVariablesStyle,
+          }}
+        />
+      </head>
       <body>
         <TelemetryTagManager />
         <GlobalProviders>

@@ -1,38 +1,37 @@
 # Supabase UI Package
 
-## Figma-tokens setup
+## Theme tokens
 
-Tokens setup is based partly on blogpost on the [Mirahi Digital Garden](https://garden.mirahi.io/how-to-use-the-color-tokens-from-your-design-system-directly-in-tailwind-css/).
+The checked-in source of truth for shared design tokens now lives in `styles/tokens.css`.
 
-Transforms tokens stored on [Figma Tokens](https://github.com/six7/figma-tokens) using token-transformer and [Style Dictionary](https://github.com/amzn/style-dictionary) to css-variables with references, and use them in your [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) environment with multiple themes.
+That file contains:
+- the base token variables shared across apps and packages
+- the supported theme selectors: `light`, `dark`, `deep-dark`, and `classic-dark`
+- the existing semantic token contract such as `--foreground-default`, `--background-surface-100`, and `--border-default`
+- typography variables such as `--font-sans`, `--font-size-base`, and the shared heading/text shorthand values
 
-### Build all the styles files (css-variables and tailwind config)
+The shared Tailwind token registry lives in `styles/color-registry.js`. `packages/config/tailwind.config.js` consumes that registry so existing utility names continue to work without importing generated Figma artifacts.
+
+## Consuming the tokens
+
+For app stylesheets, import the canonical stylesheet directly:
 
 ```bash
-npm run build-styles
+@import './../../../packages/ui/styles/tokens.css';
 ```
 
-This creates a directory called `styles` with the tokens and also CSS required.
+For package consumers that resolve through the workspace package name, use:
 
-### Other examples
-
-You can find [other examples here](https://github.com/six7/figma-tokens-examples) by [Jan Six](https://twitter.com/six7)
-
-### Adding new themes/sets
-
-Add new sets by extending the scripts in package.json. Currently theme sets derive from `exported/[set name]` but can come from anywhere.
-
-Adding a new set can be done with the following:
-
-```json package.json
-// package.json
-
-//..
-"build-transform-light": "npx token-transformer tokens.json styles/tokens/02_themes/light.json global,exported/light,theme global",
-// add a new line like this:
-"build-transform-new": "npx token-transformer tokens.json styles/tokens/02_themes/new.json global,new,theme global",
-//..
-// append the new theme/set command to end of the build-transform command
-"build-transform": "npm run build-transform-global && npm run build-transform-typography && npm run build-transform-dark  && npm run build-transform-light && npm run build-transform-new",
-
+```ts
+import 'ui/styles/tokens.css'
 ```
+
+Legacy `packages/ui/build/css/*` theme files remain as temporary wrappers around the canonical stylesheet so old import paths keep working during the migration.
+
+## Legacy generation scripts
+
+The old token extraction and transform scripts are still present for now, but they are no longer the runtime source of truth for shared colour tokens.
+
+### Historical notes
+
+The previous setup transformed Figma token exports into generated CSS and Tailwind artifacts. Those files are retained only as compatibility layers while the repo finishes moving to the checked-in CSS source.

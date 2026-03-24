@@ -1,0 +1,227 @@
+:root {
+  --font-sans: var(
+    --font-custom,
+    Circular,
+    custom-font,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
+  --font-mono: var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace);
+  --font-family-body: var(--font-sans);
+  --font-family-heading: var(--font-sans);
+  --font-family-code: var(--font-mono);
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --font-size-xs: 0.75rem;
+  --line-height-xs: 1rem;
+  --font-size-sm: 0.875rem;
+  --line-height-sm: 1.25rem;
+  --font-size-base: 1rem;
+  --line-height-base: 1.5rem;
+  --font-size-lg: 1.125rem;
+  --line-height-lg: 1.75rem;
+  --font-size-xl: 1.25rem;
+  --line-height-xl: 1.75rem;
+  --font-size-2xl: 1.5rem;
+  --line-height-2xl: 2rem;
+  --font-size-3xl: 1.875rem;
+  --line-height-3xl: 2.25rem;
+  --font-size-4xl: 2.25rem;
+  --line-height-4xl: 2.5rem;
+
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+
+  --heading-title-font-size: var(--font-size-2xl);
+  --heading-title-line-height: var(--line-height-2xl);
+  --heading-title-letter-spacing: var(--tracking-tight);
+  --heading-title-font-weight: var(--font-weight-normal);
+
+  --heading-section-font-size: var(--font-size-xl);
+  --heading-section-line-height: var(--line-height-xl);
+  --heading-section-font-weight: var(--font-weight-normal);
+
+  --heading-subsection-font-size: var(--font-size-base);
+  --heading-subsection-line-height: var(--line-height-base);
+  --heading-subsection-font-weight: var(--font-weight-normal);
+
+  --heading-default-font-size: var(--font-size-sm);
+  --heading-default-line-height: var(--line-height-sm);
+  --heading-default-font-weight: var(--font-weight-medium);
+
+  --heading-compact-font-size: var(--font-size-xs);
+  --heading-compact-line-height: var(--line-height-xs);
+  --heading-compact-font-weight: var(--font-weight-medium);
+
+  --heading-meta-font-size: var(--font-size-xs);
+  --heading-meta-line-height: var(--line-height-xs);
+  --heading-meta-font-weight: var(--font-weight-medium);
+  --heading-meta-letter-spacing: var(--tracking-wider);
+
+  --text-default-font-size: var(--font-size-base);
+  --text-default-line-height: var(--line-height-base);
+  --text-subtitle-font-size: var(--font-size-lg);
+  --text-subtitle-line-height: var(--line-height-lg);
+  --text-compact-font-size: var(--font-size-xs);
+  --text-compact-line-height: var(--line-height-xs);
+
+  --text-link-underline-offset: 4px;
+  --text-link-transition-duration: 150ms;
+  --text-code-inline-font-size: var(--font-size-xs);
+  --text-code-inline-line-height: var(--line-height-xs);
+  --text-code-inline-font-weight: var(--font-weight-medium);
+  --text-code-inline-padding-y: 0.125rem;
+  --text-code-inline-padding-x: 0.25rem;
+  --text-code-inline-border-radius: 0.375rem;
+}
+
+html,
+body {
+  font-family: var(--font-family-body);
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-family-code);
+}
+
+body {
+  font-size: var(--text-default-font-size);
+  line-height: var(--text-default-line-height);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-family-heading);
+}
+
+h1,
+.heading-title {
+  scroll-margin-top: 5rem;
+  font-size: var(--heading-title-font-size);
+  line-height: var(--heading-title-line-height);
+  letter-spacing: var(--heading-title-letter-spacing);
+  font-weight: var(--heading-title-font-weight);
+}
+
+h2,
+.heading-section {
+  scroll-margin-top: 5rem;
+  font-size: var(--heading-section-font-size);
+  line-height: var(--heading-section-line-height);
+  font-weight: var(--heading-section-font-weight);
+}
+
+h3,
+.heading-subSection {
+  scroll-margin-top: 5rem;
+  font-size: var(--heading-subsection-font-size);
+  line-height: var(--heading-subsection-line-height);
+  font-weight: var(--heading-subsection-font-weight);
+}
+
+h4,
+h5,
+.heading-default {
+  scroll-margin-top: 5rem;
+  font-size: var(--heading-default-font-size);
+  line-height: var(--heading-default-line-height);
+  font-weight: var(--heading-default-font-weight);
+}
+
+h6,
+.heading-compact {
+  scroll-margin-top: 5rem;
+  font-size: var(--heading-compact-font-size);
+  line-height: var(--heading-compact-line-height);
+  font-weight: var(--heading-compact-font-weight);
+}
+
+small,
+.text-compact {
+  font-size: var(--text-compact-font-size);
+  line-height: var(--text-compact-line-height);
+}
+
+strong {
+  font-weight: var(--font-weight-medium);
+}
+
+.heading-meta {
+  font-family: var(--font-family-code);
+  font-size: var(--heading-meta-font-size);
+  line-height: var(--heading-meta-line-height);
+  letter-spacing: var(--heading-meta-letter-spacing);
+  text-transform: uppercase;
+  font-weight: var(--heading-meta-font-weight);
+}
+
+.text-default {
+  font-size: var(--text-default-font-size);
+  line-height: var(--text-default-line-height);
+}
+
+.text-subTitle {
+  font-size: var(--text-subtitle-font-size);
+  line-height: var(--text-subtitle-line-height);
+}
+
+.text-link {
+  color: hsl(var(--foreground-light));
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+  text-underline-offset: var(--text-link-underline-offset);
+  transition:
+    color var(--text-link-transition-duration),
+    text-decoration-color var(--text-link-transition-duration);
+}
+
+.text-link:hover {
+  color: hsl(var(--foreground-default));
+  text-decoration-color: hsl(var(--foreground-default));
+}
+
+.text-link-table-cell {
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration-line: underline;
+  text-decoration-color: hsl(var(--foreground-muted) / 0.5);
+  text-underline-offset: var(--text-link-underline-offset);
+  transition:
+    color 100ms,
+    text-decoration-color 100ms;
+}
+
+.text-link-table-cell:hover {
+  text-decoration-color: hsl(var(--foreground-lighter) / 0.8);
+}
+
+.text-code-inline {
+  display: inline-block;
+  border: 1px solid hsl(var(--border-muted));
+  border-radius: var(--text-code-inline-border-radius);
+  background-color: hsl(var(--background-surface-200));
+  padding: var(--text-code-inline-padding-y) var(--text-code-inline-padding-x);
+  font-size: var(--text-code-inline-font-size);
+  line-height: var(--text-code-inline-line-height);
+  font-weight: var(--text-code-inline-font-weight);
+  color: hsl(var(--foreground-default));
+  letter-spacing: var(--tracking-tight);
+  word-break: break-all;
+}

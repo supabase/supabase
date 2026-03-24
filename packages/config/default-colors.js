@@ -1,3 +1,14 @@
+const LIGHT_SCALE_LIGHTNESS = [98.8, 97.3, 95.3, 92.9, 91, 88.6, 85.9, 78, 56.1, 52.2, 43.5, 9]
+const DARK_SCALE_LIGHTNESS = [8.6, 11, 13.7, 15.7, 18, 20.4, 24.3, 31.4, 43.9, 49.4, 62.7, 92.9]
+
+const buildScale = (lightnesses) =>
+  Object.fromEntries(
+    lightnesses.map((lightness, index) => [
+      `scale${index + 1}`,
+      `hsl(var(--neutral-hue) var(--neutral-saturation) ${lightness}%)`,
+    ])
+  )
+
 module.exports = {
   brand: {
     brand1: 'hsla(153, 80%, 99%, 1)',
@@ -31,60 +42,6 @@ module.exports = {
     'brand-hiContrast': 'hsl(var(--brand-default))',
     'brand-loContrast': 'hsl(var(--brand-300))',
   },
-  scale: {
-    scale1: 'var(--colors-slate1)',
-    scale2: 'var(--colors-slate2)',
-    scale3: 'var(--colors-slate3)',
-    scale4: 'var(--colors-slate4)',
-    scale5: 'var(--colors-slate5)',
-    scale6: 'var(--colors-slate6)',
-    scale7: 'var(--colors-slate7)',
-    scale8: 'var(--colors-slate8)',
-    scale9: 'var(--colors-slate9)',
-    scale10: 'var(--colors-slate10)',
-    scale11: 'var(--colors-slate11)',
-    scale12: 'var(--colors-slate12)',
-  },
-  scaleA: {
-    scaleA1: 'var(--colors-slateA1)',
-    scaleA2: 'var(--colors-slateA2)',
-    scaleA3: 'var(--colors-slateA3)',
-    scaleA4: 'var(--colors-slateA4)',
-    scaleA5: 'var(--colors-slateA5)',
-    scaleA6: 'var(--colors-slateA6)',
-    scaleA7: 'var(--colors-slateA7)',
-    scaleA8: 'var(--colors-slateA8)',
-    scaleA9: 'var(--colors-slateA9)',
-    scaleA10: 'var(--colors-slateA10)',
-    scaleA11: 'var(--colors-slateA11)',
-    scaleA12: 'var(--colors-slateA12)',
-  },
-  scaleDark: {
-    scale1: 'var(--colors-gray1)',
-    scale2: 'var(--colors-gray2)',
-    scale3: 'var(--colors-gray3)',
-    scale4: 'var(--colors-gray4)',
-    scale5: 'var(--colors-gray5)',
-    scale6: 'var(--colors-gray6)',
-    scale7: 'var(--colors-gray7)',
-    scale8: 'var(--colors-gray8)',
-    scale9: 'var(--colors-gray9)',
-    scale10: 'var(--colors-gray10)',
-    scale11: '#bbbbbb',
-    scale12: 'var(--colors-gray12)',
-  },
-  scaleADark: {
-    scaleA1: 'var(--colors-grayA1)',
-    scaleA2: 'var(--colors-grayA2)',
-    scaleA3: 'var(--colors-grayA3)',
-    scaleA4: 'var(--colors-grayA4)',
-    scaleA5: 'var(--colors-grayA5)',
-    scaleA6: 'var(--colors-grayA6)',
-    scaleA7: 'var(--colors-grayA7)',
-    scaleA8: 'var(--colors-grayA8)',
-    scaleA9: 'var(--colors-grayA9)',
-    scaleA10: 'var(--colors-grayA10)',
-    scaleA11: 'var(--colors-grayA11)',
-    scaleA12: 'var(--colors-grayA12)',
-  },
+  scale: buildScale(LIGHT_SCALE_LIGHTNESS),
+  scaleDark: buildScale(DARK_SCALE_LIGHTNESS),
 }

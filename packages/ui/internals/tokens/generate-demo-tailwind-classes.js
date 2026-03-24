@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const color = require('./../../build/css/tw-extend/color')
+const { allColorTokens } = require('./../../styles/color-registry')
 
 /**
  *
@@ -10,10 +10,10 @@ const color = require('./../../build/css/tw-extend/color')
  * Name of file to be created
  */
 function writeJsFile(file) {
-  const backgrounds = Object.keys(color).filter((x) => x.includes('background-'))
-  const borders = Object.keys(color).filter((x) => x.includes('border-'))
-  const texts = Object.keys(color).filter((x) => x.includes('foreground-'))
-  const colors = Object.keys(color).filter(
+  const backgrounds = allColorTokens.filter((x) => x.includes('background-'))
+  const borders = allColorTokens.filter((x) => x.includes('border-'))
+  const texts = allColorTokens.filter((x) => x.includes('foreground-'))
+  const colors = allColorTokens.filter(
     (x) =>
       !x.includes('foreground-') &&
       !x.includes('background-') &&
@@ -21,7 +21,7 @@ function writeJsFile(file) {
       !x.includes('colors-') &&
       !x.includes('variables-')
   )
-  const palletes = Object.keys(color).filter((x) => x.includes('colors-'))
+  const palletes = allColorTokens.filter((x) => x.includes('colors-') || x.includes('variables-'))
 
   // console.log('Example tailwind classes: ')
 

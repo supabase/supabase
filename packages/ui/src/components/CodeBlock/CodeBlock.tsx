@@ -215,7 +215,9 @@ export const CodeBlock = ({
                       ? styleConfig?.highlightBackgroundColor
                       : 'hsl(var(--background-selection))',
                     borderLeft: highlightBorder
-                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
+                      ? `1px solid ${
+                          styleConfig?.highlightBorderColor ?? 'hsl(var(--foreground-default))'
+                        }`
                       : null,
                   },
                   class: 'hljs-line-highlight',

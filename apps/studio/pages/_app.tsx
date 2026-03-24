@@ -13,11 +13,8 @@ import 'styles/reactflow.scss'
 import 'styles/storage.scss'
 import 'styles/stripe.scss'
 import 'styles/toast.scss'
-import 'styles/typography.scss'
 import 'styles/ui.scss'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
@@ -48,7 +45,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
-import { customFont, sourceCodePro } from 'fonts'
+import { rootFontVariablesStyle } from 'fonts'
 import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { AuthProvider } from 'lib/auth'
@@ -56,6 +53,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constan
 import { ProfileProvider } from 'lib/profile'
 import { Telemetry } from 'lib/telemetry'
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -68,6 +66,17 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+const ThemeVariableDevtools =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(
+        () =>
+          import('components/interfaces/App/ThemeVariableDevtools').then(
+            (module) => module.ThemeVariableDevtools
+          ),
+        { ssr: false }
+      )
+    : () => null
 
 const FeatureFlagProviderWithOrgContext = ({
   children,
@@ -122,6 +131,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+  const showThemeVariableDevtools = process.env.NODE_ENV === 'development' && !isTestEnv
 
   const cloudProvider = useDefaultProvider()
 
@@ -153,7 +163,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                     <style
                       dangerouslySetInnerHTML={{
-                        __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                        __html: rootFontVariablesStyle,
                       }}
                     />
                     {/* Speed up initial API loading times by pre-connecting to the API domain */}
@@ -198,6 +208,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   {!isTestEnv && (
                     <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                   )}
+                  {showThemeVariableDevtools && <ThemeVariableDevtools />}
                 </ProfileProvider>
               </FeatureFlagProviderWithOrgContext>
             </AuthProvider>

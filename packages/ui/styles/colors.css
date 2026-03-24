@@ -1,0 +1,410 @@
+:root {
+  --neutral-hue: 153deg;
+  --neutral-saturation: 3%;
+  --brand-hue: 153deg;
+  --brand-saturation: 60%;
+  --warning-hue: 30deg;
+  --warning-saturation: 80%;
+  --destructive-hue: 10deg;
+  --destructive-saturation: 78%;
+
+  --colors-black: 0deg 0% 0%;
+  --colors-white: 0deg 0% 100%;
+  --variables-colors-brand-primary: var(--brand-default);
+  --variables-colors-brand-accent: var(--brand-500);
+  --spacing-scale: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 32px;
+  --spacing-xl: 64px;
+  --sizing-scale: 1.5px;
+  --sizing-xs: 4px;
+  --sizing-sm: 6px;
+  --sizing-md: 9px;
+  --sizing-lg: 13.5px;
+  --sizing-xl: 20.25px;
+  --borderradius-sm: 4px;
+  --borderradius-lg: 8px;
+  --borderradius-xl: 16px;
+  --borderradius-xs: 2px;
+  --borderradius-tableheader: 4px;
+  --borderwidth-none: 0;
+  --borderwidth-xs: 1px;
+  --borderwidth-sm: 2px;
+  --borderwidth-md: 4px;
+  --borderwidth-lg: 8px;
+  --icon-xs: 12px;
+  --icon-sm: 16px;
+  --icon-md: 18px;
+  --iconwidth-default: 1px;
+  --panel: 2px;
+  --padding-x-sm: 1rem; /* px-4 */
+  --padding-x-md: 1.5rem; /* px-6 */
+  --card-padding-x: var(--padding-x-sm);
+  --card-padding-x-md: var(--padding-x-md);
+  --datatable-headericon: 16px;
+  --datatable-rowheight: 28px;
+  --options-icon: 18px;
+  --input-sm-height: 28px;
+  --panel2: 4px;
+  --xxl: 128px;
+  --content-width-screen-xl: 1128px;
+}
+
+[data-theme='light'],
+.light {
+  --helpers-os-appearance: Light;
+  --background-base-lightness: 98.8%;
+  --background-contrast: 1;
+
+  --code-block-1: calc(var(--brand-hue) + 18deg) calc(var(--brand-saturation) * 0.72) 51%;
+  --code-block-2: calc(var(--warning-hue) + 3deg) calc(var(--warning-saturation) * 1) 52.9%;
+  --code-block-3: calc(var(--warning-hue) + 54deg) calc(var(--warning-saturation) * 0.77) 48%;
+  --code-block-4: calc(var(--brand-hue) + 95deg) calc(var(--brand-saturation) * 0.603) 52.9%;
+  --code-block-5: calc(var(--destructive-hue) + 4deg) calc(var(--destructive-saturation) * 1.03) 58%;
+
+  --secondary-default: calc(var(--brand-hue) + 95deg) calc(var(--brand-saturation) * 0.963) 70%;
+  --secondary-400: calc(var(--brand-hue) + 95.5deg) calc(var(--brand-saturation) * 0.522) 25.9%;
+  --secondary-200: calc(var(--brand-hue) + 95deg) calc(var(--brand-saturation) * 0.513) 11%;
+
+  --brand-link: calc(var(--brand-hue) + 0.4deg) calc(var(--brand-saturation) * 1.67) 36.7%;
+  --brand-default: calc(var(--brand-hue) - 0.1deg) var(--brand-saturation) 52.9%;
+  --brand-600: calc(var(--brand-hue) + 3.5deg) calc(var(--brand-saturation) * 1.44) 26.1%;
+  --brand-500: calc(var(--brand-hue) + 2.3deg) calc(var(--brand-saturation) * 1.31) 40%;
+  --brand-400: calc(var(--brand-hue) - 1.7deg) calc(var(--brand-saturation) * 1.12) 66.9%;
+  --brand-300: calc(var(--brand-hue) - 5.5deg) calc(var(--brand-saturation) * 1.2) 80.4%;
+  --brand-200: calc(var(--brand-hue) - 5.4deg) calc(var(--brand-saturation) * 1.21) 90%;
+  --colors-brand9: hsl(var(--brand-default));
+
+  --warning-default: calc(var(--warning-hue) + 0.3deg) calc(var(--warning-saturation) * 1) 47.8%;
+  --warning-600: calc(var(--warning-hue) + 0.3deg) calc(var(--warning-saturation) * 1) 47.8%;
+  --warning-500: calc(var(--warning-hue) + 6.3deg) calc(var(--warning-saturation) * 1.07) 67.1%;
+  --warning-400: calc(var(--warning-hue) + 11.9deg) calc(var(--warning-saturation) * 1.25) 81.8%;
+  --warning-300: calc(var(--warning-hue) + 14.3deg) calc(var(--warning-saturation) * 1.25) 91.8%;
+  --warning-200: calc(var(--warning-hue) + 10deg) calc(var(--warning-saturation) * 1.02) 97.8%;
+
+  --destructive-default: calc(var(--destructive-hue) + 0.2deg)
+    calc(var(--destructive-saturation) * 1) 53.9%;
+  --destructive-600: calc(var(--destructive-hue) - 0.1deg)
+    calc(var(--destructive-saturation) * 1.05) 43.5%;
+  --destructive-500: calc(var(--destructive-hue) + 0.4deg)
+    calc(var(--destructive-saturation) * 0.99) 79.4%;
+  --destructive-400: calc(var(--destructive-hue) - 2.9deg)
+    calc(var(--destructive-saturation) * 1.17) 91%;
+  --destructive-300: calc(var(--destructive-hue) - 2.9deg)
+    calc(var(--destructive-saturation) * 1.28) 96.7%;
+  --destructive-200: calc(var(--destructive-hue) - 10.2deg)
+    calc(var(--destructive-saturation) * 1.28) 99.4%;
+
+  --border-stronger: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (42.7% * var(--background-contrast)));
+  --border-strong: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (15.7% * var(--background-contrast)));
+  --border-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (11.3% * var(--background-contrast)));
+  --border-button-hover: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (12.9% * var(--background-contrast)));
+  --border-button-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (10.2% * var(--background-contrast)));
+  --border-alternative: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (7.8% * var(--background-contrast)));
+  --border-control: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (20.8% * var(--background-contrast)));
+  --border-overlay: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (7.8% * var(--background-contrast)));
+  --border-secondary: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (5.9% * var(--background-contrast)));
+  --border-muted: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (5.9% * var(--background-contrast)));
+
+  --background-dialog-default: var(--colors-white);
+  --background-muted: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (1.9% * var(--background-contrast)));
+  --background-surface-400: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (9% * var(--background-contrast)));
+  --background-surface-300: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (5.9% * var(--background-contrast)));
+  --background-surface-200: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (3.5% * var(--background-contrast)));
+  --background-surface-100: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-surface-75: var(--colors-white);
+  --background-alternative-default: var(--neutral-hue) var(--neutral-saturation) 99.2%;
+  --background-alternative-200: var(--colors-white);
+  --background-dash-canvas: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (1.5% * var(--background-contrast)));
+  --background-dash-sidebar: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-button-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-overlay-hover: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (3.5% * var(--background-contrast)));
+  --background-overlay-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-control: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (3.5% * var(--background-contrast)));
+  --background-selection: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (5.9% * var(--background-contrast)));
+  --background-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-200: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (1.5% * var(--background-contrast)));
+
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: var(--brand-default);
+
+  --foreground-contrast: var(--neutral-hue) var(--neutral-saturation) 98.4%;
+  --foreground-muted: var(--neutral-hue) var(--neutral-saturation) 69.8%;
+  --foreground-lighter: var(--neutral-hue) var(--neutral-saturation) 56.1%;
+  --foreground-light: var(--neutral-hue) var(--neutral-saturation) 32.2%;
+  --foreground-default: var(--neutral-hue) var(--neutral-saturation) 9%;
+}
+
+[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='dark'],
+.dark {
+  --helpers-os-appearance: Dark;
+  --background-base-lightness: 5%;
+  --background-contrast: 1.2;
+
+  --code-block-1: calc(var(--brand-hue) + 17.8deg) calc(var(--brand-saturation) * 0.72) 61.4%;
+  --code-block-2: calc(var(--warning-hue) + 3.2deg) calc(var(--warning-saturation) * 1.13) 75.7%;
+  --code-block-3: calc(var(--warning-hue) + 53.8deg) calc(var(--warning-saturation) * 0.77) 63.1%;
+  --code-block-4: calc(var(--brand-hue) + 94.8deg) calc(var(--brand-saturation) * 0.675) 74.5%;
+  --code-block-5: calc(var(--destructive-hue) + 3.8deg) calc(var(--destructive-saturation) * 1.15)
+    69.6%;
+
+  --secondary-default: calc(var(--brand-hue) + 95deg) calc(var(--brand-saturation) * 0.963) 70%;
+  --secondary-400: calc(var(--brand-hue) + 95.5deg) calc(var(--brand-saturation) * 0.522) 25.9%;
+  --secondary-200: calc(var(--brand-hue) + 95deg) calc(var(--brand-saturation) * 0.513) 11%;
+
+  --brand-link: calc(var(--brand-hue) + 2deg) calc(var(--brand-saturation) * 1.67) 38.6%;
+  --brand-default: calc(var(--brand-hue) + 0.1deg) calc(var(--brand-saturation) * 1) 52.7%;
+  --brand-600: calc(var(--brand-hue) + 1.9deg) calc(var(--brand-saturation) * 0.99) 70%;
+  --brand-500: calc(var(--brand-hue) + 1.9deg) calc(var(--brand-saturation) * 1.67) 19.2%;
+  --brand-400: calc(var(--brand-hue) + 2.5deg) calc(var(--brand-saturation) * 1.67) 9.6%;
+  --brand-300: calc(var(--brand-hue) + 2.1deg) calc(var(--brand-saturation) * 1.67) 8%;
+  --brand-200: calc(var(--brand-hue) + 9deg) calc(var(--brand-saturation) * 1.67) 2%;
+  --colors-brand9: hsl(var(--brand-default));
+
+  --warning-default: calc(var(--warning-hue) + 8.9deg) calc(var(--warning-saturation) * 1.25) 42.9%;
+  --warning-600: calc(var(--warning-hue) + 8.9deg) calc(var(--warning-saturation) * 1.25) 42.9%;
+  --warning-500: calc(var(--warning-hue) + 4.8deg) calc(var(--warning-saturation) * 1.14) 21.6%;
+  --warning-400: calc(var(--warning-hue) + 3.2deg) calc(var(--warning-saturation) * 1.25) 14.5%;
+  --warning-300: calc(var(--warning-hue) + 2.3deg) calc(var(--warning-saturation) * 1.25) 10.2%;
+  --warning-200: calc(var(--warning-hue) + 6.6deg) calc(var(--warning-saturation) * 1.25) 8%;
+
+  --destructive-default: calc(var(--destructive-hue) + 0.2deg)
+    calc(var(--destructive-saturation) * 1) 53.9%;
+  --destructive-600: calc(var(--destructive-hue) - 0.3deg)
+    calc(var(--destructive-saturation) * 1.09) 62.9%;
+  --destructive-500: calc(var(--destructive-hue) - 2.1deg)
+    calc(var(--destructive-saturation) * 0.92) 29%;
+  --destructive-400: calc(var(--destructive-hue) - 3.3deg)
+    calc(var(--destructive-saturation) * 0.77) 20.6%;
+  --destructive-300: calc(var(--destructive-hue) - 2.5deg)
+    calc(var(--destructive-saturation) * 0.66) 15.3%;
+  --destructive-200: calc(var(--destructive-hue) + 0.9deg) calc(var(--destructive-saturation) * 0.3)
+    9.2%;
+
+  --border-stronger: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (20% * var(--background-contrast)));
+  --border-strong: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (14.1% * var(--background-contrast)));
+  --border-alternative: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (19.6% * var(--background-contrast)));
+  --border-control: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (15.3% * var(--background-contrast)));
+  --border-overlay: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (12.9% * var(--background-contrast)));
+  --border-secondary: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --border-muted: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --border-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (10.9% * var(--background-contrast)));
+  --border-button-hover: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (24.3% * var(--background-contrast)));
+  --border-button-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (17.2% * var(--background-contrast)));
+
+  --background-dash-canvas: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-dash-sidebar: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (1.9% * var(--background-contrast)));
+  --background-dialog-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-muted: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --background-overlay-hover: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (10.9% * var(--background-contrast)));
+  --background-overlay-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --background-surface-400: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (9% * var(--background-contrast)));
+  --background-surface-300: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (9% * var(--background-contrast)));
+  --background-surface-200: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (5.8% * var(--background-contrast)));
+  --background-surface-100: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (5.1% * var(--background-contrast)));
+  --background-surface-75: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (1.9% * var(--background-contrast)));
+  --background-control: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --background-selection: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (12.1% * var(--background-contrast)));
+  --background-alternative-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (1.2% * var(--background-contrast)));
+  --background-alternative-200: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (3.9% * var(--background-contrast)));
+  --background-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-200: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (1.9% * var(--background-contrast)));
+  --background-button-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (10.9% * var(--background-contrast)));
+
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: var(--brand-default);
+
+  --foreground-contrast: var(--neutral-hue) var(--neutral-saturation) 8.6%;
+  --foreground-muted: var(--neutral-hue) var(--neutral-saturation) 30.2%;
+  --foreground-lighter: var(--neutral-hue) var(--neutral-saturation) 53.7%;
+  --foreground-light: var(--neutral-hue) var(--neutral-saturation) 70.6%;
+  --foreground-default: var(--neutral-hue) var(--neutral-saturation) 98%;
+}
+
+[data-theme='classic-dark'],
+.classic-dark {
+  --helpers-os-appearance: Dark;
+  --background-base-lightness: 11%;
+  --background-contrast: 1;
+
+  --code-block-1: calc(var(--brand-hue) + 17.8deg) calc(var(--brand-saturation) * 0.72) 61.4%;
+  --code-block-2: calc(var(--warning-hue) + 3.2deg) calc(var(--warning-saturation) * 1.13) 75.7%;
+  --code-block-3: calc(var(--warning-hue) + 53.8deg) calc(var(--warning-saturation) * 0.77) 63.1%;
+  --code-block-4: calc(var(--brand-hue) + 94.8deg) calc(var(--brand-saturation) * 0.675) 74.5%;
+  --code-block-5: calc(var(--destructive-hue) + 3.8deg) calc(var(--destructive-saturation) * 1.15)
+    69.6%;
+
+  --secondary-default: var(--colors-white);
+  --secondary-400: var(--colors-white);
+  --secondary-200: var(--colors-white);
+
+  --brand-link: calc(var(--brand-hue) + 0.1deg) calc(var(--brand-saturation) * 1) 52.7%;
+  --brand-default: calc(var(--brand-hue) + 0.1deg) calc(var(--brand-saturation) * 1) 52.7%;
+  --brand-600: var(--brand-hue) calc(var(--brand-saturation) * 0.99) 70%;
+  --brand-500: calc(var(--brand-hue) + 0.5deg) calc(var(--brand-saturation) * 1.03) 21.6%;
+  --brand-400: calc(var(--brand-hue) + 0.3deg) calc(var(--brand-saturation) * 1.09) 13.5%;
+  --brand-300: calc(var(--brand-hue) + 0.8deg) calc(var(--brand-saturation) * 1.16) 9%;
+  --brand-200: calc(var(--brand-hue) - 0.5deg) calc(var(--brand-saturation) * 1.25) 6.3%;
+  --colors-brand9: hsl(var(--brand-default));
+
+  --warning-default: calc(var(--warning-hue) + 8.9deg) calc(var(--warning-saturation) * 1.25) 57.1%;
+  --warning-600: calc(var(--warning-hue) + 8.9deg) calc(var(--warning-saturation) * 1.12) 49.8%;
+  --warning-500: calc(var(--warning-hue) + 4.8deg) calc(var(--warning-saturation) * 1.14) 21.6%;
+  --warning-400: calc(var(--warning-hue) + 3.2deg) calc(var(--warning-saturation) * 1.25) 14.5%;
+  --warning-300: calc(var(--warning-hue) + 2.3deg) calc(var(--warning-saturation) * 1.25) 10.2%;
+  --warning-200: calc(var(--warning-hue) + 6.8deg) calc(var(--warning-saturation) * 1.25) 6.1%;
+
+  --destructive-default: calc(var(--destructive-hue) + 0.2deg)
+    calc(var(--destructive-saturation) * 1) 53.9%;
+  --destructive-600: calc(var(--destructive-hue) - 0.3deg)
+    calc(var(--destructive-saturation) * 1.09) 62.9%;
+  --destructive-500: calc(var(--destructive-hue) - 2.1deg)
+    calc(var(--destructive-saturation) * 0.92) 29%;
+  --destructive-400: calc(var(--destructive-hue) - 3.3deg)
+    calc(var(--destructive-saturation) * 0.77) 20.6%;
+  --destructive-300: calc(var(--destructive-hue) - 2.5deg)
+    calc(var(--destructive-saturation) * 0.66) 15.3%;
+  --destructive-200: calc(var(--destructive-hue) + 0.9deg) calc(var(--destructive-saturation) * 0.3)
+    9.2%;
+
+  --background-dash-sidebar: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-dialog-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-surface-75: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (1.5% * var(--background-contrast)));
+  --background-200: var(--neutral-hue) var(--neutral-saturation) var(--background-base-lightness);
+  --foreground-contrast: var(--neutral-hue) var(--neutral-saturation) 11%;
+  --border-button-hover: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (20.4% * var(--background-contrast)));
+  --border-button-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (13.3% * var(--background-contrast)));
+  --border-stronger: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (20.4% * var(--background-contrast)));
+  --border-strong: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (13.3% * var(--background-contrast)));
+  --border-alternative: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --border-control: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (9.4% * var(--background-contrast)));
+  --border-overlay: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --border-secondary: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --border-muted: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --border-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (9.4% * var(--background-contrast)));
+  --background-dash-canvas: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-button-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --background-muted: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (4.7% * var(--background-contrast)));
+  --background-overlay-hover: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --background-overlay-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (2.7% * var(--background-contrast)));
+  --background-surface-400: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (13.3% * var(--background-contrast)));
+  --background-surface-300: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (7% * var(--background-contrast)));
+  --background-surface-200: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (4.7% * var(--background-contrast)));
+  --background-surface-100: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (2.7% * var(--background-contrast)));
+  --background-control: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (2.7% * var(--background-contrast)));
+  --background-selection: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) + (9.4% * var(--background-contrast)));
+  --background-alternative-default: var(--neutral-hue) var(--neutral-saturation)
+    calc(var(--background-base-lightness) - (2.4% * var(--background-contrast)));
+  --background-alternative-200: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --background-default: var(--neutral-hue) var(--neutral-saturation)
+    var(--background-base-lightness);
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: var(--brand-default);
+  --foreground-muted: var(--neutral-hue) var(--neutral-saturation) 43.9%;
+  --foreground-lighter: var(--neutral-hue) var(--neutral-saturation) 49.4%;
+  --foreground-light: var(--neutral-hue) var(--neutral-saturation) 62.7%;
+  --foreground-default: var(--neutral-hue) var(--neutral-saturation) 92.9%;
+}
+
+.bg-sidebar {
+  background-color: hsl(var(--sidebar-background));
+}
