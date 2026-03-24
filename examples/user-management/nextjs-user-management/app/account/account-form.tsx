@@ -98,7 +98,7 @@ export default function AccountForm({ claims }: { claims: Claims | null }) {
       />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={claims?.email} disabled />
+        <input id="email" type="text" value={claims?.email ?? ''} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>
