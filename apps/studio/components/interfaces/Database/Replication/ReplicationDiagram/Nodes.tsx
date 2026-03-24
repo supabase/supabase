@@ -59,7 +59,11 @@ export const PrimaryDatabaseNode = () => {
           src={`${BASE_PATH}/img/regions/${project?.region}.svg`}
         />
       )}
-      {hasReplication && <Handle type="source" position={Position.Right} className="opacity-25" />}
+      <Handle
+        type="source"
+        position={Position.Right}
+        className={hasReplication ? 'opacity-25' : 'opacity-0'}
+      />
     </NodeContainer>
   )
 }
