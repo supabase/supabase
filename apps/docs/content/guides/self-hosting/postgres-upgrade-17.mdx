@@ -235,3 +235,32 @@ docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 Removing the `db-config` volume destroys the pgsodium root key. Only do this for fresh installations with no existing vault secrets.
 
 </Admonition>
+
+### Restoring from a manual backup
+
+If the upgrade fails and the script's built-in rollback isn't sufficient, restore from the manual backups created in the [Create a backup](#create-a-backup) step:
+
+Restore the data:
+
+```sh
+docker compose down && \
+rm -rf ./volumes/db/data && \
+cp -a ./volumes/db/data-manual-backup ./volumes/db/data
+```
+
+Restore the pgsodium key to the `db-config` volume:
+
+```sh
+docker compose run --rm db \
+  sh -c 'cat > /etc/postgresql-custom/pgsodium_root.key' < ./pgsodium_root.key.backup && \
+docker compose run --rm db \
+  chown postgres:postgres /etc/postgresql-custom/pgsodium_root.key && \
+docker compose run --rm db \
+  chmod 600 /etc/postgresql-custom/pgsodium_root.key
+```
+
+Start Postgres 15:
+
+```sh
+docker compose up -d
+```

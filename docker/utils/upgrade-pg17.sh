@@ -621,6 +621,15 @@ start_pg17() {
 apply_role_migrations() {
     info "Applying Postgres 17 migrations"
 
+    # Fix collation version mismatch first (upgrade used glibc 2.39, target
+    # image may use glibc 2.40). Do this before any other SQL to suppress
+    # the noisy warnings on every subsequent command.
+    for db in postgres template1 _supabase; do
+        docker exec -i -e PGPASSWORD="$pg_password" "$DB_CONTAINER" \
+            psql -h localhost -U supabase_admin -d "$db" \
+            -c "ALTER DATABASE \"$db\" REFRESH COLLATION VERSION;" || true
+    done
+
     # Create supabase_etl_admin role (doesn't exist in PG15 images).
     # Must be created before running predefined_role_grants.sql which
     # assumes it exists.
@@ -634,14 +643,6 @@ apply_role_migrations() {
             END IF;
         END
         \$\$;" || true
-
-    # Fix collation version mismatch (upgrade used glibc 2.39, target image
-    # may use glibc 2.40)
-    for db in postgres template1 _supabase; do
-        docker exec -i -e PGPASSWORD="$pg_password" "$DB_CONTAINER" \
-            psql -h localhost -U supabase_admin -d "$db" \
-            -c "ALTER DATABASE \"$db\" REFRESH COLLATION VERSION;" || true
-    done
 
     # Run the migration files directly from the PG17 container image.
     # They're idempotent (IF EXISTS / IF NOT EXISTS guards).
