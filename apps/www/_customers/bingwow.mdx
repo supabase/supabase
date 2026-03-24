@@ -1,0 +1,111 @@
+---
+name: BingWow
+title: 'BingWow serves thousands of free multiplayer bingo games with Supabase and zero backend engineers'
+meta_title: 'BingWow serves thousands of free multiplayer bingo games with Supabase and zero backend engineers'
+description: How a solo developer built a real-time multiplayer bingo platform used by teachers, families, and event planners — powered entirely by Supabase.
+meta_description: How a solo developer built a real-time multiplayer bingo platform used by teachers, families, and event planners — powered entirely by Supabase.
+author: paul_copplestone
+author_title: Supabase
+author_url: https://github.com/kiwicopple
+author_image_url: https://avatars.githubusercontent.com/u/10214025
+logo: /images/customers/logos/bingwow.png
+logo_inverse: /images/customers/logos/light/bingwow.png
+tags:
+  - supabase
+date: '2026-03-25'
+company_url: 'https://bingwow.com'
+stats:
+  - { stat: '2,000+', label: 'Bingo cards published' }
+  - { stat: '0', label: 'Backend engineers' }
+  - { stat: '100%', label: 'Free — no paid tiers' }
+misc:
+  - { label: 'Founded', text: '2025' }
+  - { label: 'Use case', text: 'Education, team building, events, entertainment' }
+  - { label: 'Solutions', text: 'Supabase Database, Supabase Auth, Supabase Storage, Supabase Edge Functions' }
+about: BingWow is a free multiplayer bingo platform with AI-powered card generation, used by teachers, families, and event planners worldwide.
+industry:
+  - 'education'
+  - 'games'
+  - 'entertainment'
+company_size: 'startup'
+region: 'North America'
+supabase_products:
+  - 'database'
+  - 'auth'
+  - 'storage'
+  - 'functions'
+---
+
+BingWow is a free multiplayer bingo platform that lets anyone create, share, and play custom bingo cards for classrooms, parties, watch parties, and team building. Built entirely on Supabase by a solo developer, it handles AI-powered card generation, real-time multiplayer gameplay, user authentication, image storage, and content moderation — all without a dedicated backend team.
+
+## The Challenge
+
+Building a consumer multiplayer game as a solo developer means solving authentication, database management, file storage, serverless compute, and content moderation — all at once. Most developers piece together five or six services to get this stack, spending weeks on integration before writing a single line of product code.
+
+BingWow needed a backend that could handle:
+
+- **User authentication** with Google sign-in for returning users and instant anonymous access for players joining a game (no student accounts or signups required)
+- **A relational database** for 2,000+ published bingo cards with metadata, categories, clue sets, game room state, and a content trending pipeline
+- **File storage** for 6,000+ card illustrations, served directly to users
+- **Serverless compute** for AI card generation, automated content moderation, and scheduled curation pipelines
+
+Splitting these across AWS Cognito, a managed Postgres instance, S3, and Lambda would have meant weeks of glue code and ongoing operational overhead — not viable for a team of one.
+
+## Why Supabase
+
+Supabase provided the entire backend stack in a single platform, with a developer experience designed for shipping fast.
+
+### Auth — Frictionless for everyone
+
+BingWow serves two very different auth patterns. Teachers and returning users sign in with Google to save their created cards and manage their library. Students and game players need zero-friction access — they join a game via a shared link with no account creation at all.
+
+Supabase Auth handles both seamlessly. Google OAuth for persistent users, anonymous sessions for instant play. The auth layer integrates directly with Row Level Security policies, so database access rules are enforced at the Postgres level without application-side middleware.
+
+### Database — Postgres that scales with the product
+
+The core of BingWow is a Postgres database managing:
+
+- **2,000+ published bingo cards** with rich metadata (titles, descriptions, categories, clue sets, board configurations)
+- **Game room state** for real-time multiplayer sessions (up to 20 concurrent players per room)
+- **A content trending pipeline** that surfaces popular and seasonal cards using multi-source discovery, AI-powered ranking, and scheduled curation
+- **Content moderation workflows** that review AI-generated cards before they reach the public library
+
+Supabase's managed Postgres gave BingWow the full power of relational queries, JSONB columns for flexible game state, and database functions for complex operations — with zero database administration overhead.
+
+### Storage — 6,000+ illustrations, zero CDN setup
+
+Every bingo card in BingWow can display themed illustrations. The platform has 6,000+ approved illustrations organized by topic, stored in Supabase Storage and served directly to users with built-in CDN caching. No separate file hosting, no S3 bucket configuration, no CloudFront distribution setup.
+
+### Edge Functions — AI generation and moderation at the edge
+
+BingWow's most distinctive feature is AI-powered card generation. A teacher types "photosynthesis vocabulary" and receives a complete, themed bingo card in under 30 seconds. This runs on Supabase Edge Functions, which handle:
+
+- **AI card generation** — processing natural language prompts and returning structured card data
+- **Content moderation** — reviewing generated content before it enters the public library
+- **Scheduled curation** — automated pipelines that discover trending topics and generate timely cards
+
+Edge Functions deploy alongside the database and auth, sharing the same project and environment variables. No separate serverless deployment pipeline needed.
+
+## The Results
+
+BingWow launched with zero backend code outside of Supabase. Every feature — from AI card generation to 20-player real-time games to automated content moderation — runs on Supabase infrastructure.
+
+The platform is completely free with no paid tiers, demonstrating that Supabase can power a full-featured consumer product at minimal cost. A solo developer went from idea to production multiplayer game without ever provisioning a server, configuring a CDN, or writing authentication middleware.
+
+> The thing that made Supabase the right choice wasn't any single feature — it was having auth, database, storage, and edge functions in one place. As a solo developer, every integration point I don't have to maintain is a feature I can build instead.
+
+**Key outcomes:**
+
+- **2,000+ bingo cards** published and searchable across dozens of categories
+- **Zero backend engineers** — the entire platform is built and maintained by one developer
+- **Sub-second game state sync** for up to 20 concurrent players per room
+- **6,000+ illustrations** served from Supabase Storage with no CDN configuration
+- **8 automated cron jobs** running content curation, trending discovery, and moderation pipelines
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- Supabase (Auth, Database, Storage, Edge Functions)
+- Ably (real-time multiplayer WebSocket layer)
+- Vercel (hosting and deployment)
+- Anthropic Claude API (AI card generation)
