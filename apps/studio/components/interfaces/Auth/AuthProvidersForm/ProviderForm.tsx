@@ -13,7 +13,7 @@ import { BASE_PATH } from 'lib/constants'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
@@ -36,6 +36,7 @@ import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -81,20 +82,20 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const INITIAL_VALUES = (() => {
-    const initialValues: { [x: string]: string | boolean } = {}
+  const getValuesForProvider = useStaticEffectEvent((config: components['schemas']['GoTrueConfigResponse']) => {
+    const values: { [x: string]: string | boolean } = {}
     Object.keys(provider.properties).forEach((key) => {
       const isDoubleNegative = doubleNegativeKeys.includes(key)
       if (provider.title === 'SAML 2.0') {
         const configValue = (config as any)[key]
-        initialValues[key] =
+        values[key] =
           configValue || (provider.properties[key].type === 'boolean' ? false : '')
       } else {
         if (isDoubleNegative) {
-          initialValues[key] = !(config as any)[key]
+          values[key] = !(config as any)[key]
         } else {
           const configValue = (config as any)[key]
-          initialValues[key] = configValue
+          values[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
               ? false
@@ -102,8 +103,12 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         }
       }
     })
-    return initialValues
-  })()
+    return values
+  })
+
+  const INITIAL_VALUES = useMemo(() => {
+    return getValuesForProvider(config)
+  }, [config, getValuesForProvider])
 
   const onSubmit = (values: any) => {
     const payload = { ...values }
@@ -123,6 +128,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         onSuccess: (newValues) => {
           setOpen(false)
           setUrlProvider(null)
+          form.reset(getValuesForProvider(newValues))
           toast.success('Successfully updated settings')
         },
       }
