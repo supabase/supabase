@@ -55,4 +55,6 @@ export type QueryPerformanceSQLParams = {
   minTotalTime?: number
   runIndexAdvisor?: boolean
   filterIndexAdvisor?: boolean
+  page?: number
+  pageSize?: number
 }
