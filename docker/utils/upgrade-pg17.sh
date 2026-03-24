@@ -637,7 +637,11 @@ apply_role_migrations() {
 
     # Fix collation version mismatch (upgrade used glibc 2.39, target image
     # may use glibc 2.40)
-    run_sql_on "$DB_CONTAINER" -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;" || true
+    for db in postgres template1 _supabase; do
+        docker exec -i -e PGPASSWORD="$pg_password" "$DB_CONTAINER" \
+            psql -h localhost -U supabase_admin -d "$db" \
+            -c "ALTER DATABASE \"$db\" REFRESH COLLATION VERSION;" || true
+    done
 
     # Run the migration files directly from the PG17 container image.
     # They're idempotent (IF EXISTS / IF NOT EXISTS guards).
