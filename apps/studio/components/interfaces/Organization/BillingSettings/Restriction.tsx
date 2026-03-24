@@ -194,9 +194,11 @@ export const Restriction = () => {
             <p>
               Fair Use Policy applies and your service is restricted. Your projects are not able to
               serve requests and will respond with a 402 status code. You have exceeded your plan’s
-              quota{violationLabels && ` ${violationLabels}`}.{' '}
-              {org.plan.id === 'free' ? 'Upgrade your plan' : 'Disable spend cap'} to lift
-              restrictions or wait until your quota refills on your next billing period.
+              quota{violationLabels && ` ${violationLabels}`}.{‘ ‘}
+              {org.plan.id === ‘free’ ? ‘Upgrade your plan’ : ‘Disable spend cap’} to lift
+              restrictions immediately, or wait until your quota refills at the start of your next
+              billing period. Note that there may be a short delay after your billing period resets
+              before restrictions are fully lifted.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">
