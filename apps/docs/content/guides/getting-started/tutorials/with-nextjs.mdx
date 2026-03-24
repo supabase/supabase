@@ -92,7 +92,7 @@ Since Server Components can't write cookies, you need [Proxy](https://nextjs.org
 
 You can accomplish this by:
 
-- Refreshing the Auth token with the call to `supabase.auth.getUser`.
+- Refreshing the Auth token with the call to `supabase.auth.getClaims`.
 - Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
 - Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
 
