@@ -16,7 +16,7 @@ import { BASE_PATH } from 'lib/constants'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
@@ -28,6 +28,7 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
+  SheetSection,
   SheetTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -160,11 +161,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   useEffect(() => {
     if (open) {
-      form.reset()
+      form.reset(INITIAL_VALUES)
     }
-  }, [open, form])
-
-  const formId = `provider-${provider.title}-form`
+  }, [open, form, INITIAL_VALUES])
+  const formId = useId()
 
   return (
     <>
@@ -238,25 +238,30 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               })}
 
               {provider?.misc?.alert && (
-                <Admonition
-                  type="warning"
-                  title={provider.misc.alert.title}
-                  description={<ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>}
-                />
+                <SheetSection>
+                  <Admonition
+                    type="warning"
+                    title={provider.misc.alert.title}
+                    description={<ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>}
+                  />
+                </SheetSection>
               )}
 
               {provider.misc.requiresRedirect && (
-                <FormItemLayout
-                  layout="horizontal"
-                  label="Callback URL (for OAuth)"
-                  description={
-                    <Markdown content={provider.misc.helper} className="text-foreground-lighter" />
-                  }
-                >
-                  <FormControl_Shadcn_>
+                <SheetSection>
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Callback URL (for OAuth)"
+                    description={
+                      <Markdown
+                        content={provider.misc.helper}
+                        className="text-foreground-lighter"
+                      />
+                    }
+                  >
                     <Input copy readOnly value={endpoint ? `${endpoint}/auth/v1/callback` : ''} />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
+                  </FormItemLayout>
+                </SheetSection>
               )}
             </form>
           </Form_Shadcn_>
