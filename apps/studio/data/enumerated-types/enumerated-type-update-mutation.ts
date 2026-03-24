@@ -1,9 +1,10 @@
+import { getUpdateEnumeratedTypeSQL } from '@supabase/pg-meta'
+import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeUpdateVariables = {
@@ -23,38 +24,7 @@ export async function updateEnumeratedType({
   description,
   values = [],
 }: EnumeratedTypeUpdateVariables) {
-  const statements: string[] = []
-  if (name.original !== name.updated) {
-    statements.push(`alter type "${schema}"."${name.original}" rename to "${name.updated}";`)
-  }
-  if (values.length > 0) {
-    values.forEach((x, idx) => {
-      if (x.isNew) {
-        if (idx === 0) {
-          // Consider if any new enums were added before any existing enums
-          const firstExistingEnumValue = values.find((x) => !x.isNew)
-          statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' before '${firstExistingEnumValue?.original}';`
-          )
-        } else {
-          statements.push(
-            `alter type "${schema}"."${name.updated}" add value '${x.updated}' after '${
-              values[idx - 1].updated
-            }';`
-          )
-        }
-      } else if (x.original !== x.updated) {
-        statements.push(
-          `alter type "${schema}"."${name.updated}" rename value '${x.original}' to '${x.updated}';`
-        )
-      }
-    })
-  }
-  if (description !== undefined) {
-    statements.push(`comment on type "${schema}"."${name.updated}" is '${description}';`)
-  }
-
-  const sql = wrapWithTransaction(statements.join(' '))
+  const sql = getUpdateEnumeratedTypeSQL({ schema, name, description, values })
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

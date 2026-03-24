@@ -1,12 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Background,
+  ColorMode,
+  Edge,
+  ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
+} from '@xyflow/react'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
@@ -305,6 +312,8 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
             )}
             {view === 'flow' ? (
               <ReactFlow
+                // FIXME: https://github.com/xyflow/xyflow/issues/4876
+                colorMode={'' as unknown as ColorMode}
                 fitView
                 fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
                 className="instance-configuration"
@@ -314,7 +323,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 nodesConnectable={false}
                 zoomOnDoubleClick={false}
                 edgesFocusable={false}
-                edgesUpdatable={false}
+                edgesReconnectable={false}
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}

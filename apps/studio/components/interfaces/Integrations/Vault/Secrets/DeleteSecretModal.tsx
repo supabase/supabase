@@ -68,7 +68,7 @@ export const DeleteSecretModal = () => {
         <div className="space-y-1">
           <p className="text-sm">{selectedSecret?.description}</p>
           <p className="text-sm text-foreground-light">
-            ID: <span className="font-mono">{selectedSecret?.id}</span>
+            ID: <code className="text-code-inline">{selectedSecret?.id}</code>
           </p>
         </div>
       </Modal.Content>
