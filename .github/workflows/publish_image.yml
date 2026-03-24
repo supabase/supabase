@@ -145,3 +145,48 @@ jobs:
     with:
       version: ${{ needs.settings.outputs.image_version }}
     secrets: inherit
+
+  slack-notification:
+    if: ${{ always() && !cancelled() }}
+    needs:
+      - settings
+      - release_x86
+      - release_arm
+      - merge_manifest
+      - publish
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Notify Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
+        run: |
+          if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ]; then
+            STATUS="failed :x:"
+            COLOR="#dc3545"
+          else
+            STATUS="succeeded :white_check_mark:"
+            COLOR="#28a745"
+          fi
+
+          IMAGE_VERSION="${{ needs.settings.outputs.image_version }}"
+
+          curl -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d @- <<EOF
+          {
+            "attachments": [
+              {
+                "color": "${COLOR}",
+                "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Studio Docker Build ${STATUS}*\nVersion: \`${IMAGE_VERSION}\`\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
