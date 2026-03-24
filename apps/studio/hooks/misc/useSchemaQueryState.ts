@@ -1,7 +1,6 @@
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 /**
  * This hook wraps useQueryState because useQueryState imports app router for some reason which breaks the SSR in
@@ -25,7 +24,7 @@ export const useQuerySchemaState = () => {
   const { ref } = useParams()
 
   const defaultSchema =
-    typeof window !== 'undefined' && ref && ref.length > 0
+    typeof window !== 'undefined' && window.localStorage != null && ref && ref.length > 0
       ? window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
       : 'public'
 
