@@ -152,9 +152,9 @@ export const formatGridDataWithOperationValues = ({
   operations.forEach((op) => {
     if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
       const { rowIdentifiers, columnName, newValue } = op.payload
-      const rowMatches = rows.find((row) => rowMatchesIdentifiers(row, rowIdentifiers))
-      if (rowMatches) {
-        formattedRows[rowMatches.idx] = { ...rowMatches, [columnName]: newValue }
+      const rowIdx = rows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      if (rowIdx !== -1) {
+        formattedRows[rowIdx] = { ...formattedRows[rowIdx], [columnName]: newValue }
       }
     } else if (op.type === QueuedOperationType.ADD_ROW) {
       const { tempId, rowData } = op.payload
