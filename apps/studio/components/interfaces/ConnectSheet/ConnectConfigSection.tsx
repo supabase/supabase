@@ -244,7 +244,7 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   return (
-    <div className="grid grid-cols-4 rounded-lg border">
+    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
       {modes.map((mode) => (
         <button
           key={mode.id}
