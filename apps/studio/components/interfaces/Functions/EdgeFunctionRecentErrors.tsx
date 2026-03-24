@@ -67,7 +67,7 @@ type RecentErrorGroup = {
   logs: GroupedRuntimeLog[]
 }
 
-type RecentErrorGroupBase = Omit
+type RecentErrorGroupBase = Omit<RecentErrorGroup, 'logs'>
 
 const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
@@ -130,7 +130,8 @@ export const EdgeFunctionRecentErrors = ({
   )
 
   const recentErrorGroupsBase = useMemo<RecentErrorGroupBase[]>(() => {
-    const grouped = recentErrorInvocations.reduce<Record>((acc, item) => {
+    const grouped = recentErrorInvocations.reduce<Record<string, RecentErrorGroupBase>>(
+      (acc, item) => {
       const statusCode = String(item.status_code ?? '')
       const method = String(item.method ?? '')
       const message =
@@ -176,11 +177,15 @@ export const EdgeFunctionRecentErrors = ({
             : undefined
       }
 
-      return acc
-    }, {})
+        return acc
+      },
+      {}
+    )
 
     return Object.values(grouped)
-      .sort((a, b) => b.lastSeen - a.lastSeen)
+      .sort(
+        (a: RecentErrorGroupBase, b: RecentErrorGroupBase) => b.lastSeen - a.lastSeen
+      )
       .slice(0, MAX_RECENT_ERROR_GROUPS)
   }, [recentErrorInvocations])
 
@@ -221,19 +226,22 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
   const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
-    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record>((acc, log) => {
-      const executionId = String(log.execution_id ?? '')
-      if (!executionId) return acc
+    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record<string, LogData[]>>(
+      (acc, log) => {
+        const executionId = String(log.execution_id ?? '')
+        if (!executionId) return acc
 
-      acc[executionId] = [...(acc[executionId] ?? []), log]
-      return acc
-    }, {})
+        acc[executionId] = [...(acc[executionId] ?? []), log]
+        return acc
+      },
+      {}
+    )
 
     return recentErrorGroupsBase.map((group) => ({
       ...group,
       logs: group.executionIds
         .flatMap((executionId: string) => runtimeLogsByExecutionId[executionId] ?? [])
-        .reduce<GroupedRuntimeLog[]>((acc, log) => {
+        .reduce<GroupedRuntimeLog[]>((acc: GroupedRuntimeLog[], log: LogData) => {
           const level = String(log.level ?? log.event_type ?? 'log')
           const message = String(log.event_message ?? '')
           const key = `${level}:${message}`
