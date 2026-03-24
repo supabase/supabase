@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
+import { useUser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
 import { castOrganizationResponseToOrganization } from 'data/organizations/organizations-query'
@@ -49,6 +50,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const user = useUser()
 
   return useMutation<
     PendingSubscriptionCreateData,
@@ -72,7 +74,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
       // endpoint will error out with a 500 since the subscription isn't created yet.
       queryClient.setQueriesData(
         {
-          queryKey: organizationKeys.list(),
+          queryKey: organizationKeys.list(user?.id),
           exact: true,
         },
         (prev: any) => {
@@ -86,7 +88,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
         }
       )
 
-      await queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
+      await queryClient.invalidateQueries({ queryKey: permissionKeys.list(user?.id) })
 
       // todo replace plan in org
       await onSuccess?.(data, variables, context)

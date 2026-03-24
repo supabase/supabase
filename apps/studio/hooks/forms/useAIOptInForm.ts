@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, useUser } from 'common'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -29,6 +29,7 @@ export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
  */
 export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
+  const user = useUser()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -89,7 +90,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
       { slug: selectedOrganization.slug, opt_in_tags: updatedOptInTags },
       {
         onSuccess: () => {
-          invalidateOrganizationsQuery(queryClient)
+          invalidateOrganizationsQuery(queryClient, user?.id)
           toast.success('Successfully updated AI opt-in settings')
           setUpdatedOptInSinceMCP(true)
           onSuccessCallback?.() // Call optional callback on success

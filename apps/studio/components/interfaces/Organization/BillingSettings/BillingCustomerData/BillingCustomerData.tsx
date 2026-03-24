@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams, useUser } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -31,6 +31,7 @@ import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 export const BillingCustomerData = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
+  const user = useUser()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
@@ -99,7 +100,7 @@ export const BillingCustomerData = () => {
         // so the TaxIdBanner hides immediately. The server responds 304 Not Modified for a
         // while after the tax ID is saved, so invalidation/refetch won't work here.
         queryClient.setQueriesData<any[]>(
-          { queryKey: organizationKeys.list(), exact: true },
+          { queryKey: organizationKeys.list(user?.id), exact: true },
           (prev) => {
             if (!prev) return prev
             return prev.map((org) =>

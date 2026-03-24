@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { useParams, useUser } from 'common'
 import CopyButton from 'components/ui/CopyButton'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
@@ -33,6 +33,7 @@ const OrgDetailsSchema = z.object({
 export const OrganizationDetailsForm = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
+  const user = useUser()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canUpdateOrganization } = useAsyncCheckPermissions(
@@ -58,7 +59,7 @@ export const OrganizationDetailsForm = () => {
       { slug, name: values.name },
       {
         onSuccess: () => {
-          invalidateOrganizationsQuery(queryClient)
+          invalidateOrganizationsQuery(queryClient, user?.id)
           toast.success('Successfully updated organization name')
         },
         onError: (error: ResponseError) => {

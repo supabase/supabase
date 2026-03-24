@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { useUser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
@@ -38,6 +39,7 @@ export const useOrganizationAcceptInvitationMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const user = useUser()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<
@@ -47,7 +49,7 @@ export const useOrganizationAcceptInvitationMutation = ({
   >({
     mutationFn: (vars) => acceptOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
-      await invalidateOrganizationsQuery(queryClient)
+      await invalidateOrganizationsQuery(queryClient, user?.id)
       await invalidateProjectsQuery()
       await onSuccess?.(data, variables, context)
     },

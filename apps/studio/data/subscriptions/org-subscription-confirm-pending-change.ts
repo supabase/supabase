@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'api-types'
+import { useUser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
 import { organizationKeys } from 'data/organizations/keys'
@@ -55,6 +56,7 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const user = useUser()
 
   return useMutation<
     PendingSubscriptionChangeData,
@@ -86,7 +88,7 @@ export const useConfirmPendingSubscriptionChangeMutation = ({
         queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
         queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
         queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),
-        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list(user?.id) }),
         queryClient.invalidateQueries({ queryKey: organizationKeys.paymentMethods(slug) }),
       ])
 

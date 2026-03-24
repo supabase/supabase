@@ -1,6 +1,7 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
 
 import { components } from 'api-types'
+import { useUser } from 'common'
 import { get, handleError } from 'data/fetchers'
 import { MANAGED_BY, ManagedBy } from 'lib/constants/infrastructure'
 import { useProfile } from 'lib/profile'
@@ -54,8 +55,9 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   ...options
 }: UseCustomQueryOptions<OrganizationsData, OrganizationsError, TData> = {}) => {
   const { profile } = useProfile()
+  const user = useUser()
   return useQuery<OrganizationsData, OrganizationsError, TData>({
-    queryKey: organizationKeys.list(),
+    queryKey: organizationKeys.list(user?.id),
     queryFn: ({ signal }) => getOrganizations({ signal }),
     enabled: enabled && profile !== undefined,
     ...options,
@@ -63,6 +65,6 @@ export const useOrganizationsQuery = <TData = OrganizationsData>({
   })
 }
 
-export function invalidateOrganizationsQuery(client: QueryClient) {
-  return client.invalidateQueries({ queryKey: organizationKeys.list() })
+export function invalidateOrganizationsQuery(client: QueryClient, userId: string | undefined) {
+  return client.invalidateQueries({ queryKey: organizationKeys.list(userId) })
 }

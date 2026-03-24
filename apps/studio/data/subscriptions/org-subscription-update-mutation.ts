@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useUser } from 'common'
 import { handleError, put } from 'data/fetchers'
 import { invoicesKeys } from 'data/invoices/keys'
 import { organizationKeys } from 'data/organizations/keys'
@@ -63,6 +64,7 @@ export const useOrgSubscriptionUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const user = useUser()
 
   return useMutation<OrgSubscriptionUpdateData, ResponseError, OrgSubscriptionUpdateVariables>({
     mutationFn: (vars) => updateOrgSubscription(vars),
@@ -80,7 +82,7 @@ export const useOrgSubscriptionUpdateMutation = ({
           queryClient.invalidateQueries({ queryKey: usageKeys.orgUsage(slug) }),
           queryClient.invalidateQueries({ queryKey: invoicesKeys.orgUpcomingPreview(slug) }),
           queryClient.invalidateQueries({ queryKey: organizationKeys.detail(slug) }),
-          queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+          queryClient.invalidateQueries({ queryKey: organizationKeys.list(user?.id) }),
           queryClient.invalidateQueries({ queryKey: organizationKeys.entitlements(slug) }),
         ])
 
