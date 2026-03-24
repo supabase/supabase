@@ -82,29 +82,30 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const getValuesForProvider = useStaticEffectEvent((config: components['schemas']['GoTrueConfigResponse']) => {
-    const values: { [x: string]: string | boolean } = {}
-    Object.keys(provider.properties).forEach((key) => {
-      const isDoubleNegative = doubleNegativeKeys.includes(key)
-      if (provider.title === 'SAML 2.0') {
-        const configValue = (config as any)[key]
-        values[key] =
-          configValue || (provider.properties[key].type === 'boolean' ? false : '')
-      } else {
-        if (isDoubleNegative) {
-          values[key] = !(config as any)[key]
-        } else {
+  const getValuesForProvider = useStaticEffectEvent(
+    (config: components['schemas']['GoTrueConfigResponse']) => {
+      const values: { [x: string]: string | boolean } = {}
+      Object.keys(provider.properties).forEach((key) => {
+        const isDoubleNegative = doubleNegativeKeys.includes(key)
+        if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
-          values[key] = configValue
-            ? configValue
-            : provider.properties[key].type === 'boolean'
-              ? false
-              : ''
+          values[key] = configValue || (provider.properties[key].type === 'boolean' ? false : '')
+        } else {
+          if (isDoubleNegative) {
+            values[key] = !(config as any)[key]
+          } else {
+            const configValue = (config as any)[key]
+            values[key] = configValue
+              ? configValue
+              : provider.properties[key].type === 'boolean'
+                ? false
+                : ''
+          }
         }
-      }
-    })
-    return values
-  })
+      })
+      return values
+    }
+  )
 
   const INITIAL_VALUES = useMemo(() => {
     return getValuesForProvider(config)
