@@ -4,6 +4,7 @@ import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
+import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import AlertError from 'components/ui/AlertError'
@@ -66,6 +67,8 @@ type RecentErrorGroup = {
   logs: GroupedRuntimeLog[]
 }
 
+type RecentErrorGroupBase = Omit<RecentErrorGroup, 'logs'>
+
 const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
 const toAlertError = (error: unknown): { message: string } | undefined => {
@@ -126,8 +129,8 @@ export const EdgeFunctionRecentErrors = ({
     isQueryEnabled
   )
 
-  const recentErrorGroupsBase = useMemo<Omit[]>(() => {
-    const grouped = recentErrorInvocations.reduce<Record>((acc, item) => {
+  const recentErrorGroupsBase = useMemo<RecentErrorGroupBase[]>(() => {
+    const grouped = recentErrorInvocations.reduce<Record<string, RecentErrorGroupBase>>((acc, item) => {
       const statusCode = String(item.status_code ?? '')
       const method = String(item.method ?? '')
       const message =
@@ -218,24 +221,27 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
   const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
-    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record>((acc, log) => {
+    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record<string, LogData[]>>(
+      (acc, log) => {
       const executionId = String(log.execution_id ?? '')
       if (!executionId) return acc
 
       acc[executionId] = [...(acc[executionId] ?? []), log]
       return acc
-    }, {})
+      },
+      {}
+    )
 
     return recentErrorGroupsBase.map((group) => ({
       ...group,
       logs: group.executionIds
-        .flatMap((executionId) => runtimeLogsByExecutionId[executionId] ?? [])
+        .flatMap((executionId: string) => runtimeLogsByExecutionId[executionId] ?? [])
         .reduce<GroupedRuntimeLog[]>((acc, log) => {
           const level = String(log.level ?? log.event_type ?? 'log')
           const message = String(log.event_message ?? '')
           const key = `${level}:${message}`
           const timestamp = Number(log.timestamp ?? 0)
-          const existing = acc.find((entry) => entry.key === key)
+          const existing = acc.find((entry: GroupedRuntimeLog) => entry.key === key)
 
           if (existing) {
             existing.count += 1
@@ -246,7 +252,10 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
           acc.push({ key, message, level, count: 1, lastSeen: timestamp })
           return acc
         }, [])
-        .sort((a, b) => b.count - a.count || b.lastSeen - a.lastSeen)
+        .sort(
+          (a: GroupedRuntimeLog, b: GroupedRuntimeLog) =>
+            b.count - a.count || b.lastSeen - a.lastSeen
+        )
         .slice(0, MAX_RECENT_ERROR_GROUPS),
     }))
   }, [functionRuntimeLogs, recentErrorGroupsBase])

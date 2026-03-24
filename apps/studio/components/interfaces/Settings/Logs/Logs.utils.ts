@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
-import type { Filters, LogData, LogsEndpointParams } from './Logs.types'
+import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp
@@ -805,6 +805,10 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record = {
   etl_replication_logs: 'ETL',
 }
 
+const isLogsTableName = (value: string): value is LogsTableName =>
+  value in LOG_TABLE_TO_SERVICE_LABEL
+const isQueryType = (value: string): value is QueryType => value in QUERY_TYPE_LABELS
+
 export function extractEdgeFunctionName(pathname: unknown): string {
   if (typeof pathname !== 'string' || !pathname) return ''
   const parts = pathname.split('/').filter(Boolean)
@@ -814,12 +818,12 @@ export function extractEdgeFunctionName(pathname: unknown): string {
 function extractServiceLabelFromSql(sql: string): string | null {
   const match = sql.match(/\bfrom\s+(\w+)/i)
   const tableName = match?.[1]
-  return tableName ? LOG_TABLE_TO_SERVICE_LABEL[tableName] ?? null : null
+  return tableName && isLogsTableName(tableName) ? LOG_TABLE_TO_SERVICE_LABEL[tableName] : null
 }
 
 export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {
   const serviceLabel =
-    (queryType ? QUERY_TYPE_LABELS[queryType] : null) ??
+    (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
     (sqlQuery ? extractServiceLabelFromSql(sqlQuery) : null)
   const serviceContext = serviceLabel ? ` from the **${serviceLabel}** service` : ''
   const sqlContext = sqlQuery ? `\n\n**Query used:**\n\`\`\`sql\n${sqlQuery.trim()}\n\`\`\`` : ''
