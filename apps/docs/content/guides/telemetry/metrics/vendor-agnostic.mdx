@@ -25,7 +25,7 @@ No matter which collector you use, you need to hit the Metrics API once per minu
   scheme: https
   basic_auth:
     username: service_role
-    password: '<service-role key or JWT>'
+    password: '<secret API key (sb_secret_...)>'
   static_configs:
     - targets:
         - '<project-ref>.supabase.co:443'
@@ -41,9 +41,9 @@ No matter which collector you use, you need to hit the Metrics API once per minu
 
 ## 2. Secure the credentials
 
-- Store the service role key in your secret manager (AWS Secrets Manager, GCP Secret Manager, Vault, etc.).
-- Rotate the key periodically via [Project Settings → API keys](/dashboard/project/_/settings/api-keys) and update your collector.
-- If you need to give observability vendors access without exposing the service role key broadly, create a dedicated service key for metrics-only automation.
+- Store the Secret API key in your secret manager (AWS Secrets Manager, GCP Secret Manager, Vault, etc.).
+- Rotate the key periodically via [Project Settings → API Keys](/dashboard/project/_/settings/api-keys) and update your collector.
+- If you need to give observability vendors access without exposing a broadly-scoped key, create a dedicated Secret API key for metrics-only automation.
 
 ## 3. Downstream dashboards
 

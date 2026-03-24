@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.72.7
+  version: 2.78.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -147,6 +147,7 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
+        required: true
         default_value: ''
       - id: experimental
         name: --experimental
@@ -174,6 +175,7 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
+        required: true
         default_value: ''
       - id: experimental
         name: --experimental
@@ -349,35 +351,6 @@ commands:
   - id: supabase-storage-cp
     title: supabase storage cp
     summary: Copy objects from src to dst path
-    description: |
-      Relies on standard uploads to move files between local and remote storage. [Not suitable for moving files over 6MB in size](https://supabase.com/docs/guides/storage/uploads/standard-uploads?queryGroups=language&language=js#uploading).
-    examples:
-      - id: upload-file-to-bucket
-        name: Upload file to bucket
-        code: supabase storage cp -r path/to/file ss:///bucket_name --experimental
-        response: |
-          Uploading: /path/to/file/example.txt => /bucket_name/example.txt
-      - id: Upload-file-to-folder
-        name: Upload file to folder
-        code: supabase storage cp -r path/to/local/file ss:///bucket_name/path/to/folder --experimental
-        response: |
-          Uploading: /path/to/file/example.txt => /bucket_name/path/to/folder/example.txt
-      - id: upload-entire-folder-to-bucket
-        name: Upload folder to bucket
-        code: supabase storage cp -r path/to/local/folder ss:///bucket_name --experimental
-        response: |
-          Uploading: /path/to/folder/example1.txt => /bucket_name/folder/example1.txt
-          Uploading: /path/to/folder/example2.txt => /bucket_name/folder/example2.txt
-          Uploading: /path/to/folder/example3.txt => /bucket_name/folder/example3.txt
-          ...
-      - id: download-entire-bucket
-        name: Download bucket
-        code: supabase storage cp -r ss://bucket_name path/to/local/folder --experimental
-        response: |
-          Downloading: bucket_name/example1.txt => path/to/local/folder/bucket_name/example1.txt
-          Downloading: bucket_name/example2.txt => path/to/local/folder/bucket_name/example2.txt
-          Downloading: bucket_name/example3.txt => path/to/local/folder/bucket_name/example3.txt
-          ...
     tags: []
     links: []
     usage: supabase storage cp <src> <dst> [flags]
@@ -1203,9 +1176,6 @@ commands:
           - id: 8xlarge
             name: 8xlarge
             type: string
-          - id: pico
-            name: pico
-            type: string
           - id: small
             name: small
             type: string
@@ -1640,7 +1610,7 @@ commands:
 
       Creates a new migration file locally.
 
-      A `supabase/migrations` directory will be created if it does not already exist in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
+      A `supabase/migrations` directory will be created if it does not already exists in your current `workdir`. All schema migration files must be created in this directory following the pattern `<timestamp>_<name>.sql`.
 
       Outputs from other commands like `db diff` may be piped to `migration new <name>` via stdin.
     examples:
@@ -2633,10 +2603,10 @@ commands:
     title: supabase functions download
     summary: Download a Function from Supabase
     description: |
-      Download the source code for a Function from the linked Supabase project.
+      Download the source code for a Function from the linked Supabase project. If no function name is provided, downloads all functions.
     tags: []
     links: []
-    usage: supabase functions download <Function name> [flags]
+    usage: supabase functions download [Function name] [flags]
     subcommands: []
     flags:
       - id: project-ref
@@ -2754,10 +2724,6 @@ commands:
     usage: supabase domains reverify
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2772,10 +2738,6 @@ commands:
     usage: supabase domains get
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2788,10 +2750,6 @@ commands:
     usage: supabase domains delete
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2811,11 +2769,8 @@ commands:
       - id: custom-hostname
         name: --custom-hostname <string>
         description: The custom hostname to use for your Supabase project.
+        required: true
         default_value: ''
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2835,10 +2790,6 @@ commands:
     usage: supabase domains activate
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -3172,6 +3123,15 @@ commands:
       Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, storage, and those created by extensions.
 
       The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
+
+      ### Note on Privilege Migration
+
+      When restoring to a new project, tables inherit ALL privileges from default privileges in the target database. To preserve specific privileges from your dump, revoke defaults before restoring:
+
+      ```sql
+      -- Run BEFORE restoring your schema
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon, authenticated;
+      ```
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3747,9 +3707,6 @@ commands:
             type: string
           - id: 8xlarge
             name: 8xlarge
-            type: string
-          - id: pico
-            name: pico
             type: string
           - id: small
             name: small

@@ -38,8 +38,10 @@ import {
   cn,
 } from 'ui'
 
-interface SQLEditorTreeViewItemProps
-  extends Omit<ComponentProps<typeof TreeViewItem>, 'name' | 'xPadding'> {
+interface SQLEditorTreeViewItemProps extends Omit<
+  ComponentProps<typeof TreeViewItem>,
+  'name' | 'xPadding'
+> {
   element: any
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
@@ -251,6 +253,8 @@ export const SQLEditorTreeViewItem = ({
             }}
             {...props}
             name={element.name}
+            nameForTitle={props.nameForTitle}
+            description={element.metadata?.description || undefined}
             xPadding={16}
           />
         </ContextMenuTrigger_Shadcn_>

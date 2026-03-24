@@ -1,5 +1,4 @@
-import { Button } from 'ui'
-import { Input_Shadcn_ } from 'ui'
+import { Button, Input_Shadcn_ } from 'ui'
 
 export default function InputWithButton() {
   return (

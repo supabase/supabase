@@ -11,7 +11,8 @@ import {
   useRef,
   useState,
 } from 'react'
-import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
+import TreeViewPrimitive, { flattenTree, type INodeRendererProps } from 'react-accessible-treeview'
+
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
 
@@ -63,7 +64,11 @@ const TreeViewItem = forwardRef<
     /** The horizontal padding of the item */
     xPadding?: number
     /** name of entity */
-    name: string
+    name: string | ReactNode
+    /** Optional description of entity */
+    description?: string
+    /** String name to use for title attribute when name is a ReactNode */
+    nameForTitle?: string
     /** icon of entity */
     icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
@@ -90,6 +95,8 @@ const TreeViewItem = forwardRef<
       isLoading = false,
       xPadding = 16,
       name = '',
+      description,
+      nameForTitle,
       icon,
       isEditing = false,
       onEditSubmit,
@@ -99,7 +106,8 @@ const TreeViewItem = forwardRef<
     },
     ref
   ) => {
-    const [localValueState, setLocalValueState] = useState(name)
+    const nameString = nameForTitle ?? (typeof name === 'string' ? name : '')
+    const [localValueState, setLocalValueState] = useState(nameString)
     const inputRef = useRef<HTMLInputElement>(null)
     const timeRef = useRef<number>(0)
 
@@ -140,15 +148,15 @@ const TreeViewItem = forwardRef<
           }
         }, 200)
       } else {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isEditing])
+    }, [isEditing, nameString])
 
     useEffect(() => {
       if (!isLoading) {
-        setLocalValueState(name)
+        setLocalValueState(nameString)
       }
-    }, [isLoading])
+    }, [isLoading, nameString])
 
     const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
       const timestamp = Number(new Date())
@@ -178,9 +186,13 @@ const TreeViewItem = forwardRef<
       ...divProps
     } = props as any
 
+    const trimmedDescription = description?.trim()
+    const titleText = trimmedDescription ? `${nameString}\n${trimmedDescription}` : nameString
+
     return (
       <div
         ref={ref}
+        title={titleText}
         {...divProps}
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
@@ -254,9 +266,7 @@ const TreeViewItem = forwardRef<
               />
             )
           )}
-          <span className={cn(isEditing && 'hidden', 'truncate text-sm')} title={name}>
-            {name}
-          </span>
+          <span className={cn(isEditing && 'hidden', 'truncate text-sm')}>{name}</span>
         </div>
 
         {!isEditing && actions}
@@ -275,8 +285,8 @@ const TreeViewItem = forwardRef<
               if (e.key === 'Enter') {
                 inputRef.current?.blur()
               } else if (e.key === 'Escape') {
-                setLocalValueState(name)
-                onEditSubmit?.(name)
+                setLocalValueState(nameString)
+                onEditSubmit?.(nameString)
               } else {
                 e.stopPropagation()
               }
@@ -323,4 +333,11 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { flattenTree, SQL_ICON, TreeView, TreeViewFolderIcon, TreeViewItem }
+export {
+  flattenTree,
+  SQL_ICON,
+  TreeView,
+  TreeViewFolderIcon,
+  TreeViewItem,
+  type INodeRendererProps,
+}

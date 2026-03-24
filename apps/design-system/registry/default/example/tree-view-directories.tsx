@@ -1,4 +1,4 @@
-import { TreeView, TreeViewItem, flattenTree } from 'ui'
+import { flattenTree, TreeView, TreeViewItem } from 'ui'
 
 export default function TreeViewDemo() {
   const data = {

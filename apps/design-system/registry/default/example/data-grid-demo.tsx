@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import DataGrid, { Column, useRowSelection } from 'react-data-grid'
+
 import 'react-data-grid/lib/styles.css'
+
 import { Checkbox_Shadcn_, cn } from 'ui'
 
 type User = {
@@ -31,7 +33,7 @@ export default function DataGridDemo() {
       headerCellClass: 'border-default border-r border-b',
       renderCell: ({ row }) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const [isRowSelected, onRowSelectionChange] = useRowSelection()
+        const { isRowSelected, onRowSelectionChange } = useRowSelection()
 
         return (
           <div className="flex items-center justify-center h-full">
@@ -41,7 +43,6 @@ export default function DataGridDemo() {
                 e.stopPropagation()
                 onRowSelectionChange({
                   row,
-                  type: 'ROW',
                   checked: !isRowSelected,
                   isShiftClick: e.shiftKey,
                 })

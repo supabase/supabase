@@ -1,6 +1,21 @@
 'use client'
 
-import { useState, ReactNode, useMemo } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Database,
+  ExternalLink,
+  HardDrive,
+  KeyRound,
+  Lightbulb,
+  ScrollText,
+  Shield,
+  Users,
+} from 'lucide-react'
+import Link from 'next/link'
+import { ReactNode, useMemo, useState } from 'react'
+
 import { Button } from '@/registry/default/components/ui/button'
 import {
   Dialog,
@@ -14,37 +29,23 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/registry/default/components/ui/drawer'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/registry/default/components/ui/hover-card'
+import { LogoSupabase } from '@/registry/default/platform/platform-kit-nextjs/components/logo-supabase'
 import { AuthManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/auth'
 import { DatabaseManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/database'
-import { StorageManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/storage'
 import { LogsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/logs'
+import { SecretsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets'
+import { StorageManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/storage'
 import { SuggestionsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/suggestions'
 import { UsersManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/users'
-import { SecretsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets'
 import {
   SheetNavigationProvider,
   useSheetNavigation,
 } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Database,
-  ExternalLink,
-  HardDrive,
-  KeyRound,
-  Lightbulb,
-  ScrollText,
-  Shield,
-  Users,
-} from 'lucide-react'
-import {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from '@/registry/default/components/ui/hover-card'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { LogoSupabase } from '@/registry/default/platform/platform-kit-nextjs/components/logo-supabase'
-import Link from 'next/link'
 
 const queryClient = new QueryClient()
 

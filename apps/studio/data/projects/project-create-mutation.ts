@@ -28,6 +28,7 @@ export type ProjectCreateVariables = {
   dataApiUseApiSchema?: boolean
   postgresEngine?: PostgresEngine
   releaseChannel?: ReleaseChannel
+  highAvailability?: boolean
 }
 
 export async function createProject({
@@ -45,6 +46,7 @@ export async function createProject({
   dataApiUseApiSchema,
   postgresEngine,
   releaseChannel,
+  highAvailability,
 }: ProjectCreateVariables) {
   const body: CreateProjectBody = {
     cloud_provider: cloudProvider as CloudProvider,
@@ -63,6 +65,7 @@ export async function createProject({
     data_api_use_api_schema: dataApiUseApiSchema,
     postgres_engine: postgresEngine,
     release_channel: releaseChannel,
+    high_availability: highAvailability,
   }
 
   const { data, error } = await post(`/platform/projects`, {

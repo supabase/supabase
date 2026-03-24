@@ -13,7 +13,7 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useTrack } from 'lib/telemetry/track'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -42,6 +42,7 @@ import {
 import { Message } from './Message'
 import AlertError from '../AlertError'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -65,18 +66,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
-  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('assistant.advance_model')
 
   const selectedModel = useMemo<AssistantModel>(() => {
-    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    // While entitlements are loading, use the stored model without enforcing access
+    if (isLoadingEntitlements) {
+      return snap.model ?? 'gpt-5-mini'
+    }
+
+    const defaultModel: AssistantModel = hasAccessToAdvanceModel ? 'gpt-5' : 'gpt-5-mini'
     const model = snap.model ?? defaultModel
 
-    if (!isPaidPlan && model === 'gpt-5') {
+    if (!hasAccessToAdvanceModel && model === 'gpt-5') {
       return 'gpt-5-mini'
     }
 
     return model
-  }, [isPaidPlan, snap.model])
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -135,7 +142,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     })
   }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     messages: chatMessages,
@@ -224,19 +231,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
           reason,
+          spanId: state.messageSpanIds[messageId],
         })
 
-        sendEvent({
-          action: 'assistant_message_rating_submitted',
-          properties: {
-            rating,
-            category: result.category,
-            ...(reason && { reason }),
-          },
-          groups: {
-            project: project.ref,
-            organization: selectedOrganization.slug,
-          },
+        track('assistant_message_rating_submitted', {
+          rating,
+          category: result.category,
+          ...(reason && { reason }),
+          chatId: state.activeChatId,
         })
       } catch (error) {
         console.error('Failed to rate message:', error)
@@ -247,7 +249,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state]
   )
 
   const isContextExceededError =
@@ -325,21 +327,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
-      sendEvent({
-        action: 'assistant_debug_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_debug_submitted', { chatId: snap.activeChatId })
     } else {
-      sendEvent({
-        action: 'assistant_prompt_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_prompt_submitted', { chatId: snap.activeChatId })
     }
   }
 
