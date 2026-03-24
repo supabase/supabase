@@ -627,6 +627,61 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'row to edit' })).not.toBeVisible()
   })
 
+  test('newly added row is preserved after deleting another row', async ({ page, ref }) => {
+    const tableName = `${tableNamePrefix}_add_then_del`
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName, [
+          { name: 'existing row' },
+        ])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await enableQueueOperations(page)
+    await page.reload()
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Add a new row
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
+    await page.getByTestId(`${columnName}-input`).fill('new row')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(page.getByText('1 pending change')).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'new row' })).toBeVisible()
+
+    // Delete the existing row
+    const cellToDelete = page.getByRole('gridcell', { name: 'existing row' })
+    await cellToDelete.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete row' }).click()
+
+    await expect(page.getByText('2 pending changes')).toBeVisible()
+
+    // The newly added row should still be visible and not replaced
+    await expect(page.getByRole('gridcell', { name: 'new row' })).toBeVisible()
+
+    // Save and verify
+    await page.getByRole('button', { name: /Review/ }).click()
+    const sidePanel = page.getByRole('dialog')
+    await expect(sidePanel.getByText('1 row addition')).toBeVisible()
+    await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
+
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
+    await expect(page.getByText('Changes saved successfully')).toBeVisible()
+
+    await expect(page.getByRole('gridcell', { name: 'new row' })).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'existing row' })).not.toBeVisible()
+  })
+
   test('pending changes persist when switching between tables', async ({ page, ref }) => {
     const tableName1 = `${tableNamePrefix}_persist1`
     const tableName2 = `${tableNamePrefix}_persist2`
