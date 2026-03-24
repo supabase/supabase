@@ -2,9 +2,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableFilter } from 'components/grid/hooks/useTableFilter'
+import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
 import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import {
@@ -225,11 +224,10 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
-  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const { deleteRows } = useTableRowOperations()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const isImpersonatingRole = roleImpersonationState.role !== undefined
@@ -278,22 +276,11 @@ const RowHeader = ({ tableQueriesEnabled = true }: RowHeaderProps) => {
     const rowIdxs = Array.from(snap.selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
 
-    // Queue delete operations directly if queue mode is enabled (and not all rows selected)
-    if (isQueueOperationsEnabled && !snap.allRowsSelected) {
-      queueRowDeletesWithOptimisticUpdate({
-        rows,
-        table: snap.originalTable,
-        queueOperation: tableEditorSnap.queueOperation,
-        projectRef: project?.ref,
-      })
-      snap.resetSelectedRows()
-      return
-    }
-
-    // Fall back to confirmation dialog
-    tableEditorSnap.onDeleteRows(rows, {
+    deleteRows({
+      rows,
+      table: snap.originalTable,
       allRowsSelected: snap.allRowsSelected,
-      numRows: snap.allRowsSelected ? totalRows : rows.length,
+      totalRows,
       callback: () => {
         snap.resetSelectedRows()
       },

@@ -208,7 +208,9 @@ export const ReadReplicaEligibilityWarnings = () => {
           source="read-replicas"
           addon="spendCap"
           className="mt-2"
-        />
+        >
+          Disable spend cap
+        </UpgradePlanButton>
       </Admonition>
     )
   }

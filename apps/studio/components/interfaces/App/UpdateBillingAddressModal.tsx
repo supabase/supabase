@@ -128,6 +128,7 @@ export function UpdateBillingAddressModal() {
     >
       <DialogContent
         size="medium"
+        hideClose
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >

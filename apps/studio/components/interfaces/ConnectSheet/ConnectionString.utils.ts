@@ -18,8 +18,10 @@ export const resolveConnectionString = ({
 }: {
   connectionMethod: ConnectionStringMethod
   useSharedPooler: boolean
-  connectionStringPooler: ConnectionStringPooler
+  connectionStringPooler: ConnectionStringPooler | undefined
 }) => {
+  if (!connectionStringPooler) return ''
+
   if (connectionMethod === 'direct') {
     return connectionStringPooler.direct ?? ''
   }

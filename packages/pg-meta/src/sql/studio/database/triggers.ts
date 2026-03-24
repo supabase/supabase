@@ -1,4 +1,4 @@
-import { ident } from '../../../pg-format'
+import { literal } from '../../../pg-format'
 import { PGTrigger, PGTriggerCreate } from '../../../pg-meta-triggers'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
@@ -32,7 +32,7 @@ BEGIN;
 DROP TRIGGER "${originalTrigger.name}" ON "${originalTrigger.schema}"."${originalTrigger.table}";
 CREATE TRIGGER "${name}" ${activation} ${events.join(' OR ')} ON "${schema}"."${table}" 
   FOR EACH ROW EXECUTE FUNCTION 
-  "${function_schema}"."${function_name}"(${function_args?.map(ident).join(',') ?? ''});
+  "${function_schema}"."${function_name}"(${function_args?.map(literal).join(',') ?? ''});
 COMMIT;
 `.trim()
 }
