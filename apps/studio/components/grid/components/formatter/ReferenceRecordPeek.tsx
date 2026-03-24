@@ -15,6 +15,7 @@ import { Copy, Key } from 'lucide-react'
 import { useCallback, useMemo, useRef } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
+import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import { Button, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -163,12 +164,15 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           ),
         }}
       />
-      <Menu id={REFERENCE_PEEK_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
-        <Item onClick={onCopyCellContent}>
-          <Copy size={12} />
-          <span className="ml-2 text-xs">Copy cell</span>
-        </Item>
-      </Menu>
+      {createPortal(
+        <Menu id={REFERENCE_PEEK_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
+          <Item onClick={onCopyCellContent}>
+            <Copy size={12} />
+            <span className="ml-2 text-xs">Copy cell</span>
+          </Item>
+        </Menu>,
+        document.body
+      )}
       <div className="flex items-center justify-end px-2 py-1">
         <EditorTablePageLink
           href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
