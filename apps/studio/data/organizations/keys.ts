@@ -1,5 +1,5 @@
 export const organizationKeys = {
-  list: (userId: string | undefined) => ['organizations', userId] as const,
+  list: (userId: string | undefined) => ['organizations', 'list', userId] as const,
   detail: (slug?: string) => ['organizations', slug] as const,
   members: (slug?: string) => ['organizations', slug, 'members'] as const,
   mfa: (slug?: string) => ['organizations', slug, 'mfa'] as const,

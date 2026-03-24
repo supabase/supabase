@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { useUser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 export type OrganizationAcceptInvitationVariables = {
