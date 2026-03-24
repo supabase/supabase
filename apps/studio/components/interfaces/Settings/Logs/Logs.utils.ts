@@ -302,12 +302,12 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): string =>
 }
 
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
-const calcChartStart = (params: Partial): [Dayjs, string] => {
+const calcChartStart = (params: Partial<LogsEndpointParams>): [Dayjs, 'minute' | 'hour' | 'day'] => {
   const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
   // todo @TzeYiing needs typing
   const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
 
-  let trunc = 'minute'
+  let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
@@ -318,8 +318,6 @@ const calcChartStart = (params: Partial): [Dayjs, string] => {
     trunc = 'day'
     extendValue = 7
   }
-  //
-  // @ts-ignore
   return [its.add(-extendValue, trunc), trunc]
 }
 
@@ -774,7 +772,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
     .join('\n\n---\n\n')
 }
 
-const QUERY_TYPE_LABELS: Record = {
+const QUERY_TYPE_LABELS: Record<string, string> = {
   api: 'API Gateway (Edge Network)',
   database: 'Postgres Database',
   functions: 'Edge Functions',
@@ -790,7 +788,7 @@ const QUERY_TYPE_LABELS: Record = {
   etl: 'ETL',
 }
 
-const LOG_TABLE_TO_SERVICE_LABEL: Record = {
+const LOG_TABLE_TO_SERVICE_LABEL: Record<string, string> = {
   edge_logs: 'API Gateway (Edge Network)',
   postgres_logs: 'Postgres Database',
   function_logs: 'Edge Functions',

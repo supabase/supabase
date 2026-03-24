@@ -6,7 +6,7 @@ import type { ChartIntervals } from 'types'
 import type { ChartConfig } from 'ui'
 
 export type EdgeFunctionChartDatum = {
-  timestamp: string | number
+  timestamp: string
   success_count?: string | number
   redirect_count?: string | number
   client_err_count?: string | number

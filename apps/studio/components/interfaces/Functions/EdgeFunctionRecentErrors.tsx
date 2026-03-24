@@ -68,6 +68,16 @@ type RecentErrorGroup = {
 
 const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
+const toAlertError = (error: unknown): { message: string } | undefined => {
+  if (typeof error === 'string') return { message: error }
+
+  if (error && typeof error === 'object') {
+    const message = (error as { message?: unknown }).message
+    if (typeof message === 'string') return { message }
+  }
+
+  return undefined
+}
 
 interface EdgeFunctionRecentErrorsProps {
   functionId?: string
@@ -219,6 +229,8 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
     },
     Boolean(projectRef && functionRuntimeLogsSql)
   )
+  const queryError =
+    toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
   const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
     const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<
@@ -345,7 +357,7 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
 
             {recentErrorInvocationsError || functionRuntimeLogsError ? (
               <AlertError
-                error={recentErrorInvocationsError ?? functionRuntimeLogsError}
+                error={queryError}
                 subject="Failed to retrieve recent edge function errors"
               />
             ) : isLoadingRecentErrorInvocations || isLoadingFunctionRuntimeLogs ? (

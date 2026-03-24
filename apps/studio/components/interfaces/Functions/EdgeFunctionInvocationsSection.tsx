@@ -55,6 +55,17 @@ interface EdgeFunctionInvocationsSectionProps {
   updateAnnotation?: InvocationUpdateAnnotation
 }
 
+const toAlertError = (error: unknown): { message: string } | undefined => {
+  if (typeof error === 'string') return { message: error }
+
+  if (error && typeof error === 'object') {
+    const message = (error as { message?: unknown }).message
+    if (typeof message === 'string') return { message }
+  }
+
+  return undefined
+}
+
 export const EdgeFunctionInvocationsSection = ({
   interval,
   onIntervalChange,
@@ -73,8 +84,9 @@ export const EdgeFunctionInvocationsSection = ({
   onChartClick,
   updateAnnotation,
 }: EdgeFunctionInvocationsSectionProps) => {
+  const dateTimeFormat = selectedInterval.format ?? 'MMM D, h:mma'
   const emptyStateCopy = getChartEmptyStateCopy('invocations', isErrorChart, chartErrorMessage)
-  const timeRangeLabels = getChartTimeRangeLabels(chartData, selectedInterval.format)
+  const timeRangeLabels = getChartTimeRangeLabels(chartData, dateTimeFormat)
 
   return (
     <PageSection className="bg-surface-100/50 border-b pb-10 pt-8">
@@ -130,7 +142,7 @@ export const EdgeFunctionInvocationsSection = ({
               {isLoadingFunction && <GenericSkeletonLoader />}
               {isErrorFunction && (
                 <AlertError
-                  error={functionError}
+                  error={toAlertError(functionError)}
                   subject="Failed to retrieve edge function details"
                   layout="vertical"
                 />
@@ -175,7 +187,7 @@ export const EdgeFunctionInvocationsSection = ({
                                 labelFormatter={(value) =>
                                   formatChartTimestamp(
                                     value as string | number | undefined,
-                                    selectedInterval.format
+                                    dateTimeFormat
                                   )
                                 }
                                 indicator="dot"
@@ -214,7 +226,7 @@ export const EdgeFunctionInvocationsSection = ({
                         <span
                           className="pointer-events-none absolute bottom-0 z-10 flex h-6 w-6 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-foreground/20 bg-background text-foreground shadow-sm"
                           style={{ left: `${updateAnnotation.position}%` }}
-                          title={`Updated ${updateAnnotation.updatedAt.format(selectedInterval.format)}`}
+                          title={`Updated ${updateAnnotation.updatedAt.format(dateTimeFormat)}`}
                         >
                           <Rocket size={12} strokeWidth={1.75} />
                         </span>

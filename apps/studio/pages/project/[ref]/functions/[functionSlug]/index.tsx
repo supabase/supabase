@@ -77,6 +77,7 @@ const PageLayout: NextPageWithLayout = () => {
     () => getRollingTimeRange(selectedInterval),
     [selectedInterval]
   )
+  const dateTimeFormat = selectedInterval.format ?? 'MMM D, h:mma'
 
   const {
     data: combinedStatsChartData,
@@ -108,7 +109,14 @@ const PageLayout: NextPageWithLayout = () => {
     endDate: endDate.toISOString(),
   })
 
-  const chartData = combinedStatsChartData as EdgeFunctionChartDatum[]
+  const chartData = useMemo(
+    () =>
+      combinedStatsChartData.map((datum) => ({
+        ...datum,
+        timestamp: String(datum.timestamp),
+      })) as EdgeFunctionChartDatum[],
+    [combinedStatsChartData]
+  )
   const invocationChartData = useMemo(() => getInvocationChartData(chartData), [chartData])
   const { totalInvocationCount, totalWarningCount, totalErrorCount } = useMemo(
     () => getInvocationTotals(invocationChartData),
@@ -129,7 +137,10 @@ const PageLayout: NextPageWithLayout = () => {
   const invocationUpdateAnnotation = useMemo(
     () =>
       getInvocationUpdateAnnotation({
-        updatedAt: selectedFunction?.updated_at,
+        updatedAt:
+          selectedFunction?.updated_at === undefined
+            ? undefined
+            : String(selectedFunction.updated_at),
         invocationChartData,
         windowStart: selectedWindowStart,
         windowEnd: selectedWindowEnd,
@@ -206,7 +217,7 @@ const PageLayout: NextPageWithLayout = () => {
 
       <EdgeFunctionPerformanceSection
         data={chartData}
-        dateTimeFormat={selectedInterval.format}
+        dateTimeFormat={dateTimeFormat}
         isLoading={combinedStatsResults.isLoading}
         isError={isErrorCombinedStats}
         errorMessage={combinedStatsError?.message ?? 'Unknown error'}
@@ -216,7 +227,7 @@ const PageLayout: NextPageWithLayout = () => {
 
       <EdgeFunctionUsageSection
         data={chartData}
-        dateTimeFormat={selectedInterval.format}
+        dateTimeFormat={dateTimeFormat}
         isLoading={combinedStatsResults.isLoading}
         isError={isErrorCombinedStats}
         errorMessage={combinedStatsError?.message ?? 'Unknown error'}
