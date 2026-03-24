@@ -34,10 +34,8 @@ const PROVIDER_EMAIL = {
     },
     PASSWORD_HIBP_ENABLED: {
       title: 'Prevent use of leaked passwords',
-      description:
-        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      description: `Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API. [Learn more](${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection)`,
       type: 'boolean',
-      link: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
       entitlementKey: 'auth.password_hibp',
     },
     PASSWORD_MIN_LENGTH: {
