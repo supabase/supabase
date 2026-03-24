@@ -1,7 +1,6 @@
 import { Upload } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-
 import {
   Button,
   FormControl_Shadcn_,
@@ -15,6 +14,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSOMetadata = ({
@@ -110,7 +110,6 @@ export const SSOMetadata = ({
                     />
                     <Button
                       type="default"
-                      size="small"
                       icon={<Upload className="w-4 h-4" />}
                       onClick={() => fileInputRef.current?.click()}
                     >
