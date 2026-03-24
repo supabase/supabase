@@ -1,6 +1,5 @@
 import { Plus, Trash } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
-
 import {
   Button,
   FormControl_Shadcn_,
@@ -10,6 +9,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
@@ -25,7 +25,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
         layout="flex-row-reverse"
         description="Provide one or more domains"
       >
-        <div className="grid gap-2 w-96">
+        <div className="grid gap-3 w-96">
           {fields.map((field, idx) => (
             <div key={field.id} className="flex gap-2 items-top">
               <FormField_Shadcn_
@@ -51,7 +51,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
           ))}
           <div>
             <Button
-              type="text"
+              type="default"
               icon={<Plus className="w-4 h-4" />}
               size="tiny"
               onClick={() => append({ value: '' })}

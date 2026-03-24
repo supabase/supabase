@@ -1,6 +1,5 @@
 import { Plus, Trash } from 'lucide-react'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
-
+import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import {
   Button,
   FormControl_Shadcn_,
@@ -10,6 +9,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import type { SSOConfigFormSchema } from './SSOConfig'
 
 type ProviderAttribute = 'emailMapping' | 'userNameMapping' | 'firstNameMapping' | 'lastNameMapping'
@@ -131,7 +131,7 @@ export const AttributeMapping = ({
       }
       className="gap-1"
     >
-      <div className="grid w-full max-w-sm min-w-0 gap-2 justify-start">
+      <div className="grid w-full max-w-sm min-w-0 gap-3">
         <MappingFieldArray form={form} fieldName={emailField} label="email" required />
         <MappingFieldArray
           form={form}
@@ -178,7 +178,7 @@ const MappingFieldArray = ({
     <div className="w-full min-w-0 space-y-1">
       <div className="flex items-center justify-between gap-2">
         <span className="text-foreground-light">{label}</span>
-        {required ? <></> : <span className="text-foreground-muted">Optional</span>}
+        {!required ? <span className="text-foreground-muted">Optional</span> : null}
       </div>
       <div className="grid w-full min-w-0 gap-2">
         {fields.map((field, idx) => (
@@ -210,7 +210,7 @@ const MappingFieldArray = ({
         ))}
 
         <Button
-          type="text"
+          type="default"
           icon={<Plus className="w-4 h-4" />}
           onClick={() => append({ value: '' })}
           className="w-auto self-start justify-self-start"
