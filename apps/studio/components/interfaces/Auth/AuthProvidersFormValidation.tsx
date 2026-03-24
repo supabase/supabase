@@ -17,7 +17,7 @@ const PROVIDER_EMAIL = {
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
       title: 'Enable Email provider',
-      description: 'This will enable Email based signup and login for your application',
+      description: 'Allow email-based sign up and log in for your application.',
       type: 'boolean',
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
@@ -44,7 +44,7 @@ const PROVIDER_EMAIL = {
       title: 'Minimum password length',
       type: 'number',
       description:
-        'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+        'Passwords shorter than this value will be rejected as weak. Minimum 6 characters, though 8 or more is recommended.',
       units: 'characters',
     },
     PASSWORD_REQUIRED_CHARACTERS: {
@@ -75,13 +75,13 @@ const PROVIDER_EMAIL = {
     MAILER_OTP_EXP: {
       title: 'Email OTP Expiration',
       type: 'number',
-      description: 'Duration before an email otp / link expires.',
+      description: 'Duration before an email OTP / link expires.',
       units: 'seconds',
     },
     MAILER_OTP_LENGTH: {
       title: 'Email OTP Length',
       type: 'number',
-      description: 'Number of digits in the email OTP',
+      description: 'Number of digits in the email OTP.',
       units: 'number',
     },
   },
