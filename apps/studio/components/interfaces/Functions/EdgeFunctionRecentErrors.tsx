@@ -1,4 +1,3 @@
-import AlertError from 'components/ui/AlertError'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
   genDefaultQuery,
@@ -7,6 +6,7 @@ import {
 } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
+import AlertError from 'components/ui/AlertError'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
@@ -19,13 +19,13 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -116,33 +116,18 @@ export const EdgeFunctionRecentErrors = ({
     logData: recentErrorInvocations,
     isLoading: isLoadingRecentErrorInvocations,
     error: recentErrorInvocationsError,
-  } =
-    useLogsQuery(
-      projectRef as string,
-      {
-        sql: recentErrorInvocationsSql,
-        iso_timestamp_start: isoTimestampStart,
-        iso_timestamp_end: isoTimestampEnd,
-      },
-      isQueryEnabled
-    )
+  } = useLogsQuery(
+    projectRef as string,
+    {
+      sql: recentErrorInvocationsSql,
+      iso_timestamp_start: isoTimestampStart,
+      iso_timestamp_end: isoTimestampEnd,
+    },
+    isQueryEnabled
+  )
 
-  const recentErrorGroupsBase = useMemo<Omit<RecentErrorGroup, 'logs'>[]>(() => {
-    const grouped = recentErrorInvocations.reduce<
-      Record<
-        string,
-        {
-          message: string
-          count: number
-          lastSeen: number
-          lastExecutionId?: string
-          lastStatusCode?: string
-          lastMethod?: string
-          executionTime?: string
-          executionIds: string[]
-        }
-      >
-    >((acc, item) => {
+  const recentErrorGroupsBase = useMemo<Omit[]>(() => {
+    const grouped = recentErrorInvocations.reduce<Record>((acc, item) => {
       const statusCode = String(item.status_code ?? '')
       const method = String(item.method ?? '')
       const message =
@@ -233,9 +218,7 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
   const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
-    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<
-      Record<string, typeof functionRuntimeLogs>
-    >((acc, log) => {
+    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record>((acc, log) => {
       const executionId = String(log.execution_id ?? '')
       if (!executionId) return acc
 
@@ -348,7 +331,9 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
                   type="default"
                   size="tiny"
                   icon={<ExternalLink size={14} />}
-                  onClick={() => router.push(`/project/${projectRef}/functions/${functionSlug}/logs`)}
+                  onClick={() =>
+                    router.push(`/project/${projectRef}/functions/${functionSlug}/logs`)
+                  }
                 >
                   View logs
                 </Button>
@@ -392,9 +377,7 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
                               {formatSingleLineMessage(group.message)}
                             </span>
                           </TableCell>
-                          <TableCell className="text-foreground-light">
-                            {group.count}
-                          </TableCell>
+                          <TableCell className="text-foreground-light">{group.count}</TableCell>
                           <TableCell className="text-foreground-light">
                             {formatLogTimestamp(group.lastSeen, 'relative')}
                           </TableCell>
@@ -433,7 +416,9 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
                           <TableCell colSpan={7} className="p-0">
                             <div className="max-h-64 overflow-auto bg-surface-75 py-3 text-foreground-light">
                               {group.logs.length === 0 ? (
-                                <div className="px-4">No related runtime logs found for this error group.</div>
+                                <div className="px-4">
+                                  No related runtime logs found for this error group.
+                                </div>
                               ) : (
                                 group.logs.map((log) => (
                                   <div
