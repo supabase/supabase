@@ -88,7 +88,7 @@ export function defaultAssistantModelId(hasAccessToAdvanceModel: boolean): Assis
 }
 
 export function isKnownAssistantModelId(id: string): id is AssistantModelId {
-  return id in ASSISTANT_MODELS_MAP
+  return Object.hasOwn(ASSISTANT_MODELS_MAP, id)
 }
 
 export function isAssistantBaseModelId(id: string): id is AssistantBaseModelId {

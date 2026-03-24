@@ -23,6 +23,7 @@ import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
   isAssistantBaseModelId,
+  isKnownAssistantModelId,
 } from 'lib/ai/model.utils'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
@@ -84,6 +85,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
     const model = snap.model ?? defaultModel
 
+    if (!isKnownAssistantModelId(model)) return defaultModel
     if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
       return DEFAULT_ASSISTANT_BASE_MODEL_ID
     }
