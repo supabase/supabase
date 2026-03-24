@@ -12,6 +12,37 @@ export interface Region {
   coordinates: [number, number]
 }
 
+export type NodeData = {
+  id: string
+  provider: string
+  region: Region
+  computeSize?: string
+  status: string
+  inserted_at: string
+}
+
+export type PrimaryNodeData = NodeData & {
+  numReplicas: number
+  numRegions: number
+  hasLoadBalancer: boolean
+}
+
+export type LoadBalancerData = NodeData & {
+  numDatabases: number
+}
+
+export type ReplicaNodeData = NodeData & {
+  onSelectRestartReplica: () => void
+  onSelectResizeReplica: () => void
+  onSelectDropReplica: () => void
+}
+
+export type EdgeData = {
+  status: string
+  identifier: string
+  connectionString: string | null | undefined
+}
+
 // ReactFlow is scaling everything by the factor of 2
 export const NODE_WIDTH = 660
 export const NODE_ROW_HEIGHT = 50
