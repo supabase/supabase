@@ -1,7 +1,6 @@
+import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-
-import { BASE_PATH } from 'lib/constants'
 import { cn } from 'ui'
 
 interface ConnectionIconProps {
@@ -37,12 +36,6 @@ export const ConnectionIcon = ({
       }${imageExtension}.svg`
 
   return (
-    <Image
-      className={className}
-      src={iconImgSrc}
-      alt={`${icon} logo`}
-      width={size}
-      height={size}
-    />
+    <Image className={className} src={iconImgSrc} alt={`${icon} logo`} width={size} height={size} />
   )
 }

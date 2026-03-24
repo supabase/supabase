@@ -83,14 +83,14 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
                 key={action.id}
                 type="button"
                 disabled={
-                  action.requiresActiveProject ?? true ? !isActiveHealthy : !selectedProject?.ref
+                  (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
                 }
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
                   'hover:bg-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
-                  (action.requiresActiveProject ?? true
+                  ((action.requiresActiveProject ?? true)
                     ? !isActiveHealthy
                     : !selectedProject?.ref) && 'cursor-not-allowed opacity-50'
                 )}
