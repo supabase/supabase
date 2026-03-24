@@ -7,8 +7,11 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import { BASE_PATH } from 'lib/constants'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -35,8 +38,6 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -49,6 +50,7 @@ const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
   const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
 
   const [open, setOpen] = useState(false)
@@ -225,6 +227,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   <FormField
                     key={x}
                     projectRef={projectRef}
+                    organizationSlug={organization?.slug}
                     name={x}
                     properties={provider.properties[x]}
                     control={form.control}

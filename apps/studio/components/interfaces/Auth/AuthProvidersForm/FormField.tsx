@@ -33,6 +33,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface FormFieldProps {
   projectRef: string | undefined
+  organizationSlug: string | undefined
   name: string
   properties: any
   control: Control
@@ -44,11 +45,11 @@ const FormField = ({
   projectRef,
   name,
   properties,
+  organizationSlug,
   control,
   hasAccess,
   disabled: disabledProp,
 }: FormFieldProps) => {
-  const { data: organization } = useSelectedOrganizationQuery()
   const { description: originalDescription } = properties
   let description = originalDescription
 
@@ -61,7 +62,9 @@ const FormField = ({
 
   const fieldValue = useWatch_Shadcn_({ control, name })
   if (!hasAccess) {
-    const planMessage = `Only available on [Pro plan](/org/${organization?.slug}/billing?panel=subscriptionPlan) and above.`
+    const planMessage = organizationSlug
+      ? `Only available on [Pro plan](/org/${organizationSlug}/billing?panel=subscriptionPlan) and above.`
+      : ''
     description = originalDescription ? `${originalDescription} ${planMessage}` : planMessage
   }
   const disabled =
