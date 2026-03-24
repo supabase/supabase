@@ -1,5 +1,7 @@
+import { getMigrationsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { UseCustomQueryOptions } from 'types'
+
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
@@ -7,17 +9,6 @@ export type DatabaseMigration = {
   version: string
   name?: string
   statements?: string[]
-}
-
-export const getMigrationsSql = () => {
-  const sql = /* SQL */ `
-    select
-      *
-    from supabase_migrations.schema_migrations sm
-    order by sm.version desc
-  `.trim()
-
-  return sql
 }
 
 export type MigrationsVariables = {

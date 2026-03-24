@@ -1,7 +1,7 @@
 import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createSupabaseApiPlatform } from '@supabase/mcp-server-supabase/platform/api'
 import { StreamTransport } from '@supabase/mcp-utils'
-import { experimental_createMCPClient as createMCPClient } from 'ai'
+import { createMCPClient } from '@ai-sdk/mcp'
 
 import { API_URL } from 'lib/constants'
 

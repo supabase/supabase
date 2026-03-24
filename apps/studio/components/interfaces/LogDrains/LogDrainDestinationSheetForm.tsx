@@ -39,7 +39,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { z } from 'zod'
 
-import { urlRegex } from '../Auth/Auth.constants'
 import {
   DATADOG_REGIONS,
   LAST9_REGIONS,
@@ -51,19 +50,18 @@ import {
   getHeadersSectionDescription as getHeadersDescription,
   validateNewHeader,
 } from './LogDrains.utils'
+import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const FORM_ID = 'log-drain-destination-form'
 
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z
-      .string()
-      .regex(urlRegex(), 'Endpoint URL is required and must be a valid URL')
-      .refine(
-        (url) => url.startsWith('http://') || url.startsWith('https://'),
-        'Endpoint URL must start with http:// or https://'
-      ),
+    url: httpEndpointUrlSchema({
+      requiredMessage: 'Endpoint URL is required',
+      invalidMessage: 'Endpoint URL must be a valid URL',
+      prefixMessage: 'Endpoint URL must start with http:// or https://',
+    }),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -75,13 +73,11 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('loki'),
-    url: z
-      .string()
-      .min(1, { message: 'Loki URL is required' })
-      .refine(
-        (url) => url.startsWith('http://') || url.startsWith('https://'),
-        'Loki URL must start with http:// or https://'
-      ),
+    url: httpEndpointUrlSchema({
+      requiredMessage: 'Loki URL is required',
+      invalidMessage: 'Loki URL must be a valid URL',
+      prefixMessage: 'Loki URL must start with http:// or https://',
+    }),
     headers: z.record(z.string(), z.string()),
     username: z.string().optional(),
     password: z.string().optional(),
@@ -130,13 +126,11 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('otlp'),
-    endpoint: z
-      .string()
-      .min(1, { message: 'OTLP endpoint is required' })
-      .refine(
-        (url) => url.startsWith('http://') || url.startsWith('https://'),
-        'OTLP endpoint must start with http:// or https://'
-      ),
+    endpoint: httpEndpointUrlSchema({
+      requiredMessage: 'OTLP endpoint is required',
+      invalidMessage: 'OTLP endpoint must be a valid URL',
+      prefixMessage: 'OTLP endpoint must start with http:// or https://',
+    }),
     protocol: z.string().optional().default('http/protobuf'),
     gzip: z.boolean().optional().default(true),
     headers: z.record(z.string(), z.string()).optional(),

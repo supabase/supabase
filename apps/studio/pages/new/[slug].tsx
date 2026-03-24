@@ -49,6 +49,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
 import { buildStudioPageTitle } from 'lib/page-title'
 import { useProfile } from 'lib/profile'
@@ -96,6 +97,10 @@ const Wizard: NextPageWithLayout = () => {
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
+  // Read the raw flag for telemetry — useDataApiGrantTogglesEnabled coerces undefined→false,
+  // which would record false for users whose flags haven't loaded yet. The raw value preserves
+  // undefined (omitted from PostHog) so we only record true/false when the flag is resolved.
+  const tableEditorApiAccessToggleFlag = usePHFlag<boolean>('tableEditorApiAccessToggle')
 
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -259,6 +264,9 @@ const Wizard: NextPageWithLayout = () => {
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
           useOrioleDb: form.getValues('useOrioleDb'),
+          ...(tableEditorApiAccessToggleFlag !== undefined && {
+            tableEditorApiAccessToggleEnabled: tableEditorApiAccessToggleFlag,
+          }),
         },
         {
           project: res.ref,
@@ -331,7 +339,9 @@ const Wizard: NextPageWithLayout = () => {
       dbSql:
         [
           enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
-          isDataApiGrantTogglesEnabled && buildDefaultPrivilegesSql('revoke'),
+          // [Alaister]: temporarily disable the default secure sql
+          // To re-enable, remove the false &&
+          false && isDataApiGrantTogglesEnabled && buildDefaultPrivilegesSql('revoke'),
         ]
           .filter(Boolean)
           .join('\n') || undefined,

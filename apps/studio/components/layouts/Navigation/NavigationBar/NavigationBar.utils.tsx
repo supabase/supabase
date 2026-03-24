@@ -1,5 +1,4 @@
 import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
-import { useGenerateSettingsMenu } from 'components/layouts/ProjectSettingsLayout/SettingsMenu.utils'
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
@@ -7,10 +6,43 @@ import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEdito
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
-export const generateToolRoutes = (ref?: string, project?: Project, features?: {}): Route[] => {
-  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
+interface RouteContext {
+  ref?: string
+  isProjectActive: boolean
+  isProjectBuilding: boolean
+  buildingUrl: string
+}
+
+interface ProductFeatures {
+  auth?: boolean
+  edgeFunctions?: boolean
+  storage?: boolean
+  realtime?: boolean
+  authOverviewPage?: boolean
+}
+
+interface OtherFeatures {
+  isPlatform?: boolean
+  unifiedLogs?: boolean
+  showReports?: boolean
+  apiDocsSidePanel?: boolean
+}
+
+interface SettingsFeatures {
+  isPlatform?: boolean
+}
+
+function getRouteContext(ref?: string, project?: Project): RouteContext {
+  return {
+    ref,
+    isProjectActive: project?.status === PROJECT_STATUS.ACTIVE_HEALTHY,
+    isProjectBuilding: project?.status === PROJECT_STATUS.COMING_UP,
+    buildingUrl: `/project/${ref}`,
+  }
+}
+
+export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+  const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
   return [
     {
@@ -34,17 +66,9 @@ export const generateToolRoutes = (ref?: string, project?: Project, features?: {
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
-  features?: {
-    auth?: boolean
-    edgeFunctions?: boolean
-    storage?: boolean
-    realtime?: boolean
-    authOverviewPage?: boolean
-  }
+  features?: ProductFeatures
 ): Route[] => {
-  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
+  const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
@@ -122,16 +146,14 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (
   ref?: string,
   project?: Project,
-  features?: { unifiedLogs?: boolean; showReports?: boolean; apiDocsSidePanel?: boolean }
+  features?: OtherFeatures
 ): Route[] => {
-  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-  const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
-  const buildingUrl = `/project/${ref}`
+  const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
-  const { unifiedLogs, showReports, apiDocsSidePanel } = features ?? {}
-  const unifiedLogsEnabled = unifiedLogs ?? false
-  const reportsEnabled = showReports ?? true
-  const apiDocsSidePanelEnabled = apiDocsSidePanel ?? false
+  const isPlatform = features?.isPlatform ?? IS_PLATFORM
+  const unifiedLogsEnabled = features?.unifiedLogs ?? false
+  const reportsEnabled = features?.showReports ?? true
+  const apiDocsSidePanelEnabled = features?.apiDocsSidePanel ?? false
 
   return [
     {
@@ -142,18 +164,16 @@ export const generateOtherRoutes = (
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
     },
     // Observability is only available on the platform, not for self-hosted/CLI
-    ...(IS_PLATFORM
-      ? reportsEnabled
-        ? [
-            {
-              key: 'observability',
-              label: 'Observability',
-              disabled: !isProjectActive,
-              icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
-            },
-          ]
-        : []
+    ...(isPlatform && reportsEnabled
+      ? [
+          {
+            key: 'observability',
+            label: 'Observability',
+            disabled: !isProjectActive,
+            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
+          },
+        ]
       : []),
     {
       key: 'logs',
@@ -185,7 +205,9 @@ export const generateOtherRoutes = (
   ]
 }
 
-export const generateSettingsRoutes = (ref?: string): Route[] => {
+export const generateSettingsRoutes = (ref?: string, features?: SettingsFeatures): Route[] => {
+  const isPlatform = features?.isPlatform ?? IS_PLATFORM
+
   return [
     {
       key: 'settings',
@@ -193,7 +215,7 @@ export const generateSettingsRoutes = (ref?: string): Route[] => {
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link:
         ref &&
-        (IS_PLATFORM ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
+        (isPlatform ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
       disabled: false,
     },
   ]

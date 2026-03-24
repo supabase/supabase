@@ -1,6 +1,7 @@
 import { Badge } from 'ui'
 import {
   PageSection,
+  PageSectionAside,
   PageSectionContent,
   PageSectionDescription,
   PageSectionMeta,
@@ -8,6 +9,8 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { DocsButton } from 'components/ui/DocsButton'
+import { DOCS_URL } from 'lib/constants'
 import { CustomAuthProvidersList } from './CustomAuthProvidersList'
 
 export const CustomAuthProviders = () => {
@@ -23,6 +26,9 @@ export const CustomAuthProviders = () => {
             Configure OAuth/OIDC providers for this project using your own issuer or endpoints.
           </PageSectionDescription>
         </PageSectionSummary>
+        <PageSectionAside>
+          <DocsButton href={`${DOCS_URL}/guides/auth/custom-oauth-providers`} />
+        </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
         <CustomAuthProvidersList />

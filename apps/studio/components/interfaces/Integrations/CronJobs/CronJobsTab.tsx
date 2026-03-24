@@ -3,15 +3,16 @@ import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useInfiniteScroll } from 'hooks/misc/useInfiniteScroll'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
+import { cleanPointerEventsNoneOnBody } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { isGreaterThanOrEqual } from 'lib/semver'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { MouseEvent, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine } from 'ui'
 
@@ -92,24 +93,12 @@ export const CronjobsTab = () => {
     [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion]
   )
 
-  const xScroll = useRef<number>(0)
-
-  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
-    xScroll.current = event.currentTarget.scrollLeft
-
-    if (
-      grid.isLoading ||
-      grid.isFetchingNextPage ||
-      isScrollingHorizontally ||
-      !isAtBottom(event) ||
-      !grid.hasNextPage
-    ) {
-      return
-    }
-
-    grid.fetchNextPage()
-  }
+  const handleScroll = useInfiniteScroll({
+    isLoading: grid.isLoading,
+    isFetchingNextPage: grid.isFetchingNextPage,
+    hasNextPage: grid.hasNextPage,
+    fetchNextPage: grid.fetchNextPage,
+  })
 
   const onOpenCreateJobSheet = () => {
     sendEvent({
