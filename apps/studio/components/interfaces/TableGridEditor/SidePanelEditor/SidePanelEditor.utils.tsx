@@ -981,7 +981,9 @@ export const formatRowsForInsert = ({
       const column = columns?.find((c) => c.name === header)
       const originalValue = row[header]
 
-      if ((column?.format ?? '').includes('json')) {
+      if (originalValue === '' && treatEmptyAsNull && column?.is_nullable) {
+        formattedRow[header] = null
+      } else if ((column?.format ?? '').includes('json')) {
         formattedRow[header] = tryParseJson(originalValue)
       } else if ((column?.data_type ?? '') === 'ARRAY') {
         if (
@@ -995,7 +997,7 @@ export const formatRowsForInsert = ({
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] = treatEmptyAsNull && column?.is_nullable ? null : ''
+        formattedRow[header] = ''
       } else {
         formattedRow[header] = originalValue
       }

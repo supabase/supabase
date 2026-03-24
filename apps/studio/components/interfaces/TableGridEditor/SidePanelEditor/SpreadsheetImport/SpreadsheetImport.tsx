@@ -69,6 +69,7 @@ export const SpreadsheetImport = ({
   const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
   const [treatEmptyAsNull, setTreatEmptyAsNull] = useState(false)
   const treatEmptyAsNullRef = useRef(treatEmptyAsNull)
+  const parseRequestIdRef = useRef(0)
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -85,6 +86,7 @@ export const SpreadsheetImport = ({
   // Process a file into table rows and columns (used for both upload and drop)
   const processFile = useCallback(
     async (file: File) => {
+      const requestId = ++parseRequestIdRef.current
       updateEditorDirty(true)
       setUploadedFile(file)
       setParseProgress(0)
@@ -94,6 +96,8 @@ export const SpreadsheetImport = ({
         onProgressUpdate,
         treatEmptyAsNull
       )
+
+      if (requestId !== parseRequestIdRef.current) return
 
       if (errors.length > 0) {
         toast.error(csvParseErrorMessage)
@@ -129,10 +133,12 @@ export const SpreadsheetImport = ({
 
   const readSpreadsheetText = useCallback(async (text: string) => {
     if (text.length > 0) {
+      const requestId = ++parseRequestIdRef.current
       const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(
         text,
         treatEmptyAsNullRef.current
       )
+      if (requestId !== parseRequestIdRef.current) return
       if (errors.length > 0) {
         toast.error(csvParseErrorMessage)
       }
