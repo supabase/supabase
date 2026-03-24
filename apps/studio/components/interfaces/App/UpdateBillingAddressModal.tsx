@@ -158,7 +158,8 @@ export function UpdateBillingAddressModal() {
                 Tax ID is also required.
                 <br />
                 <br />
-                Please ask an organization administrator or owner to update it.
+                Please ask an organization administrator or owner to update it as soon as possible
+                to avoid service restrictions.
               </>
             )}
           </DialogDescription>
