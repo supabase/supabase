@@ -25,7 +25,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
         layout="flex-row-reverse"
         description="Provide one or more domains"
       >
-        <div className="grid gap-3 w-96">
+        <div className="grid gap-2 w-96">
           {fields.map((field, idx) => (
             <div key={field.id} className="flex gap-2 items-top">
               <FormField_Shadcn_
