@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useUser } from 'common'
+import { toast } from 'sonner'
+
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-
 import { organizationKeys } from './keys'
 
 export type OrganizationUpdateVariables = {
@@ -49,14 +48,13 @@ export const useOrganizationUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const user = useUser()
 
   return useMutation<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>({
     mutationFn: (vars) => updateOrganization(vars),
     async onSuccess(data, variables, context) {
       queryClient.setQueriesData(
         {
-          queryKey: organizationKeys.list(user?.id),
+          queryKey: organizationKeys.list(),
           exact: true,
         },
         (prev: components['schemas']['OrganizationResponse'][] | undefined) => {

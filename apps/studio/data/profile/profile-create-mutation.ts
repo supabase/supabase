@@ -1,12 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
 import { components } from 'api-types'
-import { useUser } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { organizationKeys } from 'data/organizations/keys'
 import { permissionKeys } from 'data/permissions/keys'
-import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-
 import { profileKeys } from './keys'
 
 export type ProfileResponse = components['schemas']['ProfileResponse']
@@ -26,15 +25,14 @@ export const useProfileCreateMutation = ({
   ...options
 }: Omit<UseCustomMutationOptions<ProfileCreateData, ResponseError, void>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
-  const user = useUser()
 
   return useMutation<ProfileCreateData, ResponseError, void>({
     mutationFn: () => createProfile(),
     async onSuccess(data, variables, context) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: profileKeys.profile() }),
-        queryClient.invalidateQueries({ queryKey: organizationKeys.list(user?.id) }),
-        queryClient.invalidateQueries({ queryKey: permissionKeys.list(user?.id) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: permissionKeys.list() }),
       ])
       await onSuccess?.(data, variables, context)
     },

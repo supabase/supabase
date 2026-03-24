@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useUser } from 'common'
+import { toast } from 'sonner'
+
 import { del, handleError } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
-import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-
 import { organizationKeys } from './keys'
 
 export type OrganizationDeleteVariables = {
@@ -30,14 +29,13 @@ export const useOrganizationDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const user = useUser()
 
   return useMutation<OrganizationDeleteData, ResponseError, OrganizationDeleteVariables>({
     mutationFn: (vars) => deleteOrganization(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: organizationKeys.list(user?.id) }),
-        queryClient.invalidateQueries({ queryKey: permissionKeys.list(user?.id) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: permissionKeys.list() }),
       ])
       await onSuccess?.(data, variables, context)
     },

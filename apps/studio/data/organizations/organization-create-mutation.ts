@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useUser } from 'common'
+import { toast } from 'sonner'
+
 import { handleError, post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
-import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
-
 import { organizationKeys } from './keys'
 import { castOrganizationResponseToOrganization } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
@@ -58,7 +57,6 @@ export const useOrganizationCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const user = useUser()
 
   return useMutation<OrganizationCreateData, ResponseError, OrganizationCreateVariables>({
     mutationFn: (vars) => createOrganization(vars),
@@ -69,7 +67,7 @@ export const useOrganizationCreateMutation = ({
         // endpoint will error out with a 500 since the subscription isn't created yet.
         queryClient.setQueriesData(
           {
-            queryKey: organizationKeys.list(user?.id),
+            queryKey: organizationKeys.list(),
             exact: true,
           },
           (prev: any) => {
@@ -78,7 +76,7 @@ export const useOrganizationCreateMutation = ({
           }
         )
 
-        await queryClient.invalidateQueries({ queryKey: permissionKeys.list(user?.id) })
+        await queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
       }
 
       await onSuccess?.(data, variables, context)
@@ -135,7 +133,6 @@ export const useAwsManagedOrganizationCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const user = useUser()
 
   return useMutation<
     AwsManagedOrganizationCreateData,
@@ -150,7 +147,7 @@ export const useAwsManagedOrganizationCreateMutation = ({
         // endpoint will error out with a 500 since the subscription isn't created yet.
         queryClient.setQueriesData(
           {
-            queryKey: organizationKeys.list(user?.id),
+            queryKey: organizationKeys.list(),
             exact: true,
           },
           (prev: any) => {
@@ -159,7 +156,7 @@ export const useAwsManagedOrganizationCreateMutation = ({
           }
         )
 
-        await queryClient.invalidateQueries({ queryKey: permissionKeys.list(user?.id) })
+        await queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
       }
 
       await onSuccess?.(data, variables, context)

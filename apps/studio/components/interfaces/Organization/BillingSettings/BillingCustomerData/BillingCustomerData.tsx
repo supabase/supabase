@@ -1,6 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams, useUser } from 'common'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useParams } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -9,18 +12,15 @@ import {
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
+import { organizationKeys } from 'data/organizations/keys'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
 import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,
@@ -31,7 +31,6 @@ import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 export const BillingCustomerData = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
-  const user = useUser()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
@@ -100,7 +99,7 @@ export const BillingCustomerData = () => {
         // so the TaxIdBanner hides immediately. The server responds 304 Not Modified for a
         // while after the tax ID is saved, so invalidation/refetch won't work here.
         queryClient.setQueriesData<any[]>(
-          { queryKey: organizationKeys.list(user?.id), exact: true },
+          { queryKey: organizationKeys.list(), exact: true },
           (prev) => {
             if (!prev) return prev
             return prev.map((org) =>

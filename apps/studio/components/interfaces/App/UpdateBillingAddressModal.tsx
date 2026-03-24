@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useUser } from 'common'
+import { useFlag } from 'common'
 import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,
@@ -32,7 +32,6 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export function UpdateBillingAddressModal() {
   const queryClient = useQueryClient()
-  const user = useUser()
 
   const [dismissed, setDismissed] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -109,7 +108,7 @@ export function UpdateBillingAddressModal() {
 
         await updateTaxId({ slug, taxId: data.tax_id })
 
-        await invalidateOrganizationsQuery(queryClient, user?.id)
+        await invalidateOrganizationsQuery(queryClient)
 
         toast.success('Successfully updated billing address')
         setDismissed(true)

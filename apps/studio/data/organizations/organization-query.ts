@@ -1,8 +1,8 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
+
 import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
-
 import { organizationKeys } from './keys'
 
 export type OrganizationVariables = { slug?: string }
@@ -50,6 +50,6 @@ export const useOrganizationQuery = <TData = OrganizationsData>(
   })
 }
 
-export function invalidateOrganizationsQuery(client: QueryClient, userId: string | undefined) {
-  return client.invalidateQueries({ queryKey: organizationKeys.list(userId) })
+export function invalidateOrganizationsQuery(client: QueryClient) {
+  return client.invalidateQueries({ queryKey: organizationKeys.list() })
 }
