@@ -1963,6 +1963,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "key-value-field-array-demo": {
+      name: "key-value-field-array-demo",
+      type: "components:example",
+      registryDependencies: ["button","form","input"],
+      component: React.lazy(() => import("@/registry/default/example/key-value-field-array-demo")),
+      source: "",
+      files: ["registry/default/example/key-value-field-array-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "field-choice-card": {
       name: "field-choice-card",
       type: "components:example",
@@ -2674,6 +2685,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/expanding-textarea-demo")),
       source: "",
       files: ["registry/default/example/expanding-textarea-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "error-display-demo": {
+      name: "error-display-demo",
+      type: "components:example",
+      registryDependencies: ["error-display"],
+      component: React.lazy(() => import("@/registry/default/example/error-display-demo")),
+      source: "",
+      files: ["registry/default/example/error-display-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "error-display-with-children": {
+      name: "error-display-with-children",
+      type: "components:example",
+      registryDependencies: ["error-display"],
+      component: React.lazy(() => import("@/registry/default/example/error-display-with-children")),
+      source: "",
+      files: ["registry/default/example/error-display-with-children.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []
