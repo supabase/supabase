@@ -244,7 +244,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   }
                 >
                   <FormControl_Shadcn_>
-                    <Input copy readOnly value={`${endpoint}/auth/v1/callback`} />
+                    <Input copy readOnly value={endpoint ? `${endpoint}/auth/v1/callback` : ''} />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
