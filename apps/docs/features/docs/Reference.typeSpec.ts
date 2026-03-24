@@ -265,15 +265,35 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
       if (t.name) {
         return [t.name, t.content.map((p) => p.text).join('')]
       }
-      const first = t.content[0]
       // TypeDoc may produce a tag with an empty content array (e.g. a tag with
       // no body text). Guard here so the rest of the parsing can safely assume
       // a non-empty first element.
-      if (!first) return ['', '']
-      const newline = first.text.indexOf('\n')
-      const name = (newline >= 0 ? first.text.slice(0, newline) : first.text).trim()
-      const tail = newline >= 0 ? first.text.slice(newline + 1) : ''
-      const body = [{ ...first, text: tail }, ...t.content.slice(1)].map((p) => p.text).join('')
+      if (!t.content[0]) return ['', '']
+      // The tag name may span multiple content nodes (e.g. "With " + "`select()`"
+      // when the name contains inline code). Scan through nodes until a newline.
+      const nameParts: string[] = []
+      let bodyStartIdx = 0
+      let bodyStartText = ''
+      let foundNewline = false
+      for (let i = 0; i < t.content.length; i++) {
+        const part = t.content[i]
+        const newline = part.text.indexOf('\n')
+        if (newline >= 0) {
+          nameParts.push(part.text.slice(0, newline))
+          bodyStartIdx = i
+          bodyStartText = part.text.slice(newline + 1)
+          foundNewline = true
+          break
+        } else {
+          nameParts.push(part.text)
+        }
+      }
+      const name = nameParts.join('').trim()
+      const body = foundNewline
+        ? [{ text: bodyStartText }, ...t.content.slice(bodyStartIdx + 1)]
+            .map((p) => p.text)
+            .join('')
+        : ''
       return [name, body]
     }
 
@@ -539,9 +559,14 @@ function parseMethod(
   let { params, ret, comment } = parseSignature(signature, map)
 
   // When a method has multiple overload signatures, TypeDoc places the shared
-  // JSDoc on the method node rather than any individual signature.
-  if (!comment && node.comment) {
-    comment = normalizeComment(node.comment)
+  // JSDoc on the method node rather than any individual signature. Always merge
+  // node.comment as the base so that block tags (@remarks, @example, etc.) are
+  // not lost when overload signatures already carry a minimal summary comment.
+  if (node.comment) {
+    const nodeComment = normalizeComment(node.comment)
+    if (nodeComment) {
+      comment = { ...nodeComment, ...comment }
+    }
   }
 
   const types: MethodTypes = {

@@ -10,17 +10,17 @@ catalogs:
       specifier: ^10.26.0
       version: 10.27.0
     '@supabase/auth-js':
-      specifier: 2.100.0-canary.0
-      version: 2.100.0-canary.0
+      specifier: 2.100.0
+      version: 2.100.0
     '@supabase/postgrest-js':
-      specifier: 2.100.0-canary.0
-      version: 2.100.0-canary.0
+      specifier: 2.100.0
+      version: 2.100.0
     '@supabase/realtime-js':
-      specifier: 2.100.0-canary.0
-      version: 2.100.0-canary.0
+      specifier: 2.100.0
+      version: 2.100.0
     '@supabase/supabase-js':
-      specifier: 2.100.0-canary.0
-      version: 2.100.0-canary.0
+      specifier: 2.100.0
+      version: 2.100.0
     '@types/node':
       specifier: ^22.0.0
       version: 22.13.14
@@ -333,7 +333,7 @@ importers:
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.13(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2)))
@@ -848,7 +848,7 @@ importers:
         version: 7.5.0
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@supabase/mcp-server-supabase':
         specifier: ^0.7.0
         version: 0.7.0(@modelcontextprotocol/sdk@1.27.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
@@ -860,7 +860,7 @@ importers:
         version: link:../../packages/pg-meta
       '@supabase/realtime-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@supabase/shared-types':
         specifier: 0.1.84
         version: 0.1.84
@@ -869,7 +869,7 @@ importers:
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@tanstack/react-query':
         specifier: ^5.0.0
         version: 5.83.0(react@18.3.1)
@@ -894,6 +894,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.3.4(supports-color@8.1.1)(vite@7.1.11(@types/node@22.13.14)(jiti@2.5.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1))
+      '@xyflow/react':
+        specifier: ^12.10.1
+        version: 12.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@zip.js/zip.js':
         specifier: ^2.7.29
         version: 2.7.30
@@ -1062,9 +1065,6 @@ importers:
       react-use:
         specifier: ^17.5.0
         version: 17.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      reactflow:
-        specifier: ^11.10.1
-        version: 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
         specifier: 'catalog:'
         version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1087,8 +1087,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
       stripe-experiment-sync:
-        specifier: 1.0.27
-        version: 1.0.27(@types/node@22.13.14)(supports-color@8.1.1)
+        specifier: 1.0.29
+        version: 1.0.29(@types/node@22.13.14)(supports-color@8.1.1)
       tus-js-client:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1386,7 +1386,7 @@ importers:
         version: 0.1.0
       '@supabase/postgrest-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@supabase/supa-mdx-lint':
         specifier: 0.2.6-alpha
         version: 0.2.6-alpha
@@ -1525,10 +1525,10 @@ importers:
         version: 1.6.0
       '@supabase/ssr':
         specifier: ^0.7.0
-        version: 0.7.0(@supabase/supabase-js@2.100.0-canary.0)
+        version: 0.7.0(@supabase/supabase-js@2.100.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@tanstack/react-router':
         specifier: ^1.150.0
         version: 1.158.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1639,10 +1639,10 @@ importers:
         version: 10.27.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(encoding@0.1.13)(next@15.5.13(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4))(react@18.3.1)(supports-color@8.1.1)(webpack@5.94.0)
       '@supabase/ssr':
         specifier: ^0.9.0
-        version: 0.9.0(@supabase/supabase-js@2.100.0-canary.0)
+        version: 0.9.0(@supabase/supabase-js@2.100.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@vercel/og':
         specifier: ^0.6.2
         version: 0.6.2
@@ -1889,10 +1889,10 @@ importers:
     dependencies:
       '@supabase/ssr':
         specifier: ^0.7.0
-        version: 0.7.0(@supabase/supabase-js@2.100.0-canary.0)
+        version: 0.7.0(@supabase/supabase-js@2.100.0)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@vueuse/core':
         specifier: ^14.1.0
         version: 14.1.0(vue@3.5.21(typescript@5.9.2))
@@ -1938,7 +1938,7 @@ importers:
         version: 1.56.1
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       cross-fetch:
         specifier: ^4.1.0
         version: 4.1.0(encoding@0.1.13)
@@ -1966,7 +1966,7 @@ importers:
         version: 0.18.5
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       ai:
         specifier: 5.0.52
         version: 5.0.52(zod@3.25.76)
@@ -2057,10 +2057,10 @@ importers:
     dependencies:
       '@supabase/auth-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@types/dat.gui':
         specifier: ^0.7.12
         version: 0.7.12
@@ -2622,7 +2622,7 @@ importers:
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
-        version: 2.100.0-canary.0
+        version: 2.100.0
       '@vitest/coverage-v8':
         specifier: ^3.2.0
         version: 3.2.4(supports-color@8.1.1)(vitest@3.2.4)
@@ -7628,42 +7628,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@reactflow/background@11.3.6':
-    resolution: {integrity: sha512-06FPlSUOOMALEEs+2PqPAbpqmL7WDjrkbG2UsDr2d6mbcDDhHiV4tu9FYoz44SQvXo7ma9VRotlsaR4OiRcYsg==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
-  '@reactflow/controls@11.2.6':
-    resolution: {integrity: sha512-4QHT92/ACVlZkvV+Hq44bAPV8WbMhkJl+/J0EbXcqQ1+an7cWJsF84eeelJw7R5J76RoaSSpKdsWsL2v7HAVlw==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
-  '@reactflow/core@11.10.1':
-    resolution: {integrity: sha512-GIh3usY1W3eVobx//OO9+Cwm+5evQBBdPGxDaeXwm25UqPMWRI240nXQA5F/5gL5Mwpf0DUC7DR2EmrKNQy+Rw==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
-  '@reactflow/minimap@11.7.6':
-    resolution: {integrity: sha512-kJEtyeQkTZYViLGebVWHVUJROMAGcvejvT+iX4DqKnFb5yK8E8LWlXQpRx2FrL9gDy80mJJaciy7IxnnQKE1bg==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
-  '@reactflow/node-resizer@2.2.6':
-    resolution: {integrity: sha512-1Xb6q97uP7hRBLpog9sRCNfnsHdDgFRGEiU+lQqGgPEAeYwl4nRjWa/sXwH6ajniKxBhGEvrdzOgEFn6CRMcpQ==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
-  '@reactflow/node-toolbar@1.3.6':
-    resolution: {integrity: sha512-JXDEuZ0wKjZ8z7qK2bIst0eZPzNyVEsiHL0e93EyuqT4fA9icoyE0fLq2ryNOOp7MXgId1h7LusnH6ta45F0yQ==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
   '@redocly/ajv@8.11.2':
     resolution: {integrity: sha512-io1JpnwtIcvojV7QKDUSIuMN/ikdOUd1ReEnUnMKGfDVridQZ31J0MmIuqwuRjWDZfmvr+Q0MqCcfHM2gTivOg==}
 
@@ -8371,20 +8335,12 @@ packages:
   '@supabase-labs/y-supabase@0.1.0':
     resolution: {integrity: sha512-1ItaKbcImgy7ueYfJcyVYihqCKi9RAee9MKBV8wcCqSMNsrWvw4ibhW8ai91kWsewsiWzIDXVPONgcUcxagk9g==}
 
-  '@supabase/auth-js@2.100.0-canary.0':
-    resolution: {integrity: sha512-V9cg2OvvY1RC1S1i+B1z+pPLJB4P0XWzYeBJx72ZQ7FTklPadEjUniBMlPwfrqhYqAcZ72FCrYy5jFryyy/1dA==}
+  '@supabase/auth-js@2.100.0':
+    resolution: {integrity: sha512-pdT3ye3UVRN1Cg0wom6BmyY+XTtp5DiJaYnPi6j8ht5i8Lq8kfqxJMJz9GI9YDKk3w1nhGOPnh6Qz5qpyYm+1w==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/auth-js@2.99.1':
-    resolution: {integrity: sha512-x7lKKTvKjABJt/FYcRSPiTT01Xhm2FF8RhfL8+RHMkmlwmRQ88/lREupIHKwFPW0W6pTCJqkZb7Yhpw/EZ+fNw==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/functions-js@2.100.0-canary.0':
-    resolution: {integrity: sha512-f1hKYX/mxZ9B8nkdC/1jrRtKQXDshK6Uu9SJRdO00e1x46k+hVl3q7OqiUvMB3LUBS0GpplAyJrkraFhsVvBRw==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/functions-js@2.99.1':
-    resolution: {integrity: sha512-WQE62W5geYImCO4jzFxCk/avnK7JmOdtqu2eiPz3zOaNiIJajNRSAwMMDgEGd2EMs+sUVYj1LfBjfmW3EzHgIA==}
+  '@supabase/functions-js@2.100.0':
+    resolution: {integrity: sha512-keLg79RPwP+uiwHuxFPTFgDRxPV46LM4j/swjyR2GKJgWniTVSsgiBHfbIBDcrQwehLepy09b/9QSHUywtKRWQ==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/mcp-server-supabase@0.7.0':
@@ -8407,20 +8363,12 @@ packages:
     resolution: {integrity: sha512-vz5gc6RKNfDVnIfRUmH2ssTMYFI0U3MYOVyQ9R4YkzOS2dKSanjC4rTEDGjlMFwGTCUPW3N3pbY7HJIW81wMyg==}
     engines: {node: '>=16', npm: '>=8'}
 
-  '@supabase/postgrest-js@2.100.0-canary.0':
-    resolution: {integrity: sha512-rZ0qWSo0NSFvSByWLW2AhcUNnv7UI7CaYVhZStspxJKUojL8Kux4hldzgZINvCqTkZMqauW/5E9VeFVXyLKvnA==}
+  '@supabase/postgrest-js@2.100.0':
+    resolution: {integrity: sha512-xYNvNbBJaXOGcrZ44wxwp5830uo1okMHGS8h8dm3u4f0xcZ39yzbryUsubTJW41MG2gbL/6U57cA4Pi6YMZ9pA==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/postgrest-js@2.99.1':
-    resolution: {integrity: sha512-gtw2ibJrADvfqrpUWXGNlrYUvxttF4WVWfPpTFKOb2IRj7B6YRWMDgcrYqIuD4ZEabK4m6YKQCCGy6clgf1lPA==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/realtime-js@2.100.0-canary.0':
-    resolution: {integrity: sha512-621nWkc+aIBN8vQGWNljCIkQpMnYaG5NOekpbmtNlkjm8FZx0nhMjQZ75g3Z8tPwpxi0Q4NZ9vJ3M1sxiAqOKQ==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/realtime-js@2.99.1':
-    resolution: {integrity: sha512-9EDdy/5wOseGFqxW88ShV9JMRhm7f+9JGY5x+LqT8c7R0X1CTLwg5qie8FiBWcXTZ+68yYxVWunI+7W4FhkWOg==}
+  '@supabase/realtime-js@2.100.0':
+    resolution: {integrity: sha512-2AZs00zzEF0HuCKY8grz5eCYlwEfVi5HONLZFoNR6aDfxQivl8zdQYNjyFoqN2MZiVhQHD7u6XV/xHwM8mCEHw==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/shared-types@0.1.84':
@@ -8439,12 +8387,8 @@ packages:
     peerDependencies:
       '@supabase/supabase-js': ^2.97.0
 
-  '@supabase/storage-js@2.100.0-canary.0':
-    resolution: {integrity: sha512-P+e53zG1FGKxP/7S0X5PWCsvjWMW45M1qvfEQeiQu9tcBGszn/DigvLibjs2yD5i7gU8wvLjmaF7rcCYUnm2Ng==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/storage-js@2.99.1':
-    resolution: {integrity: sha512-mf7zPfqofI62SOoyQJeNUVxe72E4rQsbWim6lTDPeLu3lHija/cP5utlQADGrjeTgOUN6znx/rWn7SjrETP1dw==}
+  '@supabase/storage-js@2.100.0':
+    resolution: {integrity: sha512-d4EeuK6RNIgYNA2MU9kj8lQrLm5AzZ+WwpWjGkii6SADQNIGTC/uiaTRu02XJ5AmFALQfo8fLl9xuCkO6Xw+iQ==}
     engines: {node: '>=20.0.0'}
 
   '@supabase/supa-mdx-lint-darwin@0.2.6-alpha':
@@ -8582,12 +8526,8 @@ packages:
     resolution: {integrity: sha512-iqJHDk/ToyxFMa/um9A5gsp9jYN7iI0cIabNq9nyBpK/Yat/J9I2IIMueQwIMy3TsG6a2qdPyUkZkuPC37SdRg==}
     hasBin: true
 
-  '@supabase/supabase-js@2.100.0-canary.0':
-    resolution: {integrity: sha512-Oj+62BfZ9VEX27WHE/uBKf2jqqZJ09UHsFSbnQrynxYTyzG3ASj3m+K0FP9qsSnenZZPOduLIIRM0gos1PKCyw==}
-    engines: {node: '>=20.0.0'}
-
-  '@supabase/supabase-js@2.99.1':
-    resolution: {integrity: sha512-5MRoYD9ffXq8F6a036dm65YoSHisC3by/d22mauKE99Vrwf792KxYIIr/iqCX7E4hkuugbPZ5EGYHTB7MKy6Vg==}
+  '@supabase/supabase-js@2.100.0':
+    resolution: {integrity: sha512-r0tlcukejJXJ1m/2eG/Ya5eYs4W8AC7oZfShpG3+SIo/eIU9uIt76ZeYI1SoUwUmcmzlAbgch+HDZDR/toVQPQ==}
     engines: {node: '>=20.0.0'}
 
   '@swc/helpers@0.5.15':
@@ -8918,6 +8858,9 @@ packages:
   '@types/d3-interpolate@3.0.2':
     resolution: {integrity: sha512-zAbCj9lTqW9J9PlF4FwnvEjXZUy75NQqPm7DMHZXuxCFTpuTrdK2NMYGQekf4hlasL78fCYOLu4EE3/tXElwow==}
 
+  '@types/d3-interpolate@3.0.4':
+    resolution: {integrity: sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA==}
+
   '@types/d3-path@1.0.9':
     resolution: {integrity: sha512-NaIeSIBiFgSC6IGUBjZWcscUJEq7vpVu7KthHN8eieTV9d9MqkSOZLH4chq1PmcKy06PNe3axLeKmRIyxJ+PZQ==}
 
@@ -9115,9 +9058,6 @@ packages:
 
   '@types/pg@8.15.6':
     resolution: {integrity: sha512-NoaMtzhxOrubeL/7UZuNTrejB4MPAJ0RpxZqXQf2qXuVlTPuG6Y8p4u9dKRaue4yjmC7ZhzVO2/Yyyn25znrPQ==}
-
-  '@types/phoenix@1.6.6':
-    resolution: {integrity: sha512-PIzZZlEppgrpoT2QgbnDU+MMzuR6BbCjllj0bM70lWoejMeNJAxCchxnv7J3XFkI8MpygtRpzXrIlmWUBclP5A==}
 
   '@types/prismjs@1.26.3':
     resolution: {integrity: sha512-A0D0aTXvjlqJ5ZILMz3rNfDBOx9hHxLZYv2by47Sm/pqW35zzjusrZTryatjN/Rf8Us2gZrJD+KeHbUSTux1Cw==}
@@ -9572,6 +9512,15 @@ packages:
 
   '@xtuc/long@4.2.2':
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
+
+  '@xyflow/react@12.10.1':
+    resolution: {integrity: sha512-5eSWtIK/+rkldOuFbOOz44CRgQRjtS9v5nufk77DV+XBnfCGL9HAQ8PG00o2ZYKqkEU/Ak6wrKC95Tu+2zuK3Q==}
+    peerDependencies:
+      react: '>=17'
+      react-dom: '>=17'
+
+  '@xyflow/system@0.0.75':
+    resolution: {integrity: sha512-iXs+AGFLi8w/VlAoc/iSxk+CxfT6o64Uw/k0CKASOPqjqz6E0rb5jFZgJtXGZCpfQI6OQpu5EnumP5fGxQheaQ==}
 
   '@zip.js/zip.js@2.7.30':
     resolution: {integrity: sha512-nhMvQCj+TF1ATBqYzFds7v+yxPBhdDYHh8J341KtC1D2UrVBUIYcYK4Jy1/GiTsxOXEiKOXSUxvPG/XR+7jMqw==}
@@ -15426,11 +15375,6 @@ packages:
     resolution: {integrity: sha512-NoSsPqXxbkD8RIe+peQCqiea4QzXgosdTKY8p7PsbbGsh2F8TifDj/vJxfuR8qJwNYrijdSs7uf0tAe6WOyCsQ==}
     engines: {node: '>=12.0.0'}
 
-  pg-node-migrations@0.0.8:
-    resolution: {integrity: sha512-44cMl9umOmCv0hzZyEcvjEq8Bm8u7mrzggZ06qXTJVSsMMB4j2OsjG+rSp+uzeKWyP2Vu0K9Ye2wKtjFUJwrdw==}
-    engines: {node: '>10.17.0'}
-    hasBin: true
-
   pg-numeric@1.0.2:
     resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
     engines: {node: '>=4'}
@@ -16316,12 +16260,6 @@ packages:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
     engines: {node: '>=0.10.0'}
 
-  reactflow@11.10.1:
-    resolution: {integrity: sha512-Q616fElAc5/N37tMwjuRkkgm/VgmnLLTNNCj61z5mvJxae+/VXZQMfot1K6a5LLz9G3SVKqU97PMb9Ga1PRXew==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-
   read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
 
@@ -17113,10 +17051,6 @@ packages:
   sql-parser-cst@0.38.2:
     resolution: {integrity: sha512-4SR3cZYMxG4gsmvZQSQYYzzfk20OnbpsnwOVbU6Fw39ORLPpIHCMqoX5li0dz+ZWyF5HeR+mSgbgayKhN4JR9w==}
 
-  sql-template-strings@2.2.2:
-    resolution: {integrity: sha512-UXhXR2869FQaD+GMly8jAMCRZ94nU5KcrFetZfWEMd+LVVG6y0ExgHAhatEcKZ/wk8YcKPdi+hiD2wm75lq3/Q==}
-    engines: {node: '>=4.0.0'}
-
   sqlstring@2.3.3:
     resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
     engines: {node: '>= 0.6'}
@@ -17315,8 +17249,8 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
-  stripe-experiment-sync@1.0.27:
-    resolution: {integrity: sha512-Uxt3DLFnjUnBza8c6xrEW1MWrvnIaLg0J7TfZA3kDSlxsNkI3xSj7KV4Gx221ruOgjcbpa2yN++mLLjM795V0w==}
+  stripe-experiment-sync@1.0.29:
+    resolution: {integrity: sha512-tUVJmz2Y0UZD7Uht2UOjmR4LVPrfIPX9K1O5GiDUxzSqSlFX2QjCAKr86BwZ5Df+1yYlXVwfxsC6NYTNHVCvfg==}
     hasBin: true
 
   stripe@17.7.0:
@@ -24817,84 +24751,6 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@reactflow/background@11.3.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@reactflow/core': 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      classcat: 5.0.4
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-
-  '@reactflow/controls@11.2.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@reactflow/core': 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      classcat: 5.0.4
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-
-  '@reactflow/core@11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@types/d3': 7.4.3
-      '@types/d3-drag': 3.0.7
-      '@types/d3-selection': 3.0.10
-      '@types/d3-zoom': 3.0.8
-      classcat: 5.0.4
-      d3-drag: 3.0.0
-      d3-selection: 3.0.0
-      d3-zoom: 3.0.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-
-  '@reactflow/minimap@11.7.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@reactflow/core': 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@types/d3-selection': 3.0.10
-      '@types/d3-zoom': 3.0.8
-      classcat: 5.0.4
-      d3-selection: 3.0.0
-      d3-zoom: 3.0.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-
-  '@reactflow/node-resizer@2.2.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@reactflow/core': 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      classcat: 5.0.4
-      d3-drag: 3.0.0
-      d3-selection: 3.0.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-
-  '@reactflow/node-toolbar@1.3.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@reactflow/core': 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      classcat: 5.0.4
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-
   '@redocly/ajv@8.11.2':
     dependencies:
       fast-deep-equal: 3.1.3
@@ -25821,26 +25677,18 @@ snapshots:
 
   '@supabase-labs/y-supabase@0.1.0':
     dependencies:
-      '@supabase/supabase-js': 2.99.1
+      '@supabase/supabase-js': 2.100.0
       y-protocols: 1.0.7(yjs@13.6.29)
       yjs: 13.6.29
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/auth-js@2.100.0-canary.0':
+  '@supabase/auth-js@2.100.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/auth-js@2.99.1':
-    dependencies:
-      tslib: 2.8.1
-
-  '@supabase/functions-js@2.100.0-canary.0':
-    dependencies:
-      tslib: 2.8.1
-
-  '@supabase/functions-js@2.99.1':
+  '@supabase/functions-js@2.100.0':
     dependencies:
       tslib: 2.8.1
 
@@ -25877,27 +25725,13 @@ snapshots:
       - pg-native
       - supports-color
 
-  '@supabase/postgrest-js@2.100.0-canary.0':
+  '@supabase/postgrest-js@2.100.0':
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/postgrest-js@2.99.1':
-    dependencies:
-      tslib: 2.8.1
-
-  '@supabase/realtime-js@2.100.0-canary.0':
+  '@supabase/realtime-js@2.100.0':
     dependencies:
       '@supabase/phoenix': 0.4.0
-      '@types/ws': 8.18.1
-      tslib: 2.8.1
-      ws: 8.18.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
-  '@supabase/realtime-js@2.99.1':
-    dependencies:
-      '@types/phoenix': 1.6.6
       '@types/ws': 8.18.1
       tslib: 2.8.1
       ws: 8.18.3
@@ -25916,22 +25750,17 @@ snapshots:
       - encoding
       - supports-color
 
-  '@supabase/ssr@0.7.0(@supabase/supabase-js@2.100.0-canary.0)':
+  '@supabase/ssr@0.7.0(@supabase/supabase-js@2.100.0)':
     dependencies:
-      '@supabase/supabase-js': 2.100.0-canary.0
+      '@supabase/supabase-js': 2.100.0
       cookie: 1.0.2
 
-  '@supabase/ssr@0.9.0(@supabase/supabase-js@2.100.0-canary.0)':
+  '@supabase/ssr@0.9.0(@supabase/supabase-js@2.100.0)':
     dependencies:
-      '@supabase/supabase-js': 2.100.0-canary.0
+      '@supabase/supabase-js': 2.100.0
       cookie: 1.0.2
 
-  '@supabase/storage-js@2.100.0-canary.0':
-    dependencies:
-      iceberg-js: 0.8.1
-      tslib: 2.8.1
-
-  '@supabase/storage-js@2.99.1':
+  '@supabase/storage-js@2.100.0':
     dependencies:
       iceberg-js: 0.8.1
       tslib: 2.8.1
@@ -26032,24 +25861,13 @@ snapshots:
       '@supabase/supa-mdx-lint-win32-x64': 0.3.2
       node-pty: 1.0.0
 
-  '@supabase/supabase-js@2.100.0-canary.0':
+  '@supabase/supabase-js@2.100.0':
     dependencies:
-      '@supabase/auth-js': 2.100.0-canary.0
-      '@supabase/functions-js': 2.100.0-canary.0
-      '@supabase/postgrest-js': 2.100.0-canary.0
-      '@supabase/realtime-js': 2.100.0-canary.0
-      '@supabase/storage-js': 2.100.0-canary.0
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
-  '@supabase/supabase-js@2.99.1':
-    dependencies:
-      '@supabase/auth-js': 2.99.1
-      '@supabase/functions-js': 2.99.1
-      '@supabase/postgrest-js': 2.99.1
-      '@supabase/realtime-js': 2.99.1
-      '@supabase/storage-js': 2.99.1
+      '@supabase/auth-js': 2.100.0
+      '@supabase/functions-js': 2.100.0
+      '@supabase/postgrest-js': 2.100.0
+      '@supabase/realtime-js': 2.100.0
+      '@supabase/storage-js': 2.100.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -26503,6 +26321,10 @@ snapshots:
     dependencies:
       '@types/d3-color': 3.1.1
 
+  '@types/d3-interpolate@3.0.4':
+    dependencies:
+      '@types/d3-color': 3.1.1
+
   '@types/d3-path@1.0.9': {}
 
   '@types/d3-polygon@3.0.2': {}
@@ -26546,7 +26368,7 @@ snapshots:
 
   '@types/d3-zoom@3.0.8':
     dependencies:
-      '@types/d3-interpolate': 3.0.2
+      '@types/d3-interpolate': 3.0.4
       '@types/d3-selection': 3.0.10
 
   '@types/d3@7.4.3':
@@ -26730,8 +26552,6 @@ snapshots:
       '@types/node': 22.13.14
       pg-protocol: 1.10.3
       pg-types: 2.2.0
-
-  '@types/phoenix@1.6.6': {}
 
   '@types/prismjs@1.26.3': {}
 
@@ -27383,6 +27203,29 @@ snapshots:
   '@xtuc/ieee754@1.2.0': {}
 
   '@xtuc/long@4.2.2': {}
+
+  '@xyflow/react@12.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@xyflow/system': 0.0.75
+      classcat: 5.0.4
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      zustand: 4.4.7(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - immer
+
+  '@xyflow/system@0.0.75':
+    dependencies:
+      '@types/d3-drag': 3.0.7
+      '@types/d3-interpolate': 3.0.4
+      '@types/d3-selection': 3.0.10
+      '@types/d3-transition': 3.0.8
+      '@types/d3-zoom': 3.0.8
+      d3-drag: 3.0.0
+      d3-interpolate: 3.0.1
+      d3-selection: 3.0.0
+      d3-zoom: 3.0.0
 
   '@zip.js/zip.js@2.7.30': {}
 
@@ -34582,13 +34425,6 @@ snapshots:
 
   pg-minify@1.6.3: {}
 
-  pg-node-migrations@0.0.8:
-    dependencies:
-      pg: 8.16.3
-      sql-template-strings: 2.2.2
-    transitivePeerDependencies:
-      - pg-native
-
   pg-numeric@1.0.2: {}
 
   pg-pool@3.10.1(pg@8.16.3):
@@ -35530,20 +35366,6 @@ snapshots:
   react@18.3.1:
     dependencies:
       loose-envify: 1.4.0
-
-  reactflow@11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@reactflow/background': 11.3.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@reactflow/controls': 11.2.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@reactflow/core': 11.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@reactflow/minimap': 11.7.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@reactflow/node-resizer': 2.2.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@reactflow/node-toolbar': 1.3.6(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
 
   read-cache@1.0.0:
     dependencies:
@@ -36648,8 +36470,6 @@ snapshots:
 
   sql-parser-cst@0.38.2: {}
 
-  sql-template-strings@2.2.2: {}
-
   sqlstring@2.3.3: {}
 
   srvx@0.10.1: {}
@@ -36880,18 +36700,16 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  stripe-experiment-sync@1.0.27(@types/node@22.13.14)(supports-color@8.1.1):
+  stripe-experiment-sync@1.0.29(@types/node@22.13.14)(supports-color@8.1.1):
     dependencies:
       '@ngrok/ngrok': 1.6.0
       chalk: 5.4.1
       commander: 12.1.0
       dotenv: 16.5.0
-      esbuild: 0.25.2
       express: 4.22.1(supports-color@8.1.1)
       inquirer: 12.11.1(@types/node@22.13.14)
       papaparse: 5.4.1
       pg: 8.16.3
-      pg-node-migrations: 0.0.8
       stripe: 17.7.0
       supabase-management-js: 2.0.2
       ws: 8.18.3

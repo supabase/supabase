@@ -132,7 +132,7 @@ export const OAuthAppsList = () => {
 
     return filtered.sort((a, b) => {
       if (sortCol === 'name') {
-        return a.client_name.localeCompare(b.client_name) * orderMultiplier
+        return (a.client_name || '').localeCompare(b.client_name || '') * orderMultiplier
       }
       if (sortCol === 'client_type') {
         return a.client_type.localeCompare(b.client_type) * orderMultiplier

@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
-import ReactFlow, { Background, ReactFlowProvider, useReactFlow } from 'reactflow'
+import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 
 import { getStatusName } from '../Pipeline.utils'
 import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
@@ -14,7 +14,7 @@ import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-s
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { timeout } from '@/lib/helpers'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 export const ReplicationDiagram = () => {
   return (
@@ -128,6 +128,8 @@ const ReplicationDiagramContent = () => {
   return (
     <div className="nowheel relative min-h-[350px]">
       <ReactFlow
+        // FIXME: https://github.com/xyflow/xyflow/issues/4876
+        colorMode={'' as unknown as ColorMode}
         fitView
         fitViewOptions={{ minZoom: 0.8, maxZoom: 0.9 }}
         className="bg"
@@ -137,7 +139,7 @@ const ReplicationDiagramContent = () => {
         nodesConnectable={false}
         zoomOnDoubleClick={false}
         edgesFocusable={false}
-        edgesUpdatable={false}
+        edgesReconnectable={false}
         defaultNodes={[]}
         defaultEdges={[]}
         nodeTypes={nodeTypes}
