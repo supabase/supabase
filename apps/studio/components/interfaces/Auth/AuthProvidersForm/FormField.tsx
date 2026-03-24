@@ -2,8 +2,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { format } from 'date-fns'
 import { BASE_PATH } from 'lib/constants'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
-import { useEffect } from 'react'
-import { useFormContext, type Control } from 'react-hook-form'
+import { type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
@@ -50,7 +49,6 @@ const FormField = ({
   disabled: disabledProp,
 }: FormFieldProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
-  const { watch } = useFormContext()
   const { description: originalDescription } = properties
   let description = originalDescription
 
