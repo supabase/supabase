@@ -216,6 +216,9 @@ export const SmtpForm = () => {
     )
   }
 
+  const showFooterMessage =
+    form.formState.isDirty && ((enableSmtp && !isSmtpEnabled(authConfig)) || !enableSmtp)
+
   return (
     <PageSection>
       <PageSectionContent>
@@ -463,27 +466,24 @@ export const SmtpForm = () => {
 
               <CardFooter
                 className={cn(
-                  form.formState.isDirty ? 'justify-between' : 'justify-end',
+                  showFooterMessage ? 'justify-between' : 'justify-end',
                   'gap-x-2'
                 )}
               >
-                {form.formState.isDirty && (
-                  <p className="text-sm text-foreground-light">
-                    {enableSmtp && !isSmtpEnabled(authConfig) ? (
-                      <>
-                        Rate limit for sending emails will be increased to 30 and{' '}
-                        <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
-                          can be adjusted
-                        </InlineLink>{' '}
-                        after enabling custom SMTP
-                      </>
-                    ) : enableSmtp ? (
-                      'Custom SMTP settings will be updated'
-                    ) : (
-                      'Rate limit for sending emails will be reduced to 2 after disabling custom SMTP'
-                    )}
-                  </p>
-                )}
+                {showFooterMessage &&
+                  (enableSmtp ? (
+                    <p className="text-sm text-foreground-light">
+                      Rate limit for sending emails will be increased to 30 and{' '}
+                      <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
+                        can be adjusted
+                      </InlineLink>{' '}
+                      after enabling custom SMTP
+                    </p>
+                  ) : (
+                    <p className="text-sm text-foreground-light">
+                      Rate limit for sending emails will be reduced to 2 after disabling custom SMTP
+                    </p>
+                  ))}
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
                     <Button
