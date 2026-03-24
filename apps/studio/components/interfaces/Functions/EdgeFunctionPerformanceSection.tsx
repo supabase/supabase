@@ -35,6 +35,18 @@ interface EdgeFunctionPerformanceSectionProps {
   maxExecutionTime: number
 }
 
+const renderExecutionTooltipDetails = (
+  averageExecutionTime: number,
+  _: EdgeFunctionChartDatum,
+  key: string,
+  value: unknown
+) =>
+  key === 'max_execution_time' ? (
+    <span className="text-foreground">
+      {formatReferenceDelta(Number(value ?? 0), averageExecutionTime)}
+    </span>
+  ) : null
+
 export const EdgeFunctionPerformanceSection = ({
   data,
   dateTimeFormat,
@@ -93,13 +105,10 @@ export const EdgeFunctionPerformanceSection = ({
                         isFullHeight
                         showYAxis
                         config={EXECUTION_TIME_CHART_CONFIG}
-                        tooltipDetails={(_, key, value) =>
-                          key === 'max_execution_time' ? (
-                            <span className="text-foreground">
-                              {formatReferenceDelta(Number(value ?? 0), averageExecutionTime)}
-                            </span>
-                          ) : null
-                        }
+                        tooltipDetails={renderExecutionTooltipDetails.bind(
+                          null,
+                          averageExecutionTime
+                        )}
                         referenceLines={[
                           {
                             y: averageExecutionTime,

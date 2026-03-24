@@ -42,6 +42,36 @@ interface EdgeFunctionUsageSectionProps {
   totalMemoryByType: number
 }
 
+const renderCpuTooltipDetails = (
+  averageCpuTime: number,
+  _: EdgeFunctionChartDatum,
+  __: string,
+  value: unknown
+) => (
+  <span className="text-foreground">
+    {formatReferenceDelta(Number(value ?? 0), averageCpuTime)}
+  </span>
+)
+
+const renderMemoryTooltipDetails = (
+  averageMemoryUsage: number,
+  datum: EdgeFunctionChartDatum,
+  _: string,
+  value: unknown
+) => (
+  <>
+    <span className="text-foreground">
+      {formatReferenceDelta(Number(value ?? 0), averageMemoryUsage)}
+    </span>
+    <span className="text-foreground-light">
+      {getMemoryTooltipDetail(
+        Number(datum.avg_heap_memory_used ?? 0),
+        Number(datum.avg_external_memory_used ?? 0)
+      )}
+    </span>
+  </>
+)
+
 export const EdgeFunctionUsageSection = ({
   data,
   dateTimeFormat,
@@ -104,11 +134,7 @@ export const EdgeFunctionUsageSection = ({
                         isFullHeight
                         showYAxis
                         config={CPU_TIME_CHART_CONFIG}
-                        tooltipDetails={(_, __, value) => (
-                          <span className="text-foreground">
-                            {formatReferenceDelta(Number(value ?? 0), averageCpuTime)}
-                          </span>
-                        )}
+                        tooltipDetails={renderCpuTooltipDetails.bind(null, averageCpuTime)}
                         referenceLines={[
                           {
                             y: averageCpuTime,
@@ -166,19 +192,7 @@ export const EdgeFunctionUsageSection = ({
                         isFullHeight
                         showYAxis
                         config={MEMORY_CHART_CONFIG}
-                        tooltipDetails={(datum, _, value) => (
-                          <>
-                            <span className="text-foreground">
-                              {formatReferenceDelta(Number(value ?? 0), averageMemoryUsage)}
-                            </span>
-                            <span className="text-foreground-light">
-                              {getMemoryTooltipDetail(
-                                Number(datum.avg_heap_memory_used ?? 0),
-                                Number(datum.avg_external_memory_used ?? 0)
-                              )}
-                            </span>
-                          </>
-                        )}
+                        tooltipDetails={renderMemoryTooltipDetails.bind(null, averageMemoryUsage)}
                         referenceLines={[
                           {
                             y: averageMemoryUsage,
