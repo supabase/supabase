@@ -14,3 +14,4 @@ export const rlsAcknowledgedKey = (tableID?: string | number) =>
   `${RLS_ACKNOWLEDGED_KEY}-${String(tableID)}`
 
 export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
+export const REFERENCE_PEEK_CONTEXT_MENU_ID = 'reference-peek-context-menu-id'

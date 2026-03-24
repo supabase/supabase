@@ -1,7 +1,8 @@
 import { PostgresTable } from '@supabase/postgres-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import { COLUMN_MIN_WIDTH, REFERENCE_PEEK_CONTEXT_MENU_ID } from 'components/grid/constants'
+import type { SupaColumn, SupaRow } from 'components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
@@ -10,12 +11,16 @@ import { isArrayColumn, isBinaryColumn, isJsonColumn } from 'components/grid/uti
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Key } from 'lucide-react'
-import { useMemo } from 'react'
-import DataGrid, { Column } from 'react-data-grid'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Copy, Key } from 'lucide-react'
+import { useCallback, useMemo, useRef } from 'react'
+import { Item, ItemParams, Menu } from 'react-contexify'
+import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
+import { toast } from 'sonner'
+import { Button, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { formatClipboardValue } from '../../utils/common'
+import { PeekRowRenderer } from '../grid/RowRenderer'
 import { BinaryFormatter } from './BinaryFormatter'
 import { DefaultFormatter } from './DefaultFormatter'
 import { JsonFormatter } from './JsonFormatter'
@@ -23,7 +28,7 @@ import { JsonFormatter } from './JsonFormatter'
 interface ReferenceRecordPeekProps {
   table: PostgresTable
   column: string
-  value: any
+  value: string | number | Record<string, unknown>
 }
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
@@ -47,6 +52,9 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     { placeholderData: keepPreviousData }
   )
 
+  const rows = useMemo(() => data?.rows ?? [], [data?.rows])
+  const selectedCellRef = useRef<{ idx: number } | null>(null)
+
   const primaryKeys = useMemo(() => table.primary_keys.map((x) => x.name), [table.primary_keys])
 
   const columns = useMemo(() => {
@@ -54,14 +62,14 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       const columnDefaultWidth = getColumnDefaultWidth({
         dataType: column.data_type,
         format: column.format,
-      } as any)
+      } as Pick<SupaColumn, 'dataType' | 'format'> as SupaColumn)
       const columnWidthBasedOnName =
         (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
       const columnWidth =
         columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
       const isPrimaryKey = primaryKeys.includes(column.name)
 
-      const res: Column<any> = {
+      const res: Column<SupaRow> = {
         key: column.name,
         name: column.name,
         resizable: false,
@@ -94,6 +102,24 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     })
   }, [table?.columns, primaryKeys])
 
+  const onCopyCellContent = useCallback(
+    (p: ItemParams<{ rowIdx: number }>) => {
+      const rowIdx = p.props?.rowIdx
+      if (selectedCellRef.current === null || rowIdx === undefined || rowIdx === null) return
+
+      const row = rows[rowIdx]
+      const columnKey = columns[selectedCellRef.current.idx]?.key
+      if (!row || !columnKey) return
+
+      const cellValue = row[columnKey]
+      const text = formatClipboardValue(cellValue)
+
+      copyToClipboard(text)
+      toast.success('Copied cell value to clipboard')
+    },
+    [rows, columns]
+  )
+
   return (
     <>
       <p className="px-2 py-2 text-xs text-foreground-light border-b">
@@ -106,12 +132,20 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       <DataGrid
         className="h-32 rounded-b border-0"
         columns={columns}
-        rows={data?.rows ?? []}
+        rows={rows}
+        onSelectedCellChange={(args: {
+          column: CalculatedColumn<SupaRow, unknown>
+          rowIdx: number
+          row: SupaRow
+        }) => {
+          selectedCellRef.current = { idx: args.column.idx }
+        }}
         onCellDoubleClick={(_, e) => {
           e.preventDefault()
           e.stopPropagation()
         }}
         renderers={{
+          renderRow: PeekRowRenderer,
           noRowsFallback: (
             <div className="w-96 px-2">
               {isLoading && (
@@ -129,6 +163,12 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           ),
         }}
       />
+      <Menu id={REFERENCE_PEEK_CONTEXT_MENU_ID} animation={false} className="!min-w-36">
+        <Item onClick={onCopyCellContent}>
+          <Copy size={12} />
+          <span className="ml-2 text-xs">Copy cell</span>
+        </Item>
+      </Menu>
       <div className="flex items-center justify-end px-2 py-1">
         <EditorTablePageLink
           href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
