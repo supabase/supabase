@@ -1,10 +1,10 @@
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
+import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
   genDefaultQuery,
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import AlertError from 'components/ui/AlertError'
@@ -67,7 +67,7 @@ type RecentErrorGroup = {
   logs: GroupedRuntimeLog[]
 }
 
-type RecentErrorGroupBase = Omit<RecentErrorGroup, 'logs'>
+type RecentErrorGroupBase = Omit
 
 const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
@@ -130,7 +130,7 @@ export const EdgeFunctionRecentErrors = ({
   )
 
   const recentErrorGroupsBase = useMemo<RecentErrorGroupBase[]>(() => {
-    const grouped = recentErrorInvocations.reduce<Record<string, RecentErrorGroupBase>>((acc, item) => {
+    const grouped = recentErrorInvocations.reduce<Record>((acc, item) => {
       const statusCode = String(item.status_code ?? '')
       const method = String(item.method ?? '')
       const message =
@@ -221,16 +221,13 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
   const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
-    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record<string, LogData[]>>(
-      (acc, log) => {
+    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record>((acc, log) => {
       const executionId = String(log.execution_id ?? '')
       if (!executionId) return acc
 
       acc[executionId] = [...(acc[executionId] ?? []), log]
       return acc
-      },
-      {}
-    )
+    }, {})
 
     return recentErrorGroupsBase.map((group) => ({
       ...group,
