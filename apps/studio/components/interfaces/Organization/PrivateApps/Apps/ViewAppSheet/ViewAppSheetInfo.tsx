@@ -27,10 +27,11 @@ function CopyableId({ id, label }: { id: string; label: string }) {
 
   function handleCopy(e: React.MouseEvent) {
     e.stopPropagation()
-    copyToClipboard(id)
-    setIsCopied(true)
-    toast.success(`Copied ${label} to clipboard`)
-    setTimeout(() => setIsCopied(false), 2000)
+    copyToClipboard(id, () => {
+      setIsCopied(true)
+      toast.success(`Copied ${label} to clipboard`)
+      setTimeout(() => setIsCopied(false), 2000)
+    })
   }
 
   return (
