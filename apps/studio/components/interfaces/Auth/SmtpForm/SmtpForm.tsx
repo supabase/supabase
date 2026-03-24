@@ -465,10 +465,7 @@ export const SmtpForm = () => {
               )}
 
               <CardFooter
-                className={cn(
-                  showFooterMessage ? 'justify-between' : 'justify-end',
-                  'gap-x-2'
-                )}
+                className={cn(showFooterMessage ? 'justify-between' : 'justify-end', 'gap-x-2')}
               >
                 {showFooterMessage &&
                   (enableSmtp ? (
