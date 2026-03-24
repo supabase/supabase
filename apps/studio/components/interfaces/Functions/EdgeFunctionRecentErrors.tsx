@@ -1,3 +1,4 @@
+import AlertError from 'components/ui/AlertError'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import {
   genDefaultQuery,
@@ -24,10 +25,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
+  PageSectionAside,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
@@ -38,6 +41,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
 
 dayjs.extend(relativeTime)
+
+const MAX_RECENT_ERROR_GROUPS = 5
+const RECENT_ERROR_INVOCATIONS_LIMIT = 50
+const RELATED_RUNTIME_LOGS_LIMIT = 100
 
 type GroupedRuntimeLog = {
   key: string
@@ -58,6 +65,9 @@ type RecentErrorGroup = {
   executionIds: string[]
   logs: GroupedRuntimeLog[]
 }
+
+const escapeSqlString = (value: string) => value.replace(/'/g, "''")
+const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
 
 interface EdgeFunctionRecentErrorsProps {
   functionId?: string
@@ -87,21 +97,16 @@ export const EdgeFunctionRecentErrors = ({
           function_id: functionId ?? '__pending__',
           'status_code.error': true,
         },
-        200
-      ),
-    [functionId]
-  )
-  const functionRuntimeLogsSql = useMemo(
-    () =>
-      genDefaultQuery(
-        LOGS_TABLES.functions,
-        { 'metadata.function_id': functionId ?? '__pending__' },
-        500
+        RECENT_ERROR_INVOCATIONS_LIMIT
       ),
     [functionId]
   )
 
-  const { logData: recentErrorInvocations, isLoading: isLoadingRecentErrorInvocations } =
+  const {
+    logData: recentErrorInvocations,
+    isLoading: isLoadingRecentErrorInvocations,
+    error: recentErrorInvocationsError,
+  } =
     useLogsQuery(
       projectRef as string,
       {
@@ -112,27 +117,7 @@ export const EdgeFunctionRecentErrors = ({
       isQueryEnabled
     )
 
-  const { logData: functionRuntimeLogs, isLoading: isLoadingFunctionRuntimeLogs } = useLogsQuery(
-    projectRef as string,
-    {
-      sql: functionRuntimeLogsSql,
-      iso_timestamp_start: isoTimestampStart,
-      iso_timestamp_end: isoTimestampEnd,
-    },
-    isQueryEnabled
-  )
-
-  const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
-    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<
-      Record<string, typeof functionRuntimeLogs>
-    >((acc, log) => {
-      const executionId = String(log.execution_id ?? '')
-      if (!executionId) return acc
-
-      acc[executionId] = [...(acc[executionId] ?? []), log]
-      return acc
-    }, {})
-
+  const recentErrorGroupsBase = useMemo<Omit<RecentErrorGroup, 'logs'>[]>(() => {
     const grouped = recentErrorInvocations.reduce<
       Record<
         string,
@@ -198,31 +183,78 @@ export const EdgeFunctionRecentErrors = ({
 
     return Object.values(grouped)
       .sort((a, b) => b.lastSeen - a.lastSeen)
-      .slice(0, 5)
-      .map((group) => ({
-        ...group,
-        logs: group.executionIds
-          .flatMap((executionId) => runtimeLogsByExecutionId[executionId] ?? [])
-          .reduce<GroupedRuntimeLog[]>((acc, log) => {
-            const level = String(log.level ?? log.event_type ?? 'log')
-            const message = String(log.event_message ?? '')
-            const key = `${level}:${message}`
-            const timestamp = Number(log.timestamp ?? 0)
-            const existing = acc.find((entry) => entry.key === key)
+      .slice(0, MAX_RECENT_ERROR_GROUPS)
+  }, [recentErrorInvocations])
 
-            if (existing) {
-              existing.count += 1
-              existing.lastSeen = Math.max(existing.lastSeen, timestamp)
-              return acc
-            }
+  const relatedExecutionIds = useMemo(
+    () =>
+      Array.from(
+        new Set(recentErrorGroupsBase.flatMap((group) => group.executionIds).filter(Boolean))
+      ),
+    [recentErrorGroupsBase]
+  )
 
-            acc.push({ key, message, level, count: 1, lastSeen: timestamp })
+  const functionRuntimeLogsSql = useMemo(() => {
+    if (!functionId || relatedExecutionIds.length === 0) return ''
+
+    const executionIds = relatedExecutionIds.map((id) => `'${escapeSqlString(id)}'`).join(', ')
+
+    return `select id, function_logs.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from function_logs
+cross join unnest(metadata) as metadata
+where metadata.function_id = '${escapeSqlString(functionId)}' and metadata.execution_id in (${executionIds})
+order by timestamp desc
+limit ${RELATED_RUNTIME_LOGS_LIMIT}`
+  }, [functionId, relatedExecutionIds])
+
+  const {
+    logData: functionRuntimeLogs,
+    isLoading: isLoadingFunctionRuntimeLogs,
+    error: functionRuntimeLogsError,
+  } = useLogsQuery(
+    projectRef as string,
+    {
+      sql: functionRuntimeLogsSql,
+      iso_timestamp_start: isoTimestampStart,
+      iso_timestamp_end: isoTimestampEnd,
+    },
+    Boolean(projectRef && functionRuntimeLogsSql)
+  )
+
+  const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
+    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<
+      Record<string, typeof functionRuntimeLogs>
+    >((acc, log) => {
+      const executionId = String(log.execution_id ?? '')
+      if (!executionId) return acc
+
+      acc[executionId] = [...(acc[executionId] ?? []), log]
+      return acc
+    }, {})
+
+    return recentErrorGroupsBase.map((group) => ({
+      ...group,
+      logs: group.executionIds
+        .flatMap((executionId) => runtimeLogsByExecutionId[executionId] ?? [])
+        .reduce<GroupedRuntimeLog[]>((acc, log) => {
+          const level = String(log.level ?? log.event_type ?? 'log')
+          const message = String(log.event_message ?? '')
+          const key = `${level}:${message}`
+          const timestamp = Number(log.timestamp ?? 0)
+          const existing = acc.find((entry) => entry.key === key)
+
+          if (existing) {
+            existing.count += 1
+            existing.lastSeen = Math.max(existing.lastSeen, timestamp)
             return acc
-          }, [])
-          .sort((a, b) => b.count - a.count || b.lastSeen - a.lastSeen)
-          .slice(0, 5),
-      }))
-  }, [functionRuntimeLogs, recentErrorInvocations])
+          }
+
+          acc.push({ key, message, level, count: 1, lastSeen: timestamp })
+          return acc
+        }, [])
+        .sort((a, b) => b.count - a.count || b.lastSeen - a.lastSeen)
+        .slice(0, MAX_RECENT_ERROR_GROUPS),
+    }))
+  }, [functionRuntimeLogs, recentErrorGroupsBase])
 
   const formatLogTimestamp = (value: string | number | undefined, format: 'relative' | 'time') => {
     if (value === undefined) return '-'
@@ -280,19 +312,6 @@ export const EdgeFunctionRecentErrors = ({
     })
   }
 
-  const buildGroupTerminalText = (group: RecentErrorGroup) => {
-    if (group.logs.length === 0) {
-      return 'No related runtime logs found for this error group.'
-    }
-
-    return group.logs
-      .map((log) => {
-        const singleLineMessage = log.message.replace(/\s*[\r\n]+\s*/g, ' ').trim()
-        return `[${formatLogTimestamp(log.lastSeen, 'time')}] [${log.level.toUpperCase()}] [${log.count}x] ${singleLineMessage}`
-      })
-      .join('\n')
-  }
-
   const getStatusBadgeVariant = (statusCode?: string) => {
     if (!statusCode) return 'destructive' as const
 
@@ -310,11 +329,26 @@ export const EdgeFunctionRecentErrors = ({
           <div className="flex flex-col gap-6">
             <PageSectionMeta>
               <PageSectionSummary>
-                <PageSectionTitle>Recent Errors</PageSectionTitle>
+                <PageSectionTitle>Recent Failed Invocations</PageSectionTitle>
               </PageSectionSummary>
+              <PageSectionAside>
+                <Button
+                  type="default"
+                  size="tiny"
+                  icon={<ExternalLink size={14} />}
+                  onClick={() => router.push(`/project/${projectRef}/functions/${functionSlug}/logs`)}
+                >
+                  View logs
+                </Button>
+              </PageSectionAside>
             </PageSectionMeta>
 
-            {isLoadingRecentErrorInvocations || isLoadingFunctionRuntimeLogs ? (
+            {recentErrorInvocationsError || functionRuntimeLogsError ? (
+              <AlertError
+                error={recentErrorInvocationsError ?? functionRuntimeLogsError}
+                subject="Failed to retrieve recent edge function errors"
+              />
+            ) : isLoadingRecentErrorInvocations || isLoadingFunctionRuntimeLogs ? (
               <GenericSkeletonLoader />
             ) : recentErrorGroups.length === 0 ? (
               <div className="rounded-md border border-dashed px-4 py-6 text-sm text-foreground-light">
@@ -331,7 +365,7 @@ export const EdgeFunctionRecentErrors = ({
                       <TableHead>Method</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Duration</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="text-right">Assistant</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -339,17 +373,20 @@ export const EdgeFunctionRecentErrors = ({
                       <Fragment key={group.message}>
                         <TableRow key={`${group.message}-summary`}>
                           <TableCell className="max-w-[420px]">
-                            <span className="block break-words text-foreground">
-                              {group.message}
+                            <span
+                              className="block truncate whitespace-nowrap text-foreground"
+                              title={formatSingleLineMessage(group.message)}
+                            >
+                              {formatSingleLineMessage(group.message)}
                             </span>
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-foreground-light">
+                          <TableCell className="text-foreground-light">
                             {group.count}
                           </TableCell>
                           <TableCell className="text-foreground-light">
                             {formatLogTimestamp(group.lastSeen, 'relative')}
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-foreground-light">
+                          <TableCell className="text-foreground-light">
                             {group.lastMethod ?? '-'}
                           </TableCell>
                           <TableCell>
@@ -366,37 +403,43 @@ export const EdgeFunctionRecentErrors = ({
                               </Badge>
                             )}
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-foreground-light">
+                          <TableCell className="text-foreground-light">
                             {group.executionTime ?? '-'}
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="flex justify-end">
                               <AiAssistantDropdown
                                 label="Ask Assistant"
                                 size="tiny"
                                 buildPrompt={() => buildGroupAssistantPrompt(group)}
                                 onOpenAssistant={() => handleOpenAssistant(group)}
                               />
-                              <Button
-                                type="default"
-                                size="tiny"
-                                icon={<ExternalLink size={14} />}
-                                onClick={() =>
-                                  router.push(
-                                    `/project/${projectRef}/functions/${functionSlug}/logs`
-                                  )
-                                }
-                              >
-                                Open logs
-                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>
                         <TableRow key={`${group.message}-logs`} className="bg-surface-100/30">
                           <TableCell colSpan={7} className="p-0">
-                            <pre className="max-h-64 overflow-auto bg-surface-75 px-4 py-3 text-xs leading-4 font-mono whitespace-pre-line break-words text-foreground-light">
-                              {buildGroupTerminalText(group)}
-                            </pre>
+                            <div className="max-h-64 overflow-auto bg-surface-75 py-3 text-foreground-light">
+                              {group.logs.length === 0 ? (
+                                <div className="px-4">No related runtime logs found for this error group.</div>
+                              ) : (
+                                group.logs.map((log) => (
+                                  <div
+                                    key={log.key}
+                                    className={cn(
+                                      'break-words px-4',
+                                      log.level === 'error'
+                                        ? 'bg-destructive-300 font-mono text-destructive'
+                                        : 'text-foreground-light'
+                                    )}
+                                  >
+                                    [{formatLogTimestamp(log.lastSeen, 'time')}] [
+                                    {log.level.toUpperCase()}] [{log.count}x]{' '}
+                                    {formatSingleLineMessage(log.message)}
+                                  </div>
+                                ))
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       </Fragment>

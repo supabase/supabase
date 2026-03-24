@@ -91,16 +91,16 @@ export const EdgeFunctionInvocationsSection = ({
                     tooltip="Total number of invocations"
                   />
                   <ChartMetric
-                    label="Error Rate"
+                    label="5xx Rate"
                     value={formatRate(totalErrorCount, totalInvocationCount)}
                     status="negative"
-                    tooltip="Share of invocations that returned a server error"
+                    tooltip="Share of invocations that returned a 5xx status code"
                   />
                   <ChartMetric
-                    label="Warning Rate"
+                    label="4xx Rate"
                     value={formatRate(totalWarningCount, totalInvocationCount)}
                     status="warning"
-                    tooltip="Share of invocations that returned a redirect or client error"
+                    tooltip="Share of invocations that returned a 4xx status code"
                   />
                 </div>
               </PageSectionSummary>
