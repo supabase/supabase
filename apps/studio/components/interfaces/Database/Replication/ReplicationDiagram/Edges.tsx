@@ -1,9 +1,8 @@
+import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams } from 'common'
 import { useReplicationLagQuery } from 'data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { Loader2, X } from 'lucide-react'
-import type { EdgeProps } from 'reactflow'
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
