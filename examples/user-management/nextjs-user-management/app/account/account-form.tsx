@@ -15,12 +15,17 @@ export default function AccountForm({ claims }: { claims: Claims | null }) {
 
   const getProfile = useCallback(async () => {
     try {
+      if (!claims?.sub) {
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
 
       const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
-        .eq('id', claims?.sub)
+        .eq('id', claims.sub)
         .single()
 
       if (error && status !== 406) {
@@ -56,10 +61,15 @@ export default function AccountForm({ claims }: { claims: Claims | null }) {
     avatar_url: string | null
   }) {
     try {
+      if (!claims?.sub) {
+        alert('You must be logged in to update your profile')
+        return
+      }
+
       setLoading(true)
 
       const { error } = await supabase.from('profiles').upsert({
-        id: claims?.sub as string,
+        id: claims.sub,
         full_name: fullname,
         username,
         website,
@@ -122,7 +132,7 @@ export default function AccountForm({ claims }: { claims: Claims | null }) {
         <button
           className="button primary block"
           onClick={() => updateProfile({ fullname, username, website, avatar_url })}
-          disabled={loading}
+          disabled={loading || !claims?.sub}
         >
           {loading ? 'Loading ...' : 'Update'}
         </button>
