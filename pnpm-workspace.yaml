@@ -47,6 +47,8 @@ minimumReleaseAgeExclude:
   - '@supabase-labs/*'
   # The following are deps that were added because of vulnerability. You can remove them after the minimum time has passed.
   - undici
+  - next
+  - '@next/*'
 
 onlyBuiltDependencies:
   - node-pty
