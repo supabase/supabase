@@ -19,19 +19,7 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
-import {
-  Check,
-  Columns,
-  Copy,
-  Edit,
-  Eye,
-  Filter,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
-} from 'lucide-react'
+import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -52,6 +40,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -317,15 +306,20 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="!px-0" />
-                  <TableHead key="name">Name</TableHead>
-                  <TableHead key="rows" className="hidden text-right xl:table-cell">
+                  <TableHead key="icon" className="hidden !px-0 sm:table-cell" />
+                  <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
+                    Name
+                  </TableHead>
+                  <TableHead key="columns" className="hidden text-right sm:table-cell">
+                    Columns
+                  </TableHead>
+                  <TableHead key="rows" className="text-right">
                     Rows (Estimated)
                   </TableHead>
-                  <TableHead key="size" className="hidden text-right xl:table-cell">
+                  <TableHead key="size" className="hidden text-right lg:table-cell">
                     Size (Estimated)
                   </TableHead>
-                  <TableHead key="realtime" className="hidden xl:table-cell text-right">
+                  <TableHead key="realtime" className="hidden text-right 2xl:table-cell">
                     Realtime Enabled
                   </TableHead>
                   <TableHead key="buttons"></TableHead>
@@ -335,7 +329,7 @@ export const TableList = ({
                 <>
                   {entities.length === 0 && filterString.length === 0 && (
                     <TableRow key={selectedSchema}>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={7}>
                         {visibleTypes.length === 0 ? (
                           <>
                             <p className="text-sm text-foreground">
@@ -370,7 +364,7 @@ export const TableList = ({
                   )}
                   {entities.length === 0 && filterString.length > 0 && (
                     <TableRow key={selectedSchema}>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={7}>
                         <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-foreground-light">
                           Your search for "{filterString}" did not return any results
@@ -381,13 +375,9 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="!pl-5 !pr-1">
+                        <TableCell className="hidden !pl-5 !pr-1 sm:table-cell">
                           <Tooltip>
                             <TooltipTrigger className="cursor-default">
-                              {/* [Alaister]: EntityTypeIcon supports PARTITIONED_TABLE, but formatAllEntities
-                                  doesn't distinguish between tables and partitioned tables yet.
-                                  Once the endpoint/formatAllEntities is updated to include partitioned tables,
-                                  EntityTypeIcon will automatically style them correctly. */}
                               <EntityTypeIcon type={x.type} />
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
@@ -395,8 +385,8 @@ export const TableList = ({
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell>
-                          <div className="flex min-w-0 flex-col gap-0.5">
+                        <TableCell className="max-w-[160px] sm:max-w-[280px]">
+                          <div className="flex min-w-0 flex-col">
                             {/* only show tooltips if required, to reduce noise */}
                             {x.name.length > 20 ? (
                               <Tooltip disableHoverableContent={true}>
@@ -414,7 +404,7 @@ export const TableList = ({
                             )}
                             {x.comment !== null ? (
                               <span
-                                className="text-foreground-lighter max-w-md truncate"
+                                className="max-w-md truncate text-foreground-lighter"
                                 title={x.comment}
                               >
                                 {x.comment}
@@ -422,42 +412,43 @@ export const TableList = ({
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell className="hidden text-right xl:table-cell">
+                        <TableCell className="hidden text-right sm:table-cell">
+                          <p className="text-foreground-light">
+                            {x.columns.length.toLocaleString()}
+                          </p>
+                        </TableCell>
+                        <TableCell className="text-right">
                           {x.rows !== undefined ? (
                             <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden text-right  xl:table-cell">
+                        <TableCell className="hidden text-right lg:table-cell">
                           {x.size !== undefined ? (
                             <p className="text-foreground-light">{x.size}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden xl:table-cell text-center">
+                        <TableCell className="hidden text-right 2xl:table-cell">
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
                             <div className="flex justify-end">
-                              <Check size={18} strokeWidth={2} className="text-brand" />
+                              <Check size={16} strokeWidth={2} className="text-brand" />
                             </div>
                           ) : (
                             <div className="flex justify-end">
-                              <X size={18} strokeWidth={2} className="text-foreground-lighter" />
+                              <X size={16} strokeWidth={2} className="text-foreground-lighter" />
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button
-                              asChild
-                              type="default"
-                              iconRight={<Columns size={14} className="text-foreground-light" />}
-                            >
+                            <Button asChild type="default">
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
-                                {x.columns.length} columns
+                                View columns
                               </Link>
                             </Button>
 
@@ -554,6 +545,13 @@ export const TableList = ({
                     ))}
                 </>
               </TableBody>
+              <TableFooter className="font-normal">
+                <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
+                  <TableCell colSpan={7} className="text-foreground-muted">
+                    {entities.length} {entities.length === 1 ? 'table' : 'tables'}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </Card>
         </div>
