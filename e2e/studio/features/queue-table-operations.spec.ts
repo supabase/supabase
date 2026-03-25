@@ -14,6 +14,14 @@ const enableQueueOperations = async (page: Page) => {
   }, QUEUE_OPERATIONS_KEY)
 }
 
+const openQueueDropdownAndClick = async (page: Page, itemName: string) => {
+  await page.getByRole('button', { name: 'More options' }).click()
+  await page.getByRole('menuitem', { name: itemName }).click()
+}
+
+const clickReview = async (page: Page) => openQueueDropdownAndClick(page, 'Review')
+const clickDiscard = async (page: Page) => openQueueDropdownAndClick(page, 'Discard')
+
 test.describe('Queue Table Operations', () => {
   test.beforeEach(async ({ page, ref }) => {
     const loadPromise = waitForTableToLoad(page, ref)
@@ -56,7 +64,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
@@ -101,9 +109,8 @@ test.describe('Queue Table Operations', () => {
     await page.keyboard.press('Enter')
 
     await expect(page.getByText('1 pending change')).toBeVisible()
-    await page.getByRole('button', { name: /Review/ }).click()
 
-    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await clickDiscard(page)
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
@@ -143,17 +150,14 @@ test.describe('Queue Table Operations', () => {
     await page.keyboard.press('Enter')
 
     await expect(page.getByText('1 pending change')).toBeVisible()
-    await page.getByRole('button', { name: /Review/ }).click()
 
-    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await clickDiscard(page)
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
     await confirmDialog.getByRole('button', { name: 'Keep editing' }).click()
 
-    const sidePanel = page.getByRole('dialog')
-    await expect(sidePanel.getByText('Pending changes')).toBeVisible()
-    await expect(sidePanel.getByText('1 operation')).toBeVisible()
+    await expect(page.getByText('1 pending change')).toBeVisible()
   })
 
   test('row inserts are queued and can be saved', async ({ page, ref }) => {
@@ -186,7 +190,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByRole('gridcell', { name: 'new row value' })).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
@@ -231,7 +235,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 operations')).toBeVisible()
@@ -276,10 +280,10 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
 
     const sidePanel = page.getByRole('dialog')
-    const removeButtons = sidePanel.getByRole('button', { name: 'Revert change' })
+    const removeButtons = sidePanel.getByRole('button', { name: 'Discard change' })
     await removeButtons.last().click()
 
     await expect(sidePanel.getByText('1 operation')).toBeVisible()
@@ -323,7 +327,7 @@ test.describe('Queue Table Operations', () => {
 
     await page.keyboard.press('ControlOrMeta+.')
     await expect(page.getByRole('dialog')).not.toBeVisible()
-    await expect(page.getByRole('button', { name: /Review/ })).toBeVisible()
+    await expect(page.getByText('pending change')).toBeVisible()
 
     await page.keyboard.press('ControlOrMeta+s')
     await expect(page.getByText('Changes saved successfully')).toBeVisible()
@@ -519,7 +523,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
@@ -560,8 +564,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('1 pending change')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
-    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await clickDiscard(page)
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
@@ -611,7 +614,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('3 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('3 operations')).toBeVisible()
     await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
@@ -667,7 +670,7 @@ test.describe('Queue Table Operations', () => {
 
     await expect(page.getByText('2 pending changes')).toBeVisible()
 
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 operations')).toBeVisible()
 
@@ -740,7 +743,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'Jones' })).toBeVisible()
 
     // Review the queued operations
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('2 cell edits')).toBeVisible()

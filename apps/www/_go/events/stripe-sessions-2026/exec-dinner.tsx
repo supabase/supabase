@@ -9,7 +9,7 @@ const joe = authors.find((a) => a.author_id === 'joe_sciarrino')
 
 const page: GoPageInput = {
   template: 'lead-gen',
-  slug: 'stripe/exec-dinner',
+  slug: 'exec-dinner-april-2026',
   metadata: {
     title: 'Executive Dinner: The Future of Scalable Databases | Supabase',
     description:
@@ -20,6 +20,12 @@ const page: GoPageInput = {
     subtitle: 'An intimate executive dinner hosted by Supabase',
     description:
       'Join Supabase product and engineering leaders for a dinner conversation about where Postgres is headed -- from scaling beyond single-node limits to managing globally distributed workloads. Expect sharp perspectives, good food, and the opportunity to connect with other engineering leaders.',
+    image: {
+      src: '/images/landing-pages/stripe-sessions/spruce-dining-room.png',
+      alt: 'Private dining room at Spruce restaurant, San Francisco',
+      width: 600,
+      height: 450,
+    },
     ctas: [
       {
         label: 'Reserve your seat',
@@ -37,8 +43,8 @@ const page: GoPageInput = {
           <p className="text-lg font-medium text-foreground">Spruce Restaurant</p>
           <p>3640 Sacramento St, San Francisco, CA</p>
           <p className="mt-4 text-lg font-medium text-foreground">Wednesday, April 29, 2026</p>
-          <p>6:30 PM -- Cocktails and introductions</p>
-          <p>7:00 PM -- Dinner and discussion</p>
+          <p>7:00 PM -- Cocktails and introductions</p>
+          <p>7:30 PM -- Dinner and discussion</p>
         </div>
       ),
     },
