@@ -1,11 +1,16 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { storageCredentialsKeys } from './s3-access-key-keys'
 import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { storageCredentialsKeys } from './s3-access-key-keys'
 
 type StorageCredentialsVariables = { projectRef?: string }
+
+export type S3AccessKey = components['schemas']['GetStorageCredentialsResponse']['data'][number] & {
+  access_key: string
+}
 
 async function fetchStorageCredentials(
   { projectRef }: StorageCredentialsVariables,
@@ -19,26 +24,21 @@ async function fetchStorageCredentials(
   })
 
   if (error) handleError(error)
-
-  // Generated types by openapi are wrong so we need to cast it.
-  return data as unknown as {
-    data: {
-      id: string
-      created_at: string
-      access_key: string
-      description: string
-    }[]
-  }
+  return data as { data: S3AccessKey[] }
 }
 
 export type StorageCredentialsData = Awaited<ReturnType<typeof fetchStorageCredentials>>
 
 export const useStorageCredentialsQuery = <TData = StorageCredentialsData>(
   { projectRef }: StorageCredentialsVariables,
-  { enabled = true, ...options }: UseQueryOptions<StorageCredentialsData, ResponseError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<StorageCredentialsData, ResponseError, TData> = {}
 ) =>
-  useQuery<StorageCredentialsData, ResponseError, TData>(
-    storageCredentialsKeys.credentials(projectRef),
-    ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
-    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<StorageCredentialsData, ResponseError, TData>({
+    queryKey: storageCredentialsKeys.credentials(projectRef),
+    queryFn: ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    ...options,
+  })

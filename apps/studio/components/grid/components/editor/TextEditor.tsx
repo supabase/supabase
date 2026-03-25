@@ -1,24 +1,17 @@
+import { useParams } from 'common'
+import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
+import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import {
-  Button,
-  Popover,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, cn, Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTrackedState } from '../../store/Store'
+
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'
@@ -37,10 +30,9 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isEditable?: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }) => {
-  const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -48,19 +40,17 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     id,
   })
 
-  const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const rawValue = row[column.key as keyof TRow] as unknown
-  const initialValue = rawValue ? String(rawValue) : null
+  const initialValue = rawValue || rawValue === '' ? String(rawValue) : null
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
+  const { isQueueEnabled } = useTableRowOperations()
+  const applyChangesLabel = isQueueEnabled ? 'Queue changes' : 'Save changes'
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
-  const isTruncated =
-    typeof initialValue === 'string' &&
-    initialValue.endsWith('...') &&
-    initialValue.length > MAX_CHARACTERS
+  const isTruncated = isValueTruncated(initialValue)
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
@@ -69,7 +59,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     }
 
     const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
-      return { ...a, [b.name]: (row as any)[b.name] }
+      return { ...a, [b.name]: row[b.name as keyof typeof row] }
     }, {})
 
     getCellValue(
@@ -124,17 +114,17 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
         overlay={
           isTruncated && !isSuccess ? (
             <div
-              style={{ width: `${gridColumn?.width || column.width}px` }}
+              style={{ width: `${column.width}px` }}
               className="flex items-center justify-center flex-col relative"
             >
               <MonacoEditor
                 readOnly
                 onChange={() => {}}
-                width={`${gridColumn?.width || column.width}px`}
+                width={`${column.width}px`}
                 value={value ?? ''}
                 language="markdown"
               />
-              <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
+              <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
             </div>
           ) : (
             <BlockKeys
@@ -144,7 +134,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               ignoreOutsideClicks={isConfirmNextModalOpen}
             >
               <MonacoEditor
-                width={`${gridColumn?.width || column.width}px`}
+                width={`${column.width}px`}
                 value={value ?? ''}
                 readOnly={!isEditable}
                 onChange={onChange}
@@ -156,7 +146,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                       <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">⏎</span>
                       </div>
-                      <p className="text-xs text-foreground-light">Save changes</p>
+                      <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
@@ -166,23 +156,30 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-y-1">
-                    <Tooltip_Shadcn_>
-                      <TooltipTrigger_Shadcn_ asChild>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
                         <Button
                           type="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
                         />
-                      </TooltipTrigger_Shadcn_>
-                      <TooltipContent_Shadcn_ side="bottom">Expand editor</TooltipContent_Shadcn_>
-                    </Tooltip_Shadcn_>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Expand editor</TooltipContent>
+                    </Tooltip>
                     {isNullable && (
                       <Button
                         size="tiny"
                         type="default"
                         htmlType="button"
-                        onClick={() => setIsConfirmNextModalOpen(true)}
+                        onClick={() => {
+                          // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled
+                          if (isQueueEnabled) {
+                            saveChanges(null)
+                          } else {
+                            setIsConfirmNextModalOpen(true)
+                          }
+                        }}
                       >
                         Set to NULL
                       </Button>

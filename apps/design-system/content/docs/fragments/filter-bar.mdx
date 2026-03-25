@@ -1,0 +1,128 @@
+---
+title: Filter Bar
+description: An advanced filtering component with support for multiple conditions and operators.
+component: true
+fragment: true
+---
+
+<ComponentPreview
+  name="filter-bar-demo"
+  description="An advanced filtering component with support for multiple conditions and operators."
+  peekCode
+  showDottedGrid
+  wide
+/>
+
+## Usage
+
+The Filter Bar component provides advanced filtering capabilities with support for multiple conditions, operators, and different field types. It can be used with both static and async options.
+
+```tsx
+const filterProperties = [
+  {
+    label: 'Name',
+    name: 'name',
+    type: 'string',
+    operators: ['=', '!=', 'CONTAINS', 'STARTS WITH', 'ENDS WITH'],
+  },
+  {
+    label: 'Status',
+    name: 'status',
+    type: 'string',
+    options: ['active', 'inactive', 'pending'],
+    operators: ['=', '!='],
+  },
+]
+
+export function FilterDemo() {
+  const [filters, setFilters] = useState<FilterGroup>(initialFilters)
+  const [freeformText, setFreeformText] = useState('')
+
+  return (
+    <FilterBar
+      filterProperties={filterProperties}
+      freeformText={freeformText}
+      onFreeformTextChange={setFreeformText}
+      filters={filters}
+      onFilterChange={setFilters}
+    />
+  )
+}
+```
+
+## API Reference
+
+### FilterProperty
+
+```tsx
+interface FilterProperty {
+  label: string
+  name: string
+  type: 'string' | 'number' | 'date' | 'boolean'
+  operators: string[]
+  options?: string[] | ((search?: string) => Promise<string[]> | string[])
+}
+```
+
+### FilterGroup
+
+```tsx
+interface FilterGroup {
+  logicalOperator: 'AND' | 'OR'
+  conditions: (FilterCondition | FilterGroup)[]
+}
+```
+
+### FilterCondition
+
+```tsx
+interface FilterCondition {
+  propertyName: string
+  value: string | number | boolean | Date
+  operator: string
+}
+```
+
+### Component Props
+
+| Prop                 | Type                           | Description                                     |
+| -------------------- | ------------------------------ | ----------------------------------------------- |
+| filterProperties     | FilterProperty[]               | Array of properties that can be filtered        |
+| filters              | FilterGroup                    | Current filter state                            |
+| onFilterChange       | (filters: FilterGroup) => void | Callback when filters change                    |
+| freeformText         | string                         | Current free-form search text                   |
+| onFreeformTextChange | (text: string) => void         | Callback when free-form text changes            |
+| actions              | FilterBarAction[]?             | Optional custom actions to show in the menu     |
+| isLoading            | boolean?                       | If true, dims the bar while work is in progress |
+
+## Custom actions (e.g. AI)
+
+You can append custom actions to the property menu. Each action receives the current free-form input value and the active group's path so you can plug in AI, saved queries, etc.
+
+```tsx
+const actions = [
+  {
+    value: 'ai-filter',
+    label: 'Filter by AI',
+    onSelect: async (inputValue, { path }) => {
+      const response = await fetch('/api/filter-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: inputValue, path }),
+      })
+      const group = (await response.json()) as FilterGroup
+      // Replace your filter state at the provided path with the returned group
+      setFilters((prev) => updateGroupAtPath(prev, path, group))
+    },
+  },
+]
+
+<FilterBar
+  filterProperties={filterProperties}
+  filters={filters}
+  onFilterChange={setFilters}
+  freeformText={freeformText}
+  onFreeformTextChange={setFreeformText}
+  actions={actions}
+/>
+```

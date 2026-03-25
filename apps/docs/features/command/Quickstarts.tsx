@@ -16,7 +16,7 @@ const quickstarts = [
     url: '/guides/getting-started/quickstarts/nextjs',
   },
   {
-    label: 'Nuxt.js',
+    label: 'Nuxt',
     url: '/guides/getting-started/quickstarts/nuxtjs',
   },
   {
@@ -34,6 +34,10 @@ const quickstarts = [
   {
     label: 'SolidJS',
     url: '/guides/getting-started/quickstarts/solidjs',
+  },
+  {
+    label: 'TanStack Start',
+    url: '/guides/getting-started/quickstarts/tanstack',
   },
   {
     label: 'Vue',

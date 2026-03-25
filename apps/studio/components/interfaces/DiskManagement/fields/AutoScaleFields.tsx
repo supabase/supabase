@@ -24,13 +24,13 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
   } = form
   const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
 
-  const { error, isLoading, isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
+  const { error, isPending: isLoading, isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
   const _growthPercent = growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
   const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
   const _maxSizeGb = errors.maxSizeGb
     ? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-    : maxSizeGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+    : (maxSizeGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb)
 
   const growthSize = Math.floor(totalSize * (_growthPercent / 100))
   const autoscaleGrowValue = Math.min(

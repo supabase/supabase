@@ -1,9 +1,9 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { AuthProvider } from 'common'
+import { AuthProvider, LOCAL_STORAGE_KEYS } from 'common'
 import { type PropsWithChildren, useCallback } from 'react'
-import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
+import { remove } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
 /**

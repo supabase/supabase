@@ -1,4 +1,4 @@
-import { PlanType } from 'data/subscriptions/org-subscription-query'
+import { PlanId } from 'data/subscriptions/types'
 
 // Disk Storage expands automatically when the database reaches 90% of the disk size
 export const AUTOSCALING_THRESHOLD = 0.9
@@ -8,20 +8,11 @@ export enum DiskType {
   IO2 = 'io2',
 }
 
-// [Joshen] As per https://github.com/supabase/infrastructure/pull/20478
+// [Joshen] As per https://github.com/supabase/platform/pull/20478
 export const DISK_AUTOSCALE_CONFIG_DEFAULTS = {
   growthPercent: 50,
   minIncrementSize: 4,
   maxSizeGb: 60000,
-}
-
-export const IOPS_RANGE = {
-  [DiskType.GP3]: { min: 3000, max: 16000 },
-  [DiskType.IO2]: { min: 100, max: 256000 },
-}
-
-export const THROUGHPUT_RANGE = {
-  [DiskType.GP3]: { min: 125, max: 1000 },
 }
 
 export const DISK_PRICING = {
@@ -50,80 +41,23 @@ export const DISK_LIMITS = {
   [DiskType.IO2]: {
     minStorage: 4,
     maxStorage: 61440,
-    minIops: 100,
+    minIops: 1500,
     maxIops: 256000,
     includedIops: 0,
     includedThroughput: 0,
   },
 }
 
-export const DISK_TYPE_LABELS = {
-  [DiskType.GP3]: 'General Purpose SSD (gp3)',
-  [DiskType.IO2]: 'Provisioned IOPS SSD (io2)',
-}
-
 interface PlanDetails {
   includedDiskGB: { gp3: number; io2: number }
 }
 
-export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
+export const PLAN_DETAILS: Record<PlanId, PlanDetails> = {
   free: { includedDiskGB: { gp3: 1, io2: 0 } },
   pro: { includedDiskGB: { gp3: 8, io2: 0 } },
   team: { includedDiskGB: { gp3: 8, io2: 0 } },
   enterprise: { includedDiskGB: { gp3: 8, io2: 0 } },
-}
-
-export const COMPUTE_BASELINE_IOPS = {
-  ci_nano: 250,
-  ci_micro: 500,
-  ci_small: 1000,
-  ci_medium: 2000,
-  ci_large: 3600,
-  ci_xlarge: 6000,
-  ci_2xlarge: 12000,
-  ci_4xlarge: 20000,
-  ci_8xlarge: 40000,
-  ci_12xlarge: 50000,
-  ci_16xlarge: 80000,
-}
-export const COMPUTE_MAX_IOPS = {
-  ci_nano: 11800,
-  ci_micro: 11800,
-  ci_small: 11800,
-  ci_medium: 11800,
-  ci_large: 20000,
-  ci_xlarge: 20000,
-  ci_2xlarge: 20000,
-  ci_4xlarge: 20000,
-  ci_8xlarge: 40000,
-  ci_12xlarge: 50000,
-  ci_16xlarge: 80000,
-}
-export const COMPUTE_BASELINE_THROUGHPUT = {
-  ci_nano: 43,
-  ci_micro: 87,
-  ci_small: 174,
-  ci_medium: 347,
-  ci_large: 630,
-  ci_xlarge: 1188,
-  ci_2xlarge: 2375,
-  ci_4xlarge: 4750,
-  ci_8xlarge: 9500,
-  ci_12xlarge: 14250,
-  ci_16xlarge: 19000,
-}
-export const COMPUTE_MAX_THROUGHPUT = {
-  ci_nano: 2085,
-  ci_micro: 2085,
-  ci_small: 2085,
-  ci_medium: 2085,
-  ci_large: 4750,
-  ci_xlarge: 4750,
-  ci_2xlarge: 4750,
-  ci_4xlarge: 4750,
-  ci_8xlarge: 9500,
-  ci_12xlarge: 14250,
-  ci_16xlarge: 19000,
+  platform: { includedDiskGB: { gp3: 8, io2: 0 } },
 }
 
 export const RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 = ['ci_nano', 'ci_micro', 'ci_small', 'ci_medium']

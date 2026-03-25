@@ -1,9 +1,0 @@
-extends: existence
-message: "Use 'July 31, 2016' format, not '%s'."
-link: 'https://developers.google.com/style/dates-times'
-ignorecase: true
-level: error
-nonword: true
-tokens:
-  - '\d{1,2}(?:\.|/)\d{1,2}(?:\.|/)\d{4}'
-  - '\d{1,2} (?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)|May|Jun(?:e)|Jul(?:y)|Aug(?:ust)|Sep(?:tember)?|Oct(?:ober)|Nov(?:ember)?|Dec(?:ember)?) \d{4}'

@@ -1,3 +1,5 @@
+'use client'
+
 import { InformationCircleIcon } from '@heroicons/react/outline'
 import { ChevronDown, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -11,6 +13,7 @@ import {
   cn,
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [
@@ -29,8 +32,11 @@ const findIntanceValueByColumn = (instance: any, column: string) =>
 
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
 
-const ComputePricingCalculator = () => {
-  const computeInstances = pricingAddOn.database.rows
+const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivity?: boolean }) => {
+  // Filter out rows with no specific pricing
+  const computeInstances = pricingAddOn.database.rows.filter((row) =>
+    row.columns.some((it) => it.key === 'pricing' && it.value !== 'Contact Us')
+  )
   const priceSteps = computeInstances.map((instance) =>
     parsePrice(findIntanceValueByColumn(instance, 'pricing'))
   )
@@ -103,7 +109,9 @@ const ComputePricingCalculator = () => {
     <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Plan</span>
-        <span className="text-light font-mono">${activePlan.price}</span>
+        <span className="text-light font-mono" translate="no">
+          ${activePlan.price}
+        </span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Total Compute</span>
@@ -111,7 +119,9 @@ const ComputePricingCalculator = () => {
       </div>
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Compute Credits</span>
-        <span className="text-light font-mono">- ${COMPUTE_CREDITS}</span>
+        <span className="text-light font-mono" translate="no">
+          - ${COMPUTE_CREDITS}
+        </span>
       </div>
     </div>
   )
@@ -198,7 +208,7 @@ const ComputePricingCalculator = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
                 {plans.map((plan: any) => (
-                  <DropdownMenuItem key="custom-expiry" onClick={() => setActivePlan(plan)}>
+                  <DropdownMenuItem key={plan.name} onClick={() => setActivePlan(plan)}>
                     {plan.name}
                   </DropdownMenuItem>
                 ))}
@@ -210,10 +220,10 @@ const ComputePricingCalculator = () => {
             <div className="flex items-center gap-1 w-full justify-between">
               <span>Total Estimate</span>
               <span className="text-foreground font-mono flex items-center gap-1">
-                <InformationCircleIcon
-                  data-tip="This estimate only includes Plan and Compute add-on monthly costs. Other resources might concur in the final invoice."
-                  className="w-3 h-3"
-                />{' '}
+                <InfoTooltip side="top" className="max-w-[250px]">
+                  This estimate only includes Plan and Compute add-on monthly costs. Other resources
+                  might concur in the final invoice.
+                </InfoTooltip>
                 ${activePrice}
               </span>
             </div>
@@ -241,7 +251,7 @@ const ComputePricingCalculator = () => {
                     Project {activeInstance.position + 1}
                   </p>
                 </div>
-                <span className="leading-3 text-sm">
+                <span className="leading-3 text-sm" translate="no">
                   {findIntanceValueByColumn(activeInstance, 'pricing')}
                 </span>
               </div>
@@ -285,12 +295,13 @@ const ComputePricingCalculator = () => {
             type="outline"
             block
             icon={<Plus />}
-            onClick={() =>
+            onClick={() => {
+              if (disableInteractivity) return
               setActiveInstances([
                 ...activeInstances,
                 { ...computeInstances[0], position: activeInstances.length },
               ])
-            }
+            }}
             className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
             <span className="w-full text-left">Add Project</span>

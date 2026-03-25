@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Signed Resumable Upload Supabase + UppyJS</title>
+    <link href="https://releases.transloadit.com/uppy/v3.6.1/uppy.min.css" rel="stylesheet" />
+
+    <style>
+      html {
+        background: #9e44ef;
+      }
+      body {
+        height: 100vh;
+        background: radial-gradient(72.03% 66.03% at 50% 69.72%, #dbb8bf 0, transparent 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      a {
+        display: block;
+        margin: 10px;
+        text-decoration: none;
+      }
+      #logo {
+        max-width: 150px;
+      }
+      #drag-drop-area {
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <img id="logo" src="supabase-logo-wordmark--dark.png" />
+    <div id="drag-drop-area"></div>
+    <a href="https://supabase.com/docs/guides/storage/uploads/resumable-uploads" target="_blank"
+      >Read the docs.</a
+    >
+
+    <script type="module">
+      import {
+        Uppy,
+        Dashboard,
+        Tus,
+      } from 'https://releases.transloadit.com/uppy/v3.6.1/uppy.min.mjs'
+
+      const SUPABASE_PUBLISHABLE_KEY = '' // your project's publishable (anon) key
+      const PROJECT_URL = 'http://127.0.0.1:54321'
+      const STORAGE_BUCKET = 'uploads'
+
+      async function getSignedUploadToken(filename) {
+        const res = await fetch(`${PROJECT_URL}/functions/v1/create-upload-token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: SUPABASE_PUBLISHABLE_KEY },
+          body: JSON.stringify({ filename }),
+        })
+
+        if (!res.ok) throw new Error('Failed to get upload token')
+
+        const data = await res.json()
+
+        return data.token
+      }
+
+      var uppy = new Uppy()
+        .use(Dashboard, {
+          inline: true,
+          limit: 10,
+          target: '#drag-drop-area',
+          showProgressDetails: true,
+        })
+        .use(Tus, {
+          endpoint: `${PROJECT_URL}/storage/v1/upload/resumable/sign`,
+          headers: {
+            apikey: SUPABASE_PUBLISHABLE_KEY,
+          },
+          uploadDataDuringCreation: true,
+          chunkSize: 6 * 1024 * 1024,
+          allowedMetaFields: ['bucketName', 'objectName', 'contentType', 'cacheControl'],
+          onError: function (error) {
+            console.log('Failed because: ' + error)
+          },
+        })
+
+      uppy.on('file-added', async (file) => {
+        const supabaseMetadata = {
+          bucketName: STORAGE_BUCKET,
+          objectName: file.name,
+          contentType: file.type,
+        }
+
+        file.meta = {
+          ...file.meta,
+          ...supabaseMetadata,
+        }
+
+        // Important - add signing token header
+        const token = await getSignedUploadToken(file.name)
+        uppy.setFileState(file.id, {
+            tus: {
+                headers: {
+                  'x-signature': token,
+                }
+            }
+        })
+      })
+
+      uppy.on('complete', (result) => {
+        console.log('Upload complete! We’ve uploaded these files:', result.successful)
+      })
+    </script>
+  </body>
+</html>

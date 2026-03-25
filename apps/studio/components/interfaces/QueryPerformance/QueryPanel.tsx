@@ -1,20 +1,20 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_, cn } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 export const QueryPanelContainer = ({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) => (
-  <div className={cn('flex flex-col gap-y-6 py-4', className)}>{children}</div>
+  <div className={cn('flex flex-col gap-y-0 py-4', className)}>{children}</div>
 )
 
 export const QueryPanelSection = ({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) => (
-  <div className={cn('px-5 flex flex-col gap-y-2', className)}>{children}</div>
+  <div className={cn('px-6 flex flex-col gap-y-0', className)}>{children}</div>
 )
 
 export const QueryPanelScoreSection = ({
@@ -35,14 +35,14 @@ export const QueryPanelScoreSection = ({
   <div className={cn('py-4 px-4 flex', className)}>
     <div className="flex gap-x-2 w-48">
       <span className="text-sm">{name}</span>
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild className="mt-1">
+      <Tooltip>
+        <TooltipTrigger asChild className="mt-1">
           <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-        </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_ side="top" className="w-52 text-center">
+        </TooltipTrigger>
+        <TooltipContent side="top" className="w-52 text-center">
           {description}
-        </TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+        </TooltipContent>
+      </Tooltip>
     </div>
     <div className="flex flex-col gap-y-1">
       <div className="flex gap-x-2 text-sm">
@@ -69,7 +69,7 @@ export const QueryPanelScoreSection = ({
               ) : (
                 <ArrowDown size={14} className="text-brand" />
               )}
-              {before !== 0 && (
+              {typeof before === 'number' && before !== 0 && !isNaN(before) && isFinite(before) && (
                 <span
                   className={cn(
                     'font-mono tracking-tighter',

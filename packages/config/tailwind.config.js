@@ -112,6 +112,16 @@ const uiConfig = ui({
     extend: {
       colors: {
         ...kebabToNested(colorExtend),
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
+        },
       },
 
       typography: ({ theme }) => ({
@@ -172,6 +182,9 @@ const uiConfig = ui({
             },
             p: {
               fontWeight: '400',
+            },
+            strong: {
+              fontWeight: '500',
             },
             pre: {
               background: 'none',
@@ -361,8 +374,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
+        sans: 'var(--font-custom, Circular, custom-font, Helvetica Neue, Helvetica, Arial, sans-serif)',
+        mono: 'var(--font-source-code-pro, Source Code Pro, Office Code Pro, Menlo, monospace)',
       },
 
       // shadcn defaults START
@@ -404,6 +417,7 @@ const uiConfig = ui({
       },
       padding: {
         content: '21px',
+        card: 'var(--card-padding-x)',
       },
       // borderRadius: {
       //   lg: `var(--radius)`,
@@ -419,6 +433,7 @@ const uiConfig = ui({
   plugins: [
     require('@tailwindcss/typography'),
     require('tailwindcss-animate'),
+    require('./tailwind-plugins/hit-area'),
     plugin(motionSafeTransition),
     function ({ addVariant }) {
       addVariant('not-disabled', '&:not(:disabled)')
@@ -480,6 +495,15 @@ function motionSafeTransition({ addUtilities, matchUtilities, theme }) {
       '@media (prefers-reduced-motion)': {
         transitionDuration: '1ms',
       },
+    },
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    '.no-scrollbar::-webkit-scrollbar': {
+      display: 'none',
+    },
+    /* Hide scrollbar for IE, Edge and Firefox */
+    '.no-scrollbar': {
+      '-ms-overflow-style': 'none' /* IE and Edge */,
+      'scrollbar-width': 'none' /* Firefox */,
     },
   })
 

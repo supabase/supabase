@@ -16,7 +16,7 @@ AND city.name = 'Gotham';
   },
   {
     lang: 'sql',
-    title: 'Crypto',
+    title: 'Cryptographic',
     code: `-- This can be run in the SQL editor
 psql
 CREATE EXTENSION pgcrypto;

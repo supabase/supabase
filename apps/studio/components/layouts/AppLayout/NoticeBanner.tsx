@@ -1,76 +1,44 @@
-import { ExternalLink } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
+import { TimestampInfo } from 'ui-patterns'
 
-import { useParams } from 'common'
-import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
-import { useProfile } from 'lib/profile'
-import { Button } from 'ui'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { isSmtpEnabled } from 'components/interfaces/Auth/SmtpForm/SmtpForm.utils'
+import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-// This file, like AppBannerWrapperContext.tsx, is meant to be dynamic - update this as and when we need to use the NoticeBanner
-
-// [Joshen] As of 19th September 24, this notice is around custom SMTP
-// https://github.com/orgs/supabase/discussions/29370
-// Timelines TLDR:
-// - 20th September 2024: Email template customization no longer possible without setting up custom SMTP provider
-// - 24th September 2024: Projects without custom SMTP will have their custom email templates returned back to default ones
-// - 26th September 2024: If no custom SMTP, emails can only be sent to email addresses in your project's organization
-// We can probably look to disable this banner perhaps a month from 26th Sept 2024 - so maybe end of October 2024
-
+/**
+ * Used to display urgent notices that apply for all users, such as maintenance windows.
+ */
 export const NoticeBanner = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const { isLoading: isLoadingProfile } = useProfile()
 
-  const appBannerContext = useAppBannerContext()
-  const { authSmtpBannerAcknowledged, onUpdateAcknowledged } = appBannerContext
+  const [bannerAcknowledged, setBannerAcknowledged, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER,
+    false
+  )
 
-  const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const smtpEnabled = isSmtpEnabled(authConfig)
-  const hasAuthEmailHookEnabled = authConfig?.HOOK_SEND_EMAIL_ENABLED
-
-  const acknowledged = authSmtpBannerAcknowledged.includes(projectRef ?? '')
-
-  if (
-    isLoadingProfile ||
-    router.pathname.includes('sign-in') ||
-    smtpEnabled ||
-    hasAuthEmailHookEnabled ||
-    acknowledged
-  ) {
+  if (router.pathname.includes('sign-in') || !isSuccess || bannerAcknowledged) {
     return null
   }
 
   return (
-    <div
-      style={{ height: '44px' }}
-      className="flex items-center justify-center gap-x-4 bg-surface-100 py-3 transition text-foreground box-border border-b border-default"
-    >
-      <p className="text-sm">
-        Action required: Set up a custom SMTP provider, further restrictions will be imposed for the
-        default email provider
-      </p>
-      <div className="flex items-center gap-x-1">
-        <Button asChild type="link" iconRight={<ExternalLink size={14} />}>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/orgs/supabase/discussions/29370"
-          >
+    <HeaderBanner
+      variant="warning"
+      title="Upcoming Dashboard and Management API maintenance"
+      description={
+        <>
+          <TimestampInfo
+            className="text-sm"
+            utcTimestamp={1768530600000}
+            label="02:30 UTC on Jan 16, 2026"
+          />
+          .{' '}
+          <InlineLink href="https://status.supabase.com/incidents/lg4j8mcn50zb">
             Learn more
-          </a>
-        </Button>
-        <Button
-          type="text"
-          className="opacity-75"
-          onClick={() => {
-            if (projectRef) onUpdateAcknowledged('auth-smtp', projectRef)
-          }}
-        >
-          Dismiss
-        </Button>
-      </div>
-    </div>
+          </InlineLink>
+        </>
+      }
+      onDismiss={() => setBannerAcknowledged(true)}
+    />
   )
 }

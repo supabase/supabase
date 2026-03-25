@@ -30,3 +30,9 @@ export enum DiffType {
   Addition = 'addition',
   NewSnippet = 'new-snippet',
 }
+
+export type PotentialIssues = {
+  hasDestructiveOperations?: boolean
+  hasUpdateWithoutWhere?: boolean
+  hasAlterDatabasePreventConnection?: boolean
+}

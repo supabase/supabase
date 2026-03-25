@@ -1,12 +1,14 @@
+import AlertError from 'components/ui/AlertError'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-
-import AlertError from 'components/ui/AlertError'
-import NoSearchResults from 'components/ui/NoSearchResults'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
@@ -17,6 +19,8 @@ const CATEGORIES = [
 ] as const
 
 export const AvailableIntegrations = () => {
+  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+
   const [selectedCategory, setSelectedCategory] = useQueryState(
     'category',
     parseAsString.withDefault('all').withOptions({ clearOnDefault: true })
@@ -26,16 +30,20 @@ export const AvailableIntegrations = () => {
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
   )
 
-  const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
-    useInstalledIntegrations()
+  const { data: allIntegrations = [] } = useAvailableIntegrations()
+  const { installedIntegrations, error, isError, isLoading, isSuccess } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
 
   // available integrations for install
+  const availableIntegrations = integrationsWrappers
+    ? allIntegrations
+    : allIntegrations.filter((x) => !x.id.endsWith('_wrapper'))
   const integrationsByCategory =
     selectedCategory === 'all'
       ? availableIntegrations
       : availableIntegrations.filter((i) => i.type === selectedCategory)
+
   const filteredIntegrations = (
     search.length > 0
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
@@ -49,7 +57,7 @@ export const AvailableIntegrations = () => {
         value={selectedCategory}
         onValueChange={(value) => setSelectedCategory(value as IntegrationCategory)}
       >
-        <TabsList_Shadcn_ className="px-10 gap-2 border-b-0 border-t pt-5">
+        <TabsList_Shadcn_ className="px-4 md:px-10 gap-2 border-b-0 border-t pt-5">
           {CATEGORIES.map((category) => (
             <TabsTrigger_Shadcn_
               key={category.key}
@@ -86,7 +94,7 @@ export const AvailableIntegrations = () => {
           />
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
-      <div className="p-10 py-8 flex flex-col gap-y-5">
+      <div className="p-4 md:p-10 md:py-8 flex flex-col gap-y-5">
         <div className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3">
           {isLoading &&
             new Array(3)

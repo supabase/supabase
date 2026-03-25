@@ -1,37 +1,32 @@
-import React from 'react'
-import Link from 'next/link'
-import NextImage from 'next/image'
-import { useRouter } from 'next/router'
-import { MDXRemote } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import dayjs from 'dayjs'
-import matter from 'gray-matter'
 import {
   DesktopComputerIcon,
-  VideoCameraIcon,
-  MicrophoneIcon,
   HandIcon,
+  MicrophoneIcon,
+  VideoCameraIcon,
 } from '@heroicons/react/solid'
-import capitalize from 'lodash/capitalize'
+import dayjs from 'dayjs'
+import matter from 'gray-matter'
 import { ChevronLeft, X as XIcon } from 'lucide-react'
+import { MDXRemote } from 'next-mdx-remote'
+import { NextSeo } from 'next-seo'
+import NextImage from 'next/image'
+import Link from 'next/link'
 
 import authors from 'lib/authors.json'
-import { isNotNullOrUndefined } from '~/lib/helpers'
+import { capitalize, isNotNullOrUndefined } from '~/lib/helpers'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata } from '~/lib/posts'
-import { isBrowser, useTelemetryProps } from 'common'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import gaEvents from '~/lib/gaEvents'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 
 import { Button, Image } from 'ui'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -76,6 +71,7 @@ interface EventData {
   end_date?: string
   speakers: string
   speakers_label?: string
+  partners?: string
   og_image?: string
   thumb?: string
   thumb_light?: string
@@ -151,6 +147,10 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
       return authors.find((author) => author.author_id === speakerId)
     })
     .filter(isNotNullOrUndefined) as Author[]
+  const partnersArray = event.partners
+    ?.split(',')
+    .map((p: string) => p.trim())
+    .filter(Boolean)
   const hadEndDate = event.end_date?.length
 
   const IS_REGISTRATION_OPEN =
@@ -185,17 +185,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const Icon = eventIcons[event.type]
 
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
-
-  const origin = isBrowser
-    ? location.origin
-    : process.env.VERCEL_URL
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com'
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <>
@@ -298,7 +288,12 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     <Link
                       href={event.main_cta?.url ?? '#'}
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
-                      onClick={() => sendTelemetryEvent(gaEvents['www_event'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'www_pricing_plan_cta_clicked',
+                          properties: { eventTitle: event.title },
+                        })
+                      }
                     >
                       {IS_REGISTRATION_OPEN
                         ? event.main_cta?.label
@@ -404,6 +399,24 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               </aside>
             </main>
             <aside className="order-first lg:order-last">
+              {partnersArray && partnersArray.length > 0 && (
+                <div className="flex flex-col gap-4 mb-8">
+                  <h2 className="text-foreground-light text-sm font-mono uppercase">Partners</h2>
+                  <ul className="list-none flex flex-row flex-wrap gap-6 items-center">
+                    {partnersArray.map((partner) => (
+                      <li key={partner}>
+                        <NextImage
+                          src={`/images/logos/publicity/${partner}.svg`}
+                          alt={`${partner} logo`}
+                          width={80}
+                          height={24}
+                          className="object-contain"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {speakers && (
                 <div className="flex flex-col gap-4">
                   <h2 className="text-foreground-light text-sm font-mono uppercase">

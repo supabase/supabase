@@ -2,8 +2,6 @@ import dayjs from 'dayjs'
 
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { Input, SidePanel } from 'ui'
 
 export interface LogDetailsPanelProps {
@@ -11,17 +9,7 @@ export interface LogDetailsPanelProps {
   onClose: () => void
 }
 
-const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
-  const { data: projects } = useProjectsQuery()
-  const { data: organizations } = useOrganizationsQuery()
-
-  const project = projects?.find(
-    (project) => project.ref === selectedLog?.target.metadata.project_ref
-  )
-  const organization = organizations?.find(
-    (org) => org.slug === selectedLog?.target.metadata.org_slug
-  )
-
+export const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
   return (
     <SidePanel
       size="large"
@@ -94,5 +82,3 @@ const LogDetailsPanel = ({ selectedLog, onClose }: LogDetailsPanelProps) => {
     </SidePanel>
   )
 }
-
-export default LogDetailsPanel

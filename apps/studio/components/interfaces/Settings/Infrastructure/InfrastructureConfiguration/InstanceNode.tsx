@@ -1,10 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { Handle, NodeProps, Position } from 'reactflow'
-
+import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import SparkBar from 'components/ui/SparkBar'
 import {
@@ -13,58 +7,40 @@ import {
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import dayjs from 'dayjs'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+
 import {
   ERROR_STATES,
   INIT_PROGRESS,
+  LoadBalancerData,
   NODE_SEP,
   NODE_WIDTH,
+  PrimaryNodeData,
   REPLICA_STATUS,
-  Region,
+  ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-interface NodeData {
-  id: string
-  provider: string
-  region: Region
-  computeSize: string
-  status: string
-  inserted_at: string
-}
-
-interface PrimaryNodeData extends NodeData {
-  numReplicas: number
-  numRegions: number
-  hasLoadBalancer: boolean
-}
-
-interface LoadBalancerData extends NodeData {
-  numDatabases: number
-}
-
-interface ReplicaNodeData extends NodeData {
-  onSelectRestartReplica: () => void
-  onSelectResizeReplica: () => void
-  onSelectDropReplica: () => void
-}
-
-export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
+export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
   const { ref } = useParams()
   const { numDatabases } = data
 
@@ -87,13 +63,15 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
               </p>
             </div>
           </div>
-          <DropdownMenu modal={false}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button type="text" icon={<MoreVertical />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
-                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+                <Link href={`/project/${ref}/integrations/data_api/overview?source=load-balancer`}>
+                  View API URL
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -104,9 +82,13 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
   )
 }
 
-export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
+export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
-  const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+  const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   return (
     <>
@@ -131,16 +113,20 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{provider}</span>
-                <span className="text-sm text-foreground-light">•</span>
-                <span className="text-sm text-foreground-light">{computeSize}</span>
+                <span className="text-sm text-foreground-light">{region.region}</span>
+                {projectHomepageShowInstanceSize && (
+                  <>
+                    <span className="text-sm text-foreground-lighter">·</span>
+                    <span className="text-sm text-foreground-light">{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
           <img
             alt="region icon"
             className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
           />
         </div>
         {numReplicas > 0 && (
@@ -167,22 +153,18 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   )
 }
 
-export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
-  const {
-    id,
-    provider,
-    region,
-    computeSize,
-    status,
-    inserted_at,
-    onSelectRestartReplica,
-    onSelectResizeReplica,
-    onSelectDropReplica,
-  } = data
+export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
   const { ref } = useParams()
-  const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const { id, region, computeSize, status, inserted_at } = data
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
+  const state = useDatabaseSelectorStateSnapshot()
+  const [, setConnect] = useQueryStates({
+    showConnect: parseAsBoolean.withDefault(false),
+    source: parseAsString,
+  })
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
   const { replicaInitializationStatus } =
@@ -254,19 +236,19 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
                   <Badge variant="destructive">Init failed</Badge>
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
+                  <Tooltip>
+                    <TooltipTrigger>
                       <HelpCircle size={16} />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_
+                    </TooltipTrigger>
+                    <TooltipContent
                       side="bottom"
                       align="end"
                       alignOffset={-70}
                       className="w-60 text-center"
                     >
                       Replica failed to initialize. Please drop this replica and spin up a new one.
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
+                    </TooltipContent>
+                  </Tooltip>
                 </>
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
@@ -274,9 +256,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESIZING ? (
                 <Badge>Resizing</Badge>
-              ) : initStatus === ReplicaInitializationStatus.Completed &&
-                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge variant="brand">Healthy</Badge>
+              ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+                <Badge variant="success">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}
@@ -284,18 +265,18 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{provider}</span>
-                {!!computeSize && (
+                <span>{region.region}</span>
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
-                    <span>•</span>
+                    <span className="text-foreground-lighter">·</span>
                     <span>{computeSize}</span>
                   </>
                 )}
               </p>
             </div>
             {initStatus === ReplicaInitializationStatus.InProgress && progress !== undefined ? (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
@@ -306,9 +287,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                       barClass="bg-brand"
                     />
                   </div>
-                </TooltipTrigger_Shadcn_>
+                </TooltipTrigger>
                 {estimations !== undefined && (
-                  <TooltipContent_Shadcn_ asChild side="bottom">
+                  <TooltipContent asChild side="bottom">
                     <div className="w-56">
                       <p className="text-foreground-light mb-0.5">Duration estimates:</p>
                       {estimations.baseBackupDownloadEstimateSeconds !== undefined && (
@@ -324,9 +305,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                         </p>
                       )}
                     </div>
-                  </TooltipContent_Shadcn_>
+                  </TooltipContent>
                 )}
-              </Tooltip_Shadcn_>
+              </Tooltip>
             ) : error !== undefined ? (
               <p className="text-sm text-foreground-light">
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
@@ -336,58 +317,26 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             )}
           </div>
         </div>
-        <DropdownMenu modal={false}>
+        <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button type="text" icon={<MoreVertical />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
               onClick={() => {
-                setShowConnect(true)
-                dbSelectorState.setSelectedDatabaseId(id)
+                setConnect({ showConnect: true, source: id })
+                state.setSelectedDatabaseId(id)
               }}
             >
               View connection string
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="gap-x-2"
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-            >
-              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
-                View replication lag
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="gap-x-2">
+              <Link href={`/project/${ref}/database/replication/replica/${id}`}>
+                Manage replica
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-x-2"
-              onClick={() => onSelectRestartReplica()}
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-            >
-              Restart replica
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
-                Resize replica
-              </DropdownMenuItem> */}
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <DropdownMenuItem
-                  className="gap-x-2 !pointer-events-auto"
-                  disabled={!canManageReplicas}
-                  onClick={() => {
-                    if (canManageReplicas) onSelectDropReplica()
-                  }}
-                >
-                  Drop replica
-                </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
-              {!canManageReplicas && (
-                <TooltipContent_Shadcn_ side="left">
-                  You need additional permissions to drop replicas
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -409,7 +358,7 @@ export const RegionNode = ({ data }: any) => {
         <img
           alt="region icon"
           className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.key}.svg`}
+          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
         />
         <p className="text-sm">{region.name}</p>
       </div>

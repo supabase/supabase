@@ -34,8 +34,8 @@ const EventListItem = ({ event }: Props) => {
 
   return (
     <Link
-      href={event.disable_page_build ? event.link?.href ?? '' : event.path}
-      target={event.disable_page_build ? event.link?.target ?? '' : '_self'}
+      href={event.disable_page_build ? (event.link?.href ?? '') : event.path}
+      target={event.disable_page_build ? (event.link?.target ?? '') : '_self'}
       className="group flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full border-b"
     >
       <div className="flex w-full lg:col-span-7 xl:col-span-8">
@@ -47,7 +47,7 @@ const EventListItem = ({ event }: Props) => {
             {event.categories.map(
               (category, i) =>
                 i === 0 && (
-                  <Badge key={category} className="group-hover:border-foreground-muted capitalize">
+                  <Badge key={category} className="group-hover:border-foreground-muted">
                     {category}
                   </Badge>
                 )

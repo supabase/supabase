@@ -14,33 +14,33 @@ Finally, we use the Thunder Client extension to simulate a POST request to the `
 
 ```javascript
 router.post(
-  "/revalidate",
+  '/revalidate',
   withContent,
   async (request, { SUPABASE_URL, SUPABASE_ANON_KEY, ARTICLES }, context) => {
     const updateCache = async () => {
-      const { type, record, old_record } = request.content;
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { type, record, old_record } = request.content
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-      if (type === "INSERT" || type === "UPDATE") {
-        await writeTo(ARTICLES, `/articles/${record.id}`, record);
+      if (type === 'INSERT' || type === 'UPDATE') {
+        await writeTo(ARTICLES, `/articles/${record.id}`, record)
       }
 
-      if (type === "DELETE") {
-        await ARTICLES.delete(`/articles/${old_record.id}`);
+      if (type === 'DELETE') {
+        await ARTICLES.delete(`/articles/${old_record.id}`)
       }
 
-      const { data: articles } = await supabase.from("articles").select("*");
-      await writeTo(ARTICLES, "/articles", articles);
-      console.log("updated cache");
-    };
+      const { data: articles } = await supabase.from('articles').select('*')
+      await writeTo(ARTICLES, '/articles', articles)
+      console.log('updated cache')
+    }
 
-    context.waitUntil(updateCache());
+    context.waitUntil(updateCache())
 
-    console.log("sending response");
+    console.log('sending response')
 
-    return json({ received: true });
+    return json({ received: true })
   }
-);
+)
 ```
 
 **Run wrangler development server**

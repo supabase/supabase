@@ -1,13 +1,14 @@
 import matter from 'gray-matter'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-
+import { type ComponentProps } from 'react'
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { components } from '~/features/docs/MdxBase.shared'
 import { RefSubLayout } from '~/features/docs/Reference.ui'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { REF_DOCS_DIRECTORY } from '~/lib/docs'
+import { CodeBlock } from '../ui/CodeBlock/CodeBlock'
 
 async function getRefMarkdownInternal(relPath: string) {
   const fullPath = join(REF_DOCS_DIRECTORY, relPath + '.mdx')
@@ -42,9 +43,16 @@ interface MDXRemoteRefsProps {
 }
 
 function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
-  const refComponents = { ...components, RefSubLayout, CliGlobalFlagsHandler }
+  const refComponents = {
+    ...components,
+    // Override the CodeBlock used for normal guides to skip type generation
+    // because it is too resource-intensive
+    pre: (props: ComponentProps<typeof CodeBlock>) => <CodeBlock {...props} skipTypeGeneration />,
+    RefSubLayout,
+    CliGlobalFlagsHandler,
+  }
 
-  return <MDXRemoteBase source={source} components={refComponents} customPreprocess={(x) => x} />
+  return <MDXRemoteBase source={source} components={refComponents} />
 }
 
 export { getRefMarkdown, MDXRemoteRefs }

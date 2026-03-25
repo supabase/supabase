@@ -5,9 +5,6 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { cn } from '@/lib/utils'
 import {
   Button,
   Calendar,
@@ -22,6 +19,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
+import { z } from 'zod'
+
+import { cn } from '@/lib/utils'
 
 const FormSchema = z.object({
   dob: z.date({
@@ -62,9 +62,9 @@ export default function DatePickerForm() {
                         'w-[240px] pl-3 text-left font-normal',
                         !field.value && 'text-muted-foreground'
                       )}
+                      icon={<CalendarIcon className="h-4 w-4 opacity-50" />}
                     >
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl_Shadcn_>
                 </PopoverTrigger_Shadcn_>

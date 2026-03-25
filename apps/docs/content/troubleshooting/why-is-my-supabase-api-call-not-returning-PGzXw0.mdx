@@ -7,7 +7,7 @@ keywords = [ "deadlock", "hang", "async" ]
 database_id = "0a6f6d33-7331-4b47-87ec-7ade7a6a5924"
 ---
 
-There is currently a bug in supabase-js which results in a deadlock if any async API call is made in onAuthStateChange code. If a call is made in the handler then the next Supabase call anywhere using that client will hang and not return.
+There is currently a bug in supabase-js which results in a deadlock if any async API call is made in `onAuthStateChange` code. If a call is made in the handler then the next Supabase call anywhere using that client will hang and not return.
 
 For now a workaround is needed until this is fixed.
 

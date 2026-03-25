@@ -1,6 +1,7 @@
 'use client'
 
-import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import React, { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
+
 import { cn } from '../../lib/utils'
 import { TextArea } from '../shadcn/ui/text-area'
 
@@ -14,31 +15,35 @@ export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTM
  */
 const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps>(
   ({ className, value, ...props }, ref) => {
-    const textAreaRef = useRef<HTMLTextAreaElement>(null)
+    const internalRef = useRef<HTMLTextAreaElement | null>(null)
 
-    // Expose the ref to the parent component
-    useImperativeHandle(ref, () => textAreaRef.current!)
-    /**
-     * This effect is used to resize the textarea based on the content
-     */
-    useEffect(() => {
-      if (textAreaRef) {
-        if (textAreaRef.current && !value) {
-          textAreaRef.current.style.height = '40px'
-        } else if (textAreaRef && textAreaRef.current) {
-          textAreaRef.current.style.height = 'auto'
-          const newHeight = textAreaRef.current.scrollHeight + 'px'
-          textAreaRef.current.style.height = newHeight
-        }
-      }
-    }, [value, textAreaRef])
+    useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement, [])
+
+    const updateTextAreaHeight = (element: HTMLTextAreaElement | null) => {
+      if (!element) return
+
+      // Match single-line input height (h-10 = 40px) so we don't shrink when typing; grow only when content wraps
+      const singleLineHeightPx = 40
+      element.style.height = 'auto'
+      const contentHeight = element.scrollHeight
+      element.style.height = Math.max(singleLineHeightPx, contentHeight) + 'px'
+    }
+
+    useLayoutEffect(() => {
+      updateTextAreaHeight(internalRef.current)
+    }, [value])
 
     return (
       <TextArea
-        ref={textAreaRef}
+        ref={(element) => {
+          if (element) {
+            internalRef.current = element
+            updateTextAreaHeight(element)
+          }
+        }}
         rows={1}
         aria-expanded={false}
-        className={cn('transition-all resize-none leading-6 box-border', className)}
+        className={cn('h-auto resize-none box-border', className)}
         value={value}
         {...props}
       />

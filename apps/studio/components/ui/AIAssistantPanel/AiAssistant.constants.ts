@@ -1,5 +1,15 @@
 import { SupportedAssistantEntities } from './AIAssistant.types'
 
+export const ASSISTANT_ERRORS = {
+  'context-exceeded': {
+    message:
+      'This conversation has become too long for the Assistant to process. Please start a new chat to continue.',
+  },
+  default: {
+    message: 'If the error persists while retrying, you may try creating a new chat and try again.',
+  },
+}
+
 export const ASSISTANT_SUPPORT_ENTITIES: {
   id: SupportedAssistantEntities
   label: string
@@ -31,4 +41,6 @@ export const SAFE_FUNCTIONS = [
   'date_trunc(',
   'string_agg(',
   'in (',
+  'now(',
+  'left(',
 ]

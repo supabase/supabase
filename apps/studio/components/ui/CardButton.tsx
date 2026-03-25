@@ -33,8 +33,10 @@ interface UrlContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorEl
 
 interface NonLinkContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {}
 
-interface ButtonContainerProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {}
+interface ButtonContainerProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'title'
+> {}
 
 // Union of all container props
 type ContainerProps =
@@ -109,7 +111,7 @@ const CardButton = ({
   }
 
   if (fixedHeight) {
-    containerClasses = [...containerClasses, 'h-32']
+    containerClasses = [...containerClasses, 'min-h-32 md:min-h-44']
   }
 
   const ImageContainer = ({ children }: { children: React.ReactNode }) => {

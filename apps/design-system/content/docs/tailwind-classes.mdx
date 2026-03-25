@@ -1,37 +1,37 @@
 ---
 title: Tailwind Classes
-description: Icons system breakdown. Copy values of Icons.
+description: Theming support for Tailwind classes.
 ---
 
-Supabase is migrating to use tailwind classes that use CSS properties.
+Supabase uses Tailwind classes that in turn use CSS properties.
 This is to support the concept of theming, so that:
 
-1. It is easy for the team to update the theme without changing 100s of files.
-2. We could offer custom or additional themes in future.
+1. We can update themes from one place.
+2. We can offer custom or additional themes in the future.
 
 ## Primitives
 
-We (the Supabase Design team ✨) define primitive color values using Figma Variables.
+We define primitive color values using these tokens:
 
 - `background`
 - `foreground`
 - `border`
 - `brand`
-- `destructive`
 - `warning`
+- `destructive`
 
-These values are exported from Figma as a .json file and transformed into tailwind utilities through some scripts under `packages/ui/internals/tokens`.
+These values are exported from Figma as a .json file and transformed into Tailwind utilities through some scripts under `packages/ui/internals/tokens`.
 
-Any of these colors are available on any tailwind utility that accepts color. For example:
+Any of these colors are available on any Tailwind utility that accepts color. For example:
 
 ```jsx
-// this uses the default foreground color
+// this uses the default foreground color for this theme
 <span className="text-foreground"></span>
 
-// this uses the 'light' foreground color
+// this uses the 'light' foreground color for this theme (one notch 'softer' than the default)
 <span className="text-foreground-light"></span>
 
-// this uses the default warning color
+// this uses the default warning color for this theme
 <span className="text-warning"></span>
 
 // this uses the '500' warning color
@@ -46,14 +46,14 @@ We support shorthand classes for `background`, `foreground` and `border`. For ex
 - `bg-surface` is the same as `bg-background-surface-100`
 - `border-strong` is the same as `border-border-strong`
 
-This will stop you from needing to 'double type' the same utlity name.
+This will stop you from needing to 'double type' the same utility name.
 
-You might notice we use `foreground` and `background` as prefixes, this is only because it is a Design Token standard, where as tailwind uses `bg` and `text`.
+You might notice we use `foreground` and `background` as prefixes, this is only because it is a Design Token standard, where as Tailwind uses `bg` and `text`.
 
 ## Mixing colors
 
 Even with shorthands, remember you can use any color. For example, `foreground-light` can also be applied on borders and backgrounds as `border-foreground-light` and `bg-foreground-light`, if needed.
-Similarly, background and border primitives can be used on other tailwind utilities.
+Similarly, background and border primitives can be used on other Tailwind utilities.
 
 ```jsx
 // use the text light color for some text
@@ -61,13 +61,13 @@ Similarly, background and border primitives can be used on other tailwind utilit
 
 // we can use the same color for a background
 <div className="bg-foreground-light">
-    <span>I have the same color background as the left example</span>
+    <span>I have the same background color as the above example</span>
 </div>
 ```
 
 ## Opacity support
 
-All the colors are generated using tailwind opacity, like `hsl(--background-default) / var(--tw-bg-opacity)`.
+All colors are generated using Tailwind opacity, like `hsl(--background-default) / var(--tw-bg-opacity)`.
 This means all the color options in our themes can support opacity rules. For example:
 
 ```jsx
@@ -82,7 +82,9 @@ This means all the color options in our themes can support opacity rules. For ex
 
 ## Usage
 
-The following tailwind classes are a combination of tailwind utilities and our primitives. They're under development and are likely to change but most are now in use and will probably be permanent fixtures.
+The following Tailwind classes are a combination of Tailwind utilities and our primitives.
+
+Note that the shade of the `DEFAULT` value on each scale pattern is variable. Sometimes it is fixed at a particular shade (such as `500` or `600`), but only when contrast is sufficient.
 
 ### Foreground (Text)
 
@@ -118,7 +120,7 @@ Examples:
 | `background-control`          | Inputs, Radios, Checkboxes                                   |
 | `background-button-{DEFAULT}` | Button default                                               |
 
-The `background` part can be omitted when used on the `bg` tailwind utility.
+The `background` part can be omitted when used on the `bg` Tailwind utility.
 
 Examples:
 

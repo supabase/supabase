@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Input } from 'ui'
 
+import { Eye, EyeOff, HelpCircle, Loader } from 'lucide-react'
 import type { ServerOption } from './Wrappers.types'
-import { HelpCircle, Loader, Eye, EyeOff } from 'lucide-react'
 
 interface InputFieldProps {
   option: ServerOption
@@ -49,7 +49,9 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
       <Input
         key={option.name}
         id={option.name}
-        name={option.name}
+        // The iceberg wrapper uses a dot in the option name, Formik has magic handling for arryas so we need to
+        // escape it in the name attribute. https://formik.org/docs/guides/arrays#avoid-nesting
+        name={`['${option.name}']`}
         label={
           <div className="flex items-center space-x-2">
             <p>{option.label}</p>
@@ -64,11 +66,12 @@ const InputField = ({ option, loading, error }: InputFieldProps) => {
             )}
           </div>
         }
+        labelOptional={option.required ? undefined : 'Optional'}
         defaultValue={option.defaultValue ?? ''}
         error={error}
         value={loading ? 'Fetching value from Vault...' : undefined}
         type={!option.secureEntry || loading ? 'text' : showHidden ? 'text' : 'password'}
-        disabled={loading}
+        disabled={loading || option.readOnly}
         actions={
           loading ? (
             <div className="flex items-center justify-center mr-1">

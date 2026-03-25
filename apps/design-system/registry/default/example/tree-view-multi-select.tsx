@@ -84,6 +84,7 @@ export default function TreeViewDemo() {
       togglableSelect
       clickAction="EXCLUSIVE_SELECT"
       multiSelect
+      className="w-[420px] border bg py-2"
       nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => {
         return (
           <ContextMenu_Shadcn_ modal={false}>

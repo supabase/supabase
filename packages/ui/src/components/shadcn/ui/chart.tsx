@@ -37,10 +37,10 @@ function useChart() {
 const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {
-    config: ChartConfig
+    config?: ChartConfig
     children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>['children']
   }
->(({ id, className, children, config, ...props }, ref) => {
+>(({ id, className, children, config = {}, ...props }, ref) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`
 
@@ -103,6 +103,7 @@ const ChartTooltipContent = React.forwardRef<
       indicator?: 'line' | 'dot' | 'dashed'
       nameKey?: string
       labelKey?: string
+      labelSuffix?: string
     }
 >(
   (
@@ -115,6 +116,7 @@ const ChartTooltipContent = React.forwardRef<
       hideIndicator = false,
       label,
       labelFormatter,
+      labelSuffix,
       labelClassName,
       formatter,
       color,
@@ -223,6 +225,7 @@ const ChartTooltipContent = React.forwardRef<
                       {item.value && (
                         <span className="font-mono font-medium tabular-nums text-foreground">
                           {item.value.toLocaleString()}
+                          {labelSuffix}
                         </span>
                       )}
                     </div>
@@ -321,9 +324,9 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
 
 export {
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  ChartTooltip,
+  ChartTooltipContent,
 }

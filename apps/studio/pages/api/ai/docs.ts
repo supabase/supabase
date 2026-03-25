@@ -33,8 +33,8 @@ export const config = {
 }
 
 const openAiKey = process.env.OPENAI_API_KEY
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
-const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 export default async function handler(req: NextRequest) {
   if (!openAiKey) {
@@ -104,7 +104,7 @@ async function handlePost(request: NextRequest) {
     throw new UserError('Missing messages in request data')
   }
 
-  const supabaseClient = new SupabaseClient(supabaseUrl, supabaseServiceKey)
+  const supabaseClient = new SupabaseClient(supabaseUrl!, supabaseServiceKey!)
 
   try {
     const response = await clippy(openai, supabaseClient, messages)
@@ -135,6 +135,8 @@ async function handlePost(request: NextRequest) {
       // Print out unexpected errors as is to help with debugging
       console.error(error)
     }
+
+    console.log('Returning generic 500 ApplicationError to client')
 
     // TODO: include more response info in debug environments
     return new Response(

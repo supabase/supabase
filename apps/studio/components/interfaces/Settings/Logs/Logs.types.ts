@@ -20,7 +20,6 @@ export interface LogsWarning {
   linkText?: string
 }
 export interface LogsEndpointParams {
-  project: string // project ref
   iso_timestamp_start?: string
   iso_timestamp_end?: string
   sql?: string
@@ -35,6 +34,7 @@ export interface PreviewLogData extends CustomLogData {
   timestamp: number
   event_message: string
   metadata?: Metadata
+  [key: string]: string | number | Metadata | undefined
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -52,6 +52,7 @@ export interface CountData {
 
 export interface EventChartData extends Datum {
   error_count: number
+  warning_count: number
   ok_count: number
   timestamp: string
 }
@@ -88,8 +89,10 @@ export type QueryType =
   | 'storage'
   | 'supavisor'
   | 'postgrest'
-  | 'warehouse'
+  | 'pg_upgrade'
   | 'pg_cron'
+  | 'pgbouncer'
+  | 'etl'
 
 export type Mode = 'simple' | 'custom'
 
@@ -139,10 +142,4 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
-}
-
-export interface WarehouseCollection {
-  name: string
-  id: number
-  token: string
 }

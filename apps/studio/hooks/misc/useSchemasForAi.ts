@@ -1,5 +1,5 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { Dispatch, SetStateAction } from 'react'
 
 /**

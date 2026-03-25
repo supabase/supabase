@@ -20,7 +20,7 @@ const PolicyTemplates = ({
   const [selectedTemplate, setSelectedTemplate] = useState<PolicyTemplate>(templates[0])
   return (
     <div>
-      <div className="flex justify-between border-t border-default">
+      <div className="flex flex-col md:flex-row justify-between border-t border-default">
         <TemplatesList
           templatesNote={templatesNote}
           templates={templates}

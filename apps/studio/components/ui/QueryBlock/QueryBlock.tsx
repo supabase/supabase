@@ -1,55 +1,49 @@
-import { Code, Play } from 'lucide-react'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
-import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
-import { toast } from 'sonner'
-
-import { useParams } from 'common'
+import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { Parameter, parseParameters, processParameterizedSql } from 'lib/sql-parameters'
-import {
-  Button,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  cn,
-  CodeBlock,
-  SQL_ICON,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
+import dayjs from 'dayjs'
+import { Code, Play } from 'lucide-react'
+import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
+import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ButtonTooltip } from '../ButtonTooltip'
+import { CHART_COLORS } from '../Charts/Charts.constants'
+import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { ParametersPopover } from './ParametersPopover'
-import { getCumulativeResults } from './QueryBlock.utils'
+import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
 
-const DEFAULT_CHART_CONFIG: ChartConfig = {
+export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
   cumulative: false,
   xKey: '',
   yKey: '',
   showLabels: false,
   showGrid: false,
+  logScale: false,
+  view: 'table',
 }
 
-interface QueryBlockProps {
+export interface QueryBlockProps {
   id?: string
   label: string
-  sql: string
+  sql?: string
+  isWriteQuery?: boolean
   chartConfig?: ChartConfig
-  maxHeight?: number
-  parameterValues?: Record<string, string>
-  actions?: ReactNode // Any other actions specific to the parent to be rendered in the header
-  isChart?: boolean
-  isLoading?: boolean
-  runQuery?: boolean
-  lockColumns?: boolean
-  onSetParameter?: (params: Parameter[]) => void
-  onUpdateChartConfig?: (config: ChartConfig) => void
+  actions?: ReactNode
+  results?: any[]
+  errorText?: string
+  isExecuting?: boolean
+  initialHideSql?: boolean
+  draggable?: boolean
+  disabled?: boolean
+  blockWriteQueries?: boolean
+  onExecute?: (queryType: 'select' | 'mutation') => void
+  onRemoveChart?: () => void
+  onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
+  onDragStart?: (e: DragEvent<Element>) => void
 }
 
 // [Joshen ReportsV2] JFYI we may adjust this in subsequent PRs when we implement this into Reports V2
@@ -59,205 +53,182 @@ export const QueryBlock = ({
   label,
   sql,
   chartConfig = DEFAULT_CHART_CONFIG,
-  maxHeight = 250,
-  parameterValues: extParameterValues,
   actions,
-  isChart = false,
-  isLoading = false,
-  runQuery = false,
-  lockColumns = false,
-  onSetParameter,
+  results,
+  errorText,
+  isWriteQuery = false,
+  isExecuting = false,
+  initialHideSql = false,
+  draggable = false,
+  disabled = false,
+  blockWriteQueries = false,
+  onExecute,
+  onRemoveChart,
   onUpdateChartConfig,
+  onDragStart,
 }: QueryBlockProps) => {
-  const { ref } = useParams()
-  const { project } = useProjectContext()
+  const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
+  const { xKey, yKey, view = 'table', logScale = false } = chartSettings
 
-  const [showSql, setShowSql] = useState(!isChart)
-  const [view, setView] = useState<'table' | 'chart'>(isChart ? 'chart' : 'table')
-  // [Joshen] Thinking cumulative could just be a UI state here to prevent unnecessary re-rendering
-  const [cumulative, setCumulative] = useState(false)
-  const [queryResult, setQueryResult] = useState<any[]>()
-  const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
+  const [showSql, setShowSql] = useState(!results && !initialHideSql)
+  const [focusDataIndex, setFocusDataIndex] = useState<number>()
   const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
-  const { xKey, yKey } = chartConfig
-  const showChart =
-    isChart && (queryResult ?? []).length > 0 && !!xKey && !!yKey && view === 'chart'
+  const prevIsWriteQuery = useRef(isWriteQuery)
 
-  const parameters = useMemo(() => {
-    if (!sql) return []
-    return parseParameters(sql)
-  }, [sql])
-  const combinedParameterValues = { ...extParameterValues, ...parameterValues }
-
-  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (data) => setQueryResult(data.result),
-  })
-
-  const handleExecute = () => {
-    if (!sql || isLoading) return
-
-    if (!isReadOnlySelect(sql)) {
-      const hasUnknownFunctions = containsUnknownFunction(sql)
-      return setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
+  useEffect(() => {
+    if (!prevIsWriteQuery.current && isWriteQuery) {
+      setShowWarning('hasWriteOperation')
     }
-
-    try {
-      const processedSql = processParameterizedSql(sql, combinedParameterValues)
-      execute({
-        projectRef: ref,
-        connectionString: project?.connectionString,
-        sql: processedSql,
-      })
-    } catch (error: any) {
-      toast.error(`Failed to execute query: ${error.message}`)
+    if (!isWriteQuery && showWarning === 'hasWriteOperation') {
+      setShowWarning(undefined)
     }
+    prevIsWriteQuery.current = isWriteQuery
+  }, [isWriteQuery, showWarning])
+
+  useEffect(() => {
+    setChartSettings(chartConfig)
+  }, [chartConfig])
+
+  const formattedQueryResult = useMemo(() => {
+    return results?.map((row) => {
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => {
+          if (key === yKey) return [key, Number(value)]
+          return [key, value]
+        })
+      )
+    })
+  }, [results, yKey])
+
+  const chartData = chartSettings.cumulative
+    ? getCumulativeResults({ rows: formattedQueryResult ?? [] }, chartSettings)
+    : formattedQueryResult
+
+  const hasNonPositiveValues = useMemo(() => {
+    if (!logScale || !yKey || !chartData?.length) return false
+    return checkHasNonPositiveValues(chartData, yKey)
+  }, [logScale, yKey, chartData])
+
+  const effectiveLogScale = logScale && !hasNonPositiveValues
+
+  const getDateFormat = (key: any) => {
+    const value = chartData?.[0]?.[key] || ''
+    if (typeof value === 'number') return 'number'
+    if (dayjs(value).isValid()) return 'date'
+    return 'string'
+  }
+  const xKeyDateFormat = getDateFormat(xKey)
+
+  const hasResults = Array.isArray(results) && results.length > 0
+
+  const runSelect = () => {
+    if (!sql || disabled || isExecuting) return
+    if (isWriteQuery) {
+      setShowWarning('hasWriteOperation')
+      return
+    }
+    onExecute?.('select')
   }
 
-  // Run once on mount to parse parameters and notify parent
-  useEffect(() => {
-    if (!!sql && onSetParameter) {
-      const params = parseParameters(sql)
-      onSetParameter(params)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql])
-
-  useEffect(() => {
-    if (!!sql && !isLoading && runQuery && isReadOnlySelect(sql) && !!project) {
-      handleExecute()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, isLoading, runQuery, project])
+  const runMutation = () => {
+    if (!sql || disabled || isExecuting) return
+    setShowWarning(undefined)
+    onExecute?.('mutation')
+  }
 
   return (
-    <div className="h-full flex flex-col overflow-hidden bg-surface-100 border-overlay rounded border shadow-sm">
-      <div className="flex py-1 pl-3 pr-1 items-center gap-2 z-10 shrink-0">
-        <SQL_ICON
-          className={cn(
-            'transition-colors fill-foreground-muted group-aria-selected:fill-foreground',
-            'w-5 h-5 shrink-0 grow-0 -ml-0.5'
-          )}
-          size={16}
-          strokeWidth={1.5}
-        />
-        <h3 className="text-xs font-medium text-foreground-light flex-1">{label}</h3>
-
-        {/* QueryBlock actions */}
-        <div className="flex items-center">
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Code size={14} />}
-            onClick={() => setShowSql(!showSql)}
-            tooltip={{
-              content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
-            }}
-          />
-
-          {queryResult && (
+    <ReportBlockContainer
+      draggable={draggable}
+      showDragHandle={draggable}
+      onDragStart={(e: DragEvent<Element>) => onDragStart?.(e)}
+      loading={isExecuting}
+      label={label}
+      badge={isWriteQuery && <Badge variant="warning">Write</Badge>}
+      actions={
+        <>
+          {!disabled && (
             <>
-              {/* [Joshen ReportsV2] Won't see this just yet as this is intended for Reports V2 */}
-              {parameters.length > 0 && (
-                <ParametersPopover
-                  parameters={parameters}
-                  parameterValues={parameterValues}
-                  onSubmit={setParameterValues}
-                />
-              )}
-              {isChart && (
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Code size={14} strokeWidth={1.5} />}
+                onClick={() => setShowSql(!showSql)}
+                tooltip={{
+                  content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
+                }}
+              />
+              {hasResults && (
                 <BlockViewConfiguration
                   view={view}
-                  isChart={isChart}
-                  lockColumns={lockColumns}
-                  chartConfig={{ ...chartConfig, cumulative }}
-                  columns={Object.keys(queryResult[0] || {})}
-                  changeView={setView}
+                  isChart={view === 'chart'}
+                  lockColumns={false}
+                  chartConfig={chartSettings}
+                  columns={Object.keys(results?.[0] ?? {})}
+                  changeView={(nextView) => {
+                    if (onUpdateChartConfig)
+                      onUpdateChartConfig({ chartConfig: { view: nextView } })
+                    setChartSettings({ ...chartSettings, view: nextView })
+                  }}
                   updateChartConfig={(config) => {
-                    if (onUpdateChartConfig) onUpdateChartConfig(config)
-                    setCumulative(config.cumulative)
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
+                    setChartSettings(config)
                   }}
                 />
               )}
+
+              <EditQueryButton id={id} title={label} sql={sql} />
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Play size={14} strokeWidth={1.5} />}
+                loading={isExecuting}
+                disabled={isExecuting || disabled || !sql}
+                onClick={runSelect}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'max-w-56 text-center',
+                    text: isExecuting
+                      ? 'Query is running. Check the SQL Editor to manage running queries.'
+                      : 'Run query',
+                  },
+                }}
+              />
             </>
           )}
 
-          <EditQueryButton title={label} sql={sql} />
-
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Play size={14} />}
-            loading={isExecuting || isLoading}
-            disabled={isLoading}
-            onClick={handleExecute}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                className: 'max-w-56 text-center',
-                text: isExecuting ? (
-                  <p>{`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}</p>
-                ) : (
-                  'Run query'
-                ),
-              },
-            }}
-          />
-
           {actions}
-        </div>
-      </div>
-
-      {showWarning && (
-        <Admonition
-          type="warning"
-          className="mb-0 rounded-none border-0 shrink-0 bg-background-100 border-t"
-        >
-          <p>
-            {showWarning === 'hasWriteOperation'
-              ? 'This query contains write operations.'
-              : 'This query involves running a function.'}{' '}
-            Are you sure you want to execute it?
-          </p>
-          <p className="text-foreground-light">
-            Make sure you are not accidentally removing something important.
-          </p>
-          <div className="flex justify-stretch mt-2 gap-2">
-            <Button
-              type="outline"
-              size="tiny"
-              className="w-full flex-1"
-              onClick={() => setShowWarning(undefined)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="danger"
-              size="tiny"
-              className="w-full flex-1"
-              onClick={() => {
-                // [Joshen] This is for when we introduced the concept of parameters into our reports
-                // const processedSql = processParameterizedSql(sql!, combinedParameterValues)
-
-                setShowWarning(undefined)
-                execute({
-                  projectRef: ref,
-                  connectionString: project?.connectionString,
-                  sql,
-                })
-              }}
-            >
-              Run
-            </Button>
-          </div>
-        </Admonition>
+        </>
+      }
+    >
+      {!!showWarning && !blockWriteQueries && (
+        <SqlWarningAdmonition
+          warningType={showWarning}
+          className="border-b"
+          onCancel={() => setShowWarning(undefined)}
+          onConfirm={runMutation}
+          disabled={!sql}
+          {...(showWarning !== 'hasWriteOperation'
+            ? {
+                message: 'Run this query now and send the results to the Assistant? ',
+                subMessage:
+                  'We will execute the query and provide the result rows back to the Assistant to continue the conversation.',
+                cancelLabel: 'Skip',
+                confirmLabel: 'Run & send',
+              }
+            : {})}
+        />
       )}
 
-      {/* QueryBlock output */}
       {showSql && (
-        <div className="shrink-0 max-h-96 overflow-y-auto border-t">
+        <div
+          className={cn('shrink-0 grow-1 w-full h-full overflow-y-auto max-h-[min(300px, 100%)]', {
+            'border-b': results !== undefined,
+          })}
+        >
           <CodeBlock
             hideLineNumbers
             wrapLines={false}
@@ -271,56 +242,112 @@ export const QueryBlock = ({
         </div>
       )}
 
-      {isExecuting && queryResult === undefined && (
-        <div className="border-t p-3">
+      {isExecuting && !results && (
+        <div className="p-3 w-full border-t">
           <ShimmeringLoader />
         </div>
       )}
 
-      {showChart ? (
-        <div className={cn('border-t flex-1 shrink-0')}>
-          <ChartContainer
-            className="aspect-auto p-3"
-            config={{}}
-            style={{
-              height: maxHeight ? `${maxHeight}px` : undefined,
-              minHeight: maxHeight ? `${maxHeight}px` : undefined,
-            }}
-          >
-            <BarChart
-              accessibilityLayer
-              margin={{ left: 0, right: 0 }}
-              data={
-                cumulative
-                  ? getCumulativeResults({ rows: queryResult ?? [] }, chartConfig)
-                  : queryResult
-              }
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey={xKey}
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-              />
-              <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
-              <Bar dataKey={yKey} fill="var(--chart-1)" radius={4} />
-            </BarChart>
-          </ChartContainer>
-        </div>
-      ) : (
+      {view === 'chart' && results !== undefined ? (
         <>
-          {queryResult && (
-            <div
-              className={cn('flex-1 overflow-auto relative border-t')}
-              style={{ maxHeight: maxHeight ? `${maxHeight}px` : undefined }}
-            >
-              <Results rows={queryResult} />
+          {(results ?? []).length === 0 ? (
+            <div className="flex w-full h-full items-center justify-center py-3">
+              <p className="text-foreground-light text-xs">No results returned from query</p>
+            </div>
+          ) : !xKey || !yKey ? (
+            <div className="flex w-full h-full items-center justify-center">
+              <p className="text-foreground-light text-xs">Select columns for the X and Y axes</p>
+            </div>
+          ) : (
+            <div className="flex-1 w-full">
+              {hasNonPositiveValues && (
+                <p className="px-3 pt-1 text-xs text-foreground-light">
+                  Log scale is unavailable because the data contains zero or negative values.
+                </p>
+              )}
+              <ChartContainer
+                className="aspect-auto px-3 py-2"
+                style={{ height: '230px', minHeight: '230px' }}
+              >
+                <BarChart
+                  accessibilityLayer
+                  margin={{ left: -20, right: 0, top: 10 }}
+                  data={chartData}
+                  onMouseMove={(e: any) => {
+                    if (e.activeTooltipIndex !== focusDataIndex) {
+                      setFocusDataIndex(e.activeTooltipIndex)
+                    }
+                  }}
+                  onMouseLeave={() => setFocusDataIndex(undefined)}
+                >
+                  <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />
+                  <XAxis
+                    dataKey={xKey}
+                    tickLine={{ stroke: CHART_COLORS.AXIS }}
+                    axisLine={{ stroke: CHART_COLORS.AXIS }}
+                    interval="preserveStartEnd"
+                    tickMargin={4}
+                    minTickGap={32}
+                    tickFormatter={(value) =>
+                      xKeyDateFormat === 'date' ? dayjs(value).format('MMM D YYYY HH:mm') : value
+                    }
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={4}
+                    scale={effectiveLogScale ? 'log' : 'auto'}
+                    domain={effectiveLogScale ? [1, 'auto'] : undefined}
+                    allowDataOverflow={effectiveLogScale}
+                    width={effectiveLogScale ? 52 : undefined}
+                    tickFormatter={effectiveLogScale ? formatLogTick : undefined}
+                  />
+                  <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
+                  <Bar radius={1} dataKey={yKey}>
+                    {chartData?.map((_: any, index: number) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        className="transition-all duration-100"
+                        fill="hsl(var(--chart-1))"
+                        opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
+                        enableBackground={12}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
             </div>
           )}
         </>
+      ) : (
+        <>
+          {isWriteQuery && blockWriteQueries ? (
+            <div className="flex flex-col h-full justify-center items-center text-center">
+              <p className="text-xs text-foreground-light">
+                SQL query is not read-only and cannot be rendered
+              </p>
+              <p className="text-xs text-foreground-lighter text-center">
+                Queries that involve any mutation will not be run in reports
+              </p>
+              {!!onRemoveChart && (
+                <Button type="default" className="mt-2" onClick={() => onRemoveChart()}>
+                  Remove chart
+                </Button>
+              )}
+            </div>
+          ) : !isExecuting && !!errorText ? (
+            <div className={cn('flex-1 w-full overflow-auto relative border-t px-3.5 py-2')}>
+              <span className="font-mono text-xs">ERROR: {errorText}</span>
+            </div>
+          ) : (
+            results && (
+              <div className={cn('flex-1 w-full overflow-auto relative max-h-64')}>
+                <Results rows={results} />
+              </div>
+            )
+          )}
+        </>
       )}
-    </div>
+    </ReportBlockContainer>
   )
 }

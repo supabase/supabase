@@ -1,21 +1,27 @@
-import ApiExamples from 'data/products/realtime/api-examples'
-import AppExamples from 'data/products/realtime/app-examples'
-import MainProducts from '~/data/MainProducts'
+import 'swiper/css'
+import RealtimeStyles from '~/styles/realtime.module.css'
+
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Image } from 'ui'
+import { Grid, Layers, Menu } from 'lucide-react'
+import Image from 'next/image'
+
+import { Button } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import RealtimeStyles from '~/styles/realtime.module.css'
+import RealtimeShowcase from '~/components/Realtime/realtime-showcase'
 
-import { Grid, Layers, Menu } from 'lucide-react'
+import ApiExamples from 'data/products/realtime/api-examples'
+import MainProducts from '~/data/MainProducts'
 import { PRODUCT_NAMES } from 'shared-data/products'
-import 'swiper/css'
+
+const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -182,39 +188,36 @@ function RealtimePage() {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="flex flex-col gap-8">
-          <div className="flex flex-col items-center justify-center">
-            <h2 className="h3">What you can build with Realtime</h2>
-            <p className="p mx-auto text-center lg:w-1/2">
+        <SingleQuote
+          id="quote"
+          className="!pb-8 md:!pb-12"
+          quote={{
+            text: 'Supabase takes out the mental effort from our back-end infrastructure so we can focus on our customers needs.',
+            author: 'Aaron Sullivan',
+            role: 'Principal Software Engineer Epsilon3',
+            link: '/customers/epsilon3',
+            logo: (
+              <Image
+                draggable={false}
+                src="/images/blog/avatars/aaron-epsilon3.png"
+                alt="Aaron Sullivan, Principal Software Engineer Epsilon3"
+                className="w-10 h-10 rounded-full overflow-hidden object-cover"
+                width={28}
+                height={28}
+              />
+            ),
+          }}
+        />
+
+        <SectionContainer className="!pb-0 !mb-0">
+          <div className="mb-12 prose">
+            <h3>What you can build with Realtime</h3>
+            <p className="text-foreground-light mt-0">
               Build any kind of Realtime application with ease, including any of these scenarios.
             </p>
           </div>
-          <div className="grid gap-10 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-            {AppExamples.map((example) => {
-              return (
-                <>
-                  <div className="flex flex-col gap-3">
-                    <Image
-                      alt={example.title}
-                      src={{
-                        light: `/images/realtime/example-apps/light/${example.img}?type=1`,
-                        dark: `/images/realtime/example-apps/dark/${example.img}`,
-                      }}
-                      className="bg-surface-100 rounded-lg"
-                      layout="fill"
-                      objectFit="contain"
-                    />
-                    <div className="prose">
-                      <h4>{example.title}</h4>
-                      <p className="text-sm">{example.description}</p>
-                    </div>
-                  </div>
-                </>
-              )
-            })}
-          </div>
+          <RealtimeShowcase />
         </SectionContainer>
-
         <SectionContainer>
           <APISection
             title="Simple and convenient APIs"

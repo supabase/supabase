@@ -1,8 +1,8 @@
 import React from 'react'
 import {
   InnerSideMenuCollapsible,
-  InnerSideMenuCollapsibleTrigger,
   InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
   InnerSideMenuSeparator,
 } from 'ui-patterns/InnerSideMenu'

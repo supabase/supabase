@@ -1,0 +1,15 @@
+{
+  "name": "social-auth-vue",
+  "type": "registry:block",
+  "title": "Social Auth flow for Vue and Supabase",
+  "description": "Social Auth flow for Vue and Supabase",
+  "registryDependencies": ["button", "card"],
+  "files": [
+    {
+      "path": "registry/default/social-auth/vue/components/login-form.vue",
+      "type": "registry:component",
+      "target": "components/login-form.vue"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest"]
+}

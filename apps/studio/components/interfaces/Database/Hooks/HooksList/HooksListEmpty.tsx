@@ -1,6 +1,6 @@
 import Table from 'components/to-be-cleaned/Table'
 
-const HooksListEmpty = () => {
+export const HooksListEmpty = () => {
   return (
     <Table
       className="table-fixed"
@@ -34,5 +34,3 @@ const HooksListEmpty = () => {
     />
   )
 }
-
-export default HooksListEmpty

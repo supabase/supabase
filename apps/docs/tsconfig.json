@@ -2,9 +2,10 @@
   "compilerOptions": {
     "incremental": true,
     "noImplicitAny": false,
-    "baseUrl": ".",
     "paths": {
+      // @deprecated: use @/ instead of ~/
       "~/*": ["./*"],
+      "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"]
     },
     "target": "ES2021",
@@ -15,7 +16,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -25,7 +26,7 @@
         "name": "next"
       }
     ],
-    "strictNullChecks": false
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",

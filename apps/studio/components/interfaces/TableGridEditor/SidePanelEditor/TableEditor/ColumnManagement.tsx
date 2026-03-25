@@ -1,32 +1,37 @@
+import { useParams } from 'common'
+import InformationBox from 'components/ui/InformationBox'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import { isEmpty, noop, partition } from 'lodash'
 import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
   DragDropContext,
   Draggable,
-  DraggableProvided,
   Droppable,
-  DroppableProvided,
+  type DraggableProvided,
+  type DroppableProvided,
+  type DropResult,
 } from 'react-beautiful-dnd'
-
-import InformationBox from 'components/ui/InformationBox'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   WarningIcon,
 } from 'ui'
+
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
-import Column from './Column'
+import { Column } from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
 
 interface ColumnManagementProps {
@@ -42,7 +47,7 @@ interface ColumnManagementProps {
   onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
-const ColumnManagement = ({
+export const ColumnManagement = ({
   table,
   columns = [],
   relations,
@@ -54,9 +59,14 @@ const ColumnManagement = ({
   onClearImportContent = noop,
   onUpdateFkRelations,
 }: ColumnManagementProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: org } = useSelectedOrganizationQuery()
+
   const [open, setOpen] = useState(false)
   const [selectedColumn, setSelectedColumn] = useState<ColumnField>()
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const hasImportContent = !isEmpty(importContent)
   const [primaryKeyColumns, otherColumns] = partition(
@@ -105,7 +115,7 @@ const ColumnManagement = ({
     onColumnsUpdated(updatedColumns)
   }
 
-  const onSortColumns = (result: any, type: 'pks' | 'others') => {
+  const onSortColumns = (result: DropResult, type: 'pks' | 'others') => {
     // Dropped outside of the list
     if (!result.destination) {
       return
@@ -136,7 +146,7 @@ const ColumnManagement = ({
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink size={12} strokeWidth={2} />}>
               <a
-                href="https://supabase.com/docs/guides/database/tables#data-types"
+                href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -156,8 +166,21 @@ const ColumnManagement = ({
                     </Button>
                   </div>
                 ) : (
-                  <Button type="default" onClick={onSelectImportData}>
-                    Import data via spreadsheet
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      onSelectImportData()
+                      sendEvent({
+                        action: 'import_data_button_clicked',
+                        properties: { tableType: 'New Table' },
+                        groups: {
+                          project: projectRef ?? 'Unknown',
+                          organization: org?.slug ?? 'Unknown',
+                        },
+                      })
+                    }}
+                  >
+                    Import data from CSV
                   </Button>
                 )}
               </>
@@ -199,30 +222,30 @@ const ColumnManagement = ({
             {isNewRecord && <div className="w-[5%]" />}
             <div className="w-[25%] flex items-center space-x-2">
               <h5 className="text-xs text-foreground-lighter">Name</h5>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
+              <Tooltip>
+                <TooltipTrigger>
                   <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" className="w-[300px]">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
                   Recommended to use lowercase and use an underscore to separate words e.g.
                   column_name
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[25%]">
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
             <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
               <h5 className="text-xs text-foreground-lighter">Default Value</h5>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_>
+              <Tooltip>
+                <TooltipTrigger>
                   <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="bottom" className="w-[300px]">
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-[300px]">
                   Can either be a literal or an expression. When using an expression wrap your
                   expression in brackets, e.g. (gen_random_uuid())
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <div className="w-[10%]">
               <h5 className="text-xs text-foreground-lighter">Primary</h5>
@@ -236,7 +259,7 @@ const ColumnManagement = ({
           </div>
 
           {primaryKeyColumns.length > 0 && (
-            <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'pks')}>
+            <DragDropContext onDragEnd={(result) => onSortColumns(result, 'pks')}>
               <Droppable droppableId="pk_columns_droppable">
                 {(droppableProvided: DroppableProvided) => (
                   <div
@@ -281,7 +304,7 @@ const ColumnManagement = ({
             </DragDropContext>
           )}
 
-          <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'others')}>
+          <DragDropContext onDragEnd={(result) => onSortColumns(result, 'others')}>
             <Droppable droppableId="other_columns_droppable">
               {(droppableProvided: DroppableProvided) => (
                 <div
@@ -357,5 +380,3 @@ const ColumnManagement = ({
     </>
   )
 }
-
-export default ColumnManagement

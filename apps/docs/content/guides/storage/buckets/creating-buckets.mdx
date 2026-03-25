@@ -18,6 +18,10 @@ Here we create a bucket called "avatars":
 <TabPanel id="javascript" label="JavaScript">
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 // Use the JS library to create a bucket.
 
 const { data, error } = await supabase.storage.createBucket('avatars', {
@@ -31,7 +35,7 @@ const { data, error } = await supabase.storage.createBucket('avatars', {
 
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Storage](https://supabase.com/dashboard/project/_/storage/buckets) page in the Dashboard.
+1. Go to the [Storage](/dashboard/project/_/storage/buckets) page in the Dashboard.
 2. Click **New Bucket** and enter a name for the bucket.
 3. Click **Create Bucket**.
 
@@ -48,6 +52,7 @@ values
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -63,6 +68,8 @@ void main() async {
 [Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -75,6 +82,8 @@ try await supabase.storage.createBucket(
 [Reference.](/docs/reference/swift/storage-createbucket)
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -87,16 +96,20 @@ supabase.storage.create_bucket(
 [Reference.](/docs/reference/python/storage-createbucket)
 
 </TabPanel>
+</$Show>
 </Tabs>
 
 ## Restricting uploads
 
 When creating a bucket you can add additional configurations to restrict the type or size of files you want this bucket to contain.
-For example, imagine you want to allow your users to upload only images to the `avatars` bucket and the size must not be greater than 1MB.
 
-You can achieve the following by providing: `allowedMimeTypes` and `maxFileSize`
+For example, imagine you want to allow your users to upload only images to the `avatars` bucket and the size must not be greater than 1MB. You can achieve the following by providing `allowedMimeTypes` and `maxFileSize`:
 
 ```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!)
+
+// ---cut---
 // Use the JS library to create a bucket.
 
 const { data, error } = await supabase.storage.createBucket('avatars', {
@@ -106,6 +119,4 @@ const { data, error } = await supabase.storage.createBucket('avatars', {
 })
 ```
 
-If an upload request doesn't meet the above restrictions it will be rejected.
-
-For more information check [File Limits](/docs/guides/storage/uploads/file-limits) Section.
+If an upload request doesn't meet the above restrictions it will be rejected. See [File Limits](/docs/guides/storage/uploads/file-limits) for more information.

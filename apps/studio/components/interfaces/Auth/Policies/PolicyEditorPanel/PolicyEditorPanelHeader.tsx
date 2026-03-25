@@ -1,18 +1,17 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
-
 import {
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   SheetClose,
   SheetHeader,
   SheetTitle,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 export const PolicyEditorPanelHeader = ({
@@ -103,8 +102,8 @@ export const PolicyEditorPanelHeader = ({
           )}
         </div>
       </div>
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
           <button
             aria-expanded={showTools}
             aria-controls="ai-chat-assistant"
@@ -119,12 +118,11 @@ export const PolicyEditorPanelHeader = ({
             ) : (
               <PanelRightClose size={19} strokeWidth={1} />
             )}
+            <span className="sr-only">{showTools ? 'Hide' : 'Show'} tools</span>
           </button>
-        </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_ side="left">
-          {showTools ? 'Hide' : 'Show'} tools
-        </TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+        </TooltipTrigger>
+        <TooltipContent side="left">{showTools ? 'Hide' : 'Show'} tools</TooltipContent>
+      </Tooltip>
     </SheetHeader>
   )
 }

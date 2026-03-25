@@ -3,13 +3,13 @@ title: 'Set Up SSO with Azure AD'
 description: 'Configure single sign-on with Azure AD (Microsoft Entra).'
 ---
 
-<Admonition>
+<Admonition type="note">
 
-This feature is only available on the Team and Enterprise Plans. Please contact [Sales](https://forms.supabase.com/enterprise) before doing these steps.
+This feature is only available on the [Team and Enterprise Plans](/pricing). If you are an existing Team or Enterprise Plan customer, continue with the setup below.
 
 </Admonition>
 
-<Admonition>
+<Admonition type="tip">
 
 Looking for docs on how to add Single Sign-On support in your Supabase project? Head on over to [Single Sign-On with SAML 2.0 for Projects](/docs/guides/auth/enterprise-sso/auth-sso-saml).
 
@@ -33,7 +33,7 @@ You'll be using the custom enterprise application setup for Supabase.
 
 ## Step 3: Fill in application details [#add-application-details]
 
-In the modal titled _Create your own application_, enter a display name for Supabase. This is the name your Azure AD users see when signing in to Supabase from Azure. `Supabase` works in most cases.
+In the modal titled _Create your own application_, enter a display name for Supabase. This is the name your Azure AD users will see when signing in to Supabase from Azure. `Supabase` works in most cases.
 
 Make sure to choose the third option: _Integrate any other application you
 don't find in the gallery (Non-gallery)_.
@@ -81,24 +81,73 @@ All of the correct information should automatically populate the _Basic SAML Con
 
 Finally, click the _Save_ button to save the configuration.
 
-## Step 7: Obtain metadata URL and send to Supabase [#send-metadata-url]
+## Step 7: Obtain metadata URL [#idp-metadata-url]
 
-Supabase needs to finalize enabling single sign-on with your Azure AD application. To do this, copy and send the link under **App Federation Metadata Url** in \*section 3 **SAML Certificates\*** to your support contact and await further instructions. If you're not clear who to send this link to or need further assistance, reach out to [Supabase Support](https://supabase.help).
-
-**Do not test the login until you have heard back from the support contact.**
+Save the link under **App Federation Metadata URL** in \*section 3 **SAML Certificates\***. You will need to enter this URL later in [Step 10](#dashboard-configure-metadata).
 
 ![Azure AD console: Supabase application, SAML Certificates card shown, App Federation Metadata Url highlighted](/docs/img/sso-azure-step-07.png)
 
-## Step 8: Wait for confirmation [#confirmation]
+## Step 8: Enable SSO in the Dashboard [#dashboard-enable-sso]
 
-Wait for confirmation or further instructions from your support contact at Supabase before proceeding to the next step. It usually takes us 1 business day to configure SSO for you.
+1. Visit the [SSO tab](/dashboard/org/_/sso) under the Organization Settings page. ![SSO disabled](/docs/img/sso-dashboard-disabled.png)
 
-## Step 9: Test single sign-on [#testing]
+2. Toggle **Enable Single Sign-On** to begin configuration. Once enabled, the configuration form appears. ![SSO enabled](/docs/img/sso-dashboard-enabled.png)
 
-_Testing sign-on before your Azure AD has been registered with Supabase will not work. Make sure you've received confirmation from your support contact at Supabase as laid out in the [confirmation](#confirmation) step._
+## Step 9: Configure domains [#dashboard-configure-domain]
 
-Once you’ve received confirmation from your support contact at Supabase that SSO setup has been completed for your enterprise, you can ask some of your users to sign in via their Azure AD account.
+Enter one or more domains associated with your users email addresses (e.g., `supabase.com`).
+These domains determine which users are eligible to sign in via SSO.
 
-You ask them to enter their email address on the [Sign in with SSO](https://supabase.com/dashboard/sign-in-sso) page.
+![Domain configuration](/docs/img/sso-dashboard-configure-domain.png)
 
-If sign in is not working correctly, reach out to your support contact at Supabase for further guidance.
+If your organization uses more than one email domain - for example, `supabase.com` for staff and `supabase.io` for contractors - you can add multiple domains here. All listed domains will be authorized for SSO sign-in.
+
+![Domain configuration with multiple domains](/docs/img/sso-dashboard-configure-domain-multi.png)
+
+<Admonition type="note">
+
+We do not permit use of public domains like `gmail.com`, `yahoo.com`.
+
+</Admonition>
+
+## Step 10: Configure metadata [#dashboard-configure-metadata]
+
+Enter the metadata URL you obtained from [Step 7](#idp-metadata-url) into the Metadata URL field:
+
+![Metadata configuration with Azure AD](/docs/img/sso-dashboard-configure-metadata-azure.png)
+
+## Step 11: Configure attribute mapping [#dashboard-configure-attributes]
+
+Fill out the Attribute Mapping section using the **Azure** preset.
+
+![Attribute mapping configuration](/docs/img/sso-dashboard-configure-attributes-azure.png)
+
+## Step 12: Join organization on signup (optional) [#dashboard-configure-autojoin]
+
+By default this setting is disabled, users logging in via SSO will not be added to your organization automatically.
+
+![Auto-join disabled](/docs/img/sso-dashboard-configure-autojoin-disabled.png)
+
+Toggle this on if you want SSO-authenticated users to be **automatically added to your organization** when they log in via SSO.
+
+![Auto-join enable](/docs/img/sso-dashboard-configure-autojoin-enabled.png)
+
+When auto-join is enabled, you can choose the **default role** for new users:
+
+![Auto-join role selection](/docs/img/sso-dashboard-configure-autojoin-enabled-role.png)
+
+Choose a role that fits the level of access you want to grant to new members.
+
+<Admonition type="note">
+
+Visit [access-control](/docs/guides/platform/access-control) documentation for details about each role.
+
+</Admonition>
+
+## Step 13: Save changes and test single sign-on [#dashboard-configure-save]
+
+When you click **Save changes**, your new SSO configuration is applied immediately. From that moment, any user with an email address matching one of your configured domains who visits your organization's sign-in URL will be routed through the SSO flow.
+
+We recommend asking a few users to test signing in via their Azure AD account. They can do this by entering their email address on the [Sign in with SSO](/dashboard/sign-in-sso) page.
+
+If SSO sign-in doesn't work as expected, contact your Supabase support representative for assistance.

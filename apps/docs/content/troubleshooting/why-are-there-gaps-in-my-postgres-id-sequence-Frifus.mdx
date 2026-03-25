@@ -2,11 +2,12 @@
 title = "Why are there gaps in my Postgres id sequence?"
 github_url = "https://github.com/orgs/supabase/discussions/22299"
 date_created = "2024-03-27T18:04:39+00:00"
-topics = ["database"]
-keywords = ["sequence", "id", "rollback", "deletions", "upserts"]
+topics = [ "database" ]
+keywords = [ "sequence", "id", "rollback", "deletions", "upserts" ]
+database_id = "0c0369db-2968-4ea7-9f99-c5f5ce55acad"
 
 [[errors]]
-message = 'Failed to run sql query: duplicate key value violates unique constraint "{table}_pkey"'
+message = "Failed to run sql query: duplicate key value violates unique constraint \"{table}_pkey\""
 ---
 
 Most database tables have a primary key that is a made-up number, and that number is usually made by a sequence.
@@ -19,12 +20,12 @@ It's also important to understand the distinction that sequences guarantee **uni
 
 If you don't know the name of your sequence, it's often formed based on a standard naming convention: table_name_id_seq, where table_name is the name of your table and id is the name of your serial column.
 
-### Common Reasons for Gaps in Sequences
+### Common reasons for gaps in sequences
 
 1. Rollbacks
    One of the most common reasons for a gap is the rollback of a transaction. If you initiate a transaction that includes an insert operation, the sequence responsible for generating the ID for the new row increments. If, for any reason, the transaction doesn't complete successfully—perhaps due to a constraint violation or a deliberate decision to rollback—the insert operation is undone, but the sequence value used is not returned or reused. The documentation explains that as well:
 
-> To avoid blocking concurrent transactions that obtain numbers from the same sequence, a nextval operation is never rolled back; that is, once a value has been fetched it is considered used and will not be returned again. This is true even if the surrounding transaction later aborts, or if the calling query ends up not using the value. For example an INSERT with an ON CONFLICT clause will compute the to-be-inserted tuple, including doing any required nextval calls, before detecting any conflict that would cause it to follow the ON CONFLICT rule instead. Such cases will leave unused “holes” in the sequence of assigned values.
+> To avoid blocking concurrent transactions that obtain numbers from the same sequence, a `nextval` operation is never rolled back; that is, once a value has been fetched it is considered used and will not be returned again. This is true even if the surrounding transaction later aborts, or if the calling query ends up not using the value. For example an INSERT with an ON CONFLICT clause will compute the to-be-inserted tuple, including doing any required `nextval` calls, before detecting any conflict that would cause it to follow the ON CONFLICT rule instead. Such cases will leave unused “holes” in the sequence of assigned values.
 
 2. Deletions
    Removing rows from your table also creates gaps in the sequence of primary key values. Although deletions do not affect the sequence directly, they contribute to the non-sequential appearance of IDs in your table.
@@ -35,9 +36,9 @@ If you don't know the name of your sequence, it's often formed based on a standa
 4. Upserts
    When an upsert is executed, it can still increase the sequence even if it is set to do nothing on conflicts
 
-### Checking for Gaps
+### Checking for gaps
 
-To check for gaps in the sequence of IDs in a PostgreSQL table, you can use a SQL query that compares the sequence of IDs to a generated series of numbers that spans the same range:
+To check for gaps in the sequence of IDs in a Postgres table, you can use a SQL query that compares the sequence of IDs to a generated series of numbers that spans the same range:
 
 ```
 SELECT
@@ -51,7 +52,7 @@ WHERE
 
 This query should help you pinpoint where gaps exist.
 
-### Encountering Errors and Adjusting Sequences
+### Encountering errors and adjusting sequences
 
 In operations involving sequences, you might encounter an error message such as:
 

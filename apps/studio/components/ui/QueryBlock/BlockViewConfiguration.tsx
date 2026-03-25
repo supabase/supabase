@@ -1,6 +1,5 @@
-import { BarChart2, Settings2, Table } from 'lucide-react'
-
 import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox_Shadcn_,
   Label_Shadcn_,
@@ -15,6 +14,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 
 interface BlockViewConfigurationProps {
@@ -43,13 +43,20 @@ export const BlockViewConfiguration = ({
           id="help-popover-button"
           type="text"
           className="px-1"
-          icon={<Settings2 size={14} />}
+          icon={<Settings2 size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'View data' } }}
         />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ side="bottom" align="center" className="w-[240px] p-3">
         <form className="grid gap-2">
-          <ToggleGroup type="single" value={view} className="w-full" onValueChange={changeView}>
+          <ToggleGroup
+            type="single"
+            value={view}
+            className="w-full"
+            onValueChange={(view: 'chart' | 'table') => {
+              if (view) changeView(view)
+            }}
+          >
             <ToggleGroupItem className="w-full" value="table" aria-label="Show as table">
               <Table className="h-4 w-4" />
               <p className="text-xs ml-2">As table</p>
@@ -113,6 +120,19 @@ export const BlockViewConfiguration = ({
                     }
                   />
                   Cumulative
+                </Label_Shadcn_>
+                <Label_Shadcn_ htmlFor="logScale">
+                  <Checkbox_Shadcn_
+                    id="logScale"
+                    checked={chartConfig?.logScale}
+                    onClick={() =>
+                      updateChartConfig({
+                        ...chartConfig,
+                        logScale: !chartConfig?.logScale,
+                      })
+                    }
+                  />
+                  Log scale
                 </Label_Shadcn_>
               </div>
             </>

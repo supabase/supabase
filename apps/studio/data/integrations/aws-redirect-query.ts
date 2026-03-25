@@ -1,0 +1,39 @@
+import { useQuery } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from 'types'
+import { integrationKeys } from './keys'
+
+export type AwsRedirectVariables = {
+  organizationSlug?: string
+}
+
+export async function getAwsRedirect(
+  { organizationSlug }: AwsRedirectVariables,
+  signal?: AbortSignal
+) {
+  if (!organizationSlug) throw new Error('organizationSlug is required')
+
+  const { data, error } = await get(`/platform/organizations/{slug}/cloud-marketplace/redirect`, {
+    params: { path: { slug: organizationSlug } },
+    signal,
+  })
+  if (error) handleError(error)
+  return data
+}
+
+export type AwsRedirectData = Awaited<ReturnType<typeof getAwsRedirect>>
+export type AwsRedirectError = ResponseError
+
+export const useAwsRedirectQuery = <TData = AwsRedirectData>(
+  { organizationSlug }: AwsRedirectVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<AwsRedirectData, AwsRedirectError, TData> = {}
+) =>
+  useQuery<AwsRedirectData, AwsRedirectError, TData>({
+    queryKey: integrationKeys.awsRedirect(organizationSlug),
+    queryFn: ({ signal }) => getAwsRedirect({ organizationSlug }, signal),
+    enabled: enabled && typeof organizationSlug !== 'undefined',
+    ...options,
+  })

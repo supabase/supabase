@@ -1,56 +1,23 @@
-import { LOCAL_STORAGE_KEYS, TelemetryProps } from 'common'
-import { API_URL, IS_PREVIEW, IS_PROD } from 'lib/constants'
-import { NextRouter } from 'next/router'
-import { post } from '~/lib/fetchWrapper'
+'use client'
 
-export interface TelemetryEvent {
-  category: string
-  action: string
-  label: string
-  value?: string
-}
+import { sendTelemetryEvent } from 'common'
+import type { TelemetryEvent } from 'common/telemetry-constants'
+import { API_URL } from 'lib/constants'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { useCallback } from 'react'
 
-const noop = () => {}
+export function useSendTelemetryEvent() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
-// This event is the same as in studio/lib/telemetry.tx
-// but uses different ENV variables for www
+  return useCallback(
+    (event: TelemetryEvent) => {
+      const url = new URL(API_URL ?? 'http://localhost:3000')
+      url.pathname = pathname ?? ''
+      url.search = searchParams?.toString() ?? ''
 
-const sendEvent = (event: TelemetryEvent, telemetryProps: TelemetryProps, router: NextRouter) => {
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  const hasAcceptedConsent = consent === 'true'
-  const IS_DEV = !IS_PROD && !IS_PREVIEW
-  const blockEvent = IS_DEV || !hasAcceptedConsent
-
-  if (blockEvent) return noop
-
-  const { category, action, label, value } = event
-  const title = typeof document !== 'undefined' ? document?.title : ''
-  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
-
-  const { page_url, search, language, viewport_height, viewport_width } = telemetryProps
-
-  return post(
-    `${API_URL}/telemetry/event`,
-    {
-      page_url,
-      action: action,
-      page_title: title,
-      pathname: router.pathname,
-      ph: {
-        search,
-        referrer,
-        language,
-        viewport_height,
-        viewport_width,
-        user_agent: navigator.userAgent,
-      },
-      custom_properties: { category, label, value } as any,
+      return sendTelemetryEvent(API_URL, event, url.toString())
     },
-    { headers: { Version: '2' }, credentials: 'include' }
+    [pathname, searchParams]
   )
 }
-
-export default { sendEvent }

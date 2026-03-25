@@ -7,17 +7,11 @@ import { UseFormReturn } from 'react-hook-form'
 import { useParams } from 'common'
 import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { useMemo } from 'react'
-import {
-  badgeVariants,
-  cn,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 
@@ -25,12 +19,12 @@ interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
   const isDarkMode = resolvedTheme?.includes('dark')
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const {
     data: diskUtil,
@@ -99,8 +93,8 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
       <div className="relative">
         <div
           className={cn(
-            'h-[35px] relative border rounded-sm w-full transition',
-            showNewSize ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            'h-[35px] relative border rounded-sm w-full transition overflow-visible',
+            showNewSize ? 'bg-selection border border-brand' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
@@ -161,15 +155,15 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           </AnimatePresence>
           <AnimatePresence>
             {showNewSize && (
-              <motion.span
+              <motion.div
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 4 }}
                 transition={{ duration: 0.12, delay: 0.12 }}
-                className={cn(badgeVariants({ variant: 'success' }), 'absolute right-1 top-[5px]')}
+                className="absolute right-2 top-0 flex items-center h-full"
               >
-                New disk size
-              </motion.span>
+                <Badge variant="success">New disk size</Badge>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
@@ -187,24 +181,24 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
                 style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
                     <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
                       Autoscaling <Info size={12} />
                     </div>
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom" className="w-[310px] flex flex-col gap-y-1">
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
                     <p>
                       Supabase expands your disk storage automatically when the database reached 90%
                       of the disk size. However, any disk modifications, including auto-scaling, can
-                      only take place once every 6 hours.
+                      only take place once every 4 hours.
                     </p>
                     <p>
-                      If within those 6 hours you reach 95% of the disk space, your project{' '}
+                      If within those 4 hours you reach 95% of the disk space, your project{' '}
                       <span className="text-destructive-600">will enter read-only mode.</span>
                     </p>
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  </TooltipContent>
+                </Tooltip>
                 <div className="w-px h-full bg-border" />
               </div>
             </motion.div>
@@ -265,14 +259,14 @@ const LegendItem = ({
   color: string
   size: number
 }) => (
-  <Tooltip_Shadcn_>
-    <TooltipTrigger_Shadcn_ asChild>
+  <Tooltip>
+    <TooltipTrigger asChild>
       <div className="flex items-center hover:cursor-help z-10">
         <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
         <span>{name}</span>
       </div>
-    </TooltipTrigger_Shadcn_>
-    <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1 max-w-xs">
+    </TooltipTrigger>
+    <TooltipContent side="bottom" className="flex flex-col gap-y-1 max-w-xs">
       <div className="flex items-center">
         <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
         <span>
@@ -280,6 +274,6 @@ const LegendItem = ({
         </span>
       </div>
       <p>{description}</p>
-    </TooltipContent_Shadcn_>
-  </Tooltip_Shadcn_>
+    </TooltipContent>
+  </Tooltip>
 )

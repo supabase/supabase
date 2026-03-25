@@ -1,19 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import gaEvents from '~/lib/gaEvents'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import { Button } from 'ui'
 
+import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import AnnouncementBadge from '~/components/Announcement/Badge'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 const Hero = () => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
-  }
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <div className="relative -mt-[65px]">
@@ -28,7 +20,7 @@ const Hero = () => {
                     <span className="text-brand block md:ml-0">Scale to millions</span>
                   </h1>
                   <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
-                    Supabase is an open source Firebase alternative.{' '}
+                    Supabase is the Postgres development platform.{' '}
                     <br className="hidden md:block" />
                     Start your project with a Postgres database, Authentication, instant APIs, Edge
                     Functions, Realtime subscriptions, Storage, and Vector embeddings.
@@ -39,7 +31,12 @@ const Hero = () => {
                     <Link
                       href="https://supabase.com/dashboard"
                       as="https://supabase.com/dashboard"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_startProject'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'start_project_button_clicked',
+                          properties: { buttonLocation: 'Homepage Hero' },
+                        })
+                      }
                     >
                       Start your project
                     </Link>
@@ -48,7 +45,12 @@ const Hero = () => {
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
+                      onClick={() =>
+                        sendTelemetryEvent({
+                          action: 'request_demo_button_clicked',
+                          properties: { buttonLocation: 'Homepage Hero' },
+                        })
+                      }
                     >
                       Request a demo
                     </Link>

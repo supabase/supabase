@@ -109,3 +109,13 @@ export const SIZE_VARIANTS_INNER = {
 }
 
 export const SIZE_VARIANTS_DEFAULT = 'small'
+
+export type PageSize = 'default' | 'small' | 'medium' | 'large' | 'full'
+
+export const PAGE_SIZE_CLASSES = {
+  small: 'max-w-3xl px-8',
+  medium: 'max-w-5xl px-8',
+  large: 'max-w-7xl px-8',
+  default: 'max-w-5xl px-8',
+  full: 'w-full',
+} as const

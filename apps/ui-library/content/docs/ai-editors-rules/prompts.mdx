@@ -1,0 +1,21 @@
+---
+title: Prompts
+description: Rules for AI Code Editors for Supabase
+---
+
+## Installation
+
+<BlockItem name="ai-editor-rules" description="Rules for AI Code Editors for Supabase" />
+
+## Folder structure
+
+<RegistryBlock itemName="ai-editor-rules" />
+
+## Usage
+
+Running the install command above will add the rule to the `.cursor/rules` directory in your project. If you don't have a `.cursor/rules` directory, it will be created for you.
+
+Rules are project-specific, so you can have different rules for different projects depending on your needs. Rules are automatically included when matching files are referenced.
+
+If you're installing the rules in a monorepo, you'll need to move the `.cursor` directory at the
+root directory and update all paths in the `.mdc` files.

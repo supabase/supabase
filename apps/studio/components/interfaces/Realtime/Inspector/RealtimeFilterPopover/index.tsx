@@ -1,8 +1,14 @@
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useParams } from 'common'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -20,7 +26,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig
@@ -32,7 +37,23 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+
+  // Update tempConfig when config changes to ensure consistency
+  useEffect(() => {
+    setTempConfig(config)
+  }, [config])
 
   const onOpen = (v: boolean) => {
     // when opening, copy the outside config into the intermediate one
@@ -53,13 +74,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           <Button
             icon={<PlusCircle size="16" />}
             type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1.5 text-xs', isFiltered ? '!py-0.5' : '!py-1')}
+            className={cn('rounded-full px-1 text-xs h-[26px]')}
             size="small"
           >
             {isFiltered ? (
               <>
                 <span className="mr-1">Filtered by </span>
-                <Badge variant="brand">table: {config.table}</Badge>
+                <Badge variant="success">table: {config.table}</Badge>
               </>
             ) : (
               <span className="mr-1">Filter messages</span>
@@ -123,9 +144,15 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
               <div className="flex gap-2.5 items-center">
                 <IconDatabaseChanges
                   size="xlarge"
-                  className="bg-foreground rounded text-background-muted"
+                  className={cn(
+                    'rounded text-background-muted',
+                    config.enableDbChanges ? 'bg-foreground' : 'bg-foreground-lighter'
+                  )}
                 />
-                <label htmlFor="toggle-db-changes" className="text-sm">
+                <label
+                  htmlFor="toggle-db-changes"
+                  className={cn('text-sm', !config.enableDbChanges && 'text-foreground-lighter')}
+                >
                   Database changes
                 </label>
               </div>
@@ -133,6 +160,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 id="toggle-db-changes"
                 size="tiny"
                 checked={tempConfig.enableDbChanges}
+                disabled={!config.enableDbChanges}
                 onChange={() =>
                   setTempConfig({ ...tempConfig, enableDbChanges: !tempConfig.enableDbChanges })
                 }
@@ -141,9 +169,20 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             <p className="text-xs text-foreground-light pt-1">
               Listen for Database inserts, updates, deletes and more
             </p>
+            {!config.enableDbChanges && (
+              <p className="text-xs text-foreground-light mt-2">
+                Enable{' '}
+                <InlineLink
+                  href={`/project/${ref}/database/publications${!!realtimePublication ? `/${realtimePublication.id}` : ''}`}
+                >
+                  realtime publications
+                </InlineLink>{' '}
+                for your tables to listen for database changes
+              </p>
+            )}
           </div>
 
-          {tempConfig.enableDbChanges && (
+          {tempConfig.enableDbChanges && config.enableDbChanges && (
             <>
               <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
                 Filter messages from database changes
@@ -177,7 +216,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                     className="underline"
                     target="_blank"
                     rel="noreferrer"
-                    href="https://supabase.com/docs/guides/realtime/postgres-changes#available-filters"
+                    href={`${DOCS_URL}/guides/realtime/postgres-changes#available-filters`}
                   >
                     our docs
                   </Link>
@@ -201,7 +240,10 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         visible={applyConfigOpen}
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
-          sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED })
+          sendEvent({
+            action: 'realtime_inspector_filters_applied',
+            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+          })
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)

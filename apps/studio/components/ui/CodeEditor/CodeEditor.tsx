@@ -1,14 +1,13 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { formatQuery } from 'data/sql/format-sql-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
-import { cn } from 'ui'
-import { Loading } from '../Loading'
+import { cn, LogoLoader } from 'ui'
 import { alignEditor } from './CodeEditor.utils'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
@@ -22,7 +21,7 @@ const DEFAULT_ACTIONS = {
 
 interface CodeEditorProps {
   id: string
-  language: 'pgsql' | 'json' | 'html' | undefined
+  language: 'pgsql' | 'json' | 'html' | 'typescript' | undefined
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
@@ -61,7 +60,7 @@ const CodeEditor = ({
   onInputChange = noop,
 }: CodeEditorProps) => {
   const monaco = useMonaco()
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const hasValue = useRef<any>()
   const ref = useRef<editor.IStandaloneCodeEditor>()
@@ -72,6 +71,11 @@ const CodeEditor = ({
     ...DEFAULT_ACTIONS,
     ...actions,
   }
+
+  const runQueryCallbackRef = useRef(runQuery.callback)
+  useEffect(() => {
+    runQueryCallbackRef.current = runQuery.callback
+  }, [runQuery.callback])
 
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
@@ -93,21 +97,6 @@ const CodeEditor = ({
     },
     options
   )
-
-  const formatPgsql = async (value: string) => {
-    try {
-      if (!project) throw new Error('No project')
-      const formatted = await formatQuery({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        sql: value,
-      })
-      return formatted.result
-    } catch (error) {
-      console.error('formatPgsql error:', error)
-      return value
-    }
-  }
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -150,7 +139,7 @@ const CodeEditor = ({
           const selectedValue = (editorRef?.current as any)
             .getModel()
             .getValueInRange((editorRef?.current as any)?.getSelection())
-          runQuery.callback(selectedValue || (editorRef?.current as any)?.getValue())
+          runQueryCallbackRef.current(selectedValue || (editorRef?.current as any)?.getValue())
         },
       })
     }
@@ -234,7 +223,7 @@ const CodeEditor = ({
       const formatProvider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
           const value = model.getValue()
-          const formatted = await formatPgsql(value)
+          const formatted = formatSql(value)
           formatDocument.callback(formatted)
           return [{ range: model.getFullModelRange(), text: formatted }]
         },
@@ -253,7 +242,7 @@ const CodeEditor = ({
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <Loading />}
+        loading={loading || <LogoLoader />}
         options={optionsMerged}
         onMount={onMount}
         onChange={onChangeContent}

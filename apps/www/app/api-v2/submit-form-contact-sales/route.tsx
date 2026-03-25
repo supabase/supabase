@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/nextjs'
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -92,6 +94,7 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       const errorData = await response.json()
+      Sentry.captureException(errorData)
       return new Response(JSON.stringify({ message: errorData.message }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: response.status,
@@ -103,6 +106,7 @@ export async function POST(req: Request) {
       status: 200,
     })
   } catch (error: any) {
+    Sentry.captureException(error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,

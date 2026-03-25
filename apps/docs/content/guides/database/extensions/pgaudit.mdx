@@ -23,7 +23,7 @@ This helps you with:
 >
 <TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for `pgaudit` and enable the extension.
 
@@ -47,8 +47,8 @@ PGAudit can be configured with different levels of precision.
 
 **PGAudit logging precision:**
 
-- **[Session](#session-logging):** Logs activity within a connection, such as a [psql](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection.
-- **[User](#user-logging):** Logs activity by a particular database user (for example, anon or postgres).
+- **[Session](#session-logging):** Logs activity within a connection, such as a [psql](/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection.
+- **[User](#user-logging):** Logs activity by a particular database user (for example, `anon` or `postgres`).
 - **[Global](#global-logging):** Logs activity across the entire database.
 - **[Object](#object-logging):** Logs events related to specific database objects (for example, the auth.users table).
 
@@ -58,15 +58,15 @@ Although Session, User, and Global modes differ in their precision, they're all 
 
 These modes can monitor predefined categories of database operations:
 
-| Category | What it Logs                                                          | Description                                                                |
-| -------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| read     | Data retrieval (SELECT, COPY)                                         | Tracks what data is being accessed.                                        |
-| write    | Data modification (INSERT, DELETE, UPDATE, TRUNCATE, COPY)            | Tracks changes made to your database.                                      |
-| function | FUNCTION, PROCEDURE, and DO/END block executions                      | Tracks routine/function executions                                         |
-| role     | User management actions (CREATE, DROP, ALTER on users and privileges) | Tracks changes to user permissions and access.                             |
-| ddl      | Schema changes (CREATE, DROP, ALTER statements)                       | Monitors modifications to your database structure (tables, indexes, etc.). |
-| misc     | Less common commands (FETCH, CHECKPOINT)                              | Captures obscure actions for deeper analysis if needed.                    |
-| all      | Everything above                                                      | Comprehensive logging for complete audit trails.                           |
+| Category   | What it Logs                                                          | Description                                                                |
+| ---------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `read`     | Data retrieval (SELECT, COPY)                                         | Tracks what data is being accessed.                                        |
+| `write`    | Data modification (INSERT, DELETE, UPDATE, TRUNCATE, COPY)            | Tracks changes made to your database.                                      |
+| `function` | FUNCTION, PROCEDURE, and DO/END block executions                      | Tracks routine/function executions                                         |
+| `role`     | User management actions (CREATE, DROP, ALTER on users and privileges) | Tracks changes to user permissions and access.                             |
+| `ddl`      | Schema changes (CREATE, DROP, ALTER statements)                       | Monitors modifications to your database structure (tables, indexes, etc.). |
+| `misc`     | Less common commands (FETCH, CHECKPOINT)                              | Captures obscure actions for deeper analysis if needed.                    |
+| `all`      | Everything above                                                      | Comprehensive logging for complete audit trails.                           |
 
 Below is a limited example of how to assign PGAudit to monitor specific categories.
 
@@ -83,11 +83,11 @@ Below is a limited example of how to assign PGAudit to monitor specific categori
 
 ### Session logging
 
-When you are connecting in a session environment, such as a [psql](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection, you can configure PGAudit to record events initiated within the session.
+When you are connecting in a session environment, such as a [psql](/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection, you can configure PGAudit to record events initiated within the session.
 
 <Admonition type="note">
 
-The [Dashboard](https://supabase.com/dashboard/project/_) is a transactional environment and won't sustain a session.
+The [Dashboard](/dashboard/project/_) is a transactional environment and won't sustain a session.
 
 </Admonition>
 
@@ -113,7 +113,7 @@ set pgaudit.log = 'none';
 
 ### User logging
 
-There are some cases where you may want to monitor a database user's actions. For instance, let's say you connected your database to [Zapier](https://supabase.com/partners/integrations/zapier) and created a custom role for it to use:
+There are some cases where you may want to monitor a database user's actions. For instance, let's say you connected your database to [Zapier](/partners/integrations/zapier) and created a custom role for it to use:
 
 ```sql
 create user "zapier" with password '<new password>';
@@ -148,13 +148,13 @@ Use global logging cautiously. It can generate many logs and make it difficult t
 
 </Admonition>
 
-The below SQL configures PGAudit to record all events associated with the "postgres" role. Since it has extensive privileges, this effectively monitors all database activity.
+The below SQL configures PGAudit to record all events associated with the `postgres` role. Since it has extensive privileges, this effectively monitors all database activity.
 
 ```sql
 alter role "postgres" set pgaudit.log to 'all';
 ```
 
-To check if the postgres role is auditing, execute the following command:
+To check if the `postgres` role is auditing, execute the following command:
 
 ```sql
 select
@@ -242,7 +242,7 @@ create table account (
 );
 ```
 
-Generates the following log in the [Dashboard's Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs):
+Generates the following log in the [Dashboard's Postgres Logs](/dashboard/project/_/logs/postgres-logs):
 
 ```
  AUDIT: SESSION,1,1,DDL,CREATE TABLE,TABLE,public.account,create table account(
@@ -254,7 +254,7 @@ Generates the following log in the [Dashboard's Postgres Logs](https://supabase.
 
 ## Finding and filtering audit logs
 
-Logs generated by PGAudit can be found in [Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs?s=AUDIT). To find a specific log, you can use the log explorer. Below is a basic example to extract logs referencing `CREATE TABLE` events
+Logs generated by PGAudit can be found in [Postgres Logs](/dashboard/project/_/logs/postgres-logs?s=AUDIT). To find a specific log, you can use the log explorer. Below is a basic example to extract logs referencing `CREATE TABLE` events
 
 ```sql
 select
@@ -275,11 +275,11 @@ limit 100;
 
 <Admonition type="note">
 
-API requests are already recorded in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
+API requests are already recorded in the [API Edge Network](/dashboard/project/_/logs/edge-logs) logs.
 
 </Admonition>
 
-To monitor all writes initiated by the Postgrest API roles:
+To monitor all writes initiated by the PostgREST API roles:
 
 ```sql
 alter role "authenticator" set pgaudit.log to 'write';
@@ -292,7 +292,7 @@ alter role "authenticator" set pgaudit.log to 'write';
 
 ### Monitoring the `auth.users` table
 
-In the worst case scenario, where a privileged roles' password is exposed, you can use PGAudit to monitor if the `auth.users` table was targeted. It should be stated that API requests are already monitored in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) and this is more about providing greater clarity about what is happening at the database level.
+In the worst case scenario, where a privileged roles' password is exposed, you can use PGAudit to monitor if the `auth.users` table was targeted. It should be stated that API requests are already monitored in the [API Edge Network](/dashboard/project/_/logs/edge-logs) and this is more about providing greater clarity about what is happening at the database level.
 
 Logging `auth.user` should be done in Object Mode and requires a custom role:
 
@@ -345,15 +345,15 @@ To prevent PGAudit from monitoring the problematic roles, you'll want to change 
 
 ## FAQ
 
-#### Can I use PGAudit to debug database functions?
+#### Using PGAudit to debug database functions
 
-Technically yes, but it is not the best approach. It is better to check out our [function debugging guide](https://supabase.com/docs/guides/database/functions#general-logging) instead.
+Technically yes, but it is not the best approach. It is better to check out our [function debugging guide](/docs/guides/database/functions#general-logging) instead.
 
-#### How can I download database logs?
+#### Downloading database logs
 
-In the [Logs Dashboard](https://supabase.com/dashboard/project/_/logs/postgres-logs) you can download logs as CSVs.
+In the [Logs Dashboard](/dashboard/project/_/logs/postgres-logs) you can download logs as CSVs.
 
-#### Can I log observed table rows?
+#### Logging observed table rows
 
 By default, PGAudit records queries, but not the returned rows. You can modify this behavior with the `pgaudit.log_rows` variable:
 
@@ -367,9 +367,9 @@ alter role "postgres" set pgaudit.log_rows to 'off';
 
 You should not do this unless you are _absolutely_ certain it is necessary for your use case. It can expose sensitive values to your logs that ideally should not be preserved. Furthermore, if done in excess, it can noticeably reduce database performance.
 
-#### Can I log function parameters?
+#### Logging function parameters
 
-We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [pgsodium](https://supabase.com/docs/guides/database/extensions/pgsodium) or[Vault](https://supabase.com/docs/guides/database/vault).
+We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [pgsodium](/docs/guides/database/extensions/pgsodium) or[Vault](/docs/guides/database/vault).
 
 You can upvote this [feature request](https://github.com/orgs/supabase/discussions/20183) with your use-case if you'd like this restriction lifted.
 
@@ -383,13 +383,13 @@ PGAudit allows settings to be applied to 3 different database scopes:
 | Database | Specific database  | ALTER DATABASE commands    |
 | Role     | Specific user/role | ALTER ROLE commands        |
 
-Supabase limits full privileges for file system and database variables, meaning PGAudit modifications can only occur at the role level. Assigning PGAudit to the 'postgres' role grants it nearly complete visibility into the database, making role-level adjustments a practical alternative to configuring at the database or system level.
+Supabase limits full privileges for file system and database variables, meaning PGAudit modifications can only occur at the role level. Assigning PGAudit to the `postgres` role grants it nearly complete visibility into the database, making role-level adjustments a practical alternative to configuring at the database or system level.
 
 PGAudit's [official documentation](https://www.pgaudit.org) focuses on system and database level configs, but its docs officially supports role level configs, too.
 
 ## Resources
 
 - [Official `PGAudit` documentation](https://www.pgaudit.org)
-- [Database Function Logging](https://supabase.com/docs/guides/database/functions#general-logging)
-- [Supabase Logging](https://supabase.com/docs/guides/platform/logs)
-- [Self-Hosting Logs](https://supabase.com/docs/reference/self-hosting-analytics/introduction)
+- [Database Function Logging](/docs/guides/database/functions#general-logging)
+- [Supabase Logging](/docs/guides/platform/logs)
+- [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

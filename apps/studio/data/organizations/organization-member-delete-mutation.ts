@@ -1,9 +1,8 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { delete_ } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { del, handleError } from 'data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationMemberDeleteVariables = {
@@ -15,9 +14,11 @@ export async function deleteOrganizationMember({
   slug,
   gotrueId,
 }: OrganizationMemberDeleteVariables) {
-  const response = await delete_(`${API_URL}/organizations/${slug}/members/${gotrueId}`)
-  if (response.error) throw response.error
-  return response
+  const { data, error } = await del('/platform/organizations/{slug}/members/{gotrue_id}', {
+    params: { path: { slug, gotrue_id: gotrueId } },
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type OrganizationMemberDeleteData = Awaited<ReturnType<typeof deleteOrganizationMember>>
@@ -27,7 +28,7 @@ export const useOrganizationMemberDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberDeleteData,
     ResponseError,
     OrganizationMemberDeleteVariables
@@ -40,13 +41,14 @@ export const useOrganizationMemberDeleteMutation = ({
     OrganizationMemberDeleteData,
     ResponseError,
     OrganizationMemberDeleteVariables
-  >((vars) => deleteOrganizationMember(vars), {
+  >({
+    mutationFn: (vars) => deleteOrganizationMember(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.members(slug)),
-        queryClient.invalidateQueries(organizationKeys.roles(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.members(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.roles(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

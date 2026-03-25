@@ -1,41 +1,26 @@
-import { useMonaco } from '@monaco-editor/react'
-import { useTheme } from 'next-themes'
-import { PropsWithChildren, useMemo } from 'react'
-
-import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
+import { useFlag } from 'common'
+import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
-import { RestrictionBanner } from 'components/layouts/AppLayout/RestrictionBanner'
-import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
-import { useFlag } from 'hooks/ui/useFlag'
-import { useProfile } from 'lib/profile'
+import { StatusPageBanner } from 'components/layouts/AppLayout/StatusPageBanner'
+import { TaxIdBanner } from 'components/layouts/AppLayout/TaxIdBanner'
+import { PropsWithChildren } from 'react'
 
-const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const monaco = useMonaco()
-  const { profile } = useProfile()
-  const { resolvedTheme } = useTheme()
+import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 
-  const ongoingIncident = useFlag('ongoingIncident')
+export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
-
-  // Define the supabase theme for Monaco before anything is rendered. Using useEffect would sometime load the theme
-  // after the editor was loaded, so it looked off. useMemo will always be run before rendering
-  useMemo(() => {
-    if (monaco && resolvedTheme) {
-      const mode: any = getTheme(resolvedTheme)
-      monaco.editor.defineTheme('supabase', mode)
-    }
-  }, [resolvedTheme, monaco])
+  const clockSkewBanner = useFlag('clockSkewBanner')
 
   return (
-    <div className="min-h-full flex flex-col">
-      <div className="flex-none">
-        {ongoingIncident && <IncidentBanner />}
+    <div className="flex flex-col">
+      <div className="flex-shrink-0">
+        <StatusPageBanner />
         {showNoticeBanner && <NoticeBanner />}
-        {profile !== undefined && <RestrictionBanner />}
+        <OrganizationResourceBanner />
+        <TaxIdBanner />
+        {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}
     </div>
   )
 }
-
-export default AppBannerWrapper
