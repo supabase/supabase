@@ -491,6 +491,54 @@ describe('upsertOperation', () => {
     expect((updated.payload as any).newValue).toBe('final value')
   })
 
+  test('should remove operation when value is reverted to original', () => {
+    const existingOp: QueuedOperation = {
+      id: 'edit_cell_content:1:name:id:1',
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      timestamp: Date.now() - 1000,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'original',
+        newValue: 'changed',
+        table: mockTable,
+      },
+    }
+
+    const otherOp: QueuedOperation = {
+      id: 'edit_cell_content:1:email:id:1',
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      timestamp: Date.now(),
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'email',
+        oldValue: 'old@test.com',
+        newValue: 'new@test.com',
+        table: mockTable,
+      },
+    }
+
+    const operations = [existingOp, otherOp]
+    const newOperation: NewEditCellContentOperation = {
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'changed',
+        newValue: 'original',
+        table: mockTable,
+      },
+    }
+
+    const result = upsertOperation(operations, newOperation)
+
+    expect(result.operations).toHaveLength(1)
+    expect(result.operations[0]).toEqual(otherOp)
+  })
+
   test('should update existing DELETE_ROW operation', () => {
     const existingOp: QueuedOperation = {
       id: 'delete_row:1:id:1',

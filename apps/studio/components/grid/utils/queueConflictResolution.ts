@@ -1,13 +1,15 @@
+import { isEqual } from 'lodash'
+
 import { isPendingAddRow } from '../types'
 import { generateTableChangeKey, rowMatchesIdentifiers } from './queueOperationUtils'
 import {
-  type NewDeleteRowOperation,
-  type NewEditCellContentOperation,
+  isDeleteRowOperation,
+  isEditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
-  isDeleteRowOperation,
-  isEditCellContentOperation,
+  type NewDeleteRowOperation,
+  type NewEditCellContentOperation,
 } from '@/state/table-editor-operation-queue.types'
 
 export type DeleteConflictResult =
@@ -165,6 +167,11 @@ export function upsertOperation(
       existingOp.type === QueuedOperationType.EDIT_CELL_CONTENT
     ) {
       queuedOperation.payload.oldValue = existingOp.payload.oldValue
+
+      if (isEqual(queuedOperation.payload.oldValue, queuedOperation.payload.newValue)) {
+        updatedOperations.splice(existingOpIndex, 1)
+        return { operations: updatedOperations }
+      }
     }
 
     updatedOperations[existingOpIndex] = queuedOperation
