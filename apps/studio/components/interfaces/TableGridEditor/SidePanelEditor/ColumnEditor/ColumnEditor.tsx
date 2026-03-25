@@ -364,6 +364,7 @@ export const ColumnEditor = ({
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <ColumnForeignKey
+            tableId={selectedTable.id}
             column={columnFields}
             relations={fkRelations}
             closePanel={closePanel}
