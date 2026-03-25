@@ -295,7 +295,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               <Form_Shadcn_ {...form}>
                 <form
                   id={FORM_ID}
-                  className="flex-grow overflow-auto"
+                  className="flex-grow"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
                   <SheetSection>
