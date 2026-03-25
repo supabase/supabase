@@ -1,5 +1,6 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import dayjs from 'dayjs'
+import { guessLocalTimezone } from 'lib/dayjs'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -28,7 +29,7 @@ export const ProjectUpgradeFailedBanner = () => {
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
     .utc(initiated_at ?? 0)
-    .tz(dayjs.tz.guess())
+    .tz(guessLocalTimezone())
     .format('DD MMM YYYY HH:mm:ss')
 
   const subject = 'Upgrade%20failed%20for%20project'

@@ -38,8 +38,10 @@ import {
   cn,
 } from 'ui'
 
-interface SQLEditorTreeViewItemProps
-  extends Omit<ComponentProps<typeof TreeViewItem>, 'name' | 'xPadding'> {
+interface SQLEditorTreeViewItemProps extends Omit<
+  ComponentProps<typeof TreeViewItem>,
+  'name' | 'xPadding'
+> {
   element: any
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'

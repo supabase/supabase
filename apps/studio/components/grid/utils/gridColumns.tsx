@@ -1,4 +1,3 @@
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 
 import { DefaultValue } from '../components/common/DefaultValue'
@@ -19,11 +18,11 @@ import { AddColumn } from '../components/grid/AddColumn'
 import { ColumnHeader } from '../components/grid/ColumnHeader'
 import { SelectColumn } from '../components/grid/SelectColumn'
 import {
+  isPendingAddRow,
   type ColumnType,
   type SupaColumn,
   type SupaRow,
   type SupaTable,
-  isPendingAddRow,
 } from '../types'
 import {
   isArrayColumn,
@@ -39,6 +38,7 @@ import {
   isTextColumn,
   isTimeColumn,
 } from './types'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
@@ -72,8 +72,7 @@ export function getGridColumns(
       sortable: true,
       width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
-      frozen: x.isPrimaryKey || false,
-      isLastFrozenColumn: false,
+      frozen: false,
       renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}

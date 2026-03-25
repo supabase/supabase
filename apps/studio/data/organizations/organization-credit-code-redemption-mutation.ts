@@ -60,10 +60,13 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
   return useMutation<RedeemCodeData, ResponseError, OrganizationCreditCodeRedemptionVariables>({
     mutationFn: (vars) => redeemCode(vars),
     async onSuccess(data, variables, context) {
-      const { slug, code } = variables
+      const { slug } = variables
 
-      await queryClient.invalidateQueries({ queryKey: organizationKeys.customerProfile(slug) })
-      await queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: organizationKeys.customerProfile(slug) }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+      ])
+
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

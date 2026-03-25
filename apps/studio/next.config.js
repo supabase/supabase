@@ -33,6 +33,9 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
+  experimental: {
+    clientRouterFilter: false,
+  },
   async rewrites() {
     return [
       {
@@ -88,6 +91,11 @@ const nextConfig = {
               destination: '/sign-in',
               permanent: false,
             },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
+              permanent: false,
+            },
           ]
         : [
             {
@@ -118,6 +126,11 @@ const nextConfig = {
             {
               source: '/log-in',
               destination: '/project/default',
+              permanent: false,
+            },
+            {
+              source: '/project/:ref/building',
+              destination: '/project/:ref',
               permanent: false,
             },
           ]),
@@ -439,6 +452,16 @@ const nextConfig = {
         destination: '/project/:ref/auth/providers',
         permanent: true,
       },
+      {
+        source: '/project/:ref/settings/api',
+        destination: '/project/:ref/integrations/data_api/overview',
+        permanent: false,
+      },
+      {
+        source: '/project/:ref/api',
+        destination: '/project/:ref/integrations/data_api/docs',
+        permanent: false,
+      },
 
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
@@ -617,5 +640,11 @@ module.exports =
         // https://docs.sentry.io/product/crons/
         // https://vercel.com/docs/cron-jobs
         automaticVercelMonitors: true,
+
+        // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
+        // distinguish our code from browser extensions / injected scripts at runtime.
+        unstable_sentryWebpackPluginOptions: {
+          applicationKey: 'supabase-studio',
+        },
       })
     : nextConfig

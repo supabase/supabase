@@ -7,11 +7,10 @@ import type {
   Table,
   VisibilityState,
 } from '@tanstack/react-table'
+import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { createContext, ReactNode, useContext, useMemo } from 'react'
 
-import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { DataTableFilterField } from '../DataTable.types'
-import { ControlsProvider } from './ControlsProvider'
 
 // REMINDER: read about how to move controlled state out of the useReactTable hook
 // https://github.com/TanStack/table/discussions/4005#discussioncomment-7303569
@@ -39,8 +38,7 @@ interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
 }
 
 interface DataTableContextType<TData = unknown, TValue = unknown>
-  extends DataTableStateContextType,
-    DataTableBaseContextType<TData, TValue> {}
+  extends DataTableStateContextType, DataTableBaseContextType<TData, TValue> {}
 
 export const DataTableContext = createContext<DataTableContextType<any, any> | null>(null)
 
@@ -66,11 +64,7 @@ export function DataTableProvider<TData, TValue>({
     [props]
   )
 
-  return (
-    <DataTableContext.Provider value={value}>
-      <ControlsProvider>{children}</ControlsProvider>
-    </DataTableContext.Provider>
-  )
+  return <DataTableContext.Provider value={value}>{children}</DataTableContext.Provider>
 }
 
 export function useDataTable<TData, TValue>() {

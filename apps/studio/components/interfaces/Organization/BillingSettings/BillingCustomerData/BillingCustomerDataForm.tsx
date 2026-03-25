@@ -1,8 +1,6 @@
-import { Check, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronsUpDown, Info, X } from 'lucide-react'
+import { useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
-
-import { useMemo, useState } from 'react'
 import {
   Button,
   cn,
@@ -19,8 +17,13 @@ import {
   Popover_Shadcn_ as Popover,
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { COUNTRIES } from './BillingAddress.constants'
 import { TAX_IDS } from './TaxID.constants'
 
@@ -53,6 +56,8 @@ export const BillingCustomerDataForm = ({
 }: BillingCustomerDataFormProps) => {
   const [showCountriesPopover, setShowCountriesPopover] = useState(false)
   const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+  const countryListboxId = useId()
+  const taxIdListboxId = useId()
 
   const onSelectTaxIdType = (name: string) => {
     const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -136,6 +141,8 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showCountriesPopover}
+                      aria-controls={countryListboxId}
                       className={cn(
                         'w-full justify-between h-[34px]',
                         !field.value && 'text-muted'
@@ -154,7 +161,12 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent
+                  id={countryListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandInput placeholder="Search country..." />
                     <CommandList>
@@ -237,7 +249,24 @@ export const BillingCustomerDataForm = ({
           name="tax_id_name"
           control={form.control}
           render={() => (
-            <FormItemLayout hideMessage layout="vertical" label="Tax ID">
+            <FormItemLayout
+              hideMessage
+              layout="vertical"
+              label="Business Tax ID"
+              afterLabel={
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info size={14} className="text-foreground-lighter cursor-pointer" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-xs text-left">
+                    If you are an individual, no need to add a Tax ID. If you are a business below
+                    your country's income threshold and don't have a Tax ID, you can leave this
+                    blank. Taxes will be added to your invoice according to your country's tax laws
+                    in the near future.
+                  </TooltipContent>
+                </Tooltip>
+              }
+            >
               <Popover open={showTaxIDsPopover} onOpenChange={setShowTaxIDsPopover}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -246,6 +275,8 @@ export const BillingCustomerDataForm = ({
                       role="combobox"
                       size="medium"
                       disabled={disabled}
+                      aria-expanded={showTaxIDsPopover}
+                      aria-controls={taxIdListboxId}
                       className={cn(
                         'w-full justify-between h-[34px] pr-2',
                         !selectedTaxId && 'text-muted'
@@ -260,7 +291,12 @@ export const BillingCustomerDataForm = ({
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                <PopoverContent
+                  id={taxIdListboxId}
+                  sameWidthAsTrigger
+                  className="p-0"
+                  align="start"
+                >
                   <Command>
                     <CommandInput placeholder="Search tax ID..." />
                     <CommandList>

@@ -9,7 +9,7 @@ const OrgUsage: NextPageWithLayout = () => {
 
 OrgUsage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>{page}</OrganizationLayout>
+    <OrganizationLayout title="Usage">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

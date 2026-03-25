@@ -1,11 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -25,6 +19,7 @@ import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
@@ -35,7 +30,11 @@ import {
   useSelectedProjectQuery,
 } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
+import { ChevronRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -46,6 +45,7 @@ import {
   Separator,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
@@ -444,7 +444,7 @@ export function DiskManagementForm() {
                   open={advancedSettingsOpen}
                   onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
                 >
-                  <CollapsibleTrigger_Shadcn_ className="px-[var(--card-padding-x)] py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                  <CollapsibleTrigger_Shadcn_ className="px-card py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
                     <div className="flex flex-col items-start">
                       <span className="text-sm text-foreground">Advanced disk settings</span>
                       <span className="text-sm text-foreground-light text-left">
@@ -465,11 +465,11 @@ export function DiskManagementForm() {
                     )}
                   >
                     <div className="flex flex-col gap-y-8 py-8">
-                      <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
+                      <div className="px-card flex flex-col gap-y-8">
                         <AutoScaleFields form={form} />
                       </div>
                       <Separator />
-                      <div className="px-[var(--card-padding-x)] flex flex-col gap-y-8">
+                      <div className="px-card flex flex-col gap-y-8">
                         <NoticeBar
                           type="default"
                           visible={!!disableIopsThroughputConfig}

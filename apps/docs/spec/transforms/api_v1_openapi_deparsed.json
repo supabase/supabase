@@ -861,6 +861,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "pgdelta",
+            "required": false,
+            "in": "query",
+            "description": "Use pg-delta instead of Migra for diffing when true",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1069,6 +1078,7 @@
                   "region": {
                     "type": "string",
                     "description": "Region you want your server to reside in. Use region_selection instead.",
+                    "example": "us-east-1",
                     "deprecated": true,
                     "enum": [
                       "us-east-1",
@@ -1157,9 +1167,10 @@
                     "description": "This field is deprecated and is ignored in this request"
                   },
                   "desired_instance_size": {
+                    "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+                    "example": "nano",
                     "type": "string",
                     "enum": [
-                      "pico",
                       "nano",
                       "micro",
                       "small",
@@ -1186,18 +1197,6 @@
                     "format": "uri",
                     "description": "Template URL used to create the project from the CLI.",
                     "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-                  },
-                  "release_channel": {
-                    "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-                    "description": "Release channel. If not provided, GA will be used.",
-                    "deprecated": true
-                  },
-                  "postgres_engine": {
-                    "type": "string",
-                    "enum": ["15", "17", "17-oriole"],
-                    "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "deprecated": true
                   }
                 },
                 "required": ["db_pass", "name", "organization_slug"],
@@ -1335,12 +1334,11 @@
             "name": "desired_instance_size",
             "required": false,
             "in": "query",
-            "description": "Desired instance size",
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "schema": {
               "example": "nano",
               "type": "string",
               "enum": [
-                "pico",
                 "nano",
                 "micro",
                 "small",
@@ -1401,7 +1399,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -1454,7 +1472,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -8287,11 +8325,19 @@
                               "db_connected": {
                                 "type": "boolean"
                               },
+                              "replication_connected": {
+                                "type": "boolean"
+                              },
                               "connected_cluster": {
                                 "type": "integer"
                               }
                             },
-                            "required": ["healthy", "db_connected", "connected_cluster"]
+                            "required": [
+                              "healthy",
+                              "db_connected",
+                              "replication_connected",
+                              "connected_cluster"
+                            ]
                           },
                           {
                             "type": "object",
@@ -9981,6 +10027,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -10157,6 +10207,12 @@
                     "oauth_server_authorization_path": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "custom_oauth_enabled": {
+                      "type": "boolean"
+                    },
+                    "custom_oauth_max_providers": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -10346,6 +10402,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -10389,7 +10446,9 @@
                     "uri_allow_list",
                     "oauth_server_enabled",
                     "oauth_server_allow_dynamic_registration",
-                    "oauth_server_authorization_path"
+                    "oauth_server_authorization_path",
+                    "custom_oauth_enabled",
+                    "custom_oauth_max_providers"
                   ]
                 }
               }
@@ -10665,6 +10724,10 @@
                   "saml_external_url": {
                     "type": "string",
                     "pattern": "^[^,]+$",
+                    "nullable": true
+                  },
+                  "security_sb_forwarded_for_enabled": {
+                    "type": "boolean",
                     "nullable": true
                   },
                   "security_captcha_enabled": {
@@ -11414,6 +11477,9 @@
                   "oauth_server_authorization_path": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "custom_oauth_enabled": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -12177,6 +12243,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -12353,6 +12423,12 @@
                     "oauth_server_authorization_path": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "custom_oauth_enabled": {
+                      "type": "boolean"
+                    },
+                    "custom_oauth_max_providers": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -12542,6 +12618,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -12585,7 +12662,9 @@
                     "uri_allow_list",
                     "oauth_server_enabled",
                     "oauth_server_allow_dynamic_registration",
-                    "oauth_server_authorization_path"
+                    "oauth_server_authorization_path",
+                    "custom_oauth_enabled",
+                    "custom_oauth_max_providers"
                   ]
                 }
               }
@@ -16439,6 +16518,78 @@
         "x-endpoint-owners": ["security"]
       }
     },
+    "/v1/projects/{ref}/database/openapi": {
+      "get": {
+        "description": "Returns the PostgREST OpenAPI specification for the project. This is the replacement for querying `/rest/v1/` directly with the anon key.",
+        "operationId": "v1-get-database-openapi",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "schema",
+            "required": false,
+            "in": "query",
+            "description": "The database schema to generate the OpenAPI spec for",
+            "schema": {
+              "default": "public",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to fetch PostgREST OpenAPI spec"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["database_read"]
+          }
+        ],
+        "summary": "Get PostgREST OpenAPI spec",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "database:read"
+      }
+    },
     "/v1/projects/{ref}/functions": {
       "get": {
         "description": "Returns all functions you've previously added to the specified project.",
@@ -17651,9 +17802,9 @@
         "x-oauth-scope": "storage:read"
       }
     },
-    "/v1/projects/{ref}/config/disk/util": {
+    "/v1/projects/{ref}/config/disk": {
       "get": {
-        "operationId": "v1-get-disk-utilization",
+        "operationId": "v1-get-database-disk",
         "parameters": [
           {
             "name": "ref",
@@ -17676,26 +17827,60 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "timestamp": {
-                      "type": "string"
-                    },
-                    "metrics": {
-                      "type": "object",
-                      "properties": {
-                        "fs_size_bytes": {
-                          "type": "number"
+                    "attributes": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "iops": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "size_gb": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "throughput_mibps": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["gp3"]
+                            }
+                          },
+                          "required": ["iops", "size_gb", "type"]
                         },
-                        "fs_avail_bytes": {
-                          "type": "number"
-                        },
-                        "fs_used_bytes": {
-                          "type": "number"
+                        {
+                          "type": "object",
+                          "properties": {
+                            "iops": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "size_gb": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["io2"]
+                            }
+                          },
+                          "required": ["iops", "size_gb", "type"]
                         }
-                      },
-                      "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+                      ]
+                    },
+                    "last_modified_at": {
+                      "type": "string"
                     }
                   },
-                  "required": ["timestamp", "metrics"]
+                  "required": ["attributes"]
                 }
               }
             }
@@ -17710,7 +17895,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to get disk utilization"
+            "description": "Failed to get database disk attributes"
           }
         },
         "security": [
@@ -17721,12 +17906,10 @@
             "fga_permissions": ["infra_disk_config_read"]
           }
         ],
-        "summary": "Get disk utilization",
+        "summary": "Get database disk attributes",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
-      }
-    },
-    "/v1/projects/{ref}/config/disk": {
+      },
       "post": {
         "operationId": "v1-modify-database-disk",
         "parameters": [
@@ -17834,6 +18017,81 @@
           }
         ],
         "summary": "Modify database disk",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
+    "/v1/projects/{ref}/config/disk/util": {
+      "get": {
+        "operationId": "v1-get-disk-utilization",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string"
+                    },
+                    "metrics": {
+                      "type": "object",
+                      "properties": {
+                        "fs_size_bytes": {
+                          "type": "number"
+                        },
+                        "fs_avail_bytes": {
+                          "type": "number"
+                        },
+                        "fs_used_bytes": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+                    }
+                  },
+                  "required": ["timestamp", "metrics"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get disk utilization"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_disk_config_read"]
+          }
+        ],
+        "summary": "Get disk utilization",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
       }
@@ -19026,7 +19284,11 @@
                     "suspend": {
                       "type": "boolean",
                       "nullable": true,
-                      "description": "Whether to suspend realtime"
+                      "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                    },
+                    "presence_enabled": {
+                      "type": "boolean",
+                      "description": "Whether to enable presence"
                     }
                   },
                   "required": [
@@ -19039,7 +19301,8 @@
                     "max_joins_per_second",
                     "max_presence_events_per_second",
                     "max_payload_size_in_kb",
-                    "suspend"
+                    "suspend",
+                    "presence_enabled"
                   ]
                 }
               }
@@ -19141,7 +19404,11 @@
                   },
                   "suspend": {
                     "type": "boolean",
-                    "description": "Whether to suspend realtime"
+                    "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                  },
+                  "presence_enabled": {
+                    "type": "boolean",
+                    "description": "Whether to enable presence"
                   }
                 },
                 "additionalProperties": false
@@ -19169,6 +19436,50 @@
           }
         ],
         "summary": "Updates realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      }
+    },
+    "/v1/projects/{ref}/config/realtime/shutdown": {
+      "post": {
+        "operationId": "v1-shutdown-realtime",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Realtime connections shutdown successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Tenant not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Shutdowns realtime connections for a project",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
       }
@@ -20414,9 +20725,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -20490,9 +20806,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -20651,6 +20972,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["members_read"]
           }
         ],
         "summary": "List members of an organization",
@@ -21726,6 +22050,7 @@
           "region": {
             "type": "string",
             "description": "Region you want your server to reside in. Use region_selection instead.",
+            "example": "us-east-1",
             "deprecated": true,
             "enum": [
               "us-east-1",
@@ -21814,9 +22139,10 @@
             "description": "This field is deprecated and is ignored in this request"
           },
           "desired_instance_size": {
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+            "example": "nano",
             "type": "string",
             "enum": [
-              "pico",
               "nano",
               "micro",
               "small",
@@ -21843,18 +22169,6 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          },
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-            "description": "Release channel. If not provided, GA will be used.",
-            "deprecated": true
-          },
-          "postgres_engine": {
-            "type": "string",
-            "enum": ["15", "17", "17-oriole"],
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "deprecated": true
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
@@ -21964,7 +22278,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -22017,7 +22351,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -23773,11 +24127,19 @@
                   "db_connected": {
                     "type": "boolean"
                   },
+                  "replication_connected": {
+                    "type": "boolean"
+                  },
                   "connected_cluster": {
                     "type": "integer"
                   }
                 },
-                "required": ["healthy", "db_connected", "connected_cluster"]
+                "required": [
+                  "healthy",
+                  "db_connected",
+                  "replication_connected",
+                  "connected_cluster"
+                ]
               },
               {
                 "type": "object",
@@ -24847,6 +25209,10 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -25023,6 +25389,12 @@
           "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
+          },
+          "custom_oauth_enabled": {
+            "type": "boolean"
+          },
+          "custom_oauth_max_providers": {
+            "type": "integer"
           }
         },
         "required": [
@@ -25212,6 +25584,7 @@
           "saml_enabled",
           "saml_external_url",
           "saml_allow_encrypted_assertions",
+          "security_sb_forwarded_for_enabled",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -25255,7 +25628,9 @@
           "uri_allow_list",
           "oauth_server_enabled",
           "oauth_server_allow_dynamic_registration",
-          "oauth_server_authorization_path"
+          "oauth_server_authorization_path",
+          "custom_oauth_enabled",
+          "custom_oauth_max_providers"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -25476,6 +25851,10 @@
           "saml_external_url": {
             "type": "string",
             "pattern": "^[^,]+$",
+            "nullable": true
+          },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
             "nullable": true
           },
           "security_captcha_enabled": {
@@ -26225,6 +26604,9 @@
           "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
+          },
+          "custom_oauth_enabled": {
+            "type": "boolean"
           }
         }
       },
@@ -27665,29 +28047,63 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskUtilMetricsResponse": {
+      "DiskResponse": {
         "type": "object",
         "properties": {
-          "timestamp": {
-            "type": "string"
-          },
-          "metrics": {
-            "type": "object",
-            "properties": {
-              "fs_size_bytes": {
-                "type": "number"
+          "attributes": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "size_gb": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "throughput_mibps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["gp3"]
+                  }
+                },
+                "required": ["iops", "size_gb", "type"]
               },
-              "fs_avail_bytes": {
-                "type": "number"
-              },
-              "fs_used_bytes": {
-                "type": "number"
+              {
+                "type": "object",
+                "properties": {
+                  "iops": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "size_gb": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["io2"]
+                  }
+                },
+                "required": ["iops", "size_gb", "type"]
               }
-            },
-            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+            ]
+          },
+          "last_modified_at": {
+            "type": "string"
           }
         },
-        "required": ["timestamp", "metrics"]
+        "required": ["attributes"]
       },
       "DiskRequestBody": {
         "type": "object",
@@ -27746,6 +28162,30 @@
           }
         },
         "required": ["attributes"]
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": {
+                "type": "number"
+              },
+              "fs_avail_bytes": {
+                "type": "number"
+              },
+              "fs_used_bytes": {
+                "type": "number"
+              }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
       },
       "DiskAutoscaleConfig": {
         "type": "object",
@@ -28355,7 +28795,11 @@
           "suspend": {
             "type": "boolean",
             "nullable": true,
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "required": [
@@ -28368,7 +28812,8 @@
           "max_joins_per_second",
           "max_presence_events_per_second",
           "max_payload_size_in_kb",
-          "suspend"
+          "suspend",
+          "presence_enabled"
         ]
       },
       "UpdateRealtimeConfigBody": {
@@ -28428,7 +28873,11 @@
           },
           "suspend": {
             "type": "boolean",
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "additionalProperties": false
@@ -29191,9 +29640,14 @@
           "status": {
             "type": "string",
             "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+          },
+          "completed_on": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
-        "required": ["name", "status"]
+        "required": ["name", "status", "completed_on"]
       },
       "V1UndoBody": {
         "type": "object",

@@ -23,6 +23,8 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { Project } from '@/components/interfaces/Settings/General/Project'
+
 const ProjectSettings: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -48,14 +50,14 @@ const ProjectSettings: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Project Settings</PageHeaderTitle>
             <PageHeaderDescription>
-              Configure general options, domains, transfers, and project lifecycle.
+              General configuration, domains, ownership, and lifecycle
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
         <General />
-
+        <Project />
         {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
         {!isBranch && hasHipaaAddon && <ComplianceConfig />}
         {projectSettingsCustomDomains && <CustomDomainConfig />}

@@ -1,4 +1,5 @@
 import { AuthClient, navigatorLock, User } from '@supabase/auth-js'
+import { isBrowser } from './helpers'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -38,7 +39,7 @@ const shouldDetectSessionInUrl = process.env.NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_
 
 const navigatorLockEnabled = !!(shouldEnableNavigatorLock && globalThis?.navigator?.locks)
 
-if (shouldEnableNavigatorLock && !globalThis?.navigator?.locks) {
+if (isBrowser && shouldEnableNavigatorLock && !globalThis?.navigator?.locks) {
   console.warn('This browser does not support the Navigator Locks API. Please update it.')
 }
 
@@ -147,32 +148,10 @@ async function debuggableNavigatorLock<R>(
       }
 
       console.error(
-        `Waited for over 10s to acquire an Auth client lock, will steal the lock to unblock`,
+        `Waited for over 10s to acquire an Auth client lock`,
         await navigator.locks.query(),
         stackException
       )
-
-      // quickly steal the lock and release it so that others can acquire it,
-      // while leaving the code that was holding it to continue running
-      navigator.locks
-        .request(
-          name,
-          {
-            steal: true,
-          },
-          async () => {
-            await new Promise((accept) => {
-              setTimeout(accept, 0)
-            })
-
-            console.error('Lock was stolen and now released', stackException)
-          }
-        )
-        .catch((e: any) => {
-          if (captureException) {
-            captureException(e)
-          }
-        })
     })()
   }, 10000)
 

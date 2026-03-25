@@ -292,7 +292,7 @@ const Examples: Example[] = [
     title: 'Huggingface Image Captioning',
     description:
       'Use the Hugging Face Inference API to make calls to 100,000+ Machine Learning models from Supabase Edge Functions.',
-    repo_url: 'https://supabase.com/docs/guides/functions/auth',
+    repo_url: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
   },
   {
     type: 'example',

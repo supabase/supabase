@@ -12,11 +12,13 @@ export const OrganizationCard = ({
   href,
   isLink = true,
   className,
+  onClick,
 }: {
   organization: Organization
   href?: string
   isLink?: boolean
   className?: string
+  onClick?: () => void
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const { data } = useOrgProjectsInfiniteQuery({ slug: organization.slug })
@@ -27,18 +29,19 @@ export const OrganizationCard = ({
     <ActionCard
       bgColor="bg border"
       className={cn(
-        'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center',
+        'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
         className
       )}
       icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
       title={organization.name}
+      onClick={onClick}
       description={
         <div className="flex items-center justify-between text-xs text-foreground-light font-sans">
-          <div className="flex items-center gap-x-1.5">
+          <div className="flex items-center gap-x-1">
             <span>{organization.plan.name} Plan</span>
             {numProjects > 0 && (
               <>
-                <span>•</span>
+                <span className="text-foreground-lighter">·</span>
                 <span>
                   {numProjects} project{numProjects > 1 ? 's' : ''}
                 </span>
