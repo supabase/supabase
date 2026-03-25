@@ -673,7 +673,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'new row' })).toBeVisible()
 
     // Save and verify
-    await page.getByRole('button', { name: /Review/ }).click()
+    await clickReview(page)
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('1 row addition')).toBeVisible()
     await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
