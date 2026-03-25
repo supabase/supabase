@@ -211,6 +211,11 @@ function createTabsState(projectRef: string) {
       if (!!store.tabsMap[id]) {
         if ('label' in updates) {
           store.tabsMap[id].label = updates.label
+          // Keep the persisted name aligned with the visible label so browser titles
+          // and tab state recover cleanly after entity renames.
+          if (typeof updates.label === 'string' && store.tabsMap[id].metadata) {
+            store.tabsMap[id].metadata.name = updates.label
+          }
         }
         if ('scrollTop' in updates && store.tabsMap[id].metadata) {
           store.tabsMap[id].metadata.scrollTop = updates.scrollTop
