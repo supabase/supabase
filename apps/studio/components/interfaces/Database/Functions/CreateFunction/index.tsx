@@ -44,6 +44,7 @@ import {
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
+import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
 
@@ -331,7 +332,7 @@ export const CreateFunction = ({
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                        <FormFieldConfigParams readonly={isEditing} />
+                        <CreateFunctionConfigParamsSection />
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -498,75 +499,6 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
             disabled={readonly}
           >
             Add a new argument
-          </Button>
-        )}
-      </div>
-    </>
-  )
-}
-
-interface FormFieldConfigParamsProps {
-  readonly?: boolean
-}
-
-const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
-    name: 'config_params',
-  })
-
-  return (
-    <>
-      <h5 className="text-base text-foreground">Configuration Parameters</h5>
-      <div className="space-y-2 pt-4">
-        {readonly && isEmpty(fields) && (
-          <span className="text-foreground-lighter">No argument for this function</span>
-        )}
-        {fields.map((field, index) => {
-          return (
-            <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField_Shadcn_
-                name={`config_params.${index}.name`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_name" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-              <FormField_Shadcn_
-                name={`config_params.${index}.value`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_value" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-
-              {!readonly && (
-                <Button
-                  type="danger"
-                  icon={<Trash size={12} />}
-                  onClick={() => remove(index)}
-                  className="h-[38px] w-[38px]"
-                />
-              )}
-            </div>
-          )
-        })}
-
-        {!readonly && (
-          <Button
-            type="default"
-            icon={<Plus size={12} />}
-            onClick={() => append({ name: '', type: '' })}
-            disabled={readonly}
-          >
-            Add a new config
           </Button>
         )}
       </div>

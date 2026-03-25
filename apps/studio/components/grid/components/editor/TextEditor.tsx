@@ -46,6 +46,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const { isQueueEnabled } = useTableRowOperations()
+  const applyChangesLabel = isQueueEnabled ? 'Queue changes' : 'Save changes'
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
@@ -145,7 +146,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                       <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">⏎</span>
                       </div>
-                      <p className="text-xs text-foreground-light">Save changes</p>
+                      <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">

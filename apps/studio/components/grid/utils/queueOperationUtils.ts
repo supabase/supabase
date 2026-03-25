@@ -152,7 +152,7 @@ export const formatGridDataWithOperationValues = ({
   operations.forEach((op) => {
     if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
       const { rowIdentifiers, columnName, newValue } = op.payload
-      const rowIdx = rows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
       if (rowIdx !== -1) {
         formattedRows[rowIdx] = { ...formattedRows[rowIdx], [columnName]: newValue }
       }
@@ -177,9 +177,9 @@ export const formatGridDataWithOperationValues = ({
       }
     } else if (op.type === QueuedOperationType.DELETE_ROW) {
       const { rowIdentifiers } = op.payload
-      const rowMatches = rows.find((row) => rowMatchesIdentifiers(row, rowIdentifiers))
-      if (rowMatches) {
-        formattedRows[rowMatches.idx] = { ...rowMatches, __isDeleted: true }
+      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      if (rowIdx !== -1) {
+        formattedRows[rowIdx] = { ...formattedRows[rowIdx], __isDeleted: true }
       }
     }
   })
