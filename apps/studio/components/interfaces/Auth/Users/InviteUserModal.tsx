@@ -60,7 +60,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     >
       <Form_Shadcn_ {...form}>
         <Modal.Content>
-          <form id={formId} onSubmit={form.handleSubmit(onInviteUser)}>
+          <form id={formId} onSubmit={form.handleSubmit(onInviteUser)} noValidate>
             <FormField_Shadcn_
               control={form.control}
               name="email"
