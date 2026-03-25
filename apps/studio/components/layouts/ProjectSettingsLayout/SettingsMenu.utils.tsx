@@ -1,24 +1,25 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
+import { useFlag, useParams } from 'common'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
-import type { Organization } from 'types'
 
-export const generateSettingsMenu = (
-  ref?: string,
-  project?: Project,
-  organization?: Organization,
-  features?: {
-    auth?: boolean
-    authProviders?: boolean
-    edgeFunctions?: boolean
-    storage?: boolean
-    invoices?: boolean
-    legacyJwtKeys?: boolean
-    logDrains?: boolean
-    billing?: boolean
-  }
-): ProductMenuGroup[] => {
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+export const useGenerateSettingsMenu = () => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  const showDashboardPreferences = useFlag('dashboardPreferences')
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+
+  const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
+    useIsFeatureEnabled(['project_settings:legacy_jwt_keys', 'billing:all'])
+
+  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
   if (!IS_PLATFORM) {
     return [
       {
@@ -34,11 +35,6 @@ export const generateSettingsMenu = (
       },
     ]
   }
-
-  const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
-
-  const legacyJwtKeysEnabled = features?.legacyJwtKeys ?? true
-  const billingEnabled = features?.billing ?? true
 
   return [
     {
@@ -72,6 +68,17 @@ export const generateSettingsMenu = (
           items: [],
           disabled: !isProjectActive,
         },
+        ...(platformWebhooksEnabled
+          ? [
+              {
+                name: 'Webhooks',
+                key: 'webhooks',
+                url: `/project/${ref}/settings/webhooks`,
+                items: [],
+                disabled: !isProjectActive,
+              },
+            ]
+          : []),
 
         {
           name: 'API Keys',
@@ -98,13 +105,28 @@ export const generateSettingsMenu = (
           disabled: !isProjectActive,
         },
         {
-          name: 'Add Ons',
+          name: 'Add-ons',
           key: 'addons',
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
       ],
     },
+    ...(IS_PLATFORM && showDashboardPreferences
+      ? [
+          {
+            title: 'Preferences',
+            items: [
+              {
+                name: 'Dashboard preferences',
+                key: 'preferences',
+                url: `/project/${ref}/settings/preferences`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: 'Integrations',
       items: [

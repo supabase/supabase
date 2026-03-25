@@ -17,13 +17,13 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN apt-get update -qq && \
   apt-get install -y --no-install-recommends \
   git \
-  python3 \ 
+  python3 \
   ca-certificates \
-  build-essential && \ 
+  build-essential && \
   rm -rf /var/lib/apt/lists/* && \
   update-ca-certificates
 
-RUN npm install -g pnpm@10.16.1
+RUN npm install -g pnpm@10.24.0
 
 WORKDIR /app
 
@@ -31,12 +31,13 @@ WORKDIR /app
 FROM base AS turbo
 COPY . .
 
-RUN pnpm dlx turbo@2.3.3 prune studio --docker
+RUN pnpm dlx turbo@2.8.13 prune studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base AS deps
 COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/pnpm-lock.yaml ./
+COPY ./patches/ ./patches
 
 # No need to clean cache because production uses standalone build
 RUN pnpm install --frozen-lockfile

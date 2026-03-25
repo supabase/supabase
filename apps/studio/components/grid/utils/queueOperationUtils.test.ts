@@ -1,10 +1,17 @@
-import { describe, test, expect } from 'vitest'
-import { generateTableChangeKey, rowMatchesIdentifiers, applyCellEdit } from './queueOperationUtils'
+import { describe, expect, test } from 'vitest'
+
+import type { SupaRow } from '../types'
 import {
-  type NewEditCellContentOperation,
+  formatGridDataWithOperationValues,
+  generateTableChangeKey,
+  rowMatchesIdentifiers,
+} from './queueOperationUtils'
+import {
+  QueuedOperationType,
   type NewAddRowOperation,
   type NewDeleteRowOperation,
-  QueuedOperationType,
+  type NewEditCellContentOperation,
+  type QueuedOperation,
 } from '@/state/table-editor-operation-queue.types'
 
 describe('generateTableChangeKey', () => {
@@ -145,101 +152,300 @@ describe('rowMatchesIdentifiers', () => {
   })
 })
 
-describe('applyCellEdit', () => {
-  test('should apply cell edit to matching row', () => {
+describe('formatGridDataWithOperationValues', () => {
+  const makeRow = (idx: number, data: Record<string, unknown> = {}): SupaRow => ({
+    idx,
+    ...data,
+  })
+
+  const makeEditOp = (
+    overrides: Partial<QueuedOperation & { payload: any }> = {}
+  ): QueuedOperation => ({
+    id: 'op-1',
+    tableId: 1,
+    timestamp: Date.now(),
+    type: QueuedOperationType.EDIT_CELL_CONTENT,
+    payload: {
+      rowIdentifiers: { id: 1 },
+      columnName: 'name',
+      oldValue: 'old',
+      newValue: 'new',
+      table: {} as any,
+    },
+    ...overrides,
+  })
+
+  const makeDeleteOp = (
+    rowIdentifiers: Record<string, unknown>,
+    originalRow: SupaRow
+  ): QueuedOperation => ({
+    id: 'op-del',
+    tableId: 1,
+    timestamp: Date.now(),
+    type: QueuedOperationType.DELETE_ROW,
+    payload: { rowIdentifiers, originalRow, table: {} as any },
+  })
+
+  const makeAddOp = (tempId: string, rowData: Record<string, unknown> = {}): QueuedOperation => ({
+    id: 'op-add',
+    tableId: 1,
+    timestamp: Date.now(),
+    type: QueuedOperationType.ADD_ROW,
+    payload: {
+      tempId,
+      rowData: { idx: Number(tempId), __tempId: tempId, ...rowData },
+      table: {} as any,
+    },
+  })
+
+  test('should return rows unchanged when there are no operations', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const result = formatGridDataWithOperationValues({ operations: [], rows })
+    expect(result).toEqual(rows)
+  })
+
+  test('should apply EDIT_CELL_CONTENT to matching row', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const op = makeEditOp({
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result[0]).toEqual({ idx: 0, id: 1, name: 'Updated' })
+    expect(result[1]).toEqual(rows[1])
+  })
+
+  test('should not modify rows when EDIT_CELL_CONTENT does not match any row', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const op = makeEditOp({
+      payload: {
+        rowIdentifiers: { id: 999 },
+        columnName: 'name',
+        oldValue: 'old',
+        newValue: 'new',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result).toEqual(rows)
+  })
+
+  test('should apply multiple EDIT_CELL_CONTENT operations to different rows', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const op1 = makeEditOp({
+      id: 'op-1',
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated Alice',
+        table: {} as any,
+      },
+    })
+    const op2 = makeEditOp({
+      id: 'op-2',
+      payload: {
+        rowIdentifiers: { id: 2 },
+        columnName: 'name',
+        oldValue: 'Bob',
+        newValue: 'Updated Bob',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({ operations: [op1, op2], rows })
+    expect(result[0].name).toBe('Updated Alice')
+    expect(result[1].name).toBe('Updated Bob')
+  })
+
+  test('multiple operations targeting the same row preserve all column changes', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice', email: 'alice@test.com' })]
+    const op1 = makeEditOp({
+      id: 'op-1',
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated',
+        table: {} as any,
+      },
+    })
+    const op2 = makeEditOp({
+      id: 'op-2',
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'email',
+        oldValue: 'alice@test.com',
+        newValue: 'updated@test.com',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({ operations: [op1, op2], rows })
+    // Both column edits should be preserved
+    expect(result[0].name).toBe('Updated')
+    expect(result[0].email).toBe('updated@test.com')
+  })
+
+  test('should mark matching row as deleted for DELETE_ROW operation', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const op = makeDeleteOp({ id: 1 }, rows[0])
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result[0].__isDeleted).toBe(true)
+    expect(result[1].__isDeleted).toBeUndefined()
+  })
+
+  test('should not modify rows when DELETE_ROW does not match any row', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const op = makeDeleteOp({ id: 999 }, makeRow(0, { id: 999 }))
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result[0].__isDeleted).toBeUndefined()
+  })
+
+  test('should not mutate the original rows array', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const op = makeEditOp({
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(rows[0].name).toBe('Alice')
+    expect(result[0].name).toBe('Updated')
+  })
+
+  test('should handle mixed operation types', () => {
     const rows = [
-      { idx: 0, id: 1, name: 'old' },
-      { idx: 1, id: 2, name: 'test' },
+      makeRow(0, { id: 1, name: 'Alice' }),
+      makeRow(1, { id: 2, name: 'Bob' }),
+      makeRow(2, { id: 3, name: 'Charlie' }),
     ]
-    const result = applyCellEdit(rows, 'name', { id: 1 }, 'new')
-    expect(result).toEqual([
-      { idx: 0, id: 1, name: 'new' },
-      { idx: 1, id: 2, name: 'test' },
-    ])
+
+    const editOp = makeEditOp({
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated Alice',
+        table: {} as any,
+      },
+    })
+    const deleteOp = makeDeleteOp({ id: 2 }, rows[1])
+
+    const result = formatGridDataWithOperationValues({
+      operations: [editOp, deleteOp],
+      rows,
+    })
+
+    expect(result[0].name).toBe('Updated Alice')
+    expect(result[1].__isDeleted).toBe(true)
+    expect(result[2]).toEqual(rows[2])
   })
 
-  test('should not affect non-matching rows', () => {
-    const rows = [
-      { idx: 0, id: 1, name: 'old' },
-      { idx: 1, id: 2, name: 'test' },
+  test('should prepend new row for ADD_ROW operation', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const op = makeAddOp('-100', { name: 'New Row' })
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'New Row' })
+    expect(result[1]).toEqual(rows[0])
+  })
+
+  test('should update existing pending row for ADD_ROW with same tempId', () => {
+    const rows: SupaRow[] = [
+      { idx: -100, __tempId: '-100', name: 'Original' } as any,
+      makeRow(1, { id: 1, name: 'Alice' }),
     ]
-    const result = applyCellEdit(rows, 'name', { id: 3 }, 'new')
-    expect(result).toEqual([
-      { idx: 0, id: 1, name: 'old' },
-      { idx: 1, id: 2, name: 'test' },
-    ])
+    const op = makeAddOp('-100', { name: 'Updated' })
+
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'Updated' })
   })
 
-  test('should create new row instances for matching row', () => {
-    const rows = [{ idx: 0, id: 1, name: 'old' }]
-    const result = applyCellEdit(rows, 'name', { id: 1 }, 'new')
-    expect(result[0]).not.toBe(rows[0])
-    expect(result[0]).toEqual({ idx: 0, id: 1, name: 'new' })
+  test('should handle multiple ADD_ROW operations', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const op1 = makeAddOp('-100', { name: 'Row 1' })
+    const op2 = makeAddOp('-200', { name: 'Row 2' })
+
+    const result = formatGridDataWithOperationValues({ operations: [op1, op2], rows })
+    expect(result).toHaveLength(3)
+    expect(result[0]).toMatchObject({ __tempId: '-200', name: 'Row 2' })
+    expect(result[1]).toMatchObject({ __tempId: '-100', name: 'Row 1' })
   })
 
-  test('should not modify original array', () => {
-    const rows = [{ idx: 0, id: 1, name: 'old' }]
-    const originalRows = [...rows]
-    applyCellEdit(rows, 'name', { id: 1 }, 'new')
-    expect(rows).toEqual(originalRows)
+  test('should correctly delete a row after adding a new row (ADD then DELETE)', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const addOp = makeAddOp('-100', { name: 'New Row' })
+    const deleteOp = makeDeleteOp({ id: 1 }, rows[0])
+
+    const result = formatGridDataWithOperationValues({
+      operations: [addOp, deleteOp],
+      rows,
+    })
+
+    expect(result).toHaveLength(3)
+    // New row should be preserved at position 0
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'New Row' })
+    expect(result[0].__isDeleted).toBeUndefined()
+    // Deleted row should be marked
+    expect(result[1].__isDeleted).toBe(true)
+    expect(result[1].id).toBe(1)
+    // Other row unaffected
+    expect(result[2]).toEqual(rows[1])
   })
 
-  test('should handle multiple matching rows with composite keys', () => {
-    const rows = [
-      { idx: 0, id: 1, org_id: 10, name: 'old1' },
-      { idx: 1, id: 1, org_id: 20, name: 'old2' },
-      { idx: 2, id: 2, org_id: 10, name: 'old3' },
-    ]
-    const result = applyCellEdit(rows, 'name', { id: 1, org_id: 10 }, 'new')
-    expect(result).toEqual([
-      { idx: 0, id: 1, org_id: 10, name: 'new' },
-      { idx: 1, id: 1, org_id: 20, name: 'old2' },
-      { idx: 2, id: 2, org_id: 10, name: 'old3' },
-    ])
+  test('should correctly edit a row after adding a new row (ADD then EDIT)', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const addOp = makeAddOp('-100', { name: 'New Row' })
+    const editOp = makeEditOp({
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated Alice',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({
+      operations: [addOp, editOp],
+      rows,
+    })
+
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'New Row' })
+    expect(result[1].name).toBe('Updated Alice')
   })
 
-  test('should handle setting value to null', () => {
-    const rows = [{ idx: 0, id: 1, name: 'test' }]
-    const result = applyCellEdit(rows, 'name', { id: 1 }, null)
-    expect(result).toEqual([{ idx: 0, id: 1, name: null }])
-  })
+  test('should handle EDIT_CELL_CONTENT with composite primary keys', () => {
+    const rows = [makeRow(0, { tenant_id: 'a', user_id: 1, name: 'Alice' })]
+    const op = makeEditOp({
+      payload: {
+        rowIdentifiers: { tenant_id: 'a', user_id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated',
+        table: {} as any,
+      },
+    })
 
-  test('should handle setting value to undefined', () => {
-    const rows = [{ idx: 0, id: 1, name: 'test' }]
-    const result = applyCellEdit(rows, 'name', { id: 1 }, undefined)
-    expect(result).toEqual([{ idx: 0, id: 1, name: undefined }])
-  })
-
-  test('should handle numeric values', () => {
-    const rows = [{ idx: 0, id: 1, count: 0 }]
-    const result = applyCellEdit(rows, 'count', { id: 1 }, 42)
-    expect(result).toEqual([{ idx: 0, id: 1, count: 42 }])
-  })
-
-  test('should handle object values', () => {
-    const rows = [{ idx: 0, id: 1, data: null }]
-    const newValue = { nested: { value: 123 } }
-    const result = applyCellEdit(rows, 'data', { id: 1 }, newValue)
-    expect(result).toEqual([{ idx: 0, id: 1, data: newValue }])
-  })
-
-  test('should handle empty rows array', () => {
-    const rows: any[] = []
-    const result = applyCellEdit(rows, 'name', { id: 1 }, 'new')
-    expect(result).toEqual([])
-  })
-
-  test('should update all matching rows with same identifier', () => {
-    const rows = [
-      { idx: 0, id: 1, name: 'row1' },
-      { idx: 1, id: 1, name: 'row2' },
-      { idx: 2, id: 2, name: 'row3' },
-    ]
-    const result = applyCellEdit(rows, 'name', { id: 1 }, 'updated')
-    expect(result).toEqual([
-      { idx: 0, id: 1, name: 'updated' },
-      { idx: 1, id: 1, name: 'updated' },
-      { idx: 2, id: 2, name: 'row3' },
-    ])
+    const result = formatGridDataWithOperationValues({ operations: [op], rows })
+    expect(result[0].name).toBe('Updated')
   })
 })

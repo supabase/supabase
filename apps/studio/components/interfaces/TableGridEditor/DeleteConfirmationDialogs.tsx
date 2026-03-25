@@ -116,7 +116,7 @@ const DeleteConfirmationDialogs = ({
   const numRows =
     snap.confirmationDialog?.type === 'row'
       ? snap.confirmationDialog.allRowsSelected
-        ? snap.confirmationDialog.numRows ?? 0
+        ? (snap.confirmationDialog.numRows ?? 0)
         : snap.confirmationDialog.rows.length
       : 0
 

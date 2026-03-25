@@ -6,6 +6,14 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getModel } from 'lib/ai/model'
+import {
+  DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  getAssistantModelEntry,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+  type AssistantModelId,
+} from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -53,7 +61,7 @@ const requestBodySchema = z.object({
   chatId: z.string().optional(),
   chatName: z.string().optional(),
   orgSlug: z.string().optional(),
-  model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
+  model: z.string().optional(),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
@@ -80,25 +88,32 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     orgSlug,
     chatId,
     chatName,
-    model: requestedModel,
+    model: rawRequestedModel,
   } = data
 
-  const messagesValidation = await safeValidateUIMessages({ messages: rawMessages })
+  const requestedModel: AssistantModelId | undefined =
+    rawRequestedModel && isKnownAssistantModelId(rawRequestedModel) ? rawRequestedModel : undefined
+
+  const messagesValidation = await safeValidateUIMessages({
+    messages: rawMessages,
+  })
   if (!messagesValidation.success) {
-    return res
-      .status(400)
-      .json({ error: 'Invalid request body', message: messagesValidation.error.message })
+    return res.status(400).json({
+      error: 'Invalid request body',
+      message: messagesValidation.error.message,
+    })
   }
   const messages = messagesValidation.data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isLimited = false
+  let hasAccessToAdvanceModel = false
   let isHipaaEnabled = false
   let orgId: number | undefined
   let planId: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
+    hasAccessToAdvanceModel = true
   }
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
@@ -106,7 +121,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       // Get organizations and compute opt in level server-side
       const {
         aiOptInLevel: orgAIOptInLevel,
-        isLimited: orgAILimited,
+        hasAccessToAdvanceModel: orgHasAccessToAdvanceModel,
         isHipaaEnabled: orgIsHipaaEnabled,
         orgId: fetchedOrgId,
         planId: fetchedPlanId,
@@ -117,7 +132,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       })
 
       aiOptInLevel = orgAIOptInLevel
-      isLimited = orgAILimited
+      hasAccessToAdvanceModel = orgHasAccessToAdvanceModel
       isHipaaEnabled = orgIsHipaaEnabled
       orgId = fetchedOrgId
       planId = fetchedPlanId
@@ -128,16 +143,20 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
+  const envThrottled = process.env.IS_THROTTLED !== 'false'
+
+  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
+  if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
+    effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
+  }
+
   const {
-    model,
+    modelParams,
     error: modelError,
     promptProviderOptions,
-    providerOptions,
   } = await getModel({
     provider: 'openai',
-    model: requestedModel ?? 'gpt-5',
-    routingKey: projectRef,
-    isLimited,
+    modelEntry: getAssistantModelEntry(effectiveModel),
   })
 
   if (modelError) {
@@ -184,7 +203,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
     const result = await generateAssistantResponse({
       messages,
-      model,
+      ...modelParams,
       tools,
       aiOptInLevel,
       getSchemas: aiOptInLevel !== 'disabled' ? getSchemas : undefined,
@@ -197,7 +216,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId,
       requestedModel,
       promptProviderOptions,
-      providerOptions,
       abortSignal: abortController.signal,
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
@@ -206,7 +224,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
     result.pipeUIMessageStreamToResponse(res, {
       sendReasoning: true,
+      headers: { 'Content-Encoding': 'none' },
       onError: (error) => {
+        console.error('Assistant stream error:', error)
+
         if (error == null) {
           return 'unknown error'
         }

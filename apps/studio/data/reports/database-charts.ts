@@ -1,30 +1,32 @@
-import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import type { Organization } from 'types'
 
 import { DiskAttributesData } from '../config/disk-attributes-query'
 import { MaxConnectionsData } from '../database/max-connections-query'
 import { Project } from '../projects/project-detail-query'
 
 export const getReportAttributesV2: (
-  org: Organization,
+  entitledFeatures: string[],
   project: Project,
   diskConfig?: DiskAttributesData,
   maxConnections?: MaxConnectionsData,
-  pgBouncerMaxConnections?: number
-) => ReportAttributes[] = (org, project, diskConfig, maxConnections, pgBouncerMaxConnections) => {
-  const isFreePlan = org?.plan?.id === 'free'
-  const isSpendCapEnabled =
-    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
-
+  pgBouncerMaxConnections?: number,
+  isSpendCapEnabled?: boolean
+) => ReportAttributes[] = (
+  entitledFeatures,
+  project,
+  diskConfig,
+  maxConnections,
+  pgBouncerMaxConnections,
+  isSpendCapEnabled
+) => {
   return [
     {
       id: 'ram-usage',
       label: 'Memory usage',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -69,19 +71,17 @@ export const getReportAttributesV2: (
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
+      normalizeVisibleStackToPercent: true,
       YAxisProps: {
-        width: 45,
-        tickFormatter: (value: any) => {
-          // avoid displaying 100.00%
-          if (value === 100) return '100%'
-          return `${numberFormatter(value, 2)}%`
-        },
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
@@ -91,6 +91,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'System',
           format: '%',
+          color: { light: '#EDC35E', dark: '#EDD35E' },
+          fill: { light: '#F6D99F', dark: '#5C5230' },
           tooltip:
             'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
@@ -99,6 +101,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'User',
           format: '%',
+          color: { light: '#0063E8', dark: '#65BCD9' },
+          fill: { light: '#80B1F4', dark: '#2A3D45' },
           tooltip:
             'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
@@ -107,6 +111,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IOwait',
           format: '%',
+          color: { light: '#DB3A34', dark: '#FF6B6B' },
+          fill: { light: '#F2A7A3', dark: '#5C2A2A' },
           tooltip:
             'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
@@ -115,6 +121,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IRQs',
           format: '%',
+          color: { light: '#DA760B', dark: '#DA760B' },
+          fill: { light: '#FFB885', dark: '#5C3D0A' },
           tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
         },
         {
@@ -122,8 +130,20 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Other',
           format: '%',
+          color: { light: '#B616A6', dark: '#DB8DF9' },
+          fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
+        },
+        {
+          attribute: 'cpu_usage_busy_idle',
+          provider: 'infra-monitoring',
+          label: 'Idle',
+          format: '%',
+          omitFromTotal: true,
+          color: { light: '#6EA85F', dark: '#A3FFC2' },
+          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
+          tooltip: 'CPU time spent idle and available for new work',
         },
         {
           attribute: 'cpu_usage_max',
@@ -140,7 +160,6 @@ export const getReportAttributesV2: (
       label: 'Disk Input/Output operations per second (IOPS)',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#disk-inputoutput-operations-per-second-iops`,
       syncId: 'database-reports',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       valuePrecision: 0,
@@ -184,7 +203,8 @@ export const getReportAttributesV2: (
       label: 'Disk throughput',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      availableIn: ['team', 'enterprise', 'platform'],
+      entitlement: 'disk_throughput',
+      requiredPlan: 'Team',
       hide: false,
       showTooltip: true,
       format: 'bytes-per-second',
@@ -231,8 +251,7 @@ export const getReportAttributesV2: (
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['free'],
-      hide: !isFreePlan,
+      hide: entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: true,
@@ -264,8 +283,9 @@ export const getReportAttributesV2: (
       label: 'Database Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -328,8 +348,9 @@ export const getReportAttributesV2: (
       label: 'Dedicated Pooler Client Connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: true,
       showLegend: true,
       showMaxValue: true,
@@ -360,8 +381,9 @@ export const getReportAttributesV2: (
       label: 'Shared Pooler (Supavisor) client connections',
       syncId: 'database-reports',
       valuePrecision: 0,
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
-      hide: isFreePlan,
+      entitlement: 'database',
+      requiredPlan: 'Pro',
+      hide: !entitledFeatures.includes('database'),
       showTooltip: false,
       showLegend: false,
       showMaxValue: false,
@@ -383,7 +405,6 @@ export const getReportAttributesV2: (
       label: 'Disk Usage',
       syncId: 'database-reports',
       valuePrecision: 2,
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       hide: false,
       showTooltip: true,
       showLegend: true,
@@ -427,7 +448,7 @@ export const getReportAttributesV2: (
           label: 'Disk Size',
           tooltip: 'Disk Size refers to the total space your project occupies on disk',
         },
-        !isFreePlan &&
+        entitledFeatures.includes('database') &&
           (isSpendCapEnabled
             ? {
                 attribute: 'pg_database_size_percent_paid_spendCap',

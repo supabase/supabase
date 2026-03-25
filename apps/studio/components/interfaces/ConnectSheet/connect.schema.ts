@@ -53,6 +53,13 @@ const frameworkShadcnStep: StepDefinition = {
   content: 'steps/shadcn/command',
 }
 
+const frameworkShadcnEnvStep: StepDefinition = {
+  id: 'shadcn-env',
+  title: 'Set env variables',
+  description: 'Add the following values to your env file.',
+  content: 'steps/shadcn/env',
+}
+
 const frameworkShadcnExploreStep: StepDefinition = {
   id: 'shadcn-explore',
   title: 'Check out more UI components',
@@ -173,7 +180,7 @@ export const connectSchema: ConnectSchema = {
       id: 'direct',
       label: 'Direct',
       description: 'Connection string',
-      fields: ['connectionMethod', 'useSharedPooler', 'connectionType'],
+      fields: ['connectionSource', 'connectionMethod', 'useSharedPooler', 'connectionType'],
     },
     {
       id: 'orm',
@@ -226,6 +233,13 @@ export const connectSchema: ConnectSchema = {
     },
 
     // Direct connection fields
+    connectionSource: {
+      id: 'connectionSource',
+      type: 'select',
+      label: 'Source',
+      options: { source: 'connectionSources' },
+      defaultValue: undefined,
+    },
     connectionMethod: {
       id: 'connectionMethod',
       type: 'radio-list',
@@ -265,7 +279,7 @@ export const connectSchema: ConnectSchema = {
       label: 'Client',
       description: 'Choose the MCP client you are using.',
       options: { source: 'mcpClients' },
-      defaultValue: 'cursor',
+      defaultValue: 'claude-code',
     },
     mcpReadonly: {
       id: 'mcpReadonly',
@@ -297,6 +311,7 @@ export const connectSchema: ConnectSchema = {
               true: [
                 frameworkInstallStep,
                 frameworkShadcnStep,
+                frameworkShadcnEnvStep,
                 frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],
@@ -308,6 +323,7 @@ export const connectSchema: ConnectSchema = {
               true: [
                 frameworkInstallStep,
                 frameworkShadcnStep,
+                frameworkShadcnEnvStep,
                 frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],

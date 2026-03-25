@@ -1,7 +1,7 @@
+import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { PendingAddRow } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { toast } from 'sonner'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'

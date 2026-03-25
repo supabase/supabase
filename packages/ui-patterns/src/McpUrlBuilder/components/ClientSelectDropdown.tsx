@@ -20,7 +20,6 @@ import type { McpClient } from '../types'
 import { ConnectionIcon } from './ConnectionIcon'
 
 interface ClientSelectDropdownProps {
-  basePath: string
   theme?: 'light' | 'dark'
   label?: string
   clients: McpClient[]
@@ -29,7 +28,6 @@ interface ClientSelectDropdownProps {
 }
 
 export const ClientSelectDropdown = ({
-  basePath,
   theme = 'light',
   label = 'Client',
   clients,
@@ -64,11 +62,9 @@ export const ClientSelectDropdown = ({
             <div className="flex items-center gap-2">
               {selectedClient?.icon ? (
                 <ConnectionIcon
-                  basePath={basePath}
-                  iconFolder="mcp-clients"
                   connection={selectedClient.icon}
                   theme={theme}
-                  supportsDarkMode={true}
+                  hasDistinctDarkIcon={selectedClient.hasDistinctDarkIcon}
                 />
               ) : (
                 <Bot size={12} aria-hidden={true} />
@@ -96,11 +92,9 @@ export const ClientSelectDropdown = ({
                 >
                   {client.icon ? (
                     <ConnectionIcon
-                      basePath={basePath}
-                      iconFolder="mcp-clients"
                       connection={client.icon}
                       theme={theme}
-                      supportsDarkMode={true}
+                      hasDistinctDarkIcon={client.hasDistinctDarkIcon}
                     />
                   ) : (
                     <Bot size={12} aria-hidden={true} />

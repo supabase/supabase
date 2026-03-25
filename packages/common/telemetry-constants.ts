@@ -291,10 +291,10 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
-  /**
-   * the instance size selected in the project creation form
-   */
   properties: {
+    /**
+     * The instance size selected in the project creation form.
+     */
     instanceSize?: string
     /**
      * Whether the automatic RLS event trigger option was enabled
@@ -322,6 +322,14 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean
+    /**
+     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
+     * meaning the project was created with default public schema grants revoked.
+     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
+     * false = user is outside the rollout (default grants left intact)
+     * omitted = PostHog flags had not loaded at the time of project creation
+     */
+    tableEditorApiAccessToggleEnabled?: boolean
   }
   groups: TelemetryGroups
 }
@@ -342,6 +350,29 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
     instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User toggled Data API access on a table via the switch in the table editor side panel.
+ * Only fires for new tables — editing existing tables links out to the settings page instead.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableApiAccessToggleClickedEvent {
+  action: 'table_api_access_toggle_clicked'
+  properties: {
+    /**
+     * The resulting state of the toggle after the click.
+     */
+    newState: 'enabled' | 'disabled'
+    /**
+     * The schema containing the table being created.
+     */
+    schemaName: string
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -636,6 +667,10 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  */
 export interface AssistantPromptSubmittedEvent {
   action: 'assistant_prompt_submitted'
+  properties: {
+    /** UUID of the chat session in which the prompt was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -647,6 +682,10 @@ export interface AssistantPromptSubmittedEvent {
  */
 export interface AssistantDebugSubmittedEvent {
   action: 'assistant_debug_submitted'
+  properties: {
+    /** UUID of the chat session in which the debug request was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -744,6 +783,29 @@ export interface DocsFeedbackClickedEvent {
      * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
      */
     response: 'yes' | 'no'
+  }
+}
+
+/**
+ * User clicked 'Copy as Markdown' option on a page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface CopyAsMarkdownEvent {
+  action: 'copy_as_markdown_clicked'
+}
+
+/**
+ * User clicked "Ask..." to open a new window to consult an agent about the current page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AskAIEvent {
+  action: 'ask_ai_clicked'
+  properties: {
+    agent: 'chatgpt' | 'claude'
   }
 }
 
@@ -1425,6 +1487,10 @@ export interface AssistantMessageRatingSubmittedEvent {
       | 'debugging'
       | 'general_help'
       | 'other'
+    /** Optional reason provided by the user when rating negatively */
+    reason?: string
+    /** UUID of the chat session in which the message was rated */
+    chatId?: string
   }
   groups: TelemetryGroups
 }
@@ -1653,6 +1719,46 @@ export interface BranchUpdatedEvent {
  */
 export interface BranchReviewWithAssistantClickedEvent {
   action: 'branch_review_with_assistant_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user selects a branch from the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorBranchClickedEvent {
+  action: 'branch_selector_branch_clicked'
+  properties: {
+    branchId: string
+    branchName: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Create branch" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorCreateClickedEvent {
+  action: 'branch_selector_create_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks "Manage branches" in the branch selector dropdown.
+ *
+ * @group Events
+ * @source studio
+ * @page branch selector (header / sheet / popover)
+ */
+export interface BranchSelectorManageClickedEvent {
+  action: 'branch_selector_manage_clicked'
   groups: TelemetryGroups
 }
 
@@ -1896,6 +2002,60 @@ export interface HomeNewExperimentExposedEvent {
      * The experiment variant shown to the user
      */
     variant: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Connect section was shown to the user as part of the connectSection experiment.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectSectionExposedEvent {
+  action: 'home_connect_section_exposed'
+  properties: {
+    /**
+     * The experiment variant shown to the user
+     */
+    variant: 'connect' | 'getting-started'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a connect action tile in the Connect section on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectActionClickedEvent {
+  action: 'home_connect_action_clicked'
+  properties: {
+    /**
+     * The connect mode that was clicked
+     */
+    mode: 'framework' | 'direct' | 'orm' | 'mcp'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the ConnectSheet panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ConnectSheetOpenedEvent {
+  action: 'connect_sheet_opened'
+  properties: {
+    /**
+     * Where the sheet was opened from
+     */
+    source: 'header_button' | 'connect_section'
   }
   groups: TelemetryGroups
 }
@@ -2300,7 +2460,33 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * The search query that was active when the command was clicked
+     */
+    search_query?: string
+    /**
+     * The path or URL the clicked item leads to (only present for route commands)
+     */
+    result_path?: string
+    /**
      * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User closed the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuClosedEvent {
+  action: 'command_menu_closed'
+  properties: {
+    /**
+     * In which app the command menu was closed
      */
     app: 'studio' | 'docs' | 'www'
   }
@@ -2321,6 +2507,54 @@ export interface SidebarOpenedEvent {
      * The sidebar panel that was opened, e.g. ai-assistant, editor-panel, advisor-panel
      */
     sidebar: 'ai-assistant' | 'editor-panel' | 'advisor-panel' | 'help-panel'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened an org menu submenu in the mobile navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgSubmenuOpenedEvent {
+  action: 'org_submenu_opened'
+  properties: {
+    /** The key of the submenu item that was opened */
+    itemKey: string
+    /** The display label of the submenu item */
+    itemLabel: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the back button in the mobile org menu to return to the top-level menu.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuBackClickedEvent {
+  action: 'org_menu_back_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a menu item in the mobile org navigation sheet.
+ *
+ * @group Events
+ * @source studio
+ * @page Organization pages (mobile)
+ */
+export interface OrgMenuItemClickedEvent {
+  action: 'org_menu_item_clicked'
+  properties: {
+    /** The key identifying the menu item */
+    itemKey: string
+    /** The navigation href of the menu item */
+    itemHref: string
   }
   groups: TelemetryGroups
 }
@@ -2369,6 +2603,7 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2399,6 +2634,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2489,6 +2725,20 @@ export interface QueryPerformanceAIExplanationButtonClickedEvent {
 }
 
 /**
+ * Source/location where AI assistant actions originate from.
+ */
+export type AiAssistantSource =
+  | 'explain_visualizer'
+  | 'query_performance'
+  | 'sql_debug'
+  | 'lint_detail'
+  | 'advisor_section'
+  | 'advisor_widget'
+  | 'branch_review'
+  | 'log_explorer'
+  | 'error_code'
+
+/**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
  * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
  *
@@ -2501,14 +2751,45 @@ export interface AiPromptCopiedEvent {
     /**
      * Source/location where the prompt was copied from
      */
-    source:
-      | 'explain_visualizer'
-      | 'query_performance'
-      | 'sql_debug'
-      | 'lint_detail'
-      | 'advisor_section'
-      | 'advisor_widget'
-      | 'branch_review'
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the main AI assistant button in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiAssistantDropdownButtonClickedEvent {
+  action: 'ai_assistant_dropdown_button_clicked'
+  properties: {
+    /**
+     * Source/location where the button was clicked
+     */
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked an external AI tool link (ChatGPT or Claude) in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiExternalToolClickedEvent {
+  action: 'ai_external_tool_clicked'
+  properties: {
+    /**
+     * Source/location where the link was clicked
+     */
+    source: AiAssistantSource
+    /**
+     * Which external AI tool was selected
+     */
+    tool: 'chatgpt' | 'claude'
   }
   groups: TelemetryGroups
 }
@@ -2525,7 +2806,7 @@ export interface RequestUpgradeModalOpenedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
     /** Feature context driving the upgrade request */
@@ -2546,7 +2827,7 @@ export interface RequestUpgradeSubmittedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
   }
@@ -2555,7 +2836,7 @@ export interface RequestUpgradeSubmittedEvent {
 
 /**
  * Triggered when a Studio error UI element is displayed (mounted).
- * This includes error Admonitions and Toast notifications.
+ * This includes error Admonitions, Toast notifications, and ErrorDisplay components.
  *
  * @group Events
  * @source studio
@@ -2566,7 +2847,69 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Source of the error
      */
-    source?: 'admonition' | 'toast'
+    source?: 'admonition' | 'toast' | 'error_display'
+    /**
+     * Type of error matched (for error_display source)
+     */
+    errorType?: string
+    /**
+     * Whether troubleshooting steps are available (for error_display source)
+     */
+    hasTroubleshooting?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when the inline error troubleshooter is shown to the user.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterExposedEvent {
+  action: 'inline_error_troubleshooter_exposed'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user opens or closes a troubleshooting accordion step.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterStepClickedEvent {
+  action: 'inline_error_troubleshooter_step_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Step number that was clicked (1, 2, 3, ...) — null when a step is collapsed */
+    step: number | null
+    /** Title of the step that was clicked */
+    stepTitle?: string
+    /** Whether the step was opened (true) or closed (false) */
+    expanded: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks an action within the inline error troubleshooter.
+ * Covers all CTAs including the contact support link.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterActionClickedEvent {
+  action: 'inline_error_troubleshooter_action_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Which CTA was clicked */
+    ctaType: 'restart_db' | 'troubleshooting_guide' | 'ask_ai' | 'contact_support'
   }
   groups: TelemetryGroups
 }
@@ -2676,6 +3019,27 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
+ * User was exposed to the pricing calculator experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingCalculatorExperimentExposedEvent {
+  action: 'pricing_calculator_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingCalculatorExperiment'
+    /**
+     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
+     */
+    variant: 'control' | 'test'
+  }
+}
+
+/**
  * User clicked the Run button in the log explorer.
  *
  * @group Events
@@ -2715,6 +3079,7 @@ export type TelemetryEvent =
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | TableApiAccessToggleClickedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
@@ -2740,6 +3105,8 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
+  | CopyAsMarkdownEvent
+  | AskAIEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
@@ -2798,12 +3165,18 @@ export type TelemetryEvent =
   | BranchMergeFailedEvent
   | BranchUpdatedEvent
   | BranchReviewWithAssistantClickedEvent
+  | BranchSelectorBranchClickedEvent
+  | BranchSelectorCreateClickedEvent
+  | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
   | HomeGettingStartedWorkflowClickedEvent
   | HomeGettingStartedStepClickedEvent
   | HomeGettingStartedClosedEvent
   | HomeGettingStartedSectionExposedEvent
   | HomeNewExperimentExposedEvent
+  | HomeConnectSectionExposedEvent
+  | HomeConnectActionClickedEvent
+  | ConnectSheetOpenedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
@@ -2823,6 +3196,7 @@ export type TelemetryEvent =
   | TableCreateGeneratePoliciesExperimentConvertedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
+  | CommandMenuClosedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
@@ -2833,12 +3207,21 @@ export type TelemetryEvent =
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
   | AiPromptCopiedEvent
+  | AiAssistantDropdownButtonClickedEvent
+  | AiExternalToolClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
+  | InlineErrorTroubleshooterExposedEvent
+  | InlineErrorTroubleshooterStepClickedEvent
+  | InlineErrorTroubleshooterActionClickedEvent
   | IntegrationInstallCompletedEvent
   | IntegrationInstallSubmittedEvent
   | IntegrationUninstallSubmittedEvent
   | IntegrationInstallFailedEvent
   | IntegrationUninstallCompletedEvent
   | RlsEventTriggerBannerCreateButtonClickedEvent
+  | OrgSubmenuOpenedEvent
+  | OrgMenuBackClickedEvent
+  | OrgMenuItemClickedEvent
+  | PricingCalculatorExperimentExposedEvent

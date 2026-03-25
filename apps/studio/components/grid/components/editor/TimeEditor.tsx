@@ -10,8 +10,10 @@ function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.select()
 }
 
-interface TimeEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface TimeEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   format: string
 }
 

@@ -1315,6 +1315,26 @@ export interface paths {
     patch: operations['v1-patch-a-migration']
     trace?: never
   }
+  '/v1/projects/{ref}/database/openapi': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get PostgREST OpenAPI spec
+     * @description Returns the PostgREST OpenAPI specification for the project. This is the replacement for querying `/rest/v1/` directly with the anon key.
+     */
+    get: operations['v1-get-database-openapi']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/password': {
     parameters: {
       query?: never
@@ -2092,6 +2112,8 @@ export interface components {
     }
     AuthConfigResponse: {
       api_max_request_duration: number | null
+      custom_oauth_enabled: boolean
+      custom_oauth_max_providers: number
       db_max_pool_size: number | null
       /** @enum {string|null} */
       db_max_pool_size_unit: 'connections' | 'percent' | null
@@ -3533,9 +3555,11 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Whether to enable presence */
+      presence_enabled: boolean
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
     RegionsInfo: {
@@ -3837,6 +3861,7 @@ export interface components {
     }
     UpdateAuthConfigBody: {
       api_max_request_duration?: number | null
+      custom_oauth_enabled?: boolean
       db_max_pool_size?: number | null
       /** @enum {string|null} */
       db_max_pool_size_unit?: 'connections' | 'percent' | null
@@ -4263,9 +4288,11 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Whether to enable presence */
+      presence_enabled?: boolean
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean
     }
     UpdateRunStatusBody: {
@@ -4365,9 +4392,12 @@ export interface components {
     V1CreateProjectBody: {
       /** @description Database password */
       db_pass: string
-      /** @enum {string} */
+      /**
+       * @description Desired instance size. Omit this field to always default to the smallest possible size.
+       * @example nano
+       * @enum {string}
+       */
       desired_instance_size?:
-        | 'pico'
         | 'nano'
         | 'micro'
         | 'small'
@@ -4409,13 +4439,8 @@ export interface components {
       plan?: 'free' | 'pro'
       /**
        * @deprecated
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17' | '17-oriole'
-      /**
-       * @deprecated
        * @description Region you want your server to reside in. Use region_selection instead.
+       * @example us-east-1
        * @enum {string}
        */
       region?:
@@ -4479,12 +4504,6 @@ export interface components {
             /** @enum {string} */
             type: 'smartGroup'
           }
-      /**
-       * @deprecated
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -4808,6 +4827,8 @@ export interface components {
       name: string
     }
     V1RestorePointResponse: {
+      /** Format: date-time */
+      completed_on: string | null
       name: string
       /** @enum {string} */
       status: 'AVAILABLE' | 'PENDING' | 'REMOVED' | 'FAILED'
@@ -5008,7 +5029,8 @@ export interface operations {
     parameters: {
       query?: {
         included_schemas?: string
-        pgdelta?: string
+        /** @description Use pg-delta instead of Migra for diffing when true */
+        pgdelta?: boolean
       }
       header?: never
       path: {
@@ -9859,6 +9881,59 @@ export interface operations {
       }
     }
   }
+  'v1-get-database-openapi': {
+    parameters: {
+      query?: {
+        /** @description The database schema to generate the OpenAPI spec for */
+        schema?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch PostgREST OpenAPI spec */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-update-database-password': {
     parameters: {
       query?: never
@@ -12313,9 +12388,8 @@ export interface operations {
       query: {
         /** @description Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica) */
         continent?: 'NA' | 'SA' | 'EU' | 'AF' | 'AS' | 'OC' | 'AN'
-        /** @description Desired instance size */
+        /** @description Desired instance size. Omit this field to always default to the smallest possible size. */
         desired_instance_size?:
-          | 'pico'
           | 'nano'
           | 'micro'
           | 'small'

@@ -13,6 +13,10 @@ import {
 } from '@stripe/stripe-js'
 import { Form } from '@ui/components/shadcn/ui/form'
 import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import {
+  resolveStoredTaxId,
+  getEffectiveTaxCountry,
+} from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
 import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { getURL } from 'lib/helpers'
 import { Check, ChevronsUpDown } from 'lucide-react'
@@ -96,10 +100,8 @@ export const NewPaymentMethodElement = forwardRef(
       resolver: zodResolver(BillingCustomerDataSchema),
       defaultValues: {
         tax_id_name: currentTaxId
-          ? TAX_IDS.find(
-              (option) =>
-                option.type === currentTaxId.type && option.countryIso2 === currentTaxId.country
-            )?.name || ''
+          ? (resolveStoredTaxId(currentTaxId.type, currentTaxId.country, currentAddress?.country)
+              ?.name ?? '')
           : '',
         tax_id_type: currentTaxId ? currentTaxId.type : '',
         tax_id_value: currentTaxId ? currentTaxId.value : '',
@@ -172,7 +174,7 @@ export const NewPaymentMethodElement = forwardRef(
     function getConfiguredTaxId(): CustomerTaxId | null {
       return purchasingAsBusiness && selectedTaxId
         ? {
-            country: selectedTaxId.countryIso2,
+            country: getEffectiveTaxCountry(selectedTaxId),
             type: selectedTaxId.type,
             value: form.getValues('tax_id_value'),
           }

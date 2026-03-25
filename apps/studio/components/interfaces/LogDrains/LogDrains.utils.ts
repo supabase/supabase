@@ -6,6 +6,7 @@
 import { z } from 'zod'
 
 import { LogDrainType } from './LogDrains.constants'
+import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 /**
  * Get the description text for the custom headers section based on log drain type
@@ -62,13 +63,11 @@ export function validateNewHeader(
  */
 export const otlpConfigSchema = z.object({
   type: z.literal('otlp'),
-  endpoint: z
-    .string()
-    .min(1, { message: 'OTLP endpoint is required' })
-    .refine(
-      (url) => url.startsWith('http://') || url.startsWith('https://'),
-      'OTLP endpoint must start with http:// or https://'
-    ),
+  endpoint: httpEndpointUrlSchema({
+    requiredMessage: 'OTLP endpoint is required',
+    invalidMessage: 'OTLP endpoint must be a valid URL',
+    prefixMessage: 'OTLP endpoint must start with http:// or https://',
+  }),
   protocol: z.string().optional().default('http/protobuf'),
   gzip: z.boolean().optional().default(true),
   headers: z.record(z.string(), z.string()).optional(),

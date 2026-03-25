@@ -18,6 +18,7 @@ import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunc
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { ExternalLink, Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -40,6 +41,15 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
+  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
+
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSortQueryParam] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
+  )
+
   const {
     data: functions,
     error,
@@ -47,12 +57,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-
-  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
-  const [sort, setSortQueryParam] = useQueryState(
-    'sort',
-    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
-  )
 
   const filteredFunctions = useMemo(() => {
     const temp = (functions ?? []).filter((x) =>
@@ -128,6 +132,11 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                       <div className="flex items-center gap-2">
                         <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
                       </div>
+                      <span className="border-l border-default pl-2 text-xs text-foreground-light">
+                        {search && filteredFunctions.length !== functions.length
+                          ? `Viewing ${filteredFunctions.length} of ${functions.length} functions in total`
+                          : `Viewing ${functions.length} ${functions.length === 1 ? 'function' : 'functions'} in total`}
+                      </span>
                     </div>
                     <Card>
                       <Table>
@@ -137,7 +146,13 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                             <TableHead>URL</TableHead>
                             <TableHead className="hidden 2xl:table-cell">Created</TableHead>
                             <TableHead className="lg:table-cell">Updated</TableHead>
-                            <TableHead className="lg:table-cell">Deployments</TableHead>
+                            {showLastHourStats && (
+                              <>
+                                <TableHead className="lg:table-cell">Total requests (1h)</TableHead>
+                                <TableHead className="lg:table-cell">5xx error rate (1h)</TableHead>
+                              </>
+                            )}
+                            <TableHead className="hidden 2xl:table-cell">Deployments</TableHead>
                           </TableRow>
                         </TableHeader>
 
@@ -149,7 +164,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               ))
                             ) : (
                               <TableRow>
-                                <TableCell colSpan={5}>
+                                <TableCell colSpan={showLastHourStats ? 7 : 5}>
                                   <p className="text-sm text-foreground">No results found</p>
                                   <p className="text-sm text-foreground-light">
                                     Your search for "{search}" did not return any results
@@ -178,7 +193,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
 EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="Edge Functions">
         <div className="w-full min-h-full flex flex-col items-stretch">
           <PageHeader size="large">
             <PageHeaderMeta>

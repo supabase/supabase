@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import AlertError from 'components/ui/AlertError'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 import {
@@ -8,11 +6,14 @@ import {
 } from 'data/invoices/org-invoice-upcoming-query'
 import { DOCS_URL } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
+import Link from 'next/link'
 import React from 'react'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { billingMetricUnit, formatUsage } from '../helpers'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -48,7 +49,7 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
   [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
 }
 
-const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
+export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const {
     data: upcomingInvoice,
     error: error,
@@ -246,17 +247,13 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                               usageBillingDocsLink[item.usage_metric] != null && (
                                 <p className="mt-2">
                                   See{' '}
-                                  <Link
-                                    className="underline"
-                                    href={usageBillingDocsLink[item.usage_metric]!}
-                                    target="_blank"
-                                  >
+                                  <InlineLink href={usageBillingDocsLink[item.usage_metric]!}>
                                     docs
-                                  </Link>{' '}
+                                  </InlineLink>{' '}
                                   on how billing for {item.description} works and{' '}
-                                  <Link className="underline" href={`/organization/${slug}/usage`}>
+                                  <InlineLink href={`/organization/${slug}/usage`}>
                                     usage page
-                                  </Link>{' '}
+                                  </InlineLink>{' '}
                                   for a detailed breakdown.
                                 </p>
                               )}
@@ -425,5 +422,3 @@ function ComputeLineItem({
     </>
   )
 }
-
-export default UpcomingInvoice

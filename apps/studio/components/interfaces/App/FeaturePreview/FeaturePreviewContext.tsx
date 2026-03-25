@@ -82,8 +82,9 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 
 export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
+  const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -93,8 +94,7 @@ export const useUnifiedLogsPreview = () => {
 
 export const useIsBranching2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const gitlessBranchingEnabled = useFlag('gitlessBranching')
-  return gitlessBranchingEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
@@ -105,8 +105,7 @@ export const useIsPgDeltaDiffEnabled = () => {
 
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const advisorRulesEnabled = useFlag('advisorRules')
-  return advisorRulesEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
 export const useIsQueueOperationsEnabled = () => {
@@ -114,9 +113,28 @@ export const useIsQueueOperationsEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
+export const useIsPlatformWebhooksEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const platformWebhooksEnabled = useFlag('platformWebhooks')
+  return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
+}
+
+export const useIsJitDbAccessEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
+  return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
+}
+
 export const useIsTableFilterBarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
+}
+
+export const useIsFloatingMobileToolbarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
+
+  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
 }
 
 export const useFeaturePreviewModal = () => {

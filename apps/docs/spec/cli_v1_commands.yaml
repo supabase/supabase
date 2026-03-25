@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.75.0
+  version: 2.78.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -147,6 +147,7 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
+        required: true
         default_value: ''
       - id: experimental
         name: --experimental
@@ -174,6 +175,7 @@ commands:
         name: --desired-subdomain <string>
         description: |
           The desired vanity subdomain to use for your Supabase project.
+        required: true
         default_value: ''
       - id: experimental
         name: --experimental
@@ -1173,9 +1175,6 @@ commands:
             type: string
           - id: 8xlarge
             name: 8xlarge
-            type: string
-          - id: pico
-            name: pico
             type: string
           - id: small
             name: small
@@ -2725,10 +2724,6 @@ commands:
     usage: supabase domains reverify
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2743,10 +2738,6 @@ commands:
     usage: supabase domains get
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2759,10 +2750,6 @@ commands:
     usage: supabase domains delete
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2782,11 +2769,8 @@ commands:
       - id: custom-hostname
         name: --custom-hostname <string>
         description: The custom hostname to use for your Supabase project.
+        required: true
         default_value: ''
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -2806,10 +2790,6 @@ commands:
     usage: supabase domains activate
     subcommands: []
     flags:
-      - id: include-raw-output
-        name: --include-raw-output
-        description: Include raw output (useful for debugging).
-        default_value: 'false'
       - id: project-ref
         name: --project-ref <string>
         description: Project ref of the Supabase project.
@@ -3143,6 +3123,15 @@ commands:
       Runs `pg_dump` in a container with additional flags to exclude Supabase managed schemas. The ignored schemas include auth, storage, and those created by extensions.
 
       The default dump does not contain any data or custom roles. To dump those contents explicitly, specify either the `--data-only` and `--role-only` flag.
+
+      ### Note on Privilege Migration
+
+      When restoring to a new project, tables inherit ALL privileges from default privileges in the target database. To preserve specific privileges from your dump, revoke defaults before restoring:
+
+      ```sql
+      -- Run BEFORE restoring your schema
+      ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon, authenticated;
+      ```
     examples:
       - id: basic-usage
         name: Basic usage
@@ -3718,9 +3707,6 @@ commands:
             type: string
           - id: 8xlarge
             name: 8xlarge
-            type: string
-          - id: pico
-            name: pico
             type: string
           - id: small
             name: small
