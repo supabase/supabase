@@ -1,12 +1,11 @@
-import { Loader2 } from 'lucide-react'
-import type { EdgeProps } from 'reactflow'
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow'
-
+import { BaseEdge, Edge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams } from 'common'
 import { useReplicationLagQuery } from 'data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import { Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { REPLICA_STATUS } from './InstanceConfiguration.constants'
+
+import { EdgeData, REPLICA_STATUS } from './InstanceConfiguration.constants'
 
 export const SmoothstepEdge = ({
   id,
@@ -19,7 +18,7 @@ export const SmoothstepEdge = ({
   style = {},
   markerEnd,
   data,
-}: EdgeProps) => {
+}: EdgeProps<Edge<EdgeData>>) => {
   const { ref } = useParams()
   // [Joshen] Only applicable for replicas
   const { status, identifier, connectionString } = data || {}
@@ -40,11 +39,12 @@ export const SmoothstepEdge = ({
     isError,
   } = useReplicationLagQuery(
     {
-      id: identifier,
+      // Safe cast as the query isn't enable if identifier is null/undefined
+      id: identifier as string,
       projectRef: ref,
       connectionString,
     },
-    { enabled: status === REPLICA_STATUS.ACTIVE_HEALTHY }
+    { enabled: identifier != null && status === REPLICA_STATUS.ACTIVE_HEALTHY }
   )
   const lagValue = Number(lagDuration?.toFixed(2) ?? 0).toLocaleString()
 

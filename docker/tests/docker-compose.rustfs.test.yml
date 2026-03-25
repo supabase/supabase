@@ -1,0 +1,11 @@
+# Test overlay: exposes the S3 backend port for direct testing.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.rustfs.yml \
+#     -f ./tests/docker-compose.rustfs.test.yml up -d
+#
+
+services:
+  rustfs:
+    ports:
+      - "${S3_BACKEND_TEST_PORT:-9100}:9000"

@@ -55,9 +55,8 @@ describe('useChartHoverState', () => {
       localStorageMock.setItem('supabase-chart-tooltip-sync-enabled', 'true')
 
       vi.resetModules()
-      const { useChartHoverState: useChartHoverStateWithStorage } = await import(
-        './useChartHoverState'
-      )
+      const { useChartHoverState: useChartHoverStateWithStorage } =
+        await import('./useChartHoverState')
 
       const { result } = renderHook(() => useChartHoverStateWithStorage('chart1'))
 
@@ -70,9 +69,8 @@ describe('useChartHoverState', () => {
       localStorageMock.setItem('supabase-chart-tooltip-sync-enabled', 'invalid-json')
 
       vi.resetModules()
-      const { useChartHoverState: useChartHoverStateWithCorrupted } = await import(
-        './useChartHoverState'
-      )
+      const { useChartHoverState: useChartHoverStateWithCorrupted } =
+        await import('./useChartHoverState')
 
       const { result } = renderHook(() => useChartHoverStateWithCorrupted('chart1'))
 

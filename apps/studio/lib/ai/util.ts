@@ -1,4 +1,15 @@
 /**
+ * LLMs sometimes emit MySQL-style `\'` escapes in SQL. PostgreSQL doesn't
+ * treat backslash as an escape character, so replace `\'` → `''`.
+ * Dollar-quoted strings (e.g. `$$...$$`) are left untouched.
+ */
+export function fixSqlBackslashEscapes(sql: string): string {
+  return sql.replace(/\$([^$]*)\$[\s\S]*?\$\1\$|\\'/g, (match, dollarTag) =>
+    dollarTag !== undefined ? match : "''"
+  )
+}
+
+/**
  * Selects a key from weighted choices using consistent hashing
  * on an input string.
  *

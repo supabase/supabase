@@ -114,7 +114,7 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.mcpClient
     expect(field.type).toBe('select')
     expect(field.options).toEqual({ source: 'mcpClients' })
-    expect(field.defaultValue).toBe('cursor')
+    expect(field.defaultValue).toBe('claude-code')
   })
 
   test('mcpFeatures field should have multi-select type', () => {
@@ -170,6 +170,7 @@ describe('connect.schema:steps resolution', () => {
       const steps = resolveSteps(connectSchema, state)
 
       expect(steps.find((s) => s.id === 'shadcn-add')).toBeDefined()
+      expect(steps.find((s) => s.id === 'shadcn-env')).toBeDefined()
       expect(steps.find((s) => s.id === 'shadcn-explore')).toBeDefined()
     })
 
@@ -186,6 +187,7 @@ describe('connect.schema:steps resolution', () => {
       const steps = resolveSteps(connectSchema, state)
 
       expect(steps.find((s) => s.id === 'shadcn-add')).toBeDefined()
+      expect(steps.find((s) => s.id === 'shadcn-env')).toBeDefined()
     })
 
     test('should resolve default steps for other frameworks', () => {
@@ -335,6 +337,14 @@ describe('connect.schema:step content paths', () => {
     const exploreStep = steps.find((s) => s.id === 'shadcn-explore')
 
     expect(exploreStep?.content).toBe('steps/shadcn/explore')
+  })
+
+  test('shadcn env step should have valid content path', () => {
+    const state: ConnectState = { mode: 'framework', framework: 'nextjs', frameworkUi: true }
+    const steps = resolveSteps(connectSchema, state)
+    const envStep = steps.find((s) => s.id === 'shadcn-env')
+
+    expect(envStep?.content).toBe('steps/shadcn/env')
   })
 
   test('direct connection step should have valid content path', () => {

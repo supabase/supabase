@@ -87,7 +87,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
               size="small"
               value={
                 showKeys
-                  ? serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY'
+                  ? (serviceApiKey ?? 'SUPABASE_CLIENT_SERVICE_KEY')
                   : 'Reveal API keys via dropdown in the header'
               }
               className="w-full"

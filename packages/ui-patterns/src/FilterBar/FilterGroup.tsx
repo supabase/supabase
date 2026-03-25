@@ -47,7 +47,6 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
 
   const isActive = activeInput?.type === 'group' && pathsEqual(path, activeInput.path)
 
-  // Reset local value when group freeform value is cleared
   useEffect(() => {
     if (freeformText === '') {
       setLocalFreeformValue('')
@@ -82,6 +81,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
   const isOperatorActive = (conditionPath: number[]) => {
     if (!activeInput) return false
     return activeInput.type === 'operator' && pathsEqual(conditionPath, activeInput.path)
+  }
+
+  const isPropertyActiveForCondition = (conditionPath: number[]) => {
+    if (!activeInput) return false
+    return activeInput.type === 'property' && pathsEqual(conditionPath, activeInput.path)
   }
 
   const isConditionHighlighted = (conditionPath: number[]) => {
@@ -135,11 +139,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
           : ''
-      } ${isRootGroup ? 'flex-1 min-w-0' : ''} ${variant === 'pill' ? 'py-2' : ''}`}
+      } ${isRootGroup ? 'flex-1 min-w-0' : ''}`}
     >
       <div
         className={cn(
-          'flex items-stretch',
+          'flex items-center flex-wrap',
           isRootGroup ? 'flex-1 min-w-0' : '',
           variant === 'pill' ? 'gap-1' : 'gap-0'
         )}
@@ -171,6 +175,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                   path={currentPath}
                   isActive={isConditionActive(currentPath)}
                   isOperatorActive={isOperatorActive(currentPath)}
+                  isPropertyActive={isPropertyActiveForCondition(currentPath)}
                   isHighlighted={isConditionHighlighted(currentPath)}
                 />
               )}
@@ -190,7 +195,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
+                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
@@ -202,7 +207,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 data-form-type="other"
               />
             ) : (
-              <div className="relative inline-block">
+              <div className="relative inline-block py-1">
                 <Input_Shadcn_
                   ref={freeformInputRef}
                   type="text"
