@@ -149,7 +149,7 @@ export const ProjectCard = ({
             </div>
           }
           footer={
-            <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
+            <ProjectCardStatus projectStatus={projectStatus} />
           }
           containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
         />
