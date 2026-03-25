@@ -1,7 +1,6 @@
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
-import { cn } from 'ui'
 
 interface ConnectionIconProps {
   icon: string
