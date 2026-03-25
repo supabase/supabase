@@ -6,16 +6,16 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.99.1
-  '@supabase/postgrest-js': 2.99.1
-  '@supabase/realtime-js': 2.99.1
-  '@supabase/supabase-js': 2.99.1
+  '@supabase/auth-js': 2.100.0
+  '@supabase/postgrest-js': 2.100.0
+  '@supabase/realtime-js': 2.100.0
+  '@supabase/supabase-js': 2.100.0
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
   lodash: ^4.17.23
   lodash-es: ^4.17.23
-  next: ^15.5.10
+  next: ^15.5.13
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -62,6 +62,7 @@ minimumReleaseAgeExclude:
   - react-resizable-panels
   - swiper@12.1.2
   - immutable
+  - undici
 
 onlyBuiltDependencies:
   - node-pty
@@ -73,6 +74,7 @@ overrides:
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
+  '@rollup/plugin-terser>serialize-javascript': ^7.0.3
   cacache>tar: ^7.5.11
   esbuild: ^0.25.2
   lodash: 'catalog:'
@@ -82,7 +84,9 @@ overrides:
   payload>undici: ^7.18.2
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
+  'terser-webpack-plugin>serialize-javascript': ^7.0.3
   tmp: ^0.2.4
+  webpack: ^5.104.1
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch
