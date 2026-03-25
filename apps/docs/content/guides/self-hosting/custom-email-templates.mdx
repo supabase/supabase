@@ -75,8 +75,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      analytics:
-        condition: service_healthy
       templates-server: # 👈 new dependency
         condition: service_started
     environment:
@@ -155,8 +153,6 @@ services:
   auth:
     depends_on:
       db:
-        condition: service_healthy
-      analytics:
         condition: service_healthy
       templates-server:
         condition: service_started
