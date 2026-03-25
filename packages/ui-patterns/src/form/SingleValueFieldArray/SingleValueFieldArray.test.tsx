@@ -60,11 +60,7 @@ const ValueForm = ({
   )
 }
 
-const NameForm = ({
-  onSubmit = vi.fn(),
-}: {
-  onSubmit?: (values: NameFormValues) => void
-}) => {
+const NameForm = ({ onSubmit = vi.fn() }: { onSubmit?: (values: NameFormValues) => void }) => {
   const form = useForm<NameFormValues>({
     resolver: zodResolver(nameSchema),
     defaultValues: {
@@ -122,7 +118,10 @@ describe('SingleValueFieldArray', () => {
 
     render(<ValueForm defaultValues={{ urls: [{ value: '' }] }} onSubmit={onSubmit} />)
 
-    await user.type(screen.getByPlaceholderText('https://example.com/callback'), 'https://example.com/auth')
+    await user.type(
+      screen.getByPlaceholderText('https://example.com/callback'),
+      'https://example.com/auth'
+    )
     await user.click(screen.getByRole('button', { name: 'Submit' }))
 
     await waitFor(() =>
