@@ -75,7 +75,7 @@ export const GitHubSection = () => {
                   branches for every pull request.
                 </p>
 
-                {!isGithubOnFreePlan && promptProPlanUpgrade ? (
+                {!isGithubOnFreePlan && promptProPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
                       layout="vertical"
@@ -85,7 +85,14 @@ export const GitHubSection = () => {
                       secondaryText="Connect your GitHub repository to automatically sync preview branches and deploy changes."
                     />
                   </div>
-                ) : (
+                )}
+
+                {/* [Joshen] Show connection form only if one of the following is true:
+                  - GH has already been authorized OR
+                  - no GH authorization but on a paid plan OR
+                  - on a free plan but the GitHub integration flag is enabled 
+                */}
+                {(!!gitHubAuthorization || !promptProPlanUpgrade || isGithubOnFreePlan) && (
                   <GitHubIntegrationConnectionForm
                     disabled={promptProPlanUpgrade}
                     connection={existingConnection}
