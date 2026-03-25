@@ -19,6 +19,12 @@ import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useHotKey } from 'hooks/ui/useHotKey'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  defaultAssistantModelId,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+} from 'lib/ai/model.utils'
 import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { AssistantModel } from 'state/ai-assistant-state'
@@ -27,6 +33,7 @@ import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import type { SqlSnippet } from './AIAssistant.types'
@@ -72,14 +79,15 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const selectedModel = useMemo<AssistantModel>(() => {
     // While entitlements are loading, use the stored model without enforcing access
     if (isLoadingEntitlements) {
-      return snap.model ?? 'gpt-5-mini'
+      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
     }
 
-    const defaultModel: AssistantModel = hasAccessToAdvanceModel ? 'gpt-5' : 'gpt-5-mini'
+    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
     const model = snap.model ?? defaultModel
 
-    if (!hasAccessToAdvanceModel && model === 'gpt-5') {
-      return 'gpt-5-mini'
+    if (!isKnownAssistantModelId(model)) return defaultModel
+    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
+      return DEFAULT_ASSISTANT_BASE_MODEL_ID
     }
 
     return model
@@ -391,7 +399,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
           showMetadataWarning={showMetadataWarning}
           updatedOptInSinceMCP={updatedOptInSinceMCP}
-          isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
+          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
           aiOptInLevel={aiOptInLevel}
         />
         {hasMessages ? (
