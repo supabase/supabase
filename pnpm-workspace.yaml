@@ -49,6 +49,7 @@ minimumReleaseAgeExclude:
   - undici
   - next
   - '@next/*'
+  - h3
 
 onlyBuiltDependencies:
   - node-pty
