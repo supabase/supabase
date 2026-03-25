@@ -1,7 +1,4 @@
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
-  genDefaultQuery,
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
@@ -39,48 +36,18 @@ import {
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
+import {
+  formatSingleLineMessage,
+  getFunctionRuntimeLogsSql,
+  getRecentErrorGroups,
+  getRecentErrorGroupsBase,
+  getRecentErrorInvocationsSql,
+  getRelatedExecutionIds,
+  toAlertError,
+  type RecentErrorGroup,
+} from './EdgeFunctionRecentErrors.utils'
 
 dayjs.extend(relativeTime)
-
-const MAX_RECENT_ERROR_GROUPS = 5
-const RECENT_ERROR_INVOCATIONS_LIMIT = 50
-const RELATED_RUNTIME_LOGS_LIMIT = 100
-
-type GroupedRuntimeLog = {
-  key: string
-  message: string
-  level: string
-  count: number
-  lastSeen: number
-}
-
-type RecentErrorGroup = {
-  message: string
-  count: number
-  lastSeen: number
-  lastExecutionId?: string
-  lastStatusCode?: string
-  lastMethod?: string
-  executionTime?: string
-  executionIds: string[]
-  logs: GroupedRuntimeLog[]
-}
-
-type RecentErrorGroupBase = Omit<RecentErrorGroup, 'logs'>
-
-const escapeSqlString = (value: string) => value.replace(/'/g, "''")
-const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
-const toAlertError = (error: unknown): { message: string } | undefined => {
-  if (typeof error === 'string') return { message: error }
-
-  if (error && typeof error === 'object') {
-    const message = (error as { message?: unknown }).message
-    if (typeof message === 'string') return { message }
-  }
-
-  return undefined
-}
 
 interface EdgeFunctionRecentErrorsProps {
   functionId?: string
@@ -103,15 +70,7 @@ export const EdgeFunctionRecentErrors = ({
 
   const isQueryEnabled = Boolean(projectRef && functionId)
   const recentErrorInvocationsSql = useMemo(
-    () =>
-      genDefaultQuery(
-        LOGS_TABLES.fn_edge,
-        {
-          function_id: functionId ?? '__pending__',
-          'status_code.error': true,
-        },
-        RECENT_ERROR_INVOCATIONS_LIMIT
-      ),
+    () => getRecentErrorInvocationsSql(functionId),
     [functionId]
   )
 
@@ -129,83 +88,20 @@ export const EdgeFunctionRecentErrors = ({
     isQueryEnabled
   )
 
-  const recentErrorGroupsBase = useMemo<RecentErrorGroupBase[]>(() => {
-    const grouped = recentErrorInvocations.reduce<Record<string, RecentErrorGroupBase>>(
-      (acc, item) => {
-        const statusCode = String(item.status_code ?? '')
-        const method = String(item.method ?? '')
-        const message =
-          parseEdgeFunctionEventMessage(
-            String(item.event_message ?? ''),
-            method || undefined,
-            statusCode
-          ) || 'Unknown error'
-        const executionId = String(item.execution_id ?? '')
-        const timestamp = Number(item.timestamp ?? 0)
-        const current = acc[message]
-
-        if (!current) {
-          acc[message] = {
-            message,
-            count: 1,
-            lastSeen: timestamp,
-            lastExecutionId: executionId || undefined,
-            lastStatusCode: statusCode || undefined,
-            lastMethod: method || undefined,
-            executionTime:
-              item.execution_time_ms !== undefined
-                ? `${Math.round(Number(item.execution_time_ms))}ms`
-                : undefined,
-            executionIds: executionId ? [executionId] : [],
-          }
-          return acc
-        }
-
-        current.count += 1
-        if (executionId && !current.executionIds.includes(executionId)) {
-          current.executionIds.push(executionId)
-        }
-
-        if (timestamp > current.lastSeen) {
-          current.lastSeen = timestamp
-          current.lastExecutionId = executionId || undefined
-          current.lastStatusCode = statusCode || undefined
-          current.lastMethod = method || undefined
-          current.executionTime =
-            item.execution_time_ms !== undefined
-              ? `${Math.round(Number(item.execution_time_ms))}ms`
-              : undefined
-        }
-
-        return acc
-      },
-      {}
-    )
-
-    return Object.values(grouped)
-      .sort((a: RecentErrorGroupBase, b: RecentErrorGroupBase) => b.lastSeen - a.lastSeen)
-      .slice(0, MAX_RECENT_ERROR_GROUPS)
-  }, [recentErrorInvocations])
+  const recentErrorGroupsBase = useMemo(
+    () => getRecentErrorGroupsBase(recentErrorInvocations),
+    [recentErrorInvocations]
+  )
 
   const relatedExecutionIds = useMemo(
-    () =>
-      Array.from(
-        new Set(recentErrorGroupsBase.flatMap((group) => group.executionIds).filter(Boolean))
-      ),
+    () => getRelatedExecutionIds(recentErrorGroupsBase),
     [recentErrorGroupsBase]
   )
 
-  const functionRuntimeLogsSql = useMemo(() => {
-    if (!functionId || relatedExecutionIds.length === 0) return ''
-
-    const executionIds = relatedExecutionIds.map((id) => `'${escapeSqlString(id)}'`).join(', ')
-
-    return `select id, function_logs.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from function_logs
-cross join unnest(metadata) as metadata
-where metadata.function_id = '${escapeSqlString(functionId)}' and metadata.execution_id in (${executionIds})
-order by timestamp desc
-limit ${RELATED_RUNTIME_LOGS_LIMIT}`
-  }, [functionId, relatedExecutionIds])
+  const functionRuntimeLogsSql = useMemo(
+    () => getFunctionRuntimeLogsSql({ functionId, executionIds: relatedExecutionIds }),
+    [functionId, relatedExecutionIds]
+  )
 
   const {
     logData: functionRuntimeLogs,
@@ -223,45 +119,10 @@ limit ${RELATED_RUNTIME_LOGS_LIMIT}`
   const queryError =
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
-  const recentErrorGroups = useMemo<RecentErrorGroup[]>(() => {
-    const runtimeLogsByExecutionId = functionRuntimeLogs.reduce<Record<string, LogData[]>>(
-      (acc, log) => {
-        const executionId = String(log.execution_id ?? '')
-        if (!executionId) return acc
-
-        acc[executionId] = [...(acc[executionId] ?? []), log]
-        return acc
-      },
-      {}
-    )
-
-    return recentErrorGroupsBase.map((group) => ({
-      ...group,
-      logs: group.executionIds
-        .flatMap((executionId: string) => runtimeLogsByExecutionId[executionId] ?? [])
-        .reduce<GroupedRuntimeLog[]>((acc: GroupedRuntimeLog[], log: LogData) => {
-          const level = String(log.level ?? log.event_type ?? 'log')
-          const message = String(log.event_message ?? '')
-          const key = `${level}:${message}`
-          const timestamp = Number(log.timestamp ?? 0)
-          const existing = acc.find((entry: GroupedRuntimeLog) => entry.key === key)
-
-          if (existing) {
-            existing.count += 1
-            existing.lastSeen = Math.max(existing.lastSeen, timestamp)
-            return acc
-          }
-
-          acc.push({ key, message, level, count: 1, lastSeen: timestamp })
-          return acc
-        }, [])
-        .sort(
-          (a: GroupedRuntimeLog, b: GroupedRuntimeLog) =>
-            b.count - a.count || b.lastSeen - a.lastSeen
-        )
-        .slice(0, MAX_RECENT_ERROR_GROUPS),
-    }))
-  }, [functionRuntimeLogs, recentErrorGroupsBase])
+  const recentErrorGroups = useMemo(
+    () => getRecentErrorGroups({ recentErrorGroupsBase, functionRuntimeLogs }),
+    [functionRuntimeLogs, recentErrorGroupsBase]
+  )
 
   const formatLogTimestamp = (value: string | number | undefined, format: 'relative' | 'time') => {
     if (value === undefined) return '-'
