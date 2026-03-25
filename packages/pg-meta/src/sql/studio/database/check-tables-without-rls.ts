@@ -1,4 +1,4 @@
-import { quoteLiteral } from '@/lib/pg-format'
+import { literal } from '../../../pg-format'
 
 /**
  * Builds a SQL query that returns entities exposed through the Data API that
@@ -12,8 +12,8 @@ import { quoteLiteral } from '@/lib/pg-format'
  * Checks against the _target_ schemas rather than the currently active
  * PostgREST config, so it works correctly when enabling the Data API.
  */
-export const unsafeEntitiesInApiSql = (schemas: Array<string>) => {
-  const schemaList = schemas.map(quoteLiteral).join(', ')
+export const getUnsafeEntitiesInApiSql = ({ schemas }: { schemas: Array<string> }) => {
+  const schemaList = schemas.map(literal).join(', ')
 
   return /* SQL */ `
     select

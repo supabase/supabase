@@ -37,6 +37,7 @@ import {
   PopoverTrigger_Shadcn_,
   Separator,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
@@ -293,23 +294,35 @@ const EdgeFunctionDetailsLayout = ({
                       </span>
                     </button>
                   </HoverCardTrigger>
-                  <HoverCardContent side="bottom" align="start" className="w-[320px] p-0">
+                  <HoverCardContent side="bottom" align="start" className="w-40 p-0">
                     {createdRelative && (
                       <div className="px-4 py-2 space-y-1">
                         <h3 className="heading-meta text-foreground-light">Created</h3>
-                        <p className="text-foreground">{createdRelative}</p>
+                        {!!selectedFunction && (
+                          <TimestampInfo
+                            className="text-sm"
+                            label={createdRelative}
+                            utcTimestamp={selectedFunction.created_at}
+                          />
+                        )}
                       </div>
                     )}
                     {updatedRelative && (
                       <div className="px-4 py-2 space-y-1">
                         <h3 className="heading-meta text-foreground-light">Last deployed</h3>
-                        <p className="text-foreground">{updatedRelative}</p>
+                        {!!selectedFunction && (
+                          <TimestampInfo
+                            className="text-sm"
+                            label={updatedRelative}
+                            utcTimestamp={selectedFunction.updated_at}
+                          />
+                        )}
                       </div>
                     )}
                     {selectedFunction?.version !== undefined && (
                       <div className="px-4 py-2 space-y-1">
                         <h3 className="heading-meta text-foreground-light">Deployments</h3>
-                        <p className="text-foreground">{selectedFunction.version}</p>
+                        <p className="text-sm text-foreground">{selectedFunction.version}</p>
                       </div>
                     )}
                   </HoverCardContent>

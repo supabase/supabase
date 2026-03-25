@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { enrichLintsQuery } from 'lib/api/self-hosted/lints'
+import { describe, expect, it } from 'vitest'
+
+import { enrichLintsQuery } from '../../../src'
 
 describe('enrichLintsQuery', () => {
   const dummyQuery = 'SELECT 1'

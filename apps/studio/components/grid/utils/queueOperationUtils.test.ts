@@ -265,8 +265,7 @@ describe('formatGridDataWithOperationValues', () => {
     expect(result[1].name).toBe('Updated Bob')
   })
 
-  test('last edit wins when multiple operations target the same row', () => {
-    // Each operation spreads from the original row, so only the last op's column change is preserved
+  test('multiple operations targeting the same row preserve all column changes', () => {
     const rows = [makeRow(0, { id: 1, name: 'Alice', email: 'alice@test.com' })]
     const op1 = makeEditOp({
       id: 'op-1',
@@ -290,8 +289,8 @@ describe('formatGridDataWithOperationValues', () => {
     })
 
     const result = formatGridDataWithOperationValues({ operations: [op1, op2], rows })
-    // The second op overwrites the first since both spread from the original row
-    expect(result[0].name).toBe('Alice')
+    // Both column edits should be preserved
+    expect(result[0].name).toBe('Updated')
     expect(result[0].email).toBe('updated@test.com')
   })
 

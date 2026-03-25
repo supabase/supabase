@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useCallback, useMemo, useState } from 'react'
 import { FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
 
@@ -24,6 +25,8 @@ import type {
   ResolvedStep,
 } from './Connect.types'
 import { resolveFrameworkLibraryKey } from './Connect.utils'
+import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 
 // ============================================================================
 // Data Source Helpers
@@ -33,7 +36,15 @@ import { resolveFrameworkLibraryKey } from './Connect.utils'
  * Get field options from a data source reference.
  * This maps source names to actual data.
  */
-function getFieldOptionsFromSource(source: string, state: ConnectState): FieldOption[] {
+function getFieldOptionsFromSource({
+  source,
+  state,
+  databases,
+}: {
+  source: string
+  state: ConnectState
+  databases: Database[]
+}): FieldOption[] {
   switch (source) {
     case 'frameworks':
       return [...FRAMEWORKS, ...MOBILES].map((f) => ({
@@ -98,6 +109,16 @@ function getFieldOptionsFromSource(source: string, state: ConnectState): FieldOp
         description: m.description,
       }))
 
+    case 'connectionSources':
+      return databases.map((db) => {
+        const region = formatDatabaseRegion(db?.region ?? '')
+        const id = formatDatabaseID(db.identifier ?? '')
+        const label = db.identifier.includes('-rr-')
+          ? `Read Replica (${region} - ${id}}`
+          : 'Primary Database'
+        return { value: db.identifier, label }
+      })
+
     case 'connectionTypes':
       return DATABASE_CONNECTION_TYPES.map((t) => ({
         value: t.id,
@@ -133,7 +154,15 @@ function getFieldOptionsFromSource(source: string, state: ConnectState): FieldOp
 /**
  * Resolve field options, handling both static options and data source references.
  */
-function resolveFieldOptionsWithSource(field: ResolvedField, state: ConnectState): FieldOption[] {
+function resolveFieldOptionsWithSource({
+  field,
+  state,
+  databases,
+}: {
+  field: ResolvedField
+  state: ConnectState
+  databases: Database[]
+}): FieldOption[] {
   // If already resolved (from conditional resolution)
   if (field.resolvedOptions.length > 0) {
     return field.resolvedOptions
@@ -142,7 +171,7 @@ function resolveFieldOptionsWithSource(field: ResolvedField, state: ConnectState
   // Check if it's a source reference
   const options = connectSchema.fields[field.id]?.options
   if (options && typeof options === 'object' && 'source' in options) {
-    return getFieldOptionsFromSource(options.source as string, state)
+    return getFieldOptionsFromSource({ source: options.source as string, state, databases })
   }
 
   return []
@@ -163,8 +192,11 @@ export interface UseConnectStateReturn {
 }
 
 export function useConnectState(initialState?: Partial<ConnectState>): UseConnectStateReturn {
+  const { ref: projectRef } = useParams()
+  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
+
   const [state, setState] = useState<ConnectState>(() => {
-    const defaults = getDefaultState(connectSchema)
+    const defaults = getDefaultState({ schema: connectSchema })
 
     // Set initial framework if mode is framework
     if (defaults.mode === 'framework' && !defaults.framework) {
@@ -246,41 +278,45 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     })
   }, [])
 
-  const setMode = useCallback((mode: ConnectMode) => {
-    setState((prev) => {
-      const next: ConnectState = { ...prev, mode }
+  const setMode = useCallback(
+    (mode: ConnectMode) => {
+      setState((prev) => {
+        const next: ConnectState = { ...prev, mode }
 
-      // Initialize mode-specific defaults
-      if (mode === 'framework' && !next.framework) {
-        const firstFramework = FRAMEWORKS[0]
-        next.framework = firstFramework?.key ?? ''
-        if (firstFramework?.children?.length > 1) {
-          next.frameworkVariant = firstFramework.children[0]?.key ?? ''
+        // Initialize mode-specific defaults
+        if (mode === 'framework' && !next.framework) {
+          const firstFramework = FRAMEWORKS[0]
+          next.framework = firstFramework?.key ?? ''
+          if (firstFramework?.children?.length > 1) {
+            next.frameworkVariant = firstFramework.children[0]?.key ?? ''
+          }
+          const libraryKey = resolveFrameworkLibraryKey({
+            framework: next.framework,
+            frameworkVariant: next.frameworkVariant,
+            library: next.library,
+          })
+          if (libraryKey) next.library = libraryKey
         }
-        const libraryKey = resolveFrameworkLibraryKey({
-          framework: next.framework,
-          frameworkVariant: next.frameworkVariant,
-          library: next.library,
-        })
-        if (libraryKey) next.library = libraryKey
-      }
 
-      if (mode === 'direct') {
-        next.connectionMethod = next.connectionMethod ?? 'direct'
-        next.connectionType = next.connectionType ?? 'uri'
-      }
+        if (mode === 'direct') {
+          next.connectionMethod = next.connectionMethod ?? 'direct'
+          next.connectionType = next.connectionType ?? 'uri'
+          next.connectionSource = projectRef ?? '_'
+        }
 
-      if (mode === 'orm' && !next.orm) {
-        next.orm = ORMS[0]?.key ?? ''
-      }
+        if (mode === 'orm' && !next.orm) {
+          next.orm = ORMS[0]?.key ?? ''
+        }
 
-      if (mode === 'mcp' && !next.mcpClient) {
-        next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
-      }
+        if (mode === 'mcp' && !next.mcpClient) {
+          next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
+        }
 
-      return next
-    })
-  }, [])
+        return next
+      })
+    },
+    [projectRef]
+  )
 
   const activeFields = useMemo(() => getActiveFields(connectSchema, state), [state])
 
@@ -290,9 +326,9 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     (fieldId: string): FieldOption[] => {
       const field = activeFields.find((f) => f.id === fieldId)
       if (!field) return []
-      return resolveFieldOptionsWithSource(field, state)
+      return resolveFieldOptionsWithSource({ field, state, databases })
     },
-    [activeFields, state]
+    [activeFields, state, databases]
   )
 
   return {

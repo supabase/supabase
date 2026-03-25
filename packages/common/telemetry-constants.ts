@@ -2603,6 +2603,7 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2633,6 +2634,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
