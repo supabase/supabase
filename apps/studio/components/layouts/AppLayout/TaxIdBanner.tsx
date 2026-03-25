@@ -23,7 +23,7 @@ export const TaxIdBanner = () => {
   const shouldFetch = Boolean(
     !!slug &&
     org?.plan?.id !== 'free' &&
-    !org.billing_partner &&
+    !org?.billing_partner &&
     isDismissLoaded &&
     !isDismissed &&
     !!org?.organization_missing_tax_id
