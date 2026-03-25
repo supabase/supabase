@@ -83,7 +83,7 @@ services:
 
   templates-server:
     image: caddy:2-alpine
-    command: ["caddy", "file-server", "-r", "/templates", "--listen", ":80"]
+    command: ['caddy', 'file-server', '-r', '/templates', '--listen', ':80']
     volumes:
       - ./volumes/templates:/templates
 ```
@@ -163,7 +163,7 @@ services:
 
   templates-server:
     image: caddy:2-alpine
-    command: ["caddy", "file-server", "-r", "/templates", "--listen", ":80"]
+    command: ['caddy', 'file-server', '-r', '/templates', '--listen', ':80']
     volumes:
       - ./volumes/templates:/templates
 ```
