@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PGRole } from '@supabase/pg-meta/src/pg-meta-roles'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import type { PgRole } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -57,14 +56,14 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
 
   useEffect(() => {
     reset(role)
-  }, [isExpanded, role, reset])
+  }, [role, reset])
 
   const onSaveChanges: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
 
     const changed = Object.fromEntries(
       Object.entries(values).filter(([k, v]) => {
-        const key = k as keyof PGRole
+        const key = k as keyof PgRole
         return v !== role[key]
       })
     )
@@ -91,7 +90,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
     )
   }
 
-  const formId = 'role-update-form'
+  const formId = `role-update-form-${role.id}`
 
   return (
     <Collapsible
@@ -109,7 +108,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <div className="flex items-center gap-2 relative">
+      <div className={cn("flex items-center relative", !disabled && "pr-[--card-padding-x]")}>
         <Collapsible.Trigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
@@ -132,7 +131,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 <p className="text-left text-sm text-foreground-light">(ID: {role.id})</p>
               </div>
             </div>
-            <div className={cn('flex items-center space-x-4', !disabled && 'mr-12')}>
+            <div className="flex items-center space-x-4">
               {role.activeConnections > 0 && (
                 <div className="relative h-2 w-2">
                   <span className="flex h-2 w-2">
@@ -157,7 +156,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             <DropdownMenuTrigger asChild>
               <Button
                 type="default"
-                className="px-1 right-4"
+                className="px-1"
                 icon={<MoreVertical />}
                 aria-label={`${role.name} actions`}
               />
@@ -194,13 +193,13 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                     disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                     render={({ field }) => (
                       <FormItemLayout
-                        id={permission}
+                        id={`${role.id}-${permission}`}
                         layout="flex"
                         label={ROLE_PERMISSIONS[permission].description}
                       >
                         <FormControl_Shadcn_>
                           <Switch
-                            id={permission}
+                            id={`${role.id}-${permission}`}
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
