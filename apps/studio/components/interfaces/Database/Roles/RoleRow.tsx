@@ -30,7 +30,7 @@ interface RoleRowProps {
   onSelectDelete: (role: string) => void
 }
 
-const permissionSchema = z.boolean()
+const permissionSchema = z.boolean().optional()
 const formSchema = z.object(
   Object.keys(ROLE_PERMISSIONS).reduce(
     (acc, key) => ({
