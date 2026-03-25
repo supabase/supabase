@@ -4,11 +4,7 @@ import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsK8sCloudProvider,
-  useIsProjectActive,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
