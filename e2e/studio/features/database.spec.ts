@@ -415,8 +415,7 @@ test.describe('Database', () => {
       await expect(columnDatabase2Row).toContainText('numeric')
 
       // update table column
-      await columnDatabase2Row.getByRole('button').click()
-      await page.getByRole('button', { name: 'Edit column' }).click()
+      await columnDatabase2Row.getByRole('button', { name: 'Edit' }).click()
       await page.getByLabel('name').fill(databaseColumnName3)
       const columnUpdateWait = createApiResponseWaiter(
         page,
@@ -438,8 +437,8 @@ test.describe('Database', () => {
 
       // delete table column
       const columnDatabase3Row = page.getByRole('row', { name: databaseColumnName3 })
-      await columnDatabase3Row.getByRole('button').click()
-      await page.getByRole('button', { name: 'Delete column' }).click()
+      await columnDatabase3Row.getByRole('button').last().click()
+      await page.getByRole('menuitem', { name: 'Delete column' }).click()
       await page.getByRole('checkbox', { name: 'Drop column with cascade?' }).check()
       const columnDeleteWait = createApiResponseWaiter(
         page,

@@ -37,7 +37,7 @@ function buildUrlMatcher(basePath: string, ref: string, action: string, method?:
 
     const hasActionPath = url.pathname.endsWith(`/${actionPath}`)
     const hasExpectedSearchParams = [...expectedSearchParams.entries()].every(([key, value]) =>
-      url.searchParams.getAll(key).includes(value)
+      url.searchParams.getAll(key).some((actualValue) => actualValue.includes(value))
     )
 
     const urlMatches = hasBasePath && hasRef && hasActionPath && hasExpectedSearchParams
