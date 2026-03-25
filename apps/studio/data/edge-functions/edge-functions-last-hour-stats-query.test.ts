@@ -41,9 +41,11 @@ describe('getEdgeFunctionsLastHourStats', () => {
       signal: undefined,
     })
 
-    expect(vi.mocked(post).mock.calls[0]?.[1]?.body?.sql).toContain(
-      'from\n  function_edge_logs'
-    )
+    const postCalls = vi.mocked(post).mock.calls as Array<
+      [string, { body?: { sql?: string } } | undefined]
+    >
+
+    expect(postCalls[0]?.[1]?.body?.sql).toContain('from\n  function_edge_logs')
   })
 
   it('coerces counts to numbers and computes error rates per function', async () => {
