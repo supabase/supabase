@@ -149,7 +149,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         {!disabled && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" className="px-1 right-4" icon={<MoreVertical />} aria-label={`${role.name} actions`} />
+              <Button
+                type="default"
+                className="px-1 right-4"
+                icon={<MoreVertical />}
+                aria-label={`${role.name} actions`}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
               <DropdownMenuItem
