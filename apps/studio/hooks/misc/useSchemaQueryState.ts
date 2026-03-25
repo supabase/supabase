@@ -24,7 +24,7 @@ export const useQuerySchemaState = () => {
   const { ref } = useParams()
 
   const defaultSchema =
-    typeof window !== 'undefined' && window.localStorage != null && ref && ref.length > 0
+    typeof window !== 'undefined' && !!window.localStorage && ref && ref.length > 0
       ? window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
       : 'public'
 
@@ -35,7 +35,7 @@ export const useQuerySchemaState = () => {
 
   useEffect(() => {
     // Update the schema in local storage on every change
-    if (typeof window !== 'undefined' && ref && ref.length > 0) {
+    if (typeof window !== 'undefined' && !!window.localStorage && ref && ref.length > 0) {
       window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref), schema)
     }
   }, [schema, ref])
