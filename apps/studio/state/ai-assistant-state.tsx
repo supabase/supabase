@@ -8,6 +8,7 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { constructHeaders } from 'data/fetchers'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
+import type { AssistantModelId } from 'lib/ai/model.utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -22,7 +23,7 @@ export type AssistantMessageType = MessageType
 
 export type SqlSnippet = string | { label: string; content: string }
 
-export type AssistantModel = 'gpt-5' | 'gpt-5-mini'
+export type AssistantModel = AssistantModelId
 
 type ChatSession = {
   id: string
@@ -287,7 +288,7 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages as AssistantMessageType[]
+          chat.messages = messages
           chat.updatedAt = new Date()
         }
 
@@ -452,7 +453,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         if (index !== -1) {
           state.updateMessage(msg)
         } else {
-          messagesToAdd.push(msg as AssistantMessageType)
+          messagesToAdd.push(msg)
         }
       })
 
@@ -468,7 +469,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        chat.messages[messageIndex] = updatedMessage
         chat.updatedAt = new Date()
       }
     },
