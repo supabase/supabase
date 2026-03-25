@@ -1278,6 +1278,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@6.0.2))
+      tsconfig:
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       tsx:
         specifier: 'catalog:'
         version: 4.20.3
@@ -27404,7 +27407,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.2)
+      vitest: 3.2.4(@types/node@22.13.14)(@vitest/ui@3.2.4)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
