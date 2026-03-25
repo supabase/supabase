@@ -23,7 +23,7 @@ catalog:
   tsx: 4.20.3
   typescript: ~5.9.0
   valtio: ^1.12.0
-  vite: ^7.1.11
+  vite: ^7.3.1
   vitest: ^3.2.0
   zod: 3.25.76
 
