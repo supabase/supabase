@@ -306,20 +306,20 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="hidden !px-0 sm:table-cell" />
+                  <TableHead key="icon" className="!px-0" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
-                  <TableHead key="columns" className="hidden text-right sm:table-cell">
+                  <TableHead key="columns" className="text-right">
                     Columns
                   </TableHead>
                   <TableHead key="rows" className="text-right">
                     Rows (Estimated)
                   </TableHead>
-                  <TableHead key="size" className="hidden text-right lg:table-cell">
+                  <TableHead key="size" className="text-right">
                     Size (Estimated)
                   </TableHead>
-                  <TableHead key="realtime" className="hidden text-right 2xl:table-cell">
+                  <TableHead key="realtime" className="text-right">
                     Realtime Enabled
                   </TableHead>
                   <TableHead key="buttons"></TableHead>
@@ -375,7 +375,7 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="hidden !pl-5 !pr-1 sm:table-cell">
+                        <TableCell className="!pl-5 !pr-1">
                           <Tooltip>
                             <TooltipTrigger className="cursor-default">
                               <EntityTypeIcon type={x.type} />
@@ -412,7 +412,7 @@ export const TableList = ({
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell className="hidden text-right sm:table-cell">
+                        <TableCell className="text-right">
                           <p className="text-foreground-light">
                             {x.columns.length.toLocaleString()}
                           </p>
@@ -424,14 +424,14 @@ export const TableList = ({
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden text-right lg:table-cell">
+                        <TableCell className="text-right">
                           {x.size !== undefined ? (
                             <p className="text-foreground-light">{x.size}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden text-right 2xl:table-cell">
+                        <TableCell className="text-right">
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
