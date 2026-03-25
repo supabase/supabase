@@ -141,6 +141,7 @@ You can authenticate to Supabase S3 using a user’s JWT to enforce Row-Level Se
 All operations performed with a session token are scoped to the authenticated user, and any RLS policies defined in the storage schema will be applied.
 
 To authenticate with S3 using a session token, provide the following credentials:
+
 - **region:** value from the `REGION` environment variable in your `.env` file
 - **access_key_id:** value from the `STORAGE_TENANT_ID` environment variable in your `.env` file
 - **secret_access_key:** value from the `ANON_KEY` environment variable
@@ -157,11 +158,11 @@ const {
 
 const client = new S3Client({
   forcePathStyle: true,
-  region: 'stub',                                  // REGION in .env
-  endpoint: 'http://<your-domain>/storage/v1/s3',  // Edit <your-domain>
+  region: 'stub', // REGION in .env
+  endpoint: 'http://<your-domain>/storage/v1/s3', // Edit <your-domain>
   credentials: {
-    accessKeyId: 'stub',                           // STORAGE_TENANT_ID in .env
-    secretAccessKey: 'your-anon-key',              // ANON_KEY in .env
+    accessKeyId: 'stub', // STORAGE_TENANT_ID in .env
+    secretAccessKey: 'your-anon-key', // ANON_KEY in .env
     sessionToken: session.access_token,
   },
 })
