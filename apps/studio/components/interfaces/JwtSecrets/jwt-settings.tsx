@@ -62,10 +62,11 @@ import {
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './jwt.constants'
 
+const MAX_JWT_EXP = 604800
 const formSchema = z.object({
   JWT_EXP: z
     .number({ required_error: 'Must have a JWT expiry value' })
-    .max(604800, 'Must be less than 604800'),
+    .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`),
 })
 const formId = 'jwt-exp-form'
 
@@ -319,8 +320,8 @@ const JWTSettings = () => {
                               <Input_Shadcn_
                                 {...field}
                                 type="number"
-                                min={1}
-                                max={1000}
+                                min={0}
+                                max={MAX_JWT_EXP}
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
                             </PrePostTab>
