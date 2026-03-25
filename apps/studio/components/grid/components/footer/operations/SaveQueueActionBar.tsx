@@ -75,7 +75,7 @@ export const SaveQueueActionBar = () => {
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="outline" className="w-7" icon={<MoreVertical />} />
+                      <Button type="outline" className="w-7" icon={<MoreVertical />} aria-label="More options" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-40">
                       <DropdownMenuItem
