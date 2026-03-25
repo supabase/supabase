@@ -32,6 +32,7 @@ interface SchemaSelectorProps {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
+  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -46,6 +47,7 @@ export const SchemaSelector = ({
   placeholderLabel = 'Choose a schema...',
   supportSelectAll = false,
   excludedSchemas = [],
+  stopScrollPropagation = false,
   onSelectSchema,
   onSelectCreateSchema,
   align = 'start',
@@ -136,7 +138,9 @@ export const SchemaSelector = ({
           >
             <Command_Shadcn_>
               <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
-              <CommandList_Shadcn_>
+              <CommandList_Shadcn_
+                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
+              >
                 <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>

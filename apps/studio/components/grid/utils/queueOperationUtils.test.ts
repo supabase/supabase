@@ -389,6 +389,50 @@ describe('formatGridDataWithOperationValues', () => {
     expect(result[1]).toMatchObject({ __tempId: '-100', name: 'Row 1' })
   })
 
+  test('should correctly delete a row after adding a new row (ADD then DELETE)', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const addOp = makeAddOp('-100', { name: 'New Row' })
+    const deleteOp = makeDeleteOp({ id: 1 }, rows[0])
+
+    const result = formatGridDataWithOperationValues({
+      operations: [addOp, deleteOp],
+      rows,
+    })
+
+    expect(result).toHaveLength(3)
+    // New row should be preserved at position 0
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'New Row' })
+    expect(result[0].__isDeleted).toBeUndefined()
+    // Deleted row should be marked
+    expect(result[1].__isDeleted).toBe(true)
+    expect(result[1].id).toBe(1)
+    // Other row unaffected
+    expect(result[2]).toEqual(rows[1])
+  })
+
+  test('should correctly edit a row after adding a new row (ADD then EDIT)', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const addOp = makeAddOp('-100', { name: 'New Row' })
+    const editOp = makeEditOp({
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated Alice',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({
+      operations: [addOp, editOp],
+      rows,
+    })
+
+    expect(result).toHaveLength(2)
+    expect(result[0]).toMatchObject({ __tempId: '-100', name: 'New Row' })
+    expect(result[1].name).toBe('Updated Alice')
+  })
+
   test('should handle EDIT_CELL_CONTENT with composite primary keys', () => {
     const rows = [makeRow(0, { tenant_id: 'a', user_id: 1, name: 'Alice' })]
     const op = makeEditOp({

@@ -1,23 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
-import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
-import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
-import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
-import type { GitHubConnection } from 'data/integrations/integrations.types'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { EMPTY_ARR } from 'lib/void'
 import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -44,13 +27,30 @@ import {
   PopoverTrigger_Shadcn_,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
+import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
+import { useGitHubConnectionCreateMutation } from '@/data/integrations/github-connection-create-mutation'
+import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
+import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
+import { useGitHubRepositoriesQuery } from '@/data/integrations/github-repositories-query'
+import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { openInstallGitHubIntegrationWindow } from '@/lib/github'
+import { EMPTY_ARR } from '@/lib/void'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -65,10 +65,12 @@ const GITHUB_ICON = (
 )
 
 interface GitHubIntegrationConnectionFormProps {
+  disabled?: boolean
   connection?: GitHubConnection
 }
 
 export const GitHubIntegrationConnectionForm = ({
+  disabled = false,
   connection,
 }: GitHubIntegrationConnectionFormProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()

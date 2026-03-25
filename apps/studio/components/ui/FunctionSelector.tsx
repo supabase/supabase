@@ -1,30 +1,29 @@
-import { uniqBy } from 'lodash'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import {
   DatabaseFunctionsData,
   useDatabaseFunctionsQuery,
 } from 'data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { uniqBy } from 'lodash'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
 
@@ -38,6 +37,7 @@ interface FunctionSelectorProps {
   value: string
   onChange: (value: string) => void
   disabled?: boolean
+  stopScrollPropagation?: boolean
   // used to filter the functions by a criteria
   filterFunction?: (func: DatabaseFunction) => boolean
   noResultsLabel?: React.ReactNode
@@ -51,6 +51,7 @@ const FunctionSelector = ({
   schema,
   value,
   onChange,
+  stopScrollPropagation = false,
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
@@ -127,7 +128,9 @@ const FunctionSelector = ({
           <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Search functions..." />
-              <CommandList_Shadcn_>
+              <CommandList_Shadcn_
+                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
+              >
                 <CommandEmpty_Shadcn_>No functions found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(functions || []).length > 7 ? 'h-[210px]' : ''}>
