@@ -9,6 +9,7 @@ import {
   GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
 import { ResponseError } from 'types'
+import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { generateTypescriptTypes } from './generate-types'
 import { getLints } from './lints'
 import { getLogQuery, retrieveAnalyticsData } from './logs'
@@ -128,7 +129,10 @@ export function getDebuggingOperations({
       return data
     },
     async getSecurityAdvisors(_projectRef) {
-      const { data, error } = await getLints({ headers })
+      const { data, error } = await getLints({
+        headers,
+        exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+      })
 
       if (error) {
         throw error
@@ -137,7 +141,10 @@ export function getDebuggingOperations({
       return data.filter((lint) => lint.categories.includes('SECURITY'))
     },
     async getPerformanceAdvisors(_projectRef) {
-      const { data, error } = await getLints({ headers })
+      const { data, error } = await getLints({
+        headers,
+        exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+      })
 
       if (error) {
         throw error

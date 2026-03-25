@@ -1,19 +1,11 @@
-import { useCallback, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
-import { detectOS } from 'lib/helpers'
-
-export function getModKey() {
-  const os = detectOS()
-  return os === 'macos' ? '⌘' : 'Ctrl+'
-}
-
-interface UseOperationQueueShortcutsOptions {
-  enabled: boolean
-  onSave: () => void
-  onTogglePanel: () => void
-  isSaving?: boolean
-  hasOperations?: boolean
-}
+import { useOperationQueueActions } from './useOperationQueueActions'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useHotKey } from '@/hooks/ui/useHotKey'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 /**
  * Hook that provides keyboard shortcuts for the operation queue.
@@ -25,44 +17,55 @@ interface UseOperationQueueShortcutsOptions {
  * These shortcuts are registered on the capture phase to ensure they fire
  * before the data grid handles the keyboard event.
  */
-export function useOperationQueueShortcuts({
-  enabled,
-  onSave,
-  onTogglePanel,
-  isSaving = false,
-  hasOperations = true,
-}: UseOperationQueueShortcutsOptions) {
-  const os = detectOS()
-  const modKey = os === 'macos' ? '⌘' : 'Ctrl+'
+export function useOperationQueueShortcuts() {
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const snap = useTableEditorStateSnapshot()
+  const { handleSave } = useOperationQueueActions()
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      const isMod = os === 'macos' ? event.metaKey : event.ctrlKey
+  const isSaving = snap.operationQueue.status === 'saving'
+  const hasOperations = snap.hasPendingOperations
+  const isEnabled = isQueueOperationsEnabled && hasOperations
 
-      if (isMod && event.key === 's') {
-        event.preventDefault()
-        event.stopPropagation()
-        if (!isSaving && hasOperations) {
-          onSave()
-        }
-      } else if (isMod && event.key === '.') {
-        event.preventDefault()
-        event.stopPropagation()
-        onTogglePanel()
+  useHotKey(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      if (!isSaving && hasOperations) {
+        handleSave()
       }
     },
-    [os, isSaving, hasOperations, onSave, onTogglePanel]
+    's',
+    { enabled: isEnabled }
   )
 
-  // Use capture phase to intercept events before the grid handles them
-  useEffect(() => {
-    if (enabled) {
-      window.addEventListener('keydown', handleKeyDown, true)
-      return () => {
-        window.removeEventListener('keydown', handleKeyDown, true)
-      }
-    }
-  }, [enabled, handleKeyDown])
+  useHotKey(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      snap.toggleViewOperationQueue()
+    },
+    '.',
+    { enabled: isEnabled }
+  )
 
-  return { modKey }
+  useHotKey(
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      const tableIdLatestOperation = snap.operationQueue.operations.at(-1)?.tableId
+      snap.undoLatestOperation()
+
+      // Invalidate the query to revert the optimistic update
+      if (project && tableIdLatestOperation) {
+        queryClient.invalidateQueries({
+          queryKey: tableRowKeys.tableRowsAndCount(project.ref, tableIdLatestOperation),
+        })
+      }
+    },
+    'z',
+    { enabled: isEnabled }
+  )
 }

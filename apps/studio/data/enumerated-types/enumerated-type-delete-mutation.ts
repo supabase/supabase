@@ -1,8 +1,9 @@
+import { getDeleteEnumeratedTypeSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { enumeratedTypesKeys } from './keys'
 
 export type EnumeratedTypeDeleteVariables = {
@@ -18,7 +19,7 @@ export async function deleteEnumeratedType({
   name,
   schema,
 }: EnumeratedTypeDeleteVariables) {
-  const sql = `drop type if exists ${schema}."${name}"`
+  const sql = getDeleteEnumeratedTypeSQL({ schema, name })
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

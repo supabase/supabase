@@ -1,8 +1,9 @@
-import { ident, literal } from './pg-format'
-import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
 import { z } from 'zod'
+
+import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { ident, literal } from './pg-format'
+import { TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
 
 const pgTablePrivilegesZod = z.object({
   relation_id: z.number(),

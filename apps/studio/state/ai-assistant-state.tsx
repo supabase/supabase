@@ -8,6 +8,7 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { constructHeaders } from 'data/fetchers'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
+import type { AssistantModelId } from 'lib/ai/model.utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -22,7 +23,7 @@ export type AssistantMessageType = MessageType
 
 export type SqlSnippet = string | { label: string; content: string }
 
-export type AssistantModel = 'gpt-5' | 'gpt-5-mini'
+export type AssistantModel = AssistantModelId
 
 type ChatSession = {
   id: string
@@ -234,6 +235,14 @@ function createChatInstance(
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      fetch: async (url, init) => {
+        const response = await globalThis.fetch(url as RequestInfo, init)
+        const spanId = response.headers.get('x-braintrust-span-id')
+        if (spanId) {
+          state.pendingSpanIds[options.id] = spanId
+        }
+        return response
+      },
       async prepareSendMessagesRequest({ messages, ...opts }) {
         const cleanedMessages = prepareMessagesForAPI(messages)
         const headerData = await constructHeaders()
@@ -248,6 +257,7 @@ function createChatInstance(
             messages: cleanedMessages,
             projectRef: state.context.projectRef,
             connectionString: state.context.connectionString,
+            chatId: options.id,
             chatName: chat?.name,
             orgSlug: state.context.orgSlug,
             context: state.context,
@@ -278,8 +288,18 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages as AssistantMessageType[]
+          chat.messages = messages
           chat.updatedAt = new Date()
+        }
+
+        // Associate pending span ID with the last assistant message
+        const pendingSpanId = state.pendingSpanIds[options.id]
+        if (pendingSpanId) {
+          const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')
+          if (lastAssistantMsg) {
+            state.messageSpanIds[lastAssistantMsg.id] = pendingSpanId
+          }
+          delete state.pendingSpanIds[options.id]
         }
       }
     },
@@ -293,6 +313,8 @@ export const createAiAssistantState = (): AiAssistantState => {
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
     chatInstances: {},
+    pendingSpanIds: {},
+    messageSpanIds: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -431,7 +453,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         if (index !== -1) {
           state.updateMessage(msg)
         } else {
-          messagesToAdd.push(msg as AssistantMessageType)
+          messagesToAdd.push(msg)
         }
       })
 
@@ -447,7 +469,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        chat.messages[messageIndex] = updatedMessage
         chat.updatedAt = new Date()
       }
     },
@@ -510,6 +532,8 @@ export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
   chatInstances: Record<string, Chat<MessageType>>
+  pendingSpanIds: Record<string, string>
+  messageSpanIds: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (

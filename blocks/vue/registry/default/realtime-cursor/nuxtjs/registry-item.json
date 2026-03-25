@@ -1,0 +1,24 @@
+{
+  "name": "realtime-cursor-nuxtjs",
+  "type": "registry:component",
+  "title": "Realtime Cursor for Nuxt and Supabase",
+  "description": "Component which renders realtime cursors from other users in a room.",
+  "files": [
+    {
+      "path": "registry/default/realtime-cursor/nuxtjs/app/components/cursor.vue",
+      "type": "registry:component",
+      "target": "app/components/cursor.vue"
+    },
+    {
+      "path": "registry/default/realtime-cursor/nuxtjs/app/components/realtime-cursors.vue",
+      "type": "registry:component",
+      "target": "app/components/realtime-cursors.vue"
+    },
+    {
+      "path": "registry/default/realtime-cursor/nuxtjs/app/composables/useRealtimeCursors.ts",
+      "type": "registry:component",
+      "target": "app/composables/useRealtimeCursors.ts"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest", "@vueuse/core", "lucide-vue-next"]
+}

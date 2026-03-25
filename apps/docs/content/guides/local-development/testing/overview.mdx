@@ -281,13 +281,11 @@ jobs:
 ## Best practices
 
 1. **Test Data Setup**
-
    - Use begin and rollback to ensure test isolation
    - Create realistic test data that covers edge cases
    - Use different user roles and permissions in tests
 
 2. **RLS Policy Testing**
-
    - Test Create, Read, Update, Delete operations
    - Test with different user roles: anonymous and authenticated
    - Test edge cases and potential security bypasses
@@ -310,7 +308,6 @@ For more complex, real-world examples of database testing, check out:
 Common issues and solutions:
 
 1. **Test Failures Due to RLS**
-
    - Ensure you've set the correct role `set local role authenticated;`
    - Verify JWT claims are set `set local "request.jwt.claims"`
    - Check policy definitions match your test assumptions

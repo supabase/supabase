@@ -1,7 +1,19 @@
-import z from 'zod'
-
 import { IS_PLATFORM } from 'common'
 import { InternalServerError } from 'lib/api/apiHelpers'
+import z from 'zod'
+
+export type IncidentCache = {
+  affected_regions: Array<string> | null
+  affects_project_creation: boolean
+  /** When true, the banner is shown unconditionally regardless of regions or project state. */
+  force?: boolean
+}
+
+export type IncidentMetadata = {
+  dashboard_metadata?: {
+    show_banner?: boolean
+  }
+}
 
 export type IncidentInfo = {
   id: string
@@ -9,6 +21,8 @@ export type IncidentInfo = {
   status: string
   impact: string
   active_since: string
+  metadata: IncidentMetadata
+  cache?: IncidentCache | null
 }
 
 const STATUSPAGE_API_URL = 'https://api.statuspage.io/v1'
@@ -27,6 +41,16 @@ const StatusPageIncidentsSchema = z.array(
     created_at: z.string(),
     scheduled_for: z.string().nullable(),
     impact: z.string(),
+    metadata: z
+      .object({
+        dashboard_metadata: z
+          .object({
+            show_banner: z.boolean().optional(),
+          })
+          .optional(),
+      })
+      .optional()
+      .default({}),
   })
 )
 
@@ -56,15 +80,17 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    cache: 'no-store',
+    next: { revalidate: 180 },
     signal: AbortSignal.timeout(30_000),
   })
   const responseText = await response.text()
 
   if (!response.ok) {
+    const retryAfter = response.headers.get('Retry-After') ?? undefined
     throw new InternalServerError(`StatusPage API responded with ${response.status}`, {
       status: response.status,
       body: responseText,
+      ...(retryAfter !== undefined && { retryAfter }),
     })
   }
 
@@ -114,5 +140,6 @@ export async function getActiveIncidents(): Promise<IncidentInfo[]> {
     status: incident.status,
     impact: incident.impact,
     active_since: incident.scheduled_for ?? incident.created_at,
+    metadata: incident.metadata,
   }))
 }

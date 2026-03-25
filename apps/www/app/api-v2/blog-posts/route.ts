@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSortedPosts } from 'lib/posts'
-import { getAllCMSPosts } from 'lib/get-cms-posts'
+
+import { getSortedPosts } from '@/lib/posts'
 
 export const revalidate = 30
 
@@ -20,11 +20,8 @@ async function getCombinedPosts() {
   // Get static blog posts
   const staticPosts = getSortedPosts({ directory: '_blog' })
 
-  // Get CMS posts
-  const cmsPosts = await getAllCMSPosts({ limit: 100 })
-
   // Combine and sort by date
-  const allPosts = [...staticPosts, ...cmsPosts].sort((a: any, b: any) => {
+  const allPosts = [...staticPosts].sort((a: any, b: any) => {
     const dateA = new Date(a.date || a.formattedDate).getTime()
     const dateB = new Date(b.date || b.formattedDate).getTime()
     return dateB - dateA

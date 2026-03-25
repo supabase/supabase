@@ -1,12 +1,12 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
+import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import type { XYCoord } from 'dnd-core'
 import { ArrowRight, Key, Lightbulb, Link, Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
-
-import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import {
   useColumnHasIndexSuggestion,
   useTableIndexAdvisor,

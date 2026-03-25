@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
-  MAP_CHART_THEME,
   buildCountsByIso2,
   computeMarkerRadius,
   extractIso2FromFeatureProps,
@@ -10,10 +9,11 @@ import {
   isKnownCountryCode,
   isMicroCountry,
   iso2ToCountryName,
+  MAP_CHART_THEME,
 } from 'components/interfaces/Reports/utils/geo'
 import {
-  TextFormatter,
   jsonSyntaxHighlight,
+  TextFormatter,
 } from 'components/interfaces/Settings/Logs/LogsFormatters'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -28,20 +28,20 @@ import { Fragment, useRef, useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import type { ResponseError } from 'types'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Collapsible,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   WarningIcon,
 } from 'ui'
 import * as z from 'zod'
 
-import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { queryParamsToObject } from '../Reports.utils'
+import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -453,10 +453,6 @@ export const RequestsByCountryMapRenderer = (
                   const iso2 = extractIso2FromFeatureProps(
                     (geo.properties || undefined) as Record<string, unknown> | undefined
                   )
-                  // Skip Antarctica entirely (causes hover issues)
-                  if ((title || '').toLowerCase() === 'antarctica') {
-                    return null
-                  }
                   const value = iso2 ? countsByIso2[iso2] || 0 : 0
                   const baseOpacity = getFillOpacity(value, max, theme)
                   const tooltipTitle = title

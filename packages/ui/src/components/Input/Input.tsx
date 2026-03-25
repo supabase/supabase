@@ -1,20 +1,22 @@
 'use client'
 
+import { Copy } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
-import { Copy } from 'lucide-react'
+import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
 import { copyToClipboard } from '../../lib/utils'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
 
-export interface Props
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
+export interface Props extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'size' | 'onCopy'
+> {
   inputClassName?: string
   iconContainerClassName?: string
   copy?: boolean
@@ -196,8 +198,10 @@ function Input({
 /**
  * @deprecated Use ./TextArea_Shadcn_ instead
  */
-export interface TextAreaProps
-  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
+export interface TextAreaProps extends Omit<
+  React.InputHTMLAttributes<HTMLTextAreaElement>,
+  'size' | 'onCopy'
+> {
   textAreaClassName?: string
   descriptionText?: string | React.ReactNode | undefined
   error?: string

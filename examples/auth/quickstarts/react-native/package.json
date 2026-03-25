@@ -10,22 +10,18 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@rneui/base": "^5.0.0",
-    "@rneui/themed": "^5.0.0",
-    "@supabase/supabase-js": "^2.93.1",
+    "@supabase/supabase-js": "^2.93.2",
     "expo": "~54.0.32",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-safe-area-context": "~5.6.0",
+    "react-native-safe-area-context": "~5.6.2",
     "react-native-url-polyfill": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.6",
-    "@testing-library/jest-native": "^5.4.3",
-    "@testing-library/react-native": "^13.2.0",
-    "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.3"
   },
   "private": true
 }

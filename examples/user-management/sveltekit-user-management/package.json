@@ -1,29 +1,27 @@
 {
-	"name": "supabase-sveltekit",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^6.0.1",
-		"@sveltejs/kit": "^2.5.27",
-		"@sveltejs/vite-plugin-svelte": "^6.1.0",
-		"svelte": "^5.14.4",
-		"svelte-check": "^4.1.1",
-		"tslib": "^2.6.3",
-		"typescript": "^5.5.3",
-		"vite": "^7.1.5"
-	},
-	"type": "module",
-	"dependencies": {
-		"@supabase/auth-ui-shared": "^0.1.8",
-		"@supabase/auth-ui-svelte": "^0.2.9",
-		"@supabase/ssr": "^0.6.1",
-		"@supabase/supabase-js": "^2.44.2"
-	}
+  "name": "supabase-sveltekit",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^7.0.1",
+    "@sveltejs/kit": "^2.55.0",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
+    "svelte": "^5.54.1",
+    "svelte-check": "^4.4.5",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.99.3"
+  }
 }

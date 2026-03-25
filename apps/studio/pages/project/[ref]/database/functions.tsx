@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
+import { FunctionsList } from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -53,7 +52,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
 DatabaseFunctionsPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Functions">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

@@ -1,17 +1,16 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { PropsWithChildren, useEffect, useRef } from 'react'
-
-import { Admonition } from 'ui-patterns/admonition'
-
-import { Button } from 'ui'
 import { useTrack } from 'lib/telemetry/track'
+import { PropsWithChildren, useEffect, useRef } from 'react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 export interface AlertErrorProps {
   projectRef?: string
   subject?: string
+  description?: string
   error?: { message: string } | null
-  layout?: 'vertical' | 'horizontal'
+  layout?: 'vertical' | 'horizontal' | 'responsive'
   className?: string
   showIcon?: boolean
   showInstructions?: boolean
@@ -19,7 +18,7 @@ export interface AlertErrorProps {
   additionalActions?: React.ReactNode
 }
 
-const ContactSupportButton = ({
+export const ContactSupportButton = ({
   projectRef,
   subject,
   error,
@@ -48,10 +47,11 @@ const ContactSupportButton = ({
 export const AlertError = ({
   projectRef,
   subject,
+  description = 'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.',
   error,
   className,
   showIcon = true,
-  layout = 'horizontal',
+  layout = 'responsive',
   showInstructions = true,
   showErrorPrefix = true,
   children,
@@ -89,12 +89,7 @@ export const AlertError = ({
               {formattedErrorMessage}
             </p>
           )}
-          {showInstructions && (
-            <p>
-              Try refreshing your browser, but if the issue persists for more than a few minutes,
-              please reach out to us via support.
-            </p>
-          )}
+          {showInstructions && <p>{description}</p>}
           {children}
         </>
       }

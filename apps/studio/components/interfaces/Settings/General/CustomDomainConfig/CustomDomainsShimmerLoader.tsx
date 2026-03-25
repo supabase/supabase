@@ -1,4 +1,4 @@
-const CustomDomainsShimmerLoader = () => {
+export const CustomDomainsShimmerLoader = () => {
   return (
     <div className="grid grid-cols-12 gap-6 px-8 py-8">
       <div className="col-span-12 lg:col-span-5">
@@ -11,5 +11,3 @@ const CustomDomainsShimmerLoader = () => {
     </div>
   )
 }
-
-export default CustomDomainsShimmerLoader

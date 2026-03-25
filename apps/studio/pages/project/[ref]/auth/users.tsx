@@ -9,7 +9,7 @@ const UsersPage: NextPageWithLayout = () => {
 
 UsersPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Users">{page}</AuthLayout>
   </DefaultLayout>
 )
 

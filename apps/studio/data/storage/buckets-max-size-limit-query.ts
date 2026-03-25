@@ -1,16 +1,11 @@
+import { getLargestSizeLimitBucketsSqlUnoptimized, getLiveTupleEstimate } from '@supabase/pg-meta'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-
 import type { ConnectionVars } from 'data/common.types'
 import { executeSql } from 'data/sql/execute-sql-query'
-import {
-  getLargestSizeLimitBucketsKey,
-  getLargestSizeLimitBucketsSqlUnoptimized,
-} from 'data/sql/queries/get-largest-size-limit-buckets'
-import {
-  getLiveTupleEstimate,
-  getLiveTupleEstimateKey,
-} from 'data/sql/queries/get-live-tuple-stats'
+import { useCallback } from 'react'
+
+import { getLiveTupleEstimateKey } from '../database/keys'
+import { sqlKeys } from '../sql/keys'
 
 export const THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS = 10_000
 
@@ -52,7 +47,7 @@ const getBucketsWithLargestSizeLimit = async ({
   if (!projectRef) throw new Error('Project reference is required')
   if (!connectionString) throw new Error('Connection string is required')
 
-  const key = getLargestSizeLimitBucketsKey(projectRef)
+  const key = sqlKeys.query(projectRef, ['buckets-with-largest-size-limit'])
 
   const sql = getLargestSizeLimitBucketsSqlUnoptimized
   const { result } = await executeSql<{ id: string; name: string; file_size_limit: number }[]>({
@@ -105,7 +100,7 @@ export const useLargestBucketSizeLimitsCheck = ({
     enabled: !!projectRef && !!connectionString,
   })
 
-  const bucketLimitsKey = getLargestSizeLimitBucketsKey(projectRef)
+  const bucketLimitsKey = sqlKeys.query(projectRef, ['buckets-with-largest-size-limit'])
 
   const fetchLargestBucketLimits = useCallback(
     () =>

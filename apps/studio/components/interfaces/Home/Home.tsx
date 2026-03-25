@@ -167,21 +167,19 @@ export const Home = () => {
                     )}
                   </div>
 
-                  {IS_PLATFORM && (
-                    <div className="flex flex-col gap-y-1">
-                      <Link
-                        href={`/project/${ref}/functions`}
-                        className="transition text-foreground-light hover:text-foreground text-sm"
-                      >
-                        Functions
-                      </Link>
-                      {isLoadingFunctions ? (
-                        <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
-                      ) : (
-                        <p className="text-2xl tabular-nums">{functionsCount}</p>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-y-1">
+                    <Link
+                      href={`/project/${ref}/functions`}
+                      className="transition text-foreground-light hover:text-foreground text-sm"
+                    >
+                      Functions
+                    </Link>
+                    {isLoadingFunctions ? (
+                      <ShimmeringLoader className="w-full h-[32px] w-6 p-0" />
+                    ) : (
+                      <p className="text-2xl tabular-nums">{functionsCount}</p>
+                    )}
+                  </div>
 
                   {IS_PLATFORM && (
                     <div className="flex flex-col gap-y-1">
