@@ -117,6 +117,14 @@ export const ProjectCardStatus = ({
     (activeWarnings.length === 0 || warningContent === undefined) &&
     projectStatus === 'isHealthy'
   ) {
+    if (renderMode === 'badge') {
+      return (
+        // Badge must be wrapped in a div in order to be centered in table cell
+        <div className="flex items-center">
+          <Badge variant="success">Active</Badge>
+        </div>
+      )
+    }
     return null
   }
 
