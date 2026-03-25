@@ -1,24 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import {
-  Check,
-  Columns,
-  Copy,
-  Edit,
-  Eye,
-  Filter,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
@@ -37,6 +18,24 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { noop } from 'lodash'
+import {
+  Check,
+  Columns,
+  Copy,
+  Edit,
+  Eye,
+  Filter,
+  MoreVertical,
+  Plus,
+  Search,
+  Trash,
+  X,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
   Card,
@@ -47,9 +46,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   Table,
   TableBody,
   TableCell,
@@ -62,6 +61,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 
@@ -319,9 +319,6 @@ export const TableList = ({
                 <TableRow>
                   <TableHead key="icon" className="!px-0" />
                   <TableHead key="name">Name</TableHead>
-                  <TableHead key="description" className="hidden lg:table-cell">
-                    Description
-                  </TableHead>
                   <TableHead key="rows" className="hidden text-right xl:table-cell">
                     Rows (Estimated)
                   </TableHead>
@@ -338,7 +335,7 @@ export const TableList = ({
                 <>
                   {entities.length === 0 && filterString.length === 0 && (
                     <TableRow key={selectedSchema}>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={6}>
                         {visibleTypes.length === 0 ? (
                           <>
                             <p className="text-sm text-foreground">
@@ -373,7 +370,7 @@ export const TableList = ({
                   )}
                   {entities.length === 0 && filterString.length > 0 && (
                     <TableRow key={selectedSchema}>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={6}>
                         <p className="text-sm text-foreground">No results found</p>
                         <p className="text-sm text-foreground-light">
                           Your search for "{filterString}" did not return any results
@@ -399,39 +396,44 @@ export const TableList = ({
                           </Tooltip>
                         </TableCell>
                         <TableCell>
-                          {/* only show tooltips if required, to reduce noise */}
-                          {x.name.length > 20 ? (
-                            <Tooltip disableHoverableContent={true}>
-                              <TooltipTrigger
-                                asChild
-                                className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
-                              >
-                                <p>{x.name}</p>
-                              </TooltipTrigger>
+                          <div className="flex min-w-0 flex-col gap-0.5">
+                            {/* only show tooltips if required, to reduce noise */}
+                            {x.name.length > 20 ? (
+                              <Tooltip disableHoverableContent={true}>
+                                <TooltipTrigger
+                                  asChild
+                                  className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                                >
+                                  <p>{x.name}</p>
+                                </TooltipTrigger>
 
-                              <TooltipContent side="bottom">{x.name}</TooltipContent>
-                            </Tooltip>
-                          ) : (
-                            <p>{x.name}</p>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell ">
-                          {x.comment !== null ? (
-                            <span className="lg:max-w-48 truncate inline-block" title={x.comment}>
-                              {x.comment}
-                            </span>
-                          ) : (
-                            <p className="text-border-stronger">No description</p>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden text-right xl:table-cell">
-                          {x.rows !== undefined ? x.rows.toLocaleString() : '-'}
+                                <TooltipContent side="bottom">{x.name}</TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <p>{x.name}</p>
+                            )}
+                            {x.comment !== null ? (
+                              <span
+                                className="text-foreground-lighter max-w-md truncate"
+                                title={x.comment}
+                              >
+                                {x.comment}
+                              </span>
+                            ) : null}
+                          </div>
                         </TableCell>
                         <TableCell className="hidden text-right xl:table-cell">
+                          {x.rows !== undefined ? (
+                            <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
+                          ) : (
+                            <p className="text-foreground-muted">–</p>
+                          )}
+                        </TableCell>
+                        <TableCell className="hidden text-right  xl:table-cell">
                           {x.size !== undefined ? (
-                            <code className="text-code-inline">{x.size}</code>
+                            <p className="text-foreground-light">{x.size}</p>
                           ) : (
-                            '-'
+                            <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
                         <TableCell className="hidden xl:table-cell text-center">
@@ -453,8 +455,6 @@ export const TableList = ({
                               asChild
                               type="default"
                               iconRight={<Columns size={14} className="text-foreground-light" />}
-                              className="whitespace-nowrap hover:border-muted"
-                              style={{ paddingTop: 3, paddingBottom: 3 }}
                             >
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
                                 {x.columns.length} columns
