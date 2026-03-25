@@ -24,19 +24,24 @@ describe('getEdgeFunctionsLastHourStats', () => {
   it('requests last-hour function stats from logs.all', async () => {
     vi.mocked(get).mockResolvedValue({ data: { result: [] }, error: null } as GetResponse)
 
-    await getEdgeFunctionsLastHourStats({ projectRef: 'project-ref' })
+    await getEdgeFunctionsLastHourStats({
+      projectRef: 'project-ref',
+      functionIds: ['fn_1', 'fn_2'],
+    })
 
     expect(get).toHaveBeenCalledWith('/platform/projects/{ref}/analytics/endpoints/logs.all', {
       params: {
         path: { ref: 'project-ref' },
-        query: {
-          sql: expect.stringContaining('from\n  function_edge_logs'),
+        query: expect.objectContaining({
+          sql: expect.stringContaining(`and function_id in ('fn_1', 'fn_2')`),
           iso_timestamp_start: '2024-01-15T11:00:00.000Z',
           iso_timestamp_end: '2024-01-15T12:00:00.000Z',
-        },
+        }),
       },
       signal: undefined,
     })
+
+    expect(vi.mocked(get).mock.calls[0]?.[1]?.params?.query?.sql).toContain('from\n  function_edge_logs')
   })
 
   it('coerces counts to numbers and computes error rates per function', async () => {
@@ -50,7 +55,10 @@ describe('getEdgeFunctionsLastHourStats', () => {
       error: null,
     } as GetResponse)
 
-    const result = await getEdgeFunctionsLastHourStats({ projectRef: 'project-ref' })
+    const result = await getEdgeFunctionsLastHourStats({
+      projectRef: 'project-ref',
+      functionIds: ['fn_1', 'fn_2'],
+    })
 
     expect(result).toEqual({
       fn_1: {
@@ -71,8 +79,21 @@ describe('getEdgeFunctionsLastHourStats', () => {
   it('handles empty results', async () => {
     vi.mocked(get).mockResolvedValue({ data: { result: [] }, error: null } as GetResponse)
 
-    const result = await getEdgeFunctionsLastHourStats({ projectRef: 'project-ref' })
+    const result = await getEdgeFunctionsLastHourStats({
+      projectRef: 'project-ref',
+      functionIds: ['fn_1'],
+    })
 
     expect(result).toEqual({})
+  })
+
+  it('skips the logs query when there are no function ids', async () => {
+    const result = await getEdgeFunctionsLastHourStats({
+      projectRef: 'project-ref',
+      functionIds: [],
+    })
+
+    expect(result).toEqual({})
+    expect(get).not.toHaveBeenCalled()
   })
 })

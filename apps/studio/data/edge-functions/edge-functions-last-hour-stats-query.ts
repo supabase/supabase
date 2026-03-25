@@ -5,7 +5,7 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { edgeFunctionsKeys } from './keys'
 
-export type EdgeFunctionsLastHourStatsVariables = { projectRef?: string }
+export type EdgeFunctionsLastHourStatsVariables = { projectRef?: string; functionIds?: string[] }
 
 export type EdgeFunctionLastHourStats = {
   functionId: string
@@ -16,7 +16,17 @@ export type EdgeFunctionLastHourStats = {
 
 export type EdgeFunctionsLastHourStatsResponse = Record<string, EdgeFunctionLastHourStats>
 
-const EDGE_FUNCTIONS_LAST_HOUR_STATS_SQL = `
+function toSqlStringLiteral(value: string) {
+  return `'${value.replaceAll("'", "''")}'`
+}
+
+function getEdgeFunctionsLastHourStatsSql(functionIds: string[]) {
+  const functionIdFilter =
+    functionIds.length > 0
+      ? `  and function_id in (${functionIds.map(toSqlStringLiteral).join(', ')})\n`
+      : ''
+
+  return `
 -- edge-functions-last-hour-stats
 select
   function_id,
@@ -28,15 +38,17 @@ from
   cross join unnest(m.response) as response
 where
   function_id is not null
-group by
+${functionIdFilter}group by
   function_id
 `
+}
 
 export async function getEdgeFunctionsLastHourStats(
-  { projectRef }: EdgeFunctionsLastHourStatsVariables,
+  { projectRef, functionIds = [] }: EdgeFunctionsLastHourStatsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
+  if (functionIds.length === 0) return {}
 
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(1, 'hour').toISOString()
@@ -45,7 +57,7 @@ export async function getEdgeFunctionsLastHourStats(
     params: {
       path: { ref: projectRef },
       query: {
-        sql: EDGE_FUNCTIONS_LAST_HOUR_STATS_SQL,
+        sql: getEdgeFunctionsLastHourStatsSql(functionIds),
         iso_timestamp_start: startDate,
         iso_timestamp_end: endDate,
       },
@@ -84,7 +96,7 @@ export type EdgeFunctionsLastHourStatsData = Awaited<
 export type EdgeFunctionsLastHourStatsError = ResponseError
 
 export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHourStatsData>(
-  { projectRef }: EdgeFunctionsLastHourStatsVariables,
+  { projectRef, functionIds = [] }: EdgeFunctionsLastHourStatsVariables,
   {
     enabled = true,
     ...options
@@ -95,9 +107,9 @@ export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHour
   > = {}
 ) =>
   useQuery<EdgeFunctionsLastHourStatsData, EdgeFunctionsLastHourStatsError, TData>({
-    queryKey: edgeFunctionsKeys.lastHourStats(projectRef),
-    queryFn: ({ signal }) => getEdgeFunctionsLastHourStats({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    queryKey: edgeFunctionsKeys.lastHourStats(projectRef, functionIds),
+    queryFn: ({ signal }) => getEdgeFunctionsLastHourStats({ projectRef, functionIds }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && functionIds.length > 0,
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

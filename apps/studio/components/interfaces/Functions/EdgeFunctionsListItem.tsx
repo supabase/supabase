@@ -19,6 +19,7 @@ interface EdgeFunctionsListItemProps {
   lastHourStats?: EdgeFunctionLastHourStats
   isStatsPending?: boolean
   isStatsError?: boolean
+  showStats?: boolean
 }
 
 export const EdgeFunctionsListItem = ({
@@ -26,6 +27,7 @@ export const EdgeFunctionsListItem = ({
   lastHourStats,
   isStatsPending = false,
   isStatsError = false,
+  showStats = IS_PLATFORM,
 }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -95,7 +97,7 @@ export const EdgeFunctionsListItem = ({
           label={dayjs(item.updated_at).fromNow()}
         />
       </TableCell>
-      {IS_PLATFORM && (
+      {showStats && (
         <>
           <TableCell className="lg:table-cell whitespace-nowrap">
             {isStatsPending ? (
