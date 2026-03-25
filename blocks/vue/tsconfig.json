@@ -1,27 +1,6 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "tsconfig/react-library.json",
   "compilerOptions": {
-    "composite": false,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "isolatedModules": true,
-    "moduleResolution": "bundler",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "noEmit": true,
-    "incremental": true,
-    "module": "esnext",
-    "resolveJsonModule": true,
-    "jsx": "preserve",
     "paths": {
       "@/*": ["./*"]
     }
