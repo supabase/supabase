@@ -63,6 +63,7 @@ overrides:
   '@redocly/respect-core>js-yaml': ^4.1.1
   '@rollup/plugin-terser>serialize-javascript': ^7.0.3
   cacache>tar: ^7.5.11
+  dompurify: ^3.3.2
   esbuild: ^0.25.2
   lodash: 'catalog:'
   lodash-es: 'catalog:'
