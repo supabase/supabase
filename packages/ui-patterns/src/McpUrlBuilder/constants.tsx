@@ -192,16 +192,6 @@ export const MCP_CLIENTS: McpClient[] = [
     },
     alternateInstructions: (config, onCopy) => (
       <div className="space-y-2">
-        <p className="text-xs text-foreground-light">
-          After adding the server, enable remote MCP client support by adding this to your{' '}
-          <code>~/.codex/config.toml</code>:
-        </p>
-        <CodeBlock
-          value={`[features]\nrmcp_client = true`}
-          focusable={false}
-          className="block"
-          onCopyCallback={() => onCopy('config')}
-        />
         <p className="text-xs text-foreground-light">Then authenticate:</p>
         <CodeBlock
           value="codex mcp login supabase"
