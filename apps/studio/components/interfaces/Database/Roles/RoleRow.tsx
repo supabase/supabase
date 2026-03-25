@@ -103,8 +103,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <Collapsible.Trigger asChild>
-        <div className="flex items-center gap-2 pr-4">
+      <div className="flex items-center gap-2 relative">
+        <Collapsible.Trigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
@@ -126,7 +126,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 <p className="text-left text-sm text-foreground-light">(ID: {role.id})</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className={cn('flex items-center space-x-4', !disabled && 'mr-12')}>
               {role.activeConnections > 0 && (
                 <div className="relative h-2 w-2">
                   <span className="flex h-2 w-2">
@@ -136,35 +136,36 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 </div>
               )}
               <p
-                className={`text-sm ${
+                className={cn(
+                  `text-sm`,
                   role.activeConnections > 0 ? 'text-foreground' : 'text-foreground-light'
-                }`}
+                )}
               >
                 {role.activeConnections} connections
               </p>
             </div>
           </button>
-          {!disabled && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" className="px-1" icon={<MoreVertical />} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" className="w-[120px]">
-                <DropdownMenuItem
-                  className="space-x-2"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onSelectDelete(role.id.toString())
-                  }}
-                >
-                  <Trash className="text-red-800" size="14" strokeWidth={2} />
-                  <p>Delete</p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
-      </Collapsible.Trigger>
+        </Collapsible.Trigger>
+        {!disabled && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" className="px-1 right-4" icon={<MoreVertical />} aria-label={`${role.name} actions`} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onSelectDelete(role.id.toString())
+                }}
+              >
+                <Trash className="text-red-800" size="14" strokeWidth={2} />
+                <p>Delete</p>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
       <Collapsible.Content>
         <Form_Shadcn_ {...form}>
           <form
