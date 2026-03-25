@@ -4,6 +4,9 @@ import type { Key } from 'react'
 import { TriggerEvent, useContextMenu } from 'react-contexify'
 import { RenderRowProps, Row } from 'react-data-grid'
 
+/**
+ * TODO: Refactor to use CellContextMenuWrapper instead of react-contexify
+ */
 export function RowRenderer(key: Key, props: RenderRowProps<SupaRow>) {
   const { show: showContextMenu } = useContextMenu()
 
