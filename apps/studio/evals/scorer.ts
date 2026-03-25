@@ -3,13 +3,10 @@ import { LLMClassifierFromTemplate } from 'autoevals'
 import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { extractUrls } from 'lib/helpers'
-import { extractIdentifiers } from 'lib/sql-identifier-quoting'
-import { isQuotedInSql, needsQuoting } from 'lib/sql-identifier-quoting'
-import { parse } from 'libpg-query'
 
-const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2-2025-12-11'
+const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
 
-type Input = {
+export type AssistantEvalInput = {
   prompt: string
   mockTables?: Record<
     string,
@@ -21,7 +18,7 @@ type Input = {
   >
 }
 
-type Output = {
+export type AssistantEvalOutput = {
   finishReason: FinishReason
   steps: Array<{ text: string; toolCalls: Array<{ toolName: string; input: unknown }> }>
   toolNames: string[]
@@ -50,12 +47,12 @@ export type AssistantEvalCaseMetadata = {
   description?: string
 }
 
-export type AssistantEvalCase = EvalCase<Input, Expected, AssistantEvalCaseMetadata>
+export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, AssistantEvalCaseMetadata>
 
 /**
  * Serialize steps into a string representation including text and tool calls
  */
-function serializeSteps(steps: Output['steps']): string {
+function serializeSteps(steps: AssistantEvalOutput['steps']): string {
   return steps
     .map((step) => {
       const toolCalls = step.toolCalls
@@ -69,17 +66,18 @@ function serializeSteps(steps: Output['steps']): string {
 /**
  * Extract only the text content from steps, filtering out empty text
  */
-function extractTextOnly(steps: Output['steps']): string {
+function extractTextOnly(steps: AssistantEvalOutput['steps']): string {
   return steps
     .map((step) => step.text)
     .filter((text) => text && text.trim().length > 0)
     .join('\n')
 }
 
-export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
-  output,
-  expected,
-}) => {
+export const toolUsageScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output, expected }) => {
   if (!expected.requiredTools) return null
 
   const presentCount = expected.requiredTools.filter((tool) =>
@@ -91,31 +89,6 @@ export const toolUsageScorer: EvalScorer<Input, Output, Expected> = async ({
   return {
     name: 'Tool Usage',
     score: ratio,
-  }
-}
-
-export const sqlSyntaxScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
-  if (output.sqlQueries === undefined || output.sqlQueries.length === 0) {
-    return null
-  }
-
-  const errors: string[] = []
-  let validQueries = 0
-
-  for (const sql of output.sqlQueries) {
-    try {
-      await parse(sql)
-      validQueries++
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      errors.push(`SQL syntax error: ${errorMessage}`)
-    }
-  }
-
-  return {
-    name: 'SQL Validity',
-    score: validQueries / output.sqlQueries.length,
-    metadata: errors.length > 0 ? { errors } : undefined,
   }
 }
 
@@ -137,10 +110,14 @@ const concisenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const concisenessScorer: EvalScorer<Input, Output, Expected> = async ({ input, output }) => {
+export const concisenessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output }) => {
   return await concisenessEvaluator({
     input: input.prompt,
-    output: serializeSteps(output.steps),
+    output: extractTextOnly(output.steps),
   })
 }
 
@@ -161,10 +138,11 @@ const completenessEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const completenessScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-}) => {
+export const completenessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output }) => {
   return await completenessEvaluator({
     input: input.prompt,
     output: serializeSteps(output.steps),
@@ -189,10 +167,11 @@ const goalCompletionEvaluator = LLMClassifierFromTemplate<{ input: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const goalCompletionScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-}) => {
+export const goalCompletionScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output }) => {
   return await goalCompletionEvaluator({
     input: input.prompt,
     output: serializeSteps(output.steps),
@@ -220,7 +199,11 @@ const docsFaithfulnessEvaluator = LLMClassifierFromTemplate<{ docs: string }>({
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const docsFaithfulnessScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+export const docsFaithfulnessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output }) => {
   // Skip scoring if no docs were retrieved
   if (!output.docs || output.docs.length === 0) {
     return null
@@ -261,11 +244,11 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
   model: LLM_AS_A_JUDGE_MODEL,
 })
 
-export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-  expected,
-}) => {
+export const correctnessScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ input, output, expected }) => {
   // Skip scoring if no ground truth is provided
   if (!expected.correctAnswer) {
     return null
@@ -278,77 +261,44 @@ export const correctnessScorer: EvalScorer<Input, Output, Expected> = async ({
   })
 }
 
-export const sqlIdentifierQuotingScorer: EvalScorer<Input, Output, Expected> = async ({
-  input,
-  output,
-}) => {
-  // Skip if no SQL queries
-  if (!output.sqlQueries?.length) {
-    return null
-  }
-
-  const errors: string[] = []
-  let totalNeedingQuotes = 0
-  let properlyQuoted = 0
-
-  for (const sql of output.sqlQueries) {
-    try {
-      const ast = await parse(sql)
-      const identifiers = extractIdentifiers(ast)
-
-      for (const identifier of identifiers) {
-        if (needsQuoting(identifier)) {
-          totalNeedingQuotes++
-          if (isQuotedInSql(sql, identifier)) {
-            properlyQuoted++
-          } else {
-            const sqlPreview = sql.length > 100 ? `${sql.substring(0, 100)}...` : sql
-            errors.push(
-              `Identifier "${identifier}" needs quoting but is not quoted in: ${sqlPreview}`
-            )
-          }
-        }
-      }
-    } catch (error) {
-      // Skip invalid SQL - already handled by sqlSyntaxScorer
-      continue
-    }
-  }
-
-  const score = totalNeedingQuotes === 0 ? 1 : properlyQuoted / totalNeedingQuotes
-
-  return {
-    name: 'SQL Identifier Quoting',
-    score,
-    metadata: errors.length > 0 ? { errors } : undefined,
-  }
-}
-
-export const urlValidityScorer: EvalScorer<Input, Output, Expected> = async ({ output }) => {
+export const urlValidityScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output }) => {
   const responseText = extractTextOnly(output.steps)
-  const urls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+  const allUrls = extractUrls(responseText, { excludeCodeBlocks: true, excludeTemplates: true })
+  const urls = allUrls.filter((url) => {
+    try {
+      const { hostname } = new URL(url)
+      return hostname === 'supabase.com' || hostname.endsWith('.supabase.com')
+    } catch {
+      return false
+    }
+  })
 
   // Skip if no URLs found
   if (urls.length === 0) {
     return null
   }
 
-  const errors: string[] = []
-  let validUrls = 0
-
-  for (const url of urls) {
-    try {
-      const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
-      if (response.ok) {
-        validUrls++
-      } else {
-        errors.push(`${url} returned ${response.status}`)
+  const results = await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(5000) })
+        if (response.ok) {
+          return { valid: true }
+        }
+        return { valid: false, error: `${url} returned ${response.status}` }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        return { valid: false, error: `${url} failed: ${errorMessage}` }
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      errors.push(`${url} failed: ${errorMessage}`)
-    }
-  }
+    })
+  )
+
+  const errors = results.flatMap((r) => (r.error ? [r.error] : []))
+  const validUrls = results.filter((r) => r.valid).length
 
   const metadata = {
     urls,

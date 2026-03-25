@@ -5,11 +5,10 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { noop } from 'lodash'
 import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +18,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
+
 import type { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
@@ -38,6 +38,7 @@ interface InputWithSuggestionsProps {
   onChange: (event: any) => void
   onSelectSuggestion: (suggestion: Suggestion) => void
   'data-testid'?: string
+  'aria-label'?: string
 }
 
 const InputWithSuggestions = ({
@@ -55,6 +56,7 @@ const InputWithSuggestions = ({
   onChange = noop,
   onSelectSuggestion = noop,
   'data-testid': dataTestId,
+  'aria-label': ariaLabel,
 }: InputWithSuggestionsProps) => {
   const ref = useRef(null)
   const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(suggestions)
@@ -83,6 +85,7 @@ const InputWithSuggestions = ({
     <div ref={ref} className="relative">
       <Input
         label={label}
+        aria-label={ariaLabel}
         descriptionText={description}
         placeholder={placeholder}
         size={size}
@@ -92,6 +95,7 @@ const InputWithSuggestions = ({
         inputClassName="pr-10"
         type="text"
         value={value}
+        title={value}
         onChange={onInputChange}
         data-testid={dataTestId}
         actions={

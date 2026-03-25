@@ -40,6 +40,7 @@ import {
   NavMenu,
   NavMenuItem,
 } from 'ui'
+import { useIsPgDeltaDiffEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const MergePage: NextPageWithLayout = () => {
@@ -47,6 +48,7 @@ const MergePage: NextPageWithLayout = () => {
   const { ref, workflow_run_id: currentWorkflowRunId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<'SUCCESS' | 'FAILED' | null>(null)
@@ -297,6 +299,7 @@ const MergePage: NextPageWithLayout = () => {
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
+      pgdelta: pgDeltaDiffEnabled,
     })
   }
 
@@ -483,7 +486,7 @@ const MergePage: NextPageWithLayout = () => {
       breadcrumbs={breadcrumbs}
       primaryActions={primaryActions}
       size="full"
-      className="border-b-0 pb-0"
+      className="h-full border-b-0 pb-0"
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
@@ -570,18 +573,20 @@ const MergePage: NextPageWithLayout = () => {
           </NavMenu>
         </ScaffoldContainer>
       </div>
-      <ScaffoldContainer size="full" className="pt-6 pb-12">
-        {currentTab === 'database' ? (
-          <DatabaseDiffPanel
-            diffContent={diffContent}
-            isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
-            error={diffError}
-            showRefreshButton={true}
-            currentBranchRef={ref}
-          />
-        ) : (
-          <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
-        )}
+      <ScaffoldContainer size="full" className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
+        <div className="flex min-h-0 flex-1 flex-col">
+          {currentTab === 'database' ? (
+            <DatabaseDiffPanel
+              diffContent={diffContent}
+              isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
+              error={diffError}
+              showRefreshButton={true}
+              currentBranchRef={ref}
+            />
+          ) : (
+            <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
+          )}
+        </div>
       </ScaffoldContainer>
 
       <ConfirmationModal

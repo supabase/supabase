@@ -64,6 +64,7 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     restriction_status: null,
     restriction_data: null,
     organization_missing_address: false,
+    organization_missing_tax_id: false,
   }
 
   return Object.assign(base, details)

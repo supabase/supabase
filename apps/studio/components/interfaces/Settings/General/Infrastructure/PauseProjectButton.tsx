@@ -4,17 +4,15 @@ import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsK8sCloudProvider,
-  useIsProjectActive,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 const PauseProjectButton = () => {
   const router = useRouter()
@@ -32,10 +30,12 @@ const PauseProjectButton = () => {
     'queue_jobs.projects.pause'
   )
 
-  const isAwsK8s = useIsAwsK8sCloudProvider()
   const isFreePlan = organization?.plan.id === 'free'
   const isBranch = Boolean(project?.parent_project_ref)
-  const isPaidAndNotAwsK8s = !isBranch && !isFreePlan && !isAwsK8s
+  const { hasAccess: projectPausingAllowedInOrg } = useCheckEntitlements(
+    'project_pausing',
+    organization?.slug
+  )
 
   const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
@@ -53,7 +53,12 @@ const PauseProjectButton = () => {
   }
 
   const buttonDisabled =
-    isPaidAndNotAwsK8s || project === undefined || isPaused || !canPauseProject || !isProjectActive
+    isBranch ||
+    !projectPausingAllowedInOrg ||
+    project === undefined ||
+    isPaused ||
+    !canPauseProject ||
+    !isProjectActive
 
   return (
     <>
@@ -72,9 +77,11 @@ const PauseProjectButton = () => {
                 ? 'You need additional permissions to pause this project'
                 : !isProjectActive
                   ? 'Unable to pause project as project is not active'
-                  : isPaidAndNotAwsK8s
-                    ? 'Projects on a paid plan will always be running'
-                    : undefined,
+                  : isBranch
+                    ? 'Branch projects cannot be paused'
+                    : !projectPausingAllowedInOrg && !isFreePlan
+                      ? 'Projects on a paid plan will always be running'
+                      : undefined,
           },
         }}
       >

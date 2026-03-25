@@ -98,7 +98,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
   const PLACEHOLDER_QUERY = IS_PLATFORM
-    ? logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY
+    ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
     : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
@@ -378,10 +378,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
         className="w-full h-full max-h-screen"
-        direction="vertical"
+        orientation="vertical"
         autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
-        <ResizablePanel collapsible minSize={5}>
+        <ResizablePanel collapsible minSize="5">
           <LogsQueryPanel
             value={datePickerValue}
             onDateChange={handleDateChange}
@@ -401,7 +401,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           />
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel collapsible minSize={5} className="overflow-auto">
+        <ResizablePanel collapsible minSize="5" className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
               isSaving={isUpsertingContent}
@@ -414,6 +414,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               projectRef={projectRef}
               onSelectedLogChange={setSelectedLog}
               selectedLog={selectedLog || undefined}
+              sqlQuery={editorValue}
             />
 
             <div className="flex flex-row justify-end mt-2">
@@ -475,7 +476,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
 LogsExplorerPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Explorer">{page}</LogsLayout>
   </DefaultLayout>
 )
 

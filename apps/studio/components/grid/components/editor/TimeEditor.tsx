@@ -1,7 +1,7 @@
-import * as React from 'react'
-import type { RenderEditCellProps } from 'react-data-grid'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import * as React from 'react'
+import type { RenderEditCellProps } from 'react-data-grid'
 
 dayjs.extend(customParseFormat)
 
@@ -10,8 +10,10 @@ function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.select()
 }
 
-interface TimeEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface TimeEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   format: string
 }
 
@@ -29,15 +31,18 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   onClose,
 }: TimeEditorProps<TRow, TSummaryRow>) {
   const value = row[column.key as keyof TRow] as unknown as string
-  const timeValue = value ? dayjs(value, format).format(INPUT_TIME_FORMAT) : value
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     const _value = event.target.value
+
     if (_value == '') {
       onRowChange({ ...row, [column.key]: null })
     } else {
-      const _timeValue = dayjs(_value, INPUT_TIME_FORMAT).format(format)
-      onRowChange({ ...row, [column.key]: _timeValue })
+      const dayJsValue = dayjs(_value, format)
+      if (dayJsValue.isValid()) {
+        const _timeValue = dayJsValue.format(format)
+        onRowChange({ ...row, [column.key]: _timeValue })
+      }
     }
   }
 
@@ -45,7 +50,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
     <input
       className="sb-grid-time-editor"
       ref={autoFocusAndSelect}
-      value={timeValue ?? ''}
+      defaultValue={value ?? ''}
       onChange={onChange}
       onBlur={() => onClose(true)}
       type="time"

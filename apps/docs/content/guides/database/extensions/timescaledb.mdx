@@ -8,6 +8,10 @@ description: 'Scalable time-series data storage and analysis'
 
 The `timescaledb` extension is deprecated in projects using Postgres 17. It continues to be supported in projects using Postgres 15, but will need to dropped before those projects are upgraded to Postgres 17. See the [Upgrading to Postgres 17 notes](/docs/guides/platform/upgrading#upgrading-to-postgres-17) for more information.
 
+If you are using hypertables, follow the [migration guide](/docs/guides/database/migrating-to-pg-partman) to convert to native partitioning managed by `pg_partman`.
+
+For additional support, contact our Success team by creating a support ticket in the Supabase Dashboard.
+
 </Admonition>
 
 [`timescaledb`](https://docs.timescale.com/timescaledb/latest/) is a Postgres extension designed for improved handling of time-series data. It provides a scalable, high-performance solution for storing and querying time-series data on top of a standard Postgres database.

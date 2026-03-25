@@ -1,5 +1,3 @@
-
-
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'

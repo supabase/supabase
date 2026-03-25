@@ -3,13 +3,19 @@ import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { TableCell, TableRow, copyToClipboard } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { useMemo, useState, type MouseEvent } from 'react'
+import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
+import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
-import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
+import { formatErrorRate } from './EdgeFunctionsListItem.utils'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useEdgeFunctionsLastHourStatsQuery } from '@/data/edge-functions/edge-functions-last-hour-stats-query'
+import {
+  useEdgeFunctionsQuery,
+  type EdgeFunctionsResponse,
+} from '@/data/edge-functions/edge-functions-query'
+import { normalizeFunctionIds } from '@/data/edge-functions/keys'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
@@ -21,20 +27,34 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
-  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
+  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionUrl =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${item.slug}`
-      : `${protocol}://${endpoint}/functions/v1/${item.slug}`
+  const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
+  const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
     `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
     router
   )
+
+  const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
+  const functionIds = useMemo(() => {
+    if (!showLastHourStats || !functions) return []
+    return normalizeFunctionIds(functions.map((item) => item.id))
+  }, [functions, showLastHourStats])
+
+  // [Joshen] We may be paginating the edge functions query in the future
+  // So this will eventually need to be a list of visibleFunctionIds instead + debounced
+  const {
+    data: lastHourStatsAll,
+    isPending: isStatsPending,
+    isError: isStatsError,
+  } = useEdgeFunctionsLastHourStatsQuery(
+    { projectRef: ref, functionIds },
+    { enabled: showLastHourStats }
+  )
+  const lastHourStats = lastHourStatsAll?.[item.id]
 
   return (
     <TableRow
@@ -56,8 +76,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           <button
             type="button"
             className="text-foreground-lighter hover:text-foreground transition"
-            onClick={(event: any) => {
-              function onCopy(value: any) {
+            onClick={(event: MouseEvent<HTMLButtonElement>) => {
+              function onCopy(value: string) {
                 setIsCopied(true)
                 copyToClipboard(value)
                 setTimeout(() => setIsCopied(false), 3000)
@@ -81,9 +101,11 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
         </div>
       </TableCell>
       <TableCell className="hidden 2xl:table-cell whitespace-nowrap">
-        <p className="text-foreground-light">
-          {dayjs(item.created_at).format('DD MMM, YYYY HH:mm')}
-        </p>
+        <TimestampInfo
+          className="text-sm text-foreground-light whitespace-nowrap"
+          utcTimestamp={item.created_at}
+          label={dayjs(item.created_at).fromNow()}
+        />
       </TableCell>
       <TableCell className="lg:table-cell">
         <TimestampInfo
@@ -92,7 +114,48 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           label={dayjs(item.updated_at).fromNow()}
         />
       </TableCell>
-      <TableCell className="lg:table-cell">
+      {showLastHourStats && (
+        <>
+          <TableCell className="lg:table-cell whitespace-nowrap">
+            {isStatsPending ? (
+              <ShimmeringLoader className="w-12" />
+            ) : isStatsError ? (
+              <p className="text-foreground-lighter" title="Failed to load stats">
+                -
+              </p>
+            ) : (
+              <p className="text-foreground-light">
+                {lastHourStats !== undefined ? lastHourStats.requestsCount.toLocaleString() : '-'}
+              </p>
+            )}
+          </TableCell>
+          <TableCell className="lg:table-cell whitespace-nowrap">
+            {isStatsPending ? (
+              <ShimmeringLoader className="w-12" />
+            ) : isStatsError ? (
+              <p className="text-foreground-lighter" title="Failed to load stats">
+                -
+              </p>
+            ) : lastHourStats !== undefined ? (
+              <span
+                className={cn(
+                  'text-sm',
+                  lastHourStats.errorRate >= 1
+                    ? 'text-destructive'
+                    : lastHourStats.errorRate > 0.1
+                      ? 'text-warning'
+                      : 'text-foreground-light'
+                )}
+              >
+                {formatErrorRate(lastHourStats.errorRate)}
+              </span>
+            ) : (
+              <p className="text-foreground-lighter">-</p>
+            )}
+          </TableCell>
+        </>
+      )}
+      <TableCell className="hidden 2xl:table-cell">
         <p className="text-foreground-light">{item.version}</p>
         <button tabIndex={-1} className="sr-only">
           Go to function details
