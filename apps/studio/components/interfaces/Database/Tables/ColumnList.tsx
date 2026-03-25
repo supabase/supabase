@@ -240,7 +240,7 @@ export const ColumnList = ({
                                     onClick={() => onDeleteColumn(column)}
                                     className="space-x-2"
                                   >
-                                    <Trash stroke="red" size={12} />
+                                    <Trash size={12} />
                                     <p>Delete column</p>
                                   </DropdownMenuItem>
                                 </TooltipTrigger>
