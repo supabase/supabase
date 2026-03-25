@@ -32,6 +32,7 @@ describe('getEdgeFunctionsLastHourStats', () => {
     expect(post).toHaveBeenCalledWith('/platform/projects/{ref}/analytics/endpoints/logs.all', {
       params: {
         path: { ref: 'project-ref' },
+        query: { key: 'last-hour-stats' },
       },
       body: expect.objectContaining({
         sql: expect.stringContaining(`and function_id in ('fn_1', 'fn_2')`),
