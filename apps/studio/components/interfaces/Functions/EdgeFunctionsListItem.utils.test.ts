@@ -16,6 +16,7 @@ describe('formatErrorRate', () => {
     { value: 1.567, expected: '1.6%' },
     { value: 50, expected: '50.0%' },
     { value: 99.9, expected: '99.9%' },
+    { value: 99.99, expected: '100%' },
     { value: 1.55, expected: '1.6%' },
     { value: 1.54, expected: '1.5%' },
   ])('formats $value as $expected', ({ value, expected }) => {

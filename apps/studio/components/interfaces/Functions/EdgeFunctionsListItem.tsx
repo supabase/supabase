@@ -3,35 +3,32 @@ import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { type MouseEvent, useState } from 'react'
+import { useMemo, useState, type MouseEvent } from 'react'
 import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
 import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import type { EdgeFunctionsResponse } from '@/data/edge-functions/edge-functions-query'
-import type { EdgeFunctionLastHourStats } from '@/data/edge-functions/edge-functions-last-hour-stats-query'
-import { createNavigationHandler } from '@/lib/navigation'
-
 import { formatErrorRate } from './EdgeFunctionsListItem.utils'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useEdgeFunctionsLastHourStatsQuery } from '@/data/edge-functions/edge-functions-last-hour-stats-query'
+import {
+  useEdgeFunctionsQuery,
+  type EdgeFunctionsResponse,
+} from '@/data/edge-functions/edge-functions-query'
+import { normalizeFunctionIds } from '@/data/edge-functions/keys'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { createNavigationHandler } from '@/lib/navigation'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
-  lastHourStats?: EdgeFunctionLastHourStats
-  isStatsPending?: boolean
-  isStatsError?: boolean
-  showStats?: boolean
 }
 
-export const EdgeFunctionsListItem = ({
-  function: item,
-  lastHourStats,
-  isStatsPending = false,
-  isStatsError = false,
-  showStats = IS_PLATFORM,
-}: EdgeFunctionsListItemProps) => {
+export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
+
+  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
 
   const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`
@@ -40,6 +37,24 @@ export const EdgeFunctionsListItem = ({
     `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/details`}`,
     router
   )
+
+  const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
+  const functionIds = useMemo(() => {
+    if (!showLastHourStats || !functions) return []
+    return normalizeFunctionIds(functions.map((item) => item.id))
+  }, [functions, showLastHourStats])
+
+  // [Joshen] We may be paginating the edge functions query in the future
+  // So this will eventually need to be a list of visibleFunctionIds instead + debounced
+  const {
+    data: lastHourStatsAll,
+    isPending: isStatsPending,
+    isError: isStatsError,
+  } = useEdgeFunctionsLastHourStatsQuery(
+    { projectRef: ref, functionIds },
+    { enabled: showLastHourStats }
+  )
+  const lastHourStats = lastHourStatsAll?.[item.id]
 
   return (
     <TableRow
@@ -99,7 +114,7 @@ export const EdgeFunctionsListItem = ({
           label={dayjs(item.updated_at).fromNow()}
         />
       </TableCell>
-      {showStats && (
+      {showLastHourStats && (
         <>
           <TableCell className="lg:table-cell whitespace-nowrap">
             {isStatsPending ? (

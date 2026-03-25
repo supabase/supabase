@@ -17,9 +17,7 @@ import DefaultLayout from 'components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
-import { useEdgeFunctionsLastHourStatsQuery } from 'data/edge-functions/edge-functions-last-hour-stats-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { normalizeFunctionIds } from 'data/edge-functions/keys'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { ExternalLink, Search, X } from 'lucide-react'
@@ -83,20 +81,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
       return 0
     })
   }, [functions, search, sort])
-
-  const functionIds = useMemo(() => {
-    if (!showLastHourStats || !functions) return []
-    return normalizeFunctionIds(functions.map((item) => item.id))
-  }, [functions, showLastHourStats])
-
-  const {
-    data: lastHourStats,
-    isPending: isStatsPending,
-    isError: isStatsError,
-  } = useEdgeFunctionsLastHourStatsQuery(
-    { projectRef: ref, functionIds },
-    { enabled: showLastHourStats }
-  )
 
   const hasFunctions = (functions ?? []).length > 0
 
@@ -176,14 +160,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                           <>
                             {filteredFunctions.length > 0 ? (
                               filteredFunctions.map((item) => (
-                                <EdgeFunctionsListItem
-                                  key={item.id}
-                                  function={item}
-                                  lastHourStats={lastHourStats?.[item.id]}
-                                  isStatsPending={showLastHourStats && isStatsPending}
-                                  isStatsError={showLastHourStats && isStatsError}
-                                  showStats={showLastHourStats}
-                                />
+                                <EdgeFunctionsListItem key={item.id} function={item} />
                               ))
                             ) : (
                               <TableRow>
