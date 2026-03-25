@@ -108,7 +108,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         'last:rounded-bl last:rounded-br'
       )}
     >
-      <div className={cn("flex items-center relative", !disabled && "pr-[--card-padding-x]")}>
+      <div className={cn('flex items-center relative', !disabled && 'pr-[--card-padding-x]')}>
         <Collapsible.Trigger asChild>
           <button
             id={`collapsible-trigger-${role.id}`}
