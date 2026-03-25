@@ -1,7 +1,7 @@
 import matter from 'gray-matter'
 import { cache } from 'react'
 
-import { getGitHubFileContents, octokit } from '~/lib/octokit'
+import { OCTOKIT_RETRY_OPTIONS, getGitHubFileContents, octokit } from '~/lib/octokit'
 
 const SKILLS_REPO = {
   org: 'supabase',
@@ -28,6 +28,7 @@ async function getAiSkillsImpl(): Promise<SkillSummary[]> {
     repo: SKILLS_REPO.repo,
     path: SKILLS_REPO.path,
     ref: SKILLS_REPO.branch,
+    request: OCTOKIT_RETRY_OPTIONS,
   })
 
   if (!Array.isArray(contents)) {
