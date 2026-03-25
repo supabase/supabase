@@ -68,6 +68,7 @@ overrides:
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   payload>undici: ^7.18.2
+  'pgsql-parser>libpg-query': ^15.2.0
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   'terser-webpack-plugin>serialize-javascript': ^7.0.3
