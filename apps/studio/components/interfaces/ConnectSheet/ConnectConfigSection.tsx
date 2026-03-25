@@ -44,8 +44,6 @@ export function ConnectConfigSection({
 }: ConnectConfigSectionProps) {
   if (activeFields.length === 0) return null
 
-  const formLayoutClassName = 'md:[&>div:first-child]:!w-1/3 xl:[&>div:first-child]:!w-2/5'
-
   return (
     <div className="flex flex-col gap-y-4">
       {activeFields.map((field) => {

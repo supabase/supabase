@@ -119,6 +119,12 @@ export const useIsPlatformWebhooksEnabled = () => {
   return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
 }
 
+export const useIsJitDbAccessEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
+  return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
+}
+
 export const useIsTableFilterBarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]

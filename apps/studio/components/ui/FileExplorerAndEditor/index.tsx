@@ -1,25 +1,12 @@
+import { IS_PLATFORM } from 'common'
 import { AIEditor } from 'components/ui/AIEditor'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Edit, File, Plus, Trash } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Plus } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
-  ContextMenu_Shadcn_,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TreeView,
-  TreeViewItem,
-  cn,
-  flattenTree,
-} from 'ui'
+import { Button, cn, flattenTree, INodeRendererProps, TreeView } from 'ui'
 
-import { FileAction, type FileData, TreeChildData } from './FileExplorerAndEditor.types'
+import { FileAction, TreeChildData, type FileData } from './FileExplorerAndEditor.types'
 import {
   extractZipFile,
   getFileAction,
@@ -27,7 +14,7 @@ import {
   isBinaryFile,
   isZipFile,
 } from './FileExplorerAndEditor.utils'
-import { IS_PLATFORM } from 'common'
+import { FileExplorerAndEditorRow } from './FileExplorerAndEditorRow'
 
 interface FileExplorerAndEditorProps {
   files: FileData[]
@@ -219,23 +206,26 @@ export const FileExplorerAndEditor = ({
     }
   }
 
-  const handleStartRename = (id: number) => {
-    // Force re-render of the TreeView with the updated metadata
-    setTreeData({
-      name: '',
-      children: files.map((file) => ({
-        id: file.id.toString(),
-        name: file.name,
-        metadata: {
-          isEditing: file.id === id,
-          originalId: file.id,
-          state: file.state,
-        },
-      })),
-    })
-  }
+  const handleStartRename = useCallback(
+    (id: number) => {
+      // Force re-render of the TreeView with the updated metadata
+      setTreeData({
+        name: '',
+        children: files.map((file) => ({
+          id: file.id.toString(),
+          name: file.name,
+          metadata: {
+            isEditing: file.id === id,
+            originalId: file.id,
+            state: file.state,
+          },
+        })),
+      })
+    },
+    [files]
+  )
 
-  const exitEditMode = () => {
+  const exitEditMode = useCallback(() => {
     // Force re-render of the TreeView with the updated metadata
     setTreeData({
       name: '',
@@ -249,56 +239,62 @@ export const FileExplorerAndEditor = ({
         },
       })),
     })
-  }
+  }, [files])
 
-  const handleFileNameChange = (id: number, newName: string) => {
-    // Don't allow empty names
-    if (!newName.trim()) {
-      toast.error('File name cannot be empty')
-      return exitEditMode()
-    }
+  const handleFileNameChange = useCallback(
+    (id: number, newName: string) => {
+      // Don't allow empty names
+      if (!newName.trim()) {
+        toast.error('File name cannot be empty')
+        return exitEditMode()
+      }
 
-    // Check if the new name already exists in other files
-    const isDuplicate = files.some((file) => file.id !== id && file.name === newName)
-    if (isDuplicate) {
-      toast.error(
-        `The name ${newName} already exists in the current directory. Please use a different name.`
-      )
-      return exitEditMode()
-    }
+      // Check if the new name already exists in other files
+      const isDuplicate = files.some((file) => file.id !== id && file.name === newName)
+      if (isDuplicate) {
+        toast.error(
+          `The name ${newName} already exists in the current directory. Please use a different name.`
+        )
+        return exitEditMode()
+      }
 
-    const updatedFiles = files.map((file) => {
-      return file.id === id
-        ? {
-            ...file,
-            name: newName,
-            content:
-              newName === 'deno.json' && file.content === ''
-                ? denoJsonDefaultContent
-                : file.content,
-          }
-        : file
-    })
-    onFilesChange(updatedFiles)
-  }
+      const updatedFiles = files.map((file) => {
+        return file.id === id
+          ? {
+              ...file,
+              name: newName,
+              content:
+                newName === 'deno.json' && file.content === ''
+                  ? denoJsonDefaultContent
+                  : file.content,
+            }
+          : file
+      })
+      onFilesChange(updatedFiles)
+    },
+    [files, onFilesChange, exitEditMode]
+  )
 
-  const handleFileDelete = (id: number) => {
-    if (files.length <= 1) {
-      // Don't allow deleting the last file
-      return
-    }
+  const handleFileDelete = useCallback(
+    (id: number) => {
+      if (files.length <= 1) {
+        // Don't allow deleting the last file
+        return
+      }
 
-    const fileToDelete = files.find((f) => f.id === id)
-    const isSelected = fileToDelete?.id === selectedFileId
-    const updatedFiles = files.filter((file) => file.id !== id)
+      const fileToDelete = files.find((f) => f.id === id)
+      const isSelected = fileToDelete?.id === selectedFileId
+      const updatedFiles = files.filter((file) => file.id !== id)
 
-    // If the deleted file was selected, select another file
-    if (isSelected && updatedFiles.length > 0) {
-      setSelectedFileId(updatedFiles[0].id)
-    }
+      // If the deleted file was selected, select another file
+      if (isSelected && updatedFiles.length > 0) {
+        setSelectedFileId(updatedFiles[0].id)
+      }
 
-    onFilesChange(updatedFiles)
-  }
+      onFilesChange(updatedFiles)
+    },
+    [files, selectedFileId, setSelectedFileId, onFilesChange]
+  )
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -336,11 +332,37 @@ export const FileExplorerAndEditor = ({
     })
 
     if (!selectedFileId && files.length > 0) setSelectedFileId(files[0].id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files])
+
+  const renderNode = useCallback(
+    (props: INodeRendererProps) => (
+      <FileExplorerAndEditorRow
+        {...props}
+        files={files}
+        selectedFileId={selectedFileId}
+        setSelectedFileId={setSelectedFileId}
+        handleFileNameChange={handleFileNameChange}
+        handleStartRename={handleStartRename}
+        handleFileDelete={handleFileDelete}
+      />
+    ),
+    [
+      files,
+      selectedFileId,
+      setSelectedFileId,
+      handleFileNameChange,
+      handleStartRename,
+      handleFileDelete,
+    ]
+  )
 
   return (
     <div
-      className={`flex-1 overflow-hidden flex h-full relative ${isDragOver ? 'bg-blue-50' : ''}`}
+      className={cn(
+        'flex-1 overflow-hidden flex h-full relative gap-x-3 bg-surface-100',
+        isDragOver && 'bg-blue-50'
+      )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -369,7 +391,8 @@ export const FileExplorerAndEditor = ({
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="w-64 border-r bg-surface-200 flex flex-col">
+
+      <div className="min-w-64 w-64 border-r bg-surface-200 flex flex-col">
         <div className="py-4 px-6 border-b flex items-center justify-between">
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
             Files
@@ -384,109 +407,12 @@ export const FileExplorerAndEditor = ({
           <TreeView
             data={flattenTree(treeData)}
             aria-label="files tree"
-            nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level }) => {
-              const nodeProps = getNodeProps()
-              const originalId =
-                typeof element.metadata?.originalId === 'number'
-                  ? element.metadata.originalId
-                  : null
-              const state = element.metadata?.state as FileData['state']
-              const isEditing = Boolean(element.metadata?.isEditing)
-
-              return (
-                <ContextMenu_Shadcn_ modal={false}>
-                  <ContextMenuTrigger_Shadcn_ asChild>
-                    <div>
-                      <TreeViewItem
-                        {...nodeProps}
-                        isExpanded={isExpanded}
-                        isBranch={isBranch}
-                        isSelected={files.find((f) => f.id === originalId)?.id === selectedFileId}
-                        level={level}
-                        xPadding={16}
-                        name={element.name}
-                        className={cn(
-                          isEditing
-                            ? ''
-                            : state === 'new'
-                              ? 'text-brand-600'
-                              : state === 'modified'
-                                ? 'text-code_block-2'
-                                : ''
-                        )}
-                        icon={<File size={14} className="text-foreground-light shrink-0" />}
-                        isEditing={isEditing}
-                        onEditSubmit={(value) => {
-                          if (IS_PLATFORM && originalId !== null) {
-                            handleFileNameChange(originalId, value)
-                          }
-                        }}
-                        onClick={() => {
-                          if (originalId !== null && !isEditing) {
-                            setSelectedFileId(originalId)
-                          }
-                        }}
-                        onDoubleClick={() => {
-                          if (IS_PLATFORM && originalId !== null) {
-                            handleStartRename(originalId)
-                          }
-                        }}
-                        actions={
-                          state !== 'unchanged' && (
-                            <div className="flex items-center justify-center w-3">
-                              <Tooltip>
-                                <TooltipTrigger className="text-xs">
-                                  {state === 'new' ? 'U' : 'M'}
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom">
-                                  {state === 'new' ? 'Unsaved' : 'Modified'}
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          )
-                        }
-                      />
-                    </div>
-                  </ContextMenuTrigger_Shadcn_>
-                  {IS_PLATFORM && (
-                    <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
-                      <ContextMenuItem_Shadcn_
-                        className="gap-x-2"
-                        onSelect={() => {
-                          if (originalId !== null) handleStartRename(originalId)
-                        }}
-                        onFocusCapture={(e) => e.stopPropagation()}
-                      >
-                        <Edit size={14} />
-                        Rename file
-                      </ContextMenuItem_Shadcn_>
-
-                      {files.length > 1 && (
-                        <>
-                          <ContextMenuSeparator_Shadcn_ />
-                          <ContextMenuItem_Shadcn_
-                            className="gap-x-2"
-                            onSelect={() => {
-                              if (originalId !== null) {
-                                handleFileDelete(originalId)
-                              }
-                            }}
-                            onFocusCapture={(e) => e.stopPropagation()}
-                          >
-                            <Trash size={14} />
-                            Delete file
-                          </ContextMenuItem_Shadcn_>
-                        </>
-                      )}
-                    </ContextMenuContent_Shadcn_>
-                  )}
-                </ContextMenu_Shadcn_>
-              )
-            }}
+            nodeRenderer={renderNode}
           />
         </div>
       </div>
-      <div className="flex-1 min-h-0 relative px-3 bg-surface-200">
+
+      <div className="flex-grow min-w-0">
         {selectedFile && isBinaryFile(selectedFile.name) ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">

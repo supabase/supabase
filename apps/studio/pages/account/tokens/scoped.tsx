@@ -68,6 +68,16 @@ const ScopedTokens: NextPageWithLayout = () => {
             if (id === newToken?.id) setNewToken(undefined)
           }}
         />
+
+        <p className="text-sm text-foreground-muted text-center mt-6">
+          Looking for Private Apps?{' '}
+          <a
+            href="/org"
+            className="text-foreground-light underline hover:text-foreground transition-colors"
+          >
+            Go to Organization Settings → Connections → Private Apps
+          </a>
+        </p>
       </div>
     </AccessTokensLayout>
   )

@@ -1,6 +1,5 @@
 import { Plus, Trash } from 'lucide-react'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
-
+import { useFieldArray, UseFormReturn } from 'react-hook-form'
 import {
   Button,
   FormControl_Shadcn_,
@@ -10,6 +9,7 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import type { SSOConfigFormSchema } from './SSOConfig'
 
 type ProviderAttribute = 'emailMapping' | 'userNameMapping' | 'firstNameMapping' | 'lastNameMapping'
@@ -119,7 +119,7 @@ export const AttributeMapping = ({
           <p>Map SSO attributes to user fields</p>
           <div className="flex flex-col gap-y-2 my-2 mt-4">
             <p>Presets for supported identity providers:</p>
-            <div className="flex items-center gap-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               {PROVIDER_PRESETS.map((preset) => (
                 <Button key={preset.name} type="outline" onClick={() => applyPreset(preset)}>
                   {preset.name}
@@ -131,7 +131,7 @@ export const AttributeMapping = ({
       }
       className="gap-1"
     >
-      <div className="grid gap-2 justify-start">
+      <div className="grid w-full max-w-sm min-w-0 gap-3">
         <MappingFieldArray form={form} fieldName={emailField} label="email" required />
         <MappingFieldArray
           form={form}
@@ -175,20 +175,25 @@ const MappingFieldArray = ({
   })
 
   return (
-    <div className="w-96 space-y-1">
-      <div className="flex justify-between items-center">
+    <div className="w-full min-w-0 space-y-1">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-foreground-light">{label}</span>
-        {required ? <></> : <span className="text-foreground-muted">Optional</span>}
+        {!required ? <span className="text-foreground-muted">Optional</span> : null}
       </div>
-      <div className="grid gap-2 w-full">
+      <div className="grid w-full min-w-0 gap-2">
         {fields.map((field, idx) => (
-          <div key={field.id} className="flex gap-2 items-start">
+          <div key={field.id} className="flex min-w-0 items-start gap-2">
             <FormField_Shadcn_
               name={`${fieldName}.${idx}.value`}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
+                <FormItem_Shadcn_ className="min-w-0 flex-1">
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} placeholder={placeholder} autoComplete="off" />
+                    <Input_Shadcn_
+                      {...field}
+                      className="min-w-0"
+                      placeholder={placeholder}
+                      autoComplete="off"
+                    />
                   </FormControl_Shadcn_>
                   <FormMessage_Shadcn_ />
                 </FormItem_Shadcn_>
@@ -197,7 +202,7 @@ const MappingFieldArray = ({
             <Button
               type="default"
               icon={<Trash size={12} />}
-              className="h-[34px] w-[34px]"
+              className="h-[34px] w-[34px] shrink-0"
               disabled={fields.length <= 1}
               onClick={() => remove(idx)}
             />
@@ -205,7 +210,7 @@ const MappingFieldArray = ({
         ))}
 
         <Button
-          type="text"
+          type="default"
           icon={<Plus className="w-4 h-4" />}
           onClick={() => append({ value: '' })}
           className="w-auto self-start justify-self-start"
