@@ -69,6 +69,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
       })
     )
 
+    if (Object.keys(changed).length === 0) {
+      // No actual changes to persist; avoid sending an empty update payload
+      reset(role)
+      return
+    }
+
     updateDatabaseRole(
       {
         projectRef: project.ref,
@@ -77,9 +83,9 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         payload: changed,
       },
       {
-        onSuccess: (newValues) => {
+        onSuccess: () => {
           toast.success(`Successfully updated role "${role.name}"`)
-          reset(newValues)
+          reset(values)
         },
       }
     )
