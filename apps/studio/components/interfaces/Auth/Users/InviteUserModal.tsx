@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -24,6 +24,7 @@ export type InviteUserModalProps = {
 const formSchema = z.object({
   email: z.string().min(1, 'Please enter a valid email').email('Please enter a valid email'),
 })
+const formId = 'invite-user-form'
 
 const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ref: projectRef } = useParams()
@@ -43,11 +44,11 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     'invite_user'
   )
 
-  const onInviteUser = async (values: any) => {
+  const onInviteUser: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
     inviteUser({ projectRef, email: values.email })
   }
-  const formId = 'invite-user-form'
+
   return (
     <Modal
       hideFooter
