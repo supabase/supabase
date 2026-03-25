@@ -262,7 +262,9 @@ describe('UpdateBillingAddressModal', () => {
     render(<UpdateBillingAddressModal />)
 
     expect(await screen.findByText('Billing address required')).toBeInTheDocument()
-    expect(screen.getByText(/please ask an organization administrator or owner/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/please ask an organization administrator or owner/i)
+    ).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Save address' })).not.toBeInTheDocument()
   })
 
