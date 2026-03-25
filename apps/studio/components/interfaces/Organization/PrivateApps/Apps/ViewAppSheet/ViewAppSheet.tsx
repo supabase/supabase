@@ -21,7 +21,8 @@ interface ViewAppSheetProps {
 
 export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetProps) {
   const { slug, installations, removeInstallationsByAppId } = usePrivateApps()
-  const isInstalled = installations.some((i) => i.app_id === app?.id)
+  const installation = installations.find((i) => i.app_id === app?.id)
+  const isInstalled = installation !== undefined
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const { data: detail, isLoading: isLoadingDetail } = usePlatformAppQuery(
@@ -73,7 +74,7 @@ export function ViewAppSheet({ app, visible, onClose, onDeleted }: ViewAppSheetP
           <ScrollArea className="flex-1 max-h-[calc(100vh-60px)]">
             {app && (
               <div className="flex flex-col gap-0">
-                <ViewAppSheetInfo app={app} isInstalled={isInstalled} />
+                <ViewAppSheetInfo app={app} isInstalled={isInstalled} installation={installation} />
                 <ViewAppSheetPermissions permissions={permissions} isLoading={isLoadingDetail} />
                 <ViewAppSheetDangerZone onDelete={() => setShowDeleteModal(true)} />
               </div>

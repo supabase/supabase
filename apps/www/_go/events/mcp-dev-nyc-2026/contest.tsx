@@ -63,7 +63,7 @@ const page: GoPageInput = {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Download Slides
+              Download slides
             </Link>
           </Button>
         </div>

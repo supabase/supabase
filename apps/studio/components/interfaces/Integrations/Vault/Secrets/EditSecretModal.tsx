@@ -186,7 +186,7 @@ export const EditSecretModal = () => {
                               aria-label={
                                 showSecretValue ? `Hide secret value` : `Show secret value`
                               }
-                              className="absolute right-2 top-1 px-3 py-2"
+                              className="absolute right-1 top-1 w-7"
                               icon={showSecretValue ? <EyeOff /> : <Eye />}
                               onClick={() => setShowSecretValue(!showSecretValue)}
                             />

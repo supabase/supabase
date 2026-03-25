@@ -16,6 +16,9 @@ import { timeout } from '@/lib/helpers'
 
 import '@xyflow/react/dist/style.css'
 
+import { SmoothstepEdge } from './Edges'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+
 export const ReplicationDiagram = () => {
   return (
     <ReactFlowProvider>
@@ -30,6 +33,8 @@ const nodeTypes = {
   readReplica: ReadReplicaNode,
 }
 
+const edgeTypes = { smoothstep: SmoothstepEdge }
+
 const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
@@ -39,7 +44,10 @@ const ReplicationDiagramContent = () => {
   const { data: databases = [], isSuccess: isSuccessReplicas } = useReadReplicasQuery({
     projectRef,
   })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  const readReplicas = useMemo(
+    () => databases.filter((x) => x.identifier !== projectRef),
+    [databases, projectRef]
+  )
 
   const { data, isSuccess: isSuccessDestinations } = useReplicationDestinationsQuery({
     projectRef,
@@ -82,6 +90,20 @@ const ReplicationDiagramContent = () => {
             opacity: isReplicating ? 1 : 0.4,
             strokeDasharray: isReplicating ? undefined : '5 5',
           },
+          data: {
+            type: 'replica',
+            identifier: x.identifier,
+            shiftEdgeEnd: readReplicas.length + destinations.length > 1,
+            isReplicating,
+            isComingUp: [
+              REPLICA_STATUS.COMING_UP,
+              REPLICA_STATUS.INIT_READ_REPLICA,
+              REPLICA_STATUS.UNKNOWN,
+            ].includes(x.status),
+            isFailed: [REPLICA_STATUS.ACTIVE_UNHEALTHY, REPLICA_STATUS.INIT_FAILED].includes(
+              x.status
+            ),
+          },
         }
       }),
       ...destinations.map((x) => {
@@ -103,6 +125,14 @@ const ReplicationDiagramContent = () => {
             opacity: isReplicating ? 1 : 0.4,
             strokeDasharray: isReplicating ? undefined : '5 5',
           },
+          data: {
+            type: 'etl',
+            identifier: x.id,
+            shiftEdgeEnd: readReplicas.length + destinations.length > 1,
+            isReplicating,
+            isComingUp: ['starting'].includes(statusName ?? ''),
+            isFailed: ['failed'].includes(statusName ?? ''),
+          },
         }
       }),
     ]
@@ -122,7 +152,9 @@ const ReplicationDiagramContent = () => {
   }
 
   useEffect(() => {
-    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) setReactFlow()
+    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) {
+      setReactFlow()
+    }
   }, [nodes, isSuccessDestinations, isSuccessReplicas])
 
   return (
@@ -143,6 +175,7 @@ const ReplicationDiagramContent = () => {
         defaultNodes={[]}
         defaultEdges={[]}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         proOptions={{ hideAttribution: true }}
       >
         <Background color={backgroundPatternColor} />
