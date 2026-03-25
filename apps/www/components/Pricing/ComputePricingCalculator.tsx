@@ -1,58 +1,45 @@
-'use client'
-
-import { InformationCircleIcon } from '@heroicons/react/outline'
-import { ChevronDown, Plus, Trash2 } from 'lucide-react'
+import pricingAddOn from '~/data/PricingAddOnTable.json'
+import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  Slider_Shadcn_,
-  cn,
-} from 'ui'
+import { Button, cn, Slider_Shadcn_ } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import pricingAddOn from '~/data/PricingAddOnTable.json'
 
-const plans = [
-  {
-    name: 'Pro',
-    price: 25,
-  },
-  {
-    name: 'Team',
-    price: 599,
-  },
-]
-
-const findIntanceValueByColumn = (instance: any, column: string) =>
+const findInstanceValueByColumn = (instance: any, column: string) =>
   instance.columns?.find((col: any) => col.key === column)?.value
 
-const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
+const parsePrice = (price: string) => {
+  const n = parseInt(price?.toString().replace('$', '').replace(',', ''), 10)
+  return Number.isNaN(n) ? 0 : n
+}
 
-const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivity?: boolean }) => {
+interface ComputePricingCalculatorProps {
+  activePlan?: {
+    name: string
+    price: number
+  }
+}
+
+const ComputePricingCalculator = ({
+  activePlan = { name: 'Pro', price: 25 },
+}: ComputePricingCalculatorProps) => {
   // Filter out rows with no specific pricing
   const computeInstances = pricingAddOn.database.rows.filter((row) =>
     row.columns.some((it) => it.key === 'pricing' && it.value !== 'Contact Us')
   )
   const priceSteps = computeInstances.map((instance) =>
-    parsePrice(findIntanceValueByColumn(instance, 'pricing'))
+    parsePrice(findInstanceValueByColumn(instance, 'pricing'))
   )
   // Base discount credits that come with every paid plan
   const COMPUTE_CREDITS = 10
 
-  const [activePlan, setActivePlan] = useState(plans[0])
   const [activeInstances, setActiveInstances] = useState([{ ...computeInstances[0], position: 0 }])
   // Final calculated price: plan cost + compute aggregate - compute credits
   const [activePrice, setActivePrice] = useState(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
-
-  useEffect(() => {
-    setActivePrice(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
-  }, [])
+  const [hasInteractedWithSlider, setHasInteractedWithSlider] = useState(false)
 
   const handleUpdateInstance = (position: number, value: number[]) => {
+    setHasInteractedWithSlider(true)
     const newArray = activeInstances.map((activeInstance) => {
       // only update the instance corresponding to the correct slider
       if (activeInstance.position === position) {
@@ -66,32 +53,22 @@ const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivi
   }
 
   const calculateComputeAggregate = (price: number) => {
-    activeInstances.map(
-      (activeInstance: any) =>
-        (price += parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')))
+    return activeInstances.reduce(
+      (acc, activeInstance: any) =>
+        acc + parsePrice(findInstanceValueByColumn(activeInstance, 'pricing')),
+      price
     )
-
-    return price
-  }
-
-  const calculatePrice = () => {
-    let aggregatePrice = 0
-    const computeAggregate = calculateComputeAggregate(aggregatePrice)
-
-    return setActivePrice(computeAggregate + activePlan.price - COMPUTE_CREDITS)
   }
 
   useEffect(() => {
-    calculatePrice()
+    const computeAggregate = calculateComputeAggregate(0)
+    setActivePrice(Math.max(0, computeAggregate + activePlan.price - COMPUTE_CREDITS))
   }, [activeInstances, activePlan])
 
   const removeInstance = (position: number) => {
     const newArray = activeInstances
       .filter((activeInstance) => activeInstance.position !== position)
-      .map((instance, index) => {
-        instance.position = index
-        return instance
-      })
+      .map((instance, index) => ({ ...instance, position: index }))
 
     setActiveInstances(newArray)
   }
@@ -99,134 +76,44 @@ const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivi
   const findSliderComputeValue = (activeInstance: any) => {
     // find index of compute based on active compute name
     const selectedCompute = computeInstances
-      .map((compute) => findIntanceValueByColumn(compute, 'plan'))
-      .indexOf(findIntanceValueByColumn(activeInstance, 'plan'))
+      .map((compute) => findInstanceValueByColumn(compute, 'plan'))
+      .indexOf(findInstanceValueByColumn(activeInstance, 'plan'))
 
     return [selectedCompute + 1]
   }
 
-  const PriceSummary = () => (
-    <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
-      <div className="flex items-center justify-between">
-        <span className="text-foreground-muted">Plan</span>
-        <span className="text-light font-mono" translate="no">
-          ${activePlan.price}
-        </span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-foreground-muted">Total Compute</span>
-        <span className="text-light font-mono">${calculateComputeAggregate(0)}</span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-foreground-muted">Compute Credits</span>
-        <span className="text-light font-mono" translate="no">
-          - ${COMPUTE_CREDITS}
-        </span>
-      </div>
-    </div>
-  )
-
   return (
-    <div className="flex flex-col lg:grid grid-cols-4 gap-4 h-full mt-4 lg:mt-0 border border-strong rounded-xl p-4">
-      <div className="flex justify-between w-full">
-        <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
-          <div className="h-full w-full flex flex-col justify-between">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  size="tiny"
-                  type="outline"
-                  iconRight={<ChevronDown />}
-                  icon={
-                    activePlan.name === 'Pro' ? (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <rect
-                          x="3.5"
-                          y="3.5"
-                          width="6.77393"
-                          height="6.77393"
-                          rx="1.5"
-                          stroke="hsl(var(--foreground-default))"
-                        />
-                        <rect
-                          x="5.55078"
-                          y="5.55127"
-                          width="2.67139"
-                          height="2.67139"
-                          rx="1.33569"
-                          stroke="hsl(var(--foreground-muted))"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 13 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <rect
-                          x="3.26953"
-                          y="3.61279"
-                          width="6.77393"
-                          height="6.77393"
-                          rx="1.5"
-                          stroke="hsl(var(--foreground-muted))"
-                        />
-                        <rect
-                          x="1.08984"
-                          y="1.43359"
-                          width="11.1323"
-                          height="11.1323"
-                          rx="3.5"
-                          stroke="hsl(var(--foreground-default))"
-                        />
-                        <rect
-                          x="5.32031"
-                          y="5.66406"
-                          width="2.67139"
-                          height="2.67139"
-                          rx="1.33569"
-                          stroke="hsl(var(--foreground-muted))"
-                        />
-                      </svg>
-                    )
-                  }
-                  className="w-full pl-1 py-2"
-                >
-                  <div className="lg:min-w-[80px] flex items-center grow w-full gap-1">
-                    <span className="text-foreground-light">Plan</span>{' '}
-                    <span>{activePlan.name}</span>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="start">
-                {plans.map((plan: any) => (
-                  <DropdownMenuItem key={plan.name} onClick={() => setActivePlan(plan)}>
-                    {plan.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div>
-            <PriceSummary />
-            <div className="flex items-center gap-1 w-full justify-between">
-              <span>Total Estimate</span>
-              <span className="text-foreground font-mono flex items-center gap-1">
-                <InfoTooltip side="top" className="max-w-[250px]">
-                  This estimate only includes Plan and Compute add-on monthly costs. Other resources
-                  might concur in the final invoice.
-                </InfoTooltip>
-                ${activePrice}
+    <div className="flex flex-col lg:grid grid-cols-4 gap-4 border border-strong rounded-xl p-4">
+      <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
+        <div>
+          <p className="text-foreground-light text-xs mb-2">Monthly estimate:</p>
+          <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Plan subscription</span>
+              <span className="text-light font-mono" translate="no">
+                ${activePlan.price}
               </span>
             </div>
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Total Compute</span>
+              <span className="text-light font-mono">${calculateComputeAggregate(0)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-muted">Compute Credits</span>
+              <span className="text-light font-mono" translate="no">
+                - ${COMPUTE_CREDITS}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 w-full justify-between">
+            <span>Total</span>
+            <span className="text-foreground font-mono flex items-center gap-1">
+              <InfoTooltip side="top" className="max-w-[250px]">
+                This estimate only includes Plan and Compute add-on monthly costs. Other resources
+                might incur additional costs in the final invoice.
+              </InfoTooltip>
+              ${activePrice}
+            </span>
           </div>
         </div>
       </div>
@@ -245,32 +132,42 @@ const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivi
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <ComputeBadge
-                    infraComputeSize={findIntanceValueByColumn(activeInstance, 'plan')}
+                    infraComputeSize={findInstanceValueByColumn(activeInstance, 'plan')}
                   />
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>
                 </div>
                 <span className="leading-3 text-sm" translate="no">
-                  {findIntanceValueByColumn(activeInstance, 'pricing')}
+                  {findInstanceValueByColumn(activeInstance, 'pricing')}
                 </span>
               </div>
-              <Slider_Shadcn_
-                onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
-                value={findSliderComputeValue(activeInstance)}
-                min={1}
-                key={`${index}-${activeInstance.position}`}
-                max={priceSteps.length}
-                step={1}
-                className="w-full mt-1"
-              />
+              <div className="w-full relative">
+                {!hasInteractedWithSlider && (
+                  <label className="absolute -top-2 left-6 text-xs text-foreground-muted pointer-events-none bg-surface-300 px-1 py-0.5 rounded-md z-10 flex items-center gap-1">
+                    Drag to adjust
+                  </label>
+                )}
+                <Slider_Shadcn_
+                  onValueChange={(value) => handleUpdateInstance(activeInstance.position, value)}
+                  value={findSliderComputeValue(activeInstance)}
+                  min={1}
+                  key={`${index}-${activeInstance.position}`}
+                  max={priceSteps.length}
+                  step={1}
+                  className={cn(
+                    'w-full cursor-grab active:cursor-grabbing',
+                    !hasInteractedWithSlider && "[&_[data-slot='slider-thumb']]:animate-pulse"
+                  )}
+                />
+              </div>
               <div className="flex items-center justify-between text-sm">
                 <div className="w-full flex items-center gap-2">
                   <span className="text-lighter text-xs md:text-[13px]">
-                    {findIntanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
-                    {findIntanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
-                    {findIntanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
-                    {findIntanceValueByColumn(activeInstance, 'poolerConnections')}
+                    {findInstanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
+                    {findInstanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
+                    {findInstanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
+                    {findInstanceValueByColumn(activeInstance, 'poolerConnections')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -289,22 +186,19 @@ const ComputePricingCalculator = ({ disableInteractivity }: { disableInteractivi
             </div>
           ))}
         </div>
-        <div className="w-full">
+        <div className="text-right w-full">
           <Button
             size="tiny"
-            type="outline"
-            block
+            type="primary"
             icon={<Plus />}
             onClick={() => {
-              if (disableInteractivity) return
               setActiveInstances([
                 ...activeInstances,
                 { ...computeInstances[0], position: activeInstances.length },
               ])
             }}
-            className="w-full border-dashed text-foreground-light hover:text-foreground"
           >
-            <span className="w-full text-left">Add Project</span>
+            <span className="text-left">Add Project</span>
           </Button>
         </div>
       </div>
