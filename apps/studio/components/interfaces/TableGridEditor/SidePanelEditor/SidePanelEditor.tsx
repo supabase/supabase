@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
 import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
@@ -196,6 +197,7 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
@@ -963,7 +965,7 @@ export const SidePanelEditor = ({
         row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
         backButtonLabel="Cancel"
-        applyButtonLabel="Save changes"
+        applyButtonLabel={isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'}
         readOnly={!editable}
         closePanel={onClosePanel}
         onSaveJSON={onSaveColumnValue}
