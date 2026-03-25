@@ -212,7 +212,8 @@ test.describe('Database', () => {
         name: `${databaseTableName} No description`,
       })
       await expect(tableRow).toContainText(databaseTableName)
-      await expect(tableRow).toContainText('3 columns')
+      await expect(tableRow.getByRole('cell').nth(2)).toHaveText('3')
+      await expect(tableRow.getByRole('link', { name: 'View columns' })).toBeVisible()
 
       // change schema -> auth
       await page.getByTestId('schema-selector').click()
@@ -364,14 +365,20 @@ test.describe('Database', () => {
         }
       )
 
+      const databaseWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'tables?include_columns=true&included_schemas=public'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/tables?schema=public`))
 
       // Wait for database tables to be populated
-      await waitForDatabaseToLoad(page, ref)
+      await databaseWait
 
       // navigate to table columns
       const databaseRow = page.getByRole('row', { name: databaseTableName })
-      await databaseRow.getByRole('link', { name: '3 columns' }).click()
+      await databaseRow.getByRole('link', { name: 'View columns' }).click()
       await page.waitForURL(/.*\/database\/tables\/\d+/)
 
       // validate and display everything correctly
