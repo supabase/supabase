@@ -89,12 +89,14 @@ test.describe('Database', () => {
       // validates table and column exists
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       // test we can edit the column
-      await page.getByText(`${databaseTableName} actions`).click()
-
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit table' }).click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Edit table' })).not.toBeVisible()
+      const tableActionsButton = page.getByRole('button', {
+        name: `${databaseTableName} actions`,
+      })
+      await tableActionsButton.click()
+      const editTableMenuItem = page.getByRole('menuitem', { name: 'Edit table' })
+      await expect(editTableMenuItem).toBeVisible()
+      await editTableMenuItem.press('Enter')
+      await expect(editTableMenuItem).not.toBeVisible()
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
@@ -104,10 +106,10 @@ test.describe('Database', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // test the schema view has been refreshed
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'Edit table' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit table' }).click()
-      await expect(page.getByRole('menuitem', { name: 'Edit table' })).not.toBeVisible()
+      await tableActionsButton.click()
+      await expect(editTableMenuItem).toBeVisible()
+      await editTableMenuItem.press('Enter')
+      await expect(editTableMenuItem).not.toBeVisible()
       await expect(page.getByRole('dialog')).toBeVisible()
       // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
       await page.waitForTimeout(500)
@@ -115,15 +117,19 @@ test.describe('Database', () => {
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Copy name' }).click()
-      await expect(page.getByRole('menuitem', { name: 'Copy name' })).not.toBeVisible()
+      await tableActionsButton.click()
+      const copyTableNameMenuItem = page.getByRole('menuitem', { name: 'Copy name' })
+      await expect(copyTableNameMenuItem).toBeVisible()
+      await copyTableNameMenuItem.press('Enter')
+      await expect(copyTableNameMenuItem).not.toBeVisible()
       await expectClipboardValue({ page, value: databaseTableName, exact: true })
 
-      await page.getByText(`${databaseTableName} actions`).click()
-      await expect(page.getByRole('menuitem', { name: 'View in Table Editor' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'View in Table Editor' }).click()
+      await tableActionsButton.click()
+      const viewInTableEditorMenuItem = page.getByRole('menuitem', {
+        name: 'View in Table Editor',
+      })
+      await expect(viewInTableEditorMenuItem).toBeVisible()
+      await viewInTableEditorMenuItem.press('Enter')
       await page.waitForURL(/.*\/editor\/\d+/)
       await expect(page.getByRole('tab', { name: databaseTableName })).toBeVisible()
     })
@@ -152,11 +158,13 @@ test.describe('Database', () => {
       await expect(page.getByText(databaseTableName, { exact: true })).toBeVisible()
       await expect(page.getByText(databaseColumnName, { exact: true })).toBeVisible()
       // test we can edit the column
-      await page
-        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
-        .click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Edit column' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit column' }).click()
+      const columnActionsButton = page.getByRole('button', {
+        name: `${databaseTableName} ${databaseColumnName} actions`,
+      })
+      await columnActionsButton.click()
+      const editColumnMenuItem = page.getByRole('menuitem', { name: 'Edit column' })
+      await expect(editColumnMenuItem).toBeVisible()
+      await editColumnMenuItem.press('Enter')
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(
@@ -165,20 +173,17 @@ test.describe('Database', () => {
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
       // test the schema view has been refreshed
-      await page
-        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
-        .click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Edit column' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Edit column' }).click()
+      await columnActionsButton.click()
+      await expect(editColumnMenuItem).toBeVisible()
+      await editColumnMenuItem.press('Enter')
       await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
 
-      await page
-        .getByText(`${databaseTableName} ${databaseColumnName} actions`)
-        .click({ force: true })
-      await expect(page.getByRole('menuitem', { name: 'Copy name' })).toBeVisible()
-      await page.getByRole('menuitem', { name: 'Copy name' }).click()
+      await columnActionsButton.click()
+      const copyColumnNameMenuItem = page.getByRole('menuitem', { name: 'Copy name' })
+      await expect(copyColumnNameMenuItem).toBeVisible()
+      await copyColumnNameMenuItem.press('Enter')
       await expectClipboardValue({ page, value: databaseColumnName, exact: true })
     })
   })

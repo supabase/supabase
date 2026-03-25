@@ -25,6 +25,7 @@ function buildUrlMatcher(basePath: string, ref: string, action: string, method?:
   const trimmedBasePath = basePath.replace(/^\/+|\/+$/g, '')
   const refAlternatives = [ref, 'default']
   const [actionPath, actionQuery] = action.split('?')
+  const trimmedActionPath = actionPath.replace(/^\/+/, '')
   const expectedSearchParams = new URLSearchParams(actionQuery ?? '')
 
   return (response: any) => {
@@ -35,7 +36,8 @@ function buildUrlMatcher(basePath: string, ref: string, action: string, method?:
     const hasBasePath = url.pathname.includes(`/${trimmedBasePath}/`)
     const hasRef = refAlternatives.some((r) => url.pathname.includes(`/${r}/`))
 
-    const hasActionPath = url.pathname.endsWith(`/${actionPath}`)
+    const hasActionPath =
+      trimmedActionPath.length === 0 || url.pathname.includes(`/${trimmedActionPath}`)
     const hasExpectedSearchParams = [...expectedSearchParams.entries()].every(([key, value]) =>
       url.searchParams.getAll(key).some((actualValue) => actualValue.includes(value))
     )
