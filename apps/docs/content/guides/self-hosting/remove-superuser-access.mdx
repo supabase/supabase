@@ -18,12 +18,6 @@ As a result:
 
 This guide explains how to bring your self-hosted Supabase instance in line with the security enhancements and ownership model used in hosted Supabase.
 
-<Admonition type="tip">
-
-This migration only updates ownership for database objects in the `public` schema. Supabase managed schemas are not affected.
-
-</Admonition>
-
 ## Configuration
 
 ### Step 1: Run the ownership migration script
@@ -31,8 +25,14 @@ This migration only updates ownership for database objects in the `public` schem
 Execute the script that reassigns ownership of database objects in the `public` schema from `supabase_admin` to `postgres`
 
 ```sh
-sh ./utils/reassign-public-schema-objects-owner-to-postgres.sh
+sh ./utils/reassign-owner.sh
 ```
+
+<Admonition type="tip">
+
+This script updates ownership only for database objects in the public schema. Supabase managed schemas or any custom schemas are not affected.
+
+</Admonition>
 
 ### Step 2: Update environment variables in docker-compose.yml
 

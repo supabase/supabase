@@ -2,20 +2,20 @@
 set -e
 
 if ! docker compose version >/dev/null 2>&1; then
-    echo "Docker Compose not found."
-    exit 1
+  echo "Docker Compose not found."
+  exit 1
 fi
 
 # Check Postgres service
 db_image_prefix="supabase.postgres:"
 
 compose_output=$(docker compose ps \
-    --format '{{.Image}}\t{{.Service}}\t{{.Status}}' 2>/dev/null |
-    grep -m1 "^$db_image_prefix" || true)
+  --format '{{.Image}}\t{{.Service}}\t{{.Status}}' 2>/dev/null |
+  grep -m1 "^$db_image_prefix" || true)
 
 if [ -z "$compose_output" ]; then
-    echo "Postgres container not found. Exiting."
-    exit 1
+  echo "Postgres container not found. Exiting."
+  exit 1
 fi
 
 db_srv_name=$(echo "$compose_output" | cut -f2)
@@ -24,16 +24,16 @@ db_srv_status=$(echo "$compose_output" | cut -f3)
 case "$db_srv_status" in
 Up*) ;;
 *)
-    echo "Postgres container status: $db_srv_status"
-    echo "Exiting."
-    exit 1
-    ;;
+  echo "Postgres container status: $db_srv_status"
+  echo "Exiting."
+  exit 1
+  ;;
 esac
 
 if ! test -t 0; then
-    echo ""
-    echo "Running non-interactively. Not reassigning ownership."
-    exit 0
+  echo ""
+  echo "Running non-interactively. Not reassigning ownership."
+  exit 0
 fi
 
 printf "Reassign public schema objects to postgres user? (y/N) "
@@ -41,9 +41,9 @@ read -r REPLY
 case "$REPLY" in
 [Yy]) ;;
 *)
-    echo "Cancelled. Not reassigning ownership."
-    exit 0
-    ;;
+  echo "Cancelled. Not reassigning ownership."
+  exit 0
+  ;;
 esac
 
 docker compose exec -T "$db_srv_name" psql -v ON_ERROR_STOP=1 -U supabase_admin -d postgres <<'EOF'
