@@ -4,7 +4,7 @@ import {
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
-} from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
+} from 'components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
@@ -45,6 +45,7 @@ import {
 import { Route } from '../ui/ui.types'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsPlatformWebhooksEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
 
@@ -225,6 +226,7 @@ const ProjectLinks = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
@@ -256,7 +258,7 @@ const ProjectLinks = () => {
     showReports,
     apiDocsSidePanel: isNewAPIDocsEnabled,
   })
-  const settingsRoutes = generateSettingsRoutes(ref, project)
+  const settingsRoutes = generateSettingsRoutes(ref)
 
   return (
     <SidebarMenu>
@@ -346,6 +348,7 @@ const ProjectLinks = () => {
           }
         })}
       </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
       {/* Settings routes to be added in with project/org nav */}
       <SidebarGroup className="gap-0.5">
         {settingsRoutes.map((route, i) => (

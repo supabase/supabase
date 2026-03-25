@@ -1,3 +1,4 @@
+import { ROLE_IMPERSONATION_NO_RESULTS } from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
@@ -7,11 +8,7 @@ import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
-import {
-  ROLE_IMPERSONATION_NO_RESULTS,
-  RoleImpersonationState,
-  wrapWithRoleImpersonation,
-} from 'lib/role-impersonation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from 'types'
 
@@ -391,17 +388,11 @@ async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  {
-    projectRef,
-    connectionString: connectionStringOverride,
-    tableId,
-    ...args
-  }: Omit<TableRowsVariables, 'queryClient'>,
+  { projectRef, tableId, ...args }: Omit<TableRowsVariables, 'queryClient' | 'connectionString'>,
   { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  const { connectionString: connectionStringReadOps } = useConnectionStringForReadOps()
-  const connectionString = connectionStringOverride || connectionStringReadOps
+  const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
 
   // [Joshen] Exclude preflightCheck from query key
   const { preflightCheck, ...othersArgs } = args
@@ -409,7 +400,7 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...othersArgs,
     }),
     queryFn: ({ signal }) =>
@@ -423,14 +414,25 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   })
 }
 
+type PrefetchTableRowsVariables = Omit<TableRowsVariables, 'queryClient'> & {
+  readReplicaIdentifier?: string
+}
+
 export function prefetchTableRows(
   client: QueryClient,
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>
+  {
+    projectRef,
+    connectionString,
+    tableId,
+    readReplicaIdentifier,
+    ...args
+  }: PrefetchTableRowsVariables
 ) {
   return client.fetchQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- readReplicaIdentifier is used as a stable version of connectionString
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...args,
     }),
     queryFn: ({ signal }) =>

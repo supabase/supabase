@@ -84,6 +84,12 @@ To authenticate with S3 using a Session Token, use the following credentials:
 
 For example, using the `aws-sdk` library:
 
+<Admonition type="note">
+
+Typically we advise against using `getSession`, because the session is read from local storage and you can't trust its claims for auth decisions. In this case however, the code only needs the raw access token string to forward as a credential to the S3 service, which validates the token server-side. Since no client-side auth decision is made based on the session data, `getSession` is appropriate here.
+
+</Admonition>
+
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3'
 

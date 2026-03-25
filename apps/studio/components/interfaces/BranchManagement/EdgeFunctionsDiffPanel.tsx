@@ -1,3 +1,4 @@
+import { IS_PLATFORM } from 'common'
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
 import { basename } from 'path'
@@ -111,7 +112,7 @@ const FunctionDiff = ({
       <CardHeader>
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+            href={`/project/${currentBranchRef}/functions/${functionSlug}${IS_PLATFORM ? '' : '/details'}`}
             className="flex items-center gap-2"
           >
             <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />

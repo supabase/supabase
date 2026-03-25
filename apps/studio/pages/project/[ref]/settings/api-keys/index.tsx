@@ -48,7 +48,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
 
 ApiKeysNewPage.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>
+    <SettingsLayout title="API Keys">
       <ApiKeysLayout>{page}</ApiKeysLayout>
     </SettingsLayout>
   </DefaultLayout>

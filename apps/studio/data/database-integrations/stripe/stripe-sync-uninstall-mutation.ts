@@ -1,15 +1,16 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { getAccessToken } from 'common'
 import { databaseKeys } from 'data/database/keys'
 import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+
 import { stripeSyncKeys } from './keys'
 
 export type StripeSyncUninstallVariables = {
   projectRef: string
+  startTime: number
 }
 
 export type StripeSyncUninstallResponse = {
@@ -19,6 +20,7 @@ export type StripeSyncUninstallResponse = {
 
 export async function uninstallStripeSync({
   projectRef,
+  startTime,
 }: StripeSyncUninstallVariables): Promise<StripeSyncUninstallResponse> {
   const accessToken = await getAccessToken()
 
@@ -30,6 +32,7 @@ export async function uninstallStripeSync({
     },
     body: JSON.stringify({
       projectRef,
+      startTime,
     }),
   })
 

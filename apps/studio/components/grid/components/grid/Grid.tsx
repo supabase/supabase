@@ -23,7 +23,7 @@ import type { GridProps, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import RowRenderer from './RowRenderer'
+import { RowRenderer } from './RowRenderer'
 import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {

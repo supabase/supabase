@@ -36,8 +36,6 @@ export const AddNewSecretModal = () => {
     setSubmitting(true)
 
     try {
-      setSubmitting(true)
-
       await addSecret({
         projectRef: project.ref,
         connectionString: project?.connectionString,
@@ -83,6 +81,7 @@ export const AddNewSecretModal = () => {
                     <div className="mr-1">
                       <Button
                         type="default"
+                        className="w-7"
                         icon={showSecretValue ? <EyeOff /> : <Eye />}
                         onClick={() => setShowSecretValue(!showSecretValue)}
                       />

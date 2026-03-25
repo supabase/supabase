@@ -3,8 +3,8 @@ import { cn } from 'ui'
 import type { GoFeatureGridSection } from '../schemas'
 
 export default function FeatureGridSection({ section }: { section: GoFeatureGridSection }) {
-  const { items } = section
-  const hasSecondRow = items.length > 3
+  const { items, columns = 3 } = section
+  const hasSecondRow = items.length > columns
 
   return (
     <div className="max-w-[80rem] mx-auto px-8">
@@ -19,12 +19,17 @@ export default function FeatureGridSection({ section }: { section: GoFeatureGrid
         </div>
       )}
       <div className="border border-muted rounded-xl overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-3">
+        <div
+          className={cn(
+            'grid grid-cols-1',
+            columns === 1 ? 'md:grid-cols-1' : columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'
+          )}
+        >
           {items.map((item, i) => {
-            const col = i % 3
-            const row = Math.floor(i / 3)
-            const isLastCol = col === 2 || i === items.length - 1
-            const isLastRow = !hasSecondRow || row === 1
+            const col = i % columns
+            const row = Math.floor(i / columns)
+            const isLastCol = col === columns - 1 || i === items.length - 1
+            const isLastRow = !hasSecondRow || row === Math.floor((items.length - 1) / columns)
 
             return (
               <div

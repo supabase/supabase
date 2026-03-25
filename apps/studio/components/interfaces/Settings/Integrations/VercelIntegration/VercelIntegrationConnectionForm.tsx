@@ -41,7 +41,7 @@ const VercelIntegrationConnectionForm = ({
   // but through a separate marketplace mechanism. It's not theoretically necessary, but we might have some stale data.
   const { data: org } = useSelectedOrganizationQuery()
   const envSyncTargets =
-    org?.managed_by === 'vercel-marketplace' ? [] : connection.env_sync_targets ?? []
+    org?.managed_by === 'vercel-marketplace' ? [] : (connection.env_sync_targets ?? [])
 
   const FormSchema = z.object({
     environmentVariablesProduction: z.boolean().default(envSyncTargets.includes('production')),

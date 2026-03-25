@@ -1,3 +1,4 @@
+import { getTableRowsCountSql } from '@supabase/pg-meta'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
@@ -10,7 +11,7 @@ import { UseCustomQueryOptions } from 'types'
 import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
-import { getTableRowsCountSql } from './table-rows.sql'
+import { formatFilterValue } from './utils'
 
 export type GetTableRowsCountArgs = {
   table?: SupaTable
@@ -58,8 +59,14 @@ export async function getTableRowsCount(
 
   const table = parseSupaTable(entity)
 
+  const formattedFilters = filters?.map((x) => ({ ...x, value: formatFilterValue(table, x) }))
   const sql = wrapWithRoleImpersonation(
-    getTableRowsCountSql({ table, filters, enforceExactCount, isUsingReadReplica }),
+    getTableRowsCountSql({
+      table,
+      filters: formattedFilters,
+      enforceExactCount,
+      isUsingReadReplica,
+    }),
     roleImpersonationState
   )
   const { result } = await executeSql(
@@ -82,23 +89,25 @@ export async function getTableRowsCount(
 export const useTableRowsCountQuery = <TData = TableRowsCountData>(
   {
     projectRef,
-    connectionString: connectionStringOverride,
     tableId,
     ...args
-  }: Omit<TableRowsCountVariables, 'queryClient'>,
+  }: Omit<TableRowsCountVariables, 'queryClient' | 'connectionString'>,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  const { connectionString: connectionStringReadOps, type } = useConnectionStringForReadOps()
-  const connectionString = connectionStringOverride || connectionStringReadOps
+  const {
+    connectionString,
+    identifier: readReplicaIdentifier,
+    type,
+  } = useConnectionStringForReadOps()
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
     queryKey: tableRowKeys.tableRowsCount(projectRef, {
       table: { id: tableId },
-      connectionString,
+      readReplicaIdentifier,
       ...args,
     }),
     queryFn: ({ signal }) =>
