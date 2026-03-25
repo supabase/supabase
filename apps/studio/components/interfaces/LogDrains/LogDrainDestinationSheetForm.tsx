@@ -811,11 +811,12 @@ export function LogDrainDestinationSheetForm({
                     <FormField_Shadcn_
                       control={form.control}
                       name="headerEntries"
-                      render={() => (
+                      render={({ fieldState }) => (
                         <FormItemLayout
                           layout="horizontal"
                           label="Custom Headers"
                           description={getHeadersDescription(type)}
+                          hideMessage={!fieldState.error?.message}
                         >
                           <KeyValueFieldArray
                             control={form.control}
@@ -833,7 +834,6 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
-                <FormMessage_Shadcn_ />
               </div>
             </form>
           </Form_Shadcn_>

@@ -68,8 +68,8 @@ export function headerRowsToRecord(rows: LogDrainHeaderRow[] = []): Record<strin
 export const logDrainHeaderEntriesSchema = z
   .array(
     z.object({
-      key: z.string().trim().min(1, HEADER_VALIDATION_ERRORS.KEY_REQUIRED),
-      value: z.string().trim().min(1, HEADER_VALIDATION_ERRORS.VALUE_REQUIRED),
+      key: z.string().trim(),
+      value: z.string().trim(),
     })
   )
   .max(20, HEADER_VALIDATION_ERRORS.MAX_LIMIT)
@@ -78,7 +78,8 @@ export const logDrainHeaderEntriesSchema = z
 
     rows.forEach((row, index) => {
       const key = row.key.trim()
-      if (!key) return
+      const value = row.value.trim()
+      if (!key || !value) return
 
       const existingIndexes = rowIndexesByKey.get(key) ?? []
       existingIndexes.push(index)

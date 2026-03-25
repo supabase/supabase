@@ -5,6 +5,7 @@ import {
   getHeadersSectionDescription,
   headerRecordToRows,
   headerRowsToRecord,
+  logDrainHeaderEntriesSchema,
   otlpConfigSchema,
 } from './LogDrains.utils'
 
@@ -93,6 +94,42 @@ describe('headerRowsToRecord', () => {
     ).toEqual({
       Authorization: 'Bearer token',
     })
+  })
+})
+
+describe('logDrainHeaderEntriesSchema', () => {
+  it('accepts empty and partially filled draft rows', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([
+      { key: 'Content-Type', value: 'application/json' },
+      { key: '', value: '' },
+      { key: 'X-Draft-Only', value: '' },
+      { key: '', value: 'draft-value' },
+    ])
+
+    expect(result.success).toBe(true)
+  })
+
+  it('still rejects duplicate completed header names', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([
+      { key: 'Content-Type', value: 'application/json' },
+      { key: 'Content-Type', value: 'application/custom' },
+    ])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Header name already exists',
+            path: [0, 'key'],
+          }),
+          expect.objectContaining({
+            message: 'Header name already exists',
+            path: [1, 'key'],
+          }),
+        ])
+      )
+    }
   })
 })
 

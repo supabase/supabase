@@ -158,7 +158,7 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it('rejects incomplete header rows with inline field errors', async () => {
+  it('ignores incomplete header rows instead of blocking submit', async () => {
     const user = userEvent.setup()
     const { onSubmit } = renderForm()
 
@@ -171,10 +171,20 @@ describe('LogDrainDestinationSheetForm', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Add a new header' }))
 
+    const headerNameInputs = screen.getAllByPlaceholderText('Header name')
+    await user.type(headerNameInputs[1], 'X-Draft-Only')
+
     submitForm()
 
-    expect(await screen.findByText('Header name is required')).toBeInTheDocument()
-    expect(await screen.findByText('Header value is required')).toBeInTheDocument()
-    expect(onSubmit).not.toHaveBeenCalled()
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'webhook',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    )
+    expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
 })
