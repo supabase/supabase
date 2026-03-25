@@ -51,7 +51,11 @@ export async function getEdgeFunctionsLastHourStats(
   const startDate = dayjs().subtract(1, 'hour').toISOString()
 
   const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: { path: { ref: projectRef } },
+    params: {
+      path: { ref: projectRef },
+      // @ts-ignore [Joshen] Just to easily identify this request in the network tools
+      query: { key: 'last-hour-stats' },
+    },
     body: {
       sql: getEdgeFunctionsLastHourStatsSql(functionIds),
       iso_timestamp_start: startDate,
@@ -110,8 +114,6 @@ export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHour
     queryFn: ({ signal }) => getEdgeFunctionsLastHourStats({ projectRef, functionIds }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && functionIds.length > 0,
     staleTime: 60 * 1000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
     retry: false,
     ...options,
   })

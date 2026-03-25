@@ -44,6 +44,14 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
+
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSortQueryParam] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
+  )
+
   const {
     data: functions,
     error,
@@ -51,12 +59,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-
-  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
-  const [sort, setSortQueryParam] = useQueryState(
-    'sort',
-    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
-  )
 
   const filteredFunctions = useMemo(() => {
     const temp = (functions ?? []).filter((x) =>
@@ -82,17 +84,17 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     })
   }, [functions, search, sort])
 
-  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
-  const visibleFunctionIds = useMemo(() => {
-    if (!showLastHourStats) return []
-    return normalizeFunctionIds(filteredFunctions.map((item) => item.id))
-  }, [filteredFunctions, showLastHourStats])
+  const functionIds = useMemo(() => {
+    if (!showLastHourStats || !functions) return []
+    return normalizeFunctionIds(functions.map((item) => item.id))
+  }, [functions, showLastHourStats])
+
   const {
     data: lastHourStats,
     isPending: isStatsPending,
     isError: isStatsError,
   } = useEdgeFunctionsLastHourStatsQuery(
-    { projectRef: ref, functionIds: visibleFunctionIds },
+    { projectRef: ref, functionIds },
     { enabled: showLastHourStats }
   )
 
