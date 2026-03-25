@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { PropsWithChildren, useMemo } from 'react'
-import { Handle, Position } from 'reactflow'
+import { Handle, Position } from '@xyflow/react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -59,7 +59,11 @@ export const PrimaryDatabaseNode = () => {
           src={`${BASE_PATH}/img/regions/${project?.region}.svg`}
         />
       )}
-      {hasReplication && <Handle type="source" position={Position.Right} className="opacity-25" />}
+      <Handle
+        type="source"
+        position={Position.Right}
+        className={hasReplication ? 'opacity-25' : 'opacity-0'}
+      />
     </NodeContainer>
   )
 }

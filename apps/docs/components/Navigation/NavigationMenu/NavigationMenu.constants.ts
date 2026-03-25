@@ -500,6 +500,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
         {
+          name: 'Agent Skills',
+          url: '/guides/getting-started/ai-skills' as `/${string}`,
+        },
+        {
           name: 'Supabase MCP server',
           url: '/guides/getting-started/mcp' as `/${string}`,
         },
@@ -771,6 +775,12 @@ export const auth: NavMenuConstant = {
               url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
             },
           ],
+        },
+
+        {
+          name: 'Custom OAuth/OIDC Providers',
+          url: '/guides/auth/custom-oauth-providers',
+          enabled: allAuthProvidersEnabled,
         },
 
         {

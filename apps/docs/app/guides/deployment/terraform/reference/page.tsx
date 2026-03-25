@@ -13,7 +13,7 @@ import {
 
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import {
   terraformDocsBranch,
@@ -394,21 +394,14 @@ const TerraformReferencePage = async () => {
  * Fetch JSON schema from external repo
  */
 const getSchema = async () => {
-  let response: Response
-  try {
-    response = await fetchRevalidatePerDay(
-      `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${terraformDocsDocsDir}/schema.json`
-    )
-  } catch (err) {
-    throw new Error(`Failed to fetch Terraform JSON schema from GitHub (network error): ${err}`)
-  }
-
-  if (!response.ok)
-    throw Error(
-      `Failed to fetch Terraform JSON schema from GitHub: ${response.status} ${response.statusText}`
-    )
-
-  const schema = await response.json()
+  const schema = JSON.parse(
+    await getGitHubFileContents({
+      org: terraformDocsOrg,
+      repo: terraformDocsRepo,
+      path: `${terraformDocsDocsDir}/schema.json`,
+      branch: terraformDocsBranch,
+    })
+  )
 
   return {
     schema,

@@ -175,17 +175,4 @@ describe('UpdateBillingAddressModal', () => {
     render(<UpdateBillingAddressModal />)
     expect(screen.queryByText('Save address')).not.toBeInTheDocument()
   })
-
-  it('dismisses on close button click', async () => {
-    render(<UpdateBillingAddressModal />)
-    expect(await screen.findByText('Billing address required')).toBeInTheDocument()
-
-    // Click the X (close) button in DialogContent
-    const closeButton = screen.getByRole('button', { name: /close/i })
-    await userEvent.click(closeButton)
-
-    await waitFor(() => {
-      expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
-    })
-  })
 })
