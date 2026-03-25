@@ -171,34 +171,33 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           <form
             id={formId}
             onSubmit={form.handleSubmit(onSaveChanges)}
-            className="group border-t border-default bg-surface-100 px-2 md:pl-20 text-foreground"
+            className="group border-t border-default bg-surface-100 py-6 px-5 md:px-20 text-foreground"
           >
             <div className="py-4 space-y-[9px]">
               {(Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[]).map(
                 (permission) => (
-                  <CardContent key={permission}>
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name={permission}
-                      disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
-                      render={({ field }) => (
-                        <FormItemLayout
-                          id={permission}
-                          layout="flex"
-                          label={ROLE_PERMISSIONS[permission].description}
-                        >
-                          <FormControl_Shadcn_>
-                            <Switch
-                              id={permission}
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
-                            />
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-                  </CardContent>
+                  <FormField_Shadcn_
+                    key={permission}
+                    control={form.control}
+                    name={permission}
+                    disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        id={permission}
+                        layout="flex"
+                        label={ROLE_PERMISSIONS[permission].description}
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            id={permission}
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
                 )
               )}
             </div>
