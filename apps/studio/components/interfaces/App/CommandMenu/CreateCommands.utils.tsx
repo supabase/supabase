@@ -1,5 +1,3 @@
-'use client'
-
 import { useParams } from 'common'
 import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
 import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
