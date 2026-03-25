@@ -30,6 +30,9 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
   const { ref: projectRef } = useParams()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+    },
   })
 
   const handleToggle = () => setVisible(!visible)
@@ -46,7 +49,14 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
 
   const onInviteUser: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
-    inviteUser({ projectRef, email: values.email })
+    inviteUser(
+      { projectRef, email: values.email },
+      {
+        onSuccess: () => {
+          form.reset()
+        },
+      }
+    )
   }
 
   return (
