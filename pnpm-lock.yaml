@@ -445,7 +445,7 @@ importers:
         specifier: ^1.0.0
         version: 1.0.1
       next:
-        specifier: 'catalog:'
+        specifier: ^15.5.14
         version: 15.5.14(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-mdx-remote:
         specifier: ^6.0.0
@@ -1736,7 +1736,7 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       next:
-        specifier: 'catalog:'
+        specifier: ^15.5.14
         version: 15.5.14(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       next-mdx-remote:
         specifier: ^6.0.0
@@ -21831,7 +21831,7 @@ snapshots:
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
-      semver: 7.7.3
+      semver: 7.7.4
       tar: 7.5.11
     transitivePeerDependencies:
       - encoding
@@ -22187,7 +22187,7 @@ snapshots:
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.7.3
+      semver: 7.7.4
 
   '@npmcli/git@4.1.0':
     dependencies:
@@ -22197,7 +22197,7 @@ snapshots:
       proc-log: 3.0.0
       promise-inflight: 1.0.1
       promise-retry: 2.0.1
-      semver: 7.7.3
+      semver: 7.7.4
       which: 3.0.1
     transitivePeerDependencies:
       - bluebird
@@ -22210,7 +22210,7 @@ snapshots:
       json-parse-even-better-errors: 3.0.2
       normalize-package-data: 5.0.0
       proc-log: 3.0.0
-      semver: 7.7.3
+      semver: 7.7.4
     transitivePeerDependencies:
       - bluebird
 
@@ -23137,7 +23137,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.24.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.24.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.24.1(@opentelemetry/api@1.9.0)
-      semver: 7.7.3
+      semver: 7.7.4
 
   '@opentelemetry/sdk-trace-node@1.26.0(@opentelemetry/api@1.9.0)':
     dependencies:
@@ -23147,7 +23147,7 @@ snapshots:
       '@opentelemetry/propagator-b3': 1.26.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/propagator-jaeger': 1.26.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-base': 1.26.0(@opentelemetry/api@1.9.0)
-      semver: 7.7.3
+      semver: 7.7.4
 
   '@opentelemetry/semantic-conventions@1.24.1': {}
 
@@ -27201,7 +27201,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.48.0
       debug: 4.4.3(supports-color@8.1.1)
       minimatch: 9.0.7
-      semver: 7.7.3
+      semver: 7.7.4
       tinyglobby: 0.2.15
       ts-api-utils: 2.1.0(typescript@6.0.2)
       typescript: 6.0.2
@@ -28262,7 +28262,7 @@ snapshots:
   browserslist@4.26.2:
     dependencies:
       baseline-browser-mapping: 2.10.0
-      caniuse-lite: 1.0.30001743
+      caniuse-lite: 1.0.30001780
       electron-to-chromium: 1.5.221
       node-releases: 2.0.21
       update-browserslist-db: 1.1.3(browserslist@4.26.2)
@@ -32385,7 +32385,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.3
+      semver: 7.7.4
 
   make-error@1.3.6:
     optional: true
@@ -33767,7 +33767,7 @@ snapshots:
     dependencies:
       '@next/env': 15.5.14
       '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001743
+      caniuse-lite: 1.0.30001780
       postcss: 8.4.31
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -33962,7 +33962,7 @@ snapshots:
       make-fetch-happen: 13.0.1(supports-color@8.1.1)
       nopt: 7.2.1
       proc-log: 3.0.0
-      semver: 7.7.3
+      semver: 7.7.4
       tar: 7.5.11
       which: 4.0.0
     transitivePeerDependencies:
@@ -34027,7 +34027,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       is-core-module: 2.16.1
-      semver: 7.7.3
+      semver: 7.7.4
       validate-npm-package-license: 3.0.4
 
   normalize-path@2.1.1:
@@ -34038,7 +34038,7 @@ snapshots:
 
   npm-install-checks@6.3.0:
     dependencies:
-      semver: 7.7.3
+      semver: 7.7.4
 
   npm-normalize-package-bin@3.0.1: {}
 
@@ -34048,7 +34048,7 @@ snapshots:
     dependencies:
       hosted-git-info: 6.1.3
       proc-log: 3.0.0
-      semver: 7.7.3
+      semver: 7.7.4
       validate-npm-package-name: 5.0.1
 
   npm-pick-manifest@8.0.2:
@@ -34056,7 +34056,7 @@ snapshots:
       npm-install-checks: 6.3.0
       npm-normalize-package-bin: 3.0.1
       npm-package-arg: 10.1.0
-      semver: 7.7.3
+      semver: 7.7.4
 
   npm-run-all@4.1.5:
     dependencies:
@@ -36553,7 +36553,7 @@ snapshots:
     dependencies:
       '@img/colour': 1.0.0
       detect-libc: 2.1.2
-      semver: 7.7.3
+      semver: 7.7.4
     optionalDependencies:
       '@img/sharp-darwin-arm64': 0.34.5
       '@img/sharp-darwin-x64': 0.34.5
