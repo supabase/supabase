@@ -1,7 +1,3 @@
-import { CpuIcon, Lock, Microchip } from 'lucide-react'
-import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
@@ -14,6 +10,9 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { DOCS_URL, InstanceSpecs } from 'lib/constants'
+import { ChevronRight, CpuIcon, Lock, Microchip } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
   cn,
   FormField_Shadcn_,
@@ -26,16 +25,36 @@ import {
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
-  getAvailableComputeOptions,
   ComputeAddonVariant,
+  getAvailableComputeOptions,
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
+
+const INITIALLY_VISIBLE_COUNT = 6
+
+// Variant IDs for sizes beyond the initial visible set (2XL and above)
+const LARGE_COMPUTE_VARIANT_IDS = [
+  'ci_2xlarge',
+  'ci_4xlarge',
+  'ci_8xlarge',
+  'ci_12xlarge',
+  'ci_16xlarge',
+  'ci_24xlarge',
+  'ci_24xlarge_optimized_memory',
+  'ci_24xlarge_optimized_cpu',
+  'ci_24xlarge_high_memory',
+  'ci_48xlarge',
+  'ci_48xlarge_optimized_memory',
+  'ci_48xlarge_optimized_cpu',
+  'ci_48xlarge_high_memory',
+]
 
 /**
  * to do: this could be a type from api-types
@@ -79,6 +98,18 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
 
+  // Expand by default if the project's current compute size is in the hidden set
+  const [showAllSizes, setShowAllSizes] = useState(() =>
+    LARGE_COMPUTE_VARIANT_IDS.includes(computeSize)
+  )
+
+  // Also expand if computeSize changes to a large size after mount (e.g. after a form reset)
+  useEffect(() => {
+    if (LARGE_COMPUTE_VARIANT_IDS.includes(computeSize) && !showAllSizes) {
+      setShowAllSizes(true)
+    }
+  }, [computeSize]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
   const computeSizePrice = calculateComputeSizePrice({
@@ -90,6 +121,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const projectComputeSize = project?.infra_compute_size ?? 'nano'
   const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
+
+  const visibleOptions = showAllSizes
+    ? availableOptions
+    : availableOptions.slice(0, INITIALLY_VISIBLE_COUNT)
+  const hasHiddenOptions = availableOptions.length > INITIALLY_VISIBLE_COUNT
 
   return (
     <FormField_Shadcn_
@@ -157,7 +193,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               }
             >
               {isLoading ? (
-                Array(10)
+                Array(6)
                   .fill(0)
                   .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
               ) : addonsError ? (
@@ -166,7 +202,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 </FormMessage>
               ) : (
                 <>
-                  {availableOptions.map((compute) => {
+                  {visibleOptions.map((compute) => {
                     const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
 
                     const lockedMicroDueToPITR =
@@ -293,58 +329,75 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                     )
                   })}
 
-                  <RadioGroupCardItem
-                    id="larger-compute"
-                    key="larger-compute"
-                    showIndicator={false}
-                    value="larger-compute"
-                    onClick={(e) => e.preventDefault()}
-                    className={cn(
-                      'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
-                    )}
-                    label={
-                      <SupportLink
-                        queryParams={{
-                          projectRef: ref,
-                          category: SupportCategories.SALES_ENQUIRY,
-                          subject: 'Enquiry about larger instance sizes',
-                        }}
-                      >
-                        <div className="w-full flex flex-col gap-3 justify-between">
-                          <div className="relative px-3 flex justify-between">
-                            <ComputeBadge infraComputeSize=">16XL" />
+                  {showAllSizes && (
+                    <RadioGroupCardItem
+                      id="larger-compute"
+                      key="larger-compute"
+                      showIndicator={false}
+                      value="larger-compute"
+                      onClick={(e) => e.preventDefault()}
+                      className={cn(
+                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
+                      )}
+                      label={
+                        <SupportLink
+                          queryParams={{
+                            projectRef: ref,
+                            category: SupportCategories.SALES_ENQUIRY,
+                            subject: 'Enquiry about larger instance sizes',
+                          }}
+                        >
+                          <div className="w-full flex flex-col gap-3 justify-between">
+                            <div className="relative px-3 flex justify-between">
+                              <ComputeBadge infraComputeSize=">16XL" />
 
-                            <div className="flex items-center space-x-1 opacity-50 ">
-                              <span className="text-foreground-light text-sm">Contact Us</span>
-                            </div>
-                          </div>
-                          <div className="w-full">
-                            <div className="px-3 text-sm flex flex-col gap-1">
-                              <div className="text-foreground-light flex gap-2 items-center">
-                                <Microchip
-                                  strokeWidth={1}
-                                  size={14}
-                                  className="text-foreground-lighter"
-                                />
-                                <span>Custom memory</span>
-                              </div>
-                              <div className="text-foreground-light flex gap-2 items-center">
-                                <CpuIcon
-                                  strokeWidth={1}
-                                  size={14}
-                                  className="text-foreground-lighter"
-                                />
-                                <span>Custom CPU</span>
+                              <div className="flex items-center space-x-1 opacity-50 ">
+                                <span className="text-foreground-light text-sm">Contact Us</span>
                               </div>
                             </div>
+                            <div className="w-full">
+                              <div className="px-3 text-sm flex flex-col gap-1">
+                                <div className="text-foreground-light flex gap-2 items-center">
+                                  <Microchip
+                                    strokeWidth={1}
+                                    size={14}
+                                    className="text-foreground-lighter"
+                                  />
+                                  <span>Custom memory</span>
+                                </div>
+                                <div className="text-foreground-light flex gap-2 items-center">
+                                  <CpuIcon
+                                    strokeWidth={1}
+                                    size={14}
+                                    className="text-foreground-lighter"
+                                  />
+                                  <span>Custom CPU</span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </SupportLink>
-                    }
-                  />
+                        </SupportLink>
+                      }
+                    />
+                  )}
                 </>
               )}
             </div>
+
+            {!isLoading && !addonsError && hasHiddenOptions && (
+              <button
+                type="button"
+                onClick={() => setShowAllSizes((prev) => !prev)}
+                className="mt-2 flex items-center gap-1 text-sm text-foreground-lighter hover:text-foreground-light transition-colors"
+              >
+                <ChevronRight
+                  size={14}
+                  strokeWidth={1.5}
+                  className={cn('transition-transform', showAllSizes && 'rotate-90')}
+                />
+                {showAllSizes ? 'Show fewer sizes' : 'Show all sizes'}
+              </button>
+            )}
           </FormItemLayout>
         </RadioGroupCard>
       )}
