@@ -68,9 +68,7 @@ export const ProjectCardStatus = ({
         return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
     }
 
-    if (!resourceWarnings) {
-      return renderMode === 'badge' && projectStatus === 'isHealthy' ? 'Active' : undefined
-    }
+    if (!resourceWarnings) return undefined
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1
@@ -119,14 +117,6 @@ export const ProjectCardStatus = ({
     (activeWarnings.length === 0 || warningContent === undefined) &&
     projectStatus === 'isHealthy'
   ) {
-    if (renderMode === 'badge') {
-      return (
-        // Badge must be wrapped in a div in order to be centered in table cell
-        <div className="flex items-center">
-          <Badge variant="success">Active</Badge>
-        </div>
-      )
-    }
     return null
   }
 
