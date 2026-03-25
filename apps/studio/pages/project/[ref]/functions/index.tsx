@@ -19,6 +19,7 @@ import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useEdgeFunctionsLastHourStatsQuery } from 'data/edge-functions/edge-functions-last-hour-stats-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { normalizeFunctionIds } from 'data/edge-functions/keys'
 import { usePHFlag } from 'hooks/ui/useFlag'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import { ExternalLink, Search, X } from 'lucide-react'
@@ -82,10 +83,10 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   }, [functions, search, sort])
 
   const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
-  const visibleFunctionIds = useMemo(
-    () => (showLastHourStats ? filteredFunctions.map((item) => item.id) : []),
-    [filteredFunctions, showLastHourStats]
-  )
+  const visibleFunctionIds = useMemo(() => {
+    if (!showLastHourStats) return []
+    return normalizeFunctionIds(filteredFunctions.map((item) => item.id))
+  }, [filteredFunctions, showLastHourStats])
   const {
     data: lastHourStats,
     isPending: isStatsPending,
