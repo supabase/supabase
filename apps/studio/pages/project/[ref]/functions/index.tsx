@@ -143,10 +143,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <EdgeFunctionsSortDropdown
-                          value={sort}
-                          onChange={setSortQueryParam}
-                        />
+                        <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
                       </div>
                       <span className="border-l border-default pl-2 text-xs text-foreground-light">
                         {search && filteredFunctions.length !== functions.length

@@ -1,6 +1,6 @@
+import { get } from 'data/fetchers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { get } from 'data/fetchers'
 import { getEdgeFunctionsLastHourStats } from './edge-functions-last-hour-stats-query'
 
 vi.mock('data/fetchers', () => ({
@@ -41,7 +41,9 @@ describe('getEdgeFunctionsLastHourStats', () => {
       signal: undefined,
     })
 
-    expect(vi.mocked(get).mock.calls[0]?.[1]?.params?.query?.sql).toContain('from\n  function_edge_logs')
+    expect(vi.mocked(get).mock.calls[0]?.[1]?.params?.query?.sql).toContain(
+      'from\n  function_edge_logs'
+    )
   })
 
   it('coerces counts to numbers and computes error rates per function', async () => {
