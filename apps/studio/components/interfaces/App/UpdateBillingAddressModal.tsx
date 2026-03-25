@@ -1,12 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
-import { useTheme } from 'next-themes'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import {
   getAddressElementAppearanceOptions,
   STRIPE_ELEMENT_FONTS,
@@ -21,6 +17,9 @@ import { invalidateOrganizationsQuery } from 'data/organizations/organizations-q
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useTheme } from 'next-themes'
+import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,

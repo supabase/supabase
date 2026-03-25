@@ -1,16 +1,16 @@
 import type { Appearance, CustomFontSource } from '@stripe/stripe-js'
-
 import { CUSTOM_FONT_BOOK_DATA_URL } from 'fonts/stripe-fonts'
 
 /**
  * Custom font for Stripe Elements iframes.
  * Stripe renders inside an iframe that can't access the parent page's CSS variables or fonts,
  * so we pass the font explicitly (Stripe requires https:// or data:// sources).
- * In production (HTTPS), we use a static URL. In dev (HTTP), we fall back to a base64 data URL.
+ * The production CDN asset is CORS-restricted, so non-prod environments fall back to a data URL.
  */
-const fontSrc = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https')
-  ? `url(${process.env.NEXT_PUBLIC_SITE_URL}/fonts/CustomFont-Book.woff2)`
-  : `url(${CUSTOM_FONT_BOOK_DATA_URL})`
+const fontSrc =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+    ? 'url(https://frontend-assets.supabase.com/fonts/CustomFont-Book.woff2)'
+    : `url(${CUSTOM_FONT_BOOK_DATA_URL})`
 
 export const STRIPE_ELEMENT_FONTS: CustomFontSource[] = [
   {
