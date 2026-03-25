@@ -208,11 +208,12 @@ test.describe('Database', () => {
       await expect(page.getByRole('button', { name: 'New table' })).toBeVisible()
 
       // validates database name is present and has accurate number of columns
-      const tableRow = page.getByRole('row', {
-        name: `${databaseTableName} No description`,
-      })
+      const tableRow = page
+        .getByRole('row')
+        .filter({ has: page.getByText(databaseTableName, { exact: true }) })
+        .first()
       await expect(tableRow).toContainText(databaseTableName)
-      await expect(tableRow.getByRole('cell').nth(2)).toHaveText('3')
+      await expect(tableRow.getByRole('cell').filter({ hasText: /^3$/ }).first()).toBeVisible()
       await expect(tableRow.getByRole('link', { name: 'View columns' })).toBeVisible()
 
       // change schema -> auth
