@@ -212,6 +212,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/status-codes',
           items: [],
         },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
       ],
     },
     {

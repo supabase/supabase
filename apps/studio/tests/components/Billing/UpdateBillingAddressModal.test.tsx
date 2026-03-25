@@ -2,6 +2,7 @@ import type {
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { UpdateBillingAddressModal } from 'components/interfaces/App/UpdateBillingAddressModal'
@@ -129,13 +130,21 @@ vi.mock('hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: mockOrg() }),
 }))
 
+const mockCanRead = vi.fn(() => true)
 const mockCanWrite = vi.fn(() => true)
-const mockPermissionsLoaded = vi.fn(() => true)
+const mockBillingReadLoaded = vi.fn(() => true)
+const mockBillingWriteLoaded = vi.fn(() => true)
 vi.mock('hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({
-    can: mockCanWrite(),
-    isSuccess: mockPermissionsLoaded(),
-  }),
+  useAsyncCheckPermissions: (action: PermissionAction) =>
+    action === PermissionAction.BILLING_READ
+      ? {
+          can: mockCanRead(),
+          isSuccess: mockBillingReadLoaded(),
+        }
+      : {
+          can: mockCanWrite(),
+          isSuccess: mockBillingWriteLoaded(),
+        },
 }))
 
 const mockCustomerProfile = vi.fn(() => ({
@@ -193,8 +202,10 @@ describe('UpdateBillingAddressModal', () => {
         plan: { id: 'pro', name: 'Pro' },
       })
     )
+    mockCanRead.mockReturnValue(true)
     mockCanWrite.mockReturnValue(true)
-    mockPermissionsLoaded.mockReturnValue(true)
+    mockBillingReadLoaded.mockReturnValue(true)
+    mockBillingWriteLoaded.mockReturnValue(true)
     mockProfileLoaded.mockReturnValue(true)
     mockTaxIdLoaded.mockReturnValue(true)
     mockCustomerProfile.mockReturnValue({
@@ -245,7 +256,18 @@ describe('UpdateBillingAddressModal', () => {
     expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
   })
 
-  it('does not render when user lacks billing write permission', () => {
+  it('renders an informational modal when user has read access but no write access', async () => {
+    mockCanRead.mockReturnValue(true)
+    mockCanWrite.mockReturnValue(false)
+    render(<UpdateBillingAddressModal />)
+
+    expect(await screen.findByText('Billing address required')).toBeInTheDocument()
+    expect(screen.getByText(/please ask an organization administrator or owner/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save address' })).not.toBeInTheDocument()
+  })
+
+  it('does not render when user lacks both billing read and write permission', () => {
+    mockCanRead.mockReturnValue(false)
     mockCanWrite.mockReturnValue(false)
     render(<UpdateBillingAddressModal />)
     expect(screen.queryByText('Billing address required')).not.toBeInTheDocument()
@@ -274,12 +296,12 @@ describe('UpdateBillingAddressModal', () => {
     render(<UpdateBillingAddressModal />)
     expect(screen.queryByText('Save address')).not.toBeInTheDocument()
   })
-
   it('dismisses on close button click', async () => {
+    mockCanRead.mockReturnValue(true)
+    mockCanWrite.mockReturnValue(false)
     render(<UpdateBillingAddressModal />)
     expect(await screen.findByText('Billing address required')).toBeInTheDocument()
 
-    // Click the X (close) button in DialogContent
     const closeButton = screen.getByRole('button', { name: /close/i })
     await userEvent.click(closeButton)
 
