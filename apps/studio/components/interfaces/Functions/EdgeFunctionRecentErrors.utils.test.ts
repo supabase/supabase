@@ -42,6 +42,7 @@ limit 25`)
   it('groups recent failed invocations by parsed error message', () => {
     const groups = getRecentErrorGroupsBase([
       {
+        id: 'invocation-1',
         event_message: 'POST | 500 | database exploded',
         method: 'POST',
         status_code: 500,
@@ -50,6 +51,7 @@ limit 25`)
         timestamp: 100,
       },
       {
+        id: 'invocation-2',
         event_message: 'POST | 500 | database exploded',
         method: 'POST',
         status_code: 500,
@@ -58,6 +60,7 @@ limit 25`)
         timestamp: 120,
       },
       {
+        id: 'invocation-3',
         event_message: '',
         method: 'GET',
         status_code: 503,
@@ -111,24 +114,28 @@ limit 25`)
         recentErrorGroupsBase,
         functionRuntimeLogs: [
           {
+            id: 'runtime-log-1',
             execution_id: 'exec-1',
             level: 'error',
             event_message: 'stack trace',
             timestamp: 101,
           },
           {
+            id: 'runtime-log-2',
             execution_id: 'exec-2',
             level: 'error',
             event_message: 'stack trace',
             timestamp: 121,
           },
           {
+            id: 'runtime-log-3',
             execution_id: 'exec-2',
             event_type: 'warn',
             event_message: 'retrying upstream',
             timestamp: 119,
           },
           {
+            id: 'runtime-log-4',
             execution_id: '',
             level: 'info',
             event_message: 'ignored',
