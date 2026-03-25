@@ -45,6 +45,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
               className="w-56 2xl:w-full"
               schema={schema}
               value={field.value}
+              stopScrollPropagation
               onChange={(name) => field.onChange(name)}
             />
           </FormItemLayout>

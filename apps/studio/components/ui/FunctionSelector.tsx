@@ -38,6 +38,7 @@ interface FunctionSelectorProps {
   value: string
   onChange: (value: string) => void
   disabled?: boolean
+  stopScrollPropagation?: boolean
   // used to filter the functions by a criteria
   filterFunction?: (func: DatabaseFunction) => boolean
   noResultsLabel?: React.ReactNode
@@ -51,6 +52,7 @@ const FunctionSelector = ({
   schema,
   value,
   onChange,
+  stopScrollPropagation = false,
   filterFunction = () => true,
   noResultsLabel = <span>No functions found in this schema.</span>,
 }: FunctionSelectorProps) => {
@@ -127,7 +129,9 @@ const FunctionSelector = ({
           <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Search functions..." />
-              <CommandList_Shadcn_>
+              <CommandList_Shadcn_
+                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
+              >
                 <CommandEmpty_Shadcn_>No functions found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(functions || []).length > 7 ? 'h-[210px]' : ''}>
