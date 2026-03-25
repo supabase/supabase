@@ -16,6 +16,8 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+
 const PauseProjectButton = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
@@ -32,10 +34,12 @@ const PauseProjectButton = () => {
     'queue_jobs.projects.pause'
   )
 
-  const isAwsK8s = useIsAwsK8sCloudProvider()
   const isFreePlan = organization?.plan.id === 'free'
   const isBranch = Boolean(project?.parent_project_ref)
-  const isPaidAndNotAwsK8s = !isBranch && !isFreePlan && !isAwsK8s
+  const { hasAccess: projectPausingAllowedInOrg } = useCheckEntitlements(
+    'project_pausing',
+    organization?.slug
+  )
 
   const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
@@ -53,7 +57,12 @@ const PauseProjectButton = () => {
   }
 
   const buttonDisabled =
-    isPaidAndNotAwsK8s || project === undefined || isPaused || !canPauseProject || !isProjectActive
+    isBranch ||
+    !projectPausingAllowedInOrg ||
+    project === undefined ||
+    isPaused ||
+    !canPauseProject ||
+    !isProjectActive
 
   return (
     <>
@@ -72,9 +81,11 @@ const PauseProjectButton = () => {
                 ? 'You need additional permissions to pause this project'
                 : !isProjectActive
                   ? 'Unable to pause project as project is not active'
-                  : isPaidAndNotAwsK8s
-                    ? 'Projects on a paid plan will always be running'
-                    : undefined,
+                  : isBranch
+                    ? 'Branch projects cannot be paused'
+                    : !projectPausingAllowedInOrg && !isFreePlan
+                      ? 'Projects on a paid plan will always be running'
+                      : undefined,
           },
         }}
       >
