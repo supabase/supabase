@@ -22,6 +22,8 @@ custom_edit_url: https://github.com/supabase/supabase/edit/master/web/spec/supab
 
     If you use Xcode, follow [Apple's dependencies guide](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app) to add supabase-swift to your project. Use https://github.com/supabase-community/supabase-swift.git for the url when Xcode asks.
 
+    After adding the package dependency, you must also add the `Supabase` library to your target. In Xcode, select your project in the navigator, then select your app target under "Targets". Under the "General" tab, scroll to "Frameworks, Libraries, and Embedded Content" and click the "+" button. Search for and add the `Supabase` library (or a subset such as `Auth`, `Realtime`, `Postgrest`, `Functions`, or `Storage`). Without this step, you may encounter a "No such module 'Supabase'" build error.
+
     If you don't want the full Supabase environment, you can add individual packages, such as Functions, `Auth`, `Realtime`, `Storage`, or `PostgREST`.
 
   </RefSubLayout.Details>

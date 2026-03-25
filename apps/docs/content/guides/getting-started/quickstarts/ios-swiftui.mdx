@@ -31,7 +31,7 @@ hideToc: true
 
       In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
-      Make sure to add `Supabase` product package as a dependency to your application target.
+      After adding the package, you must explicitly add the `Supabase` library to your app target. Select your project in the navigator, choose your app target under **Targets**, go to the **General** tab, scroll to **Frameworks, Libraries, and Embedded Content**, and click **+** to add `Supabase`. Without this step, Xcode may fail to build with a "No such module 'Supabase'" error.
 
     </StepHikeCompact.Details>
 
