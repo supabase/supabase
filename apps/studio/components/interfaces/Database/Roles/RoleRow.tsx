@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PGRole } from '@supabase/pg-meta/src/pg-meta-roles'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import type { PgRole } from 'data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
@@ -8,7 +9,6 @@ import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  CardContent,
   cn,
   Collapsible,
   DropdownMenu,
@@ -31,13 +31,14 @@ interface RoleRowProps {
   onSelectDelete: (role: string) => void
 }
 
+const permissionSchema = z.boolean()
 const formSchema = z.object(
   Object.keys(ROLE_PERMISSIONS).reduce(
     (acc, key) => ({
       ...acc,
-      [key]: z.boolean(),
+      [key]: permissionSchema,
     }),
-    {} as Record<string, any>
+    {} as Record<keyof typeof ROLE_PERMISSIONS, z.ZodBoolean>
   )
 )
 
@@ -62,7 +63,10 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
     if (!project) return console.error('Project is required')
 
     const changed = Object.fromEntries(
-      Object.entries(values).filter(([k, v]) => v !== (role as any)[k])
+      Object.entries(values).filter(([k, v]) => {
+        const key = k as keyof PGRole
+        return v !== role[key]
+      })
     )
 
     updateDatabaseRole(
@@ -73,8 +77,9 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         payload: changed,
       },
       {
-        onSuccess: () => {
+        onSuccess: (newValues) => {
           toast.success(`Successfully updated role "${role.name}"`)
+          reset(newValues)
         },
       }
     )
@@ -101,7 +106,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
       <Collapsible.Trigger asChild>
         <div className="flex items-center gap-2 pr-4">
           <button
-            id="collapsible-trigger"
+            id={`collapsible-trigger-${role.id}`}
             type="button"
             className="group flex w-full items-center justify-between rounded py-3 px-card text-foreground"
             onClick={(event) => {
@@ -112,18 +117,13 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           >
             <div className="flex items-start space-x-3">
               <ChevronUp
-                id="collapsible-trigger"
                 className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
               />
               <div className="space-x-2 flex items-center">
-                <p className="text-left text-sm" id="collapsible-trigger">
-                  {role.name}
-                </p>
-                <p className="text-left text-sm text-foreground-light" id="collapsible-trigger">
-                  (ID: {role.id})
-                </p>
+                <p className="text-left text-sm">{role.name}</p>
+                <p className="text-left text-sm text-foreground-light">(ID: {role.id})</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -136,7 +136,6 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 </div>
               )}
               <p
-                id="collapsible-trigger"
                 className={`text-sm ${
                   role.activeConnections > 0 ? 'text-foreground' : 'text-foreground-light'
                 }`}
