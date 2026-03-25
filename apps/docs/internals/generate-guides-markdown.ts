@@ -1,5 +1,6 @@
-import fs from 'fs'
-import path from 'path'
+import { execFileSync } from 'node:child_process'
+import fs from 'node:fs'
+import path from 'node:path'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 
@@ -160,6 +161,11 @@ async function generate() {
 
   const summary = warnings ? ` (${warnings} with warnings)` : ''
   console.log(`Generated ${files.length} markdown files under public/docs/guides/${summary}`)
+
+  // Create a public tar.gz archive of the generated docs (used by supabase-ssh)
+  const archivePath = 'public/docs.tar.gz'
+  execFileSync('tar', ['-czf', archivePath, '-C', 'public/docs', '.'])
+  console.log(`Created archive at ${archivePath}`)
 }
 
 generate()
