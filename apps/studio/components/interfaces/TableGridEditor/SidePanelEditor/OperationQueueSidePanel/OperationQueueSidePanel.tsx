@@ -63,7 +63,7 @@ export const OperationQueueSidePanel = () => {
                 onClick={confirmOnClose}
                 disabled={isSaving || operations.length === 0}
               >
-                Cancel
+                Discard
               </Button>
               <Button
                 onClick={handleSave}
