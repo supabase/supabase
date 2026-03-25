@@ -136,17 +136,17 @@ storage:
 
 ## Session token
 
-You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations. This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
+You can authenticate to Supabase S3 using a user’s JWT to enforce Row-Level Security (RLS) across S3 operations. This is useful when initializing the S3 client on the server for a specific user session, or when using the client directly from the frontend.
 
-All S3 operations performed with the Session Token are scoped to the authenticated user. RLS policies on the Storage Schema are respected.
+All operations performed with a session token are scoped to the authenticated user, and any RLS policies defined in the storage schema will be applied.
 
-To authenticate with S3 using a Session Token, use the following credentials:
+To authenticate with S3 using a session token, provide the following credentials:
+- **region:** value from the `REGION` environment variable in your `.env` file
+- **access_key_id:** value from the `STORAGE_TENANT_ID` environment variable in your `.env` file
+- **secret_access_key:** value from the `ANON_KEY` environment variable
+- **session_token:** a valid user JWT
 
-- access_key_id: `STORAGE_TENANT_ID` environment variable in `.env` file
-- secret_access_key: `ANON_KEY` environment variable in `.env` file
-- session_token: `valid jwt token`
-
-For example, using the `aws-sdk` library:
+Example using the `aws-sdk` library:
 
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3'
@@ -157,11 +157,11 @@ const {
 
 const client = new S3Client({
   forcePathStyle: true,
-  region: 'REGION',
-  endpoint: 'http://supabase.example.com:8000/storage/v1/s3',
+  region: 'stub',                                  // REGION in .env
+  endpoint: 'http://<your-domain>/storage/v1/s3',  // Edit <your-domain>
   credentials: {
-    accessKeyId: 'STORAGE_TENANT_ID',
-    secretAccessKey: 'ANON_KEY',
+    accessKeyId: 'stub',                           // STORAGE_TENANT_ID in .env
+    secretAccessKey: 'your-anon-key',              // ANON_KEY in .env
     sessionToken: session.access_token,
   },
 })
