@@ -40,7 +40,6 @@ export function FilterCondition({
     isLoading,
     propertyOptionsCache,
     loadingOptions,
-    handleOperatorChange,
     handleInputChange,
     handleOperatorFocus,
     handleInputFocus,
@@ -62,15 +61,23 @@ export function FilterCondition({
   const [showValueCustom, setShowValueCustom] = useState(false)
   const [hasTypedOperator, setHasTypedOperator] = useState(false)
   const [hasTypedValue, setHasTypedValue] = useState(false)
+  const [localOperator, setLocalOperator] = useState(condition.operator)
   const [localValue, setLocalValue] = useState((condition.value ?? '').toString())
   const [propertySearchText, setPropertySearchText] = useState('')
 
+  const conditionOperator = condition.operator ?? ''
   const conditionValue = (condition.value ?? '').toString()
 
   // Reset "has typed" state when focus changes
   useEffect(() => {
     if (!isOperatorActive) setHasTypedOperator(false)
   }, [isOperatorActive])
+
+  useEffect(() => {
+    if (!isOperatorActive && localOperator !== conditionOperator) {
+      setLocalOperator(conditionOperator)
+    }
+  }, [conditionOperator, isOperatorActive, localOperator])
 
   useEffect(() => {
     if (!isActive) setHasTypedValue(false)
@@ -84,17 +91,17 @@ export function FilterCondition({
   }, [conditionValue])
 
   useEffect(() => {
-    if (isActive && valueRef.current) {
-      valueRef.current.focus()
-    } else if (isOperatorActive && operatorRef.current) {
+    if (isOperatorActive && operatorRef.current) {
       operatorRef.current.focus()
+    } else if (isActive && valueRef.current) {
+      valueRef.current.focus()
     }
   }, [isActive, isOperatorActive])
 
-  const handleOperatorBlur = useDeferredBlur(
-    wrapperRef as React.RefObject<HTMLElement>,
-    handleInputBlur
-  )
+  const handleOperatorBlur = useDeferredBlur(wrapperRef as React.RefObject<HTMLElement>, () => {
+    setLocalOperator(conditionOperator)
+    handleInputBlur()
+  })
   const handleValueBlur = useDeferredBlur(
     wrapperRef as React.RefObject<HTMLElement>,
     handleInputBlur
@@ -143,9 +150,10 @@ export function FilterCondition({
         { type: 'operator', path },
         rootFilters,
         filterProperties,
-        hasTypedOperator
+        hasTypedOperator,
+        localOperator
       ),
-    [path, rootFilters, filterProperties, hasTypedOperator]
+    [path, rootFilters, filterProperties, hasTypedOperator, localOperator]
   )
 
   const valueItems = useMemo(
@@ -186,13 +194,13 @@ export function FilterCondition({
 
   const handleOperatorBackspace = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Backspace' && condition.operator === '') {
+      if (e.key === 'Backspace' && localOperator === '') {
         e.preventDefault()
         handleRemoveCondition(path)
         setActiveInput({ type: 'group', path: path.slice(0, -1) })
       }
     },
-    [condition.operator, setActiveInput, path, handleRemoveCondition]
+    [localOperator, setActiveInput, path, handleRemoveCondition]
   )
 
   const {
@@ -233,13 +241,10 @@ export function FilterCondition({
     if (!isActive) resetValHighlight()
   }, [isActive, resetValHighlight])
 
-  const onOperatorChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setHasTypedOperator(true)
-      handleOperatorChange(path, e.target.value)
-    },
-    [handleOperatorChange, path]
-  )
+  const onOperatorChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setHasTypedOperator(true)
+    setLocalOperator(e.target.value)
+  }, [])
 
   const onValueChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -260,7 +265,7 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 py-1 bg-muted group shrink-0',
+        'flex items-stretch px-0 h-[26px] bg-muted group shrink-0',
         variant === 'pill' ? 'rounded border' : 'border-r',
         isHighlighted && 'ring-2 ring-primary'
       )}
@@ -327,9 +332,12 @@ export function FilterCondition({
             <Input_Shadcn_
               ref={operatorRef}
               type="text"
-              value={condition.operator}
+              value={isOperatorActive ? localOperator : conditionOperator}
               onChange={onOperatorChange}
-              onFocus={() => handleOperatorFocus(path)}
+              onFocus={() => {
+                setLocalOperator(conditionOperator)
+                handleOperatorFocus(path)
+              }}
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
               className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
@@ -343,7 +351,7 @@ export function FilterCondition({
               data-form-type="other"
             />
             <span className="invisible whitespace-pre text-xs block px-1 shrink-0 px-1">
-              {condition.operator || ' '}
+              {(isOperatorActive ? localOperator : conditionOperator) || ' '}
             </span>
           </div>
         </PopoverAnchor_Shadcn_>

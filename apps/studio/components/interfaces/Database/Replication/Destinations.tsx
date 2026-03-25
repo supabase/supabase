@@ -56,7 +56,7 @@ export const Destinations = () => {
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
 
   const [_, setDestinationType] = useQueryState(
-    'type',
+    'destinationType',
     parseAsStringEnum<DestinationType>([
       'Read Replica',
       'BigQuery',
@@ -94,7 +94,7 @@ export const Destinations = () => {
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
-      ? destinations ?? []
+      ? (destinations ?? [])
       : (destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )

@@ -195,7 +195,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
-      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : (restStatus?.status ?? 'UNHEALTHY'),
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled

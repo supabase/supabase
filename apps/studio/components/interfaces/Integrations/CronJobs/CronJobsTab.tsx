@@ -3,19 +3,18 @@ import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useInfiniteScroll } from 'hooks/misc/useInfiniteScroll'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
+import { cleanPointerEventsNoneOnBody } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { isGreaterThanOrEqual } from 'lib/semver'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { MouseEvent, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { LoadingLine, Sheet, SheetContent } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { LoadingLine } from 'ui'
 
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
@@ -34,7 +33,6 @@ export const CronjobsTab = () => {
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
-  const [isDirty, setIsDirty] = useState(false)
   const [search, setSearch] = useState(searchQuery)
 
   const handleSearchSubmit = () => {
@@ -95,24 +93,12 @@ export const CronjobsTab = () => {
     [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion]
   )
 
-  const xScroll = useRef<number>(0)
-
-  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
-    xScroll.current = event.currentTarget.scrollLeft
-
-    if (
-      grid.isLoading ||
-      grid.isFetchingNextPage ||
-      isScrollingHorizontally ||
-      !isAtBottom(event) ||
-      !grid.hasNextPage
-    ) {
-      return
-    }
-
-    grid.fetchNextPage()
-  }
+  const handleScroll = useInfiniteScroll({
+    isLoading: grid.isLoading,
+    isFetchingNextPage: grid.isFetchingNextPage,
+    hasNextPage: grid.hasNextPage,
+    fetchNextPage: grid.fetchNextPage,
+  })
 
   const onOpenCreateJobSheet = () => {
     sendEvent({
@@ -142,13 +128,6 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      onClose()
-    },
-  })
 
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
@@ -192,18 +171,11 @@ export const CronjobsTab = () => {
 
       <DeleteCronJob />
 
-      <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
-        <SheetContent size="default" tabIndex={undefined}>
-          <CreateCronJobSheet
-            selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
-            supportsSeconds={supportsSeconds}
-            onDirty={setIsDirty}
-            onClose={onClose}
-            onCloseWithConfirmation={confirmOnClose}
-          />
-        </SheetContent>
-      </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <CreateCronJobSheet
+        open={!!createCronJobSheetShown || !!cronJobForEditing}
+        selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
+        onClose={onClose}
+      />
     </>
   )
 }
@@ -227,20 +199,4 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`
     )}
   </div>
-)
-
-// Confirmation modal for unsaved changes
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
 )

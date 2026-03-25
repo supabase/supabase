@@ -15,13 +15,61 @@ Check updates for each service to learn more.
 
 ---
 
+## [2026-03-16]
+
+⚠️ **Note:** This update includes **important changes**. Please check the details below. The following configuration files have been added/updated: `utils/add-new-auth-keys.sh`, `utils/rotate-new-api-keys.sh`, `docker-compose.yml`, `.env.example`, `docker-compose.s3.yml`, `docker-compose.rustfs.yml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, `docker-compose.caddy.yml`, `docker-compose.nginx.yml`, `volumes/functions/main/index.ts`, and `volumes/proxy`.
+
+### Configuration
+- ⚠️ Added scripts and templates to support the new API key format (`sb_` API keys) and the new asymmetric authentication - PR [#43554](https://github.com/supabase/supabase/pull/43554); see the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-auth-keys) for detailed instructions
+- Added optional proxy configuration for Caddy and nginx - PR [#43291](https://github.com/supabase/supabase/pull/43291); read the [how-to guide](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) to learn more
+
+### Documentation
+- Added several new how-to guides to the self-hosted Supabase [documentation](https://supabase.com/docs/guides/self-hosting) - PR [#42745](https://github.com/supabase/supabase/pull/42745), PR [#42953](https://github.com/supabase/supabase/pull/42953), PR [#43177](https://github.com/supabase/supabase/pull/43177), PR [#43286](https://github.com/supabase/supabase/pull/43286), PR [#43293](https://github.com/supabase/supabase/pull/43293)
+
+### Utils and tests
+- Added `add-new-auth-keys.sh` and `rotate-new-api-keys.sh` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+- Added `./tests` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
+
+### Studio
+- Updated to `supabase/studio:2026.03.16-sha-5528817`
+- ⚠️ Added the link to Data API page in Integrations - PR [#43268](https://github.com/supabase/supabase/pull/43268)
+- ⚠️ Added `PGRST_DB_SCHEMAS`, `PGRST_DB_EXTRA_SEARCH_PATH`, and `PGRST_DB_MAX_ROWS` to Studio configuration (requires `docker-compose.yml` update) - PR [#43268](https://github.com/supabase/supabase/pull/43268)
+
+### MCP Server
+- Updated to `v0.7.0` - [Release](https://github.com/supabase-community/supabase-mcp/releases/tag/v0.7.0)
+
+### API gateway
+- ⚠️ Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+
+### PostgREST
+- Updated to `v14.6` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.6)
+
+### Realtime
+
+- ⚠️ Added **mandatory** `METRICS_JWT_SECRET` environment variable (requires `docker-compose.s3.yml` update) - PR [realtime#1729](https://github.com/supabase/realtime/pull/1729)
+
+### Storage
+- Updated to `v1.44.2` - [Release](https://github.com/supabase/storage/releases/tag/v1.44.2)
+- ⚠️ Added `STORAGE_PUBLIC_URL` environment variable to simplify proxy configuration (requires `docker-compose.s3.yml` update) - PR [storage#900](https://github.com/supabase/storage/pull/900)
+- ⚠️ Added RustFS as an optional S3 backend - PR [#42935](https://github.com/supabase/supabase/pull/42935)
+- ⚠️ Changed Docker Compose configuration for S3 backends to use named volumes - PR [#43815](https://github.com/supabase/supabase/pull/43815)
+
+### Edge Runtime
+
+- Updated to `v1.71.2` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.71.2)
+- ⚠️ Added `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, and `SUPABASE_PUBLIC_URL` environment variables (requires `docker-compose.yml` update)
+- ⚠️ Added an option for a "hybrid" JWT verification following the addition of the new API keys and the new asymmetric authentication (requires `volumes/functions/main/index.ts` update) - PR [#42130](https://github.com/supabase/supabase/pull/42130)
+- ⚠️ Added optional rate limiter - PR [edge-runtime#670](https://github.com/supabase/edge-runtime/pull/670)
+
+---
+
 ## [2026-02-18]
 
 ### Storage
-- Updated `supabase/storage-api` to `v1.37.8` in `docker-compose.s3.yml`
-- Changed MinIO image in `docker-compose.s3.yml` to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Changed MinIO image to use Chainguard [minio](https://images.chainguard.dev/directory/image/minio/overview) and [minio-client](https://images.chainguard.dev/directory/image/minio-client/overview) (requires `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Updated Storage image version to `v1.37.8` in `docker-compose.s3.yml`
 - Removed `imgproxy` service from `docker-compose.s3.yml` to minimize redundancy - PR [#42942](https://github.com/supabase/supabase/pull/42942)
-- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability (requires `docker-compose.yml` and `docker-compose.s3.yml` update) - PR [#42942](https://github.com/supabase/supabase/pull/42942)
+- Fixed inconsistent `storage` service entry ordering in `docker-compose.yml` and `docker-compose.s3.yml` to improve diff readability - PR [#42942](https://github.com/supabase/supabase/pull/42942)
 
 ### Edge Runtime
 
@@ -55,8 +103,9 @@ Check updates for each service to learn more.
 ### Storage
 
 - Updated to `v1.37.8` - [Release](https://github.com/supabase/storage/releases/tag/v1.37.8)
-- ⚠️ Added configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.s3.yml` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
 - ⚠️ Changed environment variable configuration for Storage (requires `docker-compose.yml`, `.env.example` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185), PR [#42862](https://github.com/supabase/supabase/pull/42862)
+- ⚠️ Added **default** configuration to access buckets via `/storage/v1/s3` endpoint (requires `docker-compose.yml` and `.env` update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
+- ⚠️ Changed MinIO configuration for the S3 backend (requires `docker-compose.s3.yml` and `.env` update update) - PR [#37185](https://github.com/supabase/supabase/pull/37185)
 
 ### Edge Runtime
 
@@ -89,7 +138,7 @@ Check updates for each service to learn more.
 
 ### Studio
 - Updated to `2026.01.27-sha-6aa59ff`
-- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557)
+- Added SQL snippets (requires `docker-compose.yml` update) - PR [#41112](https://github.com/supabase/supabase/pull/41112), PR [#41557](https://github.com/supabase/supabase/pull/41557), discussion [#42031](https://github.com/orgs/supabase/discussions/42031)
 - Fixed type generator - PR [#40481](https://github.com/supabase/supabase/pull/40481)
 - Fixed minor UI discrepancies - PR [#40579](https://github.com/supabase/supabase/pull/40579), PR [#41936](https://github.com/supabase/supabase/pull/41936), PR [#41970](https://github.com/supabase/supabase/pull/41970), PR [#41971](https://github.com/supabase/supabase/pull/41971), PR [#41972](https://github.com/supabase/supabase/pull/41972), PR [#42015](https://github.com/supabase/supabase/pull/42015)
 

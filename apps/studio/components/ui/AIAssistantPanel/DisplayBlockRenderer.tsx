@@ -151,7 +151,7 @@ export const DisplayBlockRenderer = ({
     const connectionString =
       queryType === 'mutation'
         ? postgresConnectionString
-        : readOnlyConnectionString ?? postgresConnectionString
+        : (readOnlyConnectionString ?? postgresConnectionString)
 
     if (!connectionString) {
       const fallbackMessage = 'Unable to find a database connection to execute this query.'

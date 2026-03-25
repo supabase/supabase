@@ -19,7 +19,16 @@ import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { Dictionary } from 'types'
-import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
+import {
+  Button,
+  Checkbox,
+  Input,
+  SidePanel,
+  Toggle,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -41,7 +50,7 @@ import {
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
-import HeaderTitle from './HeaderTitle'
+import { HeaderTitle } from './HeaderTitle'
 
 export interface ColumnEditorProps {
   column?: Readonly<PostgresColumn>
@@ -243,6 +252,7 @@ export const ColumnEditor = ({
       <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
         <FormSectionContent loading={false} className="lg:!col-span-8">
           <Input
+            id="name"
             label="Name"
             type="text"
             descriptionText="Recommended to use lowercase and use an underscore to separate words e.g. column_name"
@@ -252,6 +262,7 @@ export const ColumnEditor = ({
             onChange={(event: any) => onUpdateField({ name: event.target.value })}
           />
           <Input
+            id="description"
             label="Description"
             labelOptional="Optional"
             type="text"
@@ -376,20 +387,49 @@ export const ColumnEditor = ({
             label="Is Primary Key"
             descriptionText="A primary key indicates that a column or group of columns can be used as a unique identifier for rows in the table"
             checked={columnFields?.isPrimaryKey ?? false}
-            onChange={() => onUpdateField({ isPrimaryKey: !columnFields?.isPrimaryKey })}
+            onChange={() =>
+              onUpdateField({
+                isPrimaryKey: !columnFields?.isPrimaryKey,
+                isUnique: false,
+                isNullable: false,
+              })
+            }
           />
-          <Toggle
-            label="Allow Nullable"
-            descriptionText="Allow the column to assume a NULL value if no value is provided"
-            checked={columnFields.isNullable}
-            onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
-          />
-          <Toggle
-            label="Is Unique"
-            descriptionText="Enforce values in the column to be unique across rows"
-            checked={columnFields.isUnique}
-            onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
-          />
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle
+                  label="Allow Nullable"
+                  disabled={columnFields.isPrimaryKey}
+                  descriptionText="Allow the column to assume a NULL value if no value is provided"
+                  checked={columnFields.isNullable}
+                  onChange={() => onUpdateField({ isNullable: !columnFields.isNullable })}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" align="start">
+              Column is a primary key and hence cannot be NULL
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Toggle
+                  label="Is Unique"
+                  disabled={columnFields.isPrimaryKey}
+                  descriptionText="Enforce values in the column to be unique across rows"
+                  checked={columnFields.isUnique}
+                  onChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="left" align="start">
+              Column is a primary key and hence already unique
+            </TooltipContent>
+          </Tooltip>
+
           <Input
             label="CHECK Constraint"
             labelOptional="Optional"

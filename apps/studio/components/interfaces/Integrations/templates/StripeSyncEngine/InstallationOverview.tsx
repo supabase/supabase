@@ -45,8 +45,6 @@ import {
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
@@ -71,7 +69,10 @@ export const StripeSyncInstallationPage = () => {
   })
 
   const {
-    parsedSchema: { status: installationStatus },
+    schemaComment,
+    schemaComment: { status: installationStatus },
+    latestAvailableVersion,
+    timedOut,
   } = useStripeSyncStatus({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -91,6 +92,22 @@ export const StripeSyncInstallationPage = () => {
   const installDone = isInstallDone(installationStatus)
   const uninstallDone = isUninstallDone(installationStatus)
 
+  // Detect if this is an upgrade (both old and new versions present)
+  let oldVersion
+  let newVersion
+  if (installed) {
+    // when installed we compare the installed version against the latest available
+    oldVersion = schemaComment?.newVersion
+    newVersion = latestAvailableVersion
+  } else {
+    // otherwise compare the old and new versions from the schema
+    oldVersion = schemaComment?.oldVersion
+    newVersion = schemaComment?.newVersion
+  }
+
+  const upgradeAvailable = !!(oldVersion && newVersion && oldVersion !== newVersion)
+  const upgradeDone = latestAvailableVersion == schemaComment?.newVersion
+
   const {
     mutate: installStripeSync,
     isPending: isInstallRequested,
@@ -98,7 +115,9 @@ export const StripeSyncInstallationPage = () => {
     reset: resetInstallError,
   } = useStripeSyncInstallMutation({
     onSuccess: () => {
-      toast.success('Stripe Sync installation started')
+      toast.success(
+        upgradeAvailable ? 'Stripe Sync upgrade started' : 'Stripe Sync installation started'
+      )
       setShouldShowInstallSheet(false)
       form.reset()
       setIsInstallInitiated(true)
@@ -115,11 +134,12 @@ export const StripeSyncInstallationPage = () => {
     })
 
   // Combine schema status with mutation/initiated states for UI
-  const installing = installInProgress || isInstallRequested || isInstallInitiated
-  const uninstalling = uninstallInProgress || isUninstallRequested || isUninstallInitiated
+  const installing = (installInProgress || isInstallRequested || isInstallInitiated) && !timedOut
+  const uninstalling =
+    (uninstallInProgress || isUninstallRequested || isUninstallInitiated) && !timedOut
   const canInstall = checkCanInstall(installationStatus) && !installed && !installing
 
-  const hasError = (uninstallError || installError) && !uninstalling && !installing
+  const hasError = (uninstallError || installError) && ((!uninstalling && !installing) || timedOut)
 
   // Poll for schema changes during transitions
   useSchemasQuery(
@@ -127,19 +147,12 @@ export const StripeSyncInstallationPage = () => {
     { refetchInterval: installing || uninstalling ? 5000 : false }
   )
 
-  const { data: sslEnforcementConfiguration, isSuccess: isSuccessSslEnforcement } =
-    useSSLEnforcementQuery({
-      projectRef: project?.ref,
-    })
-  const isSSLEnforced =
-    sslEnforcementConfiguration?.appliedSuccessfully &&
-    sslEnforcementConfiguration?.currentConfig.database
-
   const handleUninstall = useCallback(() => {
     if (!project?.ref) return
 
     uninstallStripeSync({
       projectRef: project.ref,
+      startTime: Date.now(),
     })
   }, [project?.ref, uninstallStripeSync])
 
@@ -173,12 +186,13 @@ export const StripeSyncInstallationPage = () => {
     }
   }, [installError, track])
 
-  // Clear install initiated flag once schema reflects completion or error
+  // Clear install initiated flag once schema reflects successful completion
+  // For errors, the flag is cleared when user manually retries (handleOpenInstallSheet)
   useEffect(() => {
-    if (isInstallInitiated && installDone) {
+    if (isInstallInitiated && installDone && upgradeDone && !installError) {
       setIsInstallInitiated(false)
     }
-  }, [isInstallInitiated, installDone])
+  }, [isInstallInitiated, installDone, upgradeDone, installError])
 
   // Clear uninstall initiated flag once schema is removed or error
   useEffect(() => {
@@ -195,20 +209,30 @@ export const StripeSyncInstallationPage = () => {
             error={uninstallError ? 'uninstall' : 'install'}
             handleUninstall={handleUninstall}
             handleOpenInstallSheet={handleOpenInstallSheet}
+            isUpgrade={upgradeAvailable}
+            installing={installing}
+            uninstalling={uninstalling}
           />
         ) : null
       }
       status={
         <StatusDisplay
           status={installationStatus}
-          isInstallRequested={isInstallRequested || isInstallInitiated}
-          isUninstallRequested={isUninstallRequested || isUninstallInitiated}
+          isInstallRequested={isInstallRequested}
+          isInstallInitiated={isInstallInitiated}
+          isUninstallRequested={isUninstallRequested}
+          isUninstallInitiated={isUninstallInitiated}
+          isUpgrade={upgradeAvailable}
+          timedOut={timedOut}
         />
       }
       actions={
         !installed && !uninstalling && !uninstallError ? (
           <>
-            <StripeSyncChangesCard installationStatus={installationStatus} />
+            <StripeSyncChangesCard
+              installationStatus={installationStatus}
+              isUpgrade={upgradeAvailable}
+            />
             <div className="flex gap-x-2 justify-end mt-4">
               <ButtonTooltip
                 type="primary"
@@ -225,7 +249,13 @@ export const StripeSyncInstallationPage = () => {
                   },
                 }}
               >
-                {installError ? 'Retry installation' : 'Install integration'}
+                {installError
+                  ? upgradeAvailable
+                    ? 'Retry upgrade'
+                    : 'Retry installation'
+                  : upgradeAvailable
+                    ? 'Upgrade integration'
+                    : 'Install integration'}
               </ButtonTooltip>
               {installError && (
                 <Button type="default" loading={isUninstallRequested} onClick={handleUninstall}>
@@ -236,12 +266,32 @@ export const StripeSyncInstallationPage = () => {
           </>
         ) : installed || uninstalling || uninstallError ? (
           <>
-            <StripeSyncChangesCard installationStatus={installationStatus} />
-            <div className="flex justify-end mt-4">
+            <StripeSyncChangesCard
+              installationStatus={installationStatus}
+              isUpgrade={upgradeAvailable}
+            />
+            <div className="flex gap-x-2 justify-end mt-4">
+              {upgradeAvailable && !uninstallError && !uninstalling && (
+                <ButtonTooltip
+                  type="primary"
+                  onClick={() => setShouldShowInstallSheet(true)}
+                  disabled={installing || !canManageSecrets}
+                  loading={installing}
+                  tooltip={{
+                    content: {
+                      text: !canManageSecrets
+                        ? 'You need additional permissions to upgrade the Stripe Sync Engine.'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Upgrade integration
+                </ButtonTooltip>
+              )}
               <ButtonTooltip
                 type="default"
                 onClick={() => setShowUninstallModal(true)}
-                disabled={!canManageSecrets}
+                disabled={installing || uninstalling || !canManageSecrets}
                 loading={uninstalling}
                 tooltip={{
                   content: {
@@ -251,7 +301,7 @@ export const StripeSyncInstallationPage = () => {
                   },
                 }}
               >
-                Uninstall integration
+                {uninstallError ? 'Retry uninstallation' : 'Uninstall integration'}
               </ButtonTooltip>
             </div>
           </>
@@ -265,33 +315,24 @@ export const StripeSyncInstallationPage = () => {
               id={formId}
               onSubmit={form.handleSubmit(({ stripeSecretKey }) => {
                 if (!project?.ref) return
-                installStripeSync({ projectRef: project.ref, stripeSecretKey })
+                installStripeSync({
+                  projectRef: project.ref,
+                  stripeSecretKey,
+                  startTime: Date.now(),
+                })
               })}
               className="overflow-auto flex-grow px-0 flex flex-col"
             >
               <SheetHeader>
-                <SheetTitle>Install Stripe Sync Engine</SheetTitle>
+                <SheetTitle>
+                  {upgradeAvailable ? 'Upgrade' : 'Install'} Stripe Sync Engine
+                </SheetTitle>
               </SheetHeader>
               <SheetSection className="flex-1 flex flex-col gap-y-6">
-                <StripeSyncChangesCard installationStatus={installationStatus} />
-
-                {isSuccessSslEnforcement && isSSLEnforced && (
-                  <Admonition type="warning">
-                    <h5 className="mb-0.5">
-                      This integration currently requires{' '}
-                      <InlineLink
-                        href={`/project/${project?.ref ?? '_'}/database/settings#ssl-configuration`}
-                      >
-                        SSL Enforcement
-                      </InlineLink>{' '}
-                      to be disabled during initial setup.
-                    </h5>
-                    <p className="text-foreground-light">
-                      Support for SSL Enforcement will be added in a future update. Once installed,
-                      all webhook and sync operations use HTTPS/SSL.
-                    </p>
-                  </Admonition>
-                )}
+                <StripeSyncChangesCard
+                  installationStatus={installationStatus}
+                  isUpgrade={upgradeAvailable}
+                />
 
                 <h3 className="heading-default">Configuration</h3>
 
@@ -368,7 +409,13 @@ export const StripeSyncInstallationPage = () => {
                   loading={isInstallRequested}
                   disabled={!form.formState.isValid || isInstallRequested}
                 >
-                  {isInstallRequested ? 'Installing' : 'Install'}
+                  {isInstallRequested
+                    ? upgradeAvailable
+                      ? 'Upgrading'
+                      : 'Installing'
+                    : upgradeAvailable
+                      ? 'Upgrade integration'
+                      : 'Install integration'}
                 </Button>
               </SheetFooter>
             </form>

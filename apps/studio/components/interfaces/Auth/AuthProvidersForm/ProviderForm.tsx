@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -6,23 +7,38 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { ResourceItem } from 'components/ui/Resource/ResourceItem'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useProjectApiUrl } from 'data/config/project-endpoint-query'
+import { useHasEntitlementAccess } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import { BASE_PATH } from 'lib/constants'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from 'ui'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -67,33 +83,38 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     )
   }
 
-  const isFreePlan = organization?.plan.id === 'free'
+  const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const INITIAL_VALUES = (() => {
-    const initialValues: { [x: string]: string | boolean } = {}
-    Object.keys(provider.properties).forEach((key) => {
-      const isDoubleNegative = doubleNegativeKeys.includes(key)
-      if (provider.title === 'SAML 2.0') {
-        const configValue = (config as any)[key]
-        initialValues[key] =
-          configValue || (provider.properties[key].type === 'boolean' ? false : '')
-      } else {
-        if (isDoubleNegative) {
-          initialValues[key] = !(config as any)[key]
-        } else {
+  const getValuesForProvider = useStaticEffectEvent(
+    (config: components['schemas']['GoTrueConfigResponse']) => {
+      const values: { [x: string]: string | boolean } = {}
+      Object.keys(provider.properties).forEach((key) => {
+        const isDoubleNegative = doubleNegativeKeys.includes(key)
+        if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
-          initialValues[key] = configValue
-            ? configValue
-            : provider.properties[key].type === 'boolean'
-              ? false
-              : ''
+          values[key] = configValue || (provider.properties[key].type === 'boolean' ? false : '')
+        } else {
+          if (isDoubleNegative) {
+            values[key] = !(config as any)[key]
+          } else {
+            const configValue = (config as any)[key]
+            values[key] = configValue
+              ? configValue
+              : provider.properties[key].type === 'boolean'
+                ? false
+                : ''
+          }
         }
-      }
-    })
-    return initialValues
-  })()
+      })
+      return values
+    }
+  )
 
-  const onSubmit = (values: any, { resetForm }: any) => {
+  const INITIAL_VALUES = useMemo(() => {
+    return getValuesForProvider(config)
+  }, [config, getValuesForProvider])
+
+  const onSubmit = (values: any) => {
     const payload = { ...values }
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
@@ -108,10 +129,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onSuccess: () => {
-          resetForm({ values: { ...values }, initialValues: { ...values } })
+        onSuccess: (newValues) => {
           setOpen(false)
           setUrlProvider(null)
+          form.reset(getValuesForProvider(newValues))
           toast.success('Successfully updated settings')
         },
       }
@@ -131,6 +152,19 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     const isProviderInQuery = urlProvider.toLowerCase() === provider.title.toLowerCase()
     setOpen(isProviderInQuery)
   }, [urlProvider, provider.title])
+
+  const form = useForm({
+    defaultValues: INITIAL_VALUES,
+    resolver: yupResolver(provider.validationSchema),
+    shouldUnregister: true,
+  })
+
+  useEffect(() => {
+    if (open) {
+      form.reset(INITIAL_VALUES)
+    }
+  }, [open, form, INITIAL_VALUES])
+  const formId = useId()
 
   return (
     <>
@@ -163,7 +197,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       </ResourceItem>
 
       <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent className="flex flex-col gap-0">
+        <SheetContent className="flex flex-col gap-0" size="lg">
           <SheetHeader className="shrink-0 flex items-center gap-4">
             <img
               src={`${BASE_PATH}/img/icons/${provider.misc.iconKey}${provider.misc.hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''}.svg`}
@@ -173,124 +207,99 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             />
             <SheetTitle>{provider.title}</SheetTitle>
           </SheetHeader>
-          <Form
-            id={`provider-${provider.title}-form`}
-            name={`provider-${provider.title}-form`}
-            initialValues={INITIAL_VALUES}
-            validationSchema={provider.validationSchema}
-            onSubmit={onSubmit}
-            className="flex-1 overflow-hidden flex flex-col"
-          >
-            {({ handleReset, initialValues, values, setFieldValue }: any) => {
-              const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
-              return (
-                <>
-                  <div className="flex-1 overflow-y-auto group py-6 px-4 md:px-6 text-foreground">
-                    <div className="mx-auto max-w-lg space-y-6">
-                      <AuthAlert
-                        title={provider.title}
-                        isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
+          <Form_Shadcn_ {...form}>
+            <form
+              id={formId}
+              name={formId}
+              className="overflow-y-auto flex-grow px-0"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <AuthAlert
+                title={provider.title}
+                isHookSendSMSEnabled={config.HOOK_SEND_SMS_ENABLED}
+              />
+
+              {Object.keys(provider.properties).map((x: string) => {
+                const { entitlementKey } = provider.properties[x]
+                const hasAccess = entitlementKey == null || hasEntitlementAccess(entitlementKey)
+
+                return (
+                  <FormField
+                    key={x}
+                    projectRef={projectRef}
+                    organizationSlug={organization?.slug}
+                    name={x}
+                    properties={provider.properties[x]}
+                    control={form.control}
+                    disabled={shouldDisableField(x) || !canUpdateConfig}
+                    hasAccess={hasAccess}
+                  />
+                )
+              })}
+
+              {provider?.misc?.alert && (
+                <SheetSection>
+                  <Admonition
+                    type="warning"
+                    title={provider.misc.alert.title}
+                    description={<ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>}
+                  />
+                </SheetSection>
+              )}
+
+              {provider.misc.requiresRedirect && (
+                <SheetSection>
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Callback URL (for OAuth)"
+                    description={
+                      <Markdown
+                        content={provider.misc.helper}
+                        className="text-foreground-lighter"
                       />
-
-                      {Object.keys(provider.properties).map((x: string) => {
-                        let description = provider.properties[x].description
-                        if (description && projectRef) {
-                          description = description.replace(
-                            /\(\.\.\/auth\/(.*?)\)/g,
-                            `(/project/${projectRef}/auth/$1)`
-                          )
-                        }
-
-                        const properties = {
-                          ...provider.properties[x],
-                          description:
-                            provider.properties[x].isPaid && isFreePlan
-                              ? `${description} Only available on [Pro plan](/org/${organization.slug}/billing?panel=subscriptionPlan) and above.`
-                              : description,
-                        }
-                        const isDisabledDueToPlan = properties.isPaid && isFreePlan
-                        const shouldDisable =
-                          properties.type === 'boolean'
-                            ? isDisabledDueToPlan && !values[x]
-                            : isDisabledDueToPlan
-
-                        return (
-                          <FormField
-                            key={x}
-                            name={x}
-                            setFieldValue={setFieldValue}
-                            properties={properties}
-                            formValues={values}
-                            disabled={shouldDisableField(x) || !canUpdateConfig || shouldDisable}
-                          />
-                        )
-                      })}
-
-                      {provider?.misc?.alert && (
-                        <Admonition
-                          type="warning"
-                          title={provider.misc.alert.title}
-                          description={
-                            <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                          }
-                        />
-                      )}
-
-                      {provider.misc.requiresRedirect && (
-                        <Input
-                          copy
-                          readOnly
-                          disabled
-                          label="Callback URL (for OAuth)"
-                          value={`${endpoint}/auth/v1/callback`}
-                          descriptionText={
-                            <Markdown
-                              content={provider.misc.helper}
-                              className="text-foreground-lighter"
-                            />
-                          }
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <SheetFooter className="shrink-0">
-                    <div className="flex items-center justify-between w-full">
-                      <DocsButton href={provider.link} />
-                      <div className="flex items-center gap-x-3">
-                        <Button
-                          type="default"
-                          htmlType="reset"
-                          onClick={() => {
-                            handleReset()
-                            setOpen(false)
-                            setUrlProvider(null)
-                          }}
-                          disabled={isUpdatingConfig}
-                        >
-                          Cancel
-                        </Button>
-                        <ButtonTooltip
-                          htmlType="submit"
-                          loading={isUpdatingConfig}
-                          disabled={isUpdatingConfig || !canUpdateConfig || noChanges}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: !canUpdateConfig
-                                ? 'You need additional permissions to update provider settings'
-                                : undefined,
-                            },
-                          }}
-                        >
-                          Save
-                        </ButtonTooltip>
-                      </div>
-                    </div>
-                  </SheetFooter>
-                </>
-              )
-            }}
-          </Form>
+                    }
+                  >
+                    <Input copy readOnly value={endpoint ? `${endpoint}/auth/v1/callback` : ''} />
+                  </FormItemLayout>
+                </SheetSection>
+              )}
+            </form>
+          </Form_Shadcn_>
+          <SheetFooter className="shrink-0">
+            <div className="flex items-center justify-between w-full">
+              <DocsButton href={provider.link} />
+              <div className="flex items-center gap-x-3">
+                <Button
+                  type="default"
+                  htmlType="reset"
+                  onClick={() => {
+                    setOpen(false)
+                    setUrlProvider(null)
+                    form.reset()
+                  }}
+                  disabled={isUpdatingConfig}
+                >
+                  Cancel
+                </Button>
+                <ButtonTooltip
+                  form={formId}
+                  htmlType="submit"
+                  loading={isUpdatingConfig}
+                  disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canUpdateConfig
+                        ? 'You need additional permissions to update provider settings'
+                        : undefined,
+                    },
+                  }}
+                >
+                  Save
+                </ButtonTooltip>
+              </div>
+            </div>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </>

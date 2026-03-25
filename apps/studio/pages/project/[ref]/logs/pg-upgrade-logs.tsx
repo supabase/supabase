@@ -11,7 +11,7 @@ export const LogPage: NextPageWithLayout = () => {
 
 LogPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout title="Database">{page}</LogsLayout>
+    <LogsLayout title="Postgres Version Upgrade">{page}</LogsLayout>
   </DefaultLayout>
 )
 

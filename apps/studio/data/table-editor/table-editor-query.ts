@@ -1,10 +1,9 @@
+import { getTableEditorSql } from '@supabase/pg-meta'
 import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
-import { id } from 'common-tags'
 import { UseCustomQueryOptions } from 'types'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
-import { getTableEditorSql } from './table-editor-query-sql'
 import { Entity } from './table-editor-types'
 
 type TableEditorArgs = {
@@ -24,7 +23,7 @@ export async function getTableEditor(
     throw new Error('id is required')
   }
 
-  const sql = getTableEditorSql(id)
+  const sql = getTableEditorSql({ id })
   const { result } = await executeSql(
     {
       projectRef,

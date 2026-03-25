@@ -32,7 +32,6 @@ The email templating system often uses a language like Go, which has built-in se
 You may observe two distinct issues:
 
 1.  **The `#ZgotmplZ` Error**:
-
     - **Cause**: This error occurs when you attempt to use a non-standard URL scheme (like `your-app-scheme://` for a mobile app deep link) directly within a template variable like `{{ .SiteURL }}` in your email templates. Go's security features sanitize this perceived "unsafe" URL, replacing it with the `#ZgotmplZ` placeholder. This prevents the link from being rendered correctly and thus from working.
 
 2.  **The 'Cannot Parse Response' Error**:

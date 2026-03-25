@@ -431,7 +431,7 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <EdgeFunctionDetailsLayout>{page}</EdgeFunctionDetailsLayout>
+    <EdgeFunctionDetailsLayout title="Overview">{page}</EdgeFunctionDetailsLayout>
   </DefaultLayout>
 )
 

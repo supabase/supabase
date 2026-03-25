@@ -8,8 +8,10 @@ import {
   type ToolSet,
   type UIMessage,
 } from 'ai'
-import { traced, wrapAISDK, type Span } from 'braintrust'
+import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
+import { buildAssistantEvalOutput } from 'evals/output'
+import type { AssistantEvalInput, AssistantEvalOutput } from 'evals/scorer'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import {
@@ -66,10 +68,6 @@ export async function generateAssistantResponse({
   const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
 
   const run = async (span?: Span) => {
-    if (span) {
-      onSpanCreated?.(span.id)
-    }
-
     // Only returns last 7 messages
     // Filters out tools with invalid states
     // Filters out tool outputs based on opt-in level using renderingToolOutputParser
@@ -139,29 +137,42 @@ export async function generateAssistantResponse({
             },
           ]
         : []),
-      ...convertToModelMessages(messages),
+      ...(await convertToModelMessages(messages)),
     ]
 
     const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
 
-    const streamTextArgs = {
+    return streamTextFn({
       model,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
-      onFinish: ({ steps }) => {
-        for (const step of steps) {
-          for (const toolCall of step.toolCalls) {
-            if (toolCall.toolName === 'rename_chat') {
-              const { newName } = toolCall.input as { newName: string }
-              span?.log({ metadata: { chatName: newName } })
+      ...(span && {
+        onFinish: ({ steps, finishReason }) => {
+          for (const step of steps) {
+            for (const toolCall of step.toolCalls) {
+              if (toolCall.toolName === 'rename_chat') {
+                const { newName } = toolCall.input as { newName: string }
+                span.log({ metadata: { chatName: newName } })
+              }
             }
           }
-        }
-      },
-    } satisfies Parameters<typeof ai.streamText>[0]
+          span.log({
+            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
+          })
+          span.end()
+        },
+      }),
+    } satisfies Parameters<typeof ai.streamText>[0])
+  }
+
+  if (shouldTrace) {
+    // startSpan instead of traced() so we control when the span closes — onFinish logs
+    // output to the span before we call span.end(), ensuring online scoring sees the output.
+    const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
+    onSpanCreated?.(span.id)
 
     const lastUserMessage = rawMessages.findLast((m) => m.role === 'user')
     const lastUserText = lastUserMessage?.parts
@@ -169,8 +180,8 @@ export async function generateAssistantResponse({
       .map((p) => p.text)
       .join('\n')
 
-    span?.log({
-      input: lastUserText,
+    span.log({
+      input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
       metadata: {
         projectRef,
         chatId,
@@ -185,11 +196,7 @@ export async function generateAssistantResponse({
       },
     })
 
-    return streamTextFn(streamTextArgs)
-  }
-
-  if (shouldTrace) {
-    return traced(run, { type: 'function', name: 'generateAssistantResponse' })
+    return withCurrent(span, () => run(span))
   }
 
   return run()

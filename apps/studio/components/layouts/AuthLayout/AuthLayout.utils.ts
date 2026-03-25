@@ -4,50 +4,50 @@ import { IS_PLATFORM } from 'lib/constants'
 
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
-export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
-  const { ref } = useParams()
-  const authenticationShowOverview = useFlag('authOverviewPage')
+export interface GenerateAuthMenuOptions {
+  ref?: string
+  isPlatform: boolean
+  showOverview: boolean
+  features: {
+    signInProviders: boolean
+    rateLimits: boolean
+    emails: boolean
+    multiFactor: boolean
+    attackProtection: boolean
+    performance: boolean
+  }
+}
 
-  const {
-    authenticationSignInProviders,
-    authenticationRateLimits,
-    authenticationEmails,
-    authenticationMultiFactor,
-    authenticationAttackProtection,
-    authenticationPerformance,
-  } = useIsFeatureEnabled([
-    'authentication:sign_in_providers',
-    'authentication:rate_limits',
-    'authentication:emails',
-    'authentication:multi_factor',
-    'authentication:attack_protection',
-    'authentication:performance',
-  ])
-
+export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuGroup[] {
+  const { ref, isPlatform, showOverview, features } = options
   const baseUrl = `/project/${ref}/auth`
 
   return [
     {
       title: 'Manage',
       items: [
-        ...(authenticationShowOverview
+        ...(showOverview
           ? [{ name: 'Overview', key: 'overview', url: `${baseUrl}/overview`, items: [] }]
           : []),
         { name: 'Users', key: 'users', url: `${baseUrl}/users`, items: [] },
-        {
-          name: 'OAuth Apps',
-          key: 'oauth-apps',
-          url: `${baseUrl}/oauth-apps`,
-          items: [],
-        },
+        ...(isPlatform
+          ? [
+              {
+                name: 'OAuth Apps',
+                key: 'oauth-apps',
+                url: `${baseUrl}/oauth-apps`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
-    ...(authenticationEmails && IS_PLATFORM
+    ...(features.emails && isPlatform
       ? [
           {
             title: 'Notifications',
             items: [
-              ...(authenticationEmails
+              ...(features.emails
                 ? [
                     {
                       name: 'Email',
@@ -71,9 +71,9 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
           url: `${baseUrl}/policies`,
           items: [],
         },
-        ...(IS_PLATFORM
+        ...(isPlatform
           ? [
-              ...(authenticationSignInProviders
+              ...(features.signInProviders
                 ? [
                     {
                       name: 'Sign In / Providers',
@@ -96,7 +96,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
                 url: `${baseUrl}/sessions`,
                 items: [],
               },
-              ...(authenticationRateLimits
+              ...(features.rateLimits
                 ? [
                     {
                       name: 'Rate Limits',
@@ -106,7 +106,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
                     },
                   ]
                 : []),
-              ...(authenticationMultiFactor
+              ...(features.multiFactor
                 ? [
                     {
                       name: 'Multi-Factor',
@@ -122,7 +122,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
                 url: `${baseUrl}/url-configuration`,
                 items: [],
               },
-              ...(authenticationAttackProtection
+              ...(features.attackProtection
                 ? [
                     {
                       name: 'Attack Protection',
@@ -145,7 +145,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
                 url: `${baseUrl}/audit-logs`,
                 items: [],
               },
-              ...(authenticationPerformance
+              ...(features.performance
                 ? [
                     {
                       name: 'Performance',
@@ -160,4 +160,39 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
       ],
     },
   ]
+}
+
+export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
+  const { ref } = useParams()
+  const showOverview = useFlag('authOverviewPage')
+
+  const {
+    authenticationSignInProviders,
+    authenticationRateLimits,
+    authenticationEmails,
+    authenticationMultiFactor,
+    authenticationAttackProtection,
+    authenticationPerformance,
+  } = useIsFeatureEnabled([
+    'authentication:sign_in_providers',
+    'authentication:rate_limits',
+    'authentication:emails',
+    'authentication:multi_factor',
+    'authentication:attack_protection',
+    'authentication:performance',
+  ])
+
+  return generateAuthMenu({
+    ref,
+    isPlatform: IS_PLATFORM,
+    showOverview,
+    features: {
+      signInProviders: authenticationSignInProviders,
+      rateLimits: authenticationRateLimits,
+      emails: authenticationEmails,
+      multiFactor: authenticationMultiFactor,
+      attackProtection: authenticationAttackProtection,
+      performance: authenticationPerformance,
+    },
+  })
 }

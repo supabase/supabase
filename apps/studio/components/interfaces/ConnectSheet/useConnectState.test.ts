@@ -1,7 +1,15 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { useConnectState } from './useConnectState'
+
+vi.mock('common', () => ({
+  useParams: () => ({ ref: 'test-ref' }),
+}))
+
+vi.mock('@/data/read-replicas/replicas-query', () => ({
+  useReadReplicasQuery: () => ({ data: [] }),
+}))
 
 describe('useConnectState', () => {
   // ============================================================================
@@ -324,8 +332,8 @@ describe('useConnectState', () => {
       const { result } = renderHook(() => useConnectState({ mode: 'mcp' }))
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
-      // MCP mode should have configure step
-      expect(stepIds.some((id) => id.includes('configure') || id.includes('mcp'))).toBe(true)
+      // MCP mode (defaults to claude-code) should have claude-add-server step
+      expect(stepIds.some((id) => id.includes('claude') || id.includes('mcp'))).toBe(true)
     })
 
     test('should resolve different steps for different mcp clients', () => {
@@ -371,6 +379,7 @@ describe('useConnectState', () => {
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
       expect(stepIds).toContain('shadcn-add')
+      expect(stepIds).toContain('shadcn-env')
     })
   })
 
