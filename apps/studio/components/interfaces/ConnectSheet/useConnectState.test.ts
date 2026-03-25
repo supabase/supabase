@@ -1,7 +1,15 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { useConnectState } from './useConnectState'
+
+vi.mock('common', () => ({
+  useParams: () => ({ ref: 'test-ref' }),
+}))
+
+vi.mock('@/data/read-replicas/replicas-query', () => ({
+  useReadReplicasQuery: () => ({ data: [] }),
+}))
 
 describe('useConnectState', () => {
   // ============================================================================
@@ -371,6 +379,7 @@ describe('useConnectState', () => {
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
       expect(stepIds).toContain('shadcn-add')
+      expect(stepIds).toContain('shadcn-env')
     })
   })
 

@@ -1,3 +1,4 @@
+import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useParams } from 'common'
 import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { FilterPill } from 'components/interfaces/QueryPerformance/components/FilterPill'
@@ -5,7 +6,6 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { FilterPopover } from 'components/ui/FilterPopover'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { wrapWithRollback } from 'data/sql/utils/transaction'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Search, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -22,6 +22,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { buildQueryInsightFixPrompt } from '../../QueryPerformance/QueryPerformance.ai'
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
 import { useQueryInsightsIssues } from '../hooks/useQueryInsightsIssues'
+import { useQueryInsightsTableColumns } from '../hooks/useQueryInsightsTableColumns'
 import type { ClassifiedQuery } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 import { QueryInsightsDetailSheet } from './QueryInsightsDetailSheet'
 import type { IssueFilter, Mode } from './QueryInsightsTable.types'
@@ -31,7 +32,6 @@ import {
   getQueryType,
   getTableName,
 } from './QueryInsightsTable.utils'
-import { useQueryInsightsTableColumns } from '../hooks/useQueryInsightsTableColumns'
 
 interface QueryInsightsTableProps {
   data: QueryPerformanceRow[]

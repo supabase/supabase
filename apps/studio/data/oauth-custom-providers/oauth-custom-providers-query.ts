@@ -30,7 +30,7 @@ export async function getOAuthCustomProviders({
     // Non-JSON responses from the API indicate custom providers aren't enabled.
     // Different browsers/SDK versions produce different JSON parse error messages,
     // so we check broadly for JSON parse indicators.
-    if (/JSON\.parse|Unexpected token|unexpected.*character/.test(newError.message)) {
+    if (/JSON\.parse|Unexpected token|unexpected.*character/i.test(newError.message)) {
       newError = new AuthError('Custom providers are not enabled for this project')
     }
     handleError(newError)

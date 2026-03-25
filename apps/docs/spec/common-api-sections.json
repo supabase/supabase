@@ -263,6 +263,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-database-openapi",
+        "title": "Get database openapi",
+        "slug": "v1-get-database-openapi",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-jit-access",
         "title": "Get jit access",
         "slug": "v1-get-jit-access",

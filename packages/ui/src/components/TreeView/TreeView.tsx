@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
+import TreeViewPrimitive, { flattenTree, type INodeRendererProps } from 'react-accessible-treeview'
 
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
@@ -333,4 +333,11 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { flattenTree, SQL_ICON, TreeView, TreeViewFolderIcon, TreeViewItem }
+export {
+  flattenTree,
+  SQL_ICON,
+  TreeView,
+  TreeViewFolderIcon,
+  TreeViewItem,
+  type INodeRendererProps,
+}

@@ -44,8 +44,6 @@ export function ConnectConfigSection({
 }: ConnectConfigSectionProps) {
   if (activeFields.length === 0) return null
 
-  const formLayoutClassName = 'md:[&>div:first-child]:!w-1/3 xl:[&>div:first-child]:!w-2/5'
-
   return (
     <div className="flex flex-col gap-y-4">
       {activeFields.map((field) => {
@@ -246,7 +244,7 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   return (
-    <div className="grid grid-cols-4 rounded-lg border">
+    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
       {modes.map((mode) => (
         <button
           key={mode.id}
