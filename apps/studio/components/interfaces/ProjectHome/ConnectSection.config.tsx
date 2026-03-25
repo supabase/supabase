@@ -6,7 +6,7 @@ import type { ConnectMode } from '../ConnectSheet/Connect.types'
 export type ConnectSectionVariant = 'connect' | 'getting-started'
 
 export type ConnectAction = {
-  id: ConnectMode | 'api-keys'
+  id: ConnectMode | 'api_keys'
   heading: string
   subheading: string
   icon: ReactNode
@@ -45,8 +45,8 @@ export const CONNECT_ACTIONS: ConnectAction[] = [
     icon: <Sparkles size={16} strokeWidth={1.5} />,
   },
   {
-    id: 'api-keys',
-    heading: 'API keys',
+    id: 'api_keys',
+    heading: 'API Keys',
     subheading: 'Manage project keys',
     icon: <KeyRound size={16} strokeWidth={1.5} />,
     href: '/project/[ref]/settings/api-keys',

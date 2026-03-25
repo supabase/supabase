@@ -99,11 +99,11 @@ export const LayoutHeader = ({
     }
   }, [orgUsage])
 
-  const connectButtonType =
-    selectedProject?.inserted_at &&
-    dayjs(selectedProject.inserted_at).isBefore(dayjs().subtract(5, 'day'))
-      ? 'default'
-      : 'primary'
+  const isNewProject =
+    selectedProject?.inserted_at !== undefined &&
+    dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
+
+  const connectButtonType = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
