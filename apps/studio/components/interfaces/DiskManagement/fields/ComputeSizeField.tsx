@@ -10,7 +10,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { DOCS_URL, InstanceSpecs } from 'lib/constants'
-import { formatCurrency } from 'lib/helpers'
 import { ChevronRight, CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -123,10 +122,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const projectComputeSize = project?.infra_compute_size ?? 'nano'
   const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
 
-  const baselineComputeVariantId = form.formState.defaultValues?.computeSize ?? 'ci_micro'
-  const baselineHourlyPrice =
-    availableOptions.find((o) => o.identifier === baselineComputeVariantId)?.price ?? 0
-
   const visibleOptions = showAllSizes
     ? availableOptions
     : availableOptions.slice(0, INITIALLY_VISIBLE_COUNT)
@@ -200,7 +195,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               {isLoading ? (
                 Array(6)
                   .fill(0)
-                  .map((_, i) => <Skeleton key={i} className="w-full h-[130px] rounded-md" />)
+                  .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
               ) : addonsError ? (
                 <FormMessage message={'Failed to load Compute size options'} type="error">
                   <p>{addonsError?.message}</p>
@@ -228,12 +223,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                           )?.price
                         : compute.price
 
-                    const monthlyDelta =
-                      price !== undefined
-                        ? Math.round((price - baselineHourlyPrice) * 720 * 100) / 100
-                        : null
-                    const isBaseline = compute.identifier === baselineComputeVariantId
-
                     const cpuLabel = (() => {
                       const cpuCores = compute.meta?.cpu_cores
                       if (typeof cpuCores === 'number') {
@@ -252,7 +241,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         key={compute.identifier}
                         value={compute.identifier}
                         className={cn(
-                          'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[130px]',
+                          'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]',
                           lockedOption && 'opacity-50'
                         )}
                         disabled={disabled || lockedOption}
@@ -278,35 +267,21 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         </div>
                                       ) : (
                                         showComputePrice && (
-                                          <div className="flex flex-col items-end gap-0.5">
-                                            <div className="flex items-center space-x-1">
-                                              <span
-                                                className="text-foreground text-sm font-semibold"
-                                                translate="no"
-                                              >
-                                                ${price}
-                                              </span>
-                                              <span className="text-foreground-light translate-y-[1px]">
-                                                {' '}
-                                                /{' '}
-                                                {compute.price_interval === 'monthly'
-                                                  ? 'month'
-                                                  : 'hour'}
-                                              </span>
-                                            </div>
-                                            {monthlyDelta !== null && !isBaseline && (
-                                              <span
-                                                className={cn(
-                                                  'text-xs font-mono tabular-nums',
-                                                  monthlyDelta > 0 ? 'text-warning' : 'text-brand'
-                                                )}
-                                                translate="no"
-                                              >
-                                                {monthlyDelta > 0 ? '+' : ''}
-                                                {formatCurrency(monthlyDelta)}/mo
-                                              </span>
-                                            )}
-                                          </div>
+                                          <>
+                                            <span
+                                              className="text-foreground text-sm font-semibold"
+                                              translate="no"
+                                            >
+                                              ${price}
+                                            </span>
+                                            <span className="text-foreground-light translate-y-[1px]">
+                                              {' '}
+                                              /{' '}
+                                              {compute.price_interval === 'monthly'
+                                                ? 'month'
+                                                : 'hour'}
+                                            </span>
+                                          </>
                                         )
                                       )}
                                     </div>
@@ -362,7 +337,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       value="larger-compute"
                       onClick={(e) => e.preventDefault()}
                       className={cn(
-                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[130px]'
+                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
                       )}
                       label={
                         <SupportLink

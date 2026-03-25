@@ -21,6 +21,9 @@ export const BillingChangeBadge = ({
   className,
   free,
 }: BillingChangeBadgeProps) => {
+  const delta =
+    beforePrice !== undefined && afterPrice !== undefined ? afterPrice - beforePrice : null
+
   return (
     <AnimatePresence>
       {beforePrice !== undefined && afterPrice !== undefined && show && (
@@ -57,6 +60,18 @@ export const BillingChangeBadge = ({
                   >
                     {`${formatCurrency(afterPrice)}/month`}
                   </motion.span>
+                  {delta !== null && delta !== 0 && (
+                    <motion.span
+                      key={delta}
+                      className="text-xs font-mono text-brand"
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 0.12 }}
+                      translate="no"
+                    >
+                      {delta > 0 ? '+' : ''}
+                      {formatCurrency(delta)}/mo
+                    </motion.span>
+                  )}
                 </div>
               </TooltipTrigger>
               {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
