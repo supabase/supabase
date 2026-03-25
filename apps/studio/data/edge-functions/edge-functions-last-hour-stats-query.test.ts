@@ -1,20 +1,20 @@
-import { get } from 'data/fetchers'
+import { post } from 'data/fetchers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getEdgeFunctionsLastHourStats } from './edge-functions-last-hour-stats-query'
 
 vi.mock('data/fetchers', () => ({
-  get: vi.fn(),
+  post: vi.fn(),
   handleError: vi.fn(),
 }))
 
-type GetResponse = Awaited<ReturnType<typeof get>>
+type PostResponse = Awaited<ReturnType<typeof post>>
 
 describe('getEdgeFunctionsLastHourStats', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2024-01-15T12:00:00.000Z'))
-    vi.mocked(get).mockReset()
+    vi.mocked(post).mockReset()
   })
 
   afterEach(() => {
@@ -22,32 +22,32 @@ describe('getEdgeFunctionsLastHourStats', () => {
   })
 
   it('requests last-hour function stats from logs.all', async () => {
-    vi.mocked(get).mockResolvedValue({ data: { result: [] }, error: null } as GetResponse)
+    vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
 
     await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
       functionIds: ['fn_1', 'fn_2'],
     })
 
-    expect(get).toHaveBeenCalledWith('/platform/projects/{ref}/analytics/endpoints/logs.all', {
+    expect(post).toHaveBeenCalledWith('/platform/projects/{ref}/analytics/endpoints/logs.all', {
       params: {
         path: { ref: 'project-ref' },
-        query: expect.objectContaining({
-          sql: expect.stringContaining(`and function_id in ('fn_1', 'fn_2')`),
-          iso_timestamp_start: '2024-01-15T11:00:00.000Z',
-          iso_timestamp_end: '2024-01-15T12:00:00.000Z',
-        }),
       },
+      body: expect.objectContaining({
+        sql: expect.stringContaining(`and function_id in ('fn_1', 'fn_2')`),
+        iso_timestamp_start: '2024-01-15T11:00:00.000Z',
+        iso_timestamp_end: '2024-01-15T12:00:00.000Z',
+      }),
       signal: undefined,
     })
 
-    expect(vi.mocked(get).mock.calls[0]?.[1]?.params?.query?.sql).toContain(
+    expect(vi.mocked(post).mock.calls[0]?.[1]?.body?.sql).toContain(
       'from\n  function_edge_logs'
     )
   })
 
   it('coerces counts to numbers and computes error rates per function', async () => {
-    vi.mocked(get).mockResolvedValue({
+    vi.mocked(post).mockResolvedValue({
       data: {
         result: [
           { function_id: 'fn_1', requests_count: '100', server_err_count: '5' },
@@ -55,7 +55,7 @@ describe('getEdgeFunctionsLastHourStats', () => {
         ],
       },
       error: null,
-    } as GetResponse)
+    } as PostResponse)
 
     const result = await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
@@ -79,7 +79,7 @@ describe('getEdgeFunctionsLastHourStats', () => {
   })
 
   it('handles empty results', async () => {
-    vi.mocked(get).mockResolvedValue({ data: { result: [] }, error: null } as GetResponse)
+    vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
 
     const result = await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
@@ -96,6 +96,6 @@ describe('getEdgeFunctionsLastHourStats', () => {
     })
 
     expect(result).toEqual({})
-    expect(get).not.toHaveBeenCalled()
+    expect(post).not.toHaveBeenCalled()
   })
 })

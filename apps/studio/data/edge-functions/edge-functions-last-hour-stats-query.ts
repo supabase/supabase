@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
+import { handleError, post } from 'data/fetchers'
 import dayjs from 'dayjs'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { edgeFunctionsKeys } from './keys'
@@ -16,14 +17,10 @@ export type EdgeFunctionLastHourStats = {
 
 export type EdgeFunctionsLastHourStatsResponse = Record<string, EdgeFunctionLastHourStats>
 
-function toSqlStringLiteral(value: string) {
-  return `'${value.replaceAll("'", "''")}'`
-}
-
 function getEdgeFunctionsLastHourStatsSql(functionIds: string[]) {
   const functionIdFilter =
     functionIds.length > 0
-      ? `  and function_id in (${functionIds.map(toSqlStringLiteral).join(', ')})\n`
+      ? `  and function_id in (${functionIds.map(quoteLiteral).join(', ')})\n`
       : ''
 
   return `
@@ -53,14 +50,12 @@ export async function getEdgeFunctionsLastHourStats(
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(1, 'hour').toISOString()
 
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql: getEdgeFunctionsLastHourStatsSql(functionIds),
-        iso_timestamp_start: startDate,
-        iso_timestamp_end: endDate,
-      },
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+    params: { path: { ref: projectRef } },
+    body: {
+      sql: getEdgeFunctionsLastHourStatsSql(functionIds),
+      iso_timestamp_start: startDate,
+      iso_timestamp_end: endDate,
     },
     signal,
   })
@@ -76,14 +71,18 @@ export async function getEdgeFunctionsLastHourStats(
   }[]
 
   return result.reduce<EdgeFunctionsLastHourStatsResponse>((acc, row) => {
-    const requestsCount = Number(row.requests_count ?? 0)
-    const serverErrorCount = Number(row.server_err_count ?? 0)
+    const toSafeNumber = (v: number | string | undefined) => {
+      const n = Number(v ?? 0)
+      return Number.isFinite(n) ? n : 0
+    }
+    const safeRequestsCount = toSafeNumber(row.requests_count)
+    const safeServerErrorCount = toSafeNumber(row.server_err_count)
 
     acc[row.function_id] = {
       functionId: row.function_id,
-      requestsCount,
-      serverErrorCount,
-      errorRate: requestsCount > 0 ? (serverErrorCount / requestsCount) * 100 : 0,
+      requestsCount: safeRequestsCount,
+      serverErrorCount: safeServerErrorCount,
+      errorRate: safeRequestsCount > 0 ? (safeServerErrorCount / safeRequestsCount) * 100 : 0,
     }
 
     return acc
@@ -113,5 +112,6 @@ export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHour
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+    retry: false,
     ...options,
   })
