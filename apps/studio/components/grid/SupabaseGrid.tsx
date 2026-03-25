@@ -93,7 +93,9 @@ export const SupabaseGrid = ({
     if (!mounted) setMounted(true)
   }, [])
 
-  const operations = tableEditorSnap.operationQueue.operations as QueuedOperation[]
+  const operations = (tableEditorSnap.operationQueue.operations as QueuedOperation[]).filter(
+    (op) => op.tableId === tableId
+  )
   const baseRows = data?.rows ?? EMPTY_ARR
   const rows = formatGridDataWithOperationValues({ operations, rows: baseRows })
 

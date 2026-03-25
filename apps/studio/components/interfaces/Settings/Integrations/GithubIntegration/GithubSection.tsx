@@ -1,22 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { useMemo } from 'react'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
-import { useParams } from 'common'
+import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -37,6 +37,7 @@ export const GitHubSection = () => {
 
   const isProPlanAndUp = organization?.plan?.id !== 'free'
   const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+  const isGithubOnFreePlan = useFlag('githubOnFreePlan')
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
@@ -74,7 +75,7 @@ export const GitHubSection = () => {
                   branches for every pull request.
                 </p>
 
-                {promptProPlanUpgrade && (
+                {!isGithubOnFreePlan && promptProPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
                       layout="vertical"
@@ -86,9 +87,12 @@ export const GitHubSection = () => {
                   </div>
                 )}
 
-                {/* [Joshen] Show connection form if GH has already been authorized OR no GH authorization but on a paid plan */}
-                {/* So this shouldn't render if there's no GH authorization and on a free plan */}
-                {(!!gitHubAuthorization || !promptProPlanUpgrade) && (
+                {/* [Joshen] Show connection form only if one of the following is true:
+                  - GH has already been authorized OR
+                  - no GH authorization but on a paid plan OR
+                  - on a free plan but the GitHub integration flag is enabled 
+                */}
+                {(!!gitHubAuthorization || !promptProPlanUpgrade || isGithubOnFreePlan) && (
                   <GitHubIntegrationConnectionForm
                     disabled={promptProPlanUpgrade}
                     connection={existingConnection}

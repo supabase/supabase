@@ -2,6 +2,7 @@ import { PostgresTable } from '@supabase/postgres-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
+import type { SupaColumn, SupaRow } from 'components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
@@ -11,19 +12,20 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Key } from 'lucide-react'
-import { useMemo } from 'react'
-import DataGrid, { Column } from 'react-data-grid'
+import { useMemo, useRef } from 'react'
+import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BinaryFormatter } from './BinaryFormatter'
+import { CellContextMenuWrapper } from './CellContextMenuWrapper'
 import { DefaultFormatter } from './DefaultFormatter'
 import { JsonFormatter } from './JsonFormatter'
 
 interface ReferenceRecordPeekProps {
   table: PostgresTable
   column: string
-  value: any
+  value: string | number | Record<string, unknown>
 }
 
 export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPeekProps) => {
@@ -47,6 +49,9 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
     { placeholderData: keepPreviousData }
   )
 
+  const rows = useMemo(() => data?.rows ?? [], [data?.rows])
+  const selectedCellRef = useRef<{ idx: number; rowIdx: number } | null>(null)
+
   const primaryKeys = useMemo(() => table.primary_keys.map((x) => x.name), [table.primary_keys])
 
   const columns = useMemo(() => {
@@ -54,14 +59,14 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       const columnDefaultWidth = getColumnDefaultWidth({
         dataType: column.data_type,
         format: column.format,
-      } as any)
+      } as Pick<SupaColumn, 'dataType' | 'format'> as SupaColumn)
       const columnWidthBasedOnName =
         (column.name.length + column.format.length) * ESTIMATED_CHARACTER_PIXEL_WIDTH
       const columnWidth =
         columnDefaultWidth < columnWidthBasedOnName ? columnWidthBasedOnName : columnDefaultWidth
       const isPrimaryKey = primaryKeys.includes(column.name)
 
-      const res: Column<any> = {
+      const res: Column<SupaRow> = {
         key: column.name,
         name: column.name,
         resizable: false,
@@ -84,11 +89,17 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
             <span className="text-xs text-foreground-light font-normal">{column.format}</span>
           </div>
         ),
-        renderCell: isBinaryColumn(column.data_type)
-          ? BinaryFormatter
-          : isJsonColumn(column.data_type) && !isArrayColumn(column.data_type)
-            ? JsonFormatter
-            : DefaultFormatter,
+        renderCell: (props) => (
+          <CellContextMenuWrapper value={props.row[props.column.key]}>
+            {isBinaryColumn(column.data_type) ? (
+              <BinaryFormatter {...props} />
+            ) : isJsonColumn(column.data_type) && !isArrayColumn(column.data_type) ? (
+              <JsonFormatter {...props} />
+            ) : (
+              <DefaultFormatter {...props} />
+            )}
+          </CellContextMenuWrapper>
+        ),
       }
       return res
     })
@@ -106,7 +117,14 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
       <DataGrid
         className="h-32 rounded-b border-0"
         columns={columns}
-        rows={data?.rows ?? []}
+        rows={rows}
+        onSelectedCellChange={(args: {
+          column: CalculatedColumn<SupaRow, unknown>
+          rowIdx: number
+          row: SupaRow
+        }) => {
+          selectedCellRef.current = { idx: args.column.idx, rowIdx: args.rowIdx }
+        }}
         onCellDoubleClick={(_, e) => {
           e.preventDefault()
           e.stopPropagation()

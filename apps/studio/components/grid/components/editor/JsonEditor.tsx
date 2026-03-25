@@ -4,6 +4,7 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
@@ -56,6 +57,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -74,6 +76,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const isTruncated = isValueTruncated(initialValue)
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
@@ -187,7 +190,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                     <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">⏎</span>
                     </div>
-                    <p className="text-xs text-foreground-light">Save changes</p>
+                    <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
