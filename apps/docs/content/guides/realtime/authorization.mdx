@@ -374,9 +374,9 @@ with check (
 
 ## Interaction with Postgres Changes
 
-Realtime Postgres Changes are separate from Channel authorization. The `private` Channel option does not apply to Postgres Changes.
+When using Postgres Changes on tables with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
 
-When using Postgres Changes with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
+Private and public channels can subscribe to Postgres Changes.
 
 ## Updating RLS policies
 
