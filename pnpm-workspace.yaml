@@ -45,23 +45,7 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  - next
-  - '@next/*'
-  - ai
-  - js-yaml
-  - supabase
-  - iceberg-js
-  - '@vitejs/plugin-rsc'
-  - stripe-experiment-sync # TODO(matlin) remove, temp just to unblock launch
-  - braintrust
-  - tar
-  - diff
-  - lodash-es
-  - lodash
-  - next-mdx-remote
-  - react-resizable-panels
-  - swiper@12.1.2
-  - immutable
+  # The following are deps that were added because of vulnerability. You can remove them after the minimum time has passed.
   - undici
 
 onlyBuiltDependencies:
