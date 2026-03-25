@@ -196,7 +196,7 @@ export const ColumnList = ({
                     <TableCell>
                       <code className="text-code-inline">{column.data_type}</code>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell>
                       <code className="text-code-inline">{column.format}</code>
                     </TableCell>
                     <TableCell className="text-right">
