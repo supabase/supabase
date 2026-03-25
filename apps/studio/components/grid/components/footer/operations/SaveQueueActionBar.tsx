@@ -2,9 +2,7 @@ import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueu
 import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eye, MoreVertical, Trash, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Dropdown } from 'react-day-picker'
+import { Eye, MoreVertical, Trash } from 'lucide-react'
 import { createPortal } from 'react-dom'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -18,7 +16,6 @@ import {
 } from 'ui'
 
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { getModKeyLabel } from '@/lib/helpers'
 
@@ -75,7 +72,12 @@ export const SaveQueueActionBar = () => {
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="outline" className="w-7" icon={<MoreVertical />} aria-label="More options" />
+                      <Button
+                        type="outline"
+                        className="w-7"
+                        icon={<MoreVertical />}
+                        aria-label="More options"
+                      />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-40">
                       <DropdownMenuItem
