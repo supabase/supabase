@@ -62,7 +62,7 @@ export const DeleteRowOperationItem = ({
         </div>
         <ButtonTooltip
           type="text"
-          aria-label="Revert change"
+          aria-label="Discard change"
           className="w-7"
           icon={<Undo2 />}
           onClick={handleDelete}
@@ -70,7 +70,7 @@ export const DeleteRowOperationItem = ({
             content: {
               side: 'left',
               align: 'end',
-              text: 'Revert change',
+              text: 'Discard change',
             },
           }}
         />

@@ -59,7 +59,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
         </div>
         <ButtonTooltip
           type="text"
-          aria-label="Revert change"
+          aria-label="Discard change"
           className="px-1.5"
           icon={<Undo2 />}
           onClick={handleDelete}
@@ -67,7 +67,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
             content: {
               side: 'left',
               align: 'end',
-              text: 'Revert change',
+              text: 'Discard change',
             },
           }}
         />
