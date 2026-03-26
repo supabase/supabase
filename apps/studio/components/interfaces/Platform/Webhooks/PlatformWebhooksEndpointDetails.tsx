@@ -126,6 +126,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
           {row.original.status !== 'success' ? (
             <ButtonTooltip
               type="default"
+              size="tiny"
               className="w-7 shrink-0 hit-area-2"
               icon={<RotateCcw />}
               aria-label={`Retry ${row.original.id}`}
@@ -137,7 +138,14 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
               onKeyDown={(event) => event.stopPropagation()}
             />
           ) : (
-            <span aria-hidden className="size-7 shrink-0" />
+            <Button
+              type="default"
+              size="tiny"
+              className="w-7 shrink-0 hit-area-2 invisible pointer-events-none"
+              icon={<RotateCcw />}
+              aria-hidden
+              tabIndex={-1}
+            />
           )}
         </div>
       )
