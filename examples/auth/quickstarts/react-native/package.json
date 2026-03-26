@@ -11,10 +11,10 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.93.2",
-    "expo": "~54.0.32",
+    "expo": "~55.0.8",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
-    "react-native": "0.81.5",
+    "react-native": "0.84.1",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-url-polyfill": "^3.0.0"
   },
