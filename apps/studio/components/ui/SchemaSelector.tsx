@@ -33,6 +33,7 @@ interface SchemaSelectorProps {
   supportSelectAll?: boolean
   excludedSchemas?: string[]
   stopScrollPropagation?: boolean
+  popoverContentClassName?: string
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -48,6 +49,7 @@ export const SchemaSelector = ({
   supportSelectAll = false,
   excludedSchemas = [],
   stopScrollPropagation = false,
+  popoverContentClassName,
   onSelectSchema,
   onSelectCreateSchema,
   align = 'start',
@@ -131,7 +133,7 @@ export const SchemaSelector = ({
             </Button>
           </PopoverTrigger_Shadcn_>
           <PopoverContent_Shadcn_
-            className="p-0 min-w-[200px] pointer-events-auto"
+            className={`p-0 min-w-[200px] pointer-events-auto ${popoverContentClassName ?? ''}`}
             side="bottom"
             align={align}
             sameWidthAsTrigger

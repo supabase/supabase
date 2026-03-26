@@ -163,6 +163,7 @@ export const TableEditorMenu = () => {
           <SchemaSelector
             className="mx-4"
             selectedSchemaName={selectedSchema}
+            popoverContentClassName="table-editor-schema-selector-popover"
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
