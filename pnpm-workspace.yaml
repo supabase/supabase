@@ -46,6 +46,8 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
+  - '@react-router/*'
+  - react-router
   - path-to-regexp
   - brace-expansion
   - serialize-javascript
