@@ -71,7 +71,7 @@ const RenameQueryModal = ({
 
   const { id, name, description } = snippet
 
-  const { mutateAsync: getGeneratedValues, isPending: isTitleGenerationLoading } =
+  const { mutate: getGeneratedValues, isPending: isTitleGenerationLoading } =
     useSqlTitleGenerateMutation({
       onSuccess: (data) => {
         const { title, description } = data
@@ -81,7 +81,7 @@ const RenameQueryModal = ({
         }
       },
       onError: (error) => {
-        toast.error(`Failed to rename query: ${error.message}`)
+        toast.error(`Failed to generate title and description: ${error.message}`)
       },
     })
   const { data: check } = useCheckOpenAIKeyQuery()
@@ -162,8 +162,9 @@ const RenameQueryModal = ({
   const { isDirty, isSubmitting } = formState
 
   useEffect(() => {
-    reset({ name, description })
-  }, [id, name, description, reset])
+    if (isDirty) return
+    reset({ name: name ?? '', description: description ?? '' })
+  }, [id, name, description, reset, isDirty])
 
   const handleCancel = () => {
     onCancel()
@@ -179,9 +180,9 @@ const RenameQueryModal = ({
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Name">
+                <FormItemLayout name="name" layout="vertical" label="Name">
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} id="name" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -217,10 +218,11 @@ const RenameQueryModal = ({
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Description">
+                <FormItemLayout name="description" layout="vertical" label="Description">
                   <FormControl_Shadcn_>
                     <Textarea
                       {...field}
+                      id="description"
                       rows={4}
                       placeholder="Describe query"
                       className="resize-none"
