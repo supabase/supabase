@@ -9,6 +9,7 @@ import { forwardRef, useEffect, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 
 import { StateOfStartupsHeader } from './components/StateOfStartupsHeader'
+import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
 import { SurveyChapter } from './components/SurveyChapter'
 import { SurveyChapterSection } from './components/SurveyChapterSection'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
@@ -205,7 +206,7 @@ export default function StateOfStartups2026Content() {
       </AnimatePresence>
       {/* Intro section */}
       <section ref={heroRef} className="w-full">
-        <StateOfStartupsHeader />
+        <StateOfStartupsAuroraHeader />
         <SurveySectionBreak className="hidden md:block" />
         <div className="grid grid-cols-1 md:grid-cols-3 max-w-[60rem] mx-auto md:border-x border-muted">
           {/* Intro text */}
