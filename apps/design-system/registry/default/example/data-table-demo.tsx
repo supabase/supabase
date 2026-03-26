@@ -237,7 +237,13 @@ export default function DataTableDemo() {
                     <TableHead
                       key={header.id}
                       aria-sort={
-                        sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'
+                        header.column.getCanSort()
+                          ? sort === 'asc'
+                            ? 'ascending'
+                            : sort === 'desc'
+                              ? 'descending'
+                              : 'none'
+                          : undefined
                       }
                       className={
                         columnId === 'amount'

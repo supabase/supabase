@@ -271,7 +271,13 @@ export const PlatformWebhooksEndpointDetails = ({
                       <TableHead
                         key={header.id}
                         aria-sort={
-                          sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'
+                          header.column.getCanSort()
+                            ? sort === 'asc'
+                              ? 'ascending'
+                              : sort === 'desc'
+                                ? 'descending'
+                                : 'none'
+                            : undefined
                         }
                         className={columnId === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
                       >
