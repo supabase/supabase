@@ -26,7 +26,13 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (response.error) {
     const { code, message } = response.error
-    return res.status(code).json({ message })
+
+    const statusCode =
+      typeof code === 'number' && code >= 100 && code < 600
+        ? code
+        : 500
+
+    return res.status(statusCode).json({ message })
   } else {
     return res.status(200).json(response)
   }
