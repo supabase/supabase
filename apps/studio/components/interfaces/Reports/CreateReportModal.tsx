@@ -94,6 +94,11 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     })
   }
 
+  const handleCancel = () => {
+    onCancel()
+    form.reset()
+  }
+
   const form = useForm<CustomReport>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: '', description: '' },
@@ -103,7 +108,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
   return (
     <Modal
       visible={visible}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       hideFooter
       header="Create a custom report"
       size="small"
@@ -115,9 +120,9 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Name">
+                <FormItemLayout name="name" layout="vertical" label="Name">
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} id="name" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -128,10 +133,11 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Description">
+                <FormItemLayout name="description" layout="vertical" label="Description">
                   <FormControl_Shadcn_>
                     <Textarea
                       {...field}
+                      id="description"
                       rows={4}
                       placeholder="Describe your custom report"
                       className="resize-none"
@@ -143,7 +149,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
           </Modal.Content>
           <Modal.Separator />
           <Modal.Content className="flex items-center justify-end gap-2">
-            <Button htmlType="reset" type="default" onClick={onCancel} disabled={isCreating}>
+            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isCreating}>
               Cancel
             </Button>
             <Button htmlType="submit" loading={isCreating} disabled={isCreating || !isDirty}>

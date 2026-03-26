@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { Content } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -73,7 +74,13 @@ export const UpdateCustomReportModal = ({
     resolver: zodResolver(formSchema),
     defaultValues: initialValues,
   })
-  const { isDirty } = form.formState
+  const { formState, reset } = form
+  const { isDirty } = formState
+
+  useEffect(() => {
+    if (isDirty) return
+    reset(initialValues)
+  }, [initialValues, isDirty, reset])
 
   return (
     <Modal
@@ -90,9 +97,9 @@ export const UpdateCustomReportModal = ({
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Name">
+                <FormItemLayout name="name" layout="vertical" label="Name">
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                    <Input_Shadcn_ {...field} id="name" />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -103,10 +110,11 @@ export const UpdateCustomReportModal = ({
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Description">
+                <FormItemLayout name="description" layout="vertical" label="Description">
                   <FormControl_Shadcn_>
                     <Textarea
                       {...field}
+                      id="description"
                       rows={4}
                       placeholder="Describe your custom report"
                       className="resize-none"
