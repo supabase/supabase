@@ -465,7 +465,7 @@ functions:
     notes: |
       This section contains methods for working with File Buckets.
   - id: list-buckets
-    title: listBuckets()
+    $ref: '@supabase/storage-js.StorageClient.listBuckets'
   - id: get-bucket
     $ref: '@supabase/storage-js.StorageClient.getBucket'
   - id: create-bucket
