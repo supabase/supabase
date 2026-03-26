@@ -128,9 +128,18 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
+  const endpointPendingDeleteHasName = endpointPendingDelete
+    ? endpointPendingDelete.name.trim().length > 0
+    : false
   const endpointPendingDeleteDisplayName = endpointPendingDelete
     ? getWebhookEndpointDisplayName(endpointPendingDelete)
     : ''
+  let deleteEndpointDescription = 'This action cannot be undone.'
+  if (endpointPendingDelete) {
+    deleteEndpointDescription = endpointPendingDeleteHasName
+      ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
+      : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
+  }
 
   useEffect(() => {
     if (!platformWebhooksEnabled) {
@@ -233,7 +242,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       setDeliverySearch('')
     }
     setEndpointIdPendingDelete(null)
-    toast.success(`Deleted endpoint "${endpointPendingDeleteDisplayName}"`)
+    toast.success('Endpoint deleted')
   }
 
   const handleUpsertEndpoint = (values: EndpointFormValues) => {
@@ -333,14 +342,14 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                     className="gap-x-2"
                     onClick={() => setShowRegenerateSecretConfirm(true)}
                   >
-                    <RotateCw size={14} />
+                    <RotateCw size={14} className="text-foreground-lighter" />
                     <span>Regenerate secret</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setEndpointIdPendingDelete(selectedEndpoint.id)}
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={14} className="text-foreground-lighter" />
                     <span>Delete endpoint</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -420,14 +429,13 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete endpoint</AlertDialogTitle>
-            <AlertDialogDescription>
-              {endpointPendingDelete
-                ? endpointPendingDelete.name.trim().length > 0
-                  ? `This will delete endpoint "${endpointPendingDeleteDisplayName}" with URL ${endpointPendingDelete.url}. This action cannot be undone.`
-                  : `This will delete endpoint ${endpointPendingDelete.url}. This action cannot be undone.`
-                : 'This action cannot be undone.'}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{deleteEndpointDescription}</AlertDialogDescription>
           </AlertDialogHeader>
+          {endpointPendingDelete && (
+            <pre className="mx-5 -mt-1 mb-5 overflow-auto whitespace-nowrap rounded-md border border-muted bg-surface-200 px-4 py-3 font-mono text-xs tracking-tight text-foreground">
+              {endpointPendingDelete.url}
+            </pre>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction variant="danger" onClick={handleDeleteEndpoint}>
