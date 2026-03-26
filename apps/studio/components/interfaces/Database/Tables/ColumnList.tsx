@@ -5,6 +5,7 @@ import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
+import { POSTGRES_DATA_TYPE_OPTIONS } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -12,14 +13,10 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
 import {
-  Binary,
-  Braces,
-  CalendarClock,
-  Database,
+  Calendar,
   Edit,
-  Fingerprint,
   Hash,
-  List,
+  ListPlus,
   MoreVertical,
   Plus,
   Search,
@@ -45,6 +42,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -52,47 +50,45 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 const getColumnTypeAffordance = (column: PostgresColumn) => {
-  const value = `${column.format} ${column.data_type}`.toLowerCase()
+  const normalizedFormat = column.format.replaceAll('"', '').replace(/\[\]$/, '')
+  const optionType = POSTGRES_DATA_TYPE_OPTIONS.find((option) => option.name === normalizedFormat)?.type
 
-  if (value.includes('uuid')) return { icon: Fingerprint, label: 'UUID' }
-  if (value.includes('json')) return { icon: Braces, label: 'JSON' }
-  if (value.includes('bool')) return { icon: ToggleRight, label: 'Boolean' }
-  if (
-    value.includes('timestamp') ||
-    value.includes('timestamptz') ||
-    value.includes('date') ||
-    value.includes('time') ||
-    value.includes('interval')
-  ) {
-    return { icon: CalendarClock, label: 'Date / time' }
-  }
-  if (
-    value.includes('int') ||
-    value.includes('numeric') ||
-    value.includes('decimal') ||
-    value.includes('float') ||
-    value.includes('double') ||
-    value.includes('real') ||
-    value.includes('serial')
-  ) {
-    return { icon: Hash, label: 'Numeric' }
-  }
-  if (value.includes('array') || column.format.endsWith('[]') || value.includes('enum')) {
-    return { icon: List, label: 'List / enum' }
-  }
-  if (value.includes('bytea') || value.includes('binary')) {
-    return { icon: Binary, label: 'Binary' }
-  }
-  if (
-    value.includes('char') ||
-    value.includes('text') ||
-    value.includes('varchar') ||
-    value.includes('citext')
-  ) {
-    return { icon: Type, label: 'Text' }
-  }
+  const iconClassName = 'text-foreground-muted'
 
-  return { icon: Database, label: 'Other' }
+  switch (optionType) {
+    case 'number':
+      return {
+        icon: <Hash size={14} className={iconClassName} strokeWidth={1.5} />,
+        label: 'Numeric',
+      }
+    case 'time':
+      return {
+        icon: <Calendar size={14} className={iconClassName} strokeWidth={1.5} />,
+        label: 'Date / time',
+      }
+    case 'text':
+      return {
+        icon: <Type size={14} className={iconClassName} strokeWidth={1.5} />,
+        label: 'Text',
+      }
+    case 'json':
+      return {
+        icon: (
+          <div className={cn(iconClassName, 'px-px text-[11px] leading-none font-mono')}>{'{ }'}</div>
+        ),
+        label: 'JSON',
+      }
+    case 'bool':
+      return {
+        icon: <ToggleRight size={14} className={iconClassName} strokeWidth={1.5} />,
+        label: 'Boolean',
+      }
+    default:
+      return {
+        icon: <ListPlus size={16} className={iconClassName} strokeWidth={1.5} />,
+        label: 'Other',
+      }
+  }
 }
 
 interface ColumnListProps {
@@ -203,7 +199,7 @@ export const ColumnList = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="!px-0" />
+                <TableHead className="w-0 !px-0" />
                 <TableHead className={columns.length === 0 ? 'text-foreground-muted' : undefined}>
                   Name
                 </TableHead>
@@ -258,15 +254,12 @@ export const ColumnList = ({
 
                   return (
                     <TableRow key={column.name}>
-                      <TableCell className="!pl-5 !pr-1">
+                      <TableCell className="w-0 !pl-5 !pr-0">
                         <Tooltip>
                           <TooltipTrigger className="cursor-default">
-                            <TypeIcon
-                              aria-label={typeLabel}
-                              size={14}
-                              strokeWidth={1.75}
-                              className="text-foreground-light"
-                            />
+                            <div aria-label={typeLabel} className="flex w-4 justify-center">
+                              {TypeIcon}
+                            </div>
                           </TooltipTrigger>
                           <TooltipContent side="bottom">
                             <div className="flex flex-col">
