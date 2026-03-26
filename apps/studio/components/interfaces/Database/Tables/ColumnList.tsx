@@ -352,9 +352,7 @@ export const ColumnList = ({
                       <TableCell className="w-0 !pl-5 !pr-1">
                         <Tooltip>
                           <TooltipTrigger className="cursor-default" aria-label={typeLabel}>
-                            <div className="flex w-4 justify-center">
-                              {TypeIcon}
-                            </div>
+                            <div className="flex w-4 justify-center">{TypeIcon}</div>
                           </TooltipTrigger>
                           <TooltipContent side="bottom">
                             <div className="flex flex-col">
