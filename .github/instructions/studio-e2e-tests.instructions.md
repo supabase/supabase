@@ -74,6 +74,6 @@ All comments are **advisory**.
 - Scope selectors to containers: `page.getByTestId('side-panel').getByRole('switch')`
 - Add `aria-label` to icon-only buttons in source code for better test selectors
 - Use `test.describe.configure({ mode: 'serial' })` for tests sharing database state
-- Add messages to expects: `await expect(locator).toBeVisible({ timeout: 30000 }, 'why')`
+- Add messages to expects: `await expect(locator, 'why').toBeVisible({ timeout: 30000 })`
 
 Canonical standard: `.claude/skills/e2e-studio-tests/SKILL.md`
