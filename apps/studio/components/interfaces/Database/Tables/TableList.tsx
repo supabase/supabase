@@ -369,7 +369,7 @@ export const TableList = ({
                       <TableRow key={x.id}>
                         <TableCell className="w-0 !pl-5 !pr-1">
                           <Tooltip>
-                            <TooltipTrigger className="cursor-default">
+                            <TooltipTrigger asChild className="cursor-default">
                               <div className="flex w-4 justify-center">
                                 <EntityTypeIcon type={x.type} />
                               </div>

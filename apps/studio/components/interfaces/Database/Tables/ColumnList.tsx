@@ -12,6 +12,7 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
 import {
+  Braces,
   Calendar,
   DiamondIcon,
   Fingerprint,
@@ -55,45 +56,7 @@ import {
   getPrimaryKeyColumnNames,
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
-
-interface ConstraintTokenProps {
-  icon?: ReactNode
-  label: string
-  variant?: 'default' | 'secondary' | 'primary'
-}
-
-const constraintTokenClassName =
-  'inline-flex items-center justify-center rounded-md text-center font-mono uppercase whitespace-nowrap font-medium tracking-[0.06em] text-[11px] leading-[1.1] px-[5.5px] py-[3px] transition-all border'
-
-const ConstraintToken = ({ icon, label, variant = 'default' }: ConstraintTokenProps) => {
-  const tokenToneClassName =
-    variant === 'primary'
-      ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
-      : variant === 'default'
-        ? 'bg-surface-75 text-foreground-light border-strong'
-        : 'bg-surface-75 bg-opacity-50 text-foreground-light border-strong'
-
-  return (
-    <div className="inline-flex items-center whitespace-nowrap">
-      {icon && (
-        <span
-          className={cn(constraintTokenClassName, tokenToneClassName, 'rounded-r-none border-r-0')}
-        >
-          {icon}
-        </span>
-      )}
-      <span
-        className={cn(
-          constraintTokenClassName,
-          tokenToneClassName,
-          icon ? 'rounded-l-none' : 'rounded-md'
-        )}
-      >
-        {label}
-      </span>
-    </div>
-  )
-}
+import { ConstraintToken } from './ConstraintToken'
 
 const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
@@ -117,11 +80,7 @@ const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
       }
     case 'json':
       return {
-        icon: (
-          <div className={cn(iconClassName, 'px-px text-[11px] leading-none font-mono')}>
-            {'{ }'}
-          </div>
-        ),
+        icon: <Braces size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'bool':
@@ -232,7 +191,10 @@ export const ColumnList = ({
             <TableHeader>
               <TableRow>
                 <TableHead className="w-0 !px-0" />
-                <TableHead className={columns.length === 0 ? 'text-foreground-muted' : undefined}>
+
+                <TableHead
+                  className={cn(columns.length === 0 ? 'text-foreground-muted' : undefined)}
+                >
                   Name
                 </TableHead>
                 <TableHead className={columns.length === 0 ? 'text-foreground-muted' : undefined}>
@@ -244,6 +206,7 @@ export const ColumnList = ({
                 <TableHead />
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {isError && (
                 <TableRow className="[&>td]:hover:bg-inherit">
@@ -280,10 +243,10 @@ export const ColumnList = ({
               )}
 
               {isSuccess &&
-                columns.length > 0 &&
                 columns.map((column) => {
                   const { icon: TypeIcon, label: typeLabel } =
                     getColumnTypeAffordancePresentation(column)
+
                   const constraintTokens = [
                     primaryKeyColumns.has(column.name) ? (
                       <ConstraintToken
@@ -351,7 +314,7 @@ export const ColumnList = ({
                     <TableRow key={column.name}>
                       <TableCell className="w-0 !pl-5 !pr-1">
                         <Tooltip>
-                          <TooltipTrigger className="cursor-default" aria-label={typeLabel}>
+                          <TooltipTrigger asChild className="cursor-default" aria-label={typeLabel}>
                             <div className="flex w-4 justify-center">{TypeIcon}</div>
                           </TooltipTrigger>
                           <TooltipContent side="bottom">
@@ -366,7 +329,7 @@ export const ColumnList = ({
                           </TooltipContent>
                         </Tooltip>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="max-w-[160px] sm:max-w-[280px]">
                         <div className="flex min-w-0 flex-col">
                           <p>{column.name}</p>
                           {column.comment !== null ? (
