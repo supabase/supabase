@@ -73,7 +73,7 @@ const formId = 'jwt-exp-form'
 const customJwtSecretFormSchema = z.object({
   customToken: z
     .string()
-    .min(32, 'Required')
+    .min(32, 'Must be at least 32 characters')
     .regex(/^(?!.*[@$]).*$/, '@ and $ are not allowed'),
 })
 const customJwtSecretFormId = 'custom-jwt-secret-form'
