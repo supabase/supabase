@@ -57,6 +57,7 @@ interface PlatformWebhooksEndpointDetailsProps {
 
 const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
+const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
 const getCurrentSort = (sorting: SortingState) => {
   if (sorting.length === 0) return ''
@@ -97,7 +98,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
       return responseA - responseB
     },
     cell: ({ row }) =>
-      row.original.responseCode ? (
+      row.original.responseCode != null ? (
         <DataTableColumnStatusCode
           value={row.original.responseCode}
           level={getStatusLevel(row.original.responseCode)}
@@ -169,7 +170,7 @@ export const PlatformWebhooksEndpointDetails = ({
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
   const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'attemptAt', desc: true }])
+  const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DELIVERIES_PAGE_SIZE,
@@ -184,12 +185,7 @@ export const PlatformWebhooksEndpointDetails = ({
       return
     }
 
-    if (currentColumnSort.desc) {
-      setSorting([])
-      return
-    }
-
-    setSorting([{ id: columnId, desc: true }])
+    setSorting([{ id: columnId, desc: !currentColumnSort.desc }])
   }
 
   const table = useReactTable({

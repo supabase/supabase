@@ -11,7 +11,14 @@ vi.mock('components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () 
 }))
 
 vi.mock('components/ui/ButtonTooltip', () => ({
-  ButtonTooltip: ({ icon, children, ...props }: any) => (
+  ButtonTooltip: ({
+    icon,
+    children,
+    size: _size,
+    tooltip: _tooltip,
+    type: _type,
+    ...props
+  }: any) => (
     <button type="button" {...props}>
       {icon}
       {children}
@@ -121,5 +128,14 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
     expect(onRetryDelivery).toHaveBeenCalledWith('org-delivery-2')
     expect(onOpenDelivery).not.toHaveBeenCalled()
+  })
+
+  it('renders a zero response code instead of the placeholder', () => {
+    renderComponent({
+      filteredDeliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
+    })
+
+    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.queryByText('–')).not.toBeInTheDocument()
   })
 })
