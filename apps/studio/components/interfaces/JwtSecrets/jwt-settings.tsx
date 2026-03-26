@@ -165,7 +165,7 @@ const JWTSettings = () => {
         },
         onSuccess: (newValues) => {
           toast.success('Successfully updated JWT expiry')
-          reset(newValues)
+          reset({ JWT_EXP: newValues.JWT_EXP ?? values.JWT_EXP })
         },
       }
     )
