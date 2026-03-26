@@ -68,8 +68,11 @@ const AddRestrictionModal = ({
       ),
     ipAddress: z
       .string()
-      .min(1, 'Please enter a valid IP address')
-      .ip('Please enter a valid IP address')
+      .min(1, `Please enter a valid IP address`)
+      .ip({
+        version: type === 'IPv4' ? 'v4' : 'v6',
+        message: `Please enter a valid ${type} address`,
+      })
       .refine((val) => !checkIfPrivate(type, val), 'Private IP addresses are not supported'),
   })
 
@@ -81,7 +84,7 @@ const AddRestrictionModal = ({
     },
   })
   const { reset, formState } = form
-  const { isDirty, errors } = formState
+  const { errors } = formState
 
   useEffect(() => {
     reset({
