@@ -19,6 +19,7 @@ Our CI pipeline already validates the following. **Never comment on these topics
 - **Missing tests for trivial changes** — Handled by topic-specific test instructions
 - **Import ordering or grouping** — Handled by linter
 - **Naming style preferences** (camelCase vs snake_case debates) — Follow existing file conventions
+- **Accessibility attributes on shadcn/Radix UI components** — See `studio-shadcn-components.instructions.md` for details
 
 ### What TO Comment On (Priority Order)
 
@@ -53,5 +54,6 @@ Path-specific rules in `.github/instructions/`:
 - **Error Handling**: `studio-error-handling.instructions.md` — error classification, `ErrorMatcher` usage
 - **E2E Tests**: `studio-e2e-tests.instructions.md` — selector priority, anti-patterns (`waitForTimeout`, `force: true`)
 - **Composition Patterns**: `studio-composition-patterns.instructions.md` — avoid boolean props, use compound components
+- **shadcn/Radix Components**: `studio-shadcn-components.instructions.md` — accessibility handled by primitives, do not flag
 
 These files are scoped to `apps/studio/` and applied automatically during reviews.
