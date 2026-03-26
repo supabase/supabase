@@ -632,6 +632,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@5.9.2))
+      tar:
+        specifier: ^7.5.13
+        version: 7.5.13
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -17311,6 +17314,10 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
+  tar@7.5.13:
+    resolution: {integrity: sha512-tOG/7GyXpFevhXVh8jOPJrmtRpOTsYqUIkVdVooZYJS/z8WhfQUX8RJILmeuJNinGAMSu1veBr4asSHFt5/hng==}
+    engines: {node: '>=18'}
+
   tar@7.5.9:
     resolution: {integrity: sha512-BTLcK0xsDh2+PUe9F6c2TlRp4zOOBMTkoQHQIWSIzI0R7KG46uEwq4OPk2W7bZcprBMsuaeFsqwYr7pjh6CuHg==}
     engines: {node: '>=18'}
@@ -21334,7 +21341,7 @@ snapshots:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.13
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -21347,7 +21354,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.13
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -27633,7 +27640,7 @@ snapshots:
       promise-inflight: 1.0.1
       rimraf: 3.0.2
       ssri: 8.0.1
-      tar: 7.5.9
+      tar: 7.5.13
       unique-filename: 1.1.1
     transitivePeerDependencies:
       - bluebird
@@ -27650,7 +27657,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       p-map: 4.0.0
       ssri: 10.0.6
-      tar: 7.5.9
+      tar: 7.5.13
       unique-filename: 3.0.0
 
   call-bind-apply-helpers@1.0.2:
@@ -33366,7 +33373,7 @@ snapshots:
       nopt: 7.2.1
       proc-log: 3.0.0
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.13
       which: 4.0.0
     transitivePeerDependencies:
       - supports-color
@@ -33381,7 +33388,7 @@ snapshots:
       npmlog: 6.0.2
       rimraf: 3.0.2
       semver: 7.7.3
-      tar: 7.5.9
+      tar: 7.5.13
       which: 2.0.2
     transitivePeerDependencies:
       - bluebird
@@ -36759,6 +36766,14 @@ snapshots:
       b4a: 1.6.7
       fast-fifo: 1.3.2
       streamx: 2.22.0
+
+  tar@7.5.13:
+    dependencies:
+      '@isaacs/fs-minipass': 4.0.1
+      chownr: 3.0.0
+      minipass: 7.1.2
+      minizlib: 3.1.0
+      yallist: 5.0.0
 
   tar@7.5.9:
     dependencies:
