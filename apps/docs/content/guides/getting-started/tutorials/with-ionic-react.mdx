@@ -42,13 +42,13 @@ Save the environment variables in a `.env`. You need the API URL and the key tha
 
 ```bash name=.env
 REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
-REACT_APP_SUPABASE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
+REACT_APP_SUPABASE_KEY=YOUR_SUPABASE_KEY
 ```
 
 </$CodeTabs>
 
 With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed
-on the browser, and that's fine as Supabase enabled [Row Level Security](/docs/guides/auth#row-level-security) by default on databases.
+in the browser, which is safe because they use a restricted publishable key and the SQL quickstart enables [Row Level Security](/docs/guides/auth#row-level-security) on the `profiles` table.
 
 <$CodeSample
 path="/user-management/ionic-react-user-management/src/supabaseClient.ts"

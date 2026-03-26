@@ -91,6 +91,14 @@ export function AccountPage() {
       if (error) {
         throw error
       }
+
+      // Ensure local profile state reflects the updated avatar URL
+      if (avatar_url !== undefined) {
+        setProfile((prev) => ({
+          ...prev,
+          avatar_url,
+        }));
+      }
     } catch (error: any) {
       showToast({ message: error.message, duration: 5000 })
     } finally {
@@ -107,7 +115,7 @@ export function AccountPage() {
       </IonHeader>
 
       <IonContent>
-        <Avatar url={profile.avatar_url} onUpload={updateProfile}></Avatar>
+        <Avatar url={profile.avatar_url} onUpload={(fileName) => updateProfile(undefined, fileName)}></Avatar>
         <form onSubmit={updateProfile}>
           <IonItem>
             <IonLabel>
