@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { handleError, patch } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { databaseKeys } from './keys'
 
 export type DatabasePasswordResetVariables = {
   ref: string
@@ -41,7 +42,15 @@ export const useDatabasePasswordResetMutation = ({
   return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>({
     mutationFn: (vars) => resetDatabasePassword(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries({ queryKey: projectKeys.detail(variables.ref) })
+      const { ref } = variables
+
+      // Invalidate pooler configs so the UI reflects fresh connection strings
+      // after the password change propagates to Supavisor and PgBouncer.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(ref) }),
+        queryClient.invalidateQueries({ queryKey: databaseKeys.poolingConfiguration(ref) }),
+        queryClient.invalidateQueries({ queryKey: databaseKeys.pgbouncerConfig(ref) }),
+      ])
 
       await onSuccess?.(data, variables, context)
     },

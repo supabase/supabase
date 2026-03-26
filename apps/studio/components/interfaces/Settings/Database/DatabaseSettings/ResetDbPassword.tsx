@@ -45,7 +45,9 @@ const ResetDbPassword = ({ disabled = false }) => {
   const { mutate: resetDatabasePassword, isPending: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
-        toast.success('Successfully updated database password')
+        toast.success(
+          'Database password updated. Transaction and session pooler connections will reflect the new password shortly.'
+        )
         setShowResetDbPass(false)
       },
     })
@@ -105,8 +107,10 @@ const ResetDbPassword = ({ disabled = false }) => {
               <div className="space-y-0.5">
                 <h3 className="text-sm text-foreground">Reset database password</h3>
                 <p className="text-sm text-foreground-light text-balance">
-                  The database password isn’t viewable after creation. Resetting it will break any
-                  existing connections.
+                  The database password isn’t viewable after creation. Resetting it will break
+                  existing direct connections and require updating credentials for transaction and
+                  session pooler connections (ports 5432 and 6543). Pooler connections may take a
+                  short moment to reflect the new password.
                 </p>
               </div>
 
