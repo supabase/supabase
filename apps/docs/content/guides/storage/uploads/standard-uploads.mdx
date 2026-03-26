@@ -95,7 +95,6 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file)
 
 </TabPanel>
 </$Show>
-
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -192,7 +191,6 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 
 </TabPanel>
 </$Show>
-
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -202,6 +200,7 @@ curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_n
   -H "x-upsert: true" \
   --data-binary "@/local/path/to/your/file.ext"
 ```
+
 </TabPanel>
 </Tabs>
 
@@ -291,7 +290,6 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 
 </TabPanel>
 </$Show>
-
 <TabPanel id="curl" label="cURL">
 
 ```bash
