@@ -29,7 +29,7 @@ export type IntegrationDefinition = {
   name: string
   status?: 'alpha' | 'beta'
   categories?: string[]
-  icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
+  icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
   files?: string[]
@@ -43,11 +43,11 @@ export type IntegrationDefinition = {
   /** Optional component to render if the integration requires extensions that are not available on the current database image */
   missingExtensionsAlert?: ReactNode
   navigation?: Array<Navigation>
-  navigate: (
-    id: string,
-    pageId: string | undefined,
+  navigate: (props: {
+    id: string | undefined
+    pageId: string | undefined
     childId: string | undefined
-  ) => ComponentType<{}> | null
+  }) => ComponentType<{}> | null
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -92,7 +92,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Settings',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
         return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
           loading: Loading,
@@ -148,7 +148,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         ),
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
         return dynamic(() => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage), {
           loading: Loading,
@@ -196,7 +196,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Secrets',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
@@ -241,7 +241,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Webhooks',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
@@ -292,7 +292,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Docs',
       },
     ],
-    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
@@ -355,7 +355,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'GraphiQL',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
@@ -406,7 +406,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         label: 'Wrappers',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
@@ -468,7 +468,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Settings',
       },
     ],
-    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
