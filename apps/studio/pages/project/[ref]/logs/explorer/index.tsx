@@ -382,6 +382,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor
+            // Ensure we reset the editor to the query content whenever the selected query changes
+            key={queryId}
             id={editorId}
             editorRef={editorRef}
             language="pgsql"
