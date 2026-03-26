@@ -53,10 +53,10 @@ Create a `.env.local` file in the project root (or update your existing `.env.lo
 
 ```bash
 REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
-REACT_APP_SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
+REACT_APP_SUPABASE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
-Populate these variables with your project's URL and anon key from the Supabase dashboard.
+Populate these variables with your project's URL and publishable (anon) key from the Supabase dashboard.
 
 ### 5. Run the application
 
