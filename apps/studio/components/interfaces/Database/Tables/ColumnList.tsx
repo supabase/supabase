@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { NoSearchResults } from 'components/ui/NoSearchResults'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -33,7 +34,6 @@ import {
   Card,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -332,23 +332,20 @@ export const ColumnList = ({
                                 <Button type="default" className="px-1" icon={<MoreVertical />} />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <DropdownMenuItem
-                                      disabled={!canUpdateColumns || isSchemaLocked}
-                                      onClick={() => onDeleteColumn(column)}
-                                      className="space-x-2"
-                                    >
-                                      <Trash size={12} />
-                                      <p>Delete column</p>
-                                    </DropdownMenuItem>
-                                  </TooltipTrigger>
-                                  {!canUpdateColumns && (
-                                    <TooltipContent side="bottom">
-                                      Additional permissions required to delete column
-                                    </TooltipContent>
-                                  )}
-                                </Tooltip>
+                                <DropdownMenuItemTooltip
+                                  disabled={!canUpdateColumns || isSchemaLocked}
+                                  onClick={() => onDeleteColumn(column)}
+                                  className="gap-x-2"
+                                  tooltip={{
+                                    content: {
+                                      side: 'left',
+                                      text: 'Additional permissions required to delete column',
+                                    },
+                                  }}
+                                >
+                                  <Trash size={12} />
+                                  <p>Delete column</p>
+                                </DropdownMenuItemTooltip>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
