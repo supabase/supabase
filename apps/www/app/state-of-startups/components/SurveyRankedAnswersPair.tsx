@@ -15,7 +15,7 @@ export function SurveyRankedAnswersPair({
       : ['bg-purple-sos-500', 'bg-purple-sos-400', 'bg-purple-sos-300']
 
   const accentRankText =
-    accent === 'green' ? 'text-brand' : 'text-purple-sos-400 dark:text-purple-sos-300'
+    accent === 'green' ? 'text-brand' : 'text-purple-sos-500 dark:text-purple-sos-300'
 
   return (
     <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted divide-opacity-50">

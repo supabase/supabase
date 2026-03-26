@@ -1,41 +1,33 @@
 'use client'
 
+import { useReducedMotion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import UnicornScene from 'unicornstudio-react/next'
 
 export function StateOfStartupsAuroraHeader() {
-  const { resolvedTheme } = useTheme()
   const [shaderLoaded, setShaderLoaded] = useState(false)
-
-  const jsonFilePath =
-    resolvedTheme === 'light'
-      ? '/images/state-of-startups/aurora-dithered-shader-light.json'
-      : '/images/state-of-startups/aurora-dithered-shader-dark.json'
-
-  // Cover with placeholder whenever the theme (and thus the shader) changes
-  useEffect(() => {
-    setShaderLoaded(false)
-  }, [resolvedTheme])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <header
       className="relative w-full overflow-hidden"
-      style={{ minHeight: '72vh', background: 'hsl(var(--background-alternative-default))' }}
+      style={{ minHeight: '46vh', background: 'hsl(var(--background-alternative-default))' }}
     >
-      {/* Aurora shader scene — swaps file on theme change */}
-      <div aria-hidden="true" className="absolute inset-0">
-        <UnicornScene
-          key={jsonFilePath}
-          jsonFilePath={jsonFilePath}
-          width="100%"
-          height="100%"
-          className="w-full h-full"
-          dpi={1.5}
-          fps={24}
-          onLoad={() => setShaderLoaded(true)}
-        />
-      </div>
+      {/* Aurora shader scene — hidden when user prefers reduced motion */}
+      {!prefersReducedMotion && (
+        <div aria-hidden="true" className="absolute inset-0">
+          <UnicornScene
+            jsonFilePath={'/images/state-of-startups/aurora-dithered-shader.json'}
+            width="100%"
+            height="100%"
+            className="w-full h-full"
+            dpi={1.5}
+            fps={24}
+            onLoad={() => setShaderLoaded(true)}
+          />
+        </div>
+      )}
 
       {/* Placeholder — visible until shader loads, fades out on load */}
       <div
@@ -52,14 +44,14 @@ export function StateOfStartupsAuroraHeader() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'linear-gradient(to top, hsl(var(--background-alternative-default)) 1%, hsl(var(--background-alternative-default) / 0.9) 25%, transparent 90%)',
+            'linear-gradient(to top, hsl(var(--background-alternative-default)) 0%, hsl(var(--background-alternative-default) / 0.9) 15%, transparent 90%)',
         }}
       />
 
       {/* Content — constrained to default container */}
       <div
-        className="relative z-10 max-w-[60rem] mx-auto px-8 flex flex-col gap-4 justify-end pb-16 md:pb-24"
-        style={{ minHeight: '72vh' }}
+        className="relative z-10 max-w-[60rem] mx-auto px-8 flex flex-col gap-4 justify-end pb-16 md:pb-18"
+        style={{ minHeight: '46vh' }}
       >
         <p className="font-mono uppercase tracking-wide text-sm text-foreground-light">
           Supabase Presents
