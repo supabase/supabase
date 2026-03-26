@@ -12,6 +12,7 @@ import { TAX_IDS } from './TaxID.constants'
 import { getEffectiveTaxCountry, resolveStoredTaxId, sanitizeTaxIdValue } from './TaxID.utils'
 
 type StripeAddressValue = StripeAddressElementChangeEvent['value']
+type StripeAddressValidationState = 'unknown' | 'complete' | 'incomplete'
 
 interface UseBillingCustomerDataFormProps {
   customerProfile?: {
@@ -93,8 +94,7 @@ export function useBillingCustomerDataForm({
     stripeAddressRef.current = initialStripeAddressValue
   }, [initialStripeAddressValue])
 
-  // Not used currently — available if we want a quick "is the address complete?" check without field-by-field validation
-  const stripeAddressCompleteRef = useRef(false)
+  const stripeAddressValidationRef = useRef<StripeAddressValidationState>('unknown')
 
   const [isAddressDirty, setIsAddressDirty] = useState(false)
   const [addressCountry, setAddressCountry] = useState<string | undefined>(
@@ -109,7 +109,7 @@ export function useBillingCustomerDataForm({
   const onAddressChange = useCallback(
     (evt: StripeAddressElementChangeEvent) => {
       stripeAddressRef.current = evt.value
-      stripeAddressCompleteRef.current = evt.complete
+      stripeAddressValidationRef.current = evt.complete ? 'complete' : 'incomplete'
       setAddressCountry(evt.value.address.country || undefined)
       setIsAddressDirty(!isAddressEqual(evt.value, initialStripeAddressValue))
     },
@@ -135,6 +135,9 @@ export function useBillingCustomerDataForm({
     }
     if (!address.address.postal_code?.trim()) {
       return 'Postal code is required.'
+    }
+    if (isAddressDirty && stripeAddressValidationRef.current === 'incomplete') {
+      return 'Please enter a valid billing address.'
     }
 
     const taxIdValues = form.getValues()
@@ -169,6 +172,7 @@ export function useBillingCustomerDataForm({
   const handleReset = () => {
     form.reset(initialTaxIdValues)
     stripeAddressRef.current = initialStripeAddressValue
+    stripeAddressValidationRef.current = 'unknown'
     setIsAddressDirty(false)
     setAddressCountry(initialStripeAddressValue.address.country || undefined)
     setResetKey((c) => c + 1)

@@ -136,6 +136,37 @@ describe('useBillingCustomerDataForm', () => {
     await expect(result.current.handleSubmit()).resolves.toBe('Full name is required.')
   })
 
+  it('blocks submit when Stripe marks the address element as incomplete', async () => {
+    const onCustomerDataChange = vi.fn()
+    const customerProfile = makeCustomerProfile()
+
+    const { result } = renderHook(
+      ({ customerProfile, onCustomerDataChange }: HookPropsWithoutTaxId) =>
+        useBillingCustomerDataForm({
+          customerProfile,
+          taxId: null,
+          onCustomerDataChange,
+        }),
+      {
+        initialProps: { customerProfile, onCustomerDataChange },
+      }
+    )
+
+    act(() => {
+      result.current.onAddressChange(
+        makeAddressChangeEvent({
+          complete: false,
+          address: { postal_code: 'ABCDE' },
+        })
+      )
+    })
+
+    await expect(result.current.handleSubmit()).resolves.toBe(
+      'Please enter a valid billing address.'
+    )
+    expect(onCustomerDataChange).not.toHaveBeenCalled()
+  })
+
   it('submits the seeded address for tax-id-only updates', async () => {
     const onCustomerDataChange = vi.fn()
     const customerProfile = makeCustomerProfile()
