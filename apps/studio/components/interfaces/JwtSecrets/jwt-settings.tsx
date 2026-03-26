@@ -64,7 +64,7 @@ import {
 
 const MAX_JWT_EXP = 604800
 const formSchema = z.object({
-  JWT_EXP: z
+  JWT_EXP: z.coerce
     .number({ required_error: 'Must have a JWT expiry value' })
     .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`),
 })
@@ -82,7 +82,6 @@ const JWTSettings = () => {
   const { ref: projectRef } = useParams()
 
   const [customToken, setCustomToken] = useState<string>('')
-  const [showCustomTokenInput, setShowCustomTokenInput] = useState(false)
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
