@@ -14,6 +14,7 @@ import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
 import {
   Calendar,
+  DiamondIcon,
   Edit,
   Fingerprint,
   Hash,
@@ -346,6 +347,14 @@ export const ColumnList = ({
                     ) : null,
                     <ConstraintToken
                       key="nullability"
+                      icon={
+                        <DiamondIcon
+                          size={12}
+                          strokeWidth={1.7}
+                          className="shrink-0"
+                          fill={column.is_nullable ? 'none' : 'currentColor'}
+                        />
+                      }
                       label={column.is_nullable ? 'Nullable' : 'Required'}
                       variant="secondary"
                     />,
