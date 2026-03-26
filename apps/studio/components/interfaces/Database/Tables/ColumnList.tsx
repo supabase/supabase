@@ -1,7 +1,6 @@
 import { PostgresColumn } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { POSTGRES_DATA_TYPE_OPTIONS } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
@@ -15,7 +14,6 @@ import { noop } from 'lodash'
 import {
   Calendar,
   DiamondIcon,
-  Edit,
   Fingerprint,
   Hash,
   Key,
@@ -51,6 +49,12 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+import {
+  getColumnTypeAffordance,
+  getForeignKeyColumnNames,
+  getPrimaryKeyColumnNames,
+  getUniqueIndexColumnNames,
+} from './ColumnList.utils'
 
 interface ConstraintTokenProps {
   icon?: ReactNode
@@ -91,29 +95,25 @@ const ConstraintToken = ({ icon, label, variant = 'default' }: ConstraintTokenPr
   )
 }
 
-const getColumnTypeAffordance = (column: PostgresColumn) => {
-  const normalizedFormat = column.format.replaceAll('"', '').replace(/\[\]$/, '')
-  const optionType = POSTGRES_DATA_TYPE_OPTIONS.find(
-    (option) => option.name === normalizedFormat
-  )?.type
-
+const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
+  const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
-  switch (optionType) {
+  switch (kind) {
     case 'number':
       return {
         icon: <Hash size={14} className={iconClassName} strokeWidth={1.5} />,
-        label: 'Numeric',
+        label,
       }
     case 'time':
       return {
         icon: <Calendar size={14} className={iconClassName} strokeWidth={1.5} />,
-        label: 'Date / time',
+        label,
       }
     case 'text':
       return {
         icon: <Type size={14} className={iconClassName} strokeWidth={1.5} />,
-        label: 'Text',
+        label,
       }
     case 'json':
       return {
@@ -122,17 +122,17 @@ const getColumnTypeAffordance = (column: PostgresColumn) => {
             {'{ }'}
           </div>
         ),
-        label: 'JSON',
+        label,
       }
     case 'bool':
       return {
         icon: <ToggleRight size={14} className={iconClassName} strokeWidth={1.5} />,
-        label: 'Boolean',
+        label,
       }
     default:
       return {
         icon: <ListPlus size={16} className={iconClassName} strokeWidth={1.5} />,
-        label: 'Other',
+        label,
       }
   }
 }
@@ -166,27 +166,10 @@ export const ColumnList = ({
 
   const [filterString, setFilterString] = useState<string>('')
   const isTableEntity = isTableLike(selectedTable)
-  const primaryKeyColumns = new Set(
-    isTableEntity ? selectedTable.primary_keys.map((primaryKey) => primaryKey.name) : []
-  )
-  const foreignKeyColumns = new Set(
-    isTableEntity
-      ? selectedTable.relationships
-          .filter(
-            (relationship) =>
-              relationship.source_schema === selectedTable.schema &&
-              relationship.source_table_name === selectedTable.name
-          )
-          .map((relationship) => relationship.source_column_name)
-      : []
-  )
-  const uniqueIndexColumns = new Set(
-    isTableEntity
-      ? (selectedTable.unique_indexes ?? [])
-          .filter((uniqueIndex) => uniqueIndex.columns.length === 1)
-          .flatMap((uniqueIndex) => uniqueIndex.columns)
-      : []
-  )
+  const tableConstraintSource = isTableEntity ? selectedTable : undefined
+  const primaryKeyColumns = getPrimaryKeyColumnNames(tableConstraintSource)
+  const foreignKeyColumns = getForeignKeyColumnNames(tableConstraintSource)
+  const uniqueIndexColumns = getUniqueIndexColumnNames(tableConstraintSource)
 
   const columns =
     (filterString.length === 0
@@ -200,6 +183,9 @@ export const ColumnList = ({
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'columns'
   )
+  const deleteColumnTooltipText = !canUpdateColumns
+    ? 'Additional permissions required to delete column'
+    : undefined
 
   return (
     <div className="space-y-4">
@@ -296,7 +282,8 @@ export const ColumnList = ({
               {isSuccess &&
                 columns.length > 0 &&
                 columns.map((column) => {
-                  const { icon: TypeIcon, label: typeLabel } = getColumnTypeAffordance(column)
+                  const { icon: TypeIcon, label: typeLabel } =
+                    getColumnTypeAffordancePresentation(column)
                   const constraintTokens = [
                     primaryKeyColumns.has(column.name) ? (
                       <ConstraintToken
@@ -424,13 +411,13 @@ export const ColumnList = ({
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItemTooltip
-                                  disabled={!canUpdateColumns || isSchemaLocked}
+                                  disabled={!canUpdateColumns}
                                   onClick={() => onDeleteColumn(column)}
                                   className="gap-x-2"
                                   tooltip={{
                                     content: {
                                       side: 'left',
-                                      text: 'Additional permissions required to delete column',
+                                      text: deleteColumnTooltipText,
                                     },
                                   }}
                                 >
