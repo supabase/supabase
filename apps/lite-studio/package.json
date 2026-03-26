@@ -13,18 +13,18 @@
     "@react-router/node": "7.13.2",
     "@react-router/serve": "7.13.2",
     "isbot": "^5.1.36",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "react-router": "7.13.2"
   },
   "devDependencies": {
     "@react-router/dev": "7.13.2",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^22",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "tailwindcss": "^4.2.2",
-    "vite": "^7.1.7",
+    "vite": "catalog:",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }
