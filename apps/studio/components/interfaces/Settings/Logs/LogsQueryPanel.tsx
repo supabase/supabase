@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from 'lib/constants'
@@ -36,6 +36,8 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
+  queryMode?: 'sql' | 'natural'
+  onQueryModeChange?: (mode: 'sql' | 'natural') => void
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -54,9 +56,12 @@ const LogsQueryPanel = ({
   onSelectTemplate,
   onSelectSource,
   onDateChange,
+  queryMode = 'sql',
+  onQueryModeChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
+  const logsExplorerAiQuerying = useFlag('logsExplorerAiQuerying')
 
   const {
     projectAuthAll: authEnabled,
@@ -85,50 +90,74 @@ const LogsQueryPanel = ({
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
-                  Insert source
+            {IS_PLATFORM && logsExplorerAiQuerying && onQueryModeChange && (
+              <div className="flex items-center rounded-md border border-control overflow-hidden">
+                <Button
+                  type={queryMode === 'sql' ? 'primary' : 'text'}
+                  size="tiny"
+                  className="rounded-none border-0"
+                  onClick={() => onQueryModeChange('sql')}
+                >
+                  SQL
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="bottom"
-                align="start"
-                className="max-h-[390px] overflow-auto"
-              >
-                {logsTableNames
-                  .sort((a, b) => a.localeCompare(b))
-                  .map((source) => (
-                    <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
-                      <DropdownMenuItemContent
-                        name={source}
-                        desc={LOGS_SOURCE_DESCRIPTION[source]}
-                      />
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <Button
+                  type={queryMode === 'natural' ? 'primary' : 'text'}
+                  size="tiny"
+                  className="rounded-none border-0 border-l border-control"
+                  onClick={() => onQueryModeChange('natural')}
+                >
+                  AI
+                </Button>
+              </div>
+            )}
+            {queryMode !== 'natural' && (
+              <>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="default" iconRight={<ChevronDown />}>
+                      Insert source
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side="bottom"
+                    align="start"
+                    className="max-h-[390px] overflow-auto"
+                  >
+                    {logsTableNames
+                      .sort((a, b) => a.localeCompare(b))
+                      .map((source) => (
+                        <DropdownMenuItem key={source} onClick={() => onSelectSource(source)}>
+                          <DropdownMenuItemContent
+                            name={source}
+                            desc={LOGS_SOURCE_DESCRIPTION[source]}
+                          />
+                        </DropdownMenuItem>
+                      ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-            {IS_PLATFORM && logsTemplates && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<ChevronDown />}>
-                    Templates
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="start">
-                  {templates
-                    .sort((a, b) => a.label!.localeCompare(b.label!))
-                    .map((template) => (
-                      <DropdownMenuItem
-                        key={template.label}
-                        onClick={() => onSelectTemplate(template)}
-                      >
-                        <p>{template.label}</p>
-                      </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                {IS_PLATFORM && logsTemplates && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="default" iconRight={<ChevronDown />}>
+                        Templates
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="start">
+                      {templates
+                        .sort((a, b) => a.label!.localeCompare(b.label!))
+                        .map((template) => (
+                          <DropdownMenuItem
+                            key={template.label}
+                            onClick={() => onSelectTemplate(template)}
+                          >
+                            <p>{template.label}</p>
+                          </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </>
             )}
 
             <LogsDatePicker

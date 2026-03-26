@@ -25,6 +25,7 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import { useLogsQueryGenerateMutation } from 'data/ai/logs-query-mutation'
 import { useContentQuery } from 'data/content/content-query'
 import {
   UpsertContentPayload,
@@ -105,6 +106,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
+  const [queryMode, setQueryMode] = useState<'sql' | 'natural'>('sql')
+  const [nlQuery, setNlQuery] = useState<string>('')
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
@@ -168,6 +171,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       }
     },
   })
+
+  const { mutate: generateLogsQuery, isPending: isGenerating } = useLogsQueryGenerateMutation({
+    onSuccess: (data) => {
+      setEditorValue(data.sql)
+      handleRun(data.sql)
+      track('log_explorer_nl_query_generated')
+    },
+  })
+
+  const handleNlSubmit = () => {
+    if (!nlQuery.trim() || isGenerating) return
+    generateLogsQuery({ prompt: nlQuery.trim() })
+  }
 
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
@@ -389,16 +405,44 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
+            queryMode={queryMode}
+            onQueryModeChange={setQueryMode}
           />
-          <ShimmerLine active={isLoading} />
-          <CodeEditor
-            id={editorId}
-            editorRef={editorRef}
-            language="pgsql"
-            defaultValue={editorValue}
-            onInputChange={(v) => setEditorValue(v || '')}
-            actions={{ runQuery: { enabled: true, callback: handleRun } }}
-          />
+          <ShimmerLine active={isLoading || isGenerating} />
+          {queryMode === 'sql' ? (
+            <CodeEditor
+              id={editorId}
+              editorRef={editorRef}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
+            />
+          ) : (
+            <div className="flex flex-col h-full p-4 gap-3">
+              <textarea
+                className="flex-1 resize-none rounded-md border border-control bg-surface-100 px-3 py-2 text-sm placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-brand disabled:opacity-50"
+                placeholder="Describe what logs you want to find... e.g. 'Show me all 500 errors from the last hour'"
+                value={nlQuery}
+                onChange={(e) => setNlQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleNlSubmit()
+                }}
+                disabled={isGenerating}
+              />
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-foreground-light">⌘+Enter to run</span>
+                <Button
+                  type="primary"
+                  loading={isGenerating}
+                  disabled={isGenerating || !nlQuery.trim()}
+                  onClick={handleNlSubmit}
+                >
+                  Generate & Run
+                </Button>
+              </div>
+            </div>
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize="5" className="overflow-auto">
