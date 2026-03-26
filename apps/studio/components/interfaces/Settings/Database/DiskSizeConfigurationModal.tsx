@@ -91,9 +91,9 @@ const DiskSizeConfigurationModal = ({
       z.object({
         'new-disk-size': z.coerce
           .number({ required_error: 'Please enter a GB amount you want to resize the disk up to.' })
-          .min(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
+          .min(Number(currentDiskSize ?? 0), `Must be at least ${currentDiskSize} GB`)
           // to do, update with max_disk_volume_size_gb
-          .max(Number(maxDiskSize), 'Must not be more than 200 GB'),
+          .max(Number(maxDiskSize), `Must not be more than ${maxDiskSize} GB`),
       }),
     [currentDiskSize]
   )
