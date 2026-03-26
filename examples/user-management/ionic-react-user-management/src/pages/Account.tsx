@@ -99,6 +99,13 @@ export function AccountPage() {
           avatar_url,
         }));
       }
+
+      if (avatar_url !== undefined) {
+        setProfile((current) => ({
+          ...current,
+          avatar_url,
+        }));
+      }
     } catch (error: any) {
       showToast({ message: error.message, duration: 5000 })
     } finally {
