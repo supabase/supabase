@@ -142,7 +142,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const { mutate: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
+  const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
       const error = e as { message: string }
       console.error(error)
@@ -267,7 +267,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       owner_id: profile.id,
       visibility: 'user' as const,
     }
-    upsertContent(
+    await upsertContent(
       { projectRef, payload },
       {
         onSuccess: () => router.push(`/project/${projectRef}/logs/explorer?queryId=${id}`),
@@ -275,12 +275,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     )
   }
 
-  function handleOnSave() {
+  async function handleOnSave() {
     if (!projectRef) return console.error('Project ref is required')
 
     // if we have a queryId, we are editing a saved query
     if (queryId && query) {
-      upsertContent({
+      await upsertContent({
         projectRef: projectRef!,
         payload: {
           ...query,

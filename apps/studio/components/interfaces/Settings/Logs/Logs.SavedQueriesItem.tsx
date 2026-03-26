@@ -39,7 +39,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
       toast.error(`Failed to delete saved query: ${error.message}`)
     },
   })
-  const { mutate: updateContent } = useContentUpsertMutation({
+  const { mutateAsync: updateContent } = useContentUpsertMutation({
     onSuccess: () => {
       setShowUpdateModal(false)
       toast.success('Successfully updated query')
@@ -56,7 +56,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
 
   const onConfirmUpdate = async ({ name, description }: { name: string; description?: string }) => {
     if (!ref || typeof ref !== 'string') return console.error('Invalid project reference')
-    updateContent({
+    await updateContent({
       projectRef: ref,
       payload: {
         ...item,
@@ -116,9 +116,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
         onCancel={() => {
           setShowUpdateModal(false)
         }}
-        onSubmit={(newValues) => {
-          onConfirmUpdate(newValues)
-        }}
+        onSubmit={onConfirmUpdate}
       />
     </>
   )
