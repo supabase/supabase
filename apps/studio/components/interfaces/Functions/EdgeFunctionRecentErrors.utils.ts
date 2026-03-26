@@ -1,8 +1,17 @@
+import type { AlertErrorProps } from 'components/ui/AlertError'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
-import { genDefaultQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
+import {
+  genDefaultQuery,
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
+
+dayjs.extend(relativeTime)
 
 export const MAX_RECENT_ERROR_GROUPS = 5
 export const RECENT_ERROR_INVOCATIONS_LIMIT = 50
@@ -34,7 +43,7 @@ export const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 
 export const formatSingleLineMessage = (message: string) => message.replace(/\s+/g, ' ').trim()
 
-export const toAlertError = (error: unknown): { message: string } | undefined => {
+export const toAlertError = (error: unknown): AlertErrorProps['error'] | undefined => {
   if (typeof error === 'string') return { message: error }
 
   if (error && typeof error === 'object') {
@@ -43,6 +52,67 @@ export const toAlertError = (error: unknown): { message: string } | undefined =>
   }
 
   return undefined
+}
+
+export const formatLogTimestamp = (
+  value: string | number | undefined,
+  format: 'relative' | 'time'
+) => {
+  if (value === undefined) return '-'
+
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : String(value)
+  return format === 'relative'
+    ? dayjs.utc(timestamp).fromNow()
+    : dayjs.utc(timestamp).format('HH:mm:ss')
+}
+
+export const buildGroupMarkdown = (group: RecentErrorGroup, functionSlug?: string) => {
+  const lines = [
+    `## Recent error for \`${functionSlug ?? 'edge function'}\``,
+    '',
+    `### ${group.message}`,
+    `- Occurrences: ${group.count}`,
+    `- Last seen: ${formatLogTimestamp(group.lastSeen, 'relative')}`,
+  ]
+
+  if (group.lastMethod) lines.push(`- Last method: ${group.lastMethod}`)
+  if (group.lastStatusCode) lines.push(`- Last status: ${group.lastStatusCode}`)
+  if (group.executionTime) lines.push(`- Last execution time: ${group.executionTime}`)
+
+  lines.push('', '#### Related runtime logs')
+
+  if (group.logs.length === 0) {
+    lines.push('- No related runtime logs found for this error group.')
+  } else {
+    for (const log of group.logs) {
+      lines.push(
+        `- [${log.level}] ${log.count} occurrence${
+          log.count === 1 ? '' : 's'
+        }, last seen ${formatLogTimestamp(log.lastSeen, 'relative')}: ${log.message}`
+      )
+    }
+  }
+
+  return lines.join('\n')
+}
+
+export const buildGroupAssistantPrompt = (group: RecentErrorGroup, functionSlug?: string) => {
+  return [
+    `Analyze this recurring edge function error for \`${functionSlug ?? 'edge function'}\`.`,
+    'Summarize the likely root cause, what the runtime logs suggest, and the next debugging steps.',
+    '',
+    buildGroupMarkdown(group, functionSlug),
+  ].join('\n')
+}
+
+export const getStatusBadgeVariant = (statusCode?: string) => {
+  if (!statusCode) return 'destructive' as const
+
+  const status = Number(statusCode)
+  if (Number.isNaN(status)) return 'destructive' as const
+  if (status >= 500) return 'destructive' as const
+
+  return 'default' as const
 }
 
 export const getRecentErrorInvocationsSql = (
@@ -81,57 +151,50 @@ limit ${limit}`
 export const getRecentErrorGroupsBase = (
   recentErrorInvocations: LogData[]
 ): RecentErrorGroupBase[] => {
-  const grouped = recentErrorInvocations.reduce<Record<string, RecentErrorGroupBase>>(
-    (acc, item) => {
-      const statusCode = String(item.status_code ?? '')
-      const method = String(item.method ?? '')
-      const message =
-        parseEdgeFunctionEventMessage(
-          String(item.event_message ?? ''),
-          method || undefined,
-          statusCode
-        ) || 'Unknown error'
-      const executionId = String(item.execution_id ?? '')
-      const timestamp = Number(item.timestamp ?? 0)
-      const current = acc[message]
+  const grouped: Record<string, RecentErrorGroupBase> = {}
 
-      if (!current) {
-        acc[message] = {
-          message,
-          count: 1,
-          lastSeen: timestamp,
-          lastExecutionId: executionId || undefined,
-          lastStatusCode: statusCode || undefined,
-          lastMethod: method || undefined,
-          executionTime:
-            item.execution_time_ms !== undefined
-              ? `${Math.round(Number(item.execution_time_ms))}ms`
-              : undefined,
-          executionIds: executionId ? [executionId] : [],
-        }
-        return acc
+  for (const item of recentErrorInvocations) {
+    const statusCode = String(item.status_code ?? '')
+    const method = String(item.method ?? '')
+    const message =
+      parseEdgeFunctionEventMessage(String(item.event_message ?? ''), method || undefined, statusCode) ||
+      'Unknown error'
+    const executionId = String(item.execution_id ?? '')
+    const timestamp = Number(item.timestamp ?? 0)
+    const executionTime =
+      item.execution_time_ms !== undefined
+        ? `${Math.round(Number(item.execution_time_ms))}ms`
+        : undefined
+    const current = grouped[message]
+
+    if (!current) {
+      grouped[message] = {
+        message,
+        count: 1,
+        lastSeen: timestamp,
+        lastExecutionId: executionId || undefined,
+        lastStatusCode: statusCode || undefined,
+        lastMethod: method || undefined,
+        executionTime,
+        executionIds: executionId ? [executionId] : [],
       }
+      continue
+    }
 
-      current.count += 1
-      if (executionId && !current.executionIds.includes(executionId)) {
-        current.executionIds.push(executionId)
-      }
+    current.count += 1
 
-      if (timestamp > current.lastSeen) {
-        current.lastSeen = timestamp
-        current.lastExecutionId = executionId || undefined
-        current.lastStatusCode = statusCode || undefined
-        current.lastMethod = method || undefined
-        current.executionTime =
-          item.execution_time_ms !== undefined
-            ? `${Math.round(Number(item.execution_time_ms))}ms`
-            : undefined
-      }
+    if (executionId && !current.executionIds.includes(executionId)) {
+      current.executionIds.push(executionId)
+    }
 
-      return acc
-    },
-    {}
-  )
+    if (timestamp > current.lastSeen) {
+      current.lastSeen = timestamp
+      current.lastExecutionId = executionId || undefined
+      current.lastStatusCode = statusCode || undefined
+      current.lastMethod = method || undefined
+      current.executionTime = executionTime
+    }
+  }
 
   return Object.values(grouped)
     .sort((a, b) => b.lastSeen - a.lastSeen)

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
+  type EdgeFunctionChartRawDatum,
   formatChartTimestamp,
   formatMetric,
   formatRate,
@@ -17,6 +18,7 @@ import {
   getMemoryTooltipDetail,
   getRollingTimeRange,
   getSegmentedButtonClassName,
+  toEdgeFunctionChartData,
   getUsageMetrics,
 } from './EdgeFunctionOverview.utils'
 
@@ -28,7 +30,7 @@ describe('EdgeFunctionOverview.utils', () => {
   })
 
   it('builds invocation chart data and totals from combined stats', () => {
-    const data = getInvocationChartData([
+    const chartData = toEdgeFunctionChartData([
       {
         timestamp: '2026-03-20T10:00:00.000Z',
         success_count: 10,
@@ -43,7 +45,8 @@ describe('EdgeFunctionOverview.utils', () => {
         client_err_count: '0',
         server_err_count: '2',
       },
-    ])
+    ] satisfies EdgeFunctionChartRawDatum[])
+    const data = getInvocationChartData(chartData)
 
     expect(data).toEqual([
       {
@@ -59,6 +62,21 @@ describe('EdgeFunctionOverview.utils', () => {
         error_count: 2,
       },
     ])
+
+    expect(chartData[1]).toEqual({
+      timestamp: '2026-03-20T10:15:00.000Z',
+      success_count: 4,
+      redirect_count: 1,
+      client_err_count: 0,
+      server_err_count: 2,
+      avg_execution_time: 0,
+      max_execution_time: 0,
+      avg_cpu_time_used: 0,
+      max_cpu_time_used: 0,
+      avg_memory_used: 0,
+      avg_heap_memory_used: 0,
+      avg_external_memory_used: 0,
+    })
 
     expect(getInvocationTotals(data)).toEqual({
       totalInvocationCount: 23,
@@ -91,6 +109,10 @@ describe('EdgeFunctionOverview.utils', () => {
     const stats = [
       {
         timestamp: '2026-03-20T10:00:00.000Z',
+        success_count: 0,
+        redirect_count: 0,
+        client_err_count: 0,
+        server_err_count: 0,
         avg_execution_time: 10,
         max_execution_time: 18,
         avg_cpu_time_used: 5,
@@ -101,6 +123,10 @@ describe('EdgeFunctionOverview.utils', () => {
       },
       {
         timestamp: '2026-03-20T10:15:00.000Z',
+        success_count: 0,
+        redirect_count: 0,
+        client_err_count: 0,
+        server_err_count: 0,
         avg_execution_time: 30,
         max_execution_time: 45,
         avg_cpu_time_used: 15,
@@ -134,8 +160,8 @@ describe('EdgeFunctionOverview.utils', () => {
         { timestamp: '2026-03-20T10:15:00.000Z', ok_count: 5, warning_count: 1, error_count: 1 },
         { timestamp: '2026-03-20T10:30:00.000Z', ok_count: 2, warning_count: 0, error_count: 0 },
       ],
-      windowStart: dayjs('2026-03-20T09:45:00.000Z'),
-      windowEnd: dayjs('2026-03-20T10:45:00.000Z'),
+      windowStart: new Date('2026-03-20T09:45:00.000Z'),
+      windowEnd: new Date('2026-03-20T10:45:00.000Z'),
     })
 
     expect(annotation?.timestamp).toBe('2026-03-20T10:15:00.000Z')
@@ -149,8 +175,8 @@ describe('EdgeFunctionOverview.utils', () => {
       invocationChartData: [
         { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
       ],
-      windowStart: dayjs('2026-03-20T09:45:00.000Z'),
-      windowEnd: dayjs('2026-03-20T10:45:00.000Z'),
+      windowStart: new Date('2026-03-20T09:45:00.000Z'),
+      windowEnd: new Date('2026-03-20T10:45:00.000Z'),
     })
 
     expect(annotation).toBeUndefined()
@@ -160,7 +186,7 @@ describe('EdgeFunctionOverview.utils', () => {
     const interval = EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === '1hr')
     expect(interval).toBeDefined()
 
-    const now = dayjs('2026-03-20T10:37:00.000Z')
+    const now = new Date('2026-03-20T10:37:00.000Z')
     const [bucketedStart, bucketedEnd] = getBucketedTimeRange(interval!, now)
     const [rollingStart, rollingEnd] = getRollingTimeRange(interval!, now)
 

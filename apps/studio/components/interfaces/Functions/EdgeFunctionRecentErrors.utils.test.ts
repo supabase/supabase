@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildGroupAssistantPrompt,
+  formatLogTimestamp,
   formatSingleLineMessage,
   getFunctionRuntimeLogsSql,
   getRecentErrorGroups,
   getRecentErrorGroupsBase,
   getRelatedExecutionIds,
+  getStatusBadgeVariant,
   toAlertError,
 } from './EdgeFunctionRecentErrors.utils'
 
@@ -164,5 +167,39 @@ limit 25`)
         ],
       },
     ])
+  })
+
+  it('formats timestamps, prompts, and status variants', () => {
+    expect(formatLogTimestamp(undefined, 'time')).toBe('-')
+    expect(formatLogTimestamp('2026-03-20T10:15:00.000Z', 'time')).toBe('10:15:00')
+
+    expect(
+      buildGroupAssistantPrompt(
+        {
+          message: 'database exploded',
+          count: 2,
+          lastSeen: 1742465700000000,
+          lastExecutionId: 'exec-2',
+          lastStatusCode: '500',
+          lastMethod: 'POST',
+          executionTime: '85ms',
+          executionIds: ['exec-1', 'exec-2'],
+          logs: [
+            {
+              key: 'error:stack trace',
+              message: 'stack trace',
+              level: 'error',
+              count: 2,
+              lastSeen: 1742465700000000,
+            },
+          ],
+        },
+        'my-function'
+      )
+    ).toContain('Analyze this recurring edge function error for `my-function`.')
+
+    expect(getStatusBadgeVariant()).toBe('destructive')
+    expect(getStatusBadgeVariant('500')).toBe('destructive')
+    expect(getStatusBadgeVariant('404')).toBe('default')
   })
 })

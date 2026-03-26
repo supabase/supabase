@@ -10,9 +10,10 @@ import {
   getInvocationTotals,
   getInvocationUpdateAnnotation,
   getRollingTimeRange,
+  toEdgeFunctionChartData,
   getUsageMetrics,
 } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
-import type { EdgeFunctionChartDatum } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
+import type { EdgeFunctionChartRawDatum } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
 import { EdgeFunctionPerformanceSection } from 'components/interfaces/Functions/EdgeFunctionPerformanceSection'
 import { EdgeFunctionRecentErrors } from 'components/interfaces/Functions/EdgeFunctionRecentErrors'
 import { EdgeFunctionUsageSection } from 'components/interfaces/Functions/EdgeFunctionUsageSection'
@@ -24,7 +25,6 @@ import {
   useFunctionsCombinedStatsQuery,
 } from 'data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { Dayjs } from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ExternalLink } from 'lucide-react'
@@ -62,18 +62,13 @@ const PageLayout: NextPageWithLayout = () => {
     }
   )
 
-  const combinedStatsData = useMemo(() => {
-    const result = combinedStatsResults.data?.result as
-      | Record<string, string | number>[]
-      | undefined
-    return result || []
-  }, [combinedStatsResults.data])
-
-  const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(
-    () => getBucketedTimeRange(selectedInterval),
-    [selectedInterval]
+  const combinedStatsData = useMemo(
+    () => (combinedStatsResults.data?.result as EdgeFunctionChartRawDatum[] | undefined) || [],
+    [combinedStatsResults.data]
   )
-  const [selectedWindowStart, selectedWindowEnd]: [Dayjs, Dayjs] = useMemo(
+
+  const [startDate, endDate] = useMemo(() => getBucketedTimeRange(selectedInterval), [selectedInterval])
+  const [selectedWindowStart, selectedWindowEnd] = useMemo(
     () => getRollingTimeRange(selectedInterval),
     [selectedInterval]
   )
@@ -109,14 +104,7 @@ const PageLayout: NextPageWithLayout = () => {
     endDate: endDate.toISOString(),
   })
 
-  const chartData = useMemo(
-    () =>
-      combinedStatsChartData.map((datum) => ({
-        ...datum,
-        timestamp: String(datum.timestamp),
-      })) as EdgeFunctionChartDatum[],
-    [combinedStatsChartData]
-  )
+  const chartData = useMemo(() => toEdgeFunctionChartData(combinedStatsChartData), [combinedStatsChartData])
   const invocationChartData = useMemo(() => getInvocationChartData(chartData), [chartData])
   const { totalInvocationCount, totalWarningCount, totalErrorCount } = useMemo(
     () => getInvocationTotals(invocationChartData),

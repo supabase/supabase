@@ -1,12 +1,6 @@
-import {
-  isUnixMicro,
-  unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import AlertError from 'components/ui/AlertError'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -37,6 +31,9 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  buildGroupAssistantPrompt,
+  formatLogTimestamp,
+  getStatusBadgeVariant,
   formatSingleLineMessage,
   getFunctionRuntimeLogsSql,
   getRecentErrorGroups,
@@ -46,8 +43,6 @@ import {
   toAlertError,
   type RecentErrorGroup,
 } from './EdgeFunctionRecentErrors.utils'
-
-dayjs.extend(relativeTime)
 
 interface EdgeFunctionRecentErrorsProps {
   functionId?: string
@@ -124,70 +119,12 @@ export const EdgeFunctionRecentErrors = ({
     [functionRuntimeLogs, recentErrorGroupsBase]
   )
 
-  const formatLogTimestamp = (value: string | number | undefined, format: 'relative' | 'time') => {
-    if (value === undefined) return '-'
-
-    const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : String(value)
-    return format === 'relative'
-      ? dayjs.utc(timestamp).fromNow()
-      : dayjs.utc(timestamp).format('HH:mm:ss')
-  }
-
-  const buildGroupMarkdown = (group: RecentErrorGroup) => {
-    const lines = [
-      `## Recent error for \`${functionSlug ?? 'edge function'}\``,
-      '',
-      `### ${group.message}`,
-      `- Occurrences: ${group.count}`,
-      `- Last seen: ${formatLogTimestamp(group.lastSeen, 'relative')}`,
-    ]
-
-    if (group.lastMethod) lines.push(`- Last method: ${group.lastMethod}`)
-    if (group.lastStatusCode) lines.push(`- Last status: ${group.lastStatusCode}`)
-    if (group.executionTime) lines.push(`- Last execution time: ${group.executionTime}`)
-
-    lines.push('', '#### Related runtime logs')
-
-    if (group.logs.length === 0) {
-      lines.push('- No related runtime logs found for this error group.')
-    } else {
-      group.logs.forEach((log) => {
-        lines.push(
-          `- [${log.level}] ${log.count} occurrence${
-            log.count === 1 ? '' : 's'
-          }, last seen ${formatLogTimestamp(log.lastSeen, 'relative')}: ${log.message}`
-        )
-      })
-    }
-
-    return lines.join('\n')
-  }
-
-  const buildGroupAssistantPrompt = (group: RecentErrorGroup) => {
-    return [
-      `Analyze this recurring edge function error for \`${functionSlug ?? 'edge function'}\`.`,
-      'Summarize the likely root cause, what the runtime logs suggest, and the next debugging steps.',
-      '',
-      buildGroupMarkdown(group),
-    ].join('\n')
-  }
-
   const handleOpenAssistant = (group: RecentErrorGroup) => {
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiAssistant.newChat({
       name: `Investigate ${functionSlug ?? 'error'}`,
-      initialMessage: buildGroupAssistantPrompt(group),
+      initialMessage: buildGroupAssistantPrompt(group, functionSlug),
     })
-  }
-
-  const getStatusBadgeVariant = (statusCode?: string) => {
-    if (!statusCode) return 'destructive' as const
-
-    const status = Number(statusCode)
-    if (Number.isNaN(status)) return 'destructive' as const
-    if (status >= 500) return 'destructive' as const
-
-    return 'default' as const
   }
 
   return (
@@ -279,7 +216,7 @@ export const EdgeFunctionRecentErrors = ({
                               <AiAssistantDropdown
                                 label="Ask Assistant"
                                 size="tiny"
-                                buildPrompt={() => buildGroupAssistantPrompt(group)}
+                                buildPrompt={() => buildGroupAssistantPrompt(group, functionSlug)}
                                 onOpenAssistant={() => handleOpenAssistant(group)}
                               />
                             </div>

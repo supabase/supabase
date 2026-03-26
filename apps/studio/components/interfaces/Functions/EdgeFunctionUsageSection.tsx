@@ -1,13 +1,6 @@
 import type { EdgeFunctionChartDatum } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
-import {
-  Chart,
-  ChartCard,
-  ChartContent,
-  ChartHeader,
-  ChartLine,
-  ChartLoadingState,
-  ChartMetric,
-} from 'ui-patterns/Chart'
+import { useMemo } from 'react'
+import { ChartMetric } from 'ui-patterns/Chart'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -17,16 +10,18 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { EdgeFunctionChartEmptyState } from './EdgeFunctionChartEmptyState'
+import {
+  getCpuTooltipDetails,
+  getMemoryTooltipDetails,
+} from './EdgeFunctionMetricTooltipDetails'
 import {
   CPU_TIME_CHART_CONFIG,
   formatMetric,
   formatRate,
-  formatReferenceDelta,
   getChartEmptyStateCopy,
-  getMemoryTooltipDetail,
   MEMORY_CHART_CONFIG,
 } from './EdgeFunctionOverview.utils'
+import { EdgeFunctionTimeSeriesChartCard } from './EdgeFunctionTimeSeriesChartCard'
 
 interface EdgeFunctionUsageSectionProps {
   data: EdgeFunctionChartDatum[]
@@ -41,36 +36,6 @@ interface EdgeFunctionUsageSectionProps {
   totalExternalMemory: number
   totalMemoryByType: number
 }
-
-const renderCpuTooltipDetails = (
-  averageCpuTime: number,
-  _: EdgeFunctionChartDatum,
-  __: string,
-  value: unknown
-) => (
-  <span className="text-foreground">
-    {formatReferenceDelta(Number(value ?? 0), averageCpuTime)}
-  </span>
-)
-
-const renderMemoryTooltipDetails = (
-  averageMemoryUsage: number,
-  datum: EdgeFunctionChartDatum,
-  _: string,
-  value: unknown
-) => (
-  <>
-    <span className="text-foreground">
-      {formatReferenceDelta(Number(value ?? 0), averageMemoryUsage)}
-    </span>
-    <span className="text-foreground-light">
-      {getMemoryTooltipDetail(
-        Number(datum.avg_heap_memory_used ?? 0),
-        Number(datum.avg_external_memory_used ?? 0)
-      )}
-    </span>
-  </>
-)
 
 export const EdgeFunctionUsageSection = ({
   data,
@@ -87,6 +52,44 @@ export const EdgeFunctionUsageSection = ({
 }: EdgeFunctionUsageSectionProps) => {
   const cpuEmptyStateCopy = getChartEmptyStateCopy('CPU time', isError, errorMessage)
   const memoryEmptyStateCopy = getChartEmptyStateCopy('memory usage', isError, errorMessage)
+  const cpuTooltipDetails = useMemo(() => getCpuTooltipDetails(averageCpuTime), [averageCpuTime])
+  const memoryTooltipDetails = useMemo(
+    () => getMemoryTooltipDetails(averageMemoryUsage),
+    [averageMemoryUsage]
+  )
+  const cpuMetrics = (
+    <div className="flex flex-wrap gap-x-8 gap-y-4">
+      <ChartMetric
+        label="Average CPU Time"
+        value={formatMetric(averageCpuTime, 'ms')}
+        tooltip="Average CPU time usage for the function"
+      />
+      <ChartMetric
+        label="Max CPU Time"
+        value={formatMetric(maxCpuTime, 'ms')}
+        tooltip="Maximum CPU time usage for the function"
+      />
+    </div>
+  )
+  const memoryMetrics = (
+    <div className="flex flex-wrap gap-x-8 gap-y-4">
+      <ChartMetric
+        label="Average Memory Usage"
+        value={formatMetric(averageMemoryUsage, 'MB')}
+        tooltip="Average memory usage for the function"
+      />
+      <ChartMetric
+        label="Heap"
+        value={formatRate(totalHeapMemory, totalMemoryByType)}
+        tooltip="Share of memory attributed to heap usage over the selected interval"
+      />
+      <ChartMetric
+        label="External"
+        value={formatRate(totalExternalMemory, totalMemoryByType)}
+        tooltip="Share of memory attributed to external usage over the selected interval"
+      />
+    </div>
+  )
 
   return (
     <PageSection>
@@ -100,116 +103,55 @@ export const EdgeFunctionUsageSection = ({
             </PageSectionMeta>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Chart isLoading={isLoading}>
-                <ChartCard>
-                  <ChartHeader align="start">
-                    <div className="flex flex-wrap gap-x-8 gap-y-4">
-                      <ChartMetric
-                        label="Average CPU Time"
-                        value={formatMetric(averageCpuTime, 'ms')}
-                        tooltip="Average CPU time usage for the function"
-                      />
-                      <ChartMetric
-                        label="Max CPU Time"
-                        value={formatMetric(maxCpuTime, 'ms')}
-                        tooltip="Maximum CPU time usage for the function"
-                      />
-                    </div>
-                  </ChartHeader>
-                  <ChartContent
-                    isEmpty={isError || data.length === 0}
-                    emptyState={
-                      <EdgeFunctionChartEmptyState
-                        title={cpuEmptyStateCopy.title}
-                        description={cpuEmptyStateCopy.description}
-                      />
-                    }
-                    loadingState={<ChartLoadingState />}
-                  >
-                    <div className="h-40">
-                      <ChartLine
-                        data={data}
-                        dataKey="max_cpu_time_used"
-                        DateTimeFormat={dateTimeFormat}
-                        isFullHeight
-                        showYAxis
-                        config={CPU_TIME_CHART_CONFIG}
-                        tooltipDetails={renderCpuTooltipDetails.bind(null, averageCpuTime)}
-                        referenceLines={[
-                          {
-                            y: averageCpuTime,
-                            label: 'average',
-                            stroke: 'hsl(var(--foreground-default))',
-                            strokeWidth: 1.5,
-                          },
-                        ]}
-                        YAxisProps={{
-                          width: 64,
-                          tickFormatter: (value: number) => `${Math.round(value)}ms`,
-                        }}
-                      />
-                    </div>
-                  </ChartContent>
-                </ChartCard>
-              </Chart>
+              <EdgeFunctionTimeSeriesChartCard
+                data={data}
+                dateTimeFormat={dateTimeFormat}
+                isLoading={isLoading}
+                isError={isError}
+                emptyTitle={cpuEmptyStateCopy.title}
+                emptyDescription={cpuEmptyStateCopy.description}
+                metrics={cpuMetrics}
+                dataKey="max_cpu_time_used"
+                config={CPU_TIME_CHART_CONFIG}
+                tooltipDetails={cpuTooltipDetails}
+                referenceLines={[
+                  {
+                    y: averageCpuTime,
+                    label: 'average',
+                    stroke: 'hsl(var(--foreground-default))',
+                    strokeWidth: 1.5,
+                  },
+                ]}
+                yAxisProps={{
+                  width: 64,
+                  tickFormatter: (value: number) => `${Math.round(value)}ms`,
+                }}
+              />
 
-              <Chart isLoading={isLoading}>
-                <ChartCard>
-                  <ChartHeader align="start">
-                    <div className="flex flex-wrap gap-x-8 gap-y-4">
-                      <ChartMetric
-                        label="Average Memory Usage"
-                        value={formatMetric(averageMemoryUsage, 'MB')}
-                        tooltip="Average memory usage for the function"
-                      />
-                      <ChartMetric
-                        label="Heap"
-                        value={formatRate(totalHeapMemory, totalMemoryByType)}
-                        tooltip="Share of memory attributed to heap usage over the selected interval"
-                      />
-                      <ChartMetric
-                        label="External"
-                        value={formatRate(totalExternalMemory, totalMemoryByType)}
-                        tooltip="Share of memory attributed to external usage over the selected interval"
-                      />
-                    </div>
-                  </ChartHeader>
-                  <ChartContent
-                    isEmpty={isError || data.length === 0}
-                    emptyState={
-                      <EdgeFunctionChartEmptyState
-                        title={memoryEmptyStateCopy.title}
-                        description={memoryEmptyStateCopy.description}
-                      />
-                    }
-                    loadingState={<ChartLoadingState />}
-                  >
-                    <div className="h-40">
-                      <ChartLine
-                        data={data}
-                        dataKey="avg_memory_used"
-                        DateTimeFormat={dateTimeFormat}
-                        isFullHeight
-                        showYAxis
-                        config={MEMORY_CHART_CONFIG}
-                        tooltipDetails={renderMemoryTooltipDetails.bind(null, averageMemoryUsage)}
-                        referenceLines={[
-                          {
-                            y: averageMemoryUsage,
-                            label: 'average',
-                            stroke: 'hsl(var(--foreground-default))',
-                            strokeWidth: 1.5,
-                          },
-                        ]}
-                        YAxisProps={{
-                          width: 64,
-                          tickFormatter: (value: number) => `${Number(value).toFixed(1)}MB`,
-                        }}
-                      />
-                    </div>
-                  </ChartContent>
-                </ChartCard>
-              </Chart>
+              <EdgeFunctionTimeSeriesChartCard
+                data={data}
+                dateTimeFormat={dateTimeFormat}
+                isLoading={isLoading}
+                isError={isError}
+                emptyTitle={memoryEmptyStateCopy.title}
+                emptyDescription={memoryEmptyStateCopy.description}
+                metrics={memoryMetrics}
+                dataKey="avg_memory_used"
+                config={MEMORY_CHART_CONFIG}
+                tooltipDetails={memoryTooltipDetails}
+                referenceLines={[
+                  {
+                    y: averageMemoryUsage,
+                    label: 'average',
+                    stroke: 'hsl(var(--foreground-default))',
+                    strokeWidth: 1.5,
+                  },
+                ]}
+                yAxisProps={{
+                  width: 64,
+                  tickFormatter: (value: number) => `${Number(value).toFixed(1)}MB`,
+                }}
+              />
             </div>
           </div>
         </PageContainer>

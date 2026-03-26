@@ -1,12 +1,12 @@
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import type { ChartIntervals } from 'types'
 import type { ChartConfig } from 'ui'
 
-export type EdgeFunctionChartDatum = {
-  timestamp: string
+export type EdgeFunctionChartRawDatum = {
+  timestamp: string | number
   success_count?: string | number
   redirect_count?: string | number
   client_err_count?: string | number
@@ -20,6 +20,21 @@ export type EdgeFunctionChartDatum = {
   avg_external_memory_used?: string | number
 }
 
+export type EdgeFunctionChartDatum = {
+  timestamp: string
+  success_count: number
+  redirect_count: number
+  client_err_count: number
+  server_err_count: number
+  avg_execution_time: number
+  max_execution_time: number
+  avg_cpu_time_used: number
+  max_cpu_time_used: number
+  avg_memory_used: number
+  avg_heap_memory_used: number
+  avg_external_memory_used: number
+}
+
 export type InvocationChartDatum = {
   timestamp: string
   ok_count: number
@@ -30,7 +45,7 @@ export type InvocationChartDatum = {
 export type InvocationUpdateAnnotation = {
   timestamp: string
   position: number
-  updatedAt: Dayjs
+  updatedAt: Date
 }
 
 export const EDGE_FUNCTION_CHART_INTERVALS: ChartIntervals[] = [
@@ -104,40 +119,36 @@ export const MEMORY_CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
+const toManipulateUnit = (unit: ChartIntervals['startUnit']) => unit as dayjs.ManipulateType
+const toNumber = (value: string | number | undefined) => Number(value ?? 0)
+
 export const getBucketedTimeRange = (
   interval: ChartIntervals,
-  now: Dayjs = dayjs()
-): [Dayjs, Dayjs] => {
-  const start = now
-    .subtract(interval.startValue, interval.startUnit as dayjs.ManipulateType)
-    .startOf(interval.startUnit as dayjs.ManipulateType)
-  const end = now.startOf(interval.startUnit as dayjs.ManipulateType)
+  now: Date = new Date()
+): [Date, Date] => {
+  const currentTime = dayjs(now)
+  const unit = toManipulateUnit(interval.startUnit)
+  const start = currentTime.subtract(interval.startValue, unit).startOf(unit)
+  const end = currentTime.startOf(unit)
 
-  return [start, end]
+  return [start.toDate(), end.toDate()]
 }
 
 export const getRollingTimeRange = (
   interval: ChartIntervals,
-  now: Dayjs = dayjs()
-): [Dayjs, Dayjs] => {
-  const end = now
-  const start = end.subtract(interval.startValue, interval.startUnit as dayjs.ManipulateType)
+  now: Date = new Date()
+): [Date, Date] => {
+  const currentTime = dayjs(now)
+  const start = currentTime.subtract(interval.startValue, toManipulateUnit(interval.startUnit))
 
-  return [start, end]
+  return [start.toDate(), currentTime.toDate()]
 }
 
-export const getInvocationChartData = (data: EdgeFunctionChartDatum[]): InvocationChartDatum[] =>
-  data.map((datum) => ({
-    timestamp: String(datum.timestamp),
-    ok_count: Number(datum.success_count ?? 0),
-    warning_count: Number(datum.redirect_count ?? 0) + Number(datum.client_err_count ?? 0),
-    error_count: Number(datum.server_err_count ?? 0),
-  }))
-
-export const getSegmentedButtonClassName = (index: number, total: number) => {
-  if (index === 0) return 'rounded-tr-none rounded-br-none'
-  if (index === total - 1) return 'rounded-tl-none rounded-bl-none'
-  return 'rounded-none'
+export const formatChartTimestamp = (
+  value: Date | string | number | undefined,
+  format: string
+) => {
+  return dayjs(value === undefined ? '' : value).format(format)
 }
 
 export const getChartTimeRangeLabels = (
@@ -152,9 +163,31 @@ export const getChartTimeRangeLabels = (
   }
 }
 
-export const formatChartTimestamp = (value: string | number | undefined, format: string) => {
-  return dayjs(value === undefined ? '' : String(value)).format(format)
-}
+export const toEdgeFunctionChartData = (
+  rows: EdgeFunctionChartRawDatum[] = []
+): EdgeFunctionChartDatum[] =>
+  rows.map((row) => ({
+    timestamp: String(row.timestamp ?? ''),
+    success_count: toNumber(row.success_count),
+    redirect_count: toNumber(row.redirect_count),
+    client_err_count: toNumber(row.client_err_count),
+    server_err_count: toNumber(row.server_err_count),
+    avg_execution_time: toNumber(row.avg_execution_time),
+    max_execution_time: toNumber(row.max_execution_time),
+    avg_cpu_time_used: toNumber(row.avg_cpu_time_used),
+    max_cpu_time_used: toNumber(row.max_cpu_time_used),
+    avg_memory_used: toNumber(row.avg_memory_used),
+    avg_heap_memory_used: toNumber(row.avg_heap_memory_used),
+    avg_external_memory_used: toNumber(row.avg_external_memory_used),
+  }))
+
+export const getInvocationChartData = (data: EdgeFunctionChartDatum[]): InvocationChartDatum[] =>
+  data.map((datum) => ({
+    timestamp: datum.timestamp,
+    ok_count: datum.success_count,
+    warning_count: datum.redirect_count + datum.client_err_count,
+    error_count: datum.server_err_count,
+  }))
 
 export const getInvocationTotals = (data: InvocationChartDatum[]) => {
   const totalInvocationCount = sumBy(data, (datum) => {
@@ -168,32 +201,19 @@ export const getInvocationTotals = (data: InvocationChartDatum[]) => {
   }
 }
 
-export const getChartEmptyStateCopy = (
-  subject: string,
-  isError: boolean,
-  errorMessage?: string
-) => ({
-  title: isError ? `Unable to load ${subject}` : 'No data to show',
-  description: isError ? errorMessage : undefined,
-})
-
 export const getExecutionMetrics = (data: EdgeFunctionChartDatum[]) => ({
-  averageExecutionTime: meanBy(data, (datum) => Number(datum.avg_execution_time ?? 0)) ?? 0,
-  maxExecutionTime: Number(
-    maxBy(data, (datum) => Number(datum.max_execution_time ?? 0))?.max_execution_time ?? 0
-  ),
+  averageExecutionTime: meanBy(data, 'avg_execution_time') ?? 0,
+  maxExecutionTime: maxBy(data, 'max_execution_time')?.max_execution_time ?? 0,
 })
 
 export const getUsageMetrics = (data: EdgeFunctionChartDatum[]) => {
-  const totalHeapMemory = sumBy(data, (datum) => Number(datum.avg_heap_memory_used ?? 0))
-  const totalExternalMemory = sumBy(data, (datum) => Number(datum.avg_external_memory_used ?? 0))
+  const totalHeapMemory = sumBy(data, 'avg_heap_memory_used')
+  const totalExternalMemory = sumBy(data, 'avg_external_memory_used')
 
   return {
-    averageCpuTime: meanBy(data, (datum) => Number(datum.avg_cpu_time_used ?? 0)) ?? 0,
-    maxCpuTime: Number(
-      maxBy(data, (datum) => Number(datum.max_cpu_time_used ?? 0))?.max_cpu_time_used ?? 0
-    ),
-    averageMemoryUsage: meanBy(data, (datum) => Number(datum.avg_memory_used ?? 0)) ?? 0,
+    averageCpuTime: meanBy(data, 'avg_cpu_time_used') ?? 0,
+    maxCpuTime: maxBy(data, 'max_cpu_time_used')?.max_cpu_time_used ?? 0,
+    averageMemoryUsage: meanBy(data, 'avg_memory_used') ?? 0,
     totalHeapMemory,
     totalExternalMemory,
     totalMemoryByType: totalHeapMemory + totalExternalMemory,
@@ -208,21 +228,22 @@ export const getInvocationUpdateAnnotation = ({
 }: {
   updatedAt?: string
   invocationChartData: InvocationChartDatum[]
-  windowStart: Dayjs
-  windowEnd: Dayjs
+  windowStart: Date
+  windowEnd: Date
 }): InvocationUpdateAnnotation | undefined => {
   if (!updatedAt || invocationChartData.length === 0) return undefined
 
-  const updatedAtTime = dayjs(updatedAt)
-  const updatedAtValue = updatedAtTime.valueOf()
+  const updatedAtDate = new Date(updatedAt)
+  const updatedAtValue = updatedAtDate.valueOf()
 
+  if (Number.isNaN(updatedAtValue)) return undefined
   if (updatedAtValue < windowStart.valueOf() || updatedAtValue > windowEnd.valueOf()) {
     return undefined
   }
 
   const closestTimestamp = invocationChartData.reduce((closest, datum) => {
-    const datumDistance = Math.abs(dayjs(datum.timestamp).valueOf() - updatedAtValue)
-    const closestDistance = Math.abs(dayjs(closest.timestamp).valueOf() - updatedAtValue)
+    const datumDistance = Math.abs(new Date(datum.timestamp).valueOf() - updatedAtValue)
+    const closestDistance = Math.abs(new Date(closest.timestamp).valueOf() - updatedAtValue)
 
     return datumDistance < closestDistance ? datum : closest
   }).timestamp
@@ -233,9 +254,24 @@ export const getInvocationUpdateAnnotation = ({
   return {
     timestamp: closestTimestamp,
     position: ((markerIndex + 0.5) / invocationChartData.length) * 100,
-    updatedAt: updatedAtTime,
+    updatedAt: updatedAtDate,
   }
 }
+
+export const getSegmentedButtonClassName = (index: number, total: number) => {
+  if (index === 0) return 'rounded-tr-none rounded-br-none'
+  if (index === total - 1) return 'rounded-tl-none rounded-bl-none'
+  return 'rounded-none'
+}
+
+export const getChartEmptyStateCopy = (
+  subject: string,
+  isError: boolean,
+  errorMessage?: string
+) => ({
+  title: isError ? `Unable to load ${subject}` : 'No data to show',
+  description: isError ? errorMessage : undefined,
+})
 
 export const formatMetric = (value?: number, unit?: string) => {
   if (value === undefined || Number.isNaN(value)) return unit ? `0${unit}` : '0'
