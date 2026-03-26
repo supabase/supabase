@@ -98,9 +98,7 @@ const DiskSizeConfigurationModal = ({
     [currentDiskSize]
   )
 
-  const confirmResetDbPass: SubmitHandler<z.infer<typeof diskSizeValidationSchema>> = async (
-    values
-  ) => {
+  const handleSubmit: SubmitHandler<z.infer<typeof diskSizeValidationSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
     const volumeSize = values['new-disk-size']
     updateProjectUsage({ projectRef, volumeSize })
@@ -183,7 +181,7 @@ const DiskSizeConfigurationModal = ({
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
                 <Form_Shadcn_ {...form}>
-                  <form id={formId} onSubmit={form.handleSubmit(confirmResetDbPass)} noValidate>
+                  <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
                     <FormField_Shadcn_
                       control={form.control}
                       name="new-disk-size"
@@ -194,16 +192,16 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="GB" className="w-full">
+                          <PrePostTab postTab="GB" className="w-full">
+                            <FormControl_Shadcn_>
                               <Input_Shadcn_
                                 {...field}
                                 id="new-disk-size"
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
+                            </FormControl_Shadcn_>
+                          </PrePostTab>
                         </FormItemLayout>
                       )}
                     />
