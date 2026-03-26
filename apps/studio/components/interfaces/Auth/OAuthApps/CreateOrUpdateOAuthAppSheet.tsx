@@ -12,8 +12,8 @@ import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-se
 import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
 import { DOCS_URL } from 'lib/constants'
-import { Plus, Trash2, Upload, X } from 'lucide-react'
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { Plus, Trash2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -86,15 +86,10 @@ export const CreateOrUpdateOAuthAppSheet = ({
   onCancel,
 }: CreateOrUpdateOAuthAppSheetProps) => {
   const { ref: projectRef } = useParams()
-  const uploadButtonRef = useRef<HTMLInputElement>(null)
 
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
-  const [logoFile, setLogoFile] = useState<File>()
-  const [logoUrl, setLogoUrl] = useState<string>()
-  const [logoRemoved, setLogoRemoved] = useState(false)
 
   const isEditMode = !!appToEdit
-  const hasLogo = logoUrl !== undefined
   const isPublicClient = appToEdit?.client_type === 'public'
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -138,8 +133,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
   useEffect(() => {
     if (visible) {
-      setLogoFile(undefined)
-      setLogoRemoved(false)
       if (appToEdit) {
         form.reset({
           name: appToEdit.client_name,
@@ -153,26 +146,11 @@ export const CreateOrUpdateOAuthAppSheet = ({
           client_secret: '****************************************************************',
           logo_uri: appToEdit.logo_uri || undefined,
         })
-        setLogoUrl(appToEdit.logo_uri || undefined)
       } else {
         form.reset(initialValues)
-        setLogoUrl(undefined)
       }
     }
   }, [visible, appToEdit, form])
-
-  const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    event.persist()
-    const files = event.target.files
-    if (files && files.length > 0) {
-      const file = files[0]
-      setLogoFile(file)
-      setLogoUrl(URL.createObjectURL(file))
-      setLogoRemoved(false)
-      form.setValue('logo_uri', '')
-      event.target.value = ''
-    }
-  }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     const validRedirectUris = data.redirect_uris
@@ -180,27 +158,17 @@ export const CreateOrUpdateOAuthAppSheet = ({
       .filter((uri) => uri !== '')
 
     const logoUriFromInput = data.logo_uri?.trim()
-    let uploadedLogoUri: string | undefined = undefined
+    let submittedLogoUri: string | undefined = logoUriFromInput || undefined
 
-    if (logoRemoved) {
-      uploadedLogoUri = ''
-    } else if (logoUriFromInput) {
-      uploadedLogoUri = logoUriFromInput
-    } else if (logoFile) {
-      const reader = new FileReader()
-      uploadedLogoUri = await new Promise<string>((resolve) => {
-        reader.onloadend = () => resolve(reader.result as string)
-        reader.readAsDataURL(logoFile)
-      })
-    } else if (logoUrl) {
-      uploadedLogoUri = logoUrl
+    if (isEditMode && appToEdit?.logo_uri && !logoUriFromInput) {
+      submittedLogoUri = ''
     }
 
     if (isEditMode && appToEdit) {
       const payload: UpdateOAuthClientParams = {
         client_name: data.name,
         redirect_uris: validRedirectUris,
-        logo_uri: uploadedLogoUri,
+        logo_uri: submittedLogoUri,
       }
 
       updateOAuthApp({
@@ -215,7 +183,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
         client_uri: '',
         client_type: data.client_type,
         redirect_uris: validRedirectUris,
-        logo_uri: uploadedLogoUri || undefined,
+        logo_uri: submittedLogoUri,
       }
 
       createOAuthApp({
@@ -241,14 +209,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
       clientEndpoint,
       clientId: appToEdit?.client_id,
     })
-  }
-
-  const handleUploadLogo = () => uploadButtonRef.current?.click()
-  const handleRemoveLogo = () => {
-    setLogoFile(undefined)
-    setLogoUrl(undefined)
-    setLogoRemoved(true)
-    form.setValue('logo_uri', '')
   }
 
   return (
@@ -297,71 +257,16 @@ export const CreateOrUpdateOAuthAppSheet = ({
                     <FormField_Shadcn_
                       control={form.control}
                       name="logo_uri"
-                      render={() => (
-                        <FormItemLayout label="Logo" description="Upload a logo for your OAuth app">
-                          <FormControl_Shadcn_>
-                            <div className="flex gap-4 items-center">
-                              <button
-                                type="button"
-                                onClick={handleUploadLogo}
-                                className={cn(
-                                  'flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong'
-                                )}
-                                style={{
-                                  backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
-                                }}
-                              >
-                                {!hasLogo && <Upload size={14} />}
-                              </button>
-                              <div className="flex gap-2 items-center">
-                                <Button
-                                  type="default"
-                                  size="tiny"
-                                  icon={<Upload size={14} />}
-                                  onClick={handleUploadLogo}
-                                >
-                                  Upload
-                                </Button>
-                                {hasLogo && (
-                                  <Button
-                                    type="default"
-                                    size="tiny"
-                                    icon={<Trash2 size={12} />}
-                                    onClick={handleRemoveLogo}
-                                  />
-                                )}
-                              </div>
-                              <input
-                                type="file"
-                                ref={uploadButtonRef}
-                                className="hidden"
-                                accept="image/png, image/jpeg"
-                                onChange={onFileUpload}
-                              />
-                            </div>
-                          </FormControl_Shadcn_>
-                        </FormItemLayout>
-                      )}
-                    />
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="logo_uri"
                       render={({ field }) => (
                         <FormItemLayout
                           label="Logo URL"
-                          description="Paste a public URL for your logo (used instead of uploaded file)"
+                          description="Paste a public URL for your logo"
                         >
                           <FormControl_Shadcn_>
                             <Input_Shadcn_
                               {...field}
                               value={field.value ?? ''}
                               placeholder="https://example.com/logo.png"
-                              onChange={(event) => {
-                                field.onChange(event)
-                                setLogoFile(undefined)
-                                setLogoRemoved(false)
-                                setLogoUrl(event.target.value || undefined)
-                              }}
                             />
                           </FormControl_Shadcn_>
                         </FormItemLayout>
