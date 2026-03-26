@@ -3,13 +3,13 @@ import { POSTGRES_DATA_TYPE_OPTIONS } from 'components/interfaces/TableGridEdito
 type TableConstraintSource = {
   schema: string
   name: string
-  primary_keys: Array<{ name: string }>
-  relationships: Array<{
+  primary_keys: ReadonlyArray<{ name: string }>
+  relationships: ReadonlyArray<{
     source_schema: string
     source_table_name: string
     source_column_name: string
   }>
-  unique_indexes?: Array<{ columns: string[] }>
+  unique_indexes?: ReadonlyArray<{ columns: ReadonlyArray<string> }>
 }
 
 export type ColumnAffordanceKind = 'number' | 'time' | 'text' | 'json' | 'bool' | 'other'
@@ -53,14 +53,19 @@ export function getPrimaryKeyColumnNames(table?: TableConstraintSource) {
 }
 
 export function getForeignKeyColumnNames(table?: TableConstraintSource) {
+  if (!table) {
+    return new Set<string>()
+  }
+
+  const { schema, name, relationships } = table
+
   return new Set(
-    table?.relationships
+    relationships
       .filter(
         (relationship) =>
-          relationship.source_schema === table.schema &&
-          relationship.source_table_name === table.name
+          relationship.source_schema === schema && relationship.source_table_name === name
       )
-      .map((relationship) => relationship.source_column_name) ?? []
+      .map((relationship) => relationship.source_column_name)
   )
 }
 

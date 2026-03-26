@@ -342,7 +342,7 @@ export const ColumnList = ({
                           fill={column.is_nullable ? 'none' : 'currentColor'}
                         />
                       }
-                      label={column.is_nullable ? 'Nullable' : 'Required'}
+                      label={column.is_nullable ? 'Nullable' : 'Non-nullable'}
                       variant="secondary"
                     />,
                   ].filter(Boolean)
@@ -351,8 +351,8 @@ export const ColumnList = ({
                     <TableRow key={column.name}>
                       <TableCell className="w-0 !pl-5 !pr-1">
                         <Tooltip>
-                          <TooltipTrigger className="cursor-default">
-                            <div aria-label={typeLabel} className="flex w-4 justify-center">
+                          <TooltipTrigger className="cursor-default" aria-label={typeLabel}>
+                            <div className="flex w-4 justify-center">
                               {TypeIcon}
                             </div>
                           </TooltipTrigger>
