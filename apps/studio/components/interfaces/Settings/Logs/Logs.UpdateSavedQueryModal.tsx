@@ -21,6 +21,7 @@ const formSchema = z.object({
 type SavedQuery = z.infer<typeof formSchema>
 
 export interface UpdateSavedQueryProps {
+  header: string
   visible: boolean
   onCancel: () => void
   onSubmit: SubmitHandler<SavedQuery>
@@ -28,6 +29,7 @@ export interface UpdateSavedQueryProps {
 }
 
 export const UpdateSavedQueryModal = ({
+  header,
   visible,
   onCancel,
   onSubmit,
@@ -51,13 +53,7 @@ export const UpdateSavedQueryModal = ({
   }
 
   return (
-    <Modal
-      visible={visible}
-      onCancel={handleCancel}
-      hideFooter
-      header="Update saved query"
-      size="medium"
-    >
+    <Modal visible={visible} onCancel={handleCancel} hideFooter header={header} size="medium">
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
           <Modal.Content>
