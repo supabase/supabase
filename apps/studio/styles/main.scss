@@ -267,8 +267,10 @@ div[data-radix-portal]:not(.portal--toast) {
   @apply z-50 #{!important};
 }
 
-[data-radix-popper-content-wrapper]:has(.table-editor-schema-selector-popover) {
-  z-index: 40 !important;
+@media (min-width: 768px) {
+  [data-radix-popper-content-wrapper]:has(.table-editor-schema-selector-popover) {
+    z-index: 40 !important;
+  }
 }
 
 .settings-container {
