@@ -32,6 +32,7 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
+  cn,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 
@@ -271,7 +272,7 @@ export const PolicyDetailsV2 = ({
                       form.setValue('command', value)
                       onUpdateCommand(value)
                     }}
-                    className={`grid grid-cols-10 gap-3 ${isEditing ? 'opacity-50' : ''}`}
+                    className={cn('flex flex-wrap gap-3', isEditing && 'opacity-50')}
                   >
                     {[
                       'select',
@@ -283,7 +284,7 @@ export const PolicyDetailsV2 = ({
                         value={x}
                         disabled={isEditing}
                         label={x.toLocaleUpperCase()}
-                        className={`col-span-2 w-auto ${isEditing ? 'cursor-not-allowed' : ''}`}
+                        className={cn('w-auto', isEditing && 'cursor-not-allowed')}
                       />
                     ))}
                   </RadioGroup_Shadcn_>

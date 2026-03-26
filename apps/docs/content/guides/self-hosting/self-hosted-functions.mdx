@@ -24,7 +24,7 @@ This returns `"Hello from Edge Functions!"`.
 
 ## Create a new function
 
-### Step 1: Create a new directory with an `index.ts` file in `volumes/functions/`:
+### Step 1: Add a new function directory and the function code
 
 ```
 mkdir -p volumes/functions/my-function &&
@@ -44,13 +44,13 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
-### Step 2: Restart the functions service to pick up the new function:
+### Step 2: Restart the functions service to pick up the new function
 
 ```bash
 docker compose restart functions --no-deps
 ```
 
-### Step 3: Invoke your function:
+### Step 3: Invoke your function
 
 ```bash
 curl -X POST http://<your-domain>:8000/functions/v1/my-function \
@@ -125,14 +125,14 @@ const customVar = Deno.env.get('MY_CUSTOM_VAR')
 
 The functions service is pre-configured with the following environment variables:
 
-| Variable | Value | Purpose |
-| --- | --- | --- |
-| `SUPABASE_URL` | `http://kong:8000` | Internal API gateway URL |
-| `SUPABASE_PUBLIC_URL` | `http://<your-domain>:8000` | Base URL for accessing Supabase from the Internet |
-| `JWT_SECRET` | Your secret key | Legacy symmetric encryption key used to sign and verify JWTs |
-| `SUPABASE_ANON_KEY` | Your anon key | Client-side API key with limited permissions (`anon` role). |
-| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key | Server-side API key with full database access (`service_role` role) |
-| `SUPABASE_DB_URL` | Postgres connection string | Can be used for direct database access |
+| Variable                    | Value                       | Purpose                                                             |
+| --------------------------- | --------------------------- | ------------------------------------------------------------------- |
+| `SUPABASE_URL`              | `http://kong:8000`          | Internal API gateway URL                                            |
+| `SUPABASE_PUBLIC_URL`       | `http://<your-domain>:8000` | Base URL for accessing Supabase from the Internet                   |
+| `JWT_SECRET`                | Your secret key             | Legacy symmetric encryption key used to sign and verify JWTs        |
+| `SUPABASE_ANON_KEY`         | Your anon key               | Client-side API key with limited permissions (`anon` role).         |
+| `SUPABASE_SERVICE_ROLE_KEY` | Your service role key       | Server-side API key with full database access (`service_role` role) |
+| `SUPABASE_DB_URL`           | Postgres connection string  | Can be used for direct database access                              |
 
 Here's an example function that queries a table using `@supabase/supabase-js`:
 

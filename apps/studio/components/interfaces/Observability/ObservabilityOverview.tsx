@@ -5,7 +5,6 @@ import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import dayjs from 'dayjs'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { RefreshCw } from 'lucide-react'
@@ -25,7 +24,6 @@ export const ObservabilityOverview = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { plan } = useCurrentOrgPlan()
   const queryClient = useQueryClient()
 
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
@@ -156,8 +154,6 @@ export const ObservabilityOverview = () => {
           <ChartIntervalDropdown
             value={interval}
             onChange={(interval) => setInterval(interval as ChartIntervalKey)}
-            planId={plan?.id}
-            planName={plan?.name}
             organizationSlug={organization?.slug}
             dropdownAlign="end"
             tooltipSide="left"

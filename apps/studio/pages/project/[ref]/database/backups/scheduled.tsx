@@ -125,7 +125,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
 
 DatabaseScheduledBackups.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Backups">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

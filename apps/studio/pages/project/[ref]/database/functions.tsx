@@ -52,7 +52,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
 DatabaseFunctionsPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Functions">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

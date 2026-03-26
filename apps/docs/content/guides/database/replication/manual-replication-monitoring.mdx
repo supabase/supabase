@@ -8,7 +8,7 @@ sidebar_label: 'Monitoring'
 
 Monitoring replication lag is important and there are 3 ways to do this:
 
-1. Dashboard - Under the [Reports](/docs/guides/platform/reports) of the dashboard, you can view the replication lag of your project
+1. Dashboard - Under the [Reports](/docs/guides/telemetry/reports) of the dashboard, you can view the replication lag of your project
 2. Database -
    - pg_stat_subscription (subscriber) - if PID is null, then the subscription is not active
    - pg_stat_subscription_stats - look here for error_count to see if there were issues applying or syncing (if yes, check the logs for why)

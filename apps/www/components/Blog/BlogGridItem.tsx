@@ -3,6 +3,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import authors from '@/lib/authors.json'
+import {
+  BLOG_GRID_IMAGE_SIZES,
+  BLOG_PLACEHOLDER_IMAGE,
+  getBlogThumbnailImage,
+} from '@/lib/blog-images'
 import type Author from '@/types/author'
 import type PostTypes from '@/types/post'
 
@@ -24,15 +29,7 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
-  const resolveImagePath = (img: string | undefined): string | null => {
-    if (!img) return null
-    return img.startsWith('/') || img.startsWith('http') ? img : `/images/blog/${img}`
-  }
-
-  const imageUrl =
-    resolveImagePath(post.imgThumb) ||
-    resolveImagePath(post.imgSocial) ||
-    '/images/blog/blog-placeholder.png'
+  const imageUrl = getBlogThumbnailImage(post) ?? BLOG_PLACEHOLDER_IMAGE
 
   return (
     <Link
@@ -45,8 +42,7 @@ const BlogGridItem = ({ post }: Props) => {
           <div className="border-default relative mb-3 w-full aspect-[1.91/1] overflow-hidden rounded-lg border shadow-sm">
             <Image
               fill
-              sizes="100%"
-              quality={100}
+              sizes={BLOG_GRID_IMAGE_SIZES}
               src={imageUrl}
               className="scale-100 object-cover overflow-hidden"
               alt={`${post.title} thumbnail`}
@@ -58,7 +54,7 @@ const BlogGridItem = ({ post }: Props) => {
               <p>{dayjs(post.date).format('D MMM YYYY')}</p>
               {post.readingTime && (
                 <>
-                  <p>•</p>
+                  <p>·</p>
                   <p>{post.readingTime}</p>
                 </>
               )}

@@ -373,6 +373,7 @@ export const CreateHookSheet = ({
                             <SchemaSelector
                               size="small"
                               showError={false}
+                              stopScrollPropagation
                               selectedSchemaName={field.value}
                               onSelectSchema={(name) => field.onChange(name)}
                               disabled={field.disabled}
@@ -395,6 +396,7 @@ export const CreateHookSheet = ({
                               size="small"
                               schema={values.postgresValues.schema}
                               value={field.value}
+                              stopScrollPropagation
                               onChange={field.onChange}
                               disabled={field.disabled}
                               filterFunction={(func) => {

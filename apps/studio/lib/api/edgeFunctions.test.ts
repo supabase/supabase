@@ -4,10 +4,10 @@ import { isValidEdgeFunctionURL } from './edgeFunctions'
 
 describe('isValidEdgeFunctionURL', () => {
   const validEdgeFunctionUrls = [
-    'https://projectref.supabase.co/functions/v1/hello-world',
-    'https://projectref.supabase.red/functions/v1/hello-world',
-    'https://projectref.supabase.red/functions/v3/hello-world',
-    'https://projectref.supabase.red/functions/v3/hello-world',
+    'https://uniquetwentychararef.supabase.co/functions/v1/hello-world',
+    'https://uniquetwentychararef.supabase.red/functions/v1/hello-world',
+    'https://uniquetwentychararef.supabase.red/functions/v3/hello-world',
+    'https://uniquetwentychararef.supabase.red/functions/v3/hello-world',
   ]
 
   const validLocalEdgeFunctionsUrls = [

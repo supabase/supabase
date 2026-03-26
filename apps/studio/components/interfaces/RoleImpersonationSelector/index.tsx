@@ -33,10 +33,10 @@ export const RoleImpersonationSelector = ({
 
   const isAuthenticatedOptionFullySelected = Boolean(
     selectedOption === 'authenticated' &&
-      state.role?.type === 'postgrest' &&
-      state.role.role === 'authenticated' &&
-      (('user' in state.role && state.role.user) ||
-        ('externalAuth' in state.role && state.role.externalAuth)) // Check for either auth type
+    state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    (('user' in state.role && state.role.user) ||
+      ('externalAuth' in state.role && state.role.externalAuth)) // Check for either auth type
   )
 
   function onSelectedChange(value: PostgrestRole) {

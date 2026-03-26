@@ -1,6 +1,7 @@
 import { CodeBlock } from 'ui/src/components/CodeBlock'
 
 import type {
+  AntigravityMcpConfig,
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
   FactoryMcpConfig,
@@ -61,6 +62,7 @@ export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group
   ['docs', 'database', 'development', 'debugging'].includes(group.id)
 )
 
+/** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
 export const MCP_CLIENTS: McpClient[] = [
   {
     key: 'cursor',
@@ -160,6 +162,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'codex',
     label: 'Codex',
     icon: 'openai',
+    hasDistinctDarkIcon: true,
     configFile: '~/.codex/config.toml',
     externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
     transformConfig: (config): CodexMcpConfig => {
@@ -305,9 +308,46 @@ export const MCP_CLIENTS: McpClient[] = [
     },
   },
   {
+    key: 'antigravity',
+    label: 'Antigravity',
+    icon: 'antigravity',
+    configFile: '~/.gemini/antigravity/mcp_config.json',
+    externalDocsUrl: 'https://antigravity.google/docs/mcp',
+    transformConfig: (config): AntigravityMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            serverUrl: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    alternateInstructions: (_config, _onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After saving the config, restart Antigravity. It will prompt you to complete the OAuth
+          flow to authenticate with Supabase.
+        </p>
+        <p className="text-xs text-foreground-light">
+          To edit the config from within Antigravity, click the <strong>···</strong> menu at the top
+          of the Agent pane &gt; <strong>MCP Servers</strong> &gt;{' '}
+          <strong>Manage MCP Servers</strong> &gt; <strong>View raw config</strong>. From the Manage
+          MCP Servers page you can also <strong>Refresh</strong> server configs and enable/disable
+          servers.
+        </p>
+        <p className="text-xs text-foreground-light">
+          If you run into authentication issues, open the command palette and run{' '}
+          <strong>Authentication: Remove Dynamic Authentication Providers</strong> to clear cached
+          OAuth credentials and re-authenticate.
+        </p>
+      </div>
+    ),
+  },
+  {
     key: 'windsurf',
     label: 'Windsurf',
     icon: 'windsurf',
+    hasDistinctDarkIcon: true,
     configFile: '~/.codeium/windsurf/mcp_config.json',
     externalDocsUrl: '',
     transformConfig: (config): WindsurfMcpConfig => {
@@ -336,6 +376,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'goose',
     label: 'Goose',
     icon: 'goose',
+    hasDistinctDarkIcon: true,
     configFile: '~/.config/goose/config.yaml',
     externalDocsUrl: 'https://block.github.io/goose/docs/category/getting-started',
     transformConfig: (config): GooseMcpConfig => {
@@ -402,6 +443,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'factory',
     label: 'Factory',
     icon: 'factory',
+    hasDistinctDarkIcon: true,
     configFile: '~/.factory/mcp.json',
     externalDocsUrl: 'https://docs.factory.ai/cli/configuration/mcp.md',
     transformConfig: (config): FactoryMcpConfig => {
@@ -443,6 +485,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'opencode',
     label: 'OpenCode',
     icon: 'opencode',
+    hasDistinctDarkIcon: true,
     configFile: '~/.config/opencode/opencode.json',
     externalDocsUrl: 'https://opencode.ai/docs/mcp-servers/',
     transformConfig: (config): OpenCodeMcpConfig => {

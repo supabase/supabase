@@ -12,6 +12,7 @@ export const FormSchema = z
       .min(1, 'Please enter a project name.') // Required field check
       .min(3, 'Project name must be at least 3 characters long.') // Minimum length check
       .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
+    highAvailability: z.boolean(),
     postgresVersion: z.string({
       required_error: 'Please enter a Postgres version.',
     }),

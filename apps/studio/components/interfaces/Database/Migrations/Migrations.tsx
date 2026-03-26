@@ -47,9 +47,9 @@ const Migrations = () => {
   const migrations =
     search.length === 0
       ? data
-      : data.filter(
+      : (data.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
-        ) ?? []
+        ) ?? [])
 
   return (
     <>
@@ -210,7 +210,10 @@ const Migrations = () => {
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={selectedMigration?.statements?.join('\n')}
+              defaultValue={
+                selectedMigration?.statements?.join(';\n') +
+                (selectedMigration?.statements?.length ? ';' : '')
+              }
             />
           </div>
         </div>

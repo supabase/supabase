@@ -1,5 +1,5 @@
-import pgMeta from '@supabase/pg-meta'
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
@@ -246,7 +246,7 @@ export const UsersV2 = () => {
   const userSearchIndexesAreValidAndReady =
     !isUserSearchIndexesError &&
     !isUserSearchIndexesLoading &&
-    userSearchIndexes?.length === pgMeta.USER_SEARCH_INDEXES.length &&
+    userSearchIndexes?.length === USER_SEARCH_INDEXES.length &&
     userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
 
   /**

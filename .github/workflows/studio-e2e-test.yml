@@ -17,7 +17,7 @@ jobs:
   test:
     name: 'E2E tests'
     timeout-minutes: 60
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     strategy:
       fail-fast: false
       matrix:
@@ -43,11 +43,13 @@ jobs:
               - 'e2e/studio/**'
               - 'pnpm-lock.yaml'
               - '.github/workflows/studio-e2e-test.yml'
+
       - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         if: steps.filter.outputs.studio == 'true'
         name: Install pnpm
         with:
           run_install: false
+
       - name: Use Node.js
         if: steps.filter.outputs.studio == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -69,7 +71,6 @@ jobs:
         with:
           # See here for caching with `yarn`, `bun` or other package managers https://github.com/actions/cache/blob/main/examples.md or you can leverage caching with actions/setup-node https://github.com/actions/setup-node
           path: |
-            .turbo/cache
             apps/studio/.next/build
             apps/studio/.next/cache
           # Generate a new cache whenever packages or source files change.
@@ -77,6 +78,18 @@ jobs:
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - name: Reset supabase
+        if: steps.filter.outputs.studio == 'true'
+        run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
+
+      - name: Start supabase
+        if: steps.filter.outputs.studio == 'true'
+        run: SKIP_ASSET_UPLOAD=1 pnpm run e2e:setup:cli
+
+      - name: Build studio
+        if: steps.filter.outputs.studio == 'true'
+        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
 
       - name: 🚀 Run Playwright tests against Vercel Preview
         if: steps.filter.outputs.studio == 'true'

@@ -126,152 +126,150 @@ export async function handler(req: Request) {
     const OG_PADDING_Y = (OG_HEIGHT - TICKET_HEIGHT) / 2
 
     const generatedTicketImage = new ImageResponse(
-      (
-        <>
+      <>
+        <div
+          style={{
+            width: '1200px',
+            height: '628px',
+            position: 'relative',
+            fontFamily: '"Circular"',
+            color: STYLING_CONGIF[ticketType].FOREGROUND,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '60px',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* Background  */}
+          <img
+            width="1202"
+            height="632"
+            style={{
+              position: 'absolute',
+              top: '-1px',
+              left: '-1px',
+              bottom: '-1px',
+              right: '-1px',
+              zIndex: '0',
+            }}
+            src={BACKGROUND[ticketType].OG}
+          />
+          {/* Ticket  */}
+          <img
+            width={TICKET_WIDTH}
+            height={TICKET_HEIGHT}
+            style={{
+              position: 'absolute',
+              top: OG_PADDING_Y,
+              left: OG_PADDING_X,
+              bottom: 0,
+              right: '0',
+              zIndex: '1',
+              margin: 'auto',
+              borderRadius: '20px',
+              border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+              boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.3)',
+            }}
+            src={BACKGROUND[ticketType].BG}
+          />
+
+          {/* Name & username */}
           <div
             style={{
-              width: '1200px',
-              height: '628px',
-              position: 'relative',
-              fontFamily: '"Circular"',
-              color: STYLING_CONGIF[ticketType].FOREGROUND,
-              overflow: 'hidden',
               display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
               flexDirection: 'column',
-              padding: '60px',
-              justifyContent: 'space-between',
+              position: 'absolute',
+              top: OG_PADDING_Y + TICKET_PADDING_Y,
+              left: OG_PADDING_X + TICKET_PADDING_X,
+              width: '530',
+              height: 'auto',
+              overflow: 'hidden',
+              textOverflow: 'clip',
+              textAlign: 'left',
+              marginBottom: '10px',
             }}
           >
-            {/* Background  */}
-            <img
-              width="1202"
-              height="632"
+            <p
               style={{
-                position: 'absolute',
-                top: '-1px',
-                left: '-1px',
-                bottom: '-1px',
-                right: '-1px',
-                zIndex: '0',
-              }}
-              src={BACKGROUND[ticketType].OG}
-            />
-            {/* Ticket  */}
-            <img
-              width={TICKET_WIDTH}
-              height={TICKET_HEIGHT}
-              style={{
-                position: 'absolute',
-                top: OG_PADDING_Y,
-                left: OG_PADDING_X,
-                bottom: 0,
-                right: '0',
-                zIndex: '1',
-                margin: 'auto',
-                borderRadius: '20px',
-                border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
-                boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.3)',
-              }}
-              src={BACKGROUND[ticketType].BG}
-            />
-
-            {/* Name & username */}
-            <div
-              style={{
+                color: STYLING_CONGIF[ticketType].FOREGROUND,
+                margin: '0',
+                padding: '0',
+                fontSize: '36',
+                lineHeight: '105%',
                 display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                position: 'absolute',
-                top: OG_PADDING_Y + TICKET_PADDING_Y,
-                left: OG_PADDING_X + TICKET_PADDING_X,
-                width: '530',
-                height: 'auto',
-                overflow: 'hidden',
-                textOverflow: 'clip',
-                textAlign: 'left',
                 marginBottom: '10px',
               }}
             >
-              <p
-                style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND,
-                  margin: '0',
-                  padding: '0',
-                  fontSize: '36',
-                  lineHeight: '105%',
-                  display: 'flex',
-                  marginBottom: '10px',
-                }}
-              >
-                {name ?? username}
-              </p>
+              {name ?? username}
+            </p>
 
-              <div
-                style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
-                  opacity: 0.8,
-                  display: 'flex',
-                  fontSize: '32',
-                  margin: '0',
-                }}
-              >
-                {HAS_NO_META && username && `@${username}`}
-                {HAS_ROLE && `${metadata.role}`}
-                {HAS_COMPANY && `${HAS_ROLE ? ' at ' : ''}${metadata.company} `}
-              </div>
-            </div>
             <div
               style={{
-                position: 'absolute',
-                bottom: OG_PADDING_Y + TICKET_PADDING_Y,
-                left: OG_PADDING_X + TICKET_PADDING_X,
+                color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                opacity: 0.8,
                 display: 'flex',
-                gap: '10',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                fontFamily: '"SourceCodePro"',
-                fontSize: '23',
-                textTransform: 'uppercase',
-                letterSpacing: '0.35rem',
-                lineHeight: '120%',
+                fontSize: '32',
+                margin: '0',
               }}
             >
-              <div style={{ display: 'flex', marginBottom: '10', marginLeft: '-10' }}>
-                <img src={BACKGROUND[ticketType].LOGO} width={65} height={65} />
-              </div>
-              {/* Ticket No  */}
-              <p
-                style={{
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
-                  margin: '0',
-                  marginBottom: '5',
-                  display: 'flex',
-                }}
-              >
-                {`NO ${prefix}${ticketNumber}`}
-              </p>
-              <p
-                style={{
-                  margin: '0',
-                  marginBottom: '5',
-                  display: 'flex',
-                }}
-              >
-                Launch Week X
-              </p>
-              <p
-                style={{
-                  margin: '0',
-                }}
-              >
-                DEC 11-15 / 8AM PT
-              </p>
+              {HAS_NO_META && username && `@${username}`}
+              {HAS_ROLE && `${metadata.role}`}
+              {HAS_COMPANY && `${HAS_ROLE ? ' at ' : ''}${metadata.company} `}
             </div>
           </div>
-        </>
-      ),
+          <div
+            style={{
+              position: 'absolute',
+              bottom: OG_PADDING_Y + TICKET_PADDING_Y,
+              left: OG_PADDING_X + TICKET_PADDING_X,
+              display: 'flex',
+              gap: '10',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              fontFamily: '"SourceCodePro"',
+              fontSize: '23',
+              textTransform: 'uppercase',
+              letterSpacing: '0.35rem',
+              lineHeight: '120%',
+            }}
+          >
+            <div style={{ display: 'flex', marginBottom: '10', marginLeft: '-10' }}>
+              <img src={BACKGROUND[ticketType].LOGO} width={65} height={65} />
+            </div>
+            {/* Ticket No  */}
+            <p
+              style={{
+                color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                margin: '0',
+                marginBottom: '5',
+                display: 'flex',
+              }}
+            >
+              {`NO ${prefix}${ticketNumber}`}
+            </p>
+            <p
+              style={{
+                margin: '0',
+                marginBottom: '5',
+                display: 'flex',
+              }}
+            >
+              Launch Week X
+            </p>
+            <p
+              style={{
+                margin: '0',
+              }}
+            >
+              DEC 11-15 / 8AM PT
+            </p>
+          </div>
+        </div>
+      </>,
       {
         width: OG_WIDTH,
         height: OG_HEIGHT,
