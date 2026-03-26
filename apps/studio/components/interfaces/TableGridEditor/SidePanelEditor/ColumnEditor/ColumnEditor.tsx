@@ -247,6 +247,7 @@ export const ColumnEditor = ({
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <FormItemLayout
                 isReactForm={false}
+                id="name"
                 className={cn(errors.name && '[&>*>label]:text-destructive')}
                 label="Name"
                 description={
@@ -265,7 +266,7 @@ export const ColumnEditor = ({
                 />
                 {errors.name && <p className="mt-2 text-destructive">{errors.name}</p>}
               </FormItemLayout>
-              <FormItemLayout isReactForm={false} label="Description" labelOptional="Optional">
+              <FormItemLayout isReactForm={false} id="description" label="Description" labelOptional="Optional">
                 <Input
                   id="description"
                   type="text"
