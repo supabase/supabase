@@ -15,7 +15,10 @@ import { noop } from 'lodash'
 import {
   Calendar,
   Edit,
+  Fingerprint,
   Hash,
+  Key,
+  Link as LinkIcon,
   ListPlus,
   MoreVertical,
   Plus,
@@ -24,9 +27,8 @@ import {
   Trash,
   Type,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import {
-  Badge,
   Button,
   Card,
   cn,
@@ -48,6 +50,45 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+
+interface ConstraintTokenProps {
+  icon?: ReactNode
+  label: string
+  variant?: 'default' | 'secondary' | 'primary'
+}
+
+const constraintTokenClassName =
+  'inline-flex items-center justify-center rounded-md text-center font-mono uppercase whitespace-nowrap font-medium tracking-[0.06em] text-[11px] leading-[1.1] px-[5.5px] py-[3px] transition-all border'
+
+const ConstraintToken = ({ icon, label, variant = 'default' }: ConstraintTokenProps) => {
+  const tokenToneClassName =
+    variant === 'primary'
+      ? 'bg-brand bg-opacity-10 text-brand-600 border-brand-500'
+      : variant === 'default'
+        ? 'bg-surface-75 text-foreground-light border-strong'
+        : 'bg-surface-75 bg-opacity-50 text-foreground-light border-strong'
+
+  return (
+    <div className="inline-flex items-center whitespace-nowrap">
+      {icon && (
+        <span
+          className={cn(constraintTokenClassName, tokenToneClassName, 'rounded-r-none border-r-0')}
+        >
+          {icon}
+        </span>
+      )}
+      <span
+        className={cn(
+          constraintTokenClassName,
+          tokenToneClassName,
+          icon ? 'rounded-l-none' : 'rounded-md'
+        )}
+      >
+        {label}
+      </span>
+    </div>
+  )
+}
 
 const getColumnTypeAffordance = (column: PostgresColumn) => {
   const normalizedFormat = column.format.replaceAll('"', '').replace(/\[\]$/, '')
@@ -255,6 +296,60 @@ export const ColumnList = ({
                 columns.length > 0 &&
                 columns.map((column) => {
                   const { icon: TypeIcon, label: typeLabel } = getColumnTypeAffordance(column)
+                  const constraintTokens = [
+                    primaryKeyColumns.has(column.name) ? (
+                      <ConstraintToken
+                        key="primary"
+                        icon={<Key size={12} strokeWidth={1.7} className="shrink-0" />}
+                        label="Primary"
+                        variant="primary"
+                      />
+                    ) : null,
+                    foreignKeyColumns.has(column.name) ? (
+                      <ConstraintToken
+                        key="foreign-key"
+                        icon={
+                          <LinkIcon
+                            size={12}
+                            strokeWidth={1.7}
+                            className="shrink-0 text-foreground-muted"
+                          />
+                        }
+                        label="Foreign key"
+                      />
+                    ) : null,
+                    column.is_unique || uniqueIndexColumns.has(column.name) ? (
+                      <ConstraintToken
+                        key="unique"
+                        icon={
+                          <Fingerprint
+                            size={12}
+                            strokeWidth={1.7}
+                            className="shrink-0 text-foreground-light"
+                          />
+                        }
+                        label="Unique"
+                      />
+                    ) : null,
+                    column.is_identity ? (
+                      <ConstraintToken
+                        key="identity"
+                        icon={
+                          <Hash
+                            size={12}
+                            strokeWidth={1.7}
+                            className="shrink-0 text-foreground-lighter"
+                          />
+                        }
+                        label="Identity"
+                      />
+                    ) : null,
+                    <ConstraintToken
+                      key="nullability"
+                      label={column.is_nullable ? 'Nullable' : 'Required'}
+                      variant="secondary"
+                    />,
+                  ].filter(Boolean)
 
                   return (
                     <TableRow key={column.name}>
@@ -291,20 +386,10 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-light">{column.format}</p>
+                        <p className="text-foreground-lighter">{column.format}</p>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          {primaryKeyColumns.has(column.name) && <Badge>PK</Badge>}
-                          {foreignKeyColumns.has(column.name) && <Badge>FK</Badge>}
-                          {(column.is_unique || uniqueIndexColumns.has(column.name)) && (
-                            <Badge>UQ</Badge>
-                          )}
-                          {column.is_identity && <Badge>ID</Badge>}
-                          <Badge variant="secondary">
-                            {column.is_nullable ? 'NULL' : 'NOT NULL'}
-                          </Badge>
-                        </div>
+                        <div className="flex flex-wrap gap-1.5">{constraintTokens}</div>
                       </TableCell>
                       <TableCell className="text-right">
                         {!isSchemaLocked && isTableEntity && (
