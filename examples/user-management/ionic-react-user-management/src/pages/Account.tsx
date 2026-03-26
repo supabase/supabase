@@ -97,7 +97,7 @@ export function AccountPage() {
         setProfile((prev) => ({
           ...prev,
           avatar_url,
-        }));
+        }))
       }
 
       if (avatar_url !== undefined) {
