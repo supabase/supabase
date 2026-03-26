@@ -51,6 +51,7 @@ minimumReleaseAgeExclude:
   - '@next/*'
   - h3
   - typescript
+  - stripe-experiment-sync
 
 onlyBuiltDependencies:
   - node-pty
