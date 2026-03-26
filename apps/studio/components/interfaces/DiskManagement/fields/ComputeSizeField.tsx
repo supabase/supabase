@@ -14,6 +14,7 @@ import { ChevronRight, CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
+  Button,
   cn,
   FormField_Shadcn_,
   RadioGroupCard,
@@ -370,18 +371,20 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             </div>
 
             {!isLoading && !addonsError && hasHiddenOptions && (
-              <button
-                type="button"
+              <Button
+                type="default"
+                size="tiny"
                 onClick={() => setShowAllSizes((prev) => !prev)}
-                className="mt-2 flex items-center gap-1 text-sm text-foreground-lighter hover:text-foreground-light transition-colors"
+                icon={
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.5}
+                    className={cn('transition-transform', showAllSizes && 'rotate-90')}
+                  />
+                }
               >
-                <ChevronRight
-                  size={14}
-                  strokeWidth={1.5}
-                  className={cn('transition-transform', showAllSizes && 'rotate-90')}
-                />
                 {showAllSizes ? 'Show fewer sizes' : 'Show all sizes'}
-              </button>
+              </Button>
             )}
           </FormItemLayout>
         </RadioGroupCard>
