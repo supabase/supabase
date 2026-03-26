@@ -4,6 +4,12 @@ import { useEffect, useState } from 'react'
 import { Button, cn, Slider_Shadcn_ } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
+
+const STANDALONE_PLANS = [
+  { name: 'Pro', price: 25 },
+  { name: 'Team', price: 599 },
+]
 
 const findInstanceValueByColumn = (instance: any, column: string) =>
   instance.columns?.find((col: any) => col.key === column)?.value
@@ -18,11 +24,18 @@ interface ComputePricingCalculatorProps {
     name: string
     price: number
   }
+  disableInteractivity?: boolean
 }
 
 const ComputePricingCalculator = ({
-  activePlan = { name: 'Pro', price: 25 },
+  activePlan,
+  disableInteractivity,
 }: ComputePricingCalculatorProps) => {
+  // When activePlan is not provided, manage plan selection internally
+  const [internalPlan, setInternalPlan] = useState(STANDALONE_PLANS[0])
+  const effectivePlan = activePlan ?? internalPlan
+  const isStandalone = activePlan === undefined
+
   // Filter out rows with no specific pricing
   const computeInstances = pricingAddOn.database.rows.filter((row) =>
     row.columns.some((it) => it.key === 'pricing' && it.value !== 'Contact Us')
@@ -35,7 +48,9 @@ const ComputePricingCalculator = ({
 
   const [activeInstances, setActiveInstances] = useState([{ ...computeInstances[0], position: 0 }])
   // Final calculated price: plan cost + compute aggregate - compute credits
-  const [activePrice, setActivePrice] = useState(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
+  const [activePrice, setActivePrice] = useState(
+    effectivePlan.price + priceSteps[0] - COMPUTE_CREDITS
+  )
   const [hasInteractedWithSlider, setHasInteractedWithSlider] = useState(false)
 
   const handleUpdateInstance = (position: number, value: number[]) => {
@@ -62,8 +77,8 @@ const ComputePricingCalculator = ({
 
   useEffect(() => {
     const computeAggregate = calculateComputeAggregate(0)
-    setActivePrice(Math.max(0, computeAggregate + activePlan.price - COMPUTE_CREDITS))
-  }, [activeInstances, activePlan])
+    setActivePrice(Math.max(0, computeAggregate + effectivePlan.price - COMPUTE_CREDITS))
+  }, [activeInstances, effectivePlan])
 
   const removeInstance = (position: number) => {
     const newArray = activeInstances
@@ -85,13 +100,39 @@ const ComputePricingCalculator = ({
   return (
     <div className="flex flex-col lg:grid grid-cols-4 gap-4 border border-strong rounded-xl p-4">
       <div className="flex flex-col text-lighter leading-4 text-xs w-full gap-4">
+        {isStandalone && (
+          <ToggleGroup
+            type="single"
+            value={internalPlan.name}
+            onValueChange={(value) => {
+              const selected = STANDALONE_PLANS.find((p) => p.name === value)
+              if (selected) setInternalPlan(selected)
+            }}
+            className="grid grid-cols-2 gap-1 w-full bg-surface-200 rounded-md"
+          >
+            {STANDALONE_PLANS.map((plan) => (
+              <ToggleGroupItem
+                key={plan.name}
+                value={plan.name}
+                className={cn(
+                  'w-full h-6 border-transparent',
+                  internalPlan.name === plan.name
+                    ? 'bg-surface-200 text-foreground data-[state=on]:bg-surface-400 data-[state=on]:text-foreground'
+                    : 'hover:bg-surface-200'
+                )}
+              >
+                {plan.name}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        )}
         <div>
           <p className="text-foreground-light text-xs mb-2">Monthly estimate:</p>
           <div className="flex flex-col gap-1 text-lighter text-right leading-4 w-full border-b pb-1 mb-1">
             <div className="flex items-center justify-between">
               <span className="text-foreground-muted">Plan subscription</span>
               <span className="text-light font-mono" translate="no">
-                ${activePlan.price}
+                ${effectivePlan.price}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -192,6 +233,7 @@ const ComputePricingCalculator = ({
             type="primary"
             icon={<Plus />}
             onClick={() => {
+              if (disableInteractivity) return
               setActiveInstances([
                 ...activeInstances,
                 { ...computeInstances[0], position: activeInstances.length },
