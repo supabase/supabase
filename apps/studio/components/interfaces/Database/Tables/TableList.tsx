@@ -310,18 +310,10 @@ export const TableList = ({
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
-                  <TableHead key="columns" className="text-right">
-                    Columns
-                  </TableHead>
-                  <TableHead key="rows" className="text-right">
-                    Rows (Estimated)
-                  </TableHead>
-                  <TableHead key="size" className="text-right">
-                    Size (Estimated)
-                  </TableHead>
-                  <TableHead key="realtime" className="text-right">
-                    Realtime Enabled
-                  </TableHead>
+                  <TableHead key="columns">Columns</TableHead>
+                  <TableHead key="rows">Rows (Estimated)</TableHead>
+                  <TableHead key="size">Size (Estimated)</TableHead>
+                  <TableHead key="realtime">Realtime</TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -414,35 +406,37 @@ export const TableList = ({
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           <p className="text-foreground-light">
                             {x.columns.length.toLocaleString()}
                           </p>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           {x.rows !== undefined ? (
                             <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           {x.size !== undefined ? (
                             <p className="text-foreground-light">{x.size}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
-                            <div className="flex justify-end">
-                              <Check size={16} strokeWidth={2} className="text-brand" />
+                            <div className="flex items-center gap-x-2">
+                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (
-                            <div className="flex justify-end">
-                              <X size={16} strokeWidth={2} className="text-foreground-lighter" />
+                            <div className="flex items-center gap-x-2">
+                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                              <p className="text-foreground-lighter">Disabled</p>
                             </div>
                           )}
                         </TableCell>
