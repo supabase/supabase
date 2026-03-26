@@ -11,8 +11,8 @@ export function StateOfStartupsAuroraHeader() {
 
   return (
     <header
-      className="relative w-full overflow-hidden"
-      style={{ minHeight: '46vh', background: 'hsl(var(--background-alternative-default))' }}
+      className="relative w-full overflow-hidden min-h-[32svh] md:min-h-[46svh]"
+      style={{ background: 'hsl(var(--background-alternative-default))' }}
     >
       {/* Aurora shader scene — hidden when user prefers reduced motion */}
       {!prefersReducedMotion && (
@@ -49,10 +49,7 @@ export function StateOfStartupsAuroraHeader() {
       />
 
       {/* Content — constrained to default container */}
-      <div
-        className="relative z-10 max-w-[60rem] mx-auto px-8 flex flex-col gap-4 justify-end pb-16 md:pb-18"
-        style={{ minHeight: '46vh' }}
-      >
+      <div className="relative z-10 max-w-[60rem] mx-auto px-8 flex flex-col gap-4 justify-end pb-16 md:pb-18 min-h-[32svh] md:min-h-[46svh]">
         <p className="font-mono uppercase tracking-wide text-sm text-foreground-light">
           Supabase Presents
         </p>
