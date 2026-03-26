@@ -136,7 +136,7 @@ storage:
 
 ## Session token
 
-You can authenticate to Supabase S3 using a user’s JWT to enforce Row-Level Security (RLS) across S3 operations. This is useful when initializing the S3 client on the server for a specific user session, or when using the client directly from the frontend.
+You can authenticate to Supabase's S3-compatible storage using a user’s JWT to enforce Row-Level Security (RLS) across S3 operations. This is useful when initializing the S3 client on the server for a specific user session, or when using the client directly from the frontend.
 
 All operations performed with a session token are scoped to the authenticated user, and any RLS policies defined in the storage schema will be applied.
 
