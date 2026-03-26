@@ -110,7 +110,12 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'attemptAt',
     header: 'Attempted',
-    cell: ({ row }) => <TimestampInfo className="text-sm" utcTimestamp={row.original.attemptAt} />,
+    cell: ({ row }) => (
+      <TimestampInfo
+        className="text-sm text-foreground-lighter"
+        utcTimestamp={row.original.attemptAt}
+      />
+    ),
   },
   {
     id: DELIVERY_ACTIONS_COLUMN_ID,
