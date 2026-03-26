@@ -11,43 +11,43 @@ import {
   useIonLoading,
   useIonToast,
   useIonRouter,
-} from '@ionic/react';
-import { useEffect, useState } from 'react';
-import { Avatar } from '../components/Avatar';
-import { supabase } from '../supabaseClient';
+} from '@ionic/react'
+import { useEffect, useState } from 'react'
+import { Avatar } from '../components/Avatar'
+import { supabase } from '../supabaseClient'
 
 export function AccountPage() {
-  const [showLoading, hideLoading] = useIonLoading();
-  const [showToast] = useIonToast();
-  const router = useIonRouter();
-  const [email, setEmail] = useState('');
+  const [showLoading, hideLoading] = useIonLoading()
+  const [showToast] = useIonToast()
+  const router = useIonRouter()
+  const [email, setEmail] = useState('')
   const [profile, setProfile] = useState({
     username: '',
     website: '',
     avatar_url: '',
-  });
+  })
 
   useEffect(() => {
-    getProfile();
-  }, []);
+    getProfile()
+  }, [])
 
   const getProfile = async () => {
-    await showLoading();
+    await showLoading()
     try {
-      const { data: authData } = await supabase.auth.getClaims();
-      if (!authData?.claims) throw new Error('No user logged in');
-      const { claims } = authData;
+      const { data: authData } = await supabase.auth.getClaims()
+      if (!authData?.claims) throw new Error('No user logged in')
+      const { claims } = authData
 
-      setEmail(claims.email as string);
+      setEmail(claims.email as string)
 
       const { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', claims.sub)
-        .single();
+        .single()
 
       if (error && status !== 406) {
-        throw error;
+        throw error
       }
 
       if (data) {
@@ -55,48 +55,48 @@ export function AccountPage() {
           username: data.username,
           website: data.website,
           avatar_url: data.avatar_url,
-        });
+        })
       }
     } catch (error: any) {
-      showToast({ message: error.message, duration: 5000 });
+      showToast({ message: error.message, duration: 5000 })
     } finally {
-      await hideLoading();
+      await hideLoading()
     }
-  };
+  }
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/', 'forward', 'replace');
-  };
+    await supabase.auth.signOut()
+    router.push('/', 'forward', 'replace')
+  }
 
   const updateProfile = async (e?: any, avatar_url?: string) => {
-    e?.preventDefault();
+    e?.preventDefault()
 
-    await showLoading();
+    await showLoading()
 
     try {
-      const { data } = await supabase.auth.getClaims();
-      if (!data?.claims) throw new Error('No user logged in');
-      const { claims } = data;
+      const { data } = await supabase.auth.getClaims()
+      if (!data?.claims) throw new Error('No user logged in')
+      const { claims } = data
 
       const updates = {
         id: claims.sub,
         ...profile,
         ...(avatar_url !== undefined ? { avatar_url } : {}),
         updated_at: new Date(),
-      };
+      }
 
-      const { error } = await supabase.from('profiles').upsert(updates);
+      const { error } = await supabase.from('profiles').upsert(updates)
 
       if (error) {
-        throw error;
+        throw error
       }
     } catch (error: any) {
-      showToast({ message: error.message, duration: 5000 });
+      showToast({ message: error.message, duration: 5000 })
     } finally {
-      await hideLoading();
+      await hideLoading()
     }
-  };
+  }
 
   return (
     <IonPage>
@@ -151,5 +151,5 @@ export function AccountPage() {
         </div>
       </IonContent>
     </IonPage>
-  );
+  )
 }

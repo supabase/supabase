@@ -1,9 +1,9 @@
-import { CapacitorConfig } from '@capacitor/cli';
+import { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'supabase-ionic-react',
   webDir: 'build',
-};
+}
 
-export default config;
+export default config

@@ -1,41 +1,41 @@
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { supabase } from './supabaseClient';
+import { Redirect, Route } from 'react-router-dom'
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react'
+import { IonReactRouter } from '@ionic/react-router'
+import { supabase } from './supabaseClient'
 
-import '@ionic/react/css/ionic.bundle.css';
+import '@ionic/react/css/ionic.bundle.css'
 
 /* Theme variables */
-import './theme/variables.css';
-import { LoginPage } from './pages/Login';
-import { AccountPage } from './pages/Account';
-import { useEffect, useState } from 'react';
-import type { FC } from 'react';
+import './theme/variables.css'
+import { LoginPage } from './pages/Login'
+import { AccountPage } from './pages/Account'
+import { useEffect, useState } from 'react'
+import type { FC } from 'react'
 
-setupIonicReact();
+setupIonicReact()
 
 const App: FC = () => {
-  const [claims, setClaims] = useState<any>(null);
+  const [claims, setClaims] = useState<any>(null)
 
   useEffect(() => {
     supabase.auth.getClaims().then(({ data }) => {
       if (data) {
-        setClaims(data.claims);
+        setClaims(data.claims)
       }
-    });
+    })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
       supabase.auth.getClaims().then(({ data }) => {
         if (data) {
-          setClaims(data.claims);
+          setClaims(data.claims)
         }
-      });
-    });
+      })
+    })
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <IonApp>
@@ -45,7 +45,7 @@ const App: FC = () => {
             exact
             path="/"
             render={() => {
-              return claims ? <Redirect to="/account" /> : <LoginPage />;
+              return claims ? <Redirect to="/account" /> : <LoginPage />
             }}
           />
           <Route
@@ -56,7 +56,7 @@ const App: FC = () => {
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
-  );
-};
+  )
+}
 
-export default App;
+export default App
