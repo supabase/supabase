@@ -19,11 +19,12 @@
   },
   "devDependencies": {
     "@react-router/dev": "7.13.2",
-    "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^22",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "tailwindcss": "^4.2.2",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "tailwindcss": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "^5.1.4"
   }
