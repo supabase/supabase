@@ -3,7 +3,6 @@ import { ChevronRight, Eye, MoreVertical, Plus, Search, Trash2, Webhook } from '
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import {
-  Badge,
   Button,
   Card,
   DropdownMenu,
@@ -20,6 +19,7 @@ import {
 } from 'ui'
 import { EmptyStatePresentational, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { StateBadge } from 'ui-patterns/StateBadge'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
@@ -167,9 +167,7 @@ export const PlatformWebhooksEndpointList = ({
                     tabIndex={0}
                   >
                     <TableCell>
-                      <Badge variant={endpoint.enabled ? 'success' : 'default'}>
-                        {endpoint.enabled ? 'Enabled' : 'Disabled'}
-                      </Badge>
+                      <StateBadge state={endpoint.enabled ? 'enabled' : 'disabled'} />
                     </TableCell>
                     <TableCell className="max-w-[420px]">
                       <p className="truncate">{displayName}</p>

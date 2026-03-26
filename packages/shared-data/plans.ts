@@ -33,7 +33,7 @@ export const plans: PricingInformation[] = [
     features: [
       'Unlimited API requests',
       '50,000 monthly active users',
-      ['500 MB database size', 'Shared CPU • 500 MB RAM'],
+      ['500 MB database size', 'Shared CPU · 500 MB RAM'],
       ['5 GB egress'],
       ['5 GB cached egress'],
       '1 GB file storage',

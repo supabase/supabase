@@ -3,7 +3,6 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { RotateCcw, Search } from 'lucide-react'
 import {
-  Badge,
   Card,
   CardContent,
   Table,
@@ -15,9 +14,9 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { StatusBadge } from 'ui-patterns/StatusBadge'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
-import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 
 interface DetailItemProps {
   label: string
@@ -152,7 +151,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     tabIndex={0}
                   >
                     <TableCell>
-                      <Badge variant={statusBadgeVariant[delivery.status]}>{delivery.status}</Badge>
+                      <StatusBadge status={delivery.status} />
                     </TableCell>
                     <TableCell>
                       <code className="text-code-inline">{delivery.eventType}</code>

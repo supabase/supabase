@@ -1,8 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -23,7 +24,9 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { StateBadge } from 'ui-patterns/StateBadge'
 
 import { CreateOrUpdateCustomProviderSheet } from './CreateOrUpdateCustomProviderSheet'
 import {
@@ -40,8 +43,6 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns/admonition'
 
 const CUSTOM_PROVIDERS_SORT_VALUES = [
   'name:asc',
@@ -419,9 +420,7 @@ export const CustomAuthProvidersList = () => {
                         {provider.provider_type}
                       </TableCell>
                       <TableCell className="text-xs text-foreground-light max-w-28">
-                        <Badge variant={provider.enabled ? 'success' : 'default'}>
-                          {provider.enabled ? 'Enabled' : 'Disabled'}
-                        </Badge>
+                        <StateBadge state={provider.enabled ? 'enabled' : 'disabled'} />
                       </TableCell>
                       <TableCell className="max-w-20 bg-surface-100 @[944px]:hover:bg-surface-200 px-6">
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">

@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
-
-import { Check } from 'lucide-react'
-import { plans } from 'shared-data/plans'
-import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { Check } from 'lucide-react'
+import Link from 'next/link'
+import { plans } from 'shared-data/plans'
+import { Badge, Button, cn } from 'ui'
+
 import UpgradePlan from './UpgradePlan'
 
 interface PricingPlansProps {
@@ -60,9 +60,9 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                         {plan.name}
                       </h3>
                       {plan.nameBadge && (
-                        <span className="bg-foreground-light text-background rounded-md py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
+                        <Badge variant="success" className="shrink-0">
                           {plan.nameBadge}
-                        </span>
+                        </Badge>
                       )}
                     </div>
                   </div>

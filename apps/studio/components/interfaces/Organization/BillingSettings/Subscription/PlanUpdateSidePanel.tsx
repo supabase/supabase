@@ -24,7 +24,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Organization } from 'types/base'
-import { Button, cn, SidePanel } from 'ui'
+import { Badge, Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DowngradeModal from './DowngradeModal'
@@ -208,13 +208,13 @@ export const PlanUpdateSidePanel = () => {
                     <div className="flex items-center space-x-2">
                       <p className="text-brand-link text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
-                        <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+                        <Badge variant="default" className="shrink-0">
                           Current plan
-                        </div>
+                        </Badge>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-300 dark:bg-brand-400 text-brand-600 rounded px-2 py-0.5">
+                        <Badge variant="success" className="shrink-0">
                           {plan.nameBadge}
-                        </div>
+                        </Badge>
                       ) : null}
                     </div>
                     <div className="mt-4 flex items-center space-x-1 mb-4">

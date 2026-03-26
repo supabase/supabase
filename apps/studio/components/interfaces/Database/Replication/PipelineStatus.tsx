@@ -1,12 +1,12 @@
-import { Loader2 } from 'lucide-react'
-
 import { useParams } from 'common'
 import { InlineLink } from 'components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import type { ResponseError } from 'types'
-import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { StatusBadge, type StatusBadgeStatus } from 'ui-patterns/StatusBadge'
+
 import { getPipelineStateMessages } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 
@@ -34,7 +34,7 @@ export const PipelineStatus = ({
   // Map backend statuses to UX-friendly display
   const getStatusConfig = (): {
     label: string
-    type?: 'failure' | 'warning' | 'loading' | 'success' | 'idle'
+    status: StatusBadgeStatus
     tooltip: string
   } => {
     const statusName =
@@ -48,39 +48,39 @@ export const PipelineStatus = ({
     // Show optimistic request state while backend still reports steady states
     switch (requestStatus) {
       case PipelineStatusRequestStatus.RestartRequested:
-        return { label: 'Restarting', type: 'loading', tooltip: stateMessages.message }
+        return { label: 'Restarting', status: 'pending', tooltip: stateMessages.message }
       case PipelineStatusRequestStatus.StartRequested:
-        return { label: 'Starting', type: 'loading', tooltip: stateMessages.message }
+        return { label: 'Starting', status: 'pending', tooltip: stateMessages.message }
       case PipelineStatusRequestStatus.StopRequested:
-        return { label: 'Stopping', type: 'loading', tooltip: stateMessages.message }
+        return { label: 'Stopping', status: 'pending', tooltip: stateMessages.message }
     }
 
     if (pipelineStatus && typeof pipelineStatus === 'object' && 'name' in pipelineStatus) {
       switch (pipelineStatus.name) {
         case PipelineStatusName.FAILED:
-          return { label: 'Failed', type: 'failure', tooltip: stateMessages.message }
+          return { label: 'Failed', status: 'failure', tooltip: stateMessages.message }
         case PipelineStatusName.STARTING:
-          return { label: 'Starting', type: 'loading', tooltip: stateMessages.message }
+          return { label: 'Starting', status: 'pending', tooltip: stateMessages.message }
         case PipelineStatusName.STARTED:
-          return { label: 'Running', type: 'success', tooltip: stateMessages.message }
+          return { label: 'Running', status: 'success', tooltip: stateMessages.message }
         case PipelineStatusName.STOPPED:
-          return { label: 'Stopped', type: 'idle', tooltip: stateMessages.message }
+          return { label: 'Stopped', status: 'inactive', tooltip: stateMessages.message }
         case PipelineStatusName.STOPPING:
-          return { label: 'Stopping', type: 'loading', tooltip: stateMessages.message }
+          return { label: 'Stopping', status: 'pending', tooltip: stateMessages.message }
         default:
-          return { label: 'Unknown', type: 'idle', tooltip: stateMessages.message }
+          return { label: 'Unknown', status: 'unknown', tooltip: stateMessages.message }
       }
     }
 
     // Fallback for undefined or invalid status
     return {
       label: 'Unknown',
-      type: 'idle',
+      status: 'unknown',
       tooltip: 'Pipeline status is unclear - check logs for details',
     }
   }
 
-  const { type, tooltip, label } = getStatusConfig()
+  const { status, tooltip, label } = getStatusConfig()
 
   const pipelineLogsUrl = pipelineId
     ? `/project/${ref}/logs/replication-logs?f=${encodeURIComponent(
@@ -94,8 +94,8 @@ export const PipelineStatus = ({
 
       {isError && (
         <Tooltip>
-          <TooltipTrigger>
-            <Badge variant="default">Unknown</Badge>
+          <TooltipTrigger asChild>
+            <StatusBadge status="unknown" />
           </TooltipTrigger>
           <TooltipContent side="bottom" className="w-64 text-center">
             Unable to retrieve status: {error?.message}
@@ -106,22 +106,7 @@ export const PipelineStatus = ({
       {isSuccess && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center gap-x-2">
-              <Badge
-                variant={
-                  type === 'failure'
-                    ? 'destructive'
-                    : type === 'warning'
-                      ? 'warning'
-                      : type === 'success'
-                        ? 'success'
-                        : 'default'
-                }
-              >
-                {label}
-              </Badge>
-              {type === 'loading' && <Loader2 className="animate-spin w-3 h-3" />}
-            </div>
+            <StatusBadge status={status}>{label}</StatusBadge>
           </TooltipTrigger>
           <TooltipContent side="bottom">
             {tooltip}{' '}

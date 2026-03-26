@@ -1,10 +1,7 @@
-import { Copy, RotateCcw } from 'lucide-react'
-
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { Copy, RotateCcw } from 'lucide-react'
 import {
-  AlertDialog,
-  Badge,
   Button,
   Card,
   CardContent,
@@ -21,8 +18,9 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { StatusBadge } from 'ui-patterns/StatusBadge'
+
 import type { WebhookDelivery } from './PlatformWebhooks.types'
-import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
   deliveryAttempt: number | null
@@ -58,11 +56,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
         <SheetHeader>
           <div className="flex items-center gap-2">
             <SheetTitle>Delivery details</SheetTitle>
-            {selectedDelivery && (
-              <Badge variant={statusBadgeVariant[selectedDelivery.status]}>
-                {formatDeliveryStatus(selectedDelivery.status)}
-              </Badge>
-            )}
+            {selectedDelivery && <StatusBadge status={selectedDelivery.status} />}
           </div>
         </SheetHeader>
         <Separator />
@@ -149,9 +143,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                 <TabsContent value="response" className="space-y-4 pt-4">
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Status</p>
-                    <Badge variant={statusBadgeVariant[selectedDelivery.status]}>
-                      {formatDeliveryStatus(selectedDelivery.status)}
-                    </Badge>
+                    <StatusBadge status={selectedDelivery.status} />
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Response code</p>

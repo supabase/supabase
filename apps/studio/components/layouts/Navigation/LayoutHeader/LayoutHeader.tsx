@@ -28,8 +28,9 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
-import { Badge, cn } from 'ui'
+import { cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
+import { ContextBadge } from 'ui-patterns/ContextBadge'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
@@ -170,7 +171,7 @@ export const LayoutHeader = ({
                     {exceedingLimits && (
                       <div className="ml-2">
                         <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                          <Badge variant="destructive">Exceeding usage limits</Badge>
+                          <ContextBadge variant="destructive">Exceeding usage limits</ContextBadge>
                         </Link>
                       </div>
                     )}

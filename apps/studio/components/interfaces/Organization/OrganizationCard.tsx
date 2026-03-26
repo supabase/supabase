@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Fragment } from 'react'
 import type { Organization } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { ContextBadge } from 'ui-patterns/ContextBadge'
 
 export const OrganizationCard = ({
   organization,
@@ -36,9 +37,9 @@ export const OrganizationCard = ({
       title={organization.name}
       onClick={onClick}
       description={
-        <div className="flex items-center justify-between text-xs text-foreground-light font-sans">
+        <div className="mt-1 flex items-center justify-between text-xs text-foreground-light font-sans">
           <div className="flex items-center gap-x-1">
-            <span>{organization.plan.name} Plan</span>
+            <ContextBadge variant="default">{organization.plan.name}</ContextBadge>
             {numProjects > 0 && (
               <>
                 <span className="text-foreground-lighter">·</span>

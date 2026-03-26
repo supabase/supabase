@@ -1,5 +1,5 @@
 import type { Branch } from 'data/branches/branches-query'
-import { Badge } from 'ui'
+import { ContextBadge } from 'ui-patterns/ContextBadge'
 
 interface BranchBadgeProps {
   branch: Branch | undefined
@@ -9,31 +9,31 @@ interface BranchBadgeProps {
 export function BranchBadge({ branch, isBranchingEnabled }: BranchBadgeProps) {
   if (!isBranchingEnabled) {
     return (
-      <Badge variant="warning" className="mt-[1px]">
+      <ContextBadge variant="warning" className="mt-[1px]">
         Production
-      </Badge>
+      </ContextBadge>
     )
   }
 
   if (branch?.is_default) {
     return (
-      <Badge variant="warning" className="mt-[1px]">
+      <ContextBadge variant="warning" className="mt-[1px]">
         Production
-      </Badge>
+      </ContextBadge>
     )
   }
 
   if (branch?.persistent) {
     return (
-      <Badge variant="success" className="mt-[1px]">
+      <ContextBadge variant="success" className="mt-[1px]">
         Persistent
-      </Badge>
+      </ContextBadge>
     )
   }
 
   return (
-    <Badge variant="success" className="mt-[1px]">
+    <ContextBadge variant="success" className="mt-[1px]">
       Preview
-    </Badge>
+    </ContextBadge>
   )
 }

@@ -1,15 +1,31 @@
-import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
-
 import { RESOURCE_WARNING_MESSAGES } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.utils'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { AlertTriangle, Info, PauseCircle, RefreshCcw } from 'lucide-react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { StatusBadge, type StatusBadgeStatus } from 'ui-patterns/StatusBadge'
+
 import { InferredProjectStatus } from './ProjectCard.utils'
 
 export interface ProjectCardWarningsProps {
   resourceWarnings?: ResourceWarning
   projectStatus: InferredProjectStatus
   renderMode?: 'alert' | 'badge'
+}
+
+const projectStatusBadgeConfig: Partial<
+  Record<Exclude<InferredProjectStatus, undefined>, { status: StatusBadgeStatus; label: string }>
+> = {
+  isHealthy: { status: 'success', label: 'Active' },
+  isPaused: { status: 'inactive', label: 'Paused' },
+  isPausing: { status: 'pending', label: 'Pausing' },
+  isRestarting: { status: 'pending', label: 'Restarting' },
+  isResizing: { status: 'pending', label: 'Resizing' },
+  isComingUp: { status: 'pending', label: 'Starting' },
+  isRestoring: { status: 'pending', label: 'Restoring' },
+  isUpgrading: { status: 'pending', label: 'Upgrading' },
+  isRestoreFailed: { status: 'failure', label: 'Restore Failed' },
+  isPauseFailed: { status: 'failure', label: 'Pause Failed' },
 }
 
 export const ProjectCardStatus = ({
@@ -70,7 +86,7 @@ export const ProjectCardStatus = ({
         return renderMode === 'badge' ? 'Pause Failed' : 'Project pause failed'
     }
 
-    if (!resourceWarnings) {
+    if (activeWarnings.length === 0) {
       return renderMode === 'badge' && projectStatus === 'isHealthy' ? 'Active' : undefined
     }
 
@@ -99,7 +115,7 @@ export const ProjectCardStatus = ({
         return 'Please contact support for assistance'
     }
 
-    if (!resourceWarnings) return undefined
+    if (activeWarnings.length === 0) return undefined
 
     // If none of the paused/restoring states match, proceed with the default logic
     return activeWarnings.length > 1 && showResourceExhaustionWarnings
@@ -111,6 +127,7 @@ export const ProjectCardStatus = ({
 
   const alertTitle = getTitle()
   const alertDescription = getDescription()
+  const statusBadgeConfig = projectStatus ? projectStatusBadgeConfig[projectStatus] : undefined
   const alertType = isCritical
     ? 'destructive'
     : projectStatus === 'isPaused'
@@ -119,22 +136,34 @@ export const ProjectCardStatus = ({
 
   if (
     (activeWarnings.length === 0 || warningContent === undefined) &&
-    projectStatus === 'isHealthy'
+    projectStatus === 'isHealthy' &&
+    renderMode !== 'badge'
   ) {
-    if (renderMode === 'badge') {
-      return (
-        // Badge must be wrapped in a div in order to be centered in table cell
-        <div className="flex items-center">
-          <Badge variant="success">Active</Badge>
-        </div>
-      )
-    }
     return null
   }
 
   if (renderMode === 'badge') {
     // Render a fallback en dash if no title is available
     if (!alertTitle) return <span className="text-xs text-foreground-muted">–</span>
+
+    if (statusBadgeConfig) {
+      return (
+        <div className="flex items-center overflow-visible">
+          {alertDescription ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <StatusBadge status={statusBadgeConfig.status}>
+                  {statusBadgeConfig.label}
+                </StatusBadge>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">{alertDescription}</TooltipContent>
+            </Tooltip>
+          ) : (
+            <StatusBadge status={statusBadgeConfig.status}>{statusBadgeConfig.label}</StatusBadge>
+          )}
+        </div>
+      )
+    }
 
     const badgeVariant = isCritical
       ? 'destructive'

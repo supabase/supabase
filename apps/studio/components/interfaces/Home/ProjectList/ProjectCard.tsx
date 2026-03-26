@@ -114,7 +114,7 @@ export const ProjectCard = ({
                 </div>
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
-              <div className="flex items-center gap-x-1.5 relative overflow-hidden">
+              <div className="flex items-center gap-x-1.5 relative">
                 <ProjectCardStatus
                   projectStatus={projectStatus}
                   resourceWarnings={resourceWarnings}

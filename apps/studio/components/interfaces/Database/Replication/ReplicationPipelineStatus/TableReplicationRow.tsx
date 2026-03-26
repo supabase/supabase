@@ -1,14 +1,15 @@
+import { useParams } from 'common'
 import { ExternalLink, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
+import { Button, cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { StatusBadge } from 'ui-patterns/StatusBadge'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
-import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
-import { useParams } from 'common'
-import { Badge, Button, cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ErroredTableDetails } from '../ErroredTableDetails'
 import { TableState } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
   table: ReplicationPipelineTableStatus
@@ -57,11 +58,11 @@ export const TableReplicationRow = ({
 
       <TableCell className="align-top">
         {isRestarting ? (
-          <Badge variant="default">Restarting</Badge>
+          <StatusBadge status="pending">Restarting</StatusBadge>
         ) : showDisabledState ? (
-          <Badge variant="default">Not Available</Badge>
+          <StatusBadge status="unknown">Not Available</StatusBadge>
         ) : (
-          statusConfig.badge
+          <StatusBadge status={statusConfig.badge.status}>{statusConfig.badge.label}</StatusBadge>
         )}
       </TableCell>
 

@@ -5,8 +5,9 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { Boxes } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Badge, cn } from 'ui'
+import { cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
+import { ContextBadge } from 'ui-patterns/ContextBadge'
 
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
@@ -76,7 +77,7 @@ export const OrganizationDropdown = ({
             {orgName ?? 'Select an organization'}
           </span>
           {!!selectedOrganization && (
-            <Badge variant="default">{selectedOrganization?.plan.name}</Badge>
+            <ContextBadge variant="default">{selectedOrganization?.plan.name}</ContextBadge>
           )}
         </>
       }

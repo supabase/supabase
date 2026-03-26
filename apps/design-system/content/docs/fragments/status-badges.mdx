@@ -1,0 +1,31 @@
+---
+title: Status Badge
+description: Segmented operational status badges for lifecycle, process, and delivery outcomes.
+fragment: true
+---
+
+<ComponentPreview name="status-badge-demo" peekCode />
+
+## Usage
+
+```tsx
+import { StatusBadge } from 'ui-patterns/StatusBadge'
+```
+
+```tsx
+<StatusBadge status="success" />
+```
+
+## API Reference
+
+| Prop        | Type                                                                          | Default | Description                                                            |
+| ----------- | ----------------------------------------------------------------------------- | ------- | ---------------------------------------------------------------------- |
+| `status`    | `'success' \| 'failure' \| 'pending' \| 'inactive' \| 'skipped' \| 'unknown'` | —       | Semantic status. Determines both the icon and the badge tone.          |
+| `children`  | `React.ReactNode`                                                             | —       | Optional label override. Keeps the semantic icon and colour treatment. |
+| `className` | `string`                                                                      | —       | Additional classes applied to the root wrapper.                        |
+
+## Guidance
+
+Use `StatusBadge` for short operational states where icon plus label improves scanability, such as webhook deliveries, invoice processing, replication state, or project lifecycle.
+
+Keep the text to one or two words. For binary enabled and disabled state, prefer `StateBadge`.

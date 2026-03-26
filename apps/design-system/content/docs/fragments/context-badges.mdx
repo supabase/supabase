@@ -1,0 +1,31 @@
+---
+title: Context Badge
+description: Compact uppercase context labels for plans, environments, tiers, and header pills.
+fragment: true
+---
+
+<ComponentPreview name="context-badge-demo" peekCode />
+
+## Usage
+
+```tsx
+import { ContextBadge } from 'ui-patterns/ContextBadge'
+```
+
+```tsx
+<ContextBadge variant="warning">Production</ContextBadge>
+```
+
+## API Reference
+
+| Prop        | Type                                                                  | Default   | Description                            |
+| ----------- | --------------------------------------------------------------------- | --------- | -------------------------------------- |
+| `variant`   | `'default' \| 'warning' \| 'success' \| 'destructive' \| 'secondary'` | `default` | Visual treatment for the context pill. |
+| `children`  | `React.ReactNode`                                                     | —         | Badge label.                           |
+| `className` | `string`                                                              | —         | Additional classes applied to the root |
+
+## Guidance
+
+Use `ContextBadge` for holistic labels that describe surrounding product context, such as plan, environment, deployment tier, or other header-level metadata.
+
+Do not use it for operational outcomes or enabled and disabled state. Use `StatusBadge` or `StateBadge` for those semantics.

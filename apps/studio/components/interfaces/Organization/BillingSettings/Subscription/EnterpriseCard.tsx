@@ -1,9 +1,8 @@
-import { Check } from 'lucide-react'
-
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
-import { Button, cn } from 'ui'
+import { Badge, Button, cn } from 'ui'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
@@ -31,13 +30,13 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <div className="flex items-center space-x-2">
           <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
           {isCurrentPlan ? (
-            <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
+            <Badge variant="default" className="shrink-0">
               Current plan
-            </div>
+            </Badge>
           ) : plan.nameBadge ? (
-            <div className="text-xs bg-surface-200 text-brand rounded px-2 py-0.5">
+            <Badge variant="success" className="shrink-0">
               {plan.nameBadge}
-            </div>
+            </Badge>
           ) : null}
         </div>
 

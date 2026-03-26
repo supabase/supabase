@@ -2,13 +2,11 @@ import { DocsButton } from 'components/ui/DocsButton'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import {
-  Badge,
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
   BreadcrumbList_Shadcn_ as BreadcrumbList,
   BreadcrumbPage_Shadcn_ as BreadcrumbPage,
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
-  Button,
 } from 'ui'
 import {
   PageHeader,
@@ -19,6 +17,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { StateBadge } from 'ui-patterns/StateBadge'
 
 interface PlatformWebhooksHeaderProps {
   hasSelectedEndpoint: boolean
@@ -62,12 +61,7 @@ export const PlatformWebhooksHeader = ({
             <span className="flex w-full min-w-0 items-center gap-2">
               <span className="block min-w-0 truncate leading-tight">{headerTitle}</span>
               {hasSelectedEndpoint && endpointStatus && (
-                <Badge
-                  className="shrink-0 self-center"
-                  variant={endpointStatus === 'enabled' ? 'success' : 'default'}
-                >
-                  {endpointStatus === 'enabled' ? 'Enabled' : 'Disabled'}
-                </Badge>
+                <StateBadge className="shrink-0 self-center" state={endpointStatus} />
               )}
             </span>
           </PageHeaderTitle>

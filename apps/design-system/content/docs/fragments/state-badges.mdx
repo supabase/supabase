@@ -1,0 +1,31 @@
+---
+title: State Badge
+description: Binary state badges for enabled and disabled UI.
+fragment: true
+---
+
+<ComponentPreview name="state-badge-demo" peekCode />
+
+## Usage
+
+```tsx
+import { StateBadge } from 'ui-patterns/StateBadge'
+```
+
+```tsx
+<StateBadge state="enabled" />
+```
+
+## API Reference
+
+| Prop        | Type                      | Default | Description                                                         |
+| ----------- | ------------------------- | ------- | ------------------------------------------------------------------- |
+| `state`     | `'enabled' \| 'disabled'` | —       | Semantic binary state. Determines both the icon and the badge tone. |
+| `children`  | `React.ReactNode`         | —       | Optional label override. Useful for `Active` and `Inactive` copy.   |
+| `className` | `string`                  | —       | Additional classes applied to the root wrapper.                     |
+
+## Guidance
+
+Use `StateBadge` for binary state such as enabled and disabled, or `Active` and `Inactive` where the semantic meaning is still on versus off.
+
+For lifecycle or outcome status such as pending, failed, skipped, or success, use `StatusBadge` instead.
