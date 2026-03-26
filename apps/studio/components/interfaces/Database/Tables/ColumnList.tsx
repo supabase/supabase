@@ -1,11 +1,11 @@
 import { PostgresColumn } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { POSTGRES_DATA_TYPE_OPTIONS } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { POSTGRES_DATA_TYPE_OPTIONS } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { NoSearchResults } from 'components/ui/NoSearchResults'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -29,6 +29,7 @@ import {
   Badge,
   Button,
   Card,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
@@ -42,7 +43,6 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -51,7 +51,9 @@ import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 
 const getColumnTypeAffordance = (column: PostgresColumn) => {
   const normalizedFormat = column.format.replaceAll('"', '').replace(/\[\]$/, '')
-  const optionType = POSTGRES_DATA_TYPE_OPTIONS.find((option) => option.name === normalizedFormat)?.type
+  const optionType = POSTGRES_DATA_TYPE_OPTIONS.find(
+    (option) => option.name === normalizedFormat
+  )?.type
 
   const iconClassName = 'text-foreground-muted'
 
@@ -74,7 +76,9 @@ const getColumnTypeAffordance = (column: PostgresColumn) => {
     case 'json':
       return {
         icon: (
-          <div className={cn(iconClassName, 'px-px text-[11px] leading-none font-mono')}>{'{ }'}</div>
+          <div className={cn(iconClassName, 'px-px text-[11px] leading-none font-mono')}>
+            {'{ }'}
+          </div>
         ),
         label: 'JSON',
       }
@@ -254,7 +258,7 @@ export const ColumnList = ({
 
                   return (
                     <TableRow key={column.name}>
-                      <TableCell className="w-0 !pl-5 !pr-0">
+                      <TableCell className="w-0 !pl-5 !pr-1">
                         <Tooltip>
                           <TooltipTrigger className="cursor-default">
                             <div aria-label={typeLabel} className="flex w-4 justify-center">
@@ -287,7 +291,7 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <code className="text-code-inline">{column.format}</code>
+                        <p className="text-foreground-light">{column.format}</p>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
