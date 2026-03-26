@@ -37,14 +37,14 @@ export const UpdateSavedQueryModal = ({
 }: UpdateSavedQueryProps) => {
   const form = useForm<SavedQuery>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialValues,
+    defaultValues: { ...initialValues, description: initialValues.description ?? '' },
   })
   const { reset, formState } = form
   const { isDirty, isSubmitting } = formState
 
   useEffect(() => {
     if (isDirty) return
-    reset(initialValues)
+    reset({ ...initialValues, description: initialValues.description ?? '' })
   }, [isDirty, initialValues, reset])
 
   const handleCancel = () => {
