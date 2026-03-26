@@ -1,5 +1,6 @@
 import { AddressElement } from '@stripe/react-stripe-js'
 import type {
+  StripeAddressElement,
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
@@ -38,6 +39,7 @@ interface BillingCustomerDataFormProps {
   addressOptions: StripeAddressElementOptions
   resetKey: number
   onAddressChange: (evt: StripeAddressElementChangeEvent) => void
+  onAddressReady?: (element: StripeAddressElement) => void
   addressCountry?: string
 }
 
@@ -56,6 +58,7 @@ export const BillingCustomerDataForm = ({
   addressOptions,
   resetKey,
   onAddressChange,
+  onAddressReady,
   addressCountry,
 }: BillingCustomerDataFormProps) => {
   const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
@@ -91,6 +94,7 @@ export const BillingCustomerDataForm = ({
           key={`billing-address-${resetKey}`}
           options={addressOptions}
           onChange={onAddressChange}
+          onReady={onAddressReady}
         />
         {disabled && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
       </div>

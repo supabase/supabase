@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
+import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 
@@ -65,6 +65,7 @@ export const BillingCustomerData = () => {
   const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const addressElementRef = useRef<StripeAddressElement | null>(null)
 
   const {
     form,
@@ -73,6 +74,7 @@ export const BillingCustomerData = () => {
     isDirty,
     resetKey,
     onAddressChange,
+    applyAddressElementValue,
     addressCountry,
     addressOptions,
   } = useBillingCustomerDataForm({
@@ -112,8 +114,16 @@ export const BillingCustomerData = () => {
     },
   })
 
+  useEffect(() => {
+    addressElementRef.current = null
+  }, [resetKey])
+
   const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (addressElementRef.current) {
+      const addressResult = await addressElementRef.current.getValue()
+      applyAddressElementValue(addressResult)
+    }
     const validationError = await handleSubmit()
     if (validationError) {
       toast.error(validationError)
@@ -187,6 +197,9 @@ export const BillingCustomerData = () => {
                         addressOptions={addressOptions}
                         resetKey={resetKey}
                         onAddressChange={onAddressChange}
+                        onAddressReady={(element) => {
+                          addressElementRef.current = element
+                        }}
                         addressCountry={addressCountry}
                       />
                       <CardFooter className="border-t justify-end px-8">

@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type {
+  StripeAddressElement,
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
@@ -13,6 +14,7 @@ import { getEffectiveTaxCountry, resolveStoredTaxId, sanitizeTaxIdValue } from '
 
 type StripeAddressValue = StripeAddressElementChangeEvent['value']
 type StripeAddressValidationState = 'unknown' | 'complete' | 'incomplete'
+type StripeAddressElementValueResult = Awaited<ReturnType<StripeAddressElement['getValue']>>
 
 interface UseBillingCustomerDataFormProps {
   customerProfile?: {
@@ -116,10 +118,21 @@ export function useBillingCustomerDataForm({
     [initialStripeAddressValue]
   )
 
+  const applyAddressElementValue = useCallback(
+    (result: StripeAddressElementValueResult) => {
+      stripeAddressRef.current = result.value
+      stripeAddressValidationRef.current = result.complete ? 'complete' : 'incomplete'
+      setAddressCountry(result.value.address.country || undefined)
+      setIsAddressDirty(!isAddressEqual(result.value, initialStripeAddressValue))
+    },
+    [initialStripeAddressValue]
+  )
+
   const isDirty = isAddressDirty || form.formState.isDirty
 
   const handleSubmit = async () => {
     const address = stripeAddressRef.current
+    const addressWasEdited = isAddressDirty || !isAddressEqual(address, initialStripeAddressValue)
 
     if (!address.name?.trim()) {
       return 'Full name is required.'
@@ -130,13 +143,7 @@ export function useBillingCustomerDataForm({
     if (!address.address.line1?.trim()) {
       return 'Address Line 1 is required.'
     }
-    if (!address.address.city?.trim()) {
-      return 'City is required.'
-    }
-    if (!address.address.postal_code?.trim()) {
-      return 'Postal code is required.'
-    }
-    if (isAddressDirty && stripeAddressValidationRef.current === 'incomplete') {
+    if (addressWasEdited && stripeAddressValidationRef.current === 'incomplete') {
       return 'Please enter a valid billing address.'
     }
 
@@ -185,6 +192,7 @@ export function useBillingCustomerDataForm({
     isDirty,
     resetKey,
     onAddressChange,
+    applyAddressElementValue,
     addressCountry,
     addressOptions,
   }

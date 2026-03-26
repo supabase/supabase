@@ -1,4 +1,5 @@
 import type {
+  StripeAddressElement,
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
@@ -6,19 +7,37 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { UpdateBillingAddressModal } from 'components/interfaces/App/UpdateBillingAddressModal'
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type MockAddressElementProps = {
   onChange?: (event: StripeAddressElementChangeEvent) => void
+  onReady?: (element: StripeAddressElement) => void
   options?: StripeAddressElementOptions
 }
+
+const EMPTY_ADDRESS_VALUE: StripeAddressElementChangeEvent['value'] = {
+  name: '',
+  address: {
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    country: '',
+  },
+}
+
+let currentAddressValue: StripeAddressElementChangeEvent['value'] = EMPTY_ADDRESS_VALUE
+let currentAddressComplete = false
 
 const emitAddressEvent = (
   props: MockAddressElementProps,
   event: Pick<StripeAddressElementChangeEvent, 'complete' | 'value'>
-) =>
+) => {
+  currentAddressValue = event.value
+  currentAddressComplete = event.complete
   props.onChange?.({
     elementType: 'address',
     elementMode: 'billing',
@@ -26,77 +45,109 @@ const emitAddressEvent = (
     isNewAddress: false,
     ...event,
   })
+}
 
 vi.mock('@stripe/react-stripe-js', () => ({
   Elements: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  AddressElement: (props: MockAddressElementProps) => (
-    <div>
-      <div data-testid="stripe-address-element" />
-      <button
-        type="button"
-        onClick={() =>
-          emitAddressEvent(props, {
-            complete: true,
-            value: {
+  AddressElement: (props: MockAddressElementProps) => {
+    useEffect(() => {
+      props.onReady?.({
+        getValue: vi.fn(async () => ({
+          complete: currentAddressComplete,
+          isNewAddress: false,
+          value: currentAddressValue,
+        })),
+      } as unknown as StripeAddressElement)
+    }, [props])
+
+    return (
+      <div>
+        <div data-testid="stripe-address-element" />
+        <button
+          type="button"
+          onClick={() =>
+            emitAddressEvent(props, {
+              complete: true,
+              value: {
+                name: 'Updated Company',
+                address: {
+                  line1: '500 Market St',
+                  line2: '',
+                  city: 'San Francisco',
+                  state: 'CA',
+                  postal_code: '94105',
+                  country: 'US',
+                },
+              },
+            })
+          }
+        >
+          Emit valid US address
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            emitAddressEvent(props, {
+              complete: false,
+              value: {
+                name: 'Updated Company',
+                address: {
+                  line1: '500 Market St',
+                  line2: '',
+                  city: 'San Francisco',
+                  state: 'CA',
+                  postal_code: '',
+                  country: 'US',
+                },
+              },
+            })
+          }
+        >
+          Emit invalid address
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            emitAddressEvent(props, {
+              complete: true,
+              value: {
+                name: 'Updated GmbH',
+                address: {
+                  line1: 'Stephansplatz 1',
+                  line2: '',
+                  city: 'Vienna',
+                  state: 'Vienna',
+                  postal_code: '1010',
+                  country: 'AT',
+                },
+              },
+            })
+          }
+        >
+          Emit valid AT address
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            currentAddressValue = {
               name: 'Updated Company',
               address: {
                 line1: '500 Market St',
                 line2: '',
-                city: 'San Francisco',
+                city: '',
                 state: 'CA',
                 postal_code: '94105',
                 country: 'US',
               },
-            },
-          })
-        }
-      >
-        Emit valid US address
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          emitAddressEvent(props, {
-            complete: false,
-            value: {
-              name: 'Updated Company',
-              address: {
-                line1: '500 Market St',
-                line2: '',
-                city: 'San Francisco',
-                state: 'CA',
-                postal_code: '',
-                country: 'US',
-              },
-            },
-          })
-        }
-      >
-        Emit invalid address
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          emitAddressEvent(props, {
-            complete: true,
-            value: {
-              name: 'Updated GmbH',
-              address: {
-                line1: 'Stephansplatz 1',
-                line2: '',
-                city: 'Vienna',
-                state: 'Vienna',
-                postal_code: '1010',
-                country: 'AT',
-              },
-            },
-          })
-        }
-      >
-        Emit valid AT address
-      </button>
-    </div>
-  ),
+            }
+            currentAddressComplete = false
+          }}
+        >
+          Make submit validation fail
+        </button>
+      </div>
+    )
+  },
   useElements: () => null,
   useStripe: () => null,
 }))
@@ -193,6 +244,8 @@ vi.mock('data/organizations/organizations-query', () => ({
 describe('UpdateBillingAddressModal', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    currentAddressValue = EMPTY_ADDRESS_VALUE
+    currentAddressComplete = false
     mockFlag.mockReturnValue(true)
     mockOrg.mockReturnValue(
       createMockOrganization({
@@ -334,5 +387,22 @@ describe('UpdateBillingAddressModal', () => {
 
     expect(await screen.findByText('Austria - AT VAT')).toBeInTheDocument()
     expect(screen.queryByText('United States - US EIN')).not.toBeInTheDocument()
+  })
+
+  it('uses getValue on submit to block saving when Stripe validation becomes incomplete', async () => {
+    render(<UpdateBillingAddressModal />)
+
+    expect(await screen.findByText('Billing address required')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Emit valid US address' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save address' })).toBeEnabled())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Make submit validation fail' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Save address' }))
+
+    await waitFor(() => {
+      expect(mockUpdateCustomerProfile).not.toHaveBeenCalled()
+      expect(mockUpdateTaxId).not.toHaveBeenCalled()
+    })
   })
 })

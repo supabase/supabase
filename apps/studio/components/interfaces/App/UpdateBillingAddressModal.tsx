@@ -1,5 +1,5 @@
 import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
+import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe/stripe-js'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
@@ -18,7 +18,7 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useTheme } from 'next-themes'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -41,6 +41,7 @@ export function UpdateBillingAddressModal() {
 
   const [dismissed, setDismissed] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const addressElementRef = useRef<StripeAddressElement | null>(null)
 
   const showMissingAddressModal = useFlag('enableBillingAddressModal')
   const { data: org } = useSelectedOrganizationQuery()
@@ -94,37 +95,53 @@ export function UpdateBillingAddressModal() {
   const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
   const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
 
-  const { form, handleSubmit, isDirty, resetKey, onAddressChange, addressCountry, addressOptions } =
-    useBillingCustomerDataForm({
-      customerProfile,
-      taxId,
-      onCustomerDataChange: async (data) => {
-        if (!slug) return
-        setIsSubmitting(true)
+  const {
+    form,
+    handleSubmit,
+    isDirty,
+    resetKey,
+    onAddressChange,
+    applyAddressElementValue,
+    addressCountry,
+    addressOptions,
+  } = useBillingCustomerDataForm({
+    customerProfile,
+    taxId,
+    onCustomerDataChange: async (data) => {
+      if (!slug) return
+      setIsSubmitting(true)
 
-        try {
-          await updateCustomerProfile({
-            slug,
-            address: data.address,
-            billing_name: data.billing_name,
-          })
+      try {
+        await updateCustomerProfile({
+          slug,
+          address: data.address,
+          billing_name: data.billing_name,
+        })
 
-          await updateTaxId({ slug, taxId: data.tax_id })
+        await updateTaxId({ slug, taxId: data.tax_id })
 
-          await invalidateOrganizationsQuery(queryClient)
+        await invalidateOrganizationsQuery(queryClient)
 
-          toast.success('Successfully updated billing address')
-          setDismissed(true)
-        } catch (error: any) {
-          toast.error(`Failed to update billing address: ${error.message}`)
-        } finally {
-          setIsSubmitting(false)
-        }
-      },
-    })
+        toast.success('Successfully updated billing address')
+        setDismissed(true)
+      } catch (error: any) {
+        toast.error(`Failed to update billing address: ${error.message}`)
+      } finally {
+        setIsSubmitting(false)
+      }
+    },
+  })
+
+  useEffect(() => {
+    addressElementRef.current = null
+  }, [resetKey])
 
   const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (addressElementRef.current) {
+      const addressResult = await addressElementRef.current.getValue()
+      applyAddressElementValue(addressResult)
+    }
     const validationError = await handleSubmit()
     if (validationError) {
       toast.error(validationError)
@@ -192,6 +209,9 @@ export function UpdateBillingAddressModal() {
                       addressOptions={addressOptions}
                       resetKey={resetKey}
                       onAddressChange={onAddressChange}
+                      onAddressReady={(element) => {
+                        addressElementRef.current = element
+                      }}
                       addressCountry={addressCountry}
                     />
                   </DialogSection>
