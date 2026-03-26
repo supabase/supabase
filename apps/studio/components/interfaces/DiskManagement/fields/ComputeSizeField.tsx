@@ -39,23 +39,6 @@ import { NoticeBar } from '../ui/NoticeBar'
 
 const INITIALLY_VISIBLE_COUNT = 6
 
-// Variant IDs for sizes beyond the initial visible set (2XL and above)
-const LARGE_COMPUTE_VARIANT_IDS = [
-  'ci_2xlarge',
-  'ci_4xlarge',
-  'ci_8xlarge',
-  'ci_12xlarge',
-  'ci_16xlarge',
-  'ci_24xlarge',
-  'ci_24xlarge_optimized_memory',
-  'ci_24xlarge_optimized_cpu',
-  'ci_24xlarge_high_memory',
-  'ci_48xlarge',
-  'ci_48xlarge_optimized_memory',
-  'ci_48xlarge_optimized_cpu',
-  'ci_48xlarge_high_memory',
-]
-
 /**
  * to do: this could be a type from api-types
  */
@@ -98,17 +81,19 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
 
-  // Expand by default if the project's current compute size is in the hidden set
-  const [showAllSizes, setShowAllSizes] = useState(() =>
-    LARGE_COMPUTE_VARIANT_IDS.includes(computeSize)
-  )
+  // Expand by default if the project's current compute size is beyond the initial visible set
+  const [showAllSizes, setShowAllSizes] = useState(() => {
+    const idx = availableOptions.findIndex((o) => o.identifier === computeSize)
+    return idx >= INITIALLY_VISIBLE_COUNT
+  })
 
-  // Also expand if computeSize changes to a large size after mount (e.g. after a form reset)
+  // Also expand if computeSize changes to a hidden size after mount (e.g. after a form reset)
   useEffect(() => {
-    if (LARGE_COMPUTE_VARIANT_IDS.includes(computeSize) && !showAllSizes) {
+    const idx = availableOptions.findIndex((o) => o.identifier === computeSize)
+    if (idx >= INITIALLY_VISIBLE_COUNT) {
       setShowAllSizes(true)
     }
-  }, [computeSize]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [computeSize, availableOptions])
 
   const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
