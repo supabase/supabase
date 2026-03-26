@@ -19,19 +19,19 @@ This demonstrates how to use:
   - [React](https://reactjs.org)
   - [Supabase.js](https://supabase.io/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
-  - [app.supabase.io](https://app.supabase.io/): hosted Postgres database with restful API for usage with Supabase.js.
+  - [supabase.com/dashboard](https://supabase.com/dashboard): hosted Postgres database with restful API for usage with Supabase.js.
 
 ## Instant deploy
 
 The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-react&repo-name=supabase-ionic-react&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20the%20your%20auto-generated%20docs%20at%20app.supabase.io&repository-url=https%3A%2F%2Fgithub.com%2Fmhartington%2Fsupabase-ionic-react%2Ftree%2Fmain&env=REACT_APP_SUPABASE_URL%2CREACT_APP_SUPABASE_KEY)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=supabase-ionic-react&repo-name=supabase-ionic-react&envDescription=Find%20the%20Supabase%20URL%20and%20key%20in%20your%20project%20settings%20at%20supabase.com%2Fdashboard&repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fuser-management%2Fionic-react-user-management&env=REACT_APP_SUPABASE_URL%2CREACT_APP_SUPABASE_KEY)
 
 ## Build from scratch
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management" Quickstart
 
@@ -39,9 +39,9 @@ Once your database has started, run the "User Management Starter" quickstart. In
 
 ### 3. Get the URL and Key
 
-Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
+Go to the Project Settings (the cog icon), open the API tab, and find your API URL and publishable key (`anon`), you'll need these in the next step.
 
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
+The publishable key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
 
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
@@ -53,10 +53,10 @@ Create a `.env.local` file in the project root (or update your existing `.env.lo
 
 ```bash
 REACT_APP_SUPABASE_URL=YOUR_SUPABASE_URL
-REACT_APP_SUPABASE_KEY=YOUR_SUPABASE_ANON_KEY
+REACT_APP_SUPABASE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 ```
 
-Populate these variables with your project's URL and anon key from the Supabase dashboard.
+Populate these variables with your project's URL and publishable key from the Supabase dashboard.
 
 ### 5. Run the application
 
