@@ -1,11 +1,29 @@
-import { Button, Form, Input, Modal } from 'ui'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Modal,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
-type SavedQuery = { name: string; description?: string }
+const formSchema = z.object({
+  name: z.string().min(1, 'Required'),
+  description: z.string().optional(),
+})
+
+type SavedQuery = z.infer<typeof formSchema>
 
 export interface UpdateSavedQueryProps {
   visible: boolean
   onCancel: () => void
-  onSubmit: (newValues: SavedQuery) => void
+  onSubmit: SubmitHandler<SavedQuery>
   initialValues: SavedQuery
 }
 
@@ -15,57 +33,70 @@ export const UpdateSavedQueryModal = ({
   onSubmit,
   initialValues,
 }: UpdateSavedQueryProps) => {
-  function validate(values: SavedQuery) {
-    const errors: Partial<SavedQuery> = {}
+  const form = useForm<SavedQuery>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialValues,
+  })
+  const { reset, formState } = form
+  const { isDirty, isSubmitting } = formState
 
-    if (!values.name) {
-      errors.name = 'Required'
-    }
+  useEffect(() => {
+    if (isDirty) return
+    reset(initialValues)
+  }, [isDirty, initialValues, reset])
 
-    return errors
+  const handleCancel = () => {
+    form.reset()
+    onCancel()
   }
 
   return (
     <Modal
       visible={visible}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       hideFooter
       header="Update saved query"
       size="medium"
     >
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={initialValues}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <>
-            <Modal.Content>
-              <Input label="Name" id="name" name="name" />
-            </Modal.Content>
-            <Modal.Content>
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe query"
-                size="medium"
-                textAreaClassName="resize-none"
-              />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
-                Cancel
-              </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                Save query
-              </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+          <Modal.Content>
+            <FormField_Shadcn_
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItemLayout layout="vertical" label="Name">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} placeholder="Enter text" />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </Modal.Content>
+          <Modal.Content>
+            <FormField_Shadcn_
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItemLayout layout="vertical" label="Description">
+                  <FormControl_Shadcn_>
+                    <Textarea {...field} placeholder="Describe query" className="resize-none" />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </Modal.Content>
+          <Modal.Separator />
+          <Modal.Content className="flex items-center justify-end gap-2">
+            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+              Save query
+            </Button>
+          </Modal.Content>
+        </form>
+      </Form_Shadcn_>
     </Modal>
   )
 }
