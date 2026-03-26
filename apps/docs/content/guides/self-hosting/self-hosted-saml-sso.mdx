@@ -364,10 +364,14 @@ Filter by resource ID:
 
 ```sh
 # Exact match
-curl 'http://localhost:8000/auth/v1/admin/sso/providers?resource_id=my-idp'
+curl 'http://localhost:8000/auth/v1/admin/sso/providers?resource_id=my-idp' \
+  -H 'Authorization: Bearer YOUR_SERVICE_ROLE_KEY' \
+  -H 'apikey: YOUR_SERVICE_ROLE_KEY'
 
 # Prefix match
-curl 'http://localhost:8000/auth/v1/admin/sso/providers?resource_id_prefix=prod-'
+curl 'http://localhost:8000/auth/v1/admin/sso/providers?resource_id_prefix=prod-' \
+  -H 'Authorization: Bearer YOUR_SERVICE_ROLE_KEY' \
+  -H 'apikey: YOUR_SERVICE_ROLE_KEY'
 ```
 
 ### Get a specific provider
