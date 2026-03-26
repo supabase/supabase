@@ -539,6 +539,72 @@ describe('upsertOperation', () => {
     expect(result.operations[0]).toEqual(otherOp)
   })
 
+  test('should remove operation when number oldValue matches string newValue', () => {
+    const existingOp: QueuedOperation = {
+      id: 'edit_cell_content:1:age:id:1',
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      timestamp: Date.now() - 1000,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'age',
+        oldValue: 42,
+        newValue: 'changed',
+        table: mockTable,
+      },
+    }
+
+    const operations = [existingOp]
+    const newOperation: NewEditCellContentOperation = {
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'age',
+        oldValue: 'changed',
+        newValue: '42',
+        table: mockTable,
+      },
+    }
+
+    const result = upsertOperation(operations, newOperation)
+
+    expect(result.operations).toHaveLength(0)
+  })
+
+  test('should remove operation when string oldValue matches JSON object newValue', () => {
+    const existingOp: QueuedOperation = {
+      id: 'edit_cell_content:1:metadata:id:1',
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      timestamp: Date.now() - 1000,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'metadata',
+        oldValue: '{"key":"value","count":3}',
+        newValue: 'changed',
+        table: mockTable,
+      },
+    }
+
+    const operations = [existingOp]
+    const newOperation: NewEditCellContentOperation = {
+      type: QueuedOperationType.EDIT_CELL_CONTENT,
+      tableId: 1,
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'metadata',
+        oldValue: 'changed',
+        newValue: { key: 'value', count: 3 },
+        table: mockTable,
+      },
+    }
+
+    const result = upsertOperation(operations, newOperation)
+
+    expect(result.operations).toHaveLength(0)
+  })
+
   test('should update existing DELETE_ROW operation', () => {
     const existingOp: QueuedOperation = {
       id: 'delete_row:1:id:1',

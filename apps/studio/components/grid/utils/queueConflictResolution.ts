@@ -2,6 +2,7 @@ import { isEqual } from 'lodash'
 
 import { isPendingAddRow } from '../types'
 import { generateTableChangeKey, rowMatchesIdentifiers } from './queueOperationUtils'
+import { tryParseJson } from '@/lib/helpers'
 import {
   isDeleteRowOperation,
   isEditCellContentOperation,
@@ -168,7 +169,13 @@ export function upsertOperation(
     ) {
       queuedOperation.payload.oldValue = existingOp.payload.oldValue
 
-      if (isEqual(queuedOperation.payload.oldValue, queuedOperation.payload.newValue)) {
+      const { oldValue, newValue } = queuedOperation.payload
+      // [Joshen] These comparisons by data type are because of how the table editor renders the values
+      if (
+        (typeof oldValue === 'number' && Number(oldValue) === Number(newValue)) ||
+        (typeof newValue === 'object' && isEqual(tryParseJson(oldValue), newValue)) ||
+        oldValue === newValue
+      ) {
         updatedOperations.splice(existingOpIndex, 1)
         return { operations: updatedOperations }
       }
