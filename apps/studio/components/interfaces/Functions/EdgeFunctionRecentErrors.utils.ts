@@ -1,4 +1,3 @@
-import type { AlertErrorProps } from 'components/ui/AlertError'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
 import {
@@ -6,6 +5,7 @@ import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from 'components/interfaces/Settings/Logs/Logs.utils'
+import type { AlertErrorProps } from 'components/ui/AlertError'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
@@ -157,8 +157,11 @@ export const getRecentErrorGroupsBase = (
     const statusCode = String(item.status_code ?? '')
     const method = String(item.method ?? '')
     const message =
-      parseEdgeFunctionEventMessage(String(item.event_message ?? ''), method || undefined, statusCode) ||
-      'Unknown error'
+      parseEdgeFunctionEventMessage(
+        String(item.event_message ?? ''),
+        method || undefined,
+        statusCode
+      ) || 'Unknown error'
     const executionId = String(item.execution_id ?? '')
     const timestamp = Number(item.timestamp ?? 0)
     const executionTime =

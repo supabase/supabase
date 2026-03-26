@@ -1,6 +1,7 @@
+import type { ChartLineProps } from 'ui-patterns/Chart'
+
 import type { EdgeFunctionChartDatum } from './EdgeFunctionOverview.utils'
 import { formatReferenceDelta, getMemoryTooltipDetail } from './EdgeFunctionOverview.utils'
-import type { ChartLineProps } from 'ui-patterns/Chart'
 
 export const ExecutionTooltipDetail = ({
   averageExecutionTime,
@@ -28,7 +29,9 @@ export const CpuTooltipDetail = ({
   value: unknown
 }) => {
   return (
-    <span className="text-foreground">{formatReferenceDelta(Number(value ?? 0), averageCpuTime)}</span>
+    <span className="text-foreground">
+      {formatReferenceDelta(Number(value ?? 0), averageCpuTime)}
+    </span>
   )
 }
 

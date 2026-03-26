@@ -144,10 +144,7 @@ export const getRollingTimeRange = (
   return [start.toDate(), currentTime.toDate()]
 }
 
-export const formatChartTimestamp = (
-  value: Date | string | number | undefined,
-  format: string
-) => {
+export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {
   return dayjs(value === undefined ? '' : value).format(format)
 }
 

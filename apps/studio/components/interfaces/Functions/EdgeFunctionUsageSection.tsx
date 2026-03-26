@@ -10,10 +10,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import {
-  getCpuTooltipDetails,
-  getMemoryTooltipDetails,
-} from './EdgeFunctionMetricTooltipDetails'
+import { getCpuTooltipDetails, getMemoryTooltipDetails } from './EdgeFunctionMetricTooltipDetails'
 import {
   CPU_TIME_CHART_CONFIG,
   formatMetric,

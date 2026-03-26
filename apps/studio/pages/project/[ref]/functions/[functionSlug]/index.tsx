@@ -10,8 +10,8 @@ import {
   getInvocationTotals,
   getInvocationUpdateAnnotation,
   getRollingTimeRange,
-  toEdgeFunctionChartData,
   getUsageMetrics,
+  toEdgeFunctionChartData,
 } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
 import type { EdgeFunctionChartRawDatum } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
 import { EdgeFunctionPerformanceSection } from 'components/interfaces/Functions/EdgeFunctionPerformanceSection'
@@ -67,7 +67,10 @@ const PageLayout: NextPageWithLayout = () => {
     [combinedStatsResults.data]
   )
 
-  const [startDate, endDate] = useMemo(() => getBucketedTimeRange(selectedInterval), [selectedInterval])
+  const [startDate, endDate] = useMemo(
+    () => getBucketedTimeRange(selectedInterval),
+    [selectedInterval]
+  )
   const [selectedWindowStart, selectedWindowEnd] = useMemo(
     () => getRollingTimeRange(selectedInterval),
     [selectedInterval]
@@ -104,7 +107,10 @@ const PageLayout: NextPageWithLayout = () => {
     endDate: endDate.toISOString(),
   })
 
-  const chartData = useMemo(() => toEdgeFunctionChartData(combinedStatsChartData), [combinedStatsChartData])
+  const chartData = useMemo(
+    () => toEdgeFunctionChartData(combinedStatsChartData),
+    [combinedStatsChartData]
+  )
   const invocationChartData = useMemo(() => getInvocationChartData(chartData), [chartData])
   const { totalInvocationCount, totalWarningCount, totalErrorCount } = useMemo(
     () => getInvocationTotals(invocationChartData),
