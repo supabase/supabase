@@ -10,9 +10,25 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { noop } from 'lodash'
-import { Check, Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
+import {
+  Binary,
+  Braces,
+  CalendarClock,
+  Database,
+  Edit,
+  Fingerprint,
+  Hash,
+  List,
+  MoreVertical,
+  Plus,
+  Search,
+  ToggleRight,
+  Trash,
+  Type,
+} from 'lucide-react'
 import { useState } from 'react'
 import {
+  Badge,
   Button,
   Card,
   DropdownMenu,
@@ -34,6 +50,50 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+
+const getColumnTypeAffordance = (column: PostgresColumn) => {
+  const value = `${column.format} ${column.data_type}`.toLowerCase()
+
+  if (value.includes('uuid')) return { icon: Fingerprint, label: 'UUID' }
+  if (value.includes('json')) return { icon: Braces, label: 'JSON' }
+  if (value.includes('bool')) return { icon: ToggleRight, label: 'Boolean' }
+  if (
+    value.includes('timestamp') ||
+    value.includes('timestamptz') ||
+    value.includes('date') ||
+    value.includes('time') ||
+    value.includes('interval')
+  ) {
+    return { icon: CalendarClock, label: 'Date / time' }
+  }
+  if (
+    value.includes('int') ||
+    value.includes('numeric') ||
+    value.includes('decimal') ||
+    value.includes('float') ||
+    value.includes('double') ||
+    value.includes('real') ||
+    value.includes('serial')
+  ) {
+    return { icon: Hash, label: 'Numeric' }
+  }
+  if (value.includes('array') || column.format.endsWith('[]') || value.includes('enum')) {
+    return { icon: List, label: 'List / enum' }
+  }
+  if (value.includes('bytea') || value.includes('binary')) {
+    return { icon: Binary, label: 'Binary' }
+  }
+  if (
+    value.includes('char') ||
+    value.includes('text') ||
+    value.includes('varchar') ||
+    value.includes('citext')
+  ) {
+    return { icon: Type, label: 'Text' }
+  }
+
+  return { icon: Database, label: 'Other' }
+}
 
 interface ColumnListProps {
   onAddColumn: () => void
@@ -64,6 +124,27 @@ export const ColumnList = ({
 
   const [filterString, setFilterString] = useState<string>('')
   const isTableEntity = isTableLike(selectedTable)
+  const primaryKeyColumns = new Set(
+    isTableEntity ? selectedTable.primary_keys.map((primaryKey) => primaryKey.name) : []
+  )
+  const foreignKeyColumns = new Set(
+    isTableEntity
+      ? selectedTable.relationships
+          .filter(
+            (relationship) =>
+              relationship.source_schema === selectedTable.schema &&
+              relationship.source_table_name === selectedTable.name
+          )
+          .map((relationship) => relationship.source_column_name)
+      : []
+  )
+  const uniqueIndexColumns = new Set(
+    isTableEntity
+      ? (selectedTable.unique_indexes ?? [])
+          .filter((uniqueIndex) => uniqueIndex.columns.length === 1)
+          .flatMap((uniqueIndex) => uniqueIndex.columns)
+      : []
+  )
 
   const columns =
     (filterString.length === 0
@@ -122,21 +203,15 @@ export const ColumnList = ({
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="!px-0" />
                 <TableHead className={columns.length === 0 ? 'text-foreground-muted' : undefined}>
                   Name
                 </TableHead>
                 <TableHead className={columns.length === 0 ? 'text-foreground-muted' : undefined}>
-                  Data Type
+                  Type
                 </TableHead>
                 <TableHead className={columns.length === 0 ? 'text-foreground-muted' : undefined}>
-                  Format
-                </TableHead>
-                <TableHead
-                  className={
-                    columns.length === 0 ? 'text-right text-foreground-muted' : 'text-right'
-                  }
-                >
-                  Nullable
+                  Constraints
                 </TableHead>
                 <TableHead />
               </TableRow>
@@ -178,85 +253,110 @@ export const ColumnList = ({
 
               {isSuccess &&
                 columns.length > 0 &&
-                columns.map((column) => (
-                  <TableRow key={column.name}>
-                    <TableCell>
-                      <div className="flex min-w-0 flex-col">
-                        <p>{column.name}</p>
-                        {column.comment !== null ? (
-                          <span
-                            className="max-w-md truncate text-foreground-lighter"
-                            title={column.comment}
-                          >
-                            {column.comment}
-                          </span>
-                        ) : null}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <code className="text-code-inline">{column.data_type}</code>
-                    </TableCell>
-                    <TableCell>
-                      <code className="text-code-inline">{column.format}</code>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {column.is_nullable ? (
-                        <div className="flex justify-end">
-                          <Check size={16} strokeWidth={2} className="text-brand" />
+                columns.map((column) => {
+                  const { icon: TypeIcon, label: typeLabel } = getColumnTypeAffordance(column)
+
+                  return (
+                    <TableRow key={column.name}>
+                      <TableCell className="!pl-5 !pr-1">
+                        <Tooltip>
+                          <TooltipTrigger className="cursor-default">
+                            <TypeIcon
+                              aria-label={typeLabel}
+                              size={14}
+                              strokeWidth={1.75}
+                              className="text-foreground-light"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <div className="flex flex-col">
+                              <span>{column.data_type}</span>
+                              {column.format !== column.data_type && (
+                                <span className="text-xs text-foreground-light">
+                                  {column.format}
+                                </span>
+                              )}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex min-w-0 flex-col">
+                          <p>{column.name}</p>
+                          {column.comment !== null ? (
+                            <span
+                              className="max-w-md truncate text-foreground-lighter"
+                              title={column.comment}
+                            >
+                              {column.comment}
+                            </span>
+                          ) : null}
                         </div>
-                      ) : (
-                        <div className="flex justify-end">
-                          <X size={16} strokeWidth={2} className="text-foreground-lighter" />
+                      </TableCell>
+                      <TableCell>
+                        <code className="text-code-inline">{column.format}</code>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {primaryKeyColumns.has(column.name) && <Badge>PK</Badge>}
+                          {foreignKeyColumns.has(column.name) && <Badge>FK</Badge>}
+                          {(column.is_unique || uniqueIndexColumns.has(column.name)) && (
+                            <Badge>UQ</Badge>
+                          )}
+                          {column.is_identity && <Badge>ID</Badge>}
+                          <Badge variant="secondary">
+                            {column.is_nullable ? 'NULL' : 'NOT NULL'}
+                          </Badge>
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {!isSchemaLocked && isTableEntity && (
-                        <div className="flex justify-end gap-2">
-                          <ButtonTooltip
-                            type="default"
-                            disabled={!canUpdateColumns}
-                            onClick={() => onEditColumn(column)}
-                            tooltip={{
-                              content: {
-                                side: 'bottom',
-                                text: !canUpdateColumns
-                                  ? 'Additional permissions required to edit column'
-                                  : undefined,
-                              },
-                            }}
-                          >
-                            Edit
-                          </ButtonTooltip>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side="bottom" align="end" className="w-32">
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <DropdownMenuItem
-                                    disabled={!canUpdateColumns || isSchemaLocked}
-                                    onClick={() => onDeleteColumn(column)}
-                                    className="space-x-2"
-                                  >
-                                    <Trash size={12} />
-                                    <p>Delete column</p>
-                                  </DropdownMenuItem>
-                                </TooltipTrigger>
-                                {!canUpdateColumns && (
-                                  <TooltipContent side="bottom">
-                                    Additional permissions required to delete column
-                                  </TooltipContent>
-                                )}
-                              </Tooltip>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!isSchemaLocked && isTableEntity && (
+                          <div className="flex justify-end gap-2">
+                            <ButtonTooltip
+                              type="default"
+                              disabled={!canUpdateColumns}
+                              onClick={() => onEditColumn(column)}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text: !canUpdateColumns
+                                    ? 'Additional permissions required to edit column'
+                                    : undefined,
+                                },
+                              }}
+                            >
+                              Edit
+                            </ButtonTooltip>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button type="default" className="px-1" icon={<MoreVertical />} />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent side="bottom" align="end" className="w-32">
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <DropdownMenuItem
+                                      disabled={!canUpdateColumns || isSchemaLocked}
+                                      onClick={() => onDeleteColumn(column)}
+                                      className="space-x-2"
+                                    >
+                                      <Trash size={12} />
+                                      <p>Delete column</p>
+                                    </DropdownMenuItem>
+                                  </TooltipTrigger>
+                                  {!canUpdateColumns && (
+                                    <TooltipContent side="bottom">
+                                      Additional permissions required to delete column
+                                    </TooltipContent>
+                                  )}
+                                </Tooltip>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
             </TableBody>
             {isSuccess && (
               <TableFooter className="font-normal">
