@@ -60,7 +60,7 @@ Populate these variables with your project's URL and publishable key from the Su
 
 ### 5. Run the application
 
-Run the application: `ionic serve` and the browser will open to `https://localhost:8100/` and you are ready to go 🚀.
+Run the application: `ionic serve` and the browser will open to `http://localhost:8100/` and you are ready to go 🚀.
 
 ## Supabase details
 
