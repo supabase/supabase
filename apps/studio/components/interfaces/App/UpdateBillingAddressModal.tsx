@@ -5,7 +5,7 @@ import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,
 } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
-import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import { resolveStoredTaxId } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
 import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
@@ -40,35 +40,50 @@ export function UpdateBillingAddressModal() {
   const { data: org } = useSelectedOrganizationQuery()
   const slug = org?.slug
 
-  const { can: canBillingWrite, isSuccess: permissionsLoaded } = useAsyncCheckPermissions(
+  const { can: canBillingRead, isSuccess: billingReadLoaded } = useAsyncCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.customer'
+  )
+  const { can: canBillingWrite, isSuccess: billingWriteLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.customer'
   )
 
+  const permissionsLoaded = billingReadLoaded && billingWriteLoaded
+  const canViewModal = canBillingRead || canBillingWrite
+  const canManageBillingAddress = canBillingWrite
+
   const shouldShow = Boolean(
     IS_PLATFORM &&
-      showMissingAddressModal &&
-      org &&
-      org.plan.id !== 'free' &&
-      org.organization_missing_address &&
-      !org.billing_partner &&
-      permissionsLoaded &&
-      canBillingWrite
+    showMissingAddressModal &&
+    org &&
+    org.plan.id !== 'free' &&
+    org.organization_missing_address &&
+    !org.billing_partner &&
+    permissionsLoaded &&
+    canViewModal
   )
 
   const {
     data: customerProfile,
     isSuccess: profileLoaded,
     isError: profileError,
-  } = useOrganizationCustomerProfileQuery({ slug }, { enabled: shouldShow && !dismissed && !!slug })
+  } = useOrganizationCustomerProfileQuery(
+    { slug },
+    { enabled: shouldShow && !dismissed && !!slug && canManageBillingAddress }
+  )
 
   const {
     data: taxId,
     isSuccess: taxIdLoaded,
     isError: taxIdError,
-  } = useOrganizationTaxIdQuery({ slug }, { enabled: shouldShow && !dismissed && !!slug })
+  } = useOrganizationTaxIdQuery(
+    { slug },
+    { enabled: shouldShow && !dismissed && !!slug && canManageBillingAddress }
+  )
 
-  const open = shouldShow && !dismissed && !profileError && !taxIdError
+  const open =
+    shouldShow && !dismissed && (!canManageBillingAddress || (!profileError && !taxIdError))
 
   const initialCustomerData = useMemo<Partial<BillingCustomerDataFormValues>>(
     () => ({
@@ -82,9 +97,8 @@ export function UpdateBillingAddressModal() {
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,
       tax_id_name: taxId
-        ? TAX_IDS.find(
-            (option) => option.type === taxId.type && option.countryIso2 === taxId.country
-          )?.name || ''
+        ? (resolveStoredTaxId(taxId.type, taxId.country, customerProfile?.address?.country)?.name ??
+          '')
         : '',
     }),
     [customerProfile, taxId]
@@ -129,44 +143,56 @@ export function UpdateBillingAddressModal() {
     >
       <DialogContent
         size="medium"
+        hideClose={canManageBillingAddress}
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle>Billing address required</DialogTitle>
           <DialogDescription>
-            Please provide a billing address for your organization. If you are a registered business
-            and have a Tax ID, please add your Tax ID too.
+            {canManageBillingAddress ? (
+              'Please provide a billing address for your organization. If you are a registered business and have a Tax ID, please add your Tax ID too.'
+            ) : (
+              <>
+                Your organization requires a billing address. If you are a registered business, a
+                Tax ID is also required.
+                <br />
+                <br />
+                Please ask an organization administrator or owner to update it as soon as possible
+                to avoid service restrictions.
+              </>
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        {!profileLoaded || !taxIdLoaded ? (
-          <DialogSection>
-            <div className="space-y-2">
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          </DialogSection>
-        ) : (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <DialogSection className="max-h-[60vh] overflow-y-auto">
-                <BillingCustomerDataForm form={form} />
-              </DialogSection>
-              <DialogFooter>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isSubmitting}
-                  disabled={!isDirty || isSubmitting}
-                >
-                  Save address
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        )}
+        {canManageBillingAddress &&
+          (!profileLoaded || !taxIdLoaded ? (
+            <DialogSection>
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
+            </DialogSection>
+          ) : (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)}>
+                <DialogSection className="max-h-[60vh] overflow-y-auto">
+                  <BillingCustomerDataForm form={form} />
+                </DialogSection>
+                <DialogFooter>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    disabled={!isDirty || isSubmitting}
+                  >
+                    Save address
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          ))}
       </DialogContent>
     </Dialog>
   )

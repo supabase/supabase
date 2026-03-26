@@ -36,7 +36,7 @@ export const Extensions = () => {
 
   const extensions =
     filterString.length === 0
-      ? data ?? []
+      ? (data ?? [])
       : (data ?? []).filter((ext) => {
           const nameMatchesSearch = ext.name.toLowerCase().includes(filterString.toLowerCase())
           const searchTermsMatchesSearch = (SEARCH_TERMS[ext.name] || []).some((x) =>

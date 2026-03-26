@@ -1,6 +1,8 @@
+import { getCreateMigrationsTableSQL, getInsertMigrationSQL } from '@supabase/pg-meta'
 import { fetchHandler } from 'data/fetchers'
 import type { Integration } from 'data/integrations/integrations.types'
 import { ResponseError, type SupaResponse } from 'types'
+
 import { isResponseOk } from './api/apiWrapper'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
@@ -76,13 +78,10 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   const migrations = migrationFileResponses.filter((response) => isResponseOk(response)).join(';')
   const seed = isResponseOk(seedFileResponse) ? seedFileResponse : ''
 
-  const migrationsTableSql = /* SQL */ `
-    create schema if not exists supabase_migrations;
-    create table if not exists supabase_migrations.schema_migrations (
-      version text not null primary key,
-      statements text[],
-      name text
-    );
+  const createMigrationsTableSql = getCreateMigrationsTableSQL()
+
+  const migrationsTableSql = `
+    ${createMigrationsTableSql}
     ${sortedFiles
       .map((file, i) => {
         const migration = migrationFileResponses[i]
@@ -95,12 +94,7 @@ export async function getInitialMigrationSQLFromGitHubRepo(
             .map((statement) => statement.trim())
             .filter(Boolean)
         )
-
-        return /* SQL */ `
-        insert into supabase_migrations.schema_migrations (version, statements, name)
-        select '${version}', array_agg(jsonb_statements)::text[], '${file.name}'
-        from jsonb_array_elements_text($statements$${statements}$statements$::jsonb) as jsonb_statements;
-      `
+        return getInsertMigrationSQL({ name: file.name, version, statements })
       })
       .join('')}
   `

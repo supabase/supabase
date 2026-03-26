@@ -1,8 +1,9 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from './SidePanelEditor.types'
+import { createTable } from './SidePanelEditor.utils'
 
 // Define mock functions at module level
 const mockExecuteSql = vi.fn()
@@ -50,9 +51,6 @@ vi.mock('sonner', () => ({
 vi.mock('components/ui/SparkBar', () => ({
   default: () => null,
 }))
-
-// Import after mocks are set up
-import { createTable } from './SidePanelEditor.utils'
 
 // Helper to create a column field with defaults
 const createColumnField = (overrides: Partial<ColumnField> = {}): ColumnField => ({
@@ -306,7 +304,7 @@ describe('createTable', () => {
     const sqlCall = mockExecuteSql.mock.calls[0][0]
     expect(sqlCall.sql).toContain('ADD FOREIGN KEY')
     expect(sqlCall.sql).toContain('REFERENCES')
-    expect(sqlCall.sql).toContain('"users"')
+    expect(sqlCall.sql).toContain('users')
     expect(sqlCall.sql).toContain('ON DELETE CASCADE')
   })
 

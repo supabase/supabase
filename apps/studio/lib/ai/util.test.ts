@@ -1,5 +1,46 @@
 import { describe, it, expect } from 'vitest'
-import { selectWeightedKey } from './util'
+import { fixSqlBackslashEscapes, selectWeightedKey } from './util'
+
+describe('fixSqlBackslashEscapes', () => {
+  it('converts backslash-apostrophe to double-apostrophe', () => {
+    expect(fixSqlBackslashEscapes("INSERT INTO t (c) VALUES ('We\\'ll be in touch')")).toBe(
+      "INSERT INTO t (c) VALUES ('We''ll be in touch')"
+    )
+  })
+
+  it('handles multiple backslash-apostrophes in one string', () => {
+    expect(fixSqlBackslashEscapes("VALUES ('Don\\'t stop, it\\'s fine')")).toBe(
+      "VALUES ('Don''t stop, it''s fine')"
+    )
+  })
+
+  it('handles multiple string literals in one query', () => {
+    expect(fixSqlBackslashEscapes("INSERT INTO t (a, b) VALUES ('We\\'ll', 'It\\'s ready')")).toBe(
+      "INSERT INTO t (a, b) VALUES ('We''ll', 'It''s ready')"
+    )
+  })
+
+  it('leaves already-correct double apostrophes unchanged', () => {
+    const sql = "INSERT INTO t (c) VALUES ('We''ll be in touch')"
+    expect(fixSqlBackslashEscapes(sql)).toBe(sql)
+  })
+
+  it('leaves SQL with no apostrophes unchanged', () => {
+    const sql = 'SELECT 1 + 1'
+    expect(fixSqlBackslashEscapes(sql)).toBe(sql)
+  })
+
+  it('leaves backslash-apostrophe inside dollar-quoted strings unchanged', () => {
+    const sql = "SELECT $$We\\'ll do it$$ AS greeting"
+    expect(fixSqlBackslashEscapes(sql)).toBe(sql)
+  })
+
+  it('fixes regular strings but leaves dollar-quoted strings unchanged', () => {
+    expect(
+      fixSqlBackslashEscapes("INSERT INTO t (a, b) VALUES ('We\\'ll', $$Don\\'t escape$$)")
+    ).toBe("INSERT INTO t (a, b) VALUES ('We''ll', $$Don\\'t escape$$)")
+  })
+})
 
 describe('selectWeightedKey', () => {
   it('should return a valid key from the weights object', async () => {

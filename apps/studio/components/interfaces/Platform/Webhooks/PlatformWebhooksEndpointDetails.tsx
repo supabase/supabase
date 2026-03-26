@@ -3,17 +3,17 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  useReactTable,
   type ColumnDef,
   type PaginationState,
   type SortingState,
-  useReactTable,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
-
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
@@ -29,6 +29,7 @@ import {
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 
@@ -51,9 +52,11 @@ interface PlatformWebhooksEndpointDetailsProps {
   selectedEndpoint: WebhookEndpoint
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
+  onRetryDelivery: (deliveryId: string) => void
 }
 
 const DELIVERIES_PAGE_SIZE = 5
+const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 
 const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
@@ -92,6 +95,37 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Attempted" />,
     cell: ({ row }) => <TimestampInfo className="text-sm" utcTimestamp={row.original.attemptAt} />,
   },
+  {
+    id: DELIVERY_ACTIONS_COLUMN_ID,
+    enableSorting: false,
+    header: () => <span className="sr-only">Actions</span>,
+    cell: ({ row, table }) => {
+      const { onRetryDelivery } = table.options.meta as {
+        onRetryDelivery: (deliveryId: string) => void
+      }
+
+      return (
+        <div className="flex h-full items-center justify-end">
+          {row.original.status !== 'success' ? (
+            <ButtonTooltip
+              type="default"
+              className="w-7 shrink-0 hit-area-2"
+              icon={<RotateCcw size={14} />}
+              aria-label={`Retry ${row.original.id}`}
+              tooltip={{ content: { side: 'top', text: 'Retry' } }}
+              onClick={(event) => {
+                event.stopPropagation()
+                onRetryDelivery(row.original.id)
+              }}
+              onKeyDown={(event) => event.stopPropagation()}
+            />
+          ) : (
+            <span aria-hidden className="size-7 shrink-0" />
+          )}
+        </div>
+      )
+    },
+  },
 ]
 
 export const PlatformWebhooksEndpointDetails = ({
@@ -100,8 +134,11 @@ export const PlatformWebhooksEndpointDetails = ({
   selectedEndpoint,
   onDeliverySearchChange,
   onOpenDelivery,
+  onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
+  const hasName = selectedEndpoint.name.trim().length > 0
+  const hasDescription = selectedEndpoint.description.trim().length > 0
   const [sorting, setSorting] = useState<SortingState>([{ id: 'attemptAt', desc: true }])
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -112,6 +149,7 @@ export const PlatformWebhooksEndpointDetails = ({
     data: filteredDeliveries,
     columns: DELIVERY_COLUMNS,
     state: { pagination, sorting },
+    meta: { onRetryDelivery },
     getRowId: (row) => row.id,
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -140,11 +178,15 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
+              {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
+
               <DetailItem label="URL" ddClassName="text-sm break-all">
                 {selectedEndpoint.url}
               </DetailItem>
 
-              <DetailItem label="Description">{selectedEndpoint.description || '-'}</DetailItem>
+              {hasDescription && (
+                <DetailItem label="Description">{selectedEndpoint.description}</DetailItem>
+              )}
 
               <DetailItem label="Event types" ddClassName="flex flex-wrap gap-2">
                 {(selectedEndpoint.eventTypes.includes('*')
@@ -169,7 +211,7 @@ export const PlatformWebhooksEndpointDetails = ({
                         className="px-2 py-2 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
                       >
                         <code className="text-code_block-4">{header.key}:</code>
-                        <code className="">{header.value}</code>
+                        <code>{header.value}</code>
                       </div>
                     ))}
                   </div>
@@ -205,7 +247,10 @@ export const PlatformWebhooksEndpointDetails = ({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={header.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -230,7 +275,12 @@ export const PlatformWebhooksEndpointDetails = ({
                     tabIndex={0}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        className={
+                          cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
+                        }
+                      >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -238,7 +288,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 ))
               ) : (
                 <TableRow className="[&>td]:hover:bg-inherit">
-                  <TableCell colSpan={4}>
+                  <TableCell colSpan={DELIVERY_COLUMNS.length}>
                     <p className="text-sm text-foreground">No deliveries found</p>
                     <p className="text-sm text-foreground-lighter">
                       Try adjusting your search to see more webhook attempts.

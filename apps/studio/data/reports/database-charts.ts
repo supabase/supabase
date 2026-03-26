@@ -1,4 +1,4 @@
-import { compactNumberFormatter, numberFormatter } from 'components/ui/Charts/Charts.utils'
+import { compactNumberFormatter } from 'components/ui/Charts/Charts.utils'
 import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
 import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
@@ -76,13 +76,12 @@ export const getReportAttributesV2: (
       showLegend: true,
       showMaxValue: false,
       showGrid: true,
+      normalizeVisibleStackToPercent: true,
       YAxisProps: {
-        width: 45,
-        tickFormatter: (value: any) => {
-          // avoid displaying 100.00%
-          if (value === 100) return '100%'
-          return `${numberFormatter(value, 2)}%`
-        },
+        width: 55,
+        domain: [0, 100] as [number, number],
+        allowDataOverflow: true,
+        tickFormatter: (v: number) => `${Math.round(v)}%`,
       },
       hideChartType: false,
       defaultChartStyle: 'bar',
@@ -92,6 +91,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'System',
           format: '%',
+          color: { light: '#EDC35E', dark: '#EDD35E' },
+          fill: { light: '#F6D99F', dark: '#5C5230' },
           tooltip:
             'CPU time spent on kernel operations (e.g., process scheduling, memory management). High values may indicate system overhead',
         },
@@ -100,6 +101,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'User',
           format: '%',
+          color: { light: '#0063E8', dark: '#65BCD9' },
+          fill: { light: '#80B1F4', dark: '#2A3D45' },
           tooltip:
             'CPU time used by database queries and user-space processes. High values may suggest CPU-intensive queries',
         },
@@ -108,6 +111,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IOwait',
           format: '%',
+          color: { light: '#DB3A34', dark: '#FF6B6B' },
+          fill: { light: '#F2A7A3', dark: '#5C2A2A' },
           tooltip:
             'CPU time waiting for disk or network I/O. High values may indicate disk bottlenecks',
         },
@@ -116,6 +121,8 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'IRQs',
           format: '%',
+          color: { light: '#DA760B', dark: '#DA760B' },
+          fill: { light: '#FFB885', dark: '#5C3D0A' },
           tooltip: 'CPU time handling hardware interrupt requests (IRQ)',
         },
         {
@@ -123,8 +130,20 @@ export const getReportAttributesV2: (
           provider: 'infra-monitoring',
           label: 'Other',
           format: '%',
+          color: { light: '#B616A6', dark: '#DB8DF9' },
+          fill: { light: '#DB8BD3', dark: '#4A3D5C' },
           tooltip:
             'CPU time spent on other tasks (e.g., background processes, software interrupts)',
+        },
+        {
+          attribute: 'cpu_usage_busy_idle',
+          provider: 'infra-monitoring',
+          label: 'Idle',
+          format: '%',
+          omitFromTotal: true,
+          color: { light: '#6EA85F', dark: '#A3FFC2' },
+          fill: { light: '#A6D8AE', dark: '#2A5C3F' },
+          tooltip: 'CPU time spent idle and available for new work',
         },
         {
           attribute: 'cpu_usage_max',

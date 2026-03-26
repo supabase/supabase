@@ -57,9 +57,9 @@ export const BranchDropdown = ({
     branches && branches.length > 0
       ? mainBranch
         ? [mainBranch].concat(restOfBranches ?? [])
-        : restOfBranches ?? []
+        : (restOfBranches ?? [])
       : [defaultMainBranch]
-  const branchList = isBranchingEnabled ? sortedBranches ?? [] : [defaultMainBranch]
+  const branchList = isBranchingEnabled ? (sortedBranches ?? []) : [defaultMainBranch]
 
   const commandContent = (
     <BranchDropdownCommandContent

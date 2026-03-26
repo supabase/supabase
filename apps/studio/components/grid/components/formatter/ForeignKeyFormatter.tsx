@@ -78,6 +78,7 @@ export const ForeignKeyFormatter = (props: Props) => {
                 <ButtonTooltip
                   type="default"
                   className="w-6 h-6"
+                  aria-label="View referencing record"
                   icon={<ArrowRight />}
                   onClick={(e) => e.stopPropagation()}
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
@@ -88,6 +89,9 @@ export const ForeignKeyFormatter = (props: Props) => {
                 className="p-0 w-96"
                 onDoubleClick={(e) => {
                   e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onContextMenu={(e) => {
                   e.stopPropagation()
                 }}
               >

@@ -10,6 +10,15 @@ vi.mock('components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () 
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
 }))
 
+vi.mock('components/ui/ButtonTooltip', () => ({
+  ButtonTooltip: ({ icon, children, ...props }: any) => (
+    <button type="button" {...props}>
+      {icon}
+      {children}
+    </button>
+  ),
+}))
+
 vi.mock('ui-patterns', async () => {
   const actual = await vi.importActual<typeof import('ui-patterns')>('ui-patterns')
 
@@ -37,6 +46,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
         selectedEndpoint={selectedEndpoint}
         onDeliverySearchChange={vi.fn()}
         onOpenDelivery={vi.fn()}
+        onRetryDelivery={vi.fn()}
         {...props}
       />
     )
@@ -91,11 +101,25 @@ describe('PlatformWebhooksEndpointDetails', () => {
         selectedEndpoint={selectedEndpoint}
         onDeliverySearchChange={vi.fn()}
         onOpenDelivery={vi.fn()}
+        onRetryDelivery={vi.fn()}
       />
     )
 
     await waitFor(() => {
       expect(screen.getByText('Showing 1 to 5 of 8 deliveries')).toBeInTheDocument()
     })
+  })
+
+  it('retries a failed delivery without opening the delivery row', async () => {
+    const user = userEvent.setup()
+    const onOpenDelivery = vi.fn()
+    const onRetryDelivery = vi.fn()
+
+    renderComponent({ onOpenDelivery, onRetryDelivery })
+
+    await user.click(screen.getByLabelText('Retry org-delivery-2'))
+
+    expect(onRetryDelivery).toHaveBeenCalledWith('org-delivery-2')
+    expect(onOpenDelivery).not.toHaveBeenCalled()
   })
 })

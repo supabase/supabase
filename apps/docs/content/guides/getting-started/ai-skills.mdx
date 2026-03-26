@@ -1,0 +1,48 @@
+---
+title: Agent Skills
+---
+
+Agent Skills are folders of instructions, scripts, and resources that agents can discover and use to do things more accurately and efficiently. Agents are increasingly capable, but often don't have the context they need to do real work reliably. Skills solve this by giving agents access to procedural knowledge and company-, team-, and user-specific context they can load on demand. Agents with access to a set of skills can extend their capabilities based on the task they're working on.
+
+## Installing skills
+
+Install all Supabase skills using the skills CLI:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+To install a specific skill from the repository:
+
+```bash
+npx skills add supabase/agent-skills --skill SKILL_NAME
+```
+
+### Claude Code plugin
+
+You can also install the skills as Claude Code plugins:
+
+```bash
+/plugin marketplace add supabase/agent-skills
+/plugin install postgres-best-practices@supabase-agent-skills
+```
+
+Skills work with 18+ AI agents including Claude Code, GitHub Copilot, Cursor, Cline, and many others.
+
+## Available skills
+
+<AiSkillsIndex />
+
+## Finding more skills
+
+Browse the [skills.sh directory](https://skills.sh) to discover skills from the community. You can also search for skills using the CLI:
+
+```bash
+npx skills find QUERY
+```
+
+## Learn more
+
+- [Agent Skills Repository](https://github.com/supabase/agent-skills)
+- [Agent Skills Documentation](https://agentskills.io/home)
+- [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
