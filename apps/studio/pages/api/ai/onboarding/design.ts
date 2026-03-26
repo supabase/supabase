@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import apiWrapper from 'lib/api/apiWrapper'
 
 export const maxDuration = 60
@@ -64,9 +65,9 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { model, error: modelError } = await getModel({
+  const { modelParams, error: modelError } = await getModel({
     provider: 'openai',
-    routingKey: 'onboarding',
+    modelEntry: DEFAULT_COMPLETION_MODEL,
   })
 
   if (modelError) {
@@ -76,7 +77,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body
 
   const result = streamText({
-    model,
+    ...modelParams,
     system: source`
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
       

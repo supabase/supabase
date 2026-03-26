@@ -30,7 +30,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
       {
         id: '1a4e8c73-5b29-44af-8c62-9f1d2b3c4d5e',
         name: 'Slack notifications',
-        url: 'https://hooks.slack.com/services/T000/B000/ORG',
+        url: 'https://hooks.slack.com/services/abc1234/def5678/ghi9012',
         description: 'Operational alerts for organization-level events',
         enabled: false,
         eventTypes: ['organization.updated'],

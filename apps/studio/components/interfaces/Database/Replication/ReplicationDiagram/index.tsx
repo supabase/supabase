@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo } from 'react'
-import ReactFlow, { Background, ReactFlowProvider, useReactFlow } from 'reactflow'
+import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 
 import { getStatusName } from '../Pipeline.utils'
 import { PrimaryDatabaseNode, ReadReplicaNode, ReplicationNode } from './Nodes'
@@ -14,7 +14,10 @@ import { ReplicationPipelineStatusResponse } from '@/data/replication/pipeline-s
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { timeout } from '@/lib/helpers'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
+
+import { SmoothstepEdge } from './Edges'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 
 export const ReplicationDiagram = () => {
   return (
@@ -30,6 +33,8 @@ const nodeTypes = {
   readReplica: ReadReplicaNode,
 }
 
+const edgeTypes = { smoothstep: SmoothstepEdge }
+
 const ReplicationDiagramContent = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
@@ -39,7 +44,10 @@ const ReplicationDiagramContent = () => {
   const { data: databases = [], isSuccess: isSuccessReplicas } = useReadReplicasQuery({
     projectRef,
   })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  const readReplicas = useMemo(
+    () => databases.filter((x) => x.identifier !== projectRef),
+    [databases, projectRef]
+  )
 
   const { data, isSuccess: isSuccessDestinations } = useReplicationDestinationsQuery({
     projectRef,
@@ -82,6 +90,20 @@ const ReplicationDiagramContent = () => {
             opacity: isReplicating ? 1 : 0.4,
             strokeDasharray: isReplicating ? undefined : '5 5',
           },
+          data: {
+            type: 'replica',
+            identifier: x.identifier,
+            shiftEdgeEnd: readReplicas.length + destinations.length > 1,
+            isReplicating,
+            isComingUp: [
+              REPLICA_STATUS.COMING_UP,
+              REPLICA_STATUS.INIT_READ_REPLICA,
+              REPLICA_STATUS.UNKNOWN,
+            ].includes(x.status),
+            isFailed: [REPLICA_STATUS.ACTIVE_UNHEALTHY, REPLICA_STATUS.INIT_FAILED].includes(
+              x.status
+            ),
+          },
         }
       }),
       ...destinations.map((x) => {
@@ -103,6 +125,14 @@ const ReplicationDiagramContent = () => {
             opacity: isReplicating ? 1 : 0.4,
             strokeDasharray: isReplicating ? undefined : '5 5',
           },
+          data: {
+            type: 'etl',
+            identifier: x.id,
+            shiftEdgeEnd: readReplicas.length + destinations.length > 1,
+            isReplicating,
+            isComingUp: ['starting'].includes(statusName ?? ''),
+            isFailed: ['failed'].includes(statusName ?? ''),
+          },
         }
       }),
     ]
@@ -122,12 +152,16 @@ const ReplicationDiagramContent = () => {
   }
 
   useEffect(() => {
-    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) setReactFlow()
+    if (nodes.length > 0 && isSuccessDestinations && isSuccessReplicas) {
+      setReactFlow()
+    }
   }, [nodes, isSuccessDestinations, isSuccessReplicas])
 
   return (
     <div className="nowheel relative min-h-[350px]">
       <ReactFlow
+        // FIXME: https://github.com/xyflow/xyflow/issues/4876
+        colorMode={'' as unknown as ColorMode}
         fitView
         fitViewOptions={{ minZoom: 0.8, maxZoom: 0.9 }}
         className="bg"
@@ -137,10 +171,11 @@ const ReplicationDiagramContent = () => {
         nodesConnectable={false}
         zoomOnDoubleClick={false}
         edgesFocusable={false}
-        edgesUpdatable={false}
+        edgesReconnectable={false}
         defaultNodes={[]}
         defaultEdges={[]}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         proOptions={{ hideAttribution: true }}
       >
         <Background color={backgroundPatternColor} />

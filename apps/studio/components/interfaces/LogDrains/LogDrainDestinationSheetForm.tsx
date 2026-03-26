@@ -135,6 +135,7 @@ const formUnion = z.discriminatedUnion('type', [
     gzip: z.boolean().optional().default(true),
     headers: z.record(z.string(), z.string()).optional(),
   }),
+  z.object({ type: z.literal('syslog') }),
 ])
 
 const formSchema = z
@@ -316,9 +317,7 @@ export function LogDrainDestinationSheetForm({
                 }
 
                 form.handleSubmit(onSubmit)(e)
-                track('log_drain_save_button_clicked', {
-                  destination: form.getValues('type'),
-                })
+                track('log_drain_save_button_clicked', { destination: form.getValues('type') })
               }}
             >
               <div className="space-y-8 px-content">

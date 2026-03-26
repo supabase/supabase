@@ -607,6 +607,14 @@
     "author_image_url": "https://github.com/saxonf.png"
   },
   {
+    "author_id": "sara_read",
+    "author": "Sara Read",
+    "username": "supa-sara",
+    "position": "Incident Manager",
+    "author_url": "https://github.com/supa-sara",
+    "author_image_url": "https://github.com/supa-sara.png"
+  },
+  {
     "author_id": "gregpapas",
     "author": "Greg Papas",
     "username": "gregpapas",
@@ -849,6 +857,14 @@
     "position": "Head of Databases",
     "author_url": "https://github.com/deepthi",
     "author_image_url": "https://github.com/deepthi.png"
+  },
+  {
+    "author_id": "joe_sciarrino",
+    "author": "Joe Sciarrino",
+    "username": "jhydra12",
+    "position": "Head of Product, Supabase Warehouse",
+    "author_url": "https://github.com/jhydra12",
+    "author_image_url": "https://github.com/jhydra12.png"
   },
   {
     "author_id": "manan_gupta",

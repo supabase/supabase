@@ -1,36 +1,37 @@
-import { isEmpty, noop, partition } from 'lodash'
-import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
-import { useState } from 'react'
-import {
-  DragDropContext,
-  Draggable,
-  DraggableProvided,
-  Droppable,
-  DroppableProvided,
-} from 'react-beautiful-dnd'
-
 import { useParams } from 'common'
 import InformationBox from 'components/ui/InformationBox'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from 'lib/constants'
+import { isEmpty, noop, partition } from 'lodash'
+import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
+import { useState } from 'react'
 import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  type DraggableProvided,
+  type DroppableProvided,
+  type DropResult,
+} from 'react-beautiful-dnd'
+import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   WarningIcon,
 } from 'ui'
+
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
-import Column from './Column'
+import { Column } from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
 
 interface ColumnManagementProps {
@@ -46,7 +47,7 @@ interface ColumnManagementProps {
   onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
-const ColumnManagement = ({
+export const ColumnManagement = ({
   table,
   columns = [],
   relations,
@@ -114,7 +115,7 @@ const ColumnManagement = ({
     onColumnsUpdated(updatedColumns)
   }
 
-  const onSortColumns = (result: any, type: 'pks' | 'others') => {
+  const onSortColumns = (result: DropResult, type: 'pks' | 'others') => {
     // Dropped outside of the list
     if (!result.destination) {
       return
@@ -258,7 +259,7 @@ const ColumnManagement = ({
           </div>
 
           {primaryKeyColumns.length > 0 && (
-            <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'pks')}>
+            <DragDropContext onDragEnd={(result) => onSortColumns(result, 'pks')}>
               <Droppable droppableId="pk_columns_droppable">
                 {(droppableProvided: DroppableProvided) => (
                   <div
@@ -303,7 +304,7 @@ const ColumnManagement = ({
             </DragDropContext>
           )}
 
-          <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'others')}>
+          <DragDropContext onDragEnd={(result) => onSortColumns(result, 'others')}>
             <Droppable droppableId="other_columns_droppable">
               {(droppableProvided: DroppableProvided) => (
                 <div
@@ -379,5 +380,3 @@ const ColumnManagement = ({
     </>
   )
 }
-
-export default ColumnManagement

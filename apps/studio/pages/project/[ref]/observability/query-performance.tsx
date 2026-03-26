@@ -3,7 +3,7 @@ import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/ho
 import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import { type QuerySource } from 'components/interfaces/QueryPerformance/QueryPerformance.types'
-import { useQueryPerformanceQuery } from 'components/interfaces/QueryPerformance/useQueryPerformanceQuery'
+import { useQueryPerformanceInfiniteQuery } from 'components/interfaces/QueryPerformance/useQueryPerformanceQuery'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
@@ -60,7 +60,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         ? totalTimeFilter.value
         : undefined
 
-  const queryPerformanceQuery = useQueryPerformanceQuery({
+  const queryPerformanceQuery = useQueryPerformanceInfiniteQuery({
     searchQuery,
     orderBy: sortConfig || undefined,
     preset: 'unified',
