@@ -266,7 +266,12 @@ export const ColumnEditor = ({
                 />
                 {errors.name && <p className="mt-2 text-destructive">{errors.name}</p>}
               </FormItemLayout>
-              <FormItemLayout isReactForm={false} id="description" label="Description" labelOptional="Optional">
+              <FormItemLayout
+                isReactForm={false}
+                id="description"
+                label="Description"
+                labelOptional="Optional"
+              >
                 <Input
                   id="description"
                   type="text"
