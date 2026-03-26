@@ -10,7 +10,6 @@ import {
 } from '@tanstack/react-table'
 import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -25,6 +24,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
@@ -58,22 +58,39 @@ interface PlatformWebhooksEndpointDetailsProps {
 const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 
+const getCurrentSort = (sorting: SortingState) => {
+  if (sorting.length === 0) return ''
+
+  const [currentSort] = sorting
+  return `${currentSort.id}:${currentSort.desc ? 'desc' : 'asc'}`
+}
+
+const getAriaSort = (
+  sorting: SortingState,
+  columnId: string
+): 'ascending' | 'descending' | 'none' => {
+  const currentSort = sorting.find((sort) => sort.id === columnId)
+
+  if (!currentSort) return 'none'
+  return currentSort.desc ? 'descending' : 'ascending'
+}
+
 const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    header: 'Status',
     cell: ({ row }) => (
       <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
     ),
   },
   {
     accessorKey: 'eventType',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Event type" />,
+    header: 'Event type',
     cell: ({ row }) => <code className="text-code-inline">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Response" />,
+    header: 'Response',
     sortingFn: (rowA, rowB, columnId) => {
       const responseA = rowA.getValue<number | undefined>(columnId) ?? -1
       const responseB = rowB.getValue<number | undefined>(columnId) ?? -1
@@ -92,7 +109,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   },
   {
     accessorKey: 'attemptAt',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Attempted" />,
+    header: 'Attempted',
     cell: ({ row }) => <TimestampInfo className="text-sm" utcTimestamp={row.original.attemptAt} />,
   },
   {
@@ -144,6 +161,23 @@ export const PlatformWebhooksEndpointDetails = ({
     pageIndex: 0,
     pageSize: DELIVERIES_PAGE_SIZE,
   })
+  const currentSort = getCurrentSort(sorting)
+
+  const handleSortChange = (columnId: string) => {
+    const currentColumnSort = sorting.find((sort) => sort.id === columnId)
+
+    if (!currentColumnSort) {
+      setSorting([{ id: columnId, desc: false }])
+      return
+    }
+
+    if (currentColumnSort.desc) {
+      setSorting([])
+      return
+    }
+
+    setSorting([{ id: columnId, desc: true }])
+  }
 
   const table = useReactTable({
     data: filteredDeliveries,
@@ -246,16 +280,30 @@ export const PlatformWebhooksEndpointDetails = ({
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className={header.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const columnId = header.column.id
+                    const canSort = header.column.getCanSort()
+
+                    return (
+                      <TableHead
+                        key={header.id}
+                        aria-sort={canSort ? getAriaSort(sorting, columnId) : undefined}
+                        className={columnId === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
+                      >
+                        {header.isPlaceholder ? null : canSort ? (
+                          <TableHeadSort
+                            column={columnId}
+                            currentSort={currentSort}
+                            onSortChange={handleSortChange}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHeadSort>
+                        ) : (
+                          flexRender(header.column.columnDef.header, header.getContext())
+                        )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
               ))}
             </TableHeader>
