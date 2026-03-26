@@ -460,7 +460,7 @@ export const GitHubIntegrationConnectionForm = ({
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Deploy to production"
-                            description="pply changes to your production database when you merge into your configured production GitHub branch"
+                            description="Apply changes to your production database when you merge into your configured production GitHub branch"
                           >
                             <FormControl>
                               <Switch
