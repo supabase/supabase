@@ -193,7 +193,7 @@ const JWTSettings = () => {
         footer={
           <div className="flex py-4 w-full">
             <FormActions
-              form="jwt-exp-form"
+              form={formId}
               isSubmitting={isUpdatingAuthConfig}
               hasChanges={isDirty}
               handleReset={reset}
@@ -263,6 +263,7 @@ const JWTSettings = () => {
                   <CardContent>
                     <FormItemLayout
                       layout="flex-row-reverse"
+                      id="JWT_SECRET"
                       label={
                         legacyKey?.status === 'revoked'
                           ? 'Revoked legacy JWT secret'
@@ -279,6 +280,7 @@ const JWTSettings = () => {
                       }
                     >
                       <Input
+                        id="JWT_SECRET"
                         copy={canReadJWTSecret && isNotUpdatingJwtSecret}
                         reveal={canReadJWTSecret && isNotUpdatingJwtSecret}
                         readOnly
@@ -302,6 +304,7 @@ const JWTSettings = () => {
                       disabled={!canUpdateConfig || isLoadingAuthConfig}
                       render={({ field }) => (
                         <FormItemLayout
+                          name="JWT_EXP"
                           layout="flex-row-reverse"
                           label="Access token expiry time"
                           description={
@@ -318,6 +321,7 @@ const JWTSettings = () => {
                             <PrePostTab postTab="seconds" className="w-full">
                               <Input_Shadcn_
                                 {...field}
+                                id="JWT_EXP"
                                 type="number"
                                 min={0}
                                 max={MAX_JWT_EXP}
