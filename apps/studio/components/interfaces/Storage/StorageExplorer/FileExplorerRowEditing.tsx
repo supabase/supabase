@@ -5,6 +5,7 @@ import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { RowIcon } from './FileExplorerRow'
+import type React from 'react'
 
 export interface FileExplorerRowEditingProps {
   item: StorageItem
@@ -25,7 +26,7 @@ export const FileExplorerRowEditing = ({
   const inputRef = useRef<any>(null)
   const [itemName, setItemName] = useState(item.name)
 
-  const onSaveItemName = async (name: string, event?: any) => {
+  const onSaveItemName = async (name: string, event?: React.SyntheticEvent) => {
     if (event) {
       event.preventDefault()
       event.stopPropagation()
