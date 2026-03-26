@@ -104,7 +104,7 @@ export function AccountPage() {
         setProfile((current) => ({
           ...current,
           avatar_url,
-        }));
+        }))
       }
     } catch (error: any) {
       showToast({ message: error.message, duration: 5000 })
@@ -122,7 +122,10 @@ export function AccountPage() {
       </IonHeader>
 
       <IonContent>
-        <Avatar url={profile.avatar_url} onUpload={(fileName) => updateProfile(undefined, fileName)}></Avatar>
+        <Avatar
+          url={profile.avatar_url}
+          onUpload={(fileName) => updateProfile(undefined, fileName)}
+        ></Avatar>
         <form onSubmit={updateProfile}>
           <IonItem>
             <IonLabel>
