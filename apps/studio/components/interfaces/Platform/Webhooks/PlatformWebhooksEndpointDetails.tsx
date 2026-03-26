@@ -127,7 +127,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             <ButtonTooltip
               type="default"
               className="w-7 shrink-0 hit-area-2"
-              icon={<RotateCcw size={14} />}
+              icon={<RotateCcw />}
               aria-label={`Retry ${row.original.id}`}
               tooltip={{ content: { side: 'top', text: 'Retry' } }}
               onClick={(event) => {
@@ -273,7 +273,6 @@ export const PlatformWebhooksEndpointDetails = ({
             className="w-full lg:w-52"
             onChange={(event) => onDeliverySearchChange(event.target.value)}
           />
-          <p className="text-sm text-foreground-muted">{filteredDeliveries.length} total</p>
         </div>
         <Card className="overflow-hidden">
           <Table>
@@ -355,6 +354,7 @@ export const PlatformWebhooksEndpointDetails = ({
               <div className="flex items-center gap-x-2" aria-label="Pagination">
                 <Button
                   icon={<ChevronLeft />}
+                  className="w-7 hit-area-2"
                   aria-label="Previous page"
                   type="default"
                   size="tiny"
@@ -363,6 +363,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 />
                 <Button
                   icon={<ChevronRight />}
+                  className="w-7 hit-area-2"
                   aria-label="Next page"
                   type="default"
                   size="tiny"
