@@ -54,10 +54,7 @@ describe('ColumnList.utils', () => {
           target_column_name: 'id',
         },
       ],
-      unique_indexes: [
-        { columns: ['reference'] },
-        { columns: ['customer_id', 'reference'] },
-      ],
+      unique_indexes: [{ columns: ['reference'] }, { columns: ['customer_id', 'reference'] }],
     } as const
 
     expect([...getPrimaryKeyColumnNames(table)]).toEqual(['id'])
