@@ -538,6 +538,7 @@ const JWTSettings = () => {
         onCancel={() => {
           setIsCreatingKey(false)
           setCustomToken('')
+          customJwtSecretForm.reset({ customToken: '' })
         }}
         loading={isSubmittingJwtSecretUpdateRequest}
         customFooter={
