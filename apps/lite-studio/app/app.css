@@ -1,18 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import './../../../packages/ui/build/css/source/global.css';
+@import './../../../packages/ui/build/css/themes/dark-combined.css';
+@import './../../../packages/ui/build/css/themes/light.css';
 
-@theme {
-  --font-sans:
-    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+@tailwind components;
+
+@font-face {
+  font-family: 'custom-font';
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+@font-face {
+  font-family: 'custom-font';
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+body {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
