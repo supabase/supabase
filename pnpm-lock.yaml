@@ -2531,9 +2531,6 @@ importers:
       react-intersection-observer:
         specifier: ^9.8.2
         version: 9.8.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-medium-image-zoom:
-        specifier: ^5.2.4
-        version: 5.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-resizable-panels:
         specifier: ^4.6.5
         version: 4.6.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2703,6 +2700,9 @@ importers:
       react-markdown:
         specifier: ^9.0.1
         version: 9.0.1(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
+      react-medium-image-zoom:
+        specifier: ^5.2.4
+        version: 5.2.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-syntax-highlighter:
         specifier: ^15.6.6
         version: 15.6.6(react@18.3.1)

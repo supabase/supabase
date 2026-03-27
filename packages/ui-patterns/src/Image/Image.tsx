@@ -7,8 +7,8 @@ import { useTheme } from 'next-themes'
 import NextImage, { type ImageProps as NextImageProps } from 'next/image'
 import { useEffect, useState } from 'react'
 import Zoom from 'react-medium-image-zoom'
+import { cn } from 'ui'
 
-import { cn } from '../../lib/utils'
 import ZoomContent from './ZoomContent'
 
 export type CaptionAlign = 'left' | 'center' | 'right'
@@ -49,7 +49,7 @@ export interface ImageProps extends Omit<NextImageProps, 'src'> {
  * - captionAlign: {'left' | 'center' | 'right'} (optional) to align the caption
  * - containerClassName: {string} (optional) to style the parent <figure> container
  */
-const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
+export const Image = ({ src, alt = '', zoomable, ...props }: ImageProps) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
   const isLessThanLgBreakpoint = useBreakpoint()
@@ -102,5 +102,3 @@ const getCaptionAlign = (align?: CaptionAlign) => {
       return 'text-center'
   }
 }
-
-export default Image
