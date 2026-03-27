@@ -17,10 +17,8 @@ import {
 
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { getModKeyLabel } from '@/lib/helpers'
 
 export const SaveQueueActionBar = () => {
-  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave, handleCancel } = useOperationQueueActions()
@@ -68,7 +66,11 @@ export const SaveQueueActionBar = () => {
                     loading={isSaving}
                   >
                     Save
-                    <span className="text-[10px] text-foreground/40 ml-1.5">{`${modKey}S`}</span>
+                    <KeyboardShortcut
+                      keys={['Meta', 's']}
+                      appearance="inline"
+                      className="ml-1.5 text-foreground/40"
+                    />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -321,11 +321,11 @@ test.describe('SQL Editor', () => {
     await page.keyboard.type(`select 'hello world';`)
     await page.getByTestId('sql-run-button').click()
 
-    // export as markdown
+    // export as Markdown
     await page.getByRole('button', { name: 'Export' }).click()
-    await page.getByRole('menuitem', { name: 'Copy as markdown' }).click()
+    await page.getByRole('menuitem', { name: 'Copy as Markdown' }).click()
     // Make sure the dropdown has closed otherwise it would make the other assertions unstable
-    await expect(page.getByRole('menuitem', { name: 'Copy as markdown' })).not.toBeVisible()
+    await expect(page.getByRole('menuitem', { name: 'Copy as Markdown' })).not.toBeVisible()
     await expectClipboardValue({
       page,
       value: `| ?column?    |

@@ -1,24 +1,25 @@
-import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from 'lib/constants'
+import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  KeyboardShortcut,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 
@@ -113,9 +114,12 @@ const UtilityActions = ({
               </DropdownMenuItem>
             </>
           )}
-          <DropdownMenuItem className="gap-x-2" onClick={prettifyQuery}>
-            <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
-            Prettify SQL
+          <DropdownMenuItem className="justify-between" onClick={prettifyQuery}>
+            <span className="flex items-center gap-x-2">
+              <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
+              Prettify SQL
+            </span>
+            <KeyboardShortcut keys={['Alt', 'Shift', 'f']} />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -173,7 +177,12 @@ const UtilityActions = ({
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
             />
           </TooltipTrigger>
-          <TooltipContent side="bottom">Prettify SQL</TooltipContent>
+          <TooltipContent side="bottom" className="p-1 pl-2.5">
+            <div className="flex items-center gap-2.5">
+              <span>Prettify SQL</span>
+              <KeyboardShortcut keys={['Alt', 'Shift', 'f']} />
+            </div>
+          </TooltipContent>
         </Tooltip>
       </div>
 
