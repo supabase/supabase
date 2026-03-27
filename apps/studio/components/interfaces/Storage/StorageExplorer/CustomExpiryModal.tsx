@@ -60,7 +60,7 @@ export const CustomExpiryModal = () => {
     form.reset()
   }
 
-  const { isDirty, isSubmitting } = form.formState
+  const { isDirty, isSubmitting, isValid } = form.formState
   const handleSubmit: SubmitHandler<FormSchema> = async (values) => {
     await onCopyUrl(selectedFileCustomExpiry!.path!, values.expiresIn * unitMap[values.units])
     handleClose()
@@ -137,7 +137,7 @@ export const CustomExpiryModal = () => {
               />
             </div>
           </form>
-          {isDirty && (
+          {isDirty && isValid && (
             <p className="text-sm text-foreground-light mt-2">
               URL will expire on {dayjs().add(expiresIn, units).format(DATETIME_FORMAT)}
             </p>
