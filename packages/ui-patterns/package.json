@@ -62,6 +62,18 @@
       "import": "./src/Chart/index.tsx",
       "types": "./src/Chart/index.tsx"
     },
+    "./CodeBlock/CodeBlock": {
+      "import": "./src/CodeBlock/CodeBlock.tsx",
+      "types": "./src/CodeBlock/CodeBlock.tsx"
+    },
+    "./CodeBlock/CodeBlock.utils": {
+      "import": "./src/CodeBlock/CodeBlock.utils.ts",
+      "types": "./src/CodeBlock/CodeBlock.utils.ts"
+    },
+    "./CodeBlock": {
+      "import": "./src/CodeBlock/index.tsx",
+      "types": "./src/CodeBlock/index.tsx"
+    },
     "./CommandMenu/api/Badges": {
       "import": "./src/CommandMenu/api/Badges.tsx",
       "types": "./src/CommandMenu/api/Badges.tsx"
@@ -766,6 +778,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "tsx": "catalog:",

@@ -2537,9 +2537,6 @@ importers:
       react-resizable-panels:
         specifier: ^4.6.5
         version: 4.6.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-syntax-highlighter:
-        specifier: ^15.6.6
-        version: 15.6.6(react@18.3.1)
       recharts:
         specifier: 'catalog:'
         version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2580,9 +2577,6 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 18.3.0
-      '@types/react-syntax-highlighter':
-        specifier: ^15.5.13
-        version: 15.5.13
       '@vitest/coverage-v8':
         specifier: ^3.2.0
         version: 3.2.4(supports-color@8.1.1)(vitest@3.2.4)
@@ -2785,6 +2779,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 18.3.0
+      '@types/react-syntax-highlighter':
+        specifier: ^15.5.13
+        version: 15.5.13
       api-types:
         specifier: workspace:*
         version: link:../api-types
