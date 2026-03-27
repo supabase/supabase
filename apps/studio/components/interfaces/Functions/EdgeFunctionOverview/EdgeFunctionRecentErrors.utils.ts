@@ -9,7 +9,7 @@ import type { AlertErrorProps } from 'components/ui/AlertError'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
-import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
+import { parseEdgeFunctionEventMessage } from '../EdgeFunctionRecentInvocations.utils'
 
 dayjs.extend(relativeTime)
 

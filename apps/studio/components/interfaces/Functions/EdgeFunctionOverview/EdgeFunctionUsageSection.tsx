@@ -1,4 +1,3 @@
-import type { EdgeFunctionChartDatum } from 'components/interfaces/Functions/EdgeFunctionOverview.utils'
 import { useMemo } from 'react'
 import { ChartMetric } from 'ui-patterns/Chart'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -19,6 +18,7 @@ import {
   MEMORY_CHART_CONFIG,
 } from './EdgeFunctionOverview.utils'
 import { EdgeFunctionTimeSeriesChartCard } from './EdgeFunctionTimeSeriesChartCard'
+import type { EdgeFunctionChartDatum } from './EdgeFunctionOverview.utils'
 
 interface EdgeFunctionUsageSectionProps {
   data: EdgeFunctionChartDatum[]
