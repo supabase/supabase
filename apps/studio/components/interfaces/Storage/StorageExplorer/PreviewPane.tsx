@@ -257,24 +257,23 @@ export const PreviewPane = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+            <ButtonTooltip
+              type="outline"
+              disabled={!canUpdateFiles}
+              icon={<Trash2 strokeWidth={2} />}
+              onClick={() => setSelectedItemsToDelete([file])}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateFiles
+                    ? 'You need additional permissions to delete this file'
+                    : undefined,
+                },
+              }}
+            >
+              Delete file
+            </ButtonTooltip>
           </div>
-          <ButtonTooltip
-            type="outline"
-            disabled={!canUpdateFiles}
-            size="tiny"
-            icon={<Trash2 strokeWidth={2} />}
-            onClick={() => setSelectedItemsToDelete([file])}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateFiles
-                  ? 'You need additional permissions to delete this file'
-                  : undefined,
-              },
-            }}
-          >
-            Delete file
-          </ButtonTooltip>
         </div>
       </div>
     </Transition>
