@@ -225,9 +225,7 @@ The response includes the provider `id` (UUID) — save this for use in your app
     "entity_id": "https://idp.example.com/saml",
     "metadata_url": "https://idp.example.com/saml/metadata"
   },
-  "domains": [
-    { "domain": "example.com" }
-  ],
+  "domains": [{ "domain": "example.com" }],
   "created_at": "...",
   "updated_at": "..."
 }
@@ -265,14 +263,16 @@ On the IdP side, create a new SAML application and configure it with your SP det
 
 **Okta:**
 {/* supa-mdx-lint-disable Rule003Spelling */}
+
 - Create a "SAML 2.0" application
 - Single Sign-On URL: `{API_EXTERNAL_URL}/sso/saml/acs`
 - Audience URI (SP Entity ID): `{API_EXTERNAL_URL}/sso/saml/metadata`
 - Default RelayState: leave blank
 - Name ID format: `Persistent`
-{/* supa-mdx-lint-enable Rule003Spelling */}
+  {/* supa-mdx-lint-enable Rule003Spelling */}
 
 **Azure AD (Entra ID):**
+
 - Create an "Enterprise Application" → "Non-gallery application"
 - Set up single sign-on → SAML
 - Identifier (Entity ID): `{API_EXTERNAL_URL}/sso/saml/metadata`
@@ -280,6 +280,7 @@ On the IdP side, create a new SAML application and configure it with your SP det
 - Metadata URL for Auth: App Federation Metadata URL (from the SAML Signing Certificate section)
 
 **Google Workspace:**
+
 - Admin console → Apps → Web and mobile apps → Add custom SAML app
 - ACS URL: `{API_EXTERNAL_URL}/sso/saml/acs`
 - Entity ID: `{API_EXTERNAL_URL}/sso/saml/metadata`
@@ -291,18 +292,20 @@ Attribute mapping lets you control how SAML assertion attributes are translated 
 
 **Default email detection order:**
 {/* supa-mdx-lint-disable Rule003Spelling */}
+
 1. `urn:oid:0.9.2342.19200300.100.1.3` (LDAP mail OID)
 2. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`
 3. `http://schemas.xmlsoap.org/claims/EmailAddress`
 4. Attributes named `mail`, `Mail`, or `email`
 5. Subject NameID (if it looks like an email address)
-{/* supa-mdx-lint-enable Rule003Spelling */}
+   {/* supa-mdx-lint-enable Rule003Spelling */}
 
 **Default user ID detection:**
 {/* supa-mdx-lint-disable Rule003Spelling */}
+
 1. `urn:oasis:names:tc:SAML:attribute:subject-id` attribute
 2. Subject NameID (if format is `persistent`)
-{/* supa-mdx-lint-enable Rule003Spelling */}
+   {/* supa-mdx-lint-enable Rule003Spelling */}
 
 ### Custom attribute mapping example
 
@@ -327,11 +330,7 @@ Map IdP-specific attributes to user metadata:
         "array": true
       },
       "role": {
-        "names": [
-          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-          "role",
-          "Role"
-        ],
+        "names": ["http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "role", "Role"],
         "default": "member"
       }
     }
@@ -341,12 +340,12 @@ Map IdP-specific attributes to user metadata:
 
 Each mapping key supports:
 
-| Field | Description |
-|---|---|
-| `name` | Primary SAML attribute name to look for (matched against both `Name` and `FriendlyName`, case-insensitive) |
-| `names` | Array of fallback attribute names to try in order |
-| `default` | Default value if the attribute is not present in the assertion |
-| `array` | Set to `true` to collect all values (for multi-valued attributes like groups) |
+| Field     | Description                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| `name`    | Primary SAML attribute name to look for (matched against both `Name` and `FriendlyName`, case-insensitive) |
+| `names`   | Array of fallback attribute names to try in order                                                          |
+| `default` | Default value if the attribute is not present in the assertion                                             |
+| `array`   | Set to `true` to collect all values (for multi-valued attributes like groups)                              |
 
 Mapped attributes are stored in the user's `raw_user_meta_data` and are available via `user.user_metadata` in your application.
 
@@ -472,10 +471,10 @@ Both return `{ "url": "https://idp.example.com/sso?SAMLRequest=..." }`.
 
 ### Domain-based vs provider-based lookup
 
-| Method | Use case |
-|---|---|
-| `domain` | Extract the domain from the user's email and let Auth find the right IdP. Best for login forms where the user enters their email first. |
-| `providerId` | Use when you know the exact provider — for example, a dedicated "Sign in with Okta" button. |
+| Method       | Use case                                                                                                                                |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain`     | Extract the domain from the user's email and let Auth find the right IdP. Best for login forms where the user enters their email first. |
+| `providerId` | Use when you know the exact provider — for example, a dedicated "Sign in with Okta" button.                                             |
 
 ## Test the login flow
 
@@ -520,6 +519,7 @@ docker compose down && docker compose up -d
 ### "Invalid private key" on startup
 
 The `GOTRUE_SAML_PRIVATE_KEY` value is malformed. Ensure it is:
+
 - Base64-encoded (single line, no line breaks)
 - In PKCS#1 format (the `openssl genpkey` output, not PKCS#8)
 - At least 2048-bit RSA
@@ -551,6 +551,7 @@ base64 -i pk.der
 ### User is created but attributes are missing
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+
 - Check your `attribute_mapping` configuration. Use the IdP's SAML assertion viewer (most IdPs have one) to see the exact attribute names being sent.
 - Attribute names are matched case-insensitively against both the `Name` and `FriendlyName` fields in the assertion.
 - Mapped attributes appear in `user.user_metadata`.
