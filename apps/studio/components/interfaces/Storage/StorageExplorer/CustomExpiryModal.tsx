@@ -33,7 +33,7 @@ const formSchema = z.object({
     (val) => (val ? val : undefined),
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
-      .positive('Expiry duration cannot be less than 0')
+      .positive('Expiry duration must be greater than 0')
   ),
   units: z.enum(['days', 'weeks', 'months', 'years']),
 })
