@@ -4,6 +4,8 @@ description: Displays a platform-aware keyboard shortcut label for buttons, menu
 component: true
 ---
 
+<ComponentPreview name="keyboard-shortcut-demo" align="start" peekCode wide />
+
 `KeyboardShortcut` renders a compact, platform-aware shortcut label from a list of logical keys.
 
 It is intended for:
@@ -72,25 +74,10 @@ Use the inline variant when the shortcut needs to sit on the same line as surrou
 
 ## Examples
 
-### Button accessory
+### Pill
 
-```tsx
-<Button iconRight={<KeyboardShortcut keys={['Meta', 'S']} variant="inline" />}>Save</Button>
-```
+<ComponentPreview name="keyboard-shortcut-pill" align="start" />
 
-### Dropdown item
+### Inline
 
-```tsx
-<DropdownMenuItem className="justify-between">
-  <span>Prettify SQL</span>
-  <KeyboardShortcut keys={['Alt', 'Shift', 'F']} />
-</DropdownMenuItem>
-```
-
-### Inline helper copy
-
-```tsx
-<p className="flex items-center gap-1 text-xs text-foreground-lighter">
-  Hit <KeyboardShortcut keys={['Meta', 'K']} variant="inline" /> to open search
-</p>
-```
+<ComponentPreview name="keyboard-shortcut-inline" align="start" />
