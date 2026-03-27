@@ -11,7 +11,7 @@ export const getEnableExtensionsSQL = ({
     [key: string]: { schema: string; value: string | undefined }
   }
 }) => {
-  const baseSQL = extensions
+  return extensions
     .map((extension) => {
       /**
        * [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
@@ -38,11 +38,5 @@ export const getEnableExtensionsSQL = ({
     })
     .filter(Boolean)
     .join('\n\n')
-
-  return `
--- The following database extension${extensions.length > 1 ? 's' : ''} will be enabled: 
--- ${extensions.map((x) => x.name).join(', ')}
-
-${baseSQL}
-`.trim()
+    .trim()
 }

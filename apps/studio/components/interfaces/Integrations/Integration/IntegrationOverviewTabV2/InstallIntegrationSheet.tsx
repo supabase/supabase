@@ -67,7 +67,6 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
 
   const involvesExtensions = requiredExtensionNames.length > 0
   // [Joshen] Will hook these up in the future, applicable for stripe sync engine
-  const involvesSql = false
   const involvesEdgeFunctions = false
 
   const { data: extensions = [] } = useDatabaseExtensionsQuery(
@@ -75,6 +74,8 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     { enabled: involvesExtensions }
   )
   const requiredExtensions = extensions.filter((ext) => requiredExtensionNames.includes(ext.name))
+  // [Joshen] Integration requires extensions that are not available to install on the current database image
+  const hasMissingExtensions = requiredExtensionNames.length !== requiredExtensions.length
 
   const { data: schemas = [] } = useSchemasQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
@@ -180,22 +181,24 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
               </p>
             </div>
 
+            {hasMissingExtensions && integration.missingExtensionsAlert}
+
             <Card>
               <CardContent className="px-0 pt-1.5 pb-0">
                 <Tabs_Shadcn_ defaultValue="extensions">
-                  <TabsList_Shadcn_ className="px-4">
+                  <TabsList_Shadcn_ className="px-4 space-x-4">
                     {involvesExtensions && (
-                      <TabsTrigger_Shadcn_
-                        value="extensions"
-                        className="font-mono uppercase text-xs"
-                      >
-                        Extensions
-                      </TabsTrigger_Shadcn_>
-                    )}
-                    {involvesSql && (
-                      <TabsTrigger_Shadcn_ value="sql" className="font-mono uppercase text-xs">
-                        SQL
-                      </TabsTrigger_Shadcn_>
+                      <>
+                        <TabsTrigger_Shadcn_
+                          value="extensions"
+                          className="font-mono uppercase text-xs"
+                        >
+                          Extensions
+                        </TabsTrigger_Shadcn_>
+                        <TabsTrigger_Shadcn_ value="sql" className="font-mono uppercase text-xs">
+                          SQL
+                        </TabsTrigger_Shadcn_>
+                      </>
                     )}
                     {involvesEdgeFunctions && (
                       <TabsTrigger_Shadcn_
@@ -207,7 +210,24 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
                     )}
                   </TabsList_Shadcn_>
 
-                  <TabsContent_Shadcn_ value="extensions" className="mt-0">
+                  <TabsContent_Shadcn_ value="extensions" className="mt-0 px-4">
+                    {requiredExtensionNames.map((extName) => {
+                      const ext = extensions.find((x) => x.name === extName)
+                      return (
+                        <div key={extName} className="py-3 flex items-center justify-between">
+                          <code className="text-xs">{extName}</code>
+                          {!ext ? (
+                            <Badge>Unavailable</Badge>
+                          ) : ext.installed_version ? (
+                            <Badge>Installed</Badge>
+                          ) : (
+                            <Badge>Required</Badge>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </TabsContent_Shadcn_>
+                  <TabsContent_Shadcn_ value="sql" className="mt-0">
                     <CodeBlock
                       hideCopy
                       hideLineNumbers
@@ -217,8 +237,9 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
                       className="border-0 rounded-none [&_code]:text-[12px] [&_code]:text-foreground"
                     />
                   </TabsContent_Shadcn_>
-                  <TabsContent_Shadcn_ value="sql">TBD</TabsContent_Shadcn_>
-                  <TabsContent_Shadcn_ value="edge_functions">TBD</TabsContent_Shadcn_>
+                  <TabsContent_Shadcn_ value="edge_functions" className="mt-0">
+                    TBD
+                  </TabsContent_Shadcn_>
                 </Tabs_Shadcn_>
               </CardContent>
             </Card>
@@ -323,7 +344,12 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
               Cancel
             </Button>
           </SheetClose>
-          <Button type="primary" loading={isInstalling} onClick={onInstallIntegration}>
+          <Button
+            type="primary"
+            disabled={hasMissingExtensions}
+            loading={isInstalling}
+            onClick={onInstallIntegration}
+          >
             Install integration
           </Button>
         </SheetFooter>
