@@ -1,15 +1,15 @@
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { plans as allPlans } from 'shared-data/plans'
 import { Button, cn, Slider_Shadcn_ } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
-const STANDALONE_PLANS = [
-  { name: 'Pro', price: 25 },
-  { name: 'Team', price: 599 },
-]
+const STANDALONE_PLANS = allPlans
+  .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')
+  .map((plan) => ({ name: plan.name, price: plan.priceMonthly as number }))
 
 const findInstanceValueByColumn = (instance: any, column: string) =>
   instance.columns?.find((col: any) => col.key === column)?.value
@@ -76,7 +76,11 @@ const ComputePricingCalculator = ({
   }
 
   useEffect(() => {
-    const computeAggregate = calculateComputeAggregate(0)
+    const computeAggregate = activeInstances.reduce(
+      (acc, activeInstance: any) =>
+        acc + parsePrice(findInstanceValueByColumn(activeInstance, 'pricing')),
+      0
+    )
     setActivePrice(Math.max(0, computeAggregate + effectivePlan.price - COMPUTE_CREDITS))
   }, [activeInstances, effectivePlan])
 
