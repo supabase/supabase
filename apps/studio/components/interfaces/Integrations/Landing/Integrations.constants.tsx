@@ -1,3 +1,4 @@
+import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -48,6 +49,11 @@ export type IntegrationDefinition = {
     pageId: string | undefined
     childId: string | undefined
   }) => ComponentType<{}> | null
+  /** SQL query for installing the entire integration */
+  installationSql?: string
+  /** SQL query for uninstalling the entire integration */
+  uninstallationSql?: string
+  checkInstalled?: () => void
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -230,7 +236,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       'Send real-time data from your database to another system when a table event occurs',
     docsUrl: DOCS_URL,
     author: authorSupabase,
-    requiredExtensions: [],
+    requiredExtensions: ['pg_net'],
     navigation: [
       {
         route: 'overview',
@@ -266,6 +272,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       }
       return null
     },
+    installationSql: getEnableWebhooksSQL(),
   },
   {
     id: 'data_api',
