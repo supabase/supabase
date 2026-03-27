@@ -13,7 +13,7 @@ import {
 } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { ChevronDown } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -90,7 +90,11 @@ const RestartServerButton = () => {
   const onRestartSuccess = () => {
     setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESTARTING })
     toast.success('Restarting server...')
-    router.push(`/project/${projectRef}`)
+    if (router) {
+      router.push(`/project/${projectRef}`)
+    } else if (typeof window !== 'undefined') {
+      window.location.assign(`/v2/project/${projectRef}`)
+    }
     setServiceToRestart(undefined)
   }
 

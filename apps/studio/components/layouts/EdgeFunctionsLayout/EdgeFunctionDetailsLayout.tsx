@@ -18,7 +18,8 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { DOCS_URL } from 'lib/constants'
 import { Clock, Download, FileArchive, Send } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
@@ -60,14 +61,29 @@ interface EdgeFunctionDetailsLayoutProps {
   title: string
 }
 
+const V2_EDGE_FUNCTION_DETAIL_PATH =
+  /^\/v2\/project\/[^/]+\/data\/edge-functions\/[^/]+/
+
 const EdgeFunctionDetailsLayout = ({
   title,
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
+  const appPathname = usePathname() ?? ''
+  const pathWithoutQuery =
+    appPathname.length > 0
+      ? appPathname.split('?')[0]
+      : (router?.asPath?.split('?')[0] ?? '')
   const { data: org } = useSelectedOrganizationQuery()
   const { functionSlug, ref } = useParams()
   const { mutate: sendEvent } = useSendEventMutation()
+
+  const v2FunctionBase =
+    ref && functionSlug ? `/v2/project/${ref}/data/edge-functions/${functionSlug}` : ''
+  const v2FunctionsListHref = ref ? `/v2/project/${ref}/data/edge-functions` : ''
+  const isV2EdgeFunctionDetail =
+    Boolean(ref && functionSlug && v2FunctionBase) &&
+    V2_EDGE_FUNCTION_DETAIL_PATH.test(pathWithoutQuery)
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
@@ -117,16 +133,29 @@ const EdgeFunctionDetailsLayout = ({
     section: title,
   }
 
-  const breadcrumbItems = [
-    {
-      label: 'Edge Functions',
-      href: `/project/${ref}/functions`,
-    },
-    {
-      label: functionSlug,
-      href: `/project/${ref}/functions/${functionSlug}`,
-    },
-  ]
+  const v1FunctionBase = ref && functionSlug ? `/project/${ref}/functions/${functionSlug}` : ''
+
+  const breadcrumbItems = isV2EdgeFunctionDetail
+    ? [
+        {
+          label: 'Edge Functions',
+          href: v2FunctionsListHref,
+        },
+        {
+          label: functionSlug,
+          href: v2FunctionBase,
+        },
+      ]
+    : [
+        {
+          label: 'Edge Functions',
+          href: `/project/${ref}/functions`,
+        },
+        {
+          label: functionSlug,
+          href: v1FunctionBase,
+        },
+      ]
 
   const navigationItems = functionSlug
     ? [
@@ -134,25 +163,31 @@ const EdgeFunctionDetailsLayout = ({
           ? [
               {
                 label: 'Overview',
-                href: `/project/${ref}/functions/${functionSlug}`,
+                href: isV2EdgeFunctionDetail ? v2FunctionBase : `${v1FunctionBase}`,
               },
               {
                 label: 'Invocations',
-                href: `/project/${ref}/functions/${functionSlug}/invocations`,
+                href: isV2EdgeFunctionDetail
+                  ? `${v2FunctionBase}/invocations`
+                  : `${v1FunctionBase}/invocations`,
               },
               {
                 label: 'Logs',
-                href: `/project/${ref}/functions/${functionSlug}/logs`,
+                href: isV2EdgeFunctionDetail
+                  ? `${v2FunctionBase}/logs`
+                  : `${v1FunctionBase}/logs`,
               },
             ]
           : []),
         {
           label: 'Code',
-          href: `/project/${ref}/functions/${functionSlug}/code`,
+          href: isV2EdgeFunctionDetail ? `${v2FunctionBase}/code` : `${v1FunctionBase}/code`,
         },
         {
           label: 'Settings',
-          href: `/project/${ref}/functions/${functionSlug}/details`,
+          href: isV2EdgeFunctionDetail
+            ? `${v2FunctionBase}/details`
+            : `${v1FunctionBase}/details`,
         },
       ]
     : []
@@ -230,13 +265,18 @@ const EdgeFunctionDetailsLayout = ({
 
     if (!!functionSlug && isError && error.code === 404 && !cancel) {
       toast('Edge function cannot be found in your project')
-      router.push(`/project/${ref}/functions`)
+      const fallback = isV2EdgeFunctionDetail
+        ? v2FunctionsListHref
+        : `/project/${ref}/functions`
+      if (fallback) {
+        router?.push(fallback)
+      }
     }
 
     return () => {
       cancel = true
     }
-  }, [isError])
+  }, [isError, error, functionSlug, ref, router, isV2EdgeFunctionDetail, v2FunctionsListHref])
 
   if (!isLoading && !canReadFunctions) {
     return (
@@ -247,7 +287,11 @@ const EdgeFunctionDetailsLayout = ({
   }
 
   return (
-    <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
+    <EdgeFunctionsLayout
+      title={title}
+      browserTitle={browserTitle}
+      hideProductMenu={isV2EdgeFunctionDetail}
+    >
       <div className="w-full min-h-full flex flex-col items-stretch">
         <PageHeader size="full" className="sticky top-0 z-10 bg-surface-75">
           {breadcrumbItems.length > 0 && (
@@ -406,7 +450,7 @@ const EdgeFunctionDetailsLayout = ({
             <PageHeaderNavigationTabs>
               <NavMenu>
                 {navigationItems.map((item) => {
-                  const isActive = router.asPath.split('?')[0] === item.href
+                  const isActive = pathWithoutQuery === item.href
                   return (
                     <NavMenuItem key={item.label} active={isActive}>
                       <Link href={item.href}>{item.label}</Link>

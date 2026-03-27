@@ -21,7 +21,17 @@ export function OrgCommandItem({
   onClose,
   compactPadding = false,
 }: OrgCommandItemProps) {
-  const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
+  const href = (() => {
+    if (!hasRouteSlug) return `/org/${org.slug}`
+    if (routePathname.includes('[slug]')) return routePathname.replace('[slug]', org.slug)
+    if (selectedSlug && routePathname.startsWith(`/v2/org/${selectedSlug}`)) {
+      return routePathname.replace(`/v2/org/${selectedSlug}`, `/v2/org/${org.slug}`)
+    }
+    if (selectedSlug && routePathname.startsWith(`/org/${selectedSlug}`)) {
+      return routePathname.replace(`/org/${selectedSlug}`, `/org/${org.slug}`)
+    }
+    return `/org/${org.slug}`
+  })()
 
   return (
     <CommandItem_Shadcn_

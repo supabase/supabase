@@ -1,4 +1,5 @@
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { useRouter as useAppRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useStaticEffectEvent } from '../useStaticEffectEvent'
@@ -35,7 +36,8 @@ interface UsePreventNavigationOnUnsavedChangesReturn {
 export const usePreventNavigationOnUnsavedChanges = ({
   hasChanges,
 }: UsePreventNavigationOnUnsavedChangesOptions): UsePreventNavigationOnUnsavedChangesReturn => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
   const [navigateUrl, setNavigateUrl] = useState<string>()
   const [confirmNavigate, setConfirmNavigate] = useState(false)
 
@@ -55,15 +57,60 @@ export const usePreventNavigationOnUnsavedChanges = ({
       }
       setNavigateUrl(undefined)
     }
+
+    const handleCaptureClick = (e: MouseEvent) => {
+      if (!hasChanges || confirmNavigate) return
+
+      const target = e.target
+      if (!(target instanceof Element)) return
+
+      const anchor = target.closest('a[href]')
+      if (!anchor || !(anchor instanceof HTMLAnchorElement)) return
+      if (e.defaultPrevented) return
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
+      if (anchor.target === '_blank' || anchor.hasAttribute('download')) return
+
+      const hrefAttr = anchor.getAttribute('href')
+      if (!hrefAttr || hrefAttr.startsWith('#')) return
+      if (/^(mailto:|tel:|javascript:)/i.test(hrefAttr)) return
+
+      let url: URL
+      try {
+        url = new URL(hrefAttr, window.location.href)
+      } catch {
+        return
+      }
+
+      if (url.origin !== window.location.origin) return
+
+      const next = `${url.pathname}${url.search}${url.hash}`
+      const current = `${window.location.pathname}${window.location.search}${window.location.hash}`
+      if (next === current) return
+
+      e.preventDefault()
+      e.stopPropagation()
+      setNavigateUrl(next)
+    }
+
     window.addEventListener('beforeunload', handleBeforeUnload)
-    router.events.on('routeChangeStart', handleBrowseAway)
+
+    const usesPagesRouteEvents = Boolean(compatRouter?.events)
+
+    if (usesPagesRouteEvents) {
+      compatRouter!.events.on('routeChangeStart', handleBrowseAway)
+    } else {
+      document.addEventListener('click', handleCaptureClick, true)
+    }
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      router.events.off('routeChangeStart', handleBrowseAway)
+      if (usesPagesRouteEvents) {
+        compatRouter!.events.off('routeChangeStart', handleBrowseAway)
+      } else {
+        document.removeEventListener('click', handleCaptureClick, true)
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [confirmNavigate, hasChanges])
+  }, [compatRouter, confirmNavigate, hasChanges])
 
   const handleCancel = useStaticEffectEvent(() => {
     setNavigateUrl(undefined)
@@ -77,7 +124,11 @@ export const usePreventNavigationOnUnsavedChanges = ({
     }
     if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
     setNavigateUrl(undefined)
-    router.push(urlToNavigate)
+    if (compatRouter) {
+      void compatRouter.push(urlToNavigate)
+    } else {
+      void appRouter.push(urlToNavigate)
+    }
   })
 
   return useMemo(

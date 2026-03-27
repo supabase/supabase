@@ -7,8 +7,13 @@ import { MobileSheetNav } from './MobileSheetNav'
 const mockRouter = vi.hoisted(() => ({ asPath: '/initial' }))
 const mockWindowSize = vi.hoisted(() => ({ width: 400 }))
 
-vi.mock('next/router', () => ({
+vi.mock('next/compat/router', () => ({
   useRouter: () => mockRouter,
+}))
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '',
+  useSearchParams: () => new URLSearchParams(),
 }))
 
 vi.mock('react-use', () => ({

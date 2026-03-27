@@ -57,7 +57,7 @@ export const UserPanel = () => {
   return (
     <>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
+      <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio">
         <Button
           type="text"
           className="absolute top-3 right-3 px-1"
@@ -71,14 +71,14 @@ export const UserPanel = () => {
         >
           {isPending ? (
             <div>
-              <div className="min-h-[46px] border-b" />
+              <div className="min-h-[40px] border-b" />
               <div className="p-5">
                 <GenericSkeletonLoader />
               </div>
             </div>
           ) : !!selectedUser ? (
             <>
-              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
+              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[40px]">
                 <TabsTrigger_Shadcn_
                   value="overview"
                   className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"

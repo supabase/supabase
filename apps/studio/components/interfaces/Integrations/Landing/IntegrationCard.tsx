@@ -12,6 +12,7 @@ type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
   featured?: boolean
   image?: string
+  href?: string
 }
 
 const INTEGRATION_CARD_STYLE = cn(
@@ -44,12 +45,14 @@ export const IntegrationCard = ({
   isInstalled,
   featured = false,
   image,
+  href,
 }: IntegrationCardProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const integrationHref = href ?? `/project/${project?.ref}/integrations/${id}/overview`
 
   if (featured) {
     return (
-      <Link href={`/project/${project?.ref}/integrations/${id}/overview`} className="h-full">
+      <Link href={integrationHref} className="h-full">
         <Card className="h-full">
           {/* Full-width image/icon at the top */}
           <div className="w-full h-24 bg-surface-400 rounded-t-md flex items-center justify-center overflow-hidden relative">
@@ -83,7 +86,7 @@ export const IntegrationCard = ({
   }
 
   return (
-    <Link href={`/project/${project?.ref}/integrations/${id}/overview`} className="h-full">
+    <Link href={integrationHref} className="h-full">
       <Card className="h-full">
         <CardContent className="flex flex-col p-4 @2xl:p-6 h-full">
           <div className="flex items-start justify-between mb-4">

@@ -8,7 +8,7 @@ import { isForeignTable, isTable } from 'data/table-editor/table-editor-types'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { RoleImpersonationState } from 'lib/role-impersonation'
+import type { RoleImpersonationState } from 'lib/role-impersonation'
 import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -54,7 +54,7 @@ type PaginationProps = {
 
 export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) => {
   const { id: _id } = useParams()
-  const id = _id ? Number(_id) : undefined
+  const routeTableId = _id ? Number(_id) : undefined
 
   const { sorts } = useTableSort()
   const { filters } = useTableFilter()
@@ -63,11 +63,12 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const tableId = routeTableId ?? snap.table.id
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id,
+    id: tableId,
   })
   const isForeignTableSelected = isForeignTable(selectedTable)
 
@@ -90,7 +91,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   } = useTableRowsCountQuery(
     {
       projectRef: project?.ref,
-      tableId: snap.table.id,
+      tableId,
       filters,
       enforceExactCount: snap.enforceExactCount,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
@@ -107,14 +108,14 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const maxPages = Math.ceil(count / tableEditorSnap.rowsPerPage)
   const totalPages = count > 0 ? maxPages : 1
 
-  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(id ?? -1)
+  const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   // [Joshen] This is only applicable for foreign tables, as we use the number of rows on the page to determine
   // if we've reached the last page (and hence disable the next button)
   const { data: rowsData, isPending: isLoadingRows } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      tableId: id,
+      tableId,
       sorts,
       filters,
       page: snap.page,
@@ -126,6 +127,11 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       enabled: isForeignTableSelected && enableForeignRowsQuery,
     }
   )
+  const isCountQueryEnabled =
+    !isForeignTableSelected &&
+    typeof project?.ref !== 'undefined' &&
+    typeof tableId !== 'undefined'
+  const isCountLoading = isCountQueryEnabled && isLoading
   const isLastPage = (rowsData?.rows ?? []).length < tableEditorSnap.rowsPerPage
 
   const onPreviousPage = () => {
@@ -173,7 +179,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
 
   const onRowsPerPageChange = (value: string | number) => {
     const rowsPerPage = Number(value)
-    tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
+    tableEditorSnap.setRowsPerPage(Number.isNaN(rowsPerPage) ? 100 : rowsPerPage)
     snap.setPage(1)
   }
 
@@ -188,8 +194,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     if (isError && snap.enforceExactCount && error?.code === 408) {
       snap.setEnforceExactCount(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isError, snap.enforceExactCount, error?.code])
+  }, [isError, snap.enforceExactCount, snap.setEnforceExactCount, error?.code])
 
   // [Joshen] One to revisit if we can consolidate this and the main return statement
   if (isForeignTableSelected) {
@@ -243,7 +248,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           icon={<ArrowLeft />}
           type="outline"
           className="px-1.5"
-          disabled={page <= 1 || isLoading}
+          disabled={page <= 1 || isCountLoading}
           onClick={onPreviousPage}
         />
 
@@ -284,7 +289,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />
       </div>
 
-      {isLoading ? (
+      {isCountLoading ? (
         <Button type="text" className="w-7" icon={<Loader2 size={12} className="animate-spin" />} />
       ) : isError ? (
         <Tooltip>
@@ -304,11 +309,11 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           {hasCountData && (
             <p className="text-xs text-foreground-light">
               {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}{' '}
-              {data.is_estimate ? '(estimated)' : ''}
+              {isEstimateCount ? '(estimated)' : ''}
             </p>
           )}
 
-          {data.is_estimate && (
+          {isEstimateCount && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

@@ -1,3 +1,5 @@
+'use client'
+
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   useIsBranching2Enabled,
@@ -27,8 +29,9 @@ import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ReactNode, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { useMemo, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
 
@@ -71,7 +74,9 @@ export const LayoutHeader = ({
   headerTitle,
   backToDashboardURL,
 }: LayoutHeaderProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -83,7 +88,7 @@ export const LayoutHeader = ({
 
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
-  const isAccountPage = router.pathname.startsWith('/account')
+  const isAccountPage = pathname.startsWith('/account')
 
   // We only want to query the org usage and check for possible over-ages for plans without usage billing enabled (free or pro with spend cap)
   const { data: orgUsage } = useOrgUsageQuery(

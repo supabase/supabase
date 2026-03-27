@@ -1,3 +1,5 @@
+'use client'
+
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
@@ -9,7 +11,8 @@ import { MANAGED_BY } from 'lib/constants/infrastructure'
 import { buildStudioPageTitle } from 'lib/page-title'
 import { ExternalLink } from 'lucide-react'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import type { PropsWithChildren } from 'react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
@@ -26,12 +29,14 @@ const OrganizationLayoutContent = ({
   children,
   title,
 }: PropsWithChildren<OrganizationLayoutProps>) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { appTitle } = useCustomContent(['app:title'])
 
   // Keep title intent close to each page (getLayout) to avoid route-to-title drift in this layout.
-  const isSettingsSurface = settingsPages.some((x) => router.pathname.endsWith(x))
+  const isSettingsSurface = settingsPages.some((x) => pathname.endsWith(x))
   const pageTitle = buildStudioPageTitle({
     section: title,
     surface: isSettingsSurface ? 'Organization Settings' : undefined,

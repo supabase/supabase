@@ -6,7 +6,7 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, type PropsWithChildren } from 'react'
 import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -34,9 +34,13 @@ export const SIDEBAR_KEYS = {
 export type TYPEOF_SIDEBAR_KEYS = (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]
 
 export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
-  const router = useRouter()
+  const router = useCompatRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const supportProjectRef =
+    (router?.query?.ref as string | undefined) ?? project?.ref
+  /** App Router has no Pages `router`; treat as ready so localStorage sidebar can hydrate. */
+  const isRouterReady = router?.isReady ?? true
   const { mutate: sendEvent } = useSendEventMutation()
   const { openSidebar, closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
@@ -56,11 +60,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       <HelpPanel
         onClose={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
         projectRef={project?.ref}
-        supportLinkQueryParams={getSupportLinkQueryParams(
-          project,
-          org,
-          router.query.ref as string | undefined
-        )}
+        supportLinkQueryParams={getSupportLinkQueryParams(project, org, supportProjectRef)}
       />
     ),
     {},
@@ -94,7 +94,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   // Handle toggling of sidebars on page init
   // Prioritize URL params first, then local storage
   useEffect(() => {
-    if (router.isReady && isLoadedLocalStorage) {
+    if (isRouterReady && isLoadedLocalStorage) {
       if (
         typeof sidebarURLParamRef.current === 'string' &&
         Object.values(SIDEBAR_KEYS).includes(
@@ -113,7 +113,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, isLoadedLocalStorage])
+  }, [isRouterReady, isLoadedLocalStorage])
 
   return <>{children}</>
 }

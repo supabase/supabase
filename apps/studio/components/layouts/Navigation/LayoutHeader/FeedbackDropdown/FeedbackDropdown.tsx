@@ -6,7 +6,7 @@ import { HelpSection } from 'components/ui/HelpPanel/HelpSection'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import { useState } from 'react'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -21,7 +21,7 @@ import {
 import { FeedbackWidget } from './FeedbackWidget'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
@@ -29,12 +29,10 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [stage, setStage] = useState<'select' | 'issue-options' | 'widget'>('select')
 
-  const projectRef = project?.parent_project_ref ?? (router.query.ref as string | undefined)
-  const supportLinkQueryParams = getSupportLinkQueryParams(
-    project,
-    org,
-    router.query.ref as string | undefined
-  )
+  const queryRef = compatRouter?.query?.ref as string | undefined
+  const refFromRoute = queryRef ?? project?.ref
+  const projectRef = project?.parent_project_ref ?? refFromRoute
+  const supportLinkQueryParams = getSupportLinkQueryParams(project, org, refFromRoute)
 
   return (
     <Popover_Shadcn_

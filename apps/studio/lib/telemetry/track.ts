@@ -3,7 +3,6 @@ import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { API_URL } from 'lib/constants'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
 
 type EventMap = {
@@ -29,7 +28,8 @@ type HasProperties<A extends keyof EventMap> = EventMap[A] extends { properties:
 export const useTrack = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const router = useRouter()
+  // Avoid Pages Router dependency in App Router.
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : undefined
 
   const track = useCallback(
     <A extends keyof EventMap>(
@@ -52,9 +52,9 @@ export const useTrack = () => {
         ...(groups && { groups }),
       } as EventMap[A]
 
-      sendTelemetryEvent(API_URL, event, router.pathname)
+      sendTelemetryEvent(API_URL, event, pathname)
     },
-    [project?.ref, org?.slug, router.pathname]
+    [project?.ref, org?.slug, pathname]
   )
 
   return track

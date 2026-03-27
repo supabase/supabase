@@ -1,5 +1,5 @@
 import useLatest from 'hooks/misc/useLatest'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { type Dispatch, type SetStateAction, useCallback, useMemo } from 'react'
 
 export type UrlStateParams = {
@@ -21,10 +21,13 @@ export function useUrlState<ValueParams extends UrlStateParams>({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const arrayKeysSet = useMemo(() => new Set(arrayKeys), [stringifiedArrayKeys])
   const router = useRouter()
+  const query = router?.query ?? {}
+  const pathname =
+    router?.pathname ?? (typeof window !== 'undefined' ? window.location.pathname : '')
 
   const params: ValueParams = useMemo(() => {
     return Object.fromEntries(
-      Object.entries(router.query).map(([key, value]) => {
+      Object.entries(query).map(([key, value]) => {
         if (arrayKeysSet.has(key)) {
           return Array.isArray(value) ? [key, value] : [key, [value]]
         }
@@ -32,7 +35,7 @@ export function useUrlState<ValueParams extends UrlStateParams>({
         return [key, value]
       })
     )
-  }, [arrayKeysSet, router.query])
+  }, [arrayKeysSet, query])
 
   const paramsRef = useLatest(params)
 
@@ -45,11 +48,13 @@ export function useUrlState<ValueParams extends UrlStateParams>({
         Object.entries({ ...params, ...nextParams }).filter(([, value]) => Boolean(value))
       )
 
-      const replaceOrPush = replace ? router.replace : router.push
+      const replaceOrPush = replace ? router?.replace : router?.push
+
+      if (!replaceOrPush || !pathname) return
 
       replaceOrPush(
         {
-          pathname: router.pathname,
+          pathname,
           query: newQuery,
         },
         undefined,
@@ -57,7 +62,7 @@ export function useUrlState<ValueParams extends UrlStateParams>({
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router, replace]
+    [router, replace, pathname]
   )
 
   return [params, setParams] as const

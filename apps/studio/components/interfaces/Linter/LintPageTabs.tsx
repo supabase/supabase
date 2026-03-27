@@ -13,8 +13,9 @@ import {
 } from 'ui'
 
 import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
-import { Lint } from 'data/lint/lint-query'
-import { useRouter } from 'next/router'
+import type { Lint } from 'data/lint/lint-query'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { usePathname, useRouter as useAppRouter, useSearchParams } from 'next/navigation'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface LintPageTabsProps {
@@ -24,7 +25,10 @@ interface LintPageTabsProps {
   activeLints: Lint[]
 }
 const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: LintPageTabsProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
+  const pathname = usePathname() ?? ''
+  const searchParams = useSearchParams()
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
@@ -66,8 +70,21 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
       defaultValue={currentTab}
       onValueChange={(value) => {
         setCurrentTab(value as LINTER_LEVELS)
-        const { sort, search, ...rest } = router.query
-        router.push({ ...router, query: { ...rest, preset: value, id: null } })
+        if (compatRouter) {
+          const { sort: _sort, search: _search, ...rest } = compatRouter.query
+          void compatRouter.push({
+            pathname: compatRouter.pathname ?? '/',
+            query: { ...rest, preset: value, id: null },
+          })
+        } else {
+          const next = new URLSearchParams(searchParams?.toString() ?? '')
+          next.delete('sort')
+          next.delete('search')
+          next.delete('id')
+          next.set('preset', value)
+          const qs = next.toString()
+          void appRouter.push(qs ? `${pathname}?${qs}` : pathname)
+        }
       }}
     >
       <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10 relative')}>

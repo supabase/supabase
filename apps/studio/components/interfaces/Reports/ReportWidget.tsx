@@ -1,8 +1,10 @@
 import { ExternalLink, HelpCircle } from 'lucide-react'
-import { NextRouter, useRouter } from 'next/router'
-import { ReactNode } from 'react'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import type { NextRouter } from 'next/router'
+import { ReactNode, useCallback } from 'react'
 
 import { useParams } from 'common'
+import { BASE_PATH } from 'lib/constants'
 import Panel from 'components/ui/Panel'
 import { Button, Loading, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
@@ -29,14 +31,36 @@ export interface ReportWidgetProps<T = any> {
 }
 
 export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T> {
-  router: NextRouter
+  /** `null` when rendered under App Router without Pages Router context */
+  router: NextRouter | null
   projectRef: string
 }
 
+function buildPathWithQuery(pathname: string, query: Record<string, string | undefined>) {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, value)
+  }
+  const qs = params.toString()
+  return qs ? `${pathname}?${qs}` : pathname
+}
+
 const ReportWidget = (props: ReportWidgetProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
   const { ref } = useParams()
   const projectRef = ref as string
+
+  const navigateToProjectPath = useCallback(
+    (pathname: string, query: Record<string, string | undefined>) => {
+      if (compatRouter) {
+        void compatRouter.push({ pathname, query })
+        return
+      }
+      const path = buildPathWithQuery(pathname, query)
+      window.location.assign(`${BASE_PATH}${path}`)
+    },
+    [compatRouter]
+  )
 
   return (
     <Panel noMargin noHideOverflow className={cn('pb-0', props.className)} wrapWithLoading={false}>
@@ -80,7 +104,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
                       query.ite = props.params?.iso_timestamp_end || ''
                     }
 
-                    router.push({ pathname, query })
+                    navigateToProjectPath(pathname, query)
                   }}
                 />
               </TooltipTrigger>
@@ -94,7 +118,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
         <Loading active={props.isLoading}>
           {props.data === undefined
             ? null
-            : props.renderer({ ...props, router, projectRef: projectRef as string })}
+            : props.renderer({ ...props, router: compatRouter, projectRef: projectRef as string })}
         </Loading>
       </Panel.Content>
 
@@ -103,7 +127,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
           {props.append({
             ...props,
             ...(props.appendProps || {}),
-            router,
+            router: compatRouter,
             projectRef: projectRef as string,
           })}
         </>

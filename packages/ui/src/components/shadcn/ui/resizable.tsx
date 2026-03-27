@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { GripVertical } from 'lucide-react'
 import * as ResizablePrimitive from 'react-resizable-panels'
 
@@ -22,7 +23,8 @@ const serverCompatibleLocalStorage = {
   },
 }
 
-const ResizablePanelGroupWithPersistence = ({
+/** Only mounts after hydration so `useDefaultLayout` never reads localStorage during SSR / first paint. */
+const ResizablePanelGroupPersisted = ({
   className,
   autoSaveId,
   defaultLayout: defaultLayoutProp,
@@ -40,6 +42,42 @@ const ResizablePanelGroupWithPersistence = ({
       onLayoutChanged={onLayoutChangedProp ?? onLayoutChanged}
       className={cn('flex h-full w-full aria-[orientation=vertical]:flex-col', className)}
       data-slot="resizable-panel-group"
+      {...props}
+    />
+  )
+}
+
+const ResizablePanelGroupWithPersistence = ({
+  className,
+  autoSaveId,
+  defaultLayout: defaultLayoutProp,
+  onLayoutChanged: onLayoutChangedProp,
+  ...props
+}: ResizablePrimitive.GroupProps & { autoSaveId: string }) => {
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
+
+  if (!hasMounted) {
+    return (
+      <ResizablePrimitive.Group
+        defaultLayout={defaultLayoutProp}
+        onLayoutChanged={onLayoutChangedProp}
+        className={cn('flex h-full w-full aria-[orientation=vertical]:flex-col', className)}
+        data-slot="resizable-panel-group"
+        {...props}
+      />
+    )
+  }
+
+  return (
+    <ResizablePanelGroupPersisted
+      autoSaveId={autoSaveId}
+      className={className}
+      defaultLayout={defaultLayoutProp}
+      onLayoutChanged={onLayoutChangedProp}
       {...props}
     />
   )

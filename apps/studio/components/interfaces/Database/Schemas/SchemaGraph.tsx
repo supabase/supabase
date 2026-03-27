@@ -135,7 +135,7 @@ export const SchemaGraph = () => {
     const edges = reactFlowInstance.getEdges()
 
     getLayoutedElementsViaDagre(
-      nodes.filter((item) => item.type === 'table') as Node<TableNodeData>[],
+      nodes.filter((item: Node) => item.type === 'table') as Node<TableNodeData>[],
       edges
     )
     reactFlowInstance.setNodes(nodes)
@@ -149,9 +149,9 @@ export const SchemaGraph = () => {
 
     const nodes = reactFlowInstance.getNodes()
     if (nodes.length > 0) {
-      const nodesPositionData = nodes.reduce((a, b) => {
-        return { ...a, [b.id]: b.position }
-      }, {})
+      const nodesPositionData = Object.fromEntries(
+        nodes.map((node) => [node.id, node.position] as const)
+      ) as Record<string, { x: number; y: number }>
       setStoredPositions(nodesPositionData)
     }
   })

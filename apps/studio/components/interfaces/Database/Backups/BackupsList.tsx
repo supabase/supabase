@@ -2,14 +2,15 @@ import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
-import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
+import type { DatabaseBackup } from 'data/database/backups-query'
+import { useBackupsQuery } from 'data/database/backups-query'
 import { useSetProjectStatus } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Clock } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { TimestampInfo } from 'ui-patterns'
@@ -45,7 +46,7 @@ export const BackupsList = () => {
               'DD MMM YYYY HH:mm:ss'
             )}`
           )
-          router.push(`/project/${projectRef}`)
+          router?.push(`/project/${projectRef}`)
         }, 3000)
       }
     },

@@ -10,7 +10,6 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
-import { ReactFlowProvider } from '@xyflow/react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
@@ -94,9 +93,7 @@ export const TopSection = () => {
               'w-full h-[400px] md:h-[500px] border border-muted rounded-md overflow-hidden flex flex-col relative'
             )}
           >
-            <ReactFlowProvider>
-              <InstanceConfiguration diagramOnly />
-            </ReactFlowProvider>
+            <InstanceConfiguration diagramOnly projectRef={project?.ref} />
           </div>
         </div>
       </div>

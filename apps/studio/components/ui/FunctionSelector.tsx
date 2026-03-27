@@ -1,13 +1,10 @@
 import { useParams } from 'common'
-import {
-  DatabaseFunctionsData,
-  useDatabaseFunctionsQuery,
-} from 'data/database-functions/database-functions-query'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uniqBy } from 'lodash'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useState } from 'react'
 import {
   Alert_Shadcn_,
@@ -26,6 +23,7 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+import type { DatabaseFunctionsData } from 'data/database-functions/database-functions-query'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 
@@ -59,6 +57,9 @@ const FunctionSelector = ({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
+  const newFunctionHref = router
+    ? `/project/${ref}/database/functions`
+    : `/v2/project/${ref}/data/functions`
 
   const {
     data,
@@ -171,12 +172,16 @@ const FunctionSelector = ({
                     className="cursor-pointer w-full"
                     onSelect={() => {
                       setOpen(false)
-                      router.push(`/project/${ref}/database/functions`)
+                      if (router) {
+                        router.push(newFunctionHref)
+                      } else if (typeof window !== 'undefined') {
+                        window.location.assign(newFunctionHref)
+                      }
                     }}
                     onClick={() => setOpen(false)}
                   >
                     <Link
-                      href={`/project/${ref}/database/functions`}
+                      href={newFunctionHref}
                       onClick={() => {
                         setOpen(false)
                       }}

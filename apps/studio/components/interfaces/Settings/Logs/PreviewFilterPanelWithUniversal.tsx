@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Terminal } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -105,13 +105,16 @@ export const PreviewFilterPanelWithUniversal = ({
   selectedDatePickerValue,
   setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
   const { ref } = useParams()
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
+  const pagesPathname = compatRouter?.pathname
   const showDatabaseSelector =
-    IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
+    IS_PLATFORM &&
+    typeof pagesPathname === 'string' &&
+    LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(pagesPathname)
 
   const filterProperties = useMemo(() => {
     const tableFilters = FILTER_OPTIONS[table]

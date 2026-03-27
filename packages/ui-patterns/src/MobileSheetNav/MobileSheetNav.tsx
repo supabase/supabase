@@ -1,7 +1,8 @@
 'use client'
 
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { useMemo, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
 import { CommandEmpty_Shadcn_, Sheet, SheetContent } from 'ui'
@@ -22,12 +23,19 @@ const MobileSheetNav: React.FC<{
   shouldCloseOnRouteChange = true,
   shouldCloseOnViewportResize = true,
 }) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const pathname = usePathname() ?? ''
+  const searchParams = useSearchParams()
+  const searchString = searchParams?.toString() ?? ''
   const { width } = useWindowSize()
 
-  // Use full asPath (including query) so the sheet closes when navigating to the same path with
-  // different query params (e.g. Integrations submenu: All vs Wrappers vs Postgres Modules).
-  const fullPath = router?.asPath ?? ''
+  // Use full path + query so the sheet closes when navigating to the same path with different
+  // query params (e.g. Integrations submenu). Pages: compat `asPath`; App Router: pathname + search.
+  const fullPath = useMemo(() => {
+    if (compatRouter?.asPath) return compatRouter.asPath
+    return searchString ? `${pathname}?${searchString}` : pathname
+  }, [compatRouter?.asPath, pathname, searchString])
+
   useEffect(() => {
     if (shouldCloseOnRouteChange) {
       onOpenChange(false)

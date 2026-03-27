@@ -1,10 +1,13 @@
+'use client'
+
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AppBannerWrapper } from 'components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from 'components/interfaces/Sidebar'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
@@ -39,7 +42,9 @@ export const DefaultLayout = ({
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
   const { ref } = useParams()
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
   const appSnap = useAppStateSnapshot()
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
@@ -47,7 +52,7 @@ export const DefaultLayout = ({
     ''
   )
 
-  const backToDashboardURL = router.pathname.startsWith('/account')
+  const backToDashboardURL = pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
       : !!lastVisitedOrganization
@@ -91,7 +96,7 @@ export const DefaultLayout = ({
                 {/* Main Content Area */}
                 <div className="flex flex-1 w-full overflow-y-hidden">
                   {/* Sidebar - Only show for project pages, not account pages */}
-                  {!router.pathname.startsWith('/account') && <Sidebar />}
+                  {!pathname.startsWith('/account') && <Sidebar />}
                   {/* Main Content with Layout Sidebar */}
                   <ResizablePanelGroup
                     orientation="horizontal"

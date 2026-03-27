@@ -2,7 +2,7 @@ import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportFo
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { DOCS_URL } from 'lib/constants'
 import { Activity, BookOpen, Mail, Wrench } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import SVG from 'react-inlinesvg'
 import { AiIconAnimation, ButtonGroup, ButtonGroupItem } from 'ui'
 
@@ -32,7 +32,7 @@ export const HelpOptionsList = ({
   size = 'tiny',
 }: HelpOptionsListProps) => {
   const router = useRouter()
-  const basePath = router.basePath ?? ''
+  const basePath = router?.basePath ?? ''
 
   const ids = HELP_OPTION_IDS.filter((id) => !excludeIds.includes(id))
 

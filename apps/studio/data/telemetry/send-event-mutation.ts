@@ -4,7 +4,6 @@ import { sendTelemetryEvent } from 'common'
 import { TelemetryEvent } from 'common/telemetry-constants'
 import { handleError } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
-import { useRouter } from 'next/router'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 interface SendEventVariables {
@@ -30,11 +29,10 @@ export const useSendEventMutation = ({
   UseCustomMutationOptions<SendEventData, ResponseError, TelemetryEvent>,
   'mutationFn'
 > = {}) => {
-  const router = useRouter()
-
   return useMutation<SendEventData, ResponseError, TelemetryEvent>({
     mutationFn: (event) => {
-      return sendEvent({ event, pathname: router.pathname })
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : undefined
+      return sendEvent({ event, pathname })
     },
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

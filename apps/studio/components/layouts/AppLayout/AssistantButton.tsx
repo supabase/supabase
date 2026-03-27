@@ -1,12 +1,11 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
+import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 
-export const AssistantButton = () => {
+export const AssistantButton = ({ side }: { side?: 'left' | 'right' }) => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
   const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
@@ -21,7 +20,7 @@ export const AssistantButton = () => {
       size="tiny"
       id="assistant-trigger"
       className={cn(
-        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0',
+        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 border-transparent',
         isOpen && 'bg-foreground text-background'
       )}
       onClick={() => {
@@ -29,6 +28,7 @@ export const AssistantButton = () => {
       }}
       tooltip={{
         content: {
+          side,
           className: 'p-1 pl-2.5',
           text: (
             <div className="flex items-center gap-2.5">

@@ -2,8 +2,10 @@ import { useParams } from 'common'
 import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { Clock, ExternalLink, RefreshCw } from 'lucide-react'
+import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { useCallback } from 'react'
 import { Button, cn } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -20,7 +22,18 @@ export const EdgeFunctionRecentInvocations = ({
   functionSlug,
 }: EdgeFunctionRecentInvocationsProps) => {
   const { ref } = useParams()
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+
+  const navigateToLog = useCallback(
+    (path: string) => {
+      if (compatRouter) {
+        void compatRouter.push(path)
+        return
+      }
+      window.location.assign(`${BASE_PATH}${path}`)
+    },
+    [compatRouter]
+  )
 
   const { logData, isLoading, isSuccess, refresh } = useLogsPreview({
     projectRef: ref as string,
@@ -73,11 +86,11 @@ export const EdgeFunctionRecentInvocations = ({
                 key={log.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => router.push(logUrl)}
+                onClick={() => navigateToLog(logUrl)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
-                    router.push(logUrl)
+                    navigateToLog(logUrl)
                   }
                 }}
                 className="group flex items-center font-mono px-3 py-2 gap-3 bg-surface-100 cursor-pointer hover:bg-surface-200 transition-colors"

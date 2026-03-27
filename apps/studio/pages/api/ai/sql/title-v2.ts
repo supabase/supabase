@@ -50,7 +50,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const result = await generateText({
       ...modelParams,
-      output: Output.object({ schema: titleSchema }),
+      experimental_output: Output.object({ schema: titleSchema }),
       prompt: source`
         Generate a short title and summarized description for this Postgres SQL snippet:
 
@@ -60,7 +60,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.output)
+    if (!result.experimental_output) {
+      return res.status(500).json({
+        error: 'Failed to generate title and description.',
+      })
+    }
+
+    return res.json(result.experimental_output)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI title generation failed: ${error.message}`)

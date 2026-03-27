@@ -1,7 +1,7 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import {
   Badge,
   Button,
@@ -43,7 +43,8 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     }
     if (isAdvanceOnlyModelId(modelId) && !hasAccessToAdvanceModel) {
       setOpen(false)
-      void router.push(upgradeHref)
+      if (router) void router.push(upgradeHref)
+      else if (typeof window !== 'undefined') window.location.assign(upgradeHref)
       return
     }
 
@@ -81,7 +82,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div>
-                          <Badge role="button" variant="warning">
+                          <Badge variant="warning">
                             Upgrade
                           </Badge>
                         </div>

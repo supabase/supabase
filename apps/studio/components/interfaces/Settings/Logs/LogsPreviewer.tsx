@@ -12,7 +12,8 @@ import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { Rewind } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { usePathname, useRouter as useAppRouter, useSearchParams } from 'next/navigation'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button } from 'ui'
@@ -107,37 +108,24 @@ export const LogsPreviewer = ({
   EmptyState,
   filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
+  const pathname = usePathname() ?? ''
+  const searchParams = useSearchParams()
   const { db } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
   const [showChart, setShowChart] = useState(true)
-  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
-    getDefaultDatePickerValue()
-  )
-
-  const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
-    useLogsUrlState()
-
-  useEffect(() => {
-    if (timestampStart && timestampEnd) {
-      setSelectedDatePickerValue({
-        to: timestampEnd,
-        from: timestampStart,
-        text: `${dayjs(timestampStart).format('DD MMM, HH:mm')} - ${dayjs(timestampEnd).format('DD MMM, HH:mm')}`,
-        isHelper: false,
-      })
-    }
-  }, [timestampStart, timestampEnd])
-
-  const [selectedLogId, setSelectedLogId] = useSelectedLog()
-  const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
-
-  // TODO: Move this to useLogsUrlState to simplify LogsPreviewer. - Jordi
-  function getDefaultDatePickerValue() {
-    const iso_timestamp_start = router.query.iso_timestamp_start as string
-    const iso_timestamp_end = router.query.iso_timestamp_end as string
+  const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(() => {
+    const iso_timestamp_start =
+      (compatRouter?.query?.iso_timestamp_start as string | undefined) ??
+      searchParams?.get('iso_timestamp_start') ??
+      undefined
+    const iso_timestamp_end =
+      (compatRouter?.query?.iso_timestamp_end as string | undefined) ??
+      searchParams?.get('iso_timestamp_end') ??
+      undefined
 
     if (iso_timestamp_start && iso_timestamp_end) {
       return {
@@ -155,7 +143,24 @@ export const LogsPreviewer = ({
       text: defaultDatePickerValue!.text,
       isHelper: true,
     }
-  }
+  })
+
+  const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
+    useLogsUrlState()
+
+  useEffect(() => {
+    if (timestampStart && timestampEnd) {
+      setSelectedDatePickerValue({
+        to: timestampEnd,
+        from: timestampStart,
+        text: `${dayjs(timestampStart).format('DD MMM, HH:mm')} - ${dayjs(timestampEnd).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      })
+    }
+  }, [timestampStart, timestampEnd])
+
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+  const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
 
   const table = !tableName ? LOGS_TABLES[queryType] : tableName
 
@@ -244,10 +249,15 @@ export const LogsPreviewer = ({
       const database = databases?.find((d) => d.identifier === db)
       if (database !== undefined) state.setSelectedDatabaseId(db)
     } else if (state.selectedDatabaseId !== undefined && state.selectedDatabaseId !== projectRef) {
-      if (LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)) {
-        router.push({
-          pathname: router.pathname,
-          query: { ...router.query, db: state.selectedDatabaseId },
+      const pagesPathname = compatRouter?.pathname ?? ''
+      if (
+        pagesPathname &&
+        LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(pagesPathname) &&
+        compatRouter
+      ) {
+        compatRouter.push({
+          pathname: compatRouter.pathname,
+          query: { ...compatRouter.query, db: state.selectedDatabaseId },
         })
       } else {
         state.setSelectedDatabaseId(projectRef)
@@ -278,11 +288,20 @@ export const LogsPreviewer = ({
     onToggleEventChart: () => setShowChart(!showChart),
     onSelectedDatabaseChange: (id: string) => {
       setFilters({ ...filters, database: id !== projectRef ? id : undefined })
-      const { db, ...params } = router.query
-      router.push({
-        pathname: router.pathname,
-        query: id !== projectRef ? { ...router.query, db: id } : params,
-      })
+      if (compatRouter?.pathname) {
+        const { db: _db, ...restQuery } = compatRouter.query
+        compatRouter.push({
+          pathname: compatRouter.pathname,
+          query: id !== projectRef ? { ...compatRouter.query, db: id } : restQuery,
+        })
+        return
+      }
+      if (!pathname) return
+      const sp = new URLSearchParams(searchParams?.toString() ?? '')
+      if (id !== projectRef) sp.set('db', id)
+      else sp.delete('db')
+      const qs = sp.toString()
+      void appRouter.push(qs ? `${pathname}?${qs}` : pathname)
     },
     selectedDatePickerValue,
     setSelectedDatePickerValue,

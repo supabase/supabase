@@ -600,21 +600,40 @@ const nextConfig = {
       },
     },
   },
+  webpack: (config, { dev }) => {
+    // Mirror Turbopack loader behavior when falling back to webpack builds.
+    config.module.rules.push(
+      {
+        test: /\.md$/i,
+        use: ['raw-loader'],
+      },
+      // Special case for Deno libs passed as raw text to Monaco editor.
+      {
+        test: /edge-runtime\.d\.ts$/i,
+        use: ['raw-loader'],
+      },
+      {
+        test: /lib\.deno\.d\.ts$/i,
+        use: ['raw-loader'],
+      }
+    )
+
+    // Lower webpack graph parallelism in production to reduce peak heap usage on CI builders.
+    if (!dev) {
+      config.parallelism = 20
+    }
+    return config
+  },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
-  },
-  typescript: {
-    // Typechecking is run via GitHub Action only for efficiency
-    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
-    ignoreBuildErrors: true,
   },
 }
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.ENABLE_SENTRY_BUILD === 'true'
     ? withSentryConfig(withBundleAnalyzer(nextConfig), {
         silent: true,
 
@@ -622,7 +641,7 @@ module.exports =
         // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
         // Upload a larger set of source maps for prettier stack traces (increases build time)
-        widenClientFileUpload: true,
+        widenClientFileUpload: false,
 
         // Automatically annotate React components to show their full name in breadcrumbs and session replay
         reactComponentAnnotation: {

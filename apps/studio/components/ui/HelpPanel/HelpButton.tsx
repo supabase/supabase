@@ -7,7 +7,7 @@ import { HelpCircle } from 'lucide-react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn } from 'ui'
 
-export const HelpButton = () => {
+export const HelpButton = ({ side }: { side?: 'left' | 'right' }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -20,7 +20,9 @@ export const HelpButton = () => {
       id="help-dropdown-button"
       type={isOpen ? 'secondary' : 'outline'}
       size="tiny"
-      className={cn('rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group')}
+      className={cn(
+        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group !border-transparent'
+      )}
       onClick={() => {
         toggleSidebar(SIDEBAR_KEYS.HELP_PANEL)
         // Don't send telemetry event if dropdown is already open
@@ -31,7 +33,7 @@ export const HelpButton = () => {
           })
         }
       }}
-      tooltip={{ content: { text: 'Help' } }}
+      tooltip={{ content: { side, text: 'Help' } }}
     >
       <HelpCircle
         size={16}

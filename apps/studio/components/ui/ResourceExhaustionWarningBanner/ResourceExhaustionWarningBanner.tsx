@@ -1,6 +1,6 @@
 import { AlertTriangle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 
 import { useParams } from 'common'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
@@ -11,6 +11,7 @@ import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
+  const pathname = router?.pathname ?? ''
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -99,12 +100,11 @@ export const ResourceExhaustionWarningBanner = () => {
 
   const hasNoWarnings = activeWarnings.length === 0
   const hasNoWarningContent = warningContent === undefined
-  const isUsageOrInfraPage =
-    router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
+  const isUsageOrInfraPage = pathname.endsWith('/usage') || pathname.endsWith('/infrastructure')
   const onUsageOrInfraAndNotInReadOnlyMode =
     isUsageOrInfraPage && !activeWarnings.includes('is_readonly_mode_enabled')
   const onDatabaseSettingsAndInReadOnlyMode =
-    router.pathname.endsWith('settings/compute-and-disk') &&
+    pathname.endsWith('settings/compute-and-disk') &&
     activeWarnings.includes('is_readonly_mode_enabled')
 
   // these take precedence over each other, so there's only one active warning to check
@@ -118,12 +118,12 @@ export const ResourceExhaustionWarningBanner = () => {
       // check for exact match with /project/[ref] (project home) first
       // doing this let's us avoid checking with regex, keeping it simple
       if (route === '/project/[ref]') {
-        const isExactMatch = router.pathname === '/project/[ref]'
+        const isExactMatch = pathname === '/project/[ref]'
         return isExactMatch
       }
 
       // For other routes, use the original startsWith logic
-      const isMatch = router.pathname.startsWith(route)
+      const isMatch = pathname.startsWith(route)
       return isMatch
     })
 

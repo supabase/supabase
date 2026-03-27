@@ -3,7 +3,7 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
@@ -125,7 +125,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const { mutateAsync: rateMessage } = useRateMessageMutation()
 
-  const isInSQLEditor = router.pathname.includes('/sql/[id]')
+  const isInSQLEditor = router?.pathname?.includes('/sql/') ?? false
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.sql
 

@@ -1,13 +1,16 @@
+import type { QueryClient } from '@tanstack/react-query'
 import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
+import { tableRowKeys } from 'data/table-rows/keys'
+import type { TableRowsData } from 'data/table-rows/table-rows-query'
 import type { Dictionary } from 'types'
 
-import { isPendingAddRow, PendingAddRow, SupaRow } from '../types'
-import {
+import { isPendingAddRow, type PendingAddRow, type PendingDeleteRow, type SupaRow } from '../types'
+import type {
   EditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
-  QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
+import { QueuedOperationType } from '@/state/table-editor-operation-queue.types'
 
 interface EditCellKeyOperation extends Omit<
   EditCellContentOperation,
@@ -58,6 +61,58 @@ export function rowMatchesIdentifiers(
   const identifierEntries = Object.entries(rowIdentifiers)
   if (identifierEntries.length === 0) return false
   return identifierEntries.every(([key, value]) => row[key] === value)
+}
+
+export function applyCellEdit(
+  rows: SupaRow[],
+  columnName: string,
+  rowIdentifiers: Dictionary<unknown>,
+  newValue: unknown
+): SupaRow[] {
+  return rows.map((row) => {
+    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
+    if (rowMatches) {
+      return { ...row, [columnName]: newValue }
+    }
+    return row
+  })
+}
+
+export function applyRowAdd(
+  rows: SupaRow[],
+  tempId: string,
+  idx: number,
+  rowData: Dictionary<unknown>
+): (PendingAddRow | SupaRow)[] {
+  const existingIndex = rows.findIndex((row) => isPendingAddRow(row) && row.__tempId === tempId)
+  if (existingIndex >= 0) {
+    return rows.map((row, index) => {
+      if (index === existingIndex) {
+        return { ...row, ...rowData, __tempId: tempId }
+      }
+      return row
+    })
+  }
+
+  const newRow: PendingAddRow = {
+    idx,
+    ...rowData,
+    __tempId: tempId,
+  }
+  return [newRow, ...rows]
+}
+
+export function markRowAsDeleted(
+  rows: SupaRow[],
+  rowIdentifiers: Dictionary<unknown>
+): (PendingDeleteRow | SupaRow)[] {
+  return rows.map((row): PendingDeleteRow | SupaRow => {
+    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
+    if (rowMatches) {
+      return { ...row, __isDeleted: true }
+    }
+    return row
+  })
 }
 
 export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
@@ -237,4 +292,56 @@ export function queueRowDeletesWithOptimisticUpdate({
       },
     })
   }
+}
+
+interface ReapplyOptimisticUpdatesParams {
+  queryClient: QueryClient
+  projectRef: string
+  tableId: number
+  operations: readonly QueuedOperation[]
+}
+
+/**
+ * Re-applies pending queue operations to cached row data after a refetch.
+ */
+export function reapplyOptimisticUpdates({
+  queryClient,
+  projectRef,
+  tableId,
+  operations,
+}: ReapplyOptimisticUpdatesParams) {
+  const tableOperations = operations.filter((op) => op.tableId === tableId)
+  if (tableOperations.length === 0) return
+
+  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
+  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
+    if (!old) return old
+
+    let rows = [...old.rows]
+    for (const operation of tableOperations) {
+      switch (operation.type) {
+        case QueuedOperationType.EDIT_CELL_CONTENT: {
+          const { rowIdentifiers, columnName, newValue } = operation.payload
+          rows = applyCellEdit(rows, columnName, rowIdentifiers, newValue)
+          break
+        }
+        case QueuedOperationType.ADD_ROW: {
+          const { tempId, rowData } = operation.payload
+          const idx = Number(tempId)
+          rows = applyRowAdd(rows, tempId, idx, rowData)
+          break
+        }
+        case QueuedOperationType.DELETE_ROW: {
+          const { rowIdentifiers } = operation.payload
+          rows = markRowAsDeleted(rows, rowIdentifiers)
+          break
+        }
+        default: {
+          throw new Error(`Unknown operation type: ${(operation as never)['type']}`)
+        }
+      }
+    }
+
+    return { ...old, rows }
+  })
 }

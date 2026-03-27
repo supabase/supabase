@@ -8,7 +8,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Organization } from 'types'
@@ -82,8 +82,13 @@ export const DeleteProjectModal = ({
 
       toast.success(`Successfully deleted ${project?.name}`)
 
-      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-      else router.push('/organizations')
+      if (router) {
+        if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+        else router.push('/organizations')
+      } else if (typeof window !== 'undefined') {
+        if (lastVisitedOrganization) window.location.assign(`/v2/org/${lastVisitedOrganization}`)
+        else window.location.assign('/v2')
+      }
     },
   })
   const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()

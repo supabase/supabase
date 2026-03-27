@@ -4,10 +4,11 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
 import { useSignOut } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { useRouter } from 'next/router'
-import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/compat/router'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { isNextPageWithLayout, type NextPageWithLayout } from 'types'
+import type { ComponentType } from 'react'
 
 const MAX_TIMEOUT = 10000 // 10 seconds
 
@@ -82,7 +83,12 @@ export function withAuth<T>(
 
       // Sign out before redirecting to sign in page incase the user is stuck in a loading state
       signOut().finally(() => {
-        router.push(`/sign-in?${searchParams.toString()}`)
+        const signInUrl = `/sign-in?${searchParams.toString()}`
+        if (router) {
+          router.push(signInUrl)
+        } else if (typeof window !== 'undefined') {
+          window.location.assign(signInUrl)
+        }
       })
     }, [router, signOut])
 
@@ -103,7 +109,7 @@ export function withAuth<T>(
           clearTimeout(timeoutIdRef.current)
         }
       }
-    }, [isFinishedLoading, router, redirectToSignIn])
+    }, [isFinishedLoading])
 
     const isCorrectLevel = options.useHighestAAL
       ? aalData?.currentLevel === aalData?.nextLevel
@@ -125,7 +131,7 @@ export function withAuth<T>(
     const InnerComponent = WrappedComponent as any
 
     const supportContext =
-      typeof router.query.ref === 'string' && router.pathname.startsWith('/project/')
+      typeof router?.query?.ref === 'string' && router.pathname.startsWith('/project/')
         ? {
             projectRef: router.query.ref,
             ...(typeof router.query.organizationSlug === 'string' && {

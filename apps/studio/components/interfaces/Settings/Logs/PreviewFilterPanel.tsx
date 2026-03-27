@@ -6,7 +6,8 @@ import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { IS_PLATFORM } from 'lib/constants'
 import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Button, cn, Input, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -68,17 +69,22 @@ const PreviewFilterPanel = ({
   selectedDatePickerValue,
   setSelectedDatePickerValue,
 }: PreviewFilterPanelProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
   const { ref } = useParams()
   const [search, setSearch] = useState('')
 
-  const logName = router.pathname.split('/').pop()
+  const pathnameForLogs = compatRouter?.pathname ?? appPathname
+  const logName = pathnameForLogs.split('/').filter(Boolean).pop() ?? 'logs'
 
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: ref })
 
-  // [Joshen] These are the routes tested that can show replica logs
+  const pagesPathname = compatRouter?.pathname
+  // [Joshen] These are the routes tested that can show replica logs (Pages router only).
   const showDatabaseSelector =
-    IS_PLATFORM && LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(router.pathname)
+    IS_PLATFORM &&
+    typeof pagesPathname === 'string' &&
+    LOG_ROUTES_WITH_REPLICA_SUPPORT.includes(pagesPathname)
 
   const hasEdits = search !== defaultSearchValue
 

@@ -1,18 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useCallback } from 'react'
+import { useRouter } from 'next/compat/router'
 
 import { useParams } from 'common'
+import { Footer } from 'components/grid/components/footer/Footer'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { useSyncTableEditorStateFromLocalStorageWithUrl } from 'components/grid/SupabaseGrid.utils'
 import {
-  Entity,
   isForeignTable,
   isMaterializedView,
   isTableLike,
   isView,
-  TableLike,
 } from 'data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
@@ -23,6 +22,9 @@ import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import { Button } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+
+import type { Entity, TableLike } from 'data/table-editor/table-editor-types'
+import { V2TableDataGrid } from '@/components/v2/views/V2TableDataGrid'
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'
@@ -30,14 +32,22 @@ import { TableDefinition } from './TableDefinition'
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
   selectedTable?: Entity
+  variant?: 'pages' | 'v2'
+  projectRefOverride?: string
+  tableIdOverride?: string | number
 }
 
 export const TableGridEditor = ({
   isLoadingSelectedTable = false,
   selectedTable,
+  variant = 'pages',
+  projectRefOverride,
+  tableIdOverride,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { ref: projectRef, id } = useParams()
+  const { ref: routeProjectRef, id: routeId } = useParams()
+  const projectRef = projectRefOverride ?? routeProjectRef
+  const id = tableIdOverride ? String(tableIdOverride) : routeId
   const { setLastVisitedTable } = useDashboardHistory()
   const { selectedSchema } = useQuerySchemaState()
 
@@ -63,26 +73,69 @@ export const TableGridEditor = ({
 
   const onTableCreated = useCallback(
     (table: { id: number }) => {
+      if (variant === 'v2') {
+        const base = projectRef ? `/v2/project/${projectRef}` : ''
+        if (router) {
+          router.push(
+            `${base}/data/tables/${table.id}/data${
+              !!selectedSchema ? `?schema=${selectedSchema}` : ''
+            }`
+          )
+        } else if (typeof window !== 'undefined') {
+          window.location.assign(
+            `${base}/data/tables/${table.id}/data${
+              !!selectedSchema ? `?schema=${selectedSchema}` : ''
+            }`
+          )
+        }
+        return
+      }
+
+      if (!router) return
       router.push(
-        `/project/${projectRef}/editor/${table.id}${!!selectedSchema ? `?schema=${selectedSchema}` : ''}`
+        `/project/${projectRef}/editor/${table.id}${
+          !!selectedSchema ? `?schema=${selectedSchema}` : ''
+        }`
       )
     },
-    [projectRef, router]
+    [projectRef, router, selectedSchema, variant]
   )
 
-  const onTableDeleted = useCallback(async () => {
-    // For simplicity for now, we just open the first table within the same schema
-    if (selectedTable) {
-      // Close tab
-      const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
+  const closeLegacyTab = useCallback(
+    (id: string) => {
+      if (!router) return
       tabs.handleTabClose({
-        id: tabId,
+        id,
         router,
         editor: 'table',
         onClearDashboardHistory: () => setLastVisitedTable(undefined),
       })
+    },
+    [router, setLastVisitedTable, tabs]
+  )
+
+  const onTableDeleted = useCallback(async () => {
+    if (!selectedTable) return
+
+    // For now, just close the deleted table tab.
+    // v2 uses v2 URLs, pages uses the legacy tab-close router logic.
+    const tabId = createTabId(selectedTable.entity_type, { id: selectedTable.id })
+
+    if (variant === 'v2') {
+      tabs.removeTab(tabId)
+      setLastVisitedTable(undefined)
+
+      const base = projectRef ? `/v2/project/${projectRef}` : ''
+      if (router) {
+        router.push(`${base}/data/tables`)
+      } else if (typeof window !== 'undefined') {
+        window.location.assign(`${base}/data/tables`)
+      }
+      return
     }
-  }, [router, selectedTable, tabs])
+
+    closeLegacyTab(tabId)
+  }, [closeLegacyTab, projectRef, router, selectedTable, tabs, setLastVisitedTable, variant])
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
 
@@ -117,7 +170,7 @@ export const TableGridEditor = ({
 
   return (
     // When any click happens in a table tab, the tab becomes permanent
-    <div className="h-full" onClick={() => tabs.makeActiveTabPermanent()}>
+    <div className="h-full" onPointerDownCapture={() => tabs.makeActiveTabPermanent()}>
       {!selectedTable ? (
         <div className="flex items-center justify-center h-full">
           <div className="w-[400px]">
@@ -126,19 +179,49 @@ export const TableGridEditor = ({
               title={`Unable to find your table with ID ${id}`}
               description="This table doesn't exist in your database"
             >
-              {!!tabId ? (
-                <Button
-                  type="default"
-                  className="mt-2"
-                  onClick={() => {
-                    tabs.handleTabClose({
-                      id: tabId,
-                      router,
-                      editor: 'table',
-                      onClearDashboardHistory: () => setLastVisitedTable(undefined),
-                    })
-                  }}
-                >
+              {variant === 'v2' ? (
+                !!tabId ? (
+                  <Button
+                    type="default"
+                    className="mt-2"
+                    onClick={() => {
+                      tabs.removeTab(tabId)
+                      setLastVisitedTable(undefined)
+                      const base = projectRef ? `/v2/project/${projectRef}` : ''
+                      if (router) {
+                        router.push(`${base}/data/tables`)
+                      } else if (typeof window !== 'undefined') {
+                        window.location.assign(`${base}/data/tables`)
+                      }
+                    }}
+                  >
+                    Close tab
+                  </Button>
+                ) : openTabs.length > 0 ? (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => setLastVisitedTable(undefined)}
+                  >
+                    <Link
+                      href={`/v2/project/${projectRef}/data/tables/${openTabs[0].split('-')[1]}/data`}
+                    >
+                      Close tab
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    type="default"
+                    className="mt-2"
+                    onClick={() => setLastVisitedTable(undefined)}
+                  >
+                    <Link href={`/v2/project/${projectRef}/data/tables`}>Head back</Link>
+                  </Button>
+                )
+              ) : !!tabId ? (
+                <Button type="default" className="mt-2" onClick={() => closeLegacyTab(tabId)}>
                   Close tab
                 </Button>
               ) : openTabs.length > 0 ? (
@@ -186,9 +269,19 @@ export const TableGridEditor = ({
               ) : null
             }
           >
-            {(isViewSelected || isTableSelected) && selectedView === 'definition' && (
+            {(isViewSelected || isTableSelected) && selectedView === 'definition' ? (
               <TableDefinition entity={selectedTable} />
-            )}
+            ) : variant === 'v2' && selectedView === 'data' ? (
+              <>
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                  <V2TableDataGrid
+                    projectRef={projectRef}
+                    tableId={selectedTable?.id ?? (id ? Number(id) : undefined)}
+                  />
+                </div>
+                <Footer />
+              </>
+            ) : null}
           </SupabaseGrid>
 
           <DeleteConfirmationDialogs

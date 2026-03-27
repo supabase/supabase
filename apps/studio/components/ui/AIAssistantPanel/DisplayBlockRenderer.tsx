@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useRef, useState, type DragEvent, type PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
@@ -90,8 +90,8 @@ export const DisplayBlockRenderer = ({
   const [rows, setRows] = useState<any[] | undefined>(
     Array.isArray(initialResults) ? initialResults : undefined
   )
-  const isReportsPage = router.pathname.endsWith('/reports/[id]')
-  const isHomePage = router.pathname === '/project/[ref]'
+  const isReportsPage = router?.pathname?.includes('/reports/') ?? false
+  const isHomePage = router?.pathname?.includes('/project/') ?? false
   const isDraggableToReports = canCreateSQLSnippet && (isReportsPage || isHomePage)
   const label = initialArgs.label || 'SQL Results'
   const [isWriteQuery, setIsWriteQuery] = useState<boolean>(initialArgs.isWriteQuery || false)

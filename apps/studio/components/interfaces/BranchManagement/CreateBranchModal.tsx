@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Check, DatabaseZap, DollarSign, GitMerge, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -20,11 +20,11 @@ import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import { UpgradeToPro } from 'components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
-import { DiskAttributesData, useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { projectKeys } from 'data/projects/keys'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
@@ -61,6 +61,8 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
+import type { DiskAttributesData } from 'data/config/disk-attributes-query'
+import type { DesiredInstanceSize } from 'data/projects/new-project.constants'
 
 export const CreateBranchModal = () => {
   const { ref } = useParams()
@@ -191,7 +193,11 @@ export const CreateBranchModal = () => {
       })
 
       setShowCreateBranchModal(false)
-      router.push(`/project/${data.project_ref}`)
+      if (router) {
+        router.push(`/project/${data.project_ref}`)
+      } else if (typeof window !== 'undefined') {
+        window.location.assign(`/v2/project/${data.project_ref}`)
+      }
     },
     onError: (error) => {
       toast.error(`Failed to create branch: ${error.message}`)
@@ -278,7 +284,11 @@ export const CreateBranchModal = () => {
 
   const handleGitHubClick = () => {
     setShowCreateBranchModal(false)
-    router.push(`/project/${projectRef}/settings/integrations`)
+    if (router) {
+      router.push(`/project/${projectRef}/settings/integrations`)
+    } else if (typeof window !== 'undefined') {
+      window.location.assign(`/v2/project/${projectRef}/settings/integrations`)
+    }
   }
 
   useEffect(() => {

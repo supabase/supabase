@@ -159,7 +159,7 @@ export const TableNode = ({
             }
           </header>
 
-          {data.columns.map((column) => (
+          {data.columns.map((column: TableNodeData['columns'][number]) => (
             <div
               className={cn(
                 'text-[8px] leading-5 relative flex flex-row justify-items-start',

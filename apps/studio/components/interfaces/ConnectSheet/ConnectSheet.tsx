@@ -61,9 +61,9 @@ export const ConnectSheet = () => {
 
   const handleOpenChange = (sheetOpen: boolean) => {
     if (!sheetOpen) {
-      setConnectTab(null)
+      void setConnectTab(null)
     }
-    setShowConnect(sheetOpen)
+    void setShowConnect(sheetOpen)
   }
 
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })

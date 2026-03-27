@@ -1,6 +1,7 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 
 import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
@@ -11,7 +12,9 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 const SUPPORTED_TAX_ID_COUNTRIES = new Set(TAX_IDS.map((t) => t.countryIso2))
 
 export const TaxIdBanner = () => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
   const { data: org } = useSelectedOrganizationQuery()
   const slug = org?.slug
 
@@ -37,7 +40,7 @@ export const TaxIdBanner = () => {
   const hasSupportedTaxId = !!billingCountry && SUPPORTED_TAX_ID_COUNTRIES.has(billingCountry)
 
   if (
-    router.pathname.includes('sign-in') ||
+    pathname.includes('sign-in') ||
     !org ||
     org.plan?.id === 'free' ||
     org.billing_partner ||

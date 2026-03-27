@@ -1,38 +1,36 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
-  ColorMode,
-  Edge,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
 } from '@xyflow/react'
+import type { ColorMode, Edge } from '@xyflow/react'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import '@xyflow/react/dist/style.css'
 
 import { useParams } from 'common'
+import { useV2Params } from '@/app/v2/V2ParamsContext'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import type { Database } from 'data/read-replicas/replicas-query'
 import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDb,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { IS_PLATFORM, PROVIDERS } from 'lib/constants'
 import { timeout } from 'lib/helpers'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import {
   Button,
   cn,
@@ -54,17 +52,28 @@ import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationMod
 
 interface InstanceConfigurationUIProps {
   diagramOnly?: boolean
+  /** Prefer passing from parent when router params may be unavailable (e.g. embedded surfaces). */
+  projectRefProp?: string
 }
 
-const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationUIProps) => {
+const InstanceConfigurationUI = ({
+  diagramOnly = false,
+  projectRefProp,
+}: InstanceConfigurationUIProps) => {
   const router = useRouter()
   const reactFlow = useReactFlow()
-  const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef } = useParams()
-  const { isPending: isLoadingProject } = useSelectedProjectQuery()
-
-  const isAws = useIsAwsCloudProvider()
+  const { projectRef: v2ProjectRef } = useV2Params()
+  const { ref: commonProjectRef } = useParams()
+  const projectRef = projectRefProp ?? v2ProjectRef ?? commonProjectRef
+  const { data: project, isPending: isLoadingProject } = useProjectDetailQuery(
+    { ref: projectRef },
+    {
+      enabled: Boolean(projectRef),
+    }
+  )
+  const isOrioleDb = project?.dbVersion?.endsWith('orioledb') ?? false
+  const isAws = project?.cloud_provider === PROVIDERS.AWS.id
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
   const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
@@ -77,10 +86,13 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
   const { can: canManageReplicas } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
 
   const {
-    data: loadBalancers,
+    data: loadBalancersData,
     refetch: refetchLoadBalancers,
-    isSuccess: isSuccessLoadBalancers,
+    isSuccess: isSuccessLoadBalancersQuery,
   } = useLoadBalancersQuery({ projectRef })
+  // Self-hosted: load-balancers query is disabled (`IS_PLATFORM`); treat as done with no LBs.
+  const loadBalancers = IS_PLATFORM ? (loadBalancersData ?? []) : []
+  const isSuccessLoadBalancers = IS_PLATFORM ? isSuccessLoadBalancersQuery : true
   const {
     data,
     error,
@@ -210,7 +222,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     []
   )
 
-  const setReactFlow = async () => {
+  const setReactFlow = useCallback(async () => {
     const graph = getDagreGraphLayout(nodes, edges)
     const { nodes: updatedNodes } = addRegionNodes(graph.nodes, graph.edges)
     reactFlow.setNodes(updatedNodes)
@@ -219,7 +231,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     // [Joshen] Odd fix to ensure that react flow snaps back to center when adding nodes
     await timeout(1)
     reactFlow.fitView({ maxZoom: 0.9, minZoom: 0.9 })
-  }
+  }, [edges, nodes, reactFlow])
 
   // [Joshen] Just FYI this block is oddly triggering whenever we refocus on the viewport
   // even if I change the dependency array to just data. Not blocker, just an area to optimize
@@ -227,22 +239,24 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
     if (isSuccessReplicas && isSuccessLoadBalancers && nodes.length > 0 && view === 'flow') {
       setReactFlow()
     }
-  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
+  }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, view, setReactFlow])
 
   return (
     <div className={cn('nowheel', diagramOnly ? 'h-full' : 'border-y')}>
       <div
         className={`${diagramOnly ? 'h-full' : 'h-[500px]'} w-full relative ${
-          isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
+          isSuccessReplicas && (!projectRef || !isLoadingProject)
+            ? ''
+            : 'flex items-center justify-center px-28'
         }`}
       >
         {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
             You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
-        {(isLoading || isLoadingProject) && (
+        {(isLoading || (Boolean(projectRef) && isLoadingProject)) && (
           <Loader2 className="animate-spin text-foreground-light" />
         )}
         {isError && <AlertError error={error} subject="Failed to retrieve replicas" />}
-        {isSuccessReplicas && !isLoadingProject && (
+        {isSuccessReplicas && (!projectRef || !isLoadingProject) && (
           <>
             {!diagramOnly && infrastructureReadReplicas && (
               <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
@@ -334,7 +348,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
               </ReactFlow>
             ) : (
               <MapView
-                onSelectDeployNewReplica={() => router.push(newReplicaURL)}
+                onSelectDeployNewReplica={() => router?.push(newReplicaURL)}
                 onSelectRestartReplica={setSelectedReplicaToRestart}
                 onSelectDropReplica={setSelectedReplicaToDrop}
               />
@@ -370,12 +384,16 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
 
 interface InstanceConfigurationProps {
   diagramOnly?: boolean
+  projectRef?: string
 }
 
-export const InstanceConfiguration = ({ diagramOnly = false }: InstanceConfigurationProps) => {
+export const InstanceConfiguration = ({
+  diagramOnly = false,
+  projectRef,
+}: InstanceConfigurationProps) => {
   return (
     <ReactFlowProvider>
-      <InstanceConfigurationUI diagramOnly={diagramOnly} />
+      <InstanceConfigurationUI diagramOnly={diagramOnly} projectRefProp={projectRef} />
     </ReactFlowProvider>
   )
 }

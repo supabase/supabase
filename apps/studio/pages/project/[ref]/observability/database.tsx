@@ -21,12 +21,20 @@ import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHand
 import { ReportSettings } from 'components/ui/Charts/ReportSettings'
 import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 import Panel from 'components/ui/Panel'
+import {
+  applyDemoInfrastructureIfUnreliable,
+  parseConnectionsData,
+  parseInfrastructureMetrics,
+} from 'components/interfaces/Observability/DatabaseInfrastructureSection.utils'
+import type { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
+import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
 import { analyticsKeys } from 'data/analytics/keys'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { getReportAttributesV2 } from 'data/reports/database-charts'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -40,7 +48,7 @@ import { DOCS_URL } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
@@ -62,6 +70,147 @@ DatabaseReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
+
+/** Past-24h infra + advisor snapshot for the database observability page (demo fill when telemetry is empty). */
+const DatabaseObservabilityHealthSummary = () => {
+  const { data: project } = useSelectedProjectQuery()
+  const projectRef = project?.ref
+
+  const { startDate, endDate } = useMemo(() => {
+    const n = dayjs()
+    return { startDate: n.subtract(1, 'day').toISOString(), endDate: n.toISOString() }
+  }, [])
+
+  const attributes = useMemo<InfraMonitoringAttribute[]>(
+    () => [
+      'avg_cpu_usage',
+      'ram_usage',
+      'disk_fs_used_system',
+      'disk_fs_used_wal',
+      'pg_database_size',
+      'disk_fs_size',
+      'disk_io_consumption',
+      'pg_stat_database_num_backends',
+    ],
+    []
+  )
+
+  const { data: infraData } = useInfraMonitoringAttributesQuery(
+    {
+      projectRef,
+      attributes,
+      startDate,
+      endDate,
+      interval: '1h',
+    },
+    { enabled: Boolean(projectRef) }
+  )
+
+  const { data: maxConnectionsData } = useMaxConnectionsQuery({
+    projectRef,
+    connectionString: project?.connectionString,
+  })
+
+  const rawMetrics = parseInfrastructureMetrics(infraData)
+  const rawConnections = parseConnectionsData(infraData, maxConnectionsData)
+  const { metrics, connections, isDemo } = applyDemoInfrastructureIfUnreliable(
+    infraData,
+    rawMetrics,
+    rawConnections
+  )
+
+  const lintsQuery = useProjectLintsQuery({ projectRef })
+  const lints = lintsQuery.data ?? []
+
+  const secErr = lints.filter((l) => l.categories.includes('SECURITY') && l.level === 'ERROR').length
+  const secWarn = lints.filter((l) => l.categories.includes('SECURITY') && l.level === 'WARN').length
+  const perfErr = lints.filter((l) => l.categories.includes('PERFORMANCE') && l.level === 'ERROR')
+    .length
+  const perfWarn = lints.filter((l) => l.categories.includes('PERFORMANCE') && l.level === 'WARN')
+    .length
+  const advisorNoise = secErr + secWarn + perfErr + perfWarn > 0
+
+  const cpu = metrics.cpu.current
+  const ram = metrics.ram.current
+  const disk = metrics.disk.current
+  const diskIo = metrics.diskIo.current
+  const connRatio =
+    connections.max > 0 ? connections.current / Math.max(connections.max, 1) : 0
+
+  const pressureSignals = [
+    cpu >= 72,
+    ram >= 78,
+    disk >= 82,
+    connRatio >= 0.82,
+    diskIo >= 72,
+  ].filter(Boolean).length
+
+  let variant: 'default' | 'warning' | 'destructive' = 'default'
+  if (secErr > 0 || pressureSignals >= 3) variant = 'destructive'
+  else if (perfErr > 0 || pressureSignals >= 1 || advisorNoise) variant = 'warning'
+
+  const title =
+    variant === 'destructive'
+      ? 'Last 24 hours: review recommended'
+      : variant === 'warning'
+        ? 'Last 24 hours: monitor metrics below'
+        : 'Last 24 hours: metrics look steady'
+
+  let body = ''
+  if (isDemo) {
+    body +=
+      '[Demo sample] Showing illustrative 24h averages because live telemetry had no hourly points yet. '
+  }
+
+  body += `Hourly averages over roughly the past day: CPU about ${cpu.toFixed(0)}%, memory about ${ram.toFixed(
+    0
+  )}%, disk about ${disk.toFixed(0)}% used, disk IO about ${diskIo.toFixed(0)}%. `
+
+  if (connections.max > 0) {
+    body += `Database connections averaged near ${connections.current} of ${connections.max}. `
+  }
+
+  if (pressureSignals >= 3) {
+    body += `Several metrics are high. Review logs and query statistics before you change compute size alone. `
+  } else if (pressureSignals === 2) {
+    body += `Two metrics are elevated. Review the charts below and related logs. `
+  } else if (pressureSignals === 1) {
+    body += `One metric is elevated. Track it on the charts below. `
+  } else {
+    body += `This summary does not show saturation from averages alone. `
+  }
+
+  if (secErr > 0) {
+    body += `Advisors report ${secErr} security error(s). Review Row Level Security and policies for possible data exposure. `
+  } else if (secWarn > 0) {
+    body += `Advisors report ${secWarn} security warning(s). Plan updates to access rules as traffic grows. `
+  }
+
+  if (perfErr > 0) {
+    body += `Advisors report ${perfErr} performance error(s). Address these before you rely on the system under higher load. `
+  } else if (perfWarn > 0 && pressureSignals === 0) {
+    body += `Advisors report ${perfWarn} performance warning(s). You can schedule fixes during regular maintenance. `
+  }
+
+  if (!projectRef) return null
+
+  if (lintsQuery.isLoading) {
+    return (
+      <Alert_Shadcn_ variant="default" className="mb-4 mx-4 lg:mx-6">
+        <AlertDescription_Shadcn_>Loading 24h health summary…</AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
+
+  return (
+    <Alert_Shadcn_ variant={variant} className="mb-4 mx-4 lg:mx-6">
+      <AlertDescription_Shadcn_>
+        <p className="font-medium mb-1">{title}</p>
+        <p className="text-foreground-light">{body}</p>
+      </AlertDescription_Shadcn_>
+    </Alert_Shadcn_>
+  )
+}
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -213,6 +362,7 @@ const DatabaseUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector title="Database" />
+      <DatabaseObservabilityHealthSummary />
       <ReportStickyNav
         content={
           <>

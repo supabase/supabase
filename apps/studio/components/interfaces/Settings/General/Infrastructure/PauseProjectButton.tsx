@@ -7,7 +7,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { Pause } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -41,7 +41,11 @@ const PauseProjectButton = () => {
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')
-      router.push(`/project/${projectRef}`)
+      if (router) {
+        router.push(`/project/${projectRef}`)
+      } else if (typeof window !== 'undefined') {
+        window.location.assign(`/v2/project/${projectRef}`)
+      }
     },
   })
 

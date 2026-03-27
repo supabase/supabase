@@ -18,8 +18,16 @@ import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import {
+  ComponentProps,
+  ComponentPropsWithoutRef,
+  FC,
+  ReactNode,
+  useEffect,
+  useMemo,
+} from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -48,6 +56,36 @@ import {
   useIsPlatformWebhooksEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
+
+/** First path segment after `base` (e.g. `team` for `/org/slug/team` or `/v2/org/slug/team`). */
+function firstSegmentAfterBase(pathname: string, base: string): string | undefined {
+  if (pathname === base) return undefined
+  const prefix = base.endsWith('/') ? base : `${base}/`
+  if (!pathname.startsWith(prefix)) return undefined
+  const rest = pathname.slice(prefix.length)
+  const seg = rest.split('/').filter(Boolean)[0]
+  return seg || undefined
+}
+
+function projectNavActiveSegment(pathname: string, projectRef: string | undefined): string | undefined {
+  if (!projectRef) return pathname.split('/')[3]
+  const v2 = `/v2/project/${projectRef}`
+  const v1 = `/project/${projectRef}`
+  if (pathname === v2 || pathname === v1) return undefined
+  return (
+    firstSegmentAfterBase(pathname, v2) ?? firstSegmentAfterBase(pathname, v1) ?? pathname.split('/')[3]
+  )
+}
+
+function orgNavActiveSegment(pathname: string, organizationSlug: string): string | undefined {
+  if (!organizationSlug) return pathname.split('/')[3]
+  const v2 = `/v2/org/${organizationSlug}`
+  const v1 = `/org/${organizationSlug}`
+  if (pathname === v2 || pathname === v1) return undefined
+  return (
+    firstSegmentAfterBase(pathname, v2) ?? firstSegmentAfterBase(pathname, v1) ?? pathname.split('/')[3]
+  )
+}
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -216,7 +254,9 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 }
 
 const ProjectLinks = () => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -229,7 +269,10 @@ const ProjectLinks = () => {
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
-  const activeRoute = router.pathname.split('/')[3]
+  const activeRoute = useMemo(
+    () => projectNavActiveSegment(pathname, ref),
+    [pathname, ref]
+  )
 
   const {
     projectAuthAll: authEnabled,
@@ -265,7 +308,7 @@ const ProjectLinks = () => {
       <SidebarGroup className="gap-0.5">
         <SideBarNavLink
           key="home"
-          active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+          active={isUndefined(activeRoute) && !isUndefined(ref)}
           route={{
             key: 'HOME',
             label: 'Project Overview',
@@ -364,10 +407,13 @@ const ProjectLinks = () => {
 }
 
 const OrganizationLinks = () => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
   const { slug } = useParams()
+  const queryOrgSlug = compatRouter?.query?.orgSlug as string | undefined
 
-  const organizationSlug: string = slug ?? (router.query.orgSlug as string) ?? ''
+  const organizationSlug: string = slug ?? queryOrgSlug ?? ''
 
   const { data: org } = useSelectedOrganizationQuery()
   const isUserMFAEnabled = useIsMFAEnabled()
@@ -375,7 +421,10 @@ const OrganizationLinks = () => {
 
   const showBilling = useIsFeatureEnabled('billing:all')
 
-  const activeRoute = router.pathname.split('/')[3]
+  const activeRoute = useMemo(
+    () => orgNavActiveSegment(pathname, organizationSlug),
+    [pathname, organizationSlug]
+  )
   const organizationSettingsRoutes = new Set([
     'general',
     'security',

@@ -6,7 +6,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Boxes, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname, useRouter as useAppRouter } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import { useState } from 'react'
 import {
   Command_Shadcn_,
@@ -29,7 +30,18 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { OrgSelectorSheet } from './OrgSelectorSheet'
 
 export function OrgSelector() {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
+  const appPathname = usePathname() ?? ''
+  const pathname = compatRouter?.pathname ?? appPathname
+
+  const navigate = (href: string) => {
+    if (compatRouter) void compatRouter.push(href)
+    else void appRouter.push(href)
+  }
+
+  const organizationsHref = pathname.startsWith('/v2/') ? '/v2/organizations' : '/organizations'
+
   const { slug: routeSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: organizations, isPending: isLoadingOrganizations } = useOrganizationsQuery()
@@ -118,7 +130,7 @@ export function OrgSelector() {
                         key={org.slug}
                         org={org}
                         selectedSlug={slug}
-                        routePathname={router.pathname}
+                        routePathname={pathname}
                         hasRouteSlug={!!routeSlug}
                         onClose={() => setOpen(false)}
                       />
@@ -131,11 +143,11 @@ export function OrgSelector() {
                     className="cursor-pointer w-full"
                     onSelect={() => {
                       setOpen(false)
-                      router.push('/organizations')
+                      navigate(organizationsHref)
                     }}
                     onClick={() => setOpen(false)}
                   >
-                    <Link href="/organizations" className="flex items-center gap-2 w-full">
+                    <Link href={organizationsHref} className="flex items-center gap-2 w-full">
                       <p>All Organizations</p>
                     </Link>
                   </CommandItem_Shadcn_>
@@ -148,7 +160,7 @@ export function OrgSelector() {
                         className="cursor-pointer w-full"
                         onSelect={() => {
                           setOpen(false)
-                          router.push('/new')
+                          navigate('/new')
                         }}
                         onClick={() => setOpen(false)}
                       >

@@ -1,5 +1,5 @@
-import { ComponentProps, ComponentPropsWithoutRef, ElementRef, ReactNode, forwardRef } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const ButtonTooltip = forwardRef<
   ElementRef<typeof Button>,
@@ -19,7 +19,9 @@ export const ButtonTooltip = forwardRef<
         </Button>
       </TooltipTrigger>
       {props.tooltip.content.text !== undefined && (
-        <TooltipContent {...props.tooltip.content}>{props.tooltip.content.text}</TooltipContent>
+        <TooltipContent side={props.tooltip.content.side} {...props.tooltip.content}>
+          {props.tooltip.content.text}
+        </TooltipContent>
       )}
     </Tooltip>
   )

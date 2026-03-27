@@ -15,8 +15,9 @@ import {
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 
 export const useInstalledIntegrations = () => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const canQueryInstalledIntegrations = Boolean(project?.ref) && Boolean(project?.connectionString)
 
   const allIntegrations = useMemo(() => {
     return INTEGRATIONS.filter((integration) => {
@@ -39,6 +40,8 @@ export const useInstalledIntegrations = () => {
   } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  }, {
+    enabled: canQueryInstalledIntegrations,
   })
   const {
     data: extensions,
@@ -49,6 +52,8 @@ export const useInstalledIntegrations = () => {
   } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  }, {
+    enabled: canQueryInstalledIntegrations,
   })
 
   const {
@@ -60,6 +65,8 @@ export const useInstalledIntegrations = () => {
   } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+  }, {
+    enabled: canQueryInstalledIntegrations,
   })
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
@@ -95,9 +102,12 @@ export const useInstalledIntegrations = () => {
   }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled])
 
   const error = fdwError || extensionsError || schemasError
-  const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
+  const isLoading =
+    isProjectPending ||
+    (canQueryInstalledIntegrations && (isSchemasLoading || isFDWLoading || isExtensionsLoading))
   const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
-  const isSuccess = isSuccessFDWs && isSuccessExtensions && isSuccessSchemas
+  const isSuccess =
+    canQueryInstalledIntegrations && isSuccessFDWs && isSuccessExtensions && isSuccessSchemas
 
   return {
     // show all integrations at once instead of showing partial results

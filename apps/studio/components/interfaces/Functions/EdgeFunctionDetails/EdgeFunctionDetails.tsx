@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { usePathname, useRouter as useAppRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -56,8 +57,19 @@ const FormSchema = z.object({
   verify_jwt: z.boolean(),
 })
 
+/** Keep in sync with EdgeFunctionDetailsLayout (v2 edge function detail routes). */
+const V2_EDGE_FUNCTION_DETAIL_PATH =
+  /^\/v2\/project\/[^/]+\/data\/edge-functions\/[^/]+/
+
 export const EdgeFunctionDetails = () => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
+  const appPathname = usePathname() ?? ''
+  const pathWithoutQuery =
+    appPathname.length > 0
+      ? appPathname.split('?')[0]
+      : (compatRouter?.asPath?.split('?')[0] ?? '')
+
   const { ref: projectRef, functionSlug } = useParams()
 
   const showAllEdgeFunctionInvocationExamples = useIsFeatureEnabled(
@@ -91,7 +103,12 @@ export const EdgeFunctionDetails = () => {
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted "${selectedFunction?.name}"`)
-      router.push(`/project/${projectRef}/functions`)
+      if (!projectRef) return
+      const listHref = V2_EDGE_FUNCTION_DETAIL_PATH.test(pathWithoutQuery)
+        ? `/v2/project/${projectRef}/data/edge-functions`
+        : `/project/${projectRef}/functions`
+      if (compatRouter) void compatRouter.push(listHref)
+      else void appRouter.push(listHref)
     },
   })
 

@@ -12,6 +12,8 @@
 import { useRouter } from 'next/compat/router'
 import { useMemo } from 'react'
 
+import { useRouteParamsOverride } from './RouteParamsOverrideContext'
+
 /**
  * Helper to convert kebab case to camel case
  */
@@ -33,10 +35,11 @@ function convertToCamelCase(key: string): string {
 export function useParams(): {
   [k: string]: string | undefined
 } {
+  const override = useRouteParamsOverride()
   const router = useRouter()
   const query = router?.query
 
-  const modifiedQuery = {
+  const modifiedQuery: Record<string, unknown> = {
     ...query,
   }
 
@@ -49,6 +52,13 @@ export function useParams(): {
     }
   })
 
+  if (override) {
+    Object.keys(override).forEach((key) => {
+      const modifiedKey = convertToCamelCase(key)
+      modifiedQuery[modifiedKey] = override[key]
+    })
+  }
+
   return useMemo(
     () =>
       Object.fromEntries(
@@ -60,6 +70,6 @@ export function useParams(): {
           }
         })
       ),
-    [query]
+    [query, override]
   )
 }

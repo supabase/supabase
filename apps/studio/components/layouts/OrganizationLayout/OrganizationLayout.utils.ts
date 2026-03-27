@@ -9,5 +9,10 @@ export function getPathnameWithoutQuery(asPath?: string, fallback?: string): str
 export function isOrgMenuScope(pathname: string): boolean {
   if (!pathname || typeof pathname !== 'string') return false
   const trimmed = pathname.trim()
-  return trimmed.startsWith('/org/')
+  return (
+    trimmed.startsWith('/org/') ||
+    trimmed === '/v2/org' ||
+    trimmed.startsWith('/v2/org/') ||
+    trimmed.startsWith('/v2/organizations')
+  )
 }

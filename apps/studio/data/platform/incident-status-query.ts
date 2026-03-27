@@ -19,8 +19,7 @@ export async function getIncidentStatus(
   })
 
   if (!response.ok) {
-    const errorText = await response.text()
-    console.error('[getIncidentStatus] Failed:', response.status, errorText)
+    await response.text().catch(() => undefined)
 
     let retryAfter: number | undefined
     const retryAfterHeader = response.headers.get('Retry-After')

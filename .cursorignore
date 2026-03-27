@@ -1,1 +1,5 @@
+node_modules
+dist
+build
+.git
 !.env.example

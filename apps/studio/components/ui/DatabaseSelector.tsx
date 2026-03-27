@@ -8,13 +8,14 @@ import { IS_PLATFORM } from 'lib/constants'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { useRouter as useAppRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
-  ButtonProps,
+  type ButtonProps,
   cn,
   Command_Shadcn_,
   CommandGroup_Shadcn_,
@@ -50,7 +51,8 @@ export const DatabaseSelector = ({
   className,
   isForm = false,
 }: DatabaseSelectorProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
@@ -58,6 +60,7 @@ export const DatabaseSelector = ({
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const state = useDatabaseSelectorStateSnapshot()
+  const setSelectedDatabaseId = state.setSelectedDatabaseId
   const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
   const { data, isPending: isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
@@ -75,9 +78,8 @@ export const DatabaseSelector = ({
   const newReplicaURL = `/project/${projectRef}/database/replication?type=Read+Replica`
 
   useEffect(() => {
-    if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_selectedDatabaseId])
+    if (_selectedDatabaseId && !isForm) setSelectedDatabaseId(_selectedDatabaseId)
+  }, [_selectedDatabaseId, isForm, setSelectedDatabaseId])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
@@ -218,7 +220,8 @@ export const DatabaseSelector = ({
                   className="cursor-pointer w-full"
                   onSelect={() => {
                     setOpen(false)
-                    router.push(newReplicaURL)
+                    if (compatRouter) void compatRouter.push(newReplicaURL)
+                    else void appRouter.push(newReplicaURL)
                   }}
                   onClick={() => setOpen(false)}
                 >

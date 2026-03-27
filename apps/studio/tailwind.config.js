@@ -81,6 +81,7 @@ module.exports = config({
       animation: {
         shimmer: 'shimmer 2s infinite linear',
         sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'neon-rainbow-shift': 'neon-rainbow-shift 5s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
@@ -98,6 +99,10 @@ module.exports = config({
           '50%': {
             transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
           },
+        },
+        'neon-rainbow-shift': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
         },
       },
     },

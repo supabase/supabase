@@ -4,7 +4,7 @@ import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/Lay
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { X } from 'lucide-react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import SVG from 'react-inlinesvg'
 import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
@@ -26,6 +26,7 @@ export const HelpPanel = ({
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar, closeSidebar } = useSidebarManagerSnapshot()
   const router = useRouter()
+  const basePath = router?.basePath ?? ''
 
   const __styles = styleHandler('popover')
 
@@ -76,7 +77,7 @@ export const HelpPanel = ({
             >
               <Image
                 className="absolute left-0 top-0 opacity-50 transition-opacity group-hover:opacity-40"
-                src={`${router.basePath}/img/support/discord-bg-small.jpg`}
+                src={`${basePath}/img/support/discord-bg-small.jpg`}
                 layout="fill"
                 objectFit="cover"
                 alt="Discord illustration"
@@ -84,7 +85,7 @@ export const HelpPanel = ({
               <Button
                 type="secondary"
                 size="tiny"
-                icon={<SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
+                icon={<SVG src={`${basePath}/img/discord-icon.svg`} className="h-4 w-4" />}
               >
                 <span style={{ color: '#404EED' }}>Join us on Discord</span>
               </Button>

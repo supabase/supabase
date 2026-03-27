@@ -1,7 +1,7 @@
 import { mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import {
   forwardRef,
   Fragment,
@@ -108,12 +108,14 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     ref
   ) => {
     const router = useRouter()
+    const routerPathname = router?.pathname ?? ''
+    const routerAsPath = router?.asPath ?? ''
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
-    const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
+    const pathname = getPathnameWithoutQuery(routerAsPath, routerPathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
 
     const setMainScrollContainer = useSetMainScrollContainer()
@@ -147,10 +149,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
     const ignorePausedState =
-      router.pathname === '/project/[ref]' ||
-      router.pathname.includes('/project/[ref]/settings') ||
-      router.pathname.includes('/project/[ref]/functions') ||
-      router.pathname.includes('/project/[ref]/logs')
+      routerPathname === '/project/[ref]' ||
+      routerPathname.includes('/project/[ref]/settings') ||
+      routerPathname.includes('/project/[ref]/functions') ||
+      routerPathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
 
     useLayoutEffect(() => {
@@ -261,8 +263,9 @@ const MenuBarWrapper = ({
   children,
 }: MenuBarWrapperProps) => {
   const router = useRouter()
+  const routerPathname = router?.pathname ?? ''
   const { data: selectedProject } = useSelectedProjectQuery()
-  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(routerPathname)
 
   if (!isBlocking) {
     return children
@@ -294,15 +297,17 @@ interface ContentWrapperProps {
  */
 const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
+  const routerPathname = router?.pathname ?? ''
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+  const { setSelectedDatabaseId } = state
   const { data: selectedProject } = useSelectedProjectQuery()
-  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
-  const isHomePage = router.pathname === '/project/[ref]'
+  const isBackupsPage = routerPathname.includes('/project/[ref]/database/backups')
+  const isHomePage = routerPathname === '/project/[ref]'
 
-  const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => router.pathname.includes(x))
-  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
-  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+  const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => routerPathname.includes(x))
+  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(routerPathname)
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(routerPathname)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
@@ -323,16 +328,20 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   useEffect(() => {
     if (shouldRedirectToHomeForBuilding && ref) {
-      router.replace(`/project/${ref}`)
+      if (router) {
+        router.replace(`/project/${ref}`)
+      } else if (typeof window !== 'undefined') {
+        window.location.assign(`/v2/project/${ref}`)
+      }
     }
   }, [shouldRedirectToHomeForBuilding, ref, router])
 
   useEffect(() => {
-    if (ref) state.setSelectedDatabaseId(ref)
-  }, [ref])
+    if (ref) setSelectedDatabaseId(ref)
+  }, [ref, setSelectedDatabaseId])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
+    return routerPathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
   }
 
   if (isRestarting && !isBackupsPage) {

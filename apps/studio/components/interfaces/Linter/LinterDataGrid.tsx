@@ -1,17 +1,18 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import type { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import {
   LintCategoryBadge,
   LintEntity,
   lintInfoMap,
   NoIssuesFound,
 } from 'components/interfaces/Linter/Linter.utils'
-import { Lint } from 'data/lint/lint-query'
+import type { Lint } from 'data/lint/lint-query'
 import { useTrack } from 'lib/telemetry/track'
 import { X } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter as useCompatRouter } from 'next/compat/router'
+import { usePathname, useRouter as useAppRouter, useSearchParams } from 'next/navigation'
 import { useRef } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import DataGrid, { type Column, type DataGridHandle, Row } from 'react-data-grid'
 import ReactMarkdown from 'react-markdown'
 import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -34,7 +35,10 @@ const LinterDataGrid = ({
 }: LinterDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
+  const pathname = usePathname() ?? ''
+  const searchParams = useSearchParams()
   const track = useTrack()
 
   const lintCols = [
@@ -111,8 +115,15 @@ const LinterDataGrid = ({
   })
 
   function handleSidepanelClose() {
-    const { id, ...otherParams } = router.query
-    router.push({ query: otherParams })
+    if (compatRouter) {
+      const { id: _id, ...otherParams } = compatRouter.query
+      void compatRouter.push({ pathname: compatRouter.pathname ?? '/', query: otherParams })
+    } else {
+      const next = new URLSearchParams(searchParams?.toString() ?? '')
+      next.delete('id')
+      const qs = next.toString()
+      void appRouter.push(qs ? `${pathname}?${qs}` : pathname)
+    }
   }
 
   return (
@@ -148,8 +159,18 @@ const LinterDataGrid = ({
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                      const { id, ...rest } = router.query
-                      router.push({ ...router, query: { ...rest, id: props.row.cache_key } })
+                      if (compatRouter) {
+                        const { id: _id, ...rest } = compatRouter.query
+                        void compatRouter.push({
+                          pathname: compatRouter.pathname ?? '/',
+                          query: { ...rest, id: props.row.cache_key },
+                        })
+                      } else {
+                        const next = new URLSearchParams(searchParams?.toString() ?? '')
+                        next.set('id', props.row.cache_key)
+                        const qs = next.toString()
+                        void appRouter.push(qs ? `${pathname}?${qs}` : pathname)
+                      }
 
                       track('advisor_detail_opened', {
                         origin: 'advisors_page',
@@ -192,7 +213,7 @@ const LinterDataGrid = ({
               <Button type="text" icon={<X />} onClick={handleSidepanelClose} />
             </div>
             <div className="p-6 flex-grow min-h-0 overflow-y-auto">
-              <LintDetail lint={selectedLint} projectRef={ref!} />
+              <LintDetail lint={selectedLint} projectRef={ref ?? ''} />
             </div>
           </ResizablePanel>
         </>

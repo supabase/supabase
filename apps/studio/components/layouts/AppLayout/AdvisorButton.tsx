@@ -8,7 +8,13 @@ import { cn } from 'ui'
 
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
 
-export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
+export const AdvisorButton = ({
+  projectRef,
+  side,
+}: {
+  projectRef?: string
+  side?: 'left' | 'right'
+}) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
@@ -40,12 +46,13 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         size="tiny"
         id="advisor-center-trigger"
         className={cn(
-          'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
+          'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group border-transparent',
           isOpen && 'bg-foreground text-background'
         )}
         onClick={handleClick}
         tooltip={{
           content: {
+            side,
             text: 'Advisor Center',
           },
         }}

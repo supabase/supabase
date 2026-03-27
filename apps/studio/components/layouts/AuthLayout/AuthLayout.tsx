@@ -1,8 +1,8 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
@@ -13,7 +13,7 @@ export const AuthProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()
 
   useAuthConfigPrefetch({ projectRef })
-  const page = router.pathname.split('/')[4]
+  const page = router?.pathname?.split('/')[4] ?? ''
   const menu = useGenerateAuthMenu()
 
   return <ProductMenu page={page} menu={menu} />

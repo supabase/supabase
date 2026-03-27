@@ -3,11 +3,8 @@ import BarChart from 'components/ui/Charts/BarChart'
 import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
 import Panel from 'components/ui/Panel'
-import {
-  ProjectLogStatsVariables,
-  UsageApiCounts,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
+import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
+import type { ProjectLogStatsVariables, UsageApiCounts } from 'data/analytics/project-log-stats-query'
 import dayjs from 'dayjs'
 import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
 import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
@@ -16,8 +13,8 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { Auth, Database, Realtime, Storage } from 'icons'
 import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useRouter } from 'next/compat/router'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Loading } from 'ui'
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
@@ -77,13 +74,13 @@ const ProjectUsage = () => {
     const selectedEnd = selectedStart.add(1, unit)
 
     if (_type === 'rest') {
-      router.push(
+      router?.push(
         `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}`
       )
       return
     }
 
-    router.push(
+    router?.push(
       `/project/${projectRef}/logs/edge-logs?its=${selectedStart.toISOString()}&ite=${selectedEnd.toISOString()}&f=${JSON.stringify(
         {
           product: {
@@ -217,21 +214,24 @@ const ProjectUsage = () => {
 }
 export default ProjectUsage
 
-const PanelHeader = (props: any) => {
-  const Tag = props?.href ? Link : 'div'
-  return (
-    <Tag href={props.href}>
-      <div
-        className={
-          'flex items-center space-x-3 opacity-80 transition ' +
-          (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
-        }
-      >
-        <div>{props.icon}</div>
-        <span className="flex items-center space-x-1">
-          <h4 className="mb-0 text-lg">{props.title}</h4>
-        </span>
-      </div>
-    </Tag>
+const PanelHeader = (props: { icon: ReactNode; title: string; href?: string }) => {
+  const inner = (
+    <div
+      className={
+        'flex items-center space-x-3 opacity-80 transition ' +
+        (props.href ? 'cursor-pointer hover:text-gray-1200 hover:opacity-100' : '')
+      }
+    >
+      <div>{props.icon}</div>
+      <span className="flex items-center space-x-1">
+        <h4 className="mb-0 text-lg">{props.title}</h4>
+      </span>
+    </div>
   )
+
+  if (props.href) {
+    return <Link href={props.href}>{inner}</Link>
+  }
+
+  return inner
 }

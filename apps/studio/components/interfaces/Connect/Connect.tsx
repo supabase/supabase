@@ -10,7 +10,8 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -37,7 +38,19 @@ import { ConnectTabContent } from './ConnectTabContent'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 
 export const Connect = () => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const searchParams = useSearchParams()
+  const appSearchString = searchParams?.toString() ?? ''
+
+  /** Pages: `router.query`; App Router: URL search string (nuqs syncs with both). */
+  const connectTabInUrl = useMemo(() => {
+    const q = compatRouter?.query
+    if (q != null) {
+      return typeof q.connectTab !== 'undefined'
+    }
+    return new URLSearchParams(appSearchString).has('connectTab')
+  }, [compatRouter?.query, appSearchString])
+
   const { ref: projectRef } = useParams()
 
   const {
@@ -250,7 +263,7 @@ export const Connect = () => {
 
   useEffect(() => {
     if (!open) return
-    const noConnectTabInUrl = typeof router.query.connectTab === 'undefined'
+    const noConnectTabInUrl = !connectTabInUrl
     const hasQuery = queryFramework || queryUsing || queryWith
     const inferred = inferConnectTabFromParentKey(queryFramework)
 
@@ -260,7 +273,7 @@ export const Connect = () => {
       if (inferred === 'mobiles') setConnectionObject(MOBILES)
       if (inferred === 'orms') setConnectionObject(ORMS)
     }
-  }, [open, router.query.connectTab, queryFramework, queryUsing, queryWith, setTab])
+  }, [open, connectTabInUrl, queryFramework, queryUsing, queryWith, setTab])
 
   useEffect(() => {
     if (!open) return

@@ -3,9 +3,8 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
 export const HomeIcon = ({ className }: { className?: string }) => {
@@ -14,7 +13,6 @@ export const HomeIcon = ({ className }: { className?: string }) => {
 
   const largeLogo = useIsFeatureEnabled('branding:large_logo')
 
-  const router = useRouter()
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
@@ -33,7 +31,7 @@ export const HomeIcon = ({ className }: { className?: string }) => {
     <Link href={href} className={cn('items-center justify-center flex-shrink-0 flex', className)}>
       <img
         alt="Supabase"
-        src={`${router.basePath}/img/supabase-logo.svg`}
+        src={`${BASE_PATH}/img/supabase-logo.svg`}
         className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
       />
     </Link>

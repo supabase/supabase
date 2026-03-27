@@ -4,17 +4,17 @@ import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
+import type { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { wrapWithRoleImpersonation, type RoleImpersonationState } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError, UseCustomQueryOptions } from 'types'
+import { ResponseError, type UseCustomQueryOptions } from 'types'
 
 import { handleError } from '../fetchers'
 import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { executeSql, type ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
 import { timeout } from '@/lib/helpers'
@@ -377,8 +377,9 @@ async function getTableRows(
       signal
     )
 
+    // Spread first so the positional grid index always wins over a real table column named `idx`
     const rows = result.map((x: any, index: number) => {
-      return { idx: index, ...x }
+      return { ...x, idx: index }
     }) as SupaRow[]
 
     return { rows }
@@ -388,28 +389,37 @@ async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  { projectRef, tableId, ...args }: Omit<TableRowsVariables, 'queryClient' | 'connectionString'>,
+  {
+    projectRef,
+    tableId,
+    connectionString: connectionStringOverride,
+    ...args
+  }: Omit<TableRowsVariables, 'queryClient'>,
   { enabled = true, ...options }: UseCustomQueryOptions<TableRowsData, TableRowsError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
+  const resolvedConnectionString = connectionStringOverride ?? connectionString
 
   // [Joshen] Exclude preflightCheck from query key
-  const { preflightCheck, ...othersArgs } = args
+  const { preflightCheck: _preflightCheck, ...othersArgs } = args
 
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
-      readReplicaIdentifier,
+      readReplicaIdentifier: connectionStringOverride ? undefined : readReplicaIdentifier,
       ...othersArgs,
     }),
     queryFn: ({ signal }) =>
-      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
+      getTableRows(
+        { queryClient, projectRef, connectionString: resolvedConnectionString, tableId, ...args },
+        signal
+      ),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
       typeof tableId !== 'undefined' &&
-      (!IS_PLATFORM || typeof connectionString !== 'undefined'),
+      (!IS_PLATFORM || typeof resolvedConnectionString !== 'undefined'),
     ...options,
   })
 }

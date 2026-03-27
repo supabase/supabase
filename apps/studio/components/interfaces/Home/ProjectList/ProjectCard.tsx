@@ -8,7 +8,8 @@ import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from 'lib/constants'
 import { Copy, Github, MoreVertical, Settings } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter as useAppRouter } from 'next/navigation'
+import { useRouter as useCompatRouter } from 'next/compat/router'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import type { Organization } from 'types'
@@ -42,8 +43,18 @@ export const ProjectCard = ({
   vercelIntegration,
   resourceWarnings,
 }: ProjectCardProps) => {
-  const router = useRouter()
+  const compatRouter = useCompatRouter()
+  const appRouter = useAppRouter()
   const { name, ref: projectRef } = project
+
+  const settingsHref = rewriteHref?.startsWith('/v2/')
+    ? `/v2/project/${projectRef}/settings/general`
+    : `/project/${projectRef}/settings/general`
+
+  const navigate = (href: string) => {
+    if (compatRouter) void compatRouter.push(href)
+    else void appRouter.push(href)
+  }
 
   const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
   const providerLabel =
@@ -102,7 +113,7 @@ export const ProjectCard = ({
                           className="gap-x-2"
                           onClick={(e) => {
                             e.stopPropagation()
-                            router.push(`/project/${projectRef}/settings/general`)
+                            navigate(settingsHref)
                           }}
                         >
                           <Settings size={14} />

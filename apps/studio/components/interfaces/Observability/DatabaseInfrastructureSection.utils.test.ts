@@ -153,6 +153,31 @@ describe('parseInfrastructureMetrics', () => {
     })
   })
 
+  it('averages hourly data points when series totals are missing', () => {
+    const mockResponse: InfraMonitoringMultiResponse = {
+      data: [
+        {
+          period_start: '2024-01-01T00:00:00Z',
+          values: { avg_cpu_usage: '40', ram_usage: '50' },
+        },
+        {
+          period_start: '2024-01-01T01:00:00Z',
+          values: { avg_cpu_usage: '60', ram_usage: '70' },
+        },
+      ],
+      series: {},
+    }
+
+    const result = parseInfrastructureMetrics(mockResponse)
+
+    expect(result).toEqual({
+      cpu: { current: 50, max: 100 },
+      ram: { current: 60, max: 100 },
+      disk: { current: 0, max: 100 },
+      diskIo: { current: 0, max: 100 },
+    })
+  })
+
   it('handles partial metrics data', () => {
     const mockResponse: InfraMonitoringMultiResponse = {
       data: [],

@@ -45,7 +45,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
     const result = await generateText({
       ...modelParams,
-      output: Output.object({ schema: cronSchema }),
+      experimental_output: Output.object({ schema: cronSchema }),
       prompt: source`
         You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
 
@@ -84,7 +84,14 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.output.cron_expression)
+    const expression = result.experimental_output?.cron_expression
+    if (expression === undefined || expression === '') {
+      return res.status(500).json({
+        error: 'Failed to generate a cron expression.',
+      })
+    }
+
+    return res.json(expression)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI cron generation failed: ${error.message}`)
