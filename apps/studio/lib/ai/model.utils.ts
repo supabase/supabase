@@ -2,17 +2,17 @@ export type ProviderName = 'bedrock' | 'openai'
 
 export type BedrockModel = 'anthropic.claude-3-7-sonnet-20250219-v1:0' | 'openai.gpt-oss-120b-1:0'
 
-export type OpenAIModelId = 'gpt-5' | 'gpt-5-mini'
+export type OpenAIModelId = 'gpt-5.4-nano' | 'gpt-5.3-codex'
 
 // Source: https://developers.openai.com/api/docs/guides/reasoning + per-model pages
 export type ReasoningEffort = 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
 
 // Per-model reasoning effort compatibility.
-// When adding a model, verify supported levels in the community matrix and add an entry:
-// https://community.openai.com/t/request-for-compatibility-matrix-reasoning-effort-sampling-parameters-across-gpt-5-series/1371738/2
+// Sources: https://developers.openai.com/api/docs/models/gpt-5.4-nano
+//          https://developers.openai.com/api/docs/models/gpt-5.3-codex
 type ModelReasoningSupport = {
-  'gpt-5': 'minimal' | 'low' | 'medium' | 'high'
-  'gpt-5-mini': 'minimal' | 'low' | 'medium' | 'high'
+  'gpt-5.4-nano': 'none' | 'low' | 'medium' | 'high' | 'xhigh'
+  'gpt-5.3-codex': 'low' | 'medium' | 'high' | 'xhigh'
 }
 
 type ReasoningEffortFor<ModelId extends OpenAIModelId> = ModelId extends keyof ModelReasoningSupport
@@ -47,22 +47,22 @@ export type OpenAIModelEntry = ReturnType<typeof openaiModelEntry>
 
 /** Default model entry for simple completion endpoints where latency is more important than reasoning. */
 export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({
-  id: 'gpt-5-mini',
-  reasoningEffort: 'minimal',
+  id: 'gpt-5.4-nano',
+  reasoningEffort: 'none',
 })
 
 // Single source of truth for all Assistant chat model variants and their reasoning levels.
 // Models with requiresAdvanceModelEntitlement false are available to all users; true requires the assistant.advance_model entitlement.
 export const ASSISTANT_MODELS = [
   openaiModelEntry({
-    id: 'gpt-5-mini',
+    id: 'gpt-5.4-nano',
     requiresAdvanceModelEntitlement: false,
-    reasoningEffort: 'minimal',
+    reasoningEffort: 'low',
   }),
   openaiModelEntry({
-    id: 'gpt-5',
+    id: 'gpt-5.3-codex',
     requiresAdvanceModelEntitlement: true,
-    reasoningEffort: 'minimal',
+    reasoningEffort: 'low',
   }),
 ] as const
 
@@ -77,9 +77,9 @@ const ASSISTANT_MODELS_MAP = Object.fromEntries(ASSISTANT_MODELS.map((m) => [m.i
   (typeof ASSISTANT_MODELS)[number]
 >
 
-export const DEFAULT_ASSISTANT_BASE_MODEL_ID = 'gpt-5-mini' satisfies AssistantBaseModelId
+export const DEFAULT_ASSISTANT_BASE_MODEL_ID = 'gpt-5.4-nano' satisfies AssistantBaseModelId
 
-export const DEFAULT_ASSISTANT_ADVANCE_MODEL_ID = 'gpt-5' satisfies AssistantModelId
+export const DEFAULT_ASSISTANT_ADVANCE_MODEL_ID = 'gpt-5.3-codex' satisfies AssistantModelId
 
 export function defaultAssistantModelId(hasAccessToAdvanceModel: boolean): AssistantModelId {
   return hasAccessToAdvanceModel
@@ -148,8 +148,8 @@ export const PROVIDERS: ProviderRegistry = {
   },
   openai: {
     models: {
-      'gpt-5': { default: false },
-      'gpt-5-mini': { default: true },
+      'gpt-5.3-codex': { default: false },
+      'gpt-5.4-nano': { default: true },
     },
     providerOptions: {
       openai: {

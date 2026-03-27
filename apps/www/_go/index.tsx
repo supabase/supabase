@@ -19,6 +19,7 @@ import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
+import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 import boltWebinar from './webinar/bolt-webinar'
 import boltWebinarThankYou from './webinar/bolt-webinar-thank-you'
 import figmaWebinarMay2026 from './webinar/figma-webinar-may2026'
@@ -48,6 +49,7 @@ const pages: GoPageInput[] = [
   aiEngineerEuropeContest,
   aiEngineerEuropeContestThankYou,
   startupGrindContest, // remove after May 31, 2026
+  supabaseStripeProjects,
 ]
 
 export default pages

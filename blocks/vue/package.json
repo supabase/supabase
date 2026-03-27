@@ -6,8 +6,8 @@
   "exports": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules .next .turbo",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",

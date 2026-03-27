@@ -1,24 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop } from 'lodash'
-import {
-  Check,
-  Columns,
-  Copy,
-  Edit,
-  Eye,
-  Filter,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
-import { useState } from 'react'
-
 import { useParams } from 'common'
 import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import AlertError from 'components/ui/AlertError'
@@ -37,6 +18,12 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
+import { noop } from 'lodash'
+import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
 import {
   Button,
   Card,
@@ -47,12 +34,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -62,6 +50,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 
@@ -317,20 +306,14 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="!px-0" />
-                  <TableHead key="name">Name</TableHead>
-                  <TableHead key="description" className="hidden lg:table-cell">
-                    Description
+                  <TableHead key="icon" className="w-0 !px-0" />
+                  <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
+                    Name
                   </TableHead>
-                  <TableHead key="rows" className="hidden text-right xl:table-cell">
-                    Rows (Estimated)
-                  </TableHead>
-                  <TableHead key="size" className="hidden text-right xl:table-cell">
-                    Size (Estimated)
-                  </TableHead>
-                  <TableHead key="realtime" className="hidden xl:table-cell text-right">
-                    Realtime Enabled
-                  </TableHead>
+                  <TableHead key="columns">Columns</TableHead>
+                  <TableHead key="rows">Rows (Estimated)</TableHead>
+                  <TableHead key="size">Size (Estimated)</TableHead>
+                  <TableHead key="realtime">Realtime</TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -384,80 +367,84 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="!pl-5 !pr-1">
+                        <TableCell className="w-0 !pl-5 !pr-1">
                           <Tooltip>
-                            <TooltipTrigger className="cursor-default">
-                              {/* [Alaister]: EntityTypeIcon supports PARTITIONED_TABLE, but formatAllEntities
-                                  doesn't distinguish between tables and partitioned tables yet.
-                                  Once the endpoint/formatAllEntities is updated to include partitioned tables,
-                                  EntityTypeIcon will automatically style them correctly. */}
-                              <EntityTypeIcon type={x.type} />
+                            <TooltipTrigger asChild className="cursor-default">
+                              <div className="flex w-4 justify-center">
+                                <EntityTypeIcon type={x.type} />
+                              </div>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
                               {formatTooltipText(x.type)}
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell>
-                          {/* only show tooltips if required, to reduce noise */}
-                          {x.name.length > 20 ? (
-                            <Tooltip disableHoverableContent={true}>
-                              <TooltipTrigger
-                                asChild
-                                className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
-                              >
-                                <p>{x.name}</p>
-                              </TooltipTrigger>
+                        <TableCell className="max-w-[160px] sm:max-w-[280px]">
+                          <div className="flex min-w-0 flex-col">
+                            {/* only show tooltips if required, to reduce noise */}
+                            {x.name.length > 20 ? (
+                              <Tooltip disableHoverableContent={true}>
+                                <TooltipTrigger
+                                  asChild
+                                  className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                                >
+                                  <p>{x.name}</p>
+                                </TooltipTrigger>
 
-                              <TooltipContent side="bottom">{x.name}</TooltipContent>
-                            </Tooltip>
+                                <TooltipContent side="bottom">{x.name}</TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <p>{x.name}</p>
+                            )}
+                            {x.comment !== null ? (
+                              <span
+                                className="max-w-md truncate text-foreground-lighter"
+                                title={x.comment}
+                              >
+                                {x.comment}
+                              </span>
+                            ) : null}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <p className="text-foreground-light">
+                            {x.columns.length.toLocaleString()}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          {x.rows !== undefined ? (
+                            <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
                           ) : (
-                            <p>{x.name}</p>
+                            <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell ">
-                          {x.comment !== null ? (
-                            <span className="lg:max-w-48 truncate inline-block" title={x.comment}>
-                              {x.comment}
-                            </span>
-                          ) : (
-                            <p className="text-border-stronger">No description</p>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden text-right xl:table-cell">
-                          {x.rows !== undefined ? x.rows.toLocaleString() : '-'}
-                        </TableCell>
-                        <TableCell className="hidden text-right xl:table-cell">
+                        <TableCell>
                           {x.size !== undefined ? (
-                            <code className="text-code-inline">{x.size}</code>
+                            <p className="text-foreground-light">{x.size}</p>
                           ) : (
-                            '-'
+                            <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="hidden xl:table-cell text-center">
+                        <TableCell>
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
-                            <div className="flex justify-end">
-                              <Check size={18} strokeWidth={2} className="text-brand" />
+                            <div className="flex items-center gap-x-2">
+                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (
-                            <div className="flex justify-end">
-                              <X size={18} strokeWidth={2} className="text-foreground-lighter" />
+                            <div className="flex items-center gap-x-2">
+                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                              <p className="text-foreground-lighter">Disabled</p>
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button
-                              asChild
-                              type="default"
-                              iconRight={<Columns size={14} className="text-foreground-light" />}
-                              className="whitespace-nowrap hover:border-muted"
-                              style={{ paddingTop: 3, paddingBottom: 3 }}
-                            >
+                            <Button asChild type="default">
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
-                                {x.columns.length} columns
+                                View columns
                               </Link>
                             </Button>
 
@@ -554,6 +541,13 @@ export const TableList = ({
                     ))}
                 </>
               </TableBody>
+              <TableFooter className="font-normal">
+                <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
+                  <TableCell colSpan={7} className="text-foreground-muted">
+                    {entities.length} {entities.length === 1 ? 'table' : 'tables'}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
             </Table>
           </Card>
         </div>

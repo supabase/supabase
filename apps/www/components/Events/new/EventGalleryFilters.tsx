@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '@ui/components/shadcn/ui/input'
+import { Input_Shadcn_ as Input } from 'ui'
 import { SearchIcon } from 'lucide-react'
 import { Badge } from 'ui'
 import { useEvents } from '~/app/events/context'

@@ -1,5 +1,5 @@
 ---
-description: "Studio: form patterns (page layouts + side panels) and react-hook-form conventions"
+description: 'Studio: form patterns (page layouts + side panels) and react-hook-form conventions'
 globs:
   - apps/studio/**/*.{ts,tsx}
 alwaysApply: false
@@ -29,7 +29,6 @@ Use the Design System UI pattern docs as the source of truth:
 
 ## Actions and state
 
-- Handle dirty state (`form.formState.isDirty`) to show Cancel and to disable Save.
+- Handle dirty state by destructuring `isDirty` from `formState` (`const { isDirty } = form.formState`) then use it to show Cancel and to disable Save.
 - Show loading on submit buttons via `loading`.
 - When submit button is outside the `<form>`, set a stable `formId` and use the button’s `form` prop.
-
