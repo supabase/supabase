@@ -24,8 +24,8 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  markdownComponents,
 } from 'ui'
+import { markdownComponents } from 'ui-patterns/Markdown'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'

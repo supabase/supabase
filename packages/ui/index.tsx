@@ -1,7 +1,3 @@
-// Markdown components
-
-export * from './src/lib/Markdown'
-
 // GENERAL
 
 export * from './src/components/Button'
