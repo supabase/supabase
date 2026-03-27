@@ -11,10 +11,10 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Heading,
-  Mermaid,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Image, type ImageProps } from 'ui-patterns/Image'
+import { Mermaid } from 'ui-patterns/Mermaid'
 
 const Avatar = dynamic(() => import('~/components/Avatar'))
 const Chart = dynamic(() => import('~/components/Charts/PGCharts'))

@@ -502,6 +502,14 @@
       "import": "./src/McpUrlBuilder/utils/mcpIconAssets.ts",
       "types": "./src/McpUrlBuilder/utils/mcpIconAssets.ts"
     },
+    "./Mermaid/Mermaid": {
+      "import": "./src/Mermaid/Mermaid.tsx",
+      "types": "./src/Mermaid/Mermaid.tsx"
+    },
+    "./Mermaid": {
+      "import": "./src/Mermaid/index.tsx",
+      "types": "./src/Mermaid/index.tsx"
+    },
     "./MetricCard": {
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
@@ -756,6 +764,7 @@
     "js-yaml": "^3.14.1",
     "lodash": "catalog:",
     "lucide-react": "*",
+    "mermaid": "^11.12.1",
     "mdast": "^3.0.0",
     "monaco-editor": "*",
     "next-themes": "*",
