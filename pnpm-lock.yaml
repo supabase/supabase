@@ -1407,6 +1407,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.83.0
         version: 5.83.0(react@18.3.1)
+      '@xyflow/react':
+        specifier: ^12.10.1
+        version: 12.10.1(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       api-types:
         specifier: workspace:*
         version: link:../../packages/api-types
@@ -26479,7 +26482,7 @@ snapshots:
       '@tanstack/router-utils': 1.158.0(supports-color@8.1.1)
       '@tanstack/virtual-file-routes': 1.154.7
       chokidar: 3.6.0
-      unplugin: 2.3.10
+      unplugin: 2.3.11
       zod: 3.25.76
     optionalDependencies:
       '@tanstack/react-router': 1.158.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

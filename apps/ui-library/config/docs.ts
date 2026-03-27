@@ -96,6 +96,13 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Realtime Monaco',
     },
     {
+      title: 'Realtime Flow',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-flow',
+      items: [],
+      commandItemLabel: 'Realtime Flow',
+    },
+    {
       title: 'Current User Avatar',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/current-user-avatar',
