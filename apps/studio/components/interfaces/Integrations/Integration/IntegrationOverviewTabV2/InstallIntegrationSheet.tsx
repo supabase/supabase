@@ -27,7 +27,6 @@ import {
   SheetSection,
   SheetTitle,
   SheetTrigger,
-  SonnerProgress,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -55,8 +54,9 @@ interface InstallIntegrationSheetProps {
  * [Joshen] Trying to figure out what the ideal data structure is between local + remote integrations
  * So it might be a bit messy for now as we get more context and build out this UI
  *
- * If the integration only requires extensions, dashboard will generate the SQL statements
- * Otherwise if the integration provides its own SQL query for installation, that will take precedence
+ * If the integration provides its own SQL installation command, we'll use that
+ * Otherwise if the integration provides its own SQL installation query, we'll use that through the query endpoint
+ * Else if the integration only requires extensions, dashboard will generate the queries and fire through the query endpoint
  */
 
 export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheetProps) => {
@@ -70,6 +70,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     icon,
     name,
     installationSql,
+    installationCommand,
     missingExtensionsAlert,
     requiredExtensions: requiredExtensionNames,
   } = integration
@@ -116,13 +117,15 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     if (!project) return console.error('Project is required')
 
     setIsInstalling(true)
-    const toastId = toast.loading(<SonnerProgress progress={0} message={`Installing ${name}`} />)
+    const toastId = toast.loading(`Installing ${name}`)
 
     try {
-      if (!!installationSql) {
-        installIntegrationViaSQL()
+      if (!!installationCommand) {
+        await installationCommand({ ref: project.ref })
+      } else if (!!installationSql) {
+        await installIntegrationViaSQL()
       } else {
-        installIntegrationExtensions()
+        await installIntegrationExtensions()
       }
 
       toast.success(`Successfully installed ${name}`, { id: toastId })
@@ -141,7 +144,11 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     if (!installationSql) return console.error('Installation SQL is required')
 
     const { ref: projectRef, connectionString } = project
-    executeSql({ projectRef, connectionString, sql: installationSql })
+    try {
+      await executeSql({ projectRef, connectionString, sql: installationSql })
+    } catch (error) {
+      throw error
+    }
   }
 
   const installIntegrationExtensions = async () => {
