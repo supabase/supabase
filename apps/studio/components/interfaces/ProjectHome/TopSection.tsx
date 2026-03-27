@@ -80,7 +80,7 @@ export const TopSection = () => {
                     cloudProvider={project?.cloud_provider}
                     computeSize={project?.infra_compute_size}
                   />
-                  {(project?.high_availability || true) && <HighAvailabilityBadge />}
+                  {project?.high_availability && <HighAvailabilityBadge />}
                 </div>
               </div>
               <ProjectConnectionPopover projectRef={project?.ref} />
