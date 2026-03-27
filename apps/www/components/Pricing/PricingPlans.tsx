@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
+import type { PricingPageExperimentVariant } from '~/app/pricing/PricingContent'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import UpgradePlan from './UpgradePlan'
@@ -12,9 +13,14 @@ import UpgradePlan from './UpgradePlan'
 interface PricingPlansProps {
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
+  experimentVariant?: PricingPageExperimentVariant
 }
 
-const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
+const PricingPlans = ({
+  organizations,
+  hasExistingOrganizations,
+  experimentVariant,
+}: PricingPlansProps) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
@@ -68,12 +74,27 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                   </div>
                   <p
                     className={cn(
-                      'text-foreground-light mb-4 text-sm 2xl:pr-4',
+                      'text-foreground-light text-sm 2xl:pr-4',
+                      isProPlan &&
+                        (experimentVariant === 'flexibility_card' ||
+                          experimentVariant === 'hourly_rate')
+                        ? 'mb-2'
+                        : 'mb-4',
                       isProPlan && 'xl:mb-12'
                     )}
                   >
                     {plan.description}
                   </p>
+                  {isProPlan && experimentVariant === 'flexibility_card' && (
+                    <p className="text-brand text-xs mb-4 xl:mb-12">
+                      No lock-in. Scale up or down anytime — you only pay for the hours you use.
+                    </p>
+                  )}
+                  {isProPlan && experimentVariant === 'hourly_rate' && (
+                    <p className="text-brand text-xs mb-4 xl:mb-12">
+                      Compute from $0.01/hr. Scale anytime, pay only for what you use.
+                    </p>
+                  )}
                   {isUpgradablePlan && hasExistingOrganizations ? (
                     <UpgradePlan
                       planId={plan.planId}
@@ -123,24 +144,50 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                             </p>
                           </div>
 
-                          {plan.warning && (
+                          {isProPlan && experimentVariant === 'multi_project' ? (
                             <div className="mt-4 flex flex-col gap-1">
-                              <span
-                                className={cn(
-                                  'text-[13px] leading-4 inline-flex gap-1 items-center'
-                                )}
+                              <span className="text-[13px] leading-4">
+                                First project included. Additional projects from $10/mo.
+                              </span>
+                              <Link
+                                href="#addon-compute"
+                                className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
                               >
+                                See how pricing scales
+                              </Link>
+                            </div>
+                          ) : isProPlan && experimentVariant === 'estimate_cta' ? (
+                            <div className="mt-4 flex flex-col gap-1">
+                              <span className="text-[13px] leading-4">
                                 {plan.warning}
                               </span>
-                              {(plan.name === 'Pro' || plan.name === 'Team') && (
-                                <Link
-                                  href="#addon-compute"
-                                  className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
-                                >
-                                  Need more compute?
-                                </Link>
-                              )}
+                              <Link
+                                href="#addon-compute"
+                                className="hover:underline text-brand text-[13px] m-0 p-0 leading-3 font-medium"
+                              >
+                                Estimate your cost &darr;
+                              </Link>
                             </div>
+                          ) : (
+                            plan.warning && (
+                              <div className="mt-4 flex flex-col gap-1">
+                                <span
+                                  className={cn(
+                                    'text-[13px] leading-4 inline-flex gap-1 items-center'
+                                  )}
+                                >
+                                  {plan.warning}
+                                </span>
+                                {(plan.name === 'Pro' || plan.name === 'Team') && (
+                                  <Link
+                                    href="#addon-compute"
+                                    className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
+                                  >
+                                    Need more compute?
+                                  </Link>
+                                )}
+                              </div>
+                            )
                           )}
                         </div>
                       </div>

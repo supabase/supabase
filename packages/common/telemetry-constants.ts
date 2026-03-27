@@ -3037,6 +3037,35 @@ export interface LogExplorerQueryRunButtonClickedEvent {
 }
 
 /**
+ * User was exposed to the pricing value/flexibility experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingPageExperimentExposedEvent {
+  action: 'pricing_page_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingPageExperiment'
+    /**
+     * Experiment variant.
+     * GROWTH-694: flexibility (section), flexibility_card (on card), hourly_rate (on card)
+     * GROWTH-697: multi_project (on card), estimate_cta (on card)
+     */
+    variant:
+      | 'control'
+      | 'flexibility'
+      | 'flexibility_card'
+      | 'hourly_rate'
+      | 'multi_project'
+      | 'estimate_cta'
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3203,3 +3232,4 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
+  | PricingPageExperimentExposedEvent
