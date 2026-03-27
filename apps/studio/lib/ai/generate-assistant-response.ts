@@ -16,12 +16,8 @@ import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import {
   CHAT_PROMPT,
-  EDGE_FUNCTION_PROMPT,
   GENERAL_PROMPT,
   LIMITATIONS_PROMPT,
-  PG_BEST_PRACTICES,
-  REALTIME_PROMPT,
-  RLS_PROMPT,
   SECURITY_PROMPT,
 } from 'lib/ai/prompts'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
@@ -103,12 +99,16 @@ export async function generateAssistantResponse({
     const system = source`
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${REALTIME_PROMPT}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
+
+      ## Available Skills
+
+      Before answering questions about the following topics, call \`load_skill\` to load detailed knowledge:
+      - \`pg_best_practices\` — PostgreSQL best practices
+      - \`rls\` — Row Level Security policies
+      - \`edge_functions\` — Supabase Edge Functions
+      - \`realtime\` — Supabase Realtime
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
