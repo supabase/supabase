@@ -29,7 +29,12 @@ const unitMap = {
 } as const
 
 const formSchema = z.object({
-  expiresIn: z.coerce.number().positive('Expiry duration cannot be less than 0'),
+  expiresIn: z.preprocess(
+    (val) => (val ? val : undefined),
+    z.coerce
+      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .positive('Expiry duration cannot be less than 0')
+  ),
   units: z.enum(['days', 'weeks', 'months', 'years']),
 })
 
@@ -50,10 +55,15 @@ export const CustomExpiryModal = () => {
     defaultValues: { expiresIn: 0, units: 'days' },
   })
 
+  const handleClose = () => {
+    onClose()
+    form.reset()
+  }
+
   const { isDirty, isSubmitting } = form.formState
   const handleSubmit: SubmitHandler<FormSchema> = async (values) => {
     await onCopyUrl(selectedFileCustomExpiry!.path!, values.expiresIn * unitMap[values.units])
-    onClose()
+    handleClose()
   }
 
   const [expiresIn, units] = useWatch({
@@ -69,7 +79,7 @@ export const CustomExpiryModal = () => {
       visible={visible}
       alignFooter="right"
       confirmText="Get URL"
-      onCancel={() => onClose()}
+      onCancel={handleClose}
     >
       <Form_Shadcn_ {...form}>
         <Modal.Content>
@@ -94,7 +104,11 @@ export const CustomExpiryModal = () => {
                         type="number"
                         min={1}
                         max={1000}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          field.onChange(
+                            isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
+                          )
+                        }}
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
@@ -133,7 +147,7 @@ export const CustomExpiryModal = () => {
         </Modal.Content>
         <Modal.Separator />
         <Modal.Content className="flex items-center justify-end space-x-2">
-          <Button type="default" onClick={() => onClose()}>
+          <Button type="default" onClick={handleClose}>
             Cancel
           </Button>
           <Button
