@@ -48,8 +48,8 @@ export const KeyboardShortcut = ({
   return (
     <span
       className={cn(
-        'text-[11px] leading-none text-foreground-light inline-flex items-center whitespace-nowrap shrink-0 align-middle',
-        appearance === 'pill' && 'bg-surface-200 rounded px-[5px] py-[3px]',
+        'text-[11px] leading-none -tracking-[0.05em] inline-flex items-center whitespace-nowrap shrink-0 align-middle',
+        appearance === 'pill' ? 'text-foreground-light bg-surface-200 dark:bg-surface-100 rounded px-[5px] py-[3px]' : 'text-foreground/50',
         className
       )}
     >

@@ -69,7 +69,7 @@ export const SaveQueueActionBar = () => {
                     <KeyboardShortcut
                       keys={['Meta', 's']}
                       appearance="inline"
-                      className="ml-1.5 text-foreground/40"
+                      className="ml-1.5"
                     />
                   </Button>
                   <DropdownMenu>
