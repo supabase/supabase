@@ -35,10 +35,10 @@ type TagQueryResponse = {
   repository: {
     refs: {
       nodes:
-      | {
-        name: string
-      }[]
-      | null
+        | {
+            name: string
+          }[]
+        | null
       pageInfo: {
         hasNextPage: boolean
         endCursor: string | null
@@ -270,16 +270,16 @@ const WrappersDocs = async (props: { params: Promise<Params> }) => {
 
   const options = isExternal
     ? ({
-      mdxOptions: {
-        remarkPlugins: [
-          remarkMkDocsAdmonition,
-          emoji,
-          remarkPyMdownTabs,
-          [removeTitle, meta.title],
-        ],
-        rehypePlugins: [[linkTransform, combinedUrlTransformer], rehypeSlug],
-      },
-    } as SerializeOptions)
+        mdxOptions: {
+          remarkPlugins: [
+            remarkMkDocsAdmonition,
+            emoji,
+            remarkPyMdownTabs,
+            [removeTitle, meta.title],
+          ],
+          rehypePlugins: [[linkTransform, combinedUrlTransformer], rehypeSlug],
+        },
+      } as SerializeOptions)
     : undefined
 
   const dashboardIntegrationURL = getDashboardIntegrationURL(meta.dashboardIntegrationPath)
@@ -335,14 +335,14 @@ const getContent = async (params: Params) => {
       ),
       'utf-8'
     )
-      ; ({ data: meta, content } = matter(rawContent))
+    ;({ data: meta, content } = matter(rawContent))
     if (!isValidGuideFrontmatter(meta)) {
       throw Error(`Expected valid frontmatter, got ${JSON.stringify(meta, null, 2)}`)
     }
   } else {
     isExternal = true
     let remoteFile: string
-      ; ({ remoteFile, meta } = federatedPage)
+    ;({ remoteFile, meta } = federatedPage)
 
     const tag = await getLatestRelease()
     if (!tag) {
@@ -350,12 +350,7 @@ const getContent = async (params: Params) => {
     }
 
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
-    console.log('WRAPPERS PAGE', {
-      org,
-      repo,
-      path: `${docsDir}/${remoteFile}`,
-      branch: tag,
-    })
+
     let rawContent = await getGitHubFileContents({
       org,
       repo,
