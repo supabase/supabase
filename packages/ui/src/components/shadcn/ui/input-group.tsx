@@ -4,7 +4,7 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { Button } from './button'
 import { Input, type InputProps } from './input'
-import { TextArea, type TextAreaProps } from './text-area'
+import { Textarea, type TextareaProps } from './textarea'
 
 function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
@@ -137,9 +137,9 @@ function InputGroupInput({ className, ...props }: InputProps) {
   )
 }
 
-function InputGroupTextarea({ className, ...props }: TextAreaProps) {
+function InputGroupTextarea({ className, ...props }: TextareaProps) {
   return (
-    <TextArea
+    <Textarea
       data-slot="input-group-control"
       className={cn(
         'flex-1 resize-none rounded-none border-0 bg-transparent py-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
