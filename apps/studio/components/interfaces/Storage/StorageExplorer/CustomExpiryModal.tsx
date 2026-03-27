@@ -102,8 +102,6 @@ export const CustomExpiryModal = () => {
                       <Input_Shadcn_
                         {...field}
                         type="number"
-                        min={1}
-                        max={1000}
                         onChange={(e) => {
                           field.onChange(
                             isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
