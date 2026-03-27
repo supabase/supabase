@@ -264,9 +264,6 @@ export * from './src/components/shadcn/ui/sidebar'
 
 export * from './src/components/TextLink'
 
-// used for LW
-export * from './src/layout/banners'
-
 export * from './src/components/StatusIcon'
 
 // ICONS

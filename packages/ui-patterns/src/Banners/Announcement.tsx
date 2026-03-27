@@ -3,8 +3,7 @@
 import { X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useState } from 'react'
-
-import { cn } from '../../lib/utils/cn'
+import { cn } from 'ui'
 
 export interface AnnouncementProps {
   show: boolean
@@ -21,7 +20,7 @@ interface AnnouncementComponentProps {
   announcementKey: `announcement_${string}`
 }
 
-const Announcement = ({
+export const Announcement = ({
   show = true,
   dismissable = true,
   className,
@@ -76,5 +75,3 @@ const Announcement = ({
     )
   }
 }
-
-export default Announcement
