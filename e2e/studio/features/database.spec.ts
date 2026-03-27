@@ -723,7 +723,7 @@ test.describe('Database', () => {
       // delete role if exists
       const exists = (await page.getByRole('button', { name: databaseRoleName }).count()) > 0
       if (exists) {
-        await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
+        await page.getByRole('button', { name: `${databaseRoleName} actions` }).click()
         await page.getByRole('menuitem', { name: 'Delete' }).click()
         await page.getByRole('button', { name: 'Submit' }).click()
         await expect(
@@ -745,7 +745,7 @@ test.describe('Database', () => {
       ).toBeVisible({ timeout: 50000 })
 
       // delete a role
-      await page.getByRole('button', { name: databaseRoleName }).getByRole('button').click()
+      await page.getByRole('button', { name: `${databaseRoleName} actions` }).click()
       await page.getByRole('menuitem', { name: 'Delete' }).click()
       const roleDeleteWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=roles-delete')
       await page.getByRole('button', { name: 'Submit' }).click()

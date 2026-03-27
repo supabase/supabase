@@ -306,22 +306,14 @@ export const TableList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead key="icon" className="!px-0" />
+                  <TableHead key="icon" className="w-0 !px-0" />
                   <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
                     Name
                   </TableHead>
-                  <TableHead key="columns" className="text-right">
-                    Columns
-                  </TableHead>
-                  <TableHead key="rows" className="text-right">
-                    Rows (Estimated)
-                  </TableHead>
-                  <TableHead key="size" className="text-right">
-                    Size (Estimated)
-                  </TableHead>
-                  <TableHead key="realtime" className="text-right">
-                    Realtime Enabled
-                  </TableHead>
+                  <TableHead key="columns">Columns</TableHead>
+                  <TableHead key="rows">Rows (Estimated)</TableHead>
+                  <TableHead key="size">Size (Estimated)</TableHead>
+                  <TableHead key="realtime">Realtime</TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -375,10 +367,12 @@ export const TableList = ({
                   {entities.length > 0 &&
                     entities.map((x) => (
                       <TableRow key={x.id}>
-                        <TableCell className="!pl-5 !pr-1">
+                        <TableCell className="w-0 !pl-5 !pr-1">
                           <Tooltip>
-                            <TooltipTrigger className="cursor-default">
-                              <EntityTypeIcon type={x.type} />
+                            <TooltipTrigger asChild className="cursor-default">
+                              <div className="flex w-4 justify-center">
+                                <EntityTypeIcon type={x.type} />
+                              </div>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
                               {formatTooltipText(x.type)}
@@ -412,35 +406,37 @@ export const TableList = ({
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           <p className="text-foreground-light">
                             {x.columns.length.toLocaleString()}
                           </p>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           {x.rows !== undefined ? (
                             <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           {x.size !== undefined ? (
                             <p className="text-foreground-light">{x.size}</p>
                           ) : (
                             <p className="text-foreground-muted">–</p>
                           )}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell>
                           {(realtimePublication?.tables ?? []).find(
                             (table) => table.id === x.id
                           ) ? (
-                            <div className="flex justify-end">
-                              <Check size={16} strokeWidth={2} className="text-brand" />
+                            <div className="flex items-center gap-x-2">
+                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (
-                            <div className="flex justify-end">
-                              <X size={16} strokeWidth={2} className="text-foreground-lighter" />
+                            <div className="flex items-center gap-x-2">
+                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                              <p className="text-foreground-lighter">Disabled</p>
                             </div>
                           )}
                         </TableCell>
