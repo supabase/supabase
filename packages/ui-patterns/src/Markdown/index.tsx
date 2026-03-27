@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { cn, CodeBlock } from 'ui'
+import { cn } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const NextImageHandler = (props: any) => {
   return (

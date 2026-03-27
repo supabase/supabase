@@ -1,13 +1,11 @@
 import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, ExternalLink, ScanSearch } from 'lucide-react'
-import { type RefObject, useMemo } from 'react'
-// eslint-disable-next-line no-restricted-imports
+import { useMemo, type RefObject } from 'react'
 import { type Column, type DataGridHandle } from 'react-data-grid'
 import {
   Button,
   cn,
-  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { buildQueryInsightFixPrompt } from '../../QueryPerformance/QueryPerformance.ai'
