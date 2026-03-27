@@ -21,9 +21,9 @@ catalog:
   recharts: ^2.15.4
   tailwindcss: 3.4.1
   tsx: 4.20.3
-  typescript: ~5.9.0
+  typescript: ~6.0.0
   valtio: ^1.12.0
-  vite: ^7.1.11
+  vite: ^7.3.1
   vitest: ^3.2.0
   zod: 3.25.76
 
@@ -45,24 +45,13 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
+  - undici
   - next
   - '@next/*'
-  - ai
-  - js-yaml
-  - supabase
-  - iceberg-js
-  - '@vitejs/plugin-rsc'
-  - stripe-experiment-sync # TODO(matlin) remove, temp just to unblock launch
-  - braintrust
-  - tar
-  - diff
-  - lodash-es
-  - lodash
-  - next-mdx-remote
-  - react-resizable-panels
-  - swiper@12.1.2
-  - immutable
-  - undici
+  - h3
+  - typescript
+  - stripe-experiment-sync
 
 onlyBuiltDependencies:
   - node-pty
@@ -76,12 +65,14 @@ overrides:
   '@redocly/respect-core>js-yaml': ^4.1.1
   '@rollup/plugin-terser>serialize-javascript': ^7.0.3
   cacache>tar: ^7.5.11
+  dompurify: ^3.3.2
   esbuild: ^0.25.2
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   payload>undici: ^7.18.2
+  'pgsql-parser>libpg-query': ^15.2.0
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
   'terser-webpack-plugin>serialize-javascript': ^7.0.3
