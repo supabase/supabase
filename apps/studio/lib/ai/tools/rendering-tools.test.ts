@@ -32,11 +32,12 @@ describe('ai/tools/rendering-tools', () => {
       expect(tools.rename_chat.description).toContain('Rename the current chat session')
     })
 
-    it('should have exactly 3 tools', () => {
+    it('should have exactly 4 tools', () => {
       const tools = getRenderingTools()
       const toolNames = Object.keys(tools)
 
-      expect(toolNames).toHaveLength(3)
+      expect(toolNames).toHaveLength(4)
+      expect(toolNames).toContain('load_skill')
       expect(toolNames).toContain('execute_sql')
       expect(toolNames).toContain('deploy_edge_function')
       expect(toolNames).toContain('rename_chat')
