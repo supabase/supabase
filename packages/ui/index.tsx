@@ -260,13 +260,9 @@ export * from './src/components/TreeView'
 export * from './src/components/shadcn/ui/chart'
 export * from './src/components/shadcn/ui/sidebar'
 
-// links
-
-export * from './src/components/TextLink'
-
+// ICONS
 export * from './src/components/StatusIcon'
 
-// ICONS
 // export icons
 export * from './src/components/Icon/icons/IconBriefcase2'
 export * from './src/components/Icon/icons/IconBroadcast'

@@ -654,6 +654,10 @@
       "import": "./src/StatusCode/index.tsx",
       "types": "./src/StatusCode/index.tsx"
     },
+    "./TextLink": {
+      "import": "./src/TextLink/index.tsx",
+      "types": "./src/TextLink/index.tsx"
+    },
     "./ThemeToggle": {
       "import": "./src/ThemeToggle.tsx",
       "types": "./src/ThemeToggle.tsx"
