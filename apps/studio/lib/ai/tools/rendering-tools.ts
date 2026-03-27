@@ -1,6 +1,19 @@
 import { tool } from 'ai'
+import {
+  EDGE_FUNCTION_PROMPT,
+  PG_BEST_PRACTICES,
+  REALTIME_PROMPT,
+  RLS_PROMPT,
+} from 'lib/ai/prompts'
 import { fixSqlBackslashEscapes } from 'lib/ai/util'
 import { z } from 'zod'
+
+const SKILLS = {
+  pg_best_practices: PG_BEST_PRACTICES,
+  rls: RLS_PROMPT,
+  edge_functions: EDGE_FUNCTION_PROMPT,
+  realtime: REALTIME_PROMPT,
+} as const
 
 export const getRenderingTools = () => ({
   execute_sql: tool({
@@ -40,5 +53,15 @@ export const getRenderingTools = () => ({
     execute: async () => {
       return { status: 'Chat request sent to client' }
     },
+  }),
+  load_skill: tool({
+    description:
+      'Load detailed knowledge about a Supabase topic before answering questions about it.',
+    inputSchema: z.object({
+      skill: z
+        .enum(['pg_best_practices', 'rls', 'edge_functions', 'realtime'])
+        .describe('The topic to load knowledge for'),
+    }),
+    execute: async ({ skill }) => SKILLS[skill],
   }),
 })
