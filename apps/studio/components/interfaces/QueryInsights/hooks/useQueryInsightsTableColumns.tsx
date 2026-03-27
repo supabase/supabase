@@ -1,7 +1,6 @@
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, ExternalLink, ScanSearch } from 'lucide-react'
 import { useMemo, type RefObject } from 'react'
+// eslint-disable-next-line no-restricted-imports
 import { type Column, type DataGridHandle } from 'react-data-grid'
 import {
   Button,
@@ -32,6 +31,8 @@ import {
   getColumnName,
   getTableName,
 } from '../QueryInsightsTable/QueryInsightsTable.utils'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface UseQueryInsightsTableColumnsParams {
   sort: { column: string; order: 'asc' | 'desc' }
