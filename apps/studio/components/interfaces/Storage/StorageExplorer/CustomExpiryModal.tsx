@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { DATETIME_FORMAT } from 'lib/constants'
-import { FormItemLayout } from 'node_modules/ui-patterns/src/form/FormItemLayout/FormItemLayout'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
@@ -17,6 +16,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { useCopyUrl } from './useCopyUrl'
