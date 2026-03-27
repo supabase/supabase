@@ -56,7 +56,6 @@
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
     "framer-motion": "^11.0.3",
-    "highlightjs-curl": "^1.3.0",
     "input-otp": "^1.2.3",
     "lodash": "catalog:",
     "lucide-react": "^0.436.0",
