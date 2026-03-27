@@ -25,10 +25,7 @@ export function HotkeyToggle<T extends FieldValues>({
         control={form.control}
         name={name}
         render={({ field }) => (
-          <FormItemLayout
-            layout="flex-row-reverse"
-            label={label}
-          >
+          <FormItemLayout layout="flex-row-reverse" label={label}>
             <div className="flex w-full items-center justify-end gap-x-3">
               <KeyboardShortcut keys={keys} />
               <FormControl_Shadcn_>
