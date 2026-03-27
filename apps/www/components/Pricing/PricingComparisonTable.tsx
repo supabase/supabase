@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useIsLoggedIn } from 'common'
 
 import { plans } from 'shared-data/plans'
 import { pricing } from 'shared-data/pricing'
@@ -32,9 +33,16 @@ const MobileHeader = ({
   hasExistingOrganizations?: boolean
 }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const isLoggedIn = useIsLoggedIn()
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
+
+  const isDashboardNew = selectedPlan.href.startsWith('https://supabase.com/dashboard/new')
+  const planHref =
+    !isLoggedIn && isDashboardNew
+      ? `https://supabase.com/dashboard/sign-up?plan=${selectedPlan.planId}&returnTo=%2Fdashboard%2Fnew`
+      : selectedPlan.href
 
   return (
     <div className="mt-8 px-4 mobile-header">
@@ -73,7 +81,7 @@ const MobileHeader = ({
       ) : (
         <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
-            href={selectedPlan.href}
+            href={planHref}
             onClick={() =>
               sendTelemetryEvent({
                 action: 'www_pricing_plan_cta_clicked',
@@ -106,6 +114,7 @@ const PricingComparisonTable = ({
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const isLoggedIn = useIsLoggedIn()
 
   return (
     <div
@@ -373,6 +382,12 @@ const PricingComparisonTable = ({
               {plans.map((plan) => {
                 const isUpgradablePlan = plan.name === 'Pro' || plan.name === 'Team'
 
+                const isDashboardNew = plan.href.startsWith('https://supabase.com/dashboard/new')
+                const planHref =
+                  !isLoggedIn && isDashboardNew
+                    ? `https://supabase.com/dashboard/sign-up?plan=${plan.planId}&returnTo=%2Fdashboard%2Fnew`
+                    : plan.href
+
                 return (
                   <th
                     className="text-foreground w-1/4 px-0 text-left text-sm font-normal"
@@ -428,7 +443,7 @@ const PricingComparisonTable = ({
                             block
                           >
                             <Link
-                              href={plan.href}
+                              href={planHref}
                               onClick={() =>
                                 sendTelemetryEvent({
                                   action: 'www_pricing_plan_cta_clicked',
