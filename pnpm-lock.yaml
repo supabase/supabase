@@ -2562,9 +2562,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^3.2.0
         version: 3.2.4(supports-color@8.1.1)(vitest@3.2.4)
-      common:
-        specifier: workspace:*
-        version: link:../common
       config:
         specifier: workspace:*
         version: link:../config
