@@ -1,7 +1,7 @@
 'use client'
 
 import { useTrack } from 'lib/telemetry/track'
-import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay'
+import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 
 import { getMappingForError } from './ErrorMatcher.utils'
 

@@ -8,7 +8,7 @@
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },
@@ -314,10 +314,6 @@
       "import": "./src/ErrorDisplay/ErrorDisplay.types.ts",
       "types": "./src/ErrorDisplay/ErrorDisplay.types.ts"
     },
-    "./ErrorDisplay": {
-      "import": "./src/ErrorDisplay/ErrorDisplay.tsx",
-      "types": "./src/ErrorDisplay/ErrorDisplay.tsx"
-    },
     "./ExpandableVideo": {
       "import": "./src/ExpandableVideo/index.tsx",
       "types": "./src/ExpandableVideo/index.tsx"
@@ -462,6 +458,10 @@
       "import": "./src/McpUrlBuilder/utils/getMcpButtonData.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpButtonData.ts"
     },
+    "./McpUrlBuilder/utils/getMcpIconSrc.test": {
+      "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts",
+      "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts"
+    },
     "./McpUrlBuilder/utils/getMcpIconSrc": {
       "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts"
@@ -469,6 +469,10 @@
     "./McpUrlBuilder/utils/getMcpUrl": {
       "import": "./src/McpUrlBuilder/utils/getMcpUrl.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpUrl.ts"
+    },
+    "./McpUrlBuilder/utils/mcpIconAssets": {
+      "import": "./src/McpUrlBuilder/utils/mcpIconAssets.ts",
+      "types": "./src/McpUrlBuilder/utils/mcpIconAssets.ts"
     },
     "./MetricCard": {
       "import": "./src/MetricCard/index.tsx",
@@ -497,6 +501,10 @@
     "./MultiSelectDeprecated": {
       "import": "./src/MultiSelectDeprecated/index.tsx",
       "types": "./src/MultiSelectDeprecated/index.tsx"
+    },
+    "./MultipleCodeBlock/index.test": {
+      "import": "./src/MultipleCodeBlock/index.test.tsx",
+      "types": "./src/MultipleCodeBlock/index.test.tsx"
     },
     "./MultipleCodeBlock": {
       "import": "./src/MultipleCodeBlock/index.tsx",
@@ -542,6 +550,10 @@
       "import": "./src/Row/Row.utils.ts",
       "types": "./src/Row/Row.utils.ts"
     },
+    "./Row/index.test": {
+      "import": "./src/Row/index.test.ts",
+      "types": "./src/Row/index.test.ts"
+    },
     "./Row": {
       "import": "./src/Row/index.tsx",
       "types": "./src/Row/index.tsx"
@@ -585,6 +597,10 @@
     "./SqlToRest/util": {
       "import": "./src/SqlToRest/util.ts",
       "types": "./src/SqlToRest/util.ts"
+    },
+    "./StatusCode": {
+      "import": "./src/StatusCode/index.tsx",
+      "types": "./src/StatusCode/index.tsx"
     },
     "./ThemeToggle": {
       "import": "./src/ThemeToggle.tsx",
@@ -645,6 +661,14 @@
     "./form/FormLayout2": {
       "import": "./src/form/FormLayout2.tsx",
       "types": "./src/form/FormLayout2.tsx"
+    },
+    "./form/KeyValueFieldArray/KeyValueFieldArray.test": {
+      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx",
+      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx"
+    },
+    "./form/KeyValueFieldArray/KeyValueFieldArray": {
+      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
+      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
     },
     "./form/Layout/FormLayout": {
       "import": "./src/form/Layout/FormLayout.tsx",

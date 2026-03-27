@@ -500,6 +500,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
         {
+          name: 'Agent Skills',
+          url: '/guides/getting-started/ai-skills' as `/${string}`,
+        },
+        {
           name: 'Supabase MCP server',
           url: '/guides/getting-started/mcp' as `/${string}`,
         },
@@ -2858,6 +2862,7 @@ export const self_hosting: NavMenuConstant = {
         },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        { name: 'Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },

@@ -1,8 +1,13 @@
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import useDbQuery from 'hooks/analytics/useDbQuery'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
-import { QueryPerformanceSQLParams } from './QueryPerformance.types'
+import { QueryPerformanceRow, QueryPerformanceSQLParams } from './QueryPerformance.types'
 
 export function generateQueryPerformanceSql({
   preset,
@@ -14,7 +19,14 @@ export function generateQueryPerformanceSql({
   minTotalTime = 0,
   runIndexAdvisor = false,
   filterIndexAdvisor = false,
+  page = 1,
+  pageSize = 20,
 }: QueryPerformanceSQLParams) {
+  const safePage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1
+  const safePageSize = Number.isFinite(pageSize)
+    ? Math.min(Math.max(1, Math.floor(pageSize)), 100)
+    : 20
+
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
 
@@ -49,7 +61,9 @@ export function generateQueryPerformanceSql({
     whereSql.length > 0 ? `WHERE ${whereSql}` : undefined,
     orderBySql,
     runIndexAdvisor,
-    filterIndexAdvisor
+    filterIndexAdvisor,
+    safePage,
+    safePageSize
   )
 
   return { sql, whereSql, orderBySql }
@@ -58,4 +72,104 @@ export function generateQueryPerformanceSql({
 export const useQueryPerformanceQuery = (props: QueryPerformanceSQLParams) => {
   const { sql, whereSql, orderBySql } = generateQueryPerformanceSql(props)
   return useDbQuery({ sql, params: undefined, where: whereSql, orderBy: orderBySql })
+}
+
+export interface QueryPerformanceInfiniteHook {
+  data: QueryPerformanceRow[] | undefined
+  isLoading: boolean
+  isRefetching: boolean
+  isFetchingNextPage: boolean
+  hasNextPage: boolean
+  error: unknown
+  fetchNextPage: () => void
+  refetch: () => void
+  resolvedSql: string
+}
+
+export const useQueryPerformanceInfiniteQuery = (
+  props: Omit<QueryPerformanceSQLParams, 'page'>
+): QueryPerformanceInfiniteHook => {
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
+  const state = useDatabaseSelectorStateSnapshot()
+  const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
+  const connectionString = (databases || []).find(
+    (db) => db.identifier === state.selectedDatabaseId
+  )?.connectionString
+
+  // Clamp pageSize the same way generateQueryPerformanceSql does so getNextPageParam
+  // and the queryKey are always consistent with the SQL actually executed.
+  const rawPageSize = props.pageSize
+  const safePageSize = Number.isFinite(rawPageSize)
+    ? Math.min(Math.max(1, Math.floor(rawPageSize!)), 100)
+    : 20
+  const { sql: page1Sql } = generateQueryPerformanceSql({
+    ...props,
+    page: 1,
+    pageSize: safePageSize,
+  })
+
+  // When a read-replica is selected, require its connection string before fetching.
+  // Falling back to the primary's connection string would silently query the wrong database.
+  const isPrimarySelected = !state.selectedDatabaseId || state.selectedDatabaseId === project?.ref
+  const effectiveConnectionString = isPrimarySelected
+    ? (connectionString ?? project?.connectionString)
+    : connectionString
+
+  const { data, isPending, isRefetching, isFetchingNextPage, hasNextPage, error, fetchNextPage } =
+    useInfiniteQuery({
+      queryKey: [
+        'projects',
+        project?.ref,
+        'query-performance-infinite',
+        {
+          ...props,
+          pageSize: safePageSize,
+          identifier: state.selectedDatabaseId,
+          connectionString: effectiveConnectionString,
+        },
+      ],
+      initialPageParam: 1,
+      queryFn: ({ pageParam, signal }) => {
+        const { sql } = generateQueryPerformanceSql({
+          ...props,
+          page: pageParam,
+          pageSize: safePageSize,
+        })
+        return executeSql<QueryPerformanceRow[]>(
+          {
+            projectRef: project?.ref,
+            connectionString: effectiveConnectionString,
+            sql,
+          },
+          signal
+        ).then((res) => res.result)
+      },
+      getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length < safePageSize ? undefined : allPages.length + 1
+      },
+      // Don't run until we have a connection string for the selected database.
+      // For replicas this prevents a silent fallback to the primary before replicas load.
+      enabled: Boolean(project?.ref) && Boolean(effectiveConnectionString),
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    })
+
+  return {
+    data: data?.pages.flatMap((page) => page) ?? undefined,
+    isLoading: isPending,
+    isRefetching,
+    isFetchingNextPage,
+    hasNextPage: hasNextPage ?? false,
+    error,
+    fetchNextPage,
+    // Reset to page 1 instead of re-fetching all loaded pages, avoiding a burst
+    // of N requests when the user clicks Refresh after scrolling through multiple pages.
+    refetch: () =>
+      queryClient.resetQueries({
+        queryKey: ['projects', project?.ref, 'query-performance-infinite'],
+        exact: false,
+      }),
+    resolvedSql: page1Sql,
+  }
 }

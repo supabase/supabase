@@ -5,7 +5,7 @@ import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { useInfiniteScroll } from 'hooks/misc/useInfiniteScroll'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
@@ -24,11 +24,12 @@ import { captureQueryPerformanceError } from '../QueryPerformance.utils'
 import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { QueryPerformanceMetrics } from '../QueryPerformanceMetrics'
+import { QueryPerformanceInfiniteHook } from '../useQueryPerformanceQuery'
 import { transformStatementDataToRows } from './WithStatements.utils'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
-  queryPerformanceQuery: DbQueryHook<any>
+  queryPerformanceQuery: QueryPerformanceInfiniteHook
   queryMetrics: PresetHookResult
 }
 
@@ -40,7 +41,16 @@ export const WithStatements = ({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
-  const { data, isLoading, isRefetching, error: queryError } = queryPerformanceQuery
+  const {
+    data,
+    isLoading,
+    isRefetching,
+    isFetchingNextPage,
+    hasNextPage,
+    error: queryError,
+    fetchNextPage,
+    refetch: runQuery,
+  } = queryPerformanceQuery
   const isPrimaryDatabase = state.selectedDatabaseId === ref
   const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
 
@@ -60,7 +70,7 @@ export const WithStatements = ({
   })
 
   const handleRefresh = () => {
-    queryPerformanceQuery.runQuery()
+    runQuery()
     queryHitRate.runQuery()
     queryMetrics.runQuery()
   }
@@ -70,6 +80,13 @@ export const WithStatements = ({
   }, [data, indexAdvisor])
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
+
+  const handleScroll = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  })
 
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
@@ -183,7 +200,7 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching} />
+      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
@@ -193,6 +210,7 @@ export const WithStatements = ({
             : null
         }
         onRetry={handleRefresh}
+        onScroll={handleScroll}
       />
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {

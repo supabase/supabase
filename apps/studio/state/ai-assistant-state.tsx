@@ -8,6 +8,8 @@ import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { constructHeaders } from 'data/fetchers'
 import { prepareMessagesForAPI } from 'lib/ai/message-utils'
+import { isKnownAssistantModelId } from 'lib/ai/model.utils'
+import type { AssistantModelId } from 'lib/ai/model.utils'
 import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
@@ -22,7 +24,7 @@ export type AssistantMessageType = MessageType
 
 export type SqlSnippet = string | { label: string; content: string }
 
-export type AssistantModel = 'gpt-5' | 'gpt-5-mini'
+export type AssistantModel = AssistantModelId
 
 type ChatSession = {
   id: string
@@ -45,7 +47,7 @@ type AiAssistantData = {
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
-  model: AssistantModel
+  model?: AssistantModel
   context: AiAssistantContext
 }
 
@@ -64,7 +66,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   tables: [],
   chats: {},
   activeChatId: undefined,
-  model: 'gpt-5',
+  model: undefined,
   context: {},
 }
 
@@ -287,7 +289,7 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages as AssistantMessageType[]
+          chat.messages = messages
           chat.updatedAt = new Date()
         }
 
@@ -452,7 +454,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         if (index !== -1) {
           state.updateMessage(msg)
         } else {
-          messagesToAdd.push(msg as AssistantMessageType)
+          messagesToAdd.push(msg)
         }
       })
 
@@ -468,7 +470,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        chat.messages[messageIndex] = updatedMessage
         chat.updatedAt = new Date()
       }
     },
@@ -486,7 +488,11 @@ export const createAiAssistantState = (): AiAssistantState => {
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
-      state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
+      const storedModel = persistedState.model
+      state.model =
+        storedModel && isKnownAssistantModelId(storedModel)
+          ? storedModel
+          : INITIAL_AI_ASSISTANT.model
 
       // Ensure an active chat exists after loading
       if (!state.activeChat) {

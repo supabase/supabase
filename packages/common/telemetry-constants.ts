@@ -2035,9 +2035,9 @@ export interface HomeConnectActionClickedEvent {
   action: 'home_connect_action_clicked'
   properties: {
     /**
-     * The connect mode that was clicked
+     * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -2603,6 +2603,7 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2633,6 +2634,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }

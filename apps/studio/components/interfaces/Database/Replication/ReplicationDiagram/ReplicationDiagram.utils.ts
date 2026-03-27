@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre'
-import { Edge, Node, Position } from 'reactflow'
+import { Edge, Node, Position } from '@xyflow/react'
 
 import { NODE_WIDTH } from './Nodes'
 

@@ -63,14 +63,14 @@ export const OperationQueueSidePanel = () => {
                 onClick={confirmOnClose}
                 disabled={isSaving || operations.length === 0}
               >
-                Revert{operations.length > 1 && ' all'}
+                Discard
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={isSaving || operations.length === 0}
                 loading={isSaving}
               >
-                Save{operations.length > 1 && ' all'}
+                Save
                 <span className="text-foreground/40 text-[10px] ml-1.5">{modKey}S</span>
               </Button>
             </div>

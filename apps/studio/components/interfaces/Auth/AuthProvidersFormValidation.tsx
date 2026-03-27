@@ -16,8 +16,8 @@ const PROVIDER_EMAIL = {
   link: `${DOCS_URL}/guides/auth/passwords`,
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
-      title: 'Enable Email provider',
-      description: 'This will enable Email based signup and login for your application',
+      title: 'Enable email provider',
+      description: 'Allow email-based sign up and log in for your application.',
       type: 'boolean',
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
@@ -34,22 +34,20 @@ const PROVIDER_EMAIL = {
     },
     PASSWORD_HIBP_ENABLED: {
       title: 'Prevent use of leaked passwords',
-      description:
-        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      description: `Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API. [Learn more](${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection)`,
       type: 'boolean',
-      link: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
       entitlementKey: 'auth.password_hibp',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Minimum password length',
       type: 'number',
       description:
-        'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+        'Passwords shorter than this value will be rejected as weak. Minimum 6 characters, though 8 or more is recommended.',
       units: 'characters',
     },
     PASSWORD_REQUIRED_CHARACTERS: {
       type: 'select',
-      title: 'Password Requirements',
+      title: 'Password requirements',
       description: 'Passwords that do not have at least one of each will be rejected as weak.',
       enum: [
         {
@@ -73,15 +71,15 @@ const PROVIDER_EMAIL = {
     },
 
     MAILER_OTP_EXP: {
-      title: 'Email OTP Expiration',
+      title: 'Email OTP expiration',
       type: 'number',
-      description: 'Duration before an email otp / link expires.',
+      description: 'Duration before an email OTP / link expires.',
       units: 'seconds',
     },
     MAILER_OTP_LENGTH: {
-      title: 'Email OTP Length',
+      title: 'Email OTP length',
       type: 'number',
-      description: 'Number of digits in the email OTP',
+      description: 'Number of digits in the email OTP.',
       units: 'number',
     },
   },
@@ -196,9 +194,25 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     }),
 
     // Phone SMS
-    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
-    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
-    SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_OTP_EXP: number()
+      .min(0, 'Must be more than 0')
+      .when('SMS_PROVIDER', {
+        is: (val: string) => val !== 'twilio_verify',
+        then: (schema) => schema.required('This is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMS_OTP_LENGTH: number()
+      .min(6, 'Must be 6 or more in length')
+      .when('SMS_PROVIDER', {
+        is: (val: string) => val !== 'twilio_verify',
+        then: (schema) => schema.required('This is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMS_TEMPLATE: string().when('SMS_PROVIDER', {
+      is: (val: string) => val !== 'twilio_verify',
+      then: (schema) => schema.required('SMS template is required.'),
+      otherwise: (schema) => schema,
+    }),
     SMS_TEST_OTP: string()
       .matches(
         /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
