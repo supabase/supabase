@@ -55,7 +55,7 @@ export const OperationQueueSidePanel = () => {
             <Button
               type="default"
               onClick={snap.closeSidePanel}
-              iconRight={<KeyboardShortcut keys={['Meta', '.']} appearance="inline" />}
+              iconRight={<KeyboardShortcut keys={['Meta', '.']} variant="inline" />}
             >
               Close
             </Button>
@@ -72,9 +72,7 @@ export const OperationQueueSidePanel = () => {
                 disabled={isSaving || operations.length === 0}
                 loading={isSaving}
                 iconRight={
-                  isSaving ? undefined : (
-                    <KeyboardShortcut keys={['Meta', 's']} appearance="inline" />
-                  )
+                  isSaving ? undefined : <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
                 }
               >
                 Save

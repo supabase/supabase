@@ -89,7 +89,7 @@ export const ActionBar = ({
             loading={isRunning || loading}
             iconRight={
               isRunning || loading ? undefined : (
-                <KeyboardShortcut keys={['Meta', 'Enter']} appearance="inline" />
+                <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
               )
             }
           >
@@ -105,9 +105,7 @@ export const ActionBar = ({
             htmlType="submit"
             form={formId}
             iconRight={
-              loading ? undefined : (
-                <KeyboardShortcut keys={['Meta', 'Enter']} appearance="inline" />
-              )
+              loading ? undefined : <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
             }
           >
             {applyButtonLabel}

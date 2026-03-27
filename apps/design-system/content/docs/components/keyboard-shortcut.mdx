@@ -1,0 +1,96 @@
+---
+title: Keyboard Shortcut
+description: Displays a platform-aware keyboard shortcut label for buttons, menus, tooltips, and helper text.
+component: true
+---
+
+`KeyboardShortcut` renders a compact, platform-aware shortcut label from a list of logical keys.
+
+It is intended for:
+
+- button accessories such as `Save` + `⌘ S`
+- dropdown and context menu shortcut hints
+- tooltip and helper text copy where the shortcut needs to stay in sync with the actual keybinding
+
+It is not intended to be used as part of a button's text content. For buttons, prefer rendering it via `iconRight` or another right-side accessory slot.
+
+## Usage
+
+```tsx
+import { KeyboardShortcut } from 'ui'
+```
+
+```tsx
+<KeyboardShortcut keys={['Meta', 'S']} />
+```
+
+## Props
+
+### `keys`
+
+An ordered array of logical key names.
+
+```tsx
+<KeyboardShortcut keys={['Meta', 'Enter']} />
+```
+
+Supported special keys currently include:
+
+- `Meta`
+- `Alt`
+- `Shift`
+- `Enter`
+- `Esc` / `Escape`
+- `Tab`
+
+Single-character keys are uppercased automatically.
+
+## Variants
+
+### `variant="pill"` (default)
+
+Use the pill variant for menus, tooltips, and standalone shortcut chips.
+
+```tsx
+<KeyboardShortcut keys={['Shift', 'Meta', 'M']} />
+```
+
+### `variant="inline"`
+
+Use the inline variant when the shortcut needs to sit on the same line as surrounding text or inside a button accessory slot.
+
+```tsx
+<Button iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}>Apply</Button>
+```
+
+## Guidance
+
+- Prefer logical keys such as `Meta` instead of manually branching on platform.
+- Prefer `variant="inline"` for button accessories.
+- Prefer the default pill variant for dropdown shortcuts.
+- Keep shortcut hints aligned with the actual registered keybinding. Do not add decorative shortcuts that do not work.
+
+## Examples
+
+### Button accessory
+
+```tsx
+<Button iconRight={<KeyboardShortcut keys={['Meta', 'S']} variant="inline" />}>Save</Button>
+```
+
+### Dropdown item
+
+```tsx
+<DropdownMenuItem className="justify-between">
+  <span>Prettify SQL</span>
+  <KeyboardShortcut keys={['Alt', 'Shift', 'F']} />
+</DropdownMenuItem>
+```
+
+### Inline helper copy
+
+```tsx
+<p className="flex items-center gap-1 text-xs text-foreground-lighter">
+  Hit <KeyboardShortcut keys={['Meta', 'K']} variant="inline" /> to open search
+</p>
+```

@@ -25,7 +25,7 @@ const KEY_SYMBOLS: Record<string, string | ((isMac: boolean) => string)> = {
 
 type KeyboardShortcutProps = {
   keys: string[]
-  appearance?: 'pill' | 'inline'
+  variant?: 'pill' | 'inline'
   className?: string
 }
 
@@ -36,11 +36,7 @@ const resolveKeyLabel = (key: string, isMac: boolean) => {
   return resolvedKey.length === 1 ? resolvedKey.toUpperCase() : resolvedKey
 }
 
-export const KeyboardShortcut = ({
-  keys,
-  appearance = 'pill',
-  className,
-}: KeyboardShortcutProps) => {
+export const KeyboardShortcut = ({ keys, variant = 'pill', className }: KeyboardShortcutProps) => {
   const isMac = getIsMac()
   const resolvedKeys = keys.map((key) => resolveKeyLabel(key, isMac))
   const shortcutLabel = resolvedKeys.join(' ')
@@ -49,9 +45,9 @@ export const KeyboardShortcut = ({
     <span
       className={cn(
         'inline-flex whitespace-nowrap shrink-0',
-        appearance === 'pill'
+        variant === 'pill'
           ? 'items-center text-[11px] leading-none -tracking-[0.05em] text-foreground-light bg-surface-200 dark:bg-surface-100 rounded px-[5px] py-[3px]'
-          : 'items-baseline text-[11px] leading-[inherit] text-foreground/50',
+          : 'items-baseline text-[11px] leading-[inherit] text-foreground/40',
         className
       )}
     >

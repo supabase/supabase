@@ -27,7 +27,7 @@ export const SqlRunButton = ({
         isExecuting ? (
           <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
         ) : (
-          <KeyboardShortcut keys={['Meta', 'Enter']} appearance="inline" />
+          <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
         )
       }
       className={className}

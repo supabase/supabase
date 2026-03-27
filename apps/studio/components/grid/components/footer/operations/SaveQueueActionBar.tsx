@@ -66,7 +66,7 @@ export const SaveQueueActionBar = () => {
                     loading={isSaving}
                     iconRight={
                       isSaving ? undefined : (
-                        <KeyboardShortcut keys={['Meta', 's']} appearance="inline" />
+                        <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
                       )
                     }
                   >

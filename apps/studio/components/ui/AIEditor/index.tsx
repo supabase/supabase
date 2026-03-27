@@ -451,7 +451,7 @@ export const AIEditor = ({
                 Hit{' '}
                 <KeyboardShortcut
                   keys={['Meta', 'k']}
-                  appearance="inline"
+                  variant="inline"
                   className="text-xs text-foreground-lighter"
                 />{' '}
                 to edit with the Assistant
