@@ -9,7 +9,7 @@ import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPol
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
+import { ChevronDown, FolderOpen, Info, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -24,6 +24,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
@@ -71,9 +74,16 @@ const BucketPage: NextPageWithLayout = () => {
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="truncate">{bucketId}</span>
             {bucket?.public && (
-              <Badge variant="warning" className="flex-shrink-0">
-                Public
-              </Badge>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="warning" className="flex-shrink-0">
+                    Public <Info size={9} />
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  This bucket is publicly readable. Anyone can list and access all objects stored in it.
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         }

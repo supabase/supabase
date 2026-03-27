@@ -9,9 +9,9 @@ import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Info } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Badge, TableCell, TableHead, TableHeader, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -108,7 +108,16 @@ export const BucketTableRow = ({
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
-          {bucket.public && <Badge variant="warning">Public</Badge>}
+          {bucket.public && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="warning">Public <Info size={9} /></Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    This bucket is publicly readable. Anyone can list and access all objects stored in it.
+                  </TooltipContent>
+                </Tooltip>
+              )}
         </div>
       </BucketTableCell>
 
