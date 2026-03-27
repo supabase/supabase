@@ -46,14 +46,20 @@ The login flow works as follows:
 
 ## Step 1: Generate an RSA private key
 
-SAML requests must be signed. Generate a 2048-bit (minimum) RSA private key in PKCS#1 DER format and Base64-encode it using the following two commands:
+SAML requests must be signed. The value expected by `GOTRUE_SAML_PRIVATE_KEY` is a Base64-encoded PKCS#1 DER RSA private key (minimum 2048-bit). Generate it with:
 
 ```sh
-openssl genpkey -algorithm rsa -outform DER -out pk.der
-base64 -i pk.der
+# 1) Generate an RSA private key in PKCS#8 PEM format
+openssl genpkey -algorithm RSA -out pk_pkcs8.pem
+
+# 2) Convert it to PKCS#1 DER format (this is the format GoTrue expects before Base64)
+openssl pkey -in pk_pkcs8.pem -out pk_rsa1.der -outform DER -traditional
+
+# 3) Base64-encode the PKCS#1 DER key as a single line for GOTRUE_SAML_PRIVATE_KEY
+base64 -w 0 -i pk_rsa1.der
 ```
 
-Copy the Base64 output (single line, ignoring the trailing newline) for `GOTRUE_SAML_PRIVATE_KEY`. Remove `pk.der` after that to keep the key safe.
+Copy the Base64 output (single line, ignoring the trailing newline) for `GOTRUE_SAML_PRIVATE_KEY`. Remove temporary key files after that to keep the key safe.
 
 <Admonition type="caution">
 
@@ -521,14 +527,15 @@ docker compose down && docker compose up -d
 The `GOTRUE_SAML_PRIVATE_KEY` value is malformed. Ensure it is:
 
 - Base64-encoded (single line, no line breaks)
-- In PKCS#1 format (the `openssl genpkey` output, not PKCS#8)
+- In PKCS#1 format (`openssl pkey ... -traditional` output)
 - At least 2048-bit RSA
 
 Regenerate if needed:
 
 ```sh
-openssl genpkey -algorithm rsa -outform DER -out pk.der
-base64 -i pk.der
+openssl genpkey -algorithm RSA -out pk_pkcs8.pem
+openssl pkey -in pk_pkcs8.pem -out pk_rsa1.der -outform DER -traditional
+base64 -w 0 -i pk_rsa1.der
 ```
 
 ### IdP cannot reach the ACS endpoint
