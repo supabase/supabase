@@ -11,6 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   cn,
 } from 'ui'
 
@@ -42,69 +47,96 @@ const EnvironmentVariableRow = ({
   const isPlatform = variable.category === 'platform'
   const scopeLabel = getScopeLabel(variable)
 
-  const displayValue = revealed ? variable.value || '(write-only)' : '••••••••••••••'
+  const displayValue = variable.isSecret
+    ? revealed
+      ? variable.value || '(write-only)'
+      : '••••••••••••••'
+    : variable.value
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 hover:bg-surface-100 group">
+    <TableRow>
       {/* Icon */}
-      <div className="flex items-center justify-center w-8 h-8 rounded border border-default bg-surface-100 shrink-0">
-        {variable.isSecret ? (
-          <Lock size={14} className="text-foreground-light" />
-        ) : (
-          <Code size={14} className="text-foreground-light" />
-        )}
-      </div>
-
-      {/* Name + scope */}
-      <div className="flex-1 min-w-0 flex flex-col gap-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-mono text-sm truncate">{variable.name}</p>
-          {variable.isSecret && (
-            <Badge variant="default" className="shrink-0">Sensitive</Badge>
-          )}
-          {variable.hasEnvVar === false && (
-            <Badge variant="warning" className="shrink-0">No env var</Badge>
-          )}
-          {variable.hasConfig === false && (
-            <Badge variant="warning" className="shrink-0">No config</Badge>
+      <TableCell className="w-10 pr-0">
+        <div className="flex items-center justify-center w-8 h-8 rounded border border-default bg-surface-100">
+          {variable.isSecret ? (
+            <Lock size={14} className="text-foreground-light" />
+          ) : (
+            <Code size={14} className="text-foreground-light" />
           )}
         </div>
-        <p className="text-xs text-foreground-lighter">{scopeLabel}</p>
-      </div>
+      </TableCell>
 
-      {/* Masked value + eye toggle */}
-      <div className="flex items-center gap-2 shrink-0">
-        <Button
-          type="text"
-          className="px-1 h-6 text-foreground-light hover:text-foreground"
-          icon={revealed ? <EyeOff size={14} /> : <Eye size={14} />}
-          onClick={() => setRevealed((v) => !v)}
-        />
-        <p
-          className={cn(
-            'font-mono text-sm text-foreground-light w-36 truncate',
-            !revealed && 'tracking-wider'
-          )}
-        >
-          {displayValue}
-        </p>
-      </div>
+      {/* Name + scope + badges */}
+      <TableCell>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-mono text-sm">{variable.name}</p>
+            {variable.isSecret && (
+              <Badge variant="default" className="shrink-0">Sensitive</Badge>
+            )}
+            {variable.hasEnvVar === false && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="destructive" className="shrink-0">No env var</Badge>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  This config value has no backing env var in the env server
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {variable.hasConfig === false && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="default" className="shrink-0 !text-foreground-lighter">No config</Badge>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  This env var has no corresponding platform config mapping
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+          <p className="text-xs text-foreground-lighter">{scopeLabel}</p>
+        </div>
+      </TableCell>
 
-      {/* Updated at + mock avatar */}
-      <div className="flex items-center gap-2 shrink-0 hidden lg:flex">
-        <div className="w-5 h-5 rounded-full bg-surface-300 border border-default" />
-        <p className="text-xs text-foreground-lighter">
-          {variable.updatedAt
-            ? `Updated ${new Date(variable.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-            : 'Added recently'}
-        </p>
-      </div>
+      {/* Value + eye toggle */}
+      <TableCell className="w-72">
+        <div className="flex items-center gap-2">
+          <Button
+            type="text"
+            className={cn(
+              'px-1 h-6 text-foreground-light hover:text-foreground shrink-0',
+              !variable.isSecret && 'invisible'
+            )}
+            icon={revealed ? <EyeOff size={14} /> : <Eye size={14} />}
+            onClick={() => setRevealed((v) => !v)}
+          />
+          <p
+            className={cn(
+              'font-mono text-sm text-foreground-light flex-1 truncate',
+              variable.isSecret && !revealed && 'tracking-wider'
+            )}
+          >
+            {displayValue}
+          </p>
+        </div>
+      </TableCell>
+
+      {/* Updated at */}
+      <TableCell className="hidden lg:table-cell w-40">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-full bg-surface-300 border border-default shrink-0" />
+          <p className="text-xs text-foreground-lighter whitespace-nowrap">
+            {variable.updatedAt
+              ? `Updated ${new Date(variable.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+              : 'Added recently'}
+          </p>
+        </div>
+      </TableCell>
 
       {/* Actions */}
-      <div className="shrink-0">
-        {isPlatform ? (
-          <div className="w-7" />
-        ) : (
+      <TableCell className="w-8 text-right">
+        {isPlatform ? null : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -157,8 +189,8 @@ const EnvironmentVariableRow = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-      </div>
-    </div>
+      </TableCell>
+    </TableRow>
   )
 }
 

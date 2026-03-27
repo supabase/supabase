@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Card } from 'ui'
+import { Card, Table, TableBody } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { EnvironmentVariable } from './EnvironmentVariables.types'
@@ -119,16 +119,20 @@ export const EnvironmentVariablesTable = () => {
           onSortChange={setSort}
         />
 
-        <Card className="overflow-hidden divide-y divide-border">
+        <Card className="overflow-hidden">
           {filteredVariables.length > 0 ? (
-            filteredVariables.map((variable) => (
-              <EnvironmentVariableRow
-                key={variable.sourceKey}
-                variable={variable}
-                onSelectEdit={() => setSelectedKeyToEdit(variable.sourceKey)}
-                onSelectDelete={() => setSelectedKeyToDelete(variable.sourceKey)}
-              />
-            ))
+            <Table>
+              <TableBody>
+                {filteredVariables.map((variable) => (
+                  <EnvironmentVariableRow
+                    key={variable.sourceKey}
+                    variable={variable}
+                    onSelectEdit={() => setSelectedKeyToEdit(variable.sourceKey)}
+                    onSelectDelete={() => setSelectedKeyToDelete(variable.sourceKey)}
+                  />
+                ))}
+              </TableBody>
+            </Table>
           ) : search || scopeFilter !== 'all' ? (
             <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
               <KeyRound size={24} className="text-foreground-muted" strokeWidth={1.5} />

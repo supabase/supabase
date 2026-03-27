@@ -22,6 +22,7 @@ import { Button, Form, Input, Sheet, SheetContent, SheetFooter, SheetHeader, She
 import { Admonition } from 'ui-patterns'
 import { getSecretsForAuthField } from 'components/interfaces/EnvironmentVariables/EnvironmentVariables.utils'
 import { useEnvironmentVariables } from 'components/interfaces/EnvironmentVariables/useEnvironmentVariables'
+import { useEnvVarBindings } from 'hooks/misc/useEnvVarBindings'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
@@ -40,6 +41,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const { variables: envVars } = useEnvironmentVariables()
+  const { enabled: envVarBindingsEnabled } = useEnvVarBindings()
   const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
 
   const [open, setOpen] = useState(false)
@@ -223,7 +225,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                             : isDisabledDueToPlan
 
                         const matchingEnvVars = getSecretsForAuthField(x, envVars)
-                        const isEnvVar = matchingEnvVars.length > 0
+                        // TODO: temporary — envVarBindingsEnabled toggle should be removed once bindings are stable
+                        const isEnvVar = envVarBindingsEnabled && matchingEnvVars.length > 0
 
                         return (
                           <FormField
