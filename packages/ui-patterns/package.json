@@ -602,6 +602,18 @@
       "import": "./src/ShimmeringLoader/index.tsx",
       "types": "./src/ShimmeringLoader/index.tsx"
     },
+    "./SimpleCodeBlock/SimpleCodeBlock": {
+      "import": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx",
+      "types": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx"
+    },
+    "./SimpleCodeBlock": {
+      "import": "./src/SimpleCodeBlock/index.tsx",
+      "types": "./src/SimpleCodeBlock/index.tsx"
+    },
+    "./SimpleCodeBlock/prism": {
+      "import": "./src/SimpleCodeBlock/prism.ts",
+      "types": "./src/SimpleCodeBlock/prism.ts"
+    },
     "./SqlToRest/assumptions": {
       "import": "./src/SqlToRest/assumptions.ts",
       "types": "./src/SqlToRest/assumptions.ts"
@@ -769,6 +781,7 @@
     "monaco-editor": "*",
     "next-themes": "*",
     "openai": "^4.75.1",
+    "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-countdown": "^2.3.5",
     "react-dom": "catalog:",

@@ -2498,12 +2498,6 @@ importers:
       next:
         specifier: 'catalog:'
         version: 15.5.14(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
-      next-themes:
-        specifier: ^0.3.0
-        version: 0.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      prism-react-renderer:
-        specifier: ^2.3.1
-        version: 2.3.1(react@18.3.1)
       prop-types:
         specifier: ^15.7.2
         version: 15.8.1
@@ -2679,6 +2673,9 @@ importers:
       openai:
         specifier: ^4.75.1
         version: 4.104.0(encoding@0.1.13)(ws@8.19.0)(zod@3.25.76)
+      prism-react-renderer:
+        specifier: ^2.3.1
+        version: 2.3.1(react@18.3.1)
       react:
         specifier: 'catalog:'
         version: 18.3.1

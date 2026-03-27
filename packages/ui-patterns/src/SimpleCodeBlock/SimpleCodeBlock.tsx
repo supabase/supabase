@@ -9,10 +9,8 @@
 import { useTheme } from 'next-themes'
 import { Highlight, Language, Prism, themes } from 'prism-react-renderer'
 import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+import { Button, cn, copyToClipboard } from 'ui'
 
-import { copyToClipboard } from '../../lib/utils'
-import { cn } from './../../lib/utils/cn'
-import { Button } from './../Button'
 import { dart } from './prism'
 
 // Context for copy callback - can be provided by parent components
