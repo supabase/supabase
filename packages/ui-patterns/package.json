@@ -34,6 +34,10 @@
       "import": "./src/AuthenticatedDropdownMenu/index.tsx",
       "types": "./src/AuthenticatedDropdownMenu/index.tsx"
     },
+    "./Banners/Announcement": {
+      "import": "./src/Banners/Announcement.tsx",
+      "types": "./src/Banners/Announcement.tsx"
+    },
     "./Banners/AnnouncementBanner": {
       "import": "./src/Banners/AnnouncementBanner.tsx",
       "types": "./src/Banners/AnnouncementBanner.tsx"
