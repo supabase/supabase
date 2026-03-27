@@ -64,13 +64,13 @@ export const SaveQueueActionBar = () => {
                     onClick={handleSave}
                     disabled={isSaving}
                     loading={isSaving}
+                    iconRight={
+                      isSaving ? undefined : (
+                        <KeyboardShortcut keys={['Meta', 's']} appearance="inline" />
+                      )
+                    }
                   >
                     Save
-                    <KeyboardShortcut
-                      keys={['Meta', 's']}
-                      appearance="inline"
-                      className="ml-1.5"
-                    />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

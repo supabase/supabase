@@ -203,7 +203,7 @@ const UtilityActions = ({
             hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
-            className="rounded-l-none min-w-[82px]"
+            className="rounded-l-none"
             onClick={executeQuery}
           />
         </div>
