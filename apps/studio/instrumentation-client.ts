@@ -102,13 +102,15 @@ Sentry.init({
     const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
     if (!thirdPartyErrorFilterIntegration) return []
 
-    // Drop errors whose stack trace only contains third-party frames (browser extensions,
+    // Tag errors whose stack trace only contains third-party frames (browser extensions,
     // injected scripts, etc.). This uses build-time code annotation via the applicationKey
     // in next.config.js to reliably distinguish our code from third-party code.
+    // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
+    // crashes — these may originate in third-party code but are caused by first-party bugs.
     return [
       thirdPartyErrorFilterIntegration({
         filterKeys: ['supabase-studio'],
-        behaviour: 'drop-error-if-exclusively-contains-third-party-frames',
+        behaviour: 'apply-tag-if-exclusively-contains-third-party-frames',
       }),
     ]
   })(),
@@ -146,6 +148,19 @@ Sentry.init({
       return null
     }
 
+    const isErrorBoundaryCrash =
+      event.tags?.globalErrorBoundary === true || event.tags?.globalErrorBoundary === 'true'
+    const isThirdPartyOnly =
+      event.tags?.third_party_code === true || event.tags?.third_party_code === 'true'
+
+    // Drop third-party-only errors UNLESS they crashed the page via the global error boundary.
+    // This preserves noise reduction for browser extensions and injected scripts,
+    // while ensuring page-crashing errors from third-party libs (caused by first-party bugs)
+    // are always reported.
+    if (isThirdPartyOnly && !isErrorBoundaryCrash) {
+      return null
+    }
+
     // Downsample only known high-noise classes; keep all other errors at full rate.
     const isInvalidUrlEvent = (hint.originalException as any)?.message?.includes(
       `Failed to construct 'URL': Invalid URL`
@@ -173,9 +188,14 @@ Sentry.init({
       return null
     }
 
-    // Drop events where every exception has no stack trace — these are not debuggable
+    // Drop events where every exception has no stack trace — these are not debuggable.
+    // Exempt error boundary crashes: even without stack frames, a page crash is always worth reporting.
     const exceptions = event.exception?.values ?? []
-    if (exceptions.length > 0 && exceptions.every((ex) => !ex.stacktrace?.frames?.length)) {
+    if (
+      !isErrorBoundaryCrash &&
+      exceptions.length > 0 &&
+      exceptions.every((ex) => !ex.stacktrace?.frames?.length)
+    ) {
       return null
     }
 

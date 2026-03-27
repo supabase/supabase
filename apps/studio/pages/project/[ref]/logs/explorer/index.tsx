@@ -98,7 +98,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
   const PLACEHOLDER_QUERY = IS_PLATFORM
-    ? logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY
+    ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
     : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
@@ -476,7 +476,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
 LogsExplorerPage.getLayout = (page) => (
   <DefaultLayout>
-    <LogsLayout>{page}</LogsLayout>
+    <LogsLayout title="Explorer">{page}</LogsLayout>
   </DefaultLayout>
 )
 

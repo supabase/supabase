@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { cronPattern, secondsPattern } from './CronJobs.constants'
-import { parseCronJobCommand } from './CronJobs.utils'
+import { formatCronJobColumns, parseCronJobCommand } from './CronJobs.utils'
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
@@ -277,5 +277,25 @@ describe('parseCronJobCommand', () => {
     it(`should match the regex for a cronPattern with "${description}"`, () => {
       expect(command).toMatch(cronPattern)
     })
+  })
+})
+
+describe('formatCronJobColumns', () => {
+  it('enables resizing for informational columns and keeps utility columns fixed', () => {
+    const columns = formatCronJobColumns({
+      onSelectEdit: () => undefined,
+      onSelectDelete: () => undefined,
+    })
+
+    const columnsByKey = Object.fromEntries(columns.map((column) => [String(column.key), column]))
+
+    expect(columnsByKey.jobname.resizable).toBe(true)
+    expect(columnsByKey.jobname.minWidth).toBeGreaterThan(0)
+    expect(columnsByKey.schedule.resizable).toBe(true)
+    expect(columnsByKey.latest_run.resizable).toBe(true)
+    expect(columnsByKey.next_run.resizable).toBe(true)
+    expect(columnsByKey.command.resizable).toBe(true)
+    expect(columnsByKey.active.resizable).toBe(false)
+    expect(columnsByKey.actions.resizable).toBe(false)
   })
 })

@@ -17,13 +17,11 @@ export const ProjectContextProvider = ({
   return (
     <TableEditorStateContextProvider key={`table-editor-state-${projectRef}`}>
       <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
-        <StorageExplorerStateContextProvider key={`storage-explorer-state-${projectRef}`}>
-          <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
-            <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-              {children}
-            </RoleImpersonationStateContextProvider>
-          </DatabaseSelectorStateContextProvider>
-        </StorageExplorerStateContextProvider>
+        <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
+          <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+            {children}
+          </RoleImpersonationStateContextProvider>
+        </DatabaseSelectorStateContextProvider>
       </TabsStateContextProvider>
     </TableEditorStateContextProvider>
   )

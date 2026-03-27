@@ -1,13 +1,10 @@
-import Head from 'next/head'
-import { PropsWithChildren } from 'react'
-
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from 'components/layouts/AccountLayout/AccountLayout.types'
 import { WithSidebar } from 'components/layouts/AccountLayout/WithSidebar'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { PropsWithChildren } from 'react'
 
 interface OrganizationSettingsMenuItemsProps {
   slug?: string
@@ -15,22 +12,14 @@ interface OrganizationSettingsMenuItemsProps {
   showSsoSettings?: boolean
   showLegalDocuments?: boolean
   showPlatformWebhooks?: boolean
+  showPrivateApps?: boolean
 }
 
 interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
   currentPath: string
 }
 
-interface OrganizationSettingsLayoutProps {
-  pageTitle?: string
-}
-
 export const normalizeOrganizationSettingsPath = (path: string) => path.split('#')[0]
-export const getOrganizationSettingsPageTitle = (pageTitle?: string) => pageTitle ?? 'Settings'
-export const getOrganizationSettingsDocumentTitle = (
-  pageTitle: string | undefined,
-  title: string
-) => `${getOrganizationSettingsPageTitle(pageTitle)} | ${title}`
 
 export const generateOrganizationSettingsMenuItems = ({
   slug,
@@ -38,6 +27,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showSsoSettings = true,
   showLegalDocuments = true,
   showPlatformWebhooks = true,
+  showPrivateApps = false,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -99,6 +89,7 @@ export const generateOrganizationSettingsSections = ({
   showSsoSettings = true,
   showLegalDocuments = true,
   showPlatformWebhooks = true,
+  showPrivateApps = false,
 }: OrganizationSettingsSectionsProps): SidebarSection[] => {
   const isLinkActive = (key: string, href: string) =>
     key === 'webhooks'
@@ -137,6 +128,15 @@ export const generateOrganizationSettingsSections = ({
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
     },
+    ...(showPrivateApps
+      ? [
+          {
+            key: 'private-apps',
+            label: 'Private Apps',
+            href: `/org/${slug}/private-apps`,
+          },
+        ]
+      : []),
     ...(showPlatformWebhooks
       ? [
           {
@@ -193,16 +193,12 @@ export const generateOrganizationSettingsSections = ({
   ]
 }
 
-function OrganizationSettingsLayout({
-  children,
-  pageTitle,
-}: PropsWithChildren<OrganizationSettingsLayoutProps>) {
+export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const { slug } = useParams()
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
+  const showPrivateApps = useFlag('privateApps')
   const fullCurrentPath = useCurrentPath()
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
-  const { appTitle } = useCustomContent(['app:title'])
-  const titleSuffix = appTitle || 'Supabase'
 
   const {
     organizationShowSsoSettings: showSsoSettings,
@@ -221,27 +217,23 @@ function OrganizationSettingsLayout({
     showSsoSettings,
     showLegalDocuments,
     showPlatformWebhooks,
+    showPrivateApps,
   })
 
+  // Browser titles for org settings routes are set by OrganizationLayout.
   return (
-    <>
-      <Head>
-        <title>{getOrganizationSettingsDocumentTitle(pageTitle, titleSuffix)}</title>
-        <meta name="description" content="Supabase Studio" />
-      </Head>
-      <WithSidebar
-        title="Organization Settings"
-        breadcrumbs={[]}
-        sections={sections}
-        header={
-          <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
-            <h4 className="text-lg">Settings</h4>
-          </div>
-        }
-      >
-        {children}
-      </WithSidebar>
-    </>
+    <WithSidebar
+      title="Organization Settings"
+      breadcrumbs={[]}
+      sections={sections}
+      header={
+        <div className="border-default flex min-h-[var(--header-height)] items-center border-b px-6">
+          <h4 className="text-lg">Settings</h4>
+        </div>
+      }
+    >
+      {children}
+    </WithSidebar>
   )
 }
 

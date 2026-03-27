@@ -10,11 +10,12 @@ import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { BannerStackProvider } from '../ui/BannerStack/BannerStackProvider'
-import { LayoutHeader } from './ProjectLayout/LayoutHeader/LayoutHeader'
+import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
+import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
+import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import MobileNavigationBar from './ProjectLayout/NavigationBar/MobileNavigationBar'
-import { MobileSheetProvider } from './ProjectLayout/NavigationBar/MobileSheetContext'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 
 export interface DefaultLayoutProps {
@@ -40,19 +41,19 @@ export const DefaultLayout = ({
   const { ref } = useParams()
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
-  const showProductMenu = !!ref && router.pathname !== '/project/[ref]'
 
   const [lastVisitedOrganization] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
     ''
   )
 
-  const backToDashboardURL =
-    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+  const backToDashboardURL = router.pathname.startsWith('/account')
+    ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
       : !!lastVisitedOrganization
         ? `/org/${lastVisitedOrganization}`
         : '/organizations'
+    : undefined
 
   useCheckLatestDeploy()
 
@@ -81,14 +82,11 @@ export const DefaultLayout = ({
                 {/* Top Banner */}
                 <AppBannerWrapper />
                 <div className="flex-shrink-0">
-                  <MobileNavigationBar hideMobileMenu={hideMobileMenu} />
-                  <LayoutHeader
-                    showProductMenu={showProductMenu}
-                    headerTitle={headerTitle}
-                    backToDashboardURL={
-                      router.pathname.startsWith('/account') ? backToDashboardURL : undefined
-                    }
+                  <MobileNavigationBar
+                    hideMobileMenu={hideMobileMenu}
+                    backToDashboardURL={backToDashboardURL}
                   />
+                  <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
                 </div>
                 {/* Main Content Area */}
                 <div className="flex flex-1 w-full overflow-y-hidden">
@@ -119,6 +117,7 @@ export const DefaultLayout = ({
               </div>
 
               <BannerStack />
+              <StudioMobileSheetNav />
             </BannerStackProvider>
           </MobileSheetProvider>
         </ProjectContextProvider>

@@ -39,7 +39,7 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
 
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
-    definition !== undefined
+    definition?.properties !== undefined
       ? Object.entries(definition.properties).map(([id, val]: any) => ({
           ...val,
           id,

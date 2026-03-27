@@ -12,8 +12,12 @@ import { hasConsented, useConsentState } from './consent-state'
 import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
-import type { FirstReferrerData } from './first-referrer-cookie'
-import { isExternalReferrer, parseFirstReferrerCookie } from './first-referrer-cookie'
+import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
+import {
+  isExternalReferrer,
+  parseFirstReferrerCookie,
+  parseMwDiagCookie,
+} from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useParams, useTelemetryCookie } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
@@ -109,6 +113,7 @@ interface HandlePageTelemetryOptions {
   ref?: string
   telemetryDataOverride?: SharedTelemetryData
   firstReferrerData?: FirstReferrerData | null
+  mwDiagData?: MwDiagData | null
 }
 
 function handlePageTelemetry({
@@ -119,6 +124,7 @@ function handlePageTelemetry({
   ref,
   telemetryDataOverride,
   firstReferrerData,
+  mwDiagData,
 }: HandlePageTelemetryOptions) {
   // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
@@ -222,6 +228,13 @@ function handlePageTelemetry({
       ...(firstReferrerData !== undefined && {
         first_referrer_cookie_present: firstReferrerCookiePresent,
         first_referrer_cookie_consumed: firstReferrerCookieConsumed,
+      }),
+      // Phase 1 middleware diagnostic: present only when _sb_mw_diag cookie was found
+      // (i.e., the request was routed through www middleware on /dashboard or /docs)
+      ...(mwDiagData && {
+        mw_diag_hit: mwDiagData.hit,
+        mw_diag_would_stamp: mwDiagData.would_stamp,
+        mw_diag_has_existing_cookie: mwDiagData.has_existing_cookie,
       }),
     })
   }
@@ -336,10 +349,12 @@ export const PageTelemetry = ({
       hasAcceptedConsent &&
       !hasSentInitialPageTelemetryRef.current
     ) {
-      // Read the edge-set first-referrer cookie (cross-app handoff)
-      const firstReferrerData = parseFirstReferrerCookie(document.cookie)
+      // Read the edge-set cookies (cross-app handoff)
+      const cookieHeader = document.cookie
+      const firstReferrerData = parseFirstReferrerCookie(cookieHeader)
+      const mwDiagData = parseMwDiagCookie(cookieHeader)
 
-      const cookies = document.cookie.split(';')
+      const cookies = cookieHeader.split(';')
       const telemetryCookieValue = cookies
         .map((cookie) => cookie.trim())
         .find((cookie) => cookie.startsWith(`${TELEMETRY_DATA}=`))
@@ -358,6 +373,7 @@ export const PageTelemetry = ({
             ref,
             telemetryDataOverride: telemetryData,
             firstReferrerData,
+            mwDiagData,
           })
         } catch (error) {
           if (!IS_PROD) {
@@ -370,6 +386,7 @@ export const PageTelemetry = ({
             slug,
             ref,
             firstReferrerData,
+            mwDiagData,
           })
         } finally {
           clearTelemetryDataCookie()
@@ -382,6 +399,7 @@ export const PageTelemetry = ({
           slug,
           ref,
           firstReferrerData,
+          mwDiagData,
         })
       }
 

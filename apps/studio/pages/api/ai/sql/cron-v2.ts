@@ -1,6 +1,7 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -33,23 +34,18 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const {
-      model,
-      error: modelError,
-      providerOptions,
-    } = await getModel({
+    const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      routingKey: 'cron',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const result = await generateObject({
-      model,
-      providerOptions,
-      schema: cronSchema,
+    const result = await generateText({
+      ...modelParams,
+      output: Output.object({ schema: cronSchema }),
       prompt: source`
         You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
 
@@ -88,7 +84,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       `,
     })
 
-    return res.json(result.object.cron_expression)
+    return res.json(result.output.cron_expression)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI cron generation failed: ${error.message}`)

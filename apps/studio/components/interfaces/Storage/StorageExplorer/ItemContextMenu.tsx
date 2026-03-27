@@ -1,11 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight, Copy, Download, Edit, Move, Trash2 } from 'lucide-react'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
+
 import 'react-contexify/dist/ReactContexify.css'
 
 import { useParams } from 'common'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItemWithColumn } from '../Storage.types'
 import { useCopyUrl } from './useCopyUrl'
@@ -34,7 +36,7 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
     switch (event) {
       case 'copy':
         if (expiresIn !== undefined && expiresIn < 0) return setSelectedFileCustomExpiry(item)
-        else return onCopyUrl(item.name, expiresIn)
+        if (item.path) return onCopyUrl(item.path, expiresIn)
       case 'rename':
         return setSelectedItemToRename(item)
       case 'move':
@@ -83,6 +85,10 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
           </Item>
         </Submenu>
       )}
+      <Item onClick={({ props }) => onHandleClick('download', props.item)}>
+        <Download size={14} strokeWidth={1} />
+        <span className="ml-2 text-xs">Download</span>
+      </Item>
       {canUpdateFiles && [
         <Item key="rename-file" onClick={({ props }) => onHandleClick('rename', props.item)}>
           <Edit size={14} strokeWidth={1} />
@@ -91,10 +97,6 @@ export const ItemContextMenu = ({ id = '' }: ItemContextMenuProps) => {
         <Item key="move-file" onClick={({ props }) => onHandleClick('move', props.item)}>
           <Move size={14} strokeWidth={1} />
           <span className="ml-2 text-xs">Move</span>
-        </Item>,
-        <Item key="download-file" onClick={({ props }) => onHandleClick('download', props.item)}>
-          <Download size={14} strokeWidth={1} />
-          <span className="ml-2 text-xs">Download</span>
         </Item>,
         <Separator key="file-separator" />,
         <Item key="delete-file" onClick={({ props }) => setSelectedItemsToDelete([props.item])}>

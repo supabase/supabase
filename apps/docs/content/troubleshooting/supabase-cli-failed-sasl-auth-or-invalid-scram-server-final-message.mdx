@@ -13,12 +13,10 @@ This typically indicates an authentication failure where the database connection
 **To resolve this, consider one of the following solutions:**
 
 1.  **Check Network Bans:**
-
     - Navigate to your project's [Database Settings](/dashboard/project/_/database/settings) page.
     - Review any listed IP addresses that are blocked. Remove any entries that correspond to your current connection and then try the CLI action again.
 
 2.  **Use the old Password-Based authentication flow instead:**
-
     - Provide your database password directly through an environment variable when running the CLI command.
 
     ```bash
@@ -26,7 +24,6 @@ This typically indicates an authentication failure where the database connection
     ```
 
 3.  **Skip the Pooler and connect directly to the database with the Supabase CLI (Requires IPv6):**
-
     - If your network supports IPv6, you can use the beta CLI version with the `--skip-pooler` flag to bypass the connection pooler to avoid this particular issue.
 
     ```bash

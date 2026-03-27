@@ -1,3 +1,4 @@
+import { useIsJitDbAccessEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ConnectionPooling } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
@@ -22,12 +23,14 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { DiskManagementPanelForm } from '@/components/interfaces/DiskManagement/DiskManagementPanelForm'
 import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
 import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
+import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
 import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
 
-const ProjectSettings: NextPageWithLayout = () => {
+const DatabaseSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
+  const jitDbAccessEnabled = useIsJitDbAccessEnabled()
   const showNewDiskManagementUI = isAws || isAwsK8s
   const { databaseNetworkRestrictions } = useIsFeatureEnabled(['database:network_restrictions'])
 
@@ -50,6 +53,7 @@ const ProjectSettings: NextPageWithLayout = () => {
             <ResetDbPassword />
             <ConnectionPooling />
             <SSLConfiguration />
+            {jitDbAccessEnabled && <JitDbAccessConfiguration />}
             {showNewDiskManagementUI ? (
               // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
               <DiskManagementPanelForm />
@@ -74,10 +78,10 @@ const ProjectSettings: NextPageWithLayout = () => {
   )
 }
 
-ProjectSettings.getLayout = (page) => (
+DatabaseSettings.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Settings">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 
-export default ProjectSettings
+export default DatabaseSettings

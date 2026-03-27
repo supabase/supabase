@@ -1,5 +1,5 @@
+import { LARGEST_SIZE_LIMIT_BUCKETS_COUNT } from '@supabase/pg-meta'
 import { InlineLink } from 'components/ui/InlineLink'
-import { LARGEST_SIZE_LIMIT_BUCKETS_COUNT } from 'data/storage/storage.sql'
 import Link from 'next/link'
 import { type FieldError } from 'react-hook-form'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'

@@ -18,7 +18,7 @@ export type Navigation = {
   children?: Navigation[]
 }
 
-const Loading = () => (
+export const Loading = () => (
   <div className="p-10">
     <GenericSkeletonLoader />
   </div>
@@ -28,9 +28,13 @@ export type IntegrationDefinition = {
   id: string
   name: string
   status?: 'alpha' | 'beta'
+  categories?: string[]
   icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
-  description: string
-  docsUrl: string
+  description: string | null
+  content?: string | null
+  files?: string[]
+  docsUrl: string | null
+  siteUrl?: string | null
   author: {
     name: string
     websiteUrl: string
@@ -44,7 +48,10 @@ export type IntegrationDefinition = {
     pageId: string | undefined,
     childId: string | undefined
   ) => ComponentType<{}> | null
-} & ({ type: 'wrapper'; meta: WrapperMeta } | { type: 'postgres_extension' } | { type: 'custom' })
+} & (
+  | { type: 'wrapper'; meta: WrapperMeta }
+  | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
+)
 
 const authorSupabase = {
   name: 'Supabase',
@@ -466,17 +473,17 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import(
-                'components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview'
-              ).then((mod) => mod.StripeSyncInstallationPage),
+              import('components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
+                (mod) => mod.StripeSyncInstallationPage
+              ),
             { loading: Loading }
           )
         case 'settings':
           return dynamic(
             () =>
-              import(
-                'components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage'
-              ).then((mod) => mod.StripeSyncSettingsPage),
+              import('components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
+                (mod) => mod.StripeSyncSettingsPage
+              ),
             { loading: Loading }
           )
       }

@@ -8,7 +8,7 @@
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },
@@ -222,6 +222,10 @@
       "import": "./src/CommandMenu/prepackaged/Support.tsx",
       "types": "./src/CommandMenu/prepackaged/Support.tsx"
     },
+    "./CommandMenu/prepackaged/ThemeSwitcher.test": {
+      "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx",
+      "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx"
+    },
     "./CommandMenu/prepackaged/ThemeSwitcher": {
       "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx",
       "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx"
@@ -302,9 +306,25 @@
       "import": "./src/EmptyStatePresentational/index.tsx",
       "types": "./src/EmptyStatePresentational/index.tsx"
     },
+    "./ErrorDisplay/ErrorDisplay": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.tsx",
+      "types": "./src/ErrorDisplay/ErrorDisplay.tsx"
+    },
+    "./ErrorDisplay/ErrorDisplay.types": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.types.ts",
+      "types": "./src/ErrorDisplay/ErrorDisplay.types.ts"
+    },
     "./ExpandableVideo": {
       "import": "./src/ExpandableVideo/index.tsx",
       "types": "./src/ExpandableVideo/index.tsx"
+    },
+    "./FilterBar/CommandListItem": {
+      "import": "./src/FilterBar/CommandListItem.tsx",
+      "types": "./src/FilterBar/CommandListItem.tsx"
+    },
+    "./FilterBar/DefaultCommandList.helpers": {
+      "import": "./src/FilterBar/DefaultCommandList.helpers.tsx",
+      "types": "./src/FilterBar/DefaultCommandList.helpers.tsx"
     },
     "./FilterBar/DefaultCommandList": {
       "import": "./src/FilterBar/DefaultCommandList.tsx",
@@ -330,6 +350,10 @@
       "import": "./src/FilterBar/FilterGroup.tsx",
       "types": "./src/FilterBar/FilterGroup.tsx"
     },
+    "./FilterBar/OperatorSymbolBadge": {
+      "import": "./src/FilterBar/OperatorSymbolBadge.tsx",
+      "types": "./src/FilterBar/OperatorSymbolBadge.tsx"
+    },
     "./FilterBar/hooks.test": {
       "import": "./src/FilterBar/hooks.test.ts",
       "types": "./src/FilterBar/hooks.test.ts"
@@ -342,6 +366,10 @@
       "import": "./src/FilterBar/index.ts",
       "types": "./src/FilterBar/index.ts"
     },
+    "./FilterBar/menuItems.test": {
+      "import": "./src/FilterBar/menuItems.test.ts",
+      "types": "./src/FilterBar/menuItems.test.ts"
+    },
     "./FilterBar/menuItems": {
       "import": "./src/FilterBar/menuItems.ts",
       "types": "./src/FilterBar/menuItems.ts"
@@ -350,9 +378,17 @@
       "import": "./src/FilterBar/types.ts",
       "types": "./src/FilterBar/types.ts"
     },
+    "./FilterBar/useAIFilter": {
+      "import": "./src/FilterBar/useAIFilter.ts",
+      "types": "./src/FilterBar/useAIFilter.ts"
+    },
     "./FilterBar/useCommandHandling": {
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"
+    },
+    "./FilterBar/useCommandMenu": {
+      "import": "./src/FilterBar/useCommandMenu.ts",
+      "types": "./src/FilterBar/useCommandMenu.ts"
     },
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
@@ -422,13 +458,29 @@
       "import": "./src/McpUrlBuilder/utils/getMcpButtonData.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpButtonData.ts"
     },
+    "./McpUrlBuilder/utils/getMcpIconSrc.test": {
+      "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts",
+      "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts"
+    },
+    "./McpUrlBuilder/utils/getMcpIconSrc": {
+      "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts",
+      "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts"
+    },
     "./McpUrlBuilder/utils/getMcpUrl": {
       "import": "./src/McpUrlBuilder/utils/getMcpUrl.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpUrl.ts"
     },
+    "./McpUrlBuilder/utils/mcpIconAssets": {
+      "import": "./src/McpUrlBuilder/utils/mcpIconAssets.ts",
+      "types": "./src/McpUrlBuilder/utils/mcpIconAssets.ts"
+    },
     "./MetricCard": {
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
+    },
+    "./MobileSheetNav/MobileSheetNav.test": {
+      "import": "./src/MobileSheetNav/MobileSheetNav.test.tsx",
+      "types": "./src/MobileSheetNav/MobileSheetNav.test.tsx"
     },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
@@ -449,6 +501,14 @@
     "./MultiSelectDeprecated": {
       "import": "./src/MultiSelectDeprecated/index.tsx",
       "types": "./src/MultiSelectDeprecated/index.tsx"
+    },
+    "./MultipleCodeBlock/index.test": {
+      "import": "./src/MultipleCodeBlock/index.test.tsx",
+      "types": "./src/MultipleCodeBlock/index.test.tsx"
+    },
+    "./MultipleCodeBlock": {
+      "import": "./src/MultipleCodeBlock/index.tsx",
+      "types": "./src/MultipleCodeBlock/index.tsx"
     },
     "./PageContainer": {
       "import": "./src/PageContainer/index.tsx",
@@ -489,6 +549,10 @@
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",
       "types": "./src/Row/Row.utils.ts"
+    },
+    "./Row/index.test": {
+      "import": "./src/Row/index.test.ts",
+      "types": "./src/Row/index.test.ts"
     },
     "./Row": {
       "import": "./src/Row/index.tsx",
@@ -533,6 +597,10 @@
     "./SqlToRest/util": {
       "import": "./src/SqlToRest/util.ts",
       "types": "./src/SqlToRest/util.ts"
+    },
+    "./StatusCode": {
+      "import": "./src/StatusCode/index.tsx",
+      "types": "./src/StatusCode/index.tsx"
     },
     "./ThemeToggle": {
       "import": "./src/ThemeToggle.tsx",
@@ -582,10 +650,6 @@
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
-    "./MultipleCodeBlock": {
-      "import": "./src/MultipleCodeBlock/index.tsx",
-      "types": "./src/MultipleCodeBlock/index.tsx"
-    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
@@ -597,6 +661,14 @@
     "./form/FormLayout2": {
       "import": "./src/form/FormLayout2.tsx",
       "types": "./src/form/FormLayout2.tsx"
+    },
+    "./form/KeyValueFieldArray/KeyValueFieldArray.test": {
+      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx",
+      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx"
+    },
+    "./form/KeyValueFieldArray/KeyValueFieldArray": {
+      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
+      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
     },
     "./form/Layout/FormLayout": {
       "import": "./src/form/Layout/FormLayout.tsx",
@@ -668,7 +740,6 @@
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.6.6",
-    "react-tooltip": "*",
     "react-use": "^17.5.0",
     "recharts": "catalog:",
     "remark": "^15.0.1",

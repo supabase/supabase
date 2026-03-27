@@ -273,7 +273,6 @@ values
   (1, 2, 'same_category', 5), -- "Intro to Graph Theory" and "Advanced Graph Algorithms" are in the same category
   (2, 3, 'watched_by_same_users', 3), -- "Advanced Graph Algorithms" and "Graph Neural Networks" are often watched together
   (4, 5, 'same_category', 5); -- "Beginner Python Tutorial
-
 create table interactions (
   user_id int references auth.users (id),
   video_id int references videos (id),

@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseModalProps {
+export interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseModalProps {
   title?: ReactNode
   description?: ReactNode
   confirmLabel?: ReactNode

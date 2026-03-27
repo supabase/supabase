@@ -2,6 +2,7 @@ import { useFlag } from 'common'
 import { ClockSkewBanner } from 'components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from 'components/layouts/AppLayout/StatusPageBanner'
+import { TaxIdBanner } from 'components/layouts/AppLayout/TaxIdBanner'
 import { PropsWithChildren } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
@@ -16,6 +17,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         <StatusPageBanner />
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
+        <TaxIdBanner />
         {clockSkewBanner && <ClockSkewBanner />}
       </div>
       {children}

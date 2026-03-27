@@ -168,6 +168,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Error Display',
+          href: '/docs/fragments/error-display',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -200,6 +205,16 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Confirmation Modal',
           href: '/docs/fragments/confirmation-modal',
+          items: [],
+        },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
+          items: [],
+        },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
           items: [],
         },
       ],

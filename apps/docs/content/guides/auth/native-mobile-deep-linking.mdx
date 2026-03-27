@@ -97,7 +97,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
     export default function Auth() {
       // Handle linking into app from email app.
-      const url = Linking.useURL();
+      const url = Linking.useLinkingURL();
       if (url) createSessionFromUrl(url);
 
       return (
