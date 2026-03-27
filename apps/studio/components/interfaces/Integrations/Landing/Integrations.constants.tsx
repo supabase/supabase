@@ -158,8 +158,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+                (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
               loading: Loading,
@@ -201,8 +201,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+                (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
               loading: Loading,
@@ -360,8 +360,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+                (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
               loading: Loading,
