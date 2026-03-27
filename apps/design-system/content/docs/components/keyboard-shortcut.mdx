@@ -6,15 +6,14 @@ component: true
 
 <ComponentPreview name="keyboard-shortcut-demo" align="start" peekCode wide />
 
-`KeyboardShortcut` renders a compact, platform-aware shortcut label from a list of logical keys.
+`KeyboardShortcut` renders a compact, platform-aware shortcut label from logical key names.
 
-It is intended for:
+Use it for button accessories, menu shortcuts, tooltips, and helper copy. Avoid placing it directly inside button label text; render it in a right-side accessory slot such as `iconRight` instead.
 
-- button accessories such as `Save` + `⌘ S`
-- dropdown and context menu shortcut hints
-- tooltip and helper text copy where the shortcut needs to stay in sync with the actual keybinding
-
-It is not intended to be used as part of a button's text content. For buttons, prefer rendering it via `iconRight` or another right-side accessory slot.
+- Prefer logical keys such as `Meta` instead of branching on platform yourself.
+- Use `variant="inline"` for button accessories and inline copy.
+- Use the default pill variant for menus, tooltips, and standalone chips.
+- Keep the hint aligned with the actual registered shortcut.
 
 ## Usage
 
@@ -49,28 +48,21 @@ Single-character keys are uppercased automatically.
 
 ## Variants
 
-### `variant="pill"` (default)
+### Pill (default)
 
-Use the pill variant for menus, tooltips, and standalone shortcut chips.
+Use the default pill variant for menus, tooltips, and standalone shortcut chips.
 
 ```tsx
 <KeyboardShortcut keys={['Shift', 'Meta', 'M']} />
 ```
 
-### `variant="inline"`
+### Inline
 
 Use the inline variant when the shortcut needs to sit on the same line as surrounding text or inside a button accessory slot.
 
 ```tsx
 <Button iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}>Apply</Button>
 ```
-
-## Guidance
-
-- Prefer logical keys such as `Meta` instead of manually branching on platform.
-- Prefer `variant="inline"` for button accessories.
-- Prefer the default pill variant for dropdown shortcuts.
-- Keep shortcut hints aligned with the actual registered keybinding. Do not add decorative shortcuts that do not work.
 
 ## Examples
 
