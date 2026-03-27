@@ -32,6 +32,7 @@ public/llms.txt
 public/llms/
 # Generated guide markdown files
 public/docs/
+public/docs.tar.gz
 
 # Copied examples folder
 /examples/

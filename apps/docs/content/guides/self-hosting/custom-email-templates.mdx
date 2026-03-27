@@ -1,0 +1,175 @@
+---
+title: 'Custom Email Templates'
+description: 'Configure custom email templates with self-hosted Supabase instance'
+subtitle: 'Configure custom email templates with self-hosted Supabase instance'
+---
+
+When running a self-hosted Supabase instance, you can fully customize emails sent by Supabase Auth.
+
+## Overview
+
+Supabase Auth does not read email templates from mounted Docker volumes. Instead, it expects each template to be available at a URL that returns a valid HTML template.
+
+This URL:
+
+- Does not need to be public
+- Must be reachable from `auth` service
+- Must return a valid Golang HTML template
+
+To provide templates to Supabase Auth, you need a service that serves static HTML files. This can be any server of your choice. You can even use `kong` service which is included with the default Supabase docker configuration. The only requirement is that the `auth` service must be able to reach it via a HTTP GET request.
+
+This guide uses [Caddy](https://github.com/caddyserver/caddy) for serving templates.
+
+<Admonition type="tip">
+
+If Supabase Auth cannot fetch the template or if the fetched template is invalid, it falls back to the default template.
+
+</Admonition>
+
+## Authentication email templates
+
+Authentication email templates can be configured using the following environment variables:
+
+- `GOTRUE_MAILER_TEMPLATES_<AUTH_FLOW>`: Provide a custom template URL. Falls back to the default template if not set.
+- `GOTRUE_MAILER_SUBJECTS_<AUTH_FLOW>`: Customize the email subject. Falls back to the default subject if not set.
+
+| Auth flow          | Sent                                                                 |
+| ------------------ | -------------------------------------------------------------------- |
+| `CONFIRMATION`     | When a user signs up and needs to verify their email address         |
+| `RECOVERY`         | When a user requests a password reset                                |
+| `MAGIC_LINK`       | When a user requests a magic link for password-less authentication   |
+| `INVITE`           | When a user is invited to join your application via email invitation |
+| `EMAIL_CHANGE`     | When a user requests to change their email address                   |
+| `REAUTHENTICATION` | When a user needs to re-authenticate for sensitive operations        |
+
+For example:
+
+```sh
+GOTRUE_MAILER_TEMPLATES_MAGIC_LINK='<template_url>'
+GOTRUE_MAILER_SUBJECTS_MAGIC_LINK='<custom_subject>'
+```
+
+### Example
+
+Below is an example configuration for setting up a custom invite template.
+
+### Step 1: Create a templates directory
+
+Create a `templates` directory inside the existing `volumes` directory and add your email templates to it.
+
+Your directory structure should look like this:
+
+```
+volumes/
+  templates/
+    invite.html
+```
+
+### Step 2: Update `docker-compose.yml`
+
+Update the `auth` service to depend on `templates-server`, and pass the email template environment variables. Then add a `templates-server` service to serve the templates from `./volumes/templates`.
+
+```yml
+services:
+  auth:
+    depends_on:
+      db:
+        condition: service_healthy
+      templates-server: # 👈 new dependency
+        condition: service_started
+    environment:
+      GOTRUE_MAILER_TEMPLATES_INVITE: 'http://templates-server/invite.html'
+      GOTRUE_MAILER_SUBJECTS_INVITE: 'You have been invited'
+
+  templates-server:
+    image: caddy:2-alpine
+    command: ['caddy', 'file-server', '-r', '/templates', '--listen', ':80']
+    volumes:
+      - ./volumes/templates:/templates
+```
+
+#### What this configuration does
+
+- Adds a `templates-server`service that runs alongside the Supabase services in the same docker network.
+- Serves your custom email template files from the `./volumes/templates` directory.
+- Keeps the templates-server private to the Docker network (no published ports), so it is not accessible from outside.
+- Allows the `auth` service to fetch templates via `http://templates-server/<template>.html`.
+
+### Step 3: Restart containers
+
+```sh
+docker compose up -d --force-recreate --no-deps auth templates-server
+```
+
+## Notification email templates
+
+Notification email templates can be configured using the following environment variables:
+
+- `GOTRUE_MAILER_NOTIFICATIONS_<NOTIFICATION_TYPE>_ENABLED`: Enable the notification email
+- `GOTRUE_MAILER_TEMPLATES_<NOTIFICATION_TYPE>_NOTIFICATION`: Provide a custom template URL. Falls back to the default template if not set.
+- `GOTRUE_MAILER_SUBJECTS_<NOTIFICATION_TYPE>_NOTIFICATION`: Customize the email subject. Falls back to the default subject if not set.
+
+| Notification Type       | Sent                                                  |
+| ----------------------- | ----------------------------------------------------- |
+| `PASSWORD_CHANGED`      | When a user's password is changed                     |
+| `EMAIL_CHANGED`         | When a user's email address is changed                |
+| `PHONE_CHANGED`         | When a user's phone number is changed                 |
+| `MFA_FACTOR_ENROLLED`   | When a new MFA factor is added to the user's account  |
+| `MFA_FACTOR_UNENROLLED` | When an MFA factor is removed from the user's account |
+| `IDENTITY_LINKED`       | When a new identity is linked to the account          |
+| `IDENTITY_UNLINKED`     | When an identity is unlinked from the account         |
+
+For example:
+
+```sh
+GOTRUE_MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED='true'
+GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION='<template_url>'
+GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION='<custom_subject>'
+```
+
+### Example
+
+Below is an example configuration for setting up a custom password changed notification template.
+
+### Step 1: Create the templates directory
+
+This example reuses the directory created in **Auth Email Templates – Step 1** (`volumes/templates`). Add your notification email templates to this directory.
+
+Your directory structure should look like this:
+
+```
+volumes/
+  templates/
+    invite.html
+    password_changed_notification.html
+```
+
+### Step 2: Update `docker-compose.yml`
+
+Update the `auth` service in `docker-compose.yml` to enable password changed notification
+
+```yml
+services:
+  auth:
+    depends_on:
+      db:
+        condition: service_healthy
+      templates-server:
+        condition: service_started
+    environment:
+      GOTRUE_MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED: 'true' # 👈 enabling the notification is required
+      GOTRUE_MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION: 'http://templates-server/password_changed_notification.html'
+      GOTRUE_MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: 'Your password has been changed'
+
+  templates-server:
+    image: caddy:2-alpine
+    command: ['caddy', 'file-server', '-r', '/templates', '--listen', ':80']
+    volumes:
+      - ./volumes/templates:/templates
+```
+
+### Step 3: Restart containers
+
+```sh
+docker compose up -d --force-recreate --no-deps auth templates-server
+```
