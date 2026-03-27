@@ -7,9 +7,9 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
     "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
-    "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",

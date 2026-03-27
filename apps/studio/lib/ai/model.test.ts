@@ -51,11 +51,11 @@ describe('getModel', () => {
 
     const { modelParams, promptProviderOptions } = await getModel({
       provider: 'openai',
-      modelEntry: openaiModelEntry({ id: 'gpt-5-mini' }),
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
     })
 
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5-mini')
+    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(promptProviderOptions).toBeUndefined()
   })
 
@@ -64,24 +64,24 @@ describe('getModel', () => {
 
     const { error } = await getModel({
       provider: 'openai',
-      modelEntry: openaiModelEntry({ id: 'gpt-5-mini' }),
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
     })
     expect(error).toEqual(new Error('OPENAI_API_KEY not available'))
   })
 
-  it('returns openai gpt-5 when hasAccessToAdvanceModel and not throttled', async () => {
+  it('returns openai gpt-5.3-codex when hasAccessToAdvanceModel and not throttled', async () => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key')
     vi.stubEnv('IS_THROTTLED', 'false')
 
     const { modelParams, error } = await getModel({
       provider: 'openai',
-      modelEntry: openaiModelEntry({ id: 'gpt-5', reasoningEffort: 'minimal' }),
+      modelEntry: openaiModelEntry({ id: 'gpt-5.3-codex', reasoningEffort: 'low' }),
     })
 
     expect(error).toBeUndefined()
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5')
-    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('minimal')
+    expect(openai).toHaveBeenCalledWith('gpt-5.3-codex')
+    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('low')
   })
 
   it('applies reasoningEffort from DEFAULT_COMPLETION_MODEL', async () => {
@@ -93,7 +93,7 @@ describe('getModel', () => {
     })
 
     expect(error).toBeUndefined()
-    expect(openai).toHaveBeenCalledWith('gpt-5-mini')
-    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('minimal')
+    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('none')
   })
 })

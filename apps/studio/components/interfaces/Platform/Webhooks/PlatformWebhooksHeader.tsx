@@ -74,18 +74,7 @@ export const PlatformWebhooksHeader = ({
           <PageHeaderDescription>{headerDescription}</PageHeaderDescription>
         </PageHeaderSummary>
         <PageHeaderAside>
-          {hasSelectedEndpoint ? (
-            endpointActions
-          ) : (
-            <>
-              <DocsButton href="https://supabase.com/docs" />
-              <Button asChild type="default">
-                <a target="_blank" rel="noopener noreferrer" href="https://supabase.com">
-                  Leave feedback
-                </a>
-              </Button>
-            </>
-          )}
+          {hasSelectedEndpoint ? endpointActions : <DocsButton href="https://supabase.com/docs" />}
         </PageHeaderAside>
       </PageHeaderMeta>
     </PageHeader>

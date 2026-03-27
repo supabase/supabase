@@ -56,7 +56,7 @@ The default `.env.example` and `docker-compose.yml` include commented-out placeh
 2. Set the **authorized redirect URL**, e.g., `https://<your-domain>/auth/v1/callback`
 3. Copy the **client ID** and **client secret** into your `.env` file.
 
-### Step 2: Configure variables in the `.env` file
+### Step 2: Configure environment variables
 
 Uncomment the lines for your provider in `.env` and add your client ID and secret, e.g., for Google:
 
@@ -66,7 +66,9 @@ GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_SECRET=your-client-secret
 ```
 
-### Step 3: Enable the matching lines in `docker-compose.yml`
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Step 3: Enable the matching lines in Docker Compose configuration
 
 Uncomment the corresponding `GOTRUE_EXTERNAL_` lines in the `auth` service's `environment`:
 
@@ -400,12 +402,12 @@ For detailed client-side integration, see [Social Login](/docs/guides/auth/socia
 
 ## Troubleshooting
 
-### "Provider not enabled" or provider shows `false` in `/auth/v1/settings`
+### "Provider not enabled" or provider seen as false in settings
 
 - Check that `GOTRUE_EXTERNAL_*_ENABLED` is set to `true` in `docker-compose.yml`
 - Verify the `.env` variable is not empty, e.g., check with `docker compose exec auth env | grep GOOGLE`
 
-### Variables added to `.env` but provider still not working
+### Variables added to the environment but provider still not working
 
 Configuration variables from `.env` are **not** automatically available inside the container unless there's a matching passthrough definition in `docker-compose.yml`. Check, e.g., for:
 
@@ -415,7 +417,7 @@ GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
 
 Run `docker compose exec auth env | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
 
-### `SITE_URL` or redirect URL errors after login
+### Site URL or redirect URL errors after login
 
 After a successful OAuth login, the Auth service redirects to `SITE_URL` or a URL from `ADDITIONAL_REDIRECT_URLS`. Ensure:
 

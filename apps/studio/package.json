@@ -204,6 +204,7 @@
     "raw-loader": "^4.0.2",
     "require-in-the-middle": "^8.0.0",
     "tailwindcss": "catalog:",
+    "tsconfig": "workspace:*",
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

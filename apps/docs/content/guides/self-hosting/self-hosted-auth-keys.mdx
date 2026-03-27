@@ -131,7 +131,7 @@ When `JWT_KEYS` is set, Auth will start signing new user session JWTs with the n
 
 </Admonition>
 
-## Rotating `sb_` API keys
+## Rotating the new API keys
 
 If your new API keys are compromised or you want to rotate them periodically, you can regenerate `sb_publishable` and `sb_secret` without touching the asymmetric key pair:
 
@@ -175,9 +175,9 @@ Regenerating asymmetric keys invalidates all ES256 user sessions. Plan a mainten
 
 Below are a few notes on the details of the new authentication architecture.
 
-### What `supabase-js` sends
+### What client SDK sends
 
-Every request includes two headers:
+Every request via `supabase-js` includes two headers:
 
 - `apikey` - the API key (`sb_` or legacy JWT)
 - `Authorization` - when unauthenticated, the client SDK copies the API key here (`Bearer sb_publishable_xxx` or `Bearer eyJ...`). When authenticated, this contains the user session JWT minted by Auth.

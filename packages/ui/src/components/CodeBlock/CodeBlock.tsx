@@ -1,5 +1,6 @@
 'use client'
 
+// @ts-ignore
 import curl from 'highlightjs-curl'
 import { noop } from 'lodash'
 import { Check, Copy } from 'lucide-react'

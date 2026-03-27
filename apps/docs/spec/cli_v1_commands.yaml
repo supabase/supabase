@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.78.1
+  version: 2.84.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -19,6 +19,20 @@ info:
     - id: other-commands
       title: Additional Commands
 flags:
+  - id: agent
+    name: --agent <[ auto | yes | no ]>
+    description: 'Override agent detection: yes, no, or auto (default auto)'
+    default_value: auto
+    accepted_values:
+      - id: auto
+        name: auto
+        type: '[ auto | yes | no ]'
+      - id: 'yes'
+        name: 'yes'
+        type: '[ auto | yes | no ]'
+      - id: 'no'
+        name: 'no'
+        type: '[ auto | yes | no ]'
   - id: create-ticket
     name: --create-ticket
     description: create a support ticket for any CLI error
@@ -2801,12 +2815,15 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-db-advisors
       - supabase-db-diff
       - supabase-db-dump
       - supabase-db-lint
       - supabase-db-pull
       - supabase-db-push
+      - supabase-db-query
       - supabase-db-reset
+      - supabase-db-schema
       - supabase-db-start
     flags: []
   - id: supabase-db-start
@@ -2821,6 +2838,145 @@ commands:
         name: --from-backup <string>
         description: Path to a logical backup file.
         default_value: ''
+  - id: supabase-db-schema
+    title: supabase db schema
+    summary: Manage database schema
+    tags: []
+    links: []
+    subcommands:
+      - supabase-db-schema-declarative
+    flags: []
+  - id: supabase-db-schema-declarative
+    title: supabase db schema declarative
+    summary: Manage declarative database schemas
+    tags: []
+    links: []
+    subcommands:
+      - supabase-db-schema-declarative-generate
+      - supabase-db-schema-declarative-sync
+    flags: []
+  - id: supabase-db-schema-declarative-sync
+    title: supabase db schema declarative sync
+    summary: Generate a new migration from declarative schema
+    description: |2
+
+      Generate a new migration by diffing your declarative schema files against the current migration state.
+
+      When no declarative schema exists yet, the command offers to run `generate` first. After computing the diff, you can optionally name the migration and apply it to the local database.
+
+      Requires `--experimental` flag or `[experimental.pgdelta] enabled = true` in config.
+    examples:
+      - id: with-pg-delta
+        name: Sync declarative schema with pg-delta
+        code: |
+          # After editing declarative schema files, generate a migration:
+          supabase db schema declarative sync --experimental
+        response: |
+          Creating shadow database...
+          Applying declarative schemas via pg-delta...
+          Applied 239 statements in 1 round(s).
+          Enter a name for this migration (press Enter to keep 'declarative_sync'): add_updated_at
+          Created new migration at supabase/migrations/20260317194051_add_updated_at.sql
+          Apply this migration to local database? [Y/n]
+          Connecting to local database...
+          Applying migration 20260317194051_add_updated_at.sql...
+          Migration applied successfully.
+      - id: generate-first
+        name: Generate declarative schema from migrations
+        code: |
+          supabase db schema declarative sync --experimental
+        response: |
+          No declarative schema found. Generate a new one ? [Y/n]
+          Reset local database to match migrations first? (local data will be lost) [y/N] y
+          Resetting database...
+          ...
+          Declarative schema written to supabase/declarative
+          Finished supabase db schema declarative generate.
+    tags: []
+    links: []
+    usage: supabase db schema declarative sync [flags]
+    subcommands: []
+    flags:
+      - id: apply
+        name: --apply
+        description: |
+          Apply the generated migration to the local database without prompting.
+        default_value: 'false'
+      - id: file
+        name: -f, --file <string>
+        description: Saves schema diff to a new migration file.
+        default_value: declarative_sync
+      - id: name
+        name: --name <string>
+        description: Name for the generated migration file.
+        default_value: ''
+      - id: schema
+        name: -s, --schema <strings>
+        description: Comma separated list of schema to include.
+        default_value: '[]'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: no-cache
+        name: --no-cache
+        description: Disable catalog cache and force fresh shadow database setup.
+        default_value: 'false'
+  - id: supabase-db-schema-declarative-generate
+    title: supabase db schema declarative generate
+    summary: Generate declarative schema from a database
+    description: |2
+
+      Generate declarative schema files from a database.
+
+      Exports the schema of a live database (local, linked, or custom URL) into SQL files under the declarative schema directory. This is the entrypoint for bootstrapping declarative mode.
+
+      Requires `--experimental` flag or `[experimental.pgdelta] enabled = true` in config.
+    tags: []
+    links: []
+    usage: supabase db schema declarative generate [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Generates declarative schema from the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Generates declarative schema from the linked project.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Generates declarative schema from the local database.
+        default_value: 'false'
+      - id: overwrite
+        name: --overwrite
+        description: Overwrite declarative schema files without confirmation.
+        default_value: 'false'
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
+      - id: reset
+        name: --reset
+        description: |
+          Reset local database before generating (local data will be lost).
+        default_value: 'false'
+      - id: schema
+        name: -s, --schema <strings>
+        description: Comma separated list of schema to include.
+        default_value: '[]'
+      - id: experimental
+        name: --experimental
+        description: enable experimental features
+        required: true
+        default_value: 'false'
+      - id: no-cache
+        name: --no-cache
+        description: Disable catalog cache and force fresh shadow database setup.
+        default_value: 'false'
   - id: supabase-db-reset
     title: supabase db reset
     summary: Resets the local database to current migrations
@@ -2873,6 +3029,52 @@ commands:
         name: --version <string>
         description: Reset up to the specified version.
         default_value: ''
+  - id: supabase-db-query
+    title: supabase db query
+    summary: Execute a SQL query against the database
+    description: |-
+      Execute a SQL query against the local or linked database.
+
+      When used by an AI coding agent (auto-detected or via --agent=yes), the default
+      output format is JSON with an untrusted data warning envelope. When used by a
+      human (--agent=no or no agent detected), the default output format is table
+      without the envelope.
+    tags: []
+    links: []
+    usage: supabase db query [sql] [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Queries the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: file
+        name: -f, --file <string>
+        description: Path to a SQL file to execute.
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Queries the linked project's database via Management API.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Queries the local database.
+        default_value: 'true'
+      - id: output
+        name: -o, --output <[ json | table | csv ]>
+        description: 'Output format: table, json, or csv.'
+        default_value: json
+        accepted_values:
+          - id: json
+            name: json
+            type: '[ json | table | csv ]'
+          - id: table
+            name: table
+            type: '[ json | table | csv ]'
+          - id: csv
+            name: csv
+            type: '[ json | table | csv ]'
   - id: supabase-db-push
     title: supabase db push
     summary: Push new migrations to the remote database
@@ -3019,6 +3221,10 @@ commands:
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: use-pg-delta
+        name: --use-pg-delta
+        description: Use pg-delta to pull declarative schema.
+        default_value: 'false'
   - id: supabase-db-lint
     title: supabase db lint
     summary: Checks local database for typing error
@@ -3270,6 +3476,10 @@ commands:
         name: -f, --file <string>
         description: Saves schema diff to a new migration file.
         default_value: ''
+      - id: from
+        name: --from <string>
+        description: Diff from local, linked, migrations, or a Postgres URL.
+        default_value: ''
       - id: linked
         name: --linked
         description: Diffs local migration files against the linked project.
@@ -3278,10 +3488,18 @@ commands:
         name: --local
         description: Diffs local migration files against the local database.
         default_value: 'true'
+      - id: output
+        name: -o, --output <string>
+        description: Write explicit diff output to a file path.
+        default_value: ''
       - id: schema
         name: -s, --schema <strings>
         description: Comma separated list of schema to include.
         default_value: '[]'
+      - id: to
+        name: --to <string>
+        description: Diff to local, linked, migrations, or a Postgres URL.
+        default_value: ''
       - id: use-migra
         name: --use-migra
         description: Use migra to generate schema diff.
@@ -3298,6 +3516,75 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
+  - id: supabase-db-advisors
+    title: supabase db advisors
+    summary: Checks database for security and performance issues
+    description: |
+      Inspects the database for common security and performance issues such as missing RLS policies, unindexed foreign keys, exposed auth.users, and more.
+    tags: []
+    links: []
+    usage: supabase db advisors [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Checks the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: fail-on
+        name: --fail-on <[ none | info | warn | error ]>
+        description: |
+          Issue level to exit with non-zero status: none, info, warn, error.
+        default_value: none
+        accepted_values:
+          - id: none
+            name: none
+            type: '[ none | info | warn | error ]'
+          - id: info
+            name: info
+            type: '[ none | info | warn | error ]'
+          - id: warn
+            name: warn
+            type: '[ none | info | warn | error ]'
+          - id: error
+            name: error
+            type: '[ none | info | warn | error ]'
+      - id: level
+        name: --level <[ info | warn | error ]>
+        description: 'Minimum issue level to display: info, warn, error.'
+        default_value: warn
+        accepted_values:
+          - id: info
+            name: info
+            type: '[ info | warn | error ]'
+          - id: warn
+            name: warn
+            type: '[ info | warn | error ]'
+          - id: error
+            name: error
+            type: '[ info | warn | error ]'
+      - id: linked
+        name: --linked
+        description: Checks the linked project for issues.
+        default_value: 'false'
+      - id: local
+        name: --local
+        description: Checks the local database for issues.
+        default_value: 'true'
+      - id: type
+        name: --type <[ all | security | performance ]>
+        description: 'Type of advisors to check: all, security, performance.'
+        default_value: all
+        accepted_values:
+          - id: all
+            name: all
+            type: '[ all | security | performance ]'
+          - id: security
+            name: security
+            type: '[ all | security | performance ]'
+          - id: performance
+            name: performance
+            type: '[ all | security | performance ]'
   - id: supabase-config
     title: supabase config
     summary: Manage Supabase project configurations
