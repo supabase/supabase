@@ -183,12 +183,9 @@ export function SurveyChart({
   functionName,
 }: SurveyChartProps) {
   const accent = useAccent()
-  const accentBg = accent === 'green' ? 'hsl(var(--brand-300))' : 'hsl(293 100% 54% / 0.10)'
-  const accentBarFg = accent === 'green' ? 'bg-brand' : 'bg-purple-sos-500'
-  const accentBarText =
-    accent === 'green'
-      ? 'text-brand-link dark:text-brand'
-      : 'text-purple-sos-500 dark:text-purple-sos-300'
+  const accentBg = 'hsl(var(--brand-300))'
+  const accentBarFg = 'bg-brand'
+  const accentBarText = 'text-brand-link dark:text-brand'
 
   const [isInView, setIsInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)

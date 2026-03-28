@@ -9,13 +9,9 @@ export function SurveyRankedAnswersPair({
 }) {
   const accent = useAccent()
 
-  const accentBlocks =
-    accent === 'green'
-      ? ['bg-brand', 'bg-brand-500', 'bg-brand-300']
-      : ['bg-purple-sos-500', 'bg-purple-sos-400', 'bg-purple-sos-300']
+  const accentBlocks = ['bg-brand', 'bg-brand-500', 'bg-brand-300']
 
-  const accentRankText =
-    accent === 'green' ? 'text-brand' : 'text-purple-sos-500 dark:text-purple-sos-300'
+  const accentRankText = 'text-brand'
 
   return (
     <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted divide-opacity-50">

@@ -17,7 +17,7 @@ export function SurveyWordCloud({
   const [scramblingTexts, setScramblingTexts] = useState<string[]>([])
   const accent = useAccent()
 
-  const accentBg = accent === 'green' ? 'bg-brand' : 'bg-purple-sos-500'
+  const accentBg = 'bg-brand'
 
   // Calculate the range within the current context
   const counts = answers.map((answer) => answer.count)

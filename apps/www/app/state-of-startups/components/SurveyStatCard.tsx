@@ -13,9 +13,8 @@ export function SurveyStatCard({ label, percent }: { label: string; percent: num
   const cardRef = useRef<HTMLDivElement>(null)
   const accent = useAccent()
 
-  const accentBg = accent === 'green' ? 'bg-brand' : 'bg-purple-sos-500'
-  const accentText =
-    accent === 'green' ? 'text-brand' : 'text-purple-sos-500 dark:text-purple-sos-300'
+  const accentBg = 'bg-brand'
+  const accentText = 'text-brand'
 
   useEffect(() => {
     if (!percent || hasAnimated) return

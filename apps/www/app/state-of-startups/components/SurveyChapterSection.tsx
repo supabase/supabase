@@ -51,10 +51,7 @@ export function SurveyChapterSection({
 }: SurveyChapterSectionProps) {
   const accent = useAccent()
 
-  const eyebrowColor =
-    accent === 'green'
-      ? 'text-brand-link dark:text-brand'
-      : 'text-purple-sos-500 dark:text-purple-sos-300'
+  const eyebrowColor = 'text-brand-link dark:text-brand'
 
   const chartComponents = {
     RoleChart,

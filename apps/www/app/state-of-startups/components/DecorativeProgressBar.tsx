@@ -56,19 +56,19 @@ const PROGRESS_BARS = [
   {
     height: 'h-4',
     bgColor: 'bg-foreground-muted/80',
-    fgColor: 'bg-purple-sos-500',
+    fgColor: 'bg-brand-300',
     animationDelay: '0s',
   },
   {
     height: 'h-8',
     bgColor: 'bg-foreground-muted/50',
-    fgColor: 'bg-brand-500',
+    fgColor: 'bg-brand',
     animationDelay: '0.3s',
   },
   {
     height: 'h-12',
     bgColor: 'bg-foreground-muted/20',
-    fgColor: 'bg-brand',
+    fgColor: 'bg-brand-500',
     animationDelay: '0.6s',
   },
 ]

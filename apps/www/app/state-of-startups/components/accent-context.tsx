@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react'
 
-export type Accent = 'green' | 'purple'
+export type Accent = 'green'
 
 export const AccentContext = createContext<Accent>('green')
 

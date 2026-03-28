@@ -29,7 +29,7 @@ export function SurveyChapter({
   pullQuote,
   children,
 }: SurveyChapterProps) {
-  const accent = number % 2 !== 0 ? 'green' : 'purple'
+  const accent = 'green'
 
   return (
     <AccentContext.Provider value={accent}>
@@ -42,7 +42,7 @@ export function SurveyChapter({
               background:
                 number % 2 !== 0
                   ? `radial-gradient(circle at 35% 280%, hsl(var(--brand-300)), transparent 70%)`
-                  : `radial-gradient(circle at 65% 280%, hsl(293 100% 54% / 0.10), transparent 70%)`,
+                  : `radial-gradient(circle at 65% 280%, hsl(var(--brand-300)), transparent 70%)`,
             }}
           >
             {/* Decorative progress bar */}
@@ -54,7 +54,7 @@ export function SurveyChapter({
             <div className="max-w-[60rem] mx-auto grid gap-y-4 sm:gap-y-8 grid-cols-1 md:grid-cols-3 text-balance pb-12">
               <div className="md:col-span-2 flex flex-col gap-4 px-8">
                 <p
-                  className={`text-sm uppercase font-mono text-balance tracking-wider ${accent === 'green' ? 'text-brand-link' : 'text-purple-sos-500 dark:text-purple-sos-300'}`}
+                  className={`text-sm uppercase font-mono text-balance tracking-wider text-brand-link`}
                 >
                   {shortTitle}
                 </p>
