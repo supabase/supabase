@@ -502,7 +502,7 @@ export const NewOrgForm = ({
 
             {form.watch('plan') === 'PRO' && (
               <>
-                <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
+                <Panel.Content className="border-b border-muted">
                   <FormField_Shadcn_
                     control={form.control}
                     name="spend_cap"
