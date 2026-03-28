@@ -49,7 +49,7 @@ Use the shared [Key/Value Field Array](../fragments/key-value-field-array) fragm
 
 4. **Use Cards for grouping**: Wrap form sections in `Card` components with `CardContent` and `CardFooter` for actions.
 
-5. **Handle dirty state**: Show cancel buttons and disable save buttons based on `form.formState.isDirty`.
+5. **Handle dirty state**: Show cancel buttons and disable save buttons based on `form.formState.isDirty`. Make sure you destructure `isDirty` from `form.formState` (see https://react-hook-form.com/docs/useform/formstate)
 
 6. **Error handling**: Always use mutations with `onSuccess` and `onError` callbacks that show toast notifications.
 

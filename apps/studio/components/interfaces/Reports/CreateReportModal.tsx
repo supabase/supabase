@@ -1,19 +1,36 @@
-import { useRouter } from 'next/router'
-import { useMemo } from 'react'
-import { toast } from 'sonner'
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { Button, Form, Input, Modal } from 'ui'
+import { useRouter } from 'next/router'
+import { useMemo } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Modal,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
-type CustomReport = { name: string; description?: string }
 export interface CreateReportModal {
   visible: boolean
   onCancel: () => void
   afterSubmit: () => void
 }
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Required'),
+  description: z.string().optional(),
+})
+
+type CustomReport = z.infer<typeof formSchema>
 
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
   const router = useRouter()
@@ -47,7 +64,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     },
   })
 
-  async function createCustomReport({ name, description }: { name: string; description?: string }) {
+  const createCustomReport: SubmitHandler<CustomReport> = async ({ name, description }) => {
     if (!ref) return console.error('Project ref is required')
     if (!profile) return console.error('Profile is required')
 
@@ -77,53 +94,70 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     })
   }
 
+  const handleCancel = () => {
+    onCancel()
+    form.reset()
+  }
+
+  const form = useForm<CustomReport>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: '', description: '' },
+  })
+  const { isDirty } = form.formState
+
   return (
     <Modal
       visible={visible}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       hideFooter
       header="Create a custom report"
       size="small"
     >
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={{ name: '', description: '' }}
-        validate={(vals) => {
-          const errors: Partial<CustomReport> = {}
-
-          if (!vals.name) {
-            errors.name = 'Required'
-          }
-
-          return errors
-        }}
-        onSubmit={(newVals) => createCustomReport(newVals)}
-      >
-        {() => (
-          <>
-            <Modal.Content className="space-y-4">
-              <Input label="Name" id="name" name="name" />
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe your custom report"
-                size="medium"
-                textAreaClassName="resize-none"
-              />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isCreating}>
-                Cancel
-              </Button>
-              <Button htmlType="submit" loading={isCreating} disabled={isCreating}>
-                Create report
-              </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(createCustomReport)} noValidate>
+          <Modal.Content>
+            <FormField_Shadcn_
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItemLayout name="name" layout="vertical" label="Name">
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} id="name" />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </Modal.Content>
+          <Modal.Content>
+            <FormField_Shadcn_
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItemLayout name="description" layout="vertical" label="Description">
+                  <FormControl_Shadcn_>
+                    <Textarea
+                      {...field}
+                      id="description"
+                      rows={4}
+                      placeholder="Describe your custom report"
+                      className="resize-none"
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </Modal.Content>
+          <Modal.Separator />
+          <Modal.Content className="flex items-center justify-end gap-2">
+            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isCreating}>
+              Cancel
+            </Button>
+            <Button htmlType="submit" loading={isCreating} disabled={isCreating || !isDirty}>
+              Create report
+            </Button>
+          </Modal.Content>
+        </form>
+      </Form_Shadcn_>
     </Modal>
   )
 }

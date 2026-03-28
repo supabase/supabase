@@ -170,6 +170,7 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       columns: columns.map((columnItems, i) => ({
         id: null,
         name: `col-${i}`,
+        path: `col-${i}`,
         status: STORAGE_ROW_STATUS.READY,
         items: columnItems.map((overrides) => ({
           id: 'file-id',
