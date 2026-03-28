@@ -122,7 +122,7 @@ export const run = async () => {
 import os
 from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
-from supabase.client import Client, create_client
+from supabase import Client, create_client
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
@@ -204,7 +204,7 @@ export const run = async () => {
 import os
 from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
-from supabase.client import Client, create_client
+from supabase import Client, create_client
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
@@ -317,7 +317,7 @@ import os
 from langchain_community.vectorstores import SupabaseVectorStore
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
-from supabase.client import Client, create_client
+from supabase import Client, create_client
 
 supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
