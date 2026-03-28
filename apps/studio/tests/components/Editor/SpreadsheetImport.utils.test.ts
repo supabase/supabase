@@ -65,3 +65,42 @@ describe('SpreadsheedImport.utils: inferColumnType', () => {
     expect(type4).toBe('timestamptz')
   })
 })
+
+import { getUpdateSerialSequenceSQL } from '@supabase/pg-meta'
+
+describe('getUpdateSerialSequenceSQL', () => {
+  test('generates setval SQL using pg_get_serial_sequence', () => {
+    const sql = getUpdateSerialSequenceSQL({ schema: 'public', table: 'users', column: 'id' })
+    expect(sql).toContain('setval')
+    expect(sql).toContain('pg_get_serial_sequence')
+    expect(sql).toContain('users')
+    expect(sql).toContain('id')
+  })
+
+  test('uses COALESCE to handle empty tables gracefully', () => {
+    const sql = getUpdateSerialSequenceSQL({ schema: 'public', table: 'users', column: 'id' })
+    expect(sql).toContain('COALESCE')
+    expect(sql).toContain('MAX')
+  })
+
+  test('handles custom schemas correctly', () => {
+    const sql = getUpdateSerialSequenceSQL({
+      schema: 'myschema',
+      table: 'orders',
+      column: 'order_id',
+    })
+    expect(sql).toContain('myschema')
+    expect(sql).toContain('orders')
+    expect(sql).toContain('order_id')
+  })
+
+  test('handles table names with special characters safely', () => {
+    const sql = getUpdateSerialSequenceSQL({
+      schema: 'public',
+      table: 'my-table',
+      column: 'id',
+    })
+    expect(sql).toContain('setval')
+    expect(sql).toContain('pg_get_serial_sequence')
+  })
+})

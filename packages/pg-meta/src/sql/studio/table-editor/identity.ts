@@ -25,3 +25,39 @@ export const getDuplicateIdentitySequenceSQL = ({
 }) => {
   return `SELECT setval('${ident(sourceTableSchema)}.${ident(`${duplicatedTableName}_${columnName}_seq`)}', (SELECT COALESCE(MAX(${ident(columnName)}), 1) FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)}));`
 }
+
+export const getUpdateSerialSequenceSQL = ({
+  schema,
+  table,
+  column,
+}: {
+  schema: string
+  table: string
+  column: string
+}) => {
+  return `SELECT setval(pg_get_serial_sequence('${ident(schema)}.${ident(table)}', '${column}'), COALESCE((SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)}), 1))`
+}
+
+export const getUpdateSerialSequenceSQL = ({
+  schema,
+  table,
+  column,
+}: {
+  schema: string
+  table: string
+  column: string
+}) => {
+  return `SELECT setval(pg_get_serial_sequence('${ident(schema)}.${ident(table)}', '${column}'), COALESCE((SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)}), 1))`
+}
+
+export const getUpdateSerialSequenceSQL = ({
+  schema,
+  table,
+  column,
+}: {
+  schema: string
+  table: string
+  column: string
+}) => {
+  return `SELECT setval(pg_get_serial_sequence('${ident(schema)}.${ident(table)}', '${column}'), COALESCE((SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)}), 1))`
+}
