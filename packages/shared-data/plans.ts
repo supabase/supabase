@@ -4,7 +4,7 @@ export interface PricingInformation {
   id: string
   planId: PlanId
   name: string
-  nameBadge?: string
+  nameBadge?: strin
   costUnit?: string
   href: string
   priceLabel?: string
@@ -25,7 +25,7 @@ export const plans: PricingInformation[] = [
     name: 'Free',
     nameBadge: '',
     costUnit: '/ month',
-    href: 'https://supabase.com/dashboard/new?plan=free',
+    href: 'https://supabase.com/dashboard/sign-up?plan=free',
     priceLabel: '',
     priceMonthly: 0,
     description: 'Perfect for passion projects & simple websites.',
