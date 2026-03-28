@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
+import { DOCS_URL } from 'lib/constants'
+import { tryParseJson } from 'lib/helpers'
 import { has, includes } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-
-import { DOCS_URL } from 'lib/constants'
-import { tryParseJson } from 'lib/helpers'
 import { Button } from 'ui'
+
 import {
   MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
   UPLOAD_FILE_EXTENSIONS,
@@ -173,13 +173,13 @@ export const acceptedFileExtension = (file: any) => {
 }
 
 export function flagInvalidFileImport(file: File): boolean {
-  if (!file || !UPLOAD_FILE_TYPES.includes(file.type) || !acceptedFileExtension(file)) {
-    toast.error("Couldn't import file: only CSV files are accepted")
+  if (!file || (!UPLOAD_FILE_TYPES.includes(file.type) && !acceptedFileExtension(file))) {
+    toast.error("Couldn't import file: only CSV and TSV files are accepted")
     return true
   } else if (file.size > MAX_TABLE_EDITOR_IMPORT_CSV_SIZE) {
     toast.error(
       <div className="space-y-1">
-        <p>The dashboard currently only supports importing of CSVs below 100MB.</p>
+        <p>The dashboard currently only supports importing of CSV/TSV files below 100MB.</p>
         <p>For bulk data loading, we recommend doing so directly through the database.</p>
         <Button asChild type="default" icon={<ExternalLink />} className="!mt-2">
           <Link
