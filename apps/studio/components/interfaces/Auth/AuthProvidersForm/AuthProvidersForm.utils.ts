@@ -14,7 +14,7 @@ export const normalizeSmsTemplateValue = (key: string, value: unknown): unknown 
   return normalizeEscapedNewlines(value)
 }
 
-export const normalizeSmsTemplateValueTyped = <T extends string | boolean>(
+export const normalizeSmsTemplateValueTyped = <T extends string | boolean | number>(
   key: string,
   value: T
 ): T => normalizeSmsTemplateValue(key, value) as T

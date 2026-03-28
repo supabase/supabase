@@ -21,10 +21,10 @@ export interface Provider {
         | 'number'
         | 'multiline-string'
         | 'datetime'
-      enum: Enum[]
-      show: {
+      enum?: Enum[]
+      show?: {
         key: string
-        matches: string
+        matches?: string | string[]
       }
       description?: string
       descriptionOptional?: string
