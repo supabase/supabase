@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,8 +25,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
   onClose: () => void
-  // TODO: Remove this if this Dialog is only used for creating.
-  onDelete: () => void
 }
 
 const FORM_ID = 'create-firebase-auth-integration-form'
@@ -44,11 +41,7 @@ const FormSchema = z.object({
 export const CreateFirebaseAuthIntegrationDialog = ({
   visible,
   onClose,
-  onDelete,
 }: CreateFirebaseAuthIntegrationProps) => {
-  // TODO: Remove this if this Dialog is only used for creating.
-  const isCreating = true
-
   const { ref: projectRef } = useParams()
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
@@ -89,11 +82,7 @@ export const CreateFirebaseAuthIntegrationDialog = ({
     <Dialog open={visible} onOpenChange={() => onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="truncate">
-            {isCreating
-              ? `Add new Firebase Auth connection`
-              : `Update existing Firebase Auth connection`}
-          </DialogTitle>
+          <DialogTitle className="truncate">Add new Firebase Auth connection</DialogTitle>
         </DialogHeader>
 
         <Separator />
@@ -143,19 +132,11 @@ export const CreateFirebaseAuthIntegrationDialog = ({
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          {!isCreating && (
-            <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()} icon={<Trash />}>
-                Remove connection
-              </Button>
-            </div>
-          )}
-
           <Button disabled={isPending} type="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
-            {isCreating ? 'Create connection' : 'Update connection'}
+            Create connection
           </Button>
         </DialogFooter>
       </DialogContent>
