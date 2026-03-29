@@ -50,7 +50,7 @@ import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
-import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
+import { DiskManagementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { AutoScaleFields } from './fields/AutoScaleFields'
 import { ComputeSizeField } from './fields/ComputeSizeField'
@@ -343,7 +343,7 @@ export function DiskManagementForm() {
           isProjectRequestingDiskChanges ||
           (isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions)) && (
           <div className="relative flex flex-col gap-10">
-            <DiskMangementRestartRequiredSection
+            <DiskManagementRestartRequiredSection
               visible={isProjectResizing}
               title="Your project will now automatically restart."
               description="Your project will be unavailable for up to 2 mins."

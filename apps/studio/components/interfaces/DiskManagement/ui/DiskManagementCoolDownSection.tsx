@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
 
-export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {
+export const DiskManagementCoolDownSection = ({ visible }: { visible: boolean }) => {
   const [progress, setProgress] = useState(100)
   const [showCountdown, setShowCountdown] = useState(false)
   const [isJumping, setIsJumping] = useState(false)
