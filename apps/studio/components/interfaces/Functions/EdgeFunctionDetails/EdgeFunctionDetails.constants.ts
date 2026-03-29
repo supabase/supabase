@@ -18,7 +18,7 @@ export const INVOCATION_TABS: InvocationTab[] = [
     language: 'bash',
     code: ({ showKey, functionUrl, apiKey }) => {
       const obfuscatedName = apiKey.includes('publishable')
-        ? 'SUPABASE_PUBLISHABLE_DEFAULT_KEY'
+        ? 'SUPABASE_PUBLISHABLE_KEY'
         : 'SUPABASE_ANON_KEY'
       const keyValue = showKey ? apiKey : obfuscatedName
 
