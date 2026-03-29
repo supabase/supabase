@@ -41,6 +41,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
           .string()
           .min(1, 'Please provide a value')
           .regex(urlRegex(), 'Please provide a valid URL')
+          .transform((val) => val.trim())
           .refine((value) => !allowList.includes(value), {
             message: 'URL already exists in the allow list',
           }),
