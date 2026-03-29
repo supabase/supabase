@@ -4,101 +4,30 @@ title: 'Better Auth'
 subtitle: 'Use Better Auth as your authentication layer with your Supabase Postgres database'
 ---
 
-Better Auth can be used as a standalone authentication layer that connects directly to your Supabase Postgres database,
-replacing Supabase Auth entirely. This guide focuses on setting up Better Auth on NextJS apps however the general steps
-will be the same for any other stack.
+Better Auth can be used as a standalone authentication layer that connects directly to your Supabase Postgres database, replacing Supabase Auth entirely.
 
-If you are using another framework, then see the full [installation docs](https://better-auth.com/docs/installation) for Better Auth. 
+# Getting started
 
-## Getting started
-
-1. Install the `better-auth` and `pg` libraries.
-2. Set the environment variables: `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `DATABASE_URL`.
-NOTE: Secrets must be 32 characters or more. You can use `openssl rand -base64 32` to generate one.
-3. Set up the server-side Better Auth instance.
-4. Generate and run the database migration to create the required auth tables.
-5. Create a catch-all route handler to expose the Better Auth API.
-6. Set up the client-side Better Auth instance to initiate auth operations such as `SignIn` and `SignUp`.
-
-## Install packages
-
-```bash
-npm install better-auth pg
-npm install --save-dev @types/pg # this may only be required if you run into type errors
-```
-## Configure environment variables
-
-```bash
-BETTER_AUTH_SECRET=<a-random-secret>
-BETTER_AUTH_URL=https://<your-app-domain>
-DATABASE_URL=postgresql://postgres:<password>@db.<supabase-project>.supabase.co:5432/postgres
-```
+Getting started with BetterAuth is simple. See the full [Better Auth installation](https://better-auth.com/docs/installation) and follow the steps for your tech stack, selecting Postgres as the database.
 
 The `DATABASE_URL` should use Supabase's direct connection string (port 5432), not
 the transaction pooler (port 6543).
 
 You can find your connection string in `connect` tab at the top of your project dashboard.
 
-## Set up the Better Auth server instance
+# Configuring for local development and self-hosting
 
-Create a `lib/auth.ts` file at the root of your project. This file should run server-side only
-and should never be imported by client components.
+To use Better Auth locally you will need to update your `DATABASE_URL` to point to your local supabase in the `.env` file and run the migration commands again.
 
-```typescript
-import { betterAuth } from 'better-auth'
-import { Pool } from 'pg'
-
-export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    },
-  },
-  plugins: [admin(), anonymous(), phoneNumber()],
-})
 ```
-The above is only an example, there are additional plugins and configuration options to extend authentication
-capabilities which can be found [here]( https://better-auth.com/docs/plugins).
-
-## Generate and run the database migration
-
-Run these commands (or their equivalants) from the root of your project.
-
-```bash
-npx better-auth generate
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
 ```
 
-```bash
-npx better-auth migrate
-```
+# Plugins
 
-The generate command produces an SQL file. The migrate command will run this migration against your database.
-Running the migration will create whatever tables are required for your auth configuration.
+Better Auth makes use of plugins to extend the functionality for different types of auth. The full list of plugins can be found [here](https://better-auth.com/docs/plugins).
 
-Create the catch-all route handler to handle all requests to /api/auth/*. The path varies by framework.
-
-```typescript
-// app/api/auth/[...all]/route.ts
-import { auth } from '@/lib/auth'
-import { toNextJsHandler } from 'better-auth/next-js'
-
-export const { GET, POST } = toNextJsHandler(auth)
-```
-
-```typescript
-// pages/api/auth/[...all].ts
-import { auth } from '@/lib/auth'
-import { toNextJsHandler } from 'better-auth/next-js'
-
-export default toNextJsHandler(auth)
-```
+NOTE: If you add a new plugin you will have to run the migration commands again to produce the neccesary tables
 
 ## Set up the Better Auth client instance
 
@@ -109,20 +38,25 @@ import { createAuthClient } from 'better-auth/react'
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
-  # only required if auth server is on a different domain than your frontend
+  // only required if auth server is on a different domain than your frontend
 })
 ```
 
-## Usage
-```typescript
- import { authClient } from '@/lib/auth-client'
+# Example Usage
 
+Signing up
+
+```typescript
 const { data, error } = await authClient.signUp.email({
   email: 'user@example.com',
   password: 'password',
   name: 'John Doe',
 })
+```
 
+Signing in
+
+```typescript
 const { data, error } = await authClient.signIn.email({
   email: 'user@example.com',
   password: 'password',
@@ -130,8 +64,120 @@ const { data, error } = await authClient.signIn.email({
 await authClient.signOut()
 ```
 
-## Limitations
+# Using RLS policies
+To use Better Auth with RLS you will need to create a signed JWT on the server side using a private JSON Web Token signing key.
 
--  Better Auth connects to Postgres as a Superuser, bypassing RLS entirely, hence policies will have no effect. Instead, enforce access control in your server-side API routes by identifying the user from their session and filtering queries accordingly. 
+## Create key
+
+To create a new JSON Web Token signing key, run the following commands on shell:
+
+Generate the JWK
+```bash
+node -e "
+const { generateKeyPairSync } = require('crypto');
+const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+const jwk = privateKey.export({ format: 'jwk' });
+jwk.kid = require('crypto').randomUUID();
+jwk.key_ops = ['sign', 'verify'];
+console.log(JSON.stringify(jwk, null, 2));
+"
+```
+This will produce a JSON output that looks much like:
+
+```
+{
+  "kty": "EC",
+  "x": "R0d-ANIqQDRYDrD4MS76ThBRMmySdI7F7h1TcUJDz4Q",
+  "y": "NVzTpKSJE0cEoZTjE84qTjXsdkGltufexH3hVWPVZ6w",
+  "crv": "P-256",
+  "d": "voGFcEsa6AG087wivVf_0oS4f392VjK6nmhVwYXMCjg",
+  "kid": "00cbfcf0-d926-4891-b84b-27d2f9361046",
+  "key_ops": [
+    "sign",
+    "verify"
+  ]
+}
+```
+## Import key
+You can then head to Project Settings > JWT Keys > JWT Signing Keys > Create Standby Key > import an existing private key and add your JWK from above > Set key to be active
+
+## Create Route for producing signed JWT
+
+On your server side application, ensure you have `jose` installed and then run
+
+```typescript
+ import { SignJWT, importJWK } from 'jose'
+ const session = await auth.api.getSession({ headers: request.headers })
+ if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+try {
+  // jose's importJWK rejects keys with key_ops set
+  const { key_ops, ...jwk } = JSON.parse(process.env.SUPABASE_PRIVATE_KEY_JWK!)
+  const privateKey = await importJWK(jwk, 'ES256')
+
+  const token = await new SignJWT({ sub: session.user.id, role: 'authenticated', iss: 'supabase' })
+    .setProtectedHeader({ alg: 'ES256' })
+    .setExpirationTime('1h')
+    .sign(privateKey)
+
+  return Response.json({ token })
+  } catch (err) {
+    console.error('[supabase-token]', err)
+    return Response.json({ error: String(err) }, { status: 500 })
+  }
+  ```
+  - `auth` is your server side BetterAuth client that you created above
+  - `SUPABASE_PRIVATE_KEY_JWK` will be your JSON JWK that you created previously and imported into Supabase
+
+  Once you have an endpoint to produce a signed JWT you can pass it back to your Supabase client on the client side:
+
+## Use Signed JWT in Supabase Client
+
+  ```typescript
+ import { createClient } from '@supabase/supabase-js'
+
+let cachedToken: string | null = null
+let tokenExpiresAt = 0
+
+async function getSupabaseToken(): Promise<string> {
+  // Reuse cached token if it has more than 60s remaining
+  if (cachedToken && Date.now() < tokenExpiresAt - 60_000) {
+    return cachedToken
+  }
+
+  const res = await fetch('/api/supabase-token')
+  if (!res.ok) throw new Error('Failed to fetch Supabase token')
+
+  const { token } = await res.json()
+  cachedToken = token
+  // JWTs from the endpoint expire in 1h
+  tokenExpiresAt = Date.now() + 60 * 60 * 1000
+  return token
+}
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    accessToken: getSupabaseToken,
+  }
+)
+```
+
+## Add RLS policies
+
+Now all that remains is to ensure your tables have a user_id column that stores the Better Auth user ID (the sub value in the JWT). Here is an example of fetching the sub from the JWT in an RLS policy:
+
+```sql
+alter policy "Authenticated users can view their orders"
+on "public"."orders"
+to authenticated
+using (
+  (user_id = (auth.jwt() ->> 'sub'::text))
+
+);
+```
+
+- For local development, the JWT signing key configured in the cloud dashboard does not apply to your local Supabase instance.
 
 
