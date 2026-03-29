@@ -59,25 +59,26 @@ using ( (select auth.uid()) = id );
     url: '/docs/guides/auth#policies-with-joins',
     code: `
 create table teams (
-  id bigint primary key generated always as identity,
+  id serial primary key,
   name text
 );
 
 create table members (
-  team_id bigint references teams,
-  user_id uuid references auth.users
+  team_id references team.id,
+  user_id referenced auth.users.id
 );
 
 alter table teams enable row level security;
 
-create policy "Team members can update team details if they belong to the team"
-  on teams
-  for update using (
-    (select auth.uid()) in (
-      select user_id from members
-      where team_id = id
-    )
-  );
+-- Create Advanced Policies
+create policy "Team members can update team details"
+on teams
+for update using (
+  (select auth.uid()) in ( 
+    select user_id from members 
+    where team_id = id 
+  )
+);
 `.trim(),
   },
 ]
