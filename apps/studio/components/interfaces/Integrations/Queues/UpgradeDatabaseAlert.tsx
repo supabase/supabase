@@ -1,6 +1,5 @@
-import Link from 'next/link'
-
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -13,8 +12,7 @@ export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabas
 
   return (
     <Admonition
-      type="warning"
-      className="mt-4"
+      type="default"
       title="Database upgrade needed"
       childProps={{ description: { className: 'flex flex-col gap-y-2' } }}
     >

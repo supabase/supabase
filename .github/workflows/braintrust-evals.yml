@@ -52,7 +52,7 @@ jobs:
         run: cd apps/studio && pnpm evals:setup
 
       - name: Run Evals
-        uses: braintrustdata/eval-action@v1
+        uses: braintrustdata/eval-action@c0dd75b29984a0cc63a827d6e8da2f23f2752be4 # v1.0.16
         with:
           api_key: ${{ secrets.BRAINTRUST_API_KEY }}
           runtime: node

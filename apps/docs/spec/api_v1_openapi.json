@@ -5459,7 +5459,7 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["realtime_config_read"] }],
         "summary": "Gets realtime configuration",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
@@ -5489,7 +5489,7 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["realtime_config_write"] }],
         "summary": "Updates realtime configuration",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
@@ -5514,7 +5514,7 @@
           "404": { "description": "Tenant not found" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["realtime_config_write"] }],
         "summary": "Shutdowns realtime connections for a project",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]

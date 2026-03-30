@@ -7,13 +7,13 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --port 3007",
     "build": "pnpm run content:build && next build --turbopack",
-    "internal:sync": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/sync-internal-content.mts",
+    "internal:sync": "tsx ./scripts/sync-internal-content.mts",
     "start": "next start",
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "content:build": "contentlayer2 build",
     "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
-    "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
+    "typecheck": "contentlayer2 build && tsc --noEmit"
   },
   "dependencies": {
     "common": "workspace:*",
