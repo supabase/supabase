@@ -9,14 +9,10 @@ import { useEffect, useRef } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
-import { CONNECT_ACTIONS, type ConnectSectionVariant } from './ConnectSection.config'
+import { CONNECT_ACTIONS } from './ConnectSection.config'
 import { useAppStateSnapshot } from '@/state/app-state'
 
-interface ConnectSectionProps {
-  variant: ConnectSectionVariant
-}
-
-export const ConnectSection = ({ variant }: ConnectSectionProps) => {
+export const ConnectSection = () => {
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
@@ -37,8 +33,8 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
     if (!IS_PLATFORM) return
     if (hasTrackedExposure.current) return
     hasTrackedExposure.current = true
-    track('home_connect_section_exposed', { variant })
-  }, [variant, track])
+    track('home_connect_section_exposed', {})
+  }, [track])
 
   const handleActionClick = (action: (typeof CONNECT_ACTIONS)[number]) => {
     track('home_connect_action_clicked', { mode: action.id })
@@ -83,14 +79,14 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
                 key={action.id}
                 type="button"
                 disabled={
-                  (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
+                  action.requiresActiveProject ?? true ? !isActiveHealthy : !selectedProject?.ref
                 }
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
                   'hover:bg-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
-                  ((action.requiresActiveProject ?? true)
+                  (action.requiresActiveProject ?? true
                     ? !isActiveHealthy
                     : !selectedProject?.ref) && 'cursor-not-allowed opacity-50'
                 )}

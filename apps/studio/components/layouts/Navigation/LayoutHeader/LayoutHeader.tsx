@@ -3,7 +3,6 @@ import {
   useIsBranching2Enabled,
   useIsFloatingMobileToolbarEnabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Connect } from 'components/interfaces/Connect/Connect'
 import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from 'components/interfaces/ConnectSheet/ConnectSheet'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
@@ -23,7 +22,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -37,7 +35,6 @@ import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
-import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -78,9 +75,6 @@ export const LayoutHeader = ({
   const gitlessBranching = useIsBranching2Enabled()
 
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
-  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
-  const isConnectSheetEnabled = connectSectionVariant === 'connect'
-
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
   const isAccountPage = router.pathname.startsWith('/account')
@@ -292,7 +286,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
+      <ConnectSheet />
     </>
   )
 }
