@@ -817,6 +817,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@6.0.2))
+      tsconfig:
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       vite:
         specifier: 'catalog:'
         version: 7.3.1(@types/node@22.13.14)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3)
