@@ -13,7 +13,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
       role="group"
       className={cn(
         'group/input-group relative items-center outline-none transition-[color,box-shadow]',
-        'flex h-10 w-full rounded-md border border-control read-only:border-button bg-foreground/[.026] py-2 text-sm',
+        'flex h-10 w-full rounded-md border border-control bg-foreground/[.026] py-2 text-sm',
         'h-9 has-[>textarea]:h-auto',
 
         // Variants based on alignment.
@@ -31,6 +31,9 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
 
         // Disabled state.
         'has-[[data-slot=input-group-control]:disabled]:cursor-not-allowed has-[[data-slot=input-group-control]:disabled]:text-foreground-muted',
+
+        // Readonly state.
+        'has-[[data-slot=input-group-control]:read-only]:border-button',
         className
       )}
       {...props}
