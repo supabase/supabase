@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useFeatureFlags, useParams } from 'common'
+import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
 import { EdgeFunctionOverview } from 'components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
 import { EdgeFunctionRecentInvocations } from 'components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
@@ -432,8 +432,8 @@ const LegacyEdgeFunctionOverview = () => {
 }
 
 const PageLayout: NextPageWithLayout = () => {
-  const { hasLoaded: flagsLoaded, posthog } = useFeatureFlags()
-  const showNewOverview = posthog.edgeFunctionsOverview === true
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const showNewOverview = useFlag('edgeFunctionsOverview') === true
 
   if (IS_PLATFORM && !flagsLoaded) {
     return <LogoLoader />
