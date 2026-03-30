@@ -102,7 +102,7 @@ describe('ai/org-ai-details', () => {
       })
     })
 
-    it('should return AI opt-in level and limited status', async () => {
+    it('should return AI opt-in level and assistant advance-model flag', async () => {
       const mockOrg = {
         id: 1,
         slug: 'test-org',
@@ -126,14 +126,14 @@ describe('ai/org-ai-details', () => {
 
       expect(result).toEqual({
         aiOptInLevel: 'schema_only',
-        isLimited: true,
+        hasAccessToAdvanceModel: false,
         isHipaaEnabled: false,
         orgId: 1,
         planId: 'free',
       })
     })
 
-    it('should mark pro plan as not limited', async () => {
+    it('should set hasAccessToAdvanceModel when entitlement grants access', async () => {
       const mockOrg = {
         id: 1,
         slug: 'test-org',
@@ -155,7 +155,7 @@ describe('ai/org-ai-details', () => {
         projectRef: 'test-project',
       })
 
-      expect(result.isLimited).toBe(false)
+      expect(result.hasAccessToAdvanceModel).toBe(true)
     })
 
     it('should throw error when project and org do not match', async () => {
@@ -277,7 +277,7 @@ describe('ai/org-ai-details', () => {
         projectRef: 'test-project',
       })
 
-      expect(result.isLimited).toBe(false) // Has advance model entitlement
+      expect(result.hasAccessToAdvanceModel).toBe(true)
     })
 
     it('should return isHipaaEnabled true when subscription has HIPAA addon and project is sensitive', async () => {

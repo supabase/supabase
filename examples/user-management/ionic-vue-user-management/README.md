@@ -2,7 +2,6 @@
 
 > This project is based on the Supabase Ionic Vue user management [Quickstart](https://supabase.io/docs/guides/with-ionic-vue)
 > To keep it in sync with this Quickstart, architecture choices have been made to facilitate the comparison
->
 
 This example will set you up for a very common situation: users can sign up with a magic link and then update their account with profile information, including a profile image.
 

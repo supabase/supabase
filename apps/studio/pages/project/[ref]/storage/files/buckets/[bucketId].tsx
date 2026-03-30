@@ -84,6 +84,7 @@ const BucketPage: NextPageWithLayout = () => {
           },
           {
             label: 'Buckets',
+            href: `/project/${ref}/storage/files`,
           },
         ]}
         primaryActions={

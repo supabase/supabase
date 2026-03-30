@@ -1,5 +1,5 @@
 import { ActivityStats } from 'components/interfaces/ProjectHome/ActivityStats'
-import { ProjectConnectionHoverCard } from 'components/interfaces/ProjectHome/ProjectConnectionHoverCard'
+import { ProjectConnectionPopover } from 'components/interfaces/ProjectHome/ProjectConnectionPopover'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import { InlineLink } from 'components/ui/InlineLink'
@@ -10,7 +10,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
-import { ReactFlowProvider } from 'reactflow'
+import { ReactFlowProvider } from '@xyflow/react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
@@ -81,7 +81,7 @@ export const TopSection = () => {
                   />
                 </div>
               </div>
-              <ProjectConnectionHoverCard projectRef={project?.ref} />
+              <ProjectConnectionPopover projectRef={project?.ref} />
             </div>
           </div>
           <div className="mt-8">

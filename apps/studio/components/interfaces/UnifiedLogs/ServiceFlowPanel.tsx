@@ -8,7 +8,6 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useState } from 'react'
 import {
   cn,
-  CodeBlock,
   ResizableHandle,
   ResizablePanel,
   Skeleton,
@@ -17,6 +16,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
 import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'

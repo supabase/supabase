@@ -1,5 +1,5 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
 import * as Sentry from '@sentry/nextjs'
+import type { PostgresColumn } from '@supabase/postgres-meta'
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
 import {
@@ -303,6 +303,16 @@ export const createTableEditorState = () => {
       state.operationQueue.operations = state.operationQueue.operations.filter(
         (op) => op.id !== operationId
       )
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
+     * Undo the latest operation from the queue
+     */
+    undoLatestOperation: () => {
+      state.operationQueue.operations = state.operationQueue.operations.slice(0, -1)
       if (state.operationQueue.operations.length === 0) {
         state.operationQueue.status = 'idle'
       }

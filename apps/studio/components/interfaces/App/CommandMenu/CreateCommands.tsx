@@ -46,7 +46,6 @@ const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFuncti
 const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
 const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
 const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
-const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 

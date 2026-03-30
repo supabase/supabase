@@ -236,7 +236,7 @@ export const formatCronJobColumns = ({
       minWidth: col.minWidth ?? 100,
       maxWidth: col.maxWidth,
       width: col.width,
-      resizable: false,
+      resizable: col.resizable ?? false,
       sortable: false,
       draggable: false,
       headerCellClass: undefined,

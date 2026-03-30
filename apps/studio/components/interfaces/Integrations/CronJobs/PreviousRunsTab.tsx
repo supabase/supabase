@@ -1,17 +1,19 @@
-import dayjs from 'dayjs'
-import { CircleCheck, CircleX, Loader } from 'lucide-react'
-import { UIEvent, useCallback, useMemo } from 'react'
-import DataGrid, { Column, Row } from 'react-data-grid'
-
 import { useParams } from 'common'
 import {
   CronJobRun,
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import dayjs from 'dayjs'
+import { useInfiniteScroll } from 'hooks/misc/useInfiniteScroll'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cn, CodeBlock, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { CircleCheck, CircleX, Loader } from 'lucide-react'
+import { useMemo } from 'react'
+import DataGrid, { Column, Row } from 'react-data-grid'
+import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { calculateDuration, formatDate } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
 
@@ -146,10 +148,6 @@ const columns = cronJobColumns.map((col) => {
   return result
 })
 
-function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
-  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
-}
-
 export const PreviousRunsTab = () => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -160,6 +158,8 @@ export const PreviousRunsTab = () => {
     data,
     isPending: isLoadingCronJobRuns,
     isFetching,
+    isFetchingNextPage,
+    hasNextPage,
     fetchNextPage,
   } = useCronJobRunsInfiniteQuery(
     {
@@ -172,15 +172,12 @@ export const PreviousRunsTab = () => {
 
   const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
 
-  const handleScroll = useCallback(
-    (event: UIEvent<HTMLDivElement>) => {
-      if (isLoadingCronJobRuns || !isAtBottom(event)) return
-      // the cancelRefetch is to prevent the query from being refetched when the user scrolls back up and down again,
-      // resulting in multiple fetchNextPage calls
-      fetchNextPage({ cancelRefetch: false })
-    },
-    [fetchNextPage, isLoadingCronJobRuns]
-  )
+  const handleScroll = useInfiniteScroll({
+    isLoading: isLoadingCronJobRuns,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  })
 
   return (
     <div className="h-full flex flex-col">

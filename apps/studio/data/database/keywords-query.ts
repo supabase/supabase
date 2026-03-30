@@ -1,15 +1,9 @@
+import { getKeywordsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { databaseKeys } from './keys'
 import { UseCustomQueryOptions } from 'types'
 
-export const getKeywordsSql = () => {
-  const sql = /* SQL */ `
-SELECT word FROM pg_get_keywords();
-`.trim()
-
-  return sql
-}
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
 export type KeywordsVariables = {
   projectRef?: string

@@ -1,20 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import {
-  Card,
-  CardContent,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  KeyboardShortcut,
-  Switch,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useForm } from 'react-hook-form'
+import { Card, Form_Shadcn_ } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -23,11 +12,17 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
+
+import { HotkeyToggle } from './HotkeyToggle'
 
 const HotkeySchema = z.object({
   commandMenuEnabled: z.boolean(),
   aiAssistantEnabled: z.boolean(),
   inlineEditorEnabled: z.boolean(),
+  copyMarkdownEnabled: z.boolean(),
+  copyJsonEnabled: z.boolean(),
+  downloadCsvEnabled: z.boolean(),
 })
 
 export const HotkeySettings = () => {
@@ -43,6 +38,18 @@ export const HotkeySettings = () => {
     LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
     true
   )
+  const [copyMarkdownEnabled, setCopyMarkdownEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_COPY_MARKDOWN,
+    true
+  )
+  const [copyJsonEnabled, setCopyJsonEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_COPY_JSON,
+    true
+  )
+  const [downloadCsvEnabled, setDownloadCsvEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_DOWNLOAD_CSV,
+    true
+  )
 
   const form = useForm<z.infer<typeof HotkeySchema>>({
     resolver: zodResolver(HotkeySchema),
@@ -50,6 +57,9 @@ export const HotkeySettings = () => {
       commandMenuEnabled: commandMenuEnabled ?? true,
       aiAssistantEnabled: aiAssistantEnabled ?? true,
       inlineEditorEnabled: inlineEditorEnabled ?? true,
+      copyMarkdownEnabled: copyMarkdownEnabled ?? true,
+      copyJsonEnabled: copyJsonEnabled ?? true,
+      downloadCsvEnabled: downloadCsvEnabled ?? true,
     },
   })
 
@@ -66,87 +76,49 @@ export const HotkeySettings = () => {
       <PageSectionContent>
         <Form_Shadcn_ {...form}>
           <Card>
-            <CardContent className="border-b">
-              <FormField_Shadcn_
-                control={form.control}
-                name="commandMenuEnabled"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label={
-                      <div className="flex items-center gap-x-3">
-                        <KeyboardShortcut keys={['Meta', 'k']} />
-                        <span>Command menu</span>
-                      </div>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(value) => {
-                          field.onChange(value)
-                          setCommandMenuEnabled(value)
-                        }}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </CardContent>
-            <CardContent className="border-b">
-              <FormField_Shadcn_
-                control={form.control}
-                name="aiAssistantEnabled"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label={
-                      <div className="flex items-center gap-x-3">
-                        <KeyboardShortcut keys={['Meta', 'i']} />
-                        <span>AI Assistant Panel</span>
-                      </div>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(value) => {
-                          field.onChange(value)
-                          setAiAssistantEnabled(value)
-                        }}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </CardContent>
-            <CardContent>
-              <FormField_Shadcn_
-                control={form.control}
-                name="inlineEditorEnabled"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label={
-                      <div className="flex items-center gap-x-3">
-                        <KeyboardShortcut keys={['Meta', 'e']} />
-                        <span>Inline SQL Editor Panel</span>
-                      </div>
-                    }
-                  >
-                    <FormControl_Shadcn_>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(value) => {
-                          field.onChange(value)
-                          setInlineEditorEnabled(value)
-                        }}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            </CardContent>
+            <HotkeyToggle
+              form={form}
+              name="commandMenuEnabled"
+              keys={['Meta', 'k']}
+              label="Command menu"
+              onToggle={setCommandMenuEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="aiAssistantEnabled"
+              keys={['Meta', 'i']}
+              label="AI Assistant Panel"
+              onToggle={setAiAssistantEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="inlineEditorEnabled"
+              keys={['Meta', 'e']}
+              label="Inline SQL Editor Panel"
+              onToggle={setInlineEditorEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="copyMarkdownEnabled"
+              keys={['Shift', 'Meta', 'm']}
+              label="Copy results as Markdown"
+              onToggle={setCopyMarkdownEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="copyJsonEnabled"
+              keys={['Shift', 'Meta', 'j']}
+              label="Copy results as JSON"
+              onToggle={setCopyJsonEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="downloadCsvEnabled"
+              keys={['Shift', 'Meta', 'd']}
+              label="Download results as CSV"
+              onToggle={setDownloadCsvEnabled}
+              isLast
+            />
           </Card>
         </Form_Shadcn_>
       </PageSectionContent>

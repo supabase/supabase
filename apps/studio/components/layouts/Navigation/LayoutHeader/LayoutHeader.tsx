@@ -3,7 +3,6 @@ import {
   useIsBranching2Enabled,
   useIsFloatingMobileToolbarEnabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Connect } from 'components/interfaces/Connect/Connect'
 import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from 'components/interfaces/ConnectSheet/ConnectSheet'
 import { LocalDropdown } from 'components/interfaces/LocalDropdown'
@@ -17,12 +16,12 @@ import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import dayjs from 'dayjs'
 import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePHFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -36,7 +35,6 @@ import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
-import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -59,7 +57,7 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
 
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
-  breadcrumbs?: any[]
+  breadcrumbs?: unknown[]
   headerTitle?: string
   backToDashboardURL?: string
 }
@@ -77,9 +75,6 @@ export const LayoutHeader = ({
   const gitlessBranching = useIsBranching2Enabled()
 
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
-  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
-  const isConnectSheetEnabled = connectSectionVariant === 'connect'
-
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
   const isAccountPage = router.pathname.startsWith('/account')
@@ -97,6 +92,12 @@ export const LayoutHeader = ({
       return false
     }
   }, [orgUsage])
+
+  const isNewProject =
+    selectedProject?.inserted_at !== undefined &&
+    dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
+
+  const connectButtonType = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
@@ -216,7 +217,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
-                  <ConnectButton />
+                  <ConnectButton buttonType={connectButtonType} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -285,7 +286,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
+      <ConnectSheet />
     </>
   )
 }

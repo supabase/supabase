@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoPermission from 'components/ui/NoPermission'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
@@ -11,10 +11,13 @@ import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
 
 export const WebhooksOverviewTab = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   const {
     data: schemas,
@@ -59,37 +62,42 @@ export const WebhooksOverviewTab = () => {
     )
   }
 
-  return (
-    <IntegrationOverviewTab
-      actions={
-        isSchemasLoaded && isHooksEnabled ? null : (
-          <Admonition
-            showIcon={false}
-            type="default"
-            title="Enable database webhooks on your project"
-          >
-            <p>
-              Database Webhooks can be used to trigger serverless functions or send requests to an
-              HTTP endpoint
-            </p>
-            <ButtonTooltip
-              className="mt-2 w-fit"
-              onClick={() => enableHooksForProject()}
-              disabled={isEnablingHooks}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canReadWebhooks
-                    ? 'You need additional permissions to enable webhooks'
-                    : undefined,
-                },
-              }}
+  if (isMarketplaceEnabled) {
+    return <IntegrationOverviewTabV2 />
+  } else {
+    return (
+      <IntegrationOverviewTab
+        hideRequiredExtensionsSection
+        actions={
+          isSchemasLoaded && isHooksEnabled ? null : (
+            <Admonition
+              showIcon={false}
+              type="default"
+              title="Enable database webhooks on your project"
             >
-              Enable webhooks
-            </ButtonTooltip>
-          </Admonition>
-        )
-      }
-    />
-  )
+              <p>
+                Database Webhooks can be used to trigger serverless functions or send requests to an
+                HTTP endpoint
+              </p>
+              <ButtonTooltip
+                className="mt-2 w-fit"
+                onClick={() => enableHooksForProject()}
+                disabled={isEnablingHooks}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canReadWebhooks
+                      ? 'You need additional permissions to enable webhooks'
+                      : undefined,
+                  },
+                }}
+              >
+                Enable webhooks
+              </ButtonTooltip>
+            </Admonition>
+          )
+        }
+      />
+    )
+  }
 }

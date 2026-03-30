@@ -5,18 +5,13 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import { Entity, isTableLike, postgresTableToEntity } from 'data/table-editor/table-editor-types'
 import { useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 const DatabaseTables: NextPageWithLayout = () => {
@@ -26,34 +21,29 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   return (
     <>
-      <PageHeader size="large">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Database Tables</PageHeaderTitle>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
-      <PageContainer size="large">
-        <PageSection>
-          <PageSectionContent>
-            <TableList
-              onAddTable={snap.onAddTable}
-              onEditTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onEditTable()
-              }}
-              onDeleteTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onDeleteTable()
-              }}
-              onDuplicateTable={(table) => {
-                setSelectedTableToEdit(postgresTableToEntity(table))
-                snap.onDuplicateTable()
-              }}
-            />
-          </PageSectionContent>
-        </PageSection>
-      </PageContainer>
+      <PageLayout title="Database Tables" size="large">
+        <PageContainer size="large">
+          <PageSection>
+            <PageSectionContent>
+              <TableList
+                onAddTable={snap.onAddTable}
+                onEditTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onEditTable()
+                }}
+                onDeleteTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onDeleteTable()
+                }}
+                onDuplicateTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onDuplicateTable()
+                }}
+              />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </PageLayout>
 
       {projectRef !== undefined &&
         selectedTableToEdit !== undefined &&

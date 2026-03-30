@@ -1,6 +1,7 @@
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
+import { validateBlogFrontmatterImages } from './blog-images'
 import { generateReadingTime } from './helpers'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
@@ -64,6 +65,10 @@ export const getSortedPosts = ({
       const { data, content } = matter(fileContents) as unknown as {
         data: { [key: string]: any; tags?: string[] }
         content: string
+      }
+
+      if (directory === '_blog') {
+        validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
       }
 
       const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
@@ -169,6 +174,12 @@ export const getPostdata = async (slug: string, directory: string) => {
 
   const fullPath = path.join(postDirectory, found)
   const postContent = fs.readFileSync(fullPath, 'utf8')
+
+  if (directory === '_blog') {
+    const { data } = matter(postContent) as unknown as { data: { [key: string]: any } }
+    validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
+  }
+
   return postContent
 }
 

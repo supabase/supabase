@@ -1,18 +1,18 @@
-import { range } from 'lib/helpers'
+import { useBreakpoint } from 'common'
+import { Code } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Badge, Button } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { useBreakpoint } from 'common'
-import { Badge, Button, TextLink } from 'ui'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
-
-import pageData from '~/data/partners'
-import { Code } from 'lucide-react'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import Panel from '@/components/Panel'
+import ProductHeaderCentered from '@/components/Sections/ProductHeaderCentered'
+import pageData from '@/data/partners'
+import { range } from '@/lib/helpers'
 
 const Partners = () => {
   const router = useRouter()
