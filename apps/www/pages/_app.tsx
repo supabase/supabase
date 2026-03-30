@@ -1,7 +1,9 @@
-import '@code-hike/mdx/styles'
+import '@code-hike/mdx/styles.css'
 import 'config/code-hike.scss'
 import '../styles/index.css'
 
+import { WwwCommandMenu } from '~/components/CommandMenu'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -11,6 +13,10 @@ import {
   ThemeProvider,
   useThemeSandbox,
 } from 'common'
+import MetaFaviconsPagesRouter, {
+  DEFAULT_FAVICON_ROUTE,
+  DEFAULT_FAVICON_THEME_COLOR,
+} from 'common/MetaFavicons/pages-router'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { DefaultSeo } from 'next-seo'
 import type { AppProps } from 'next/app'
@@ -20,12 +26,6 @@ import { SonnerToaster, themes, TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
 
-import MetaFaviconsPagesRouter, {
-  DEFAULT_FAVICON_ROUTE,
-  DEFAULT_FAVICON_THEME_COLOR,
-} from 'common/MetaFavicons/pages-router'
-import { WwwCommandMenu } from '~/components/CommandMenu'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
 

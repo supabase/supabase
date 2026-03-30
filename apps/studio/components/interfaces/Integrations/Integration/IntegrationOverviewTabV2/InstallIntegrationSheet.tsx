@@ -93,7 +93,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     { enabled: involvesExtensions }
   )
   const requiredExtensions = extensions.filter((ext) => requiredExtensionNames.includes(ext.name))
-  // Integration requires extensions that are not available to install on the current database image
+  // [Joshen] Integration requires extensions that are not available to install on the current database image
   const hasMissingExtensions = requiredExtensionNames.length !== requiredExtensions.length
 
   const { data: schemas = [] } = useSchemasQuery(

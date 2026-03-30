@@ -17,6 +17,7 @@ import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
 import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import dayjs from 'dayjs'
 import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
@@ -59,7 +60,7 @@ const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanEl
 
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
-  breadcrumbs?: any[]
+  breadcrumbs?: unknown[]
   headerTitle?: string
   backToDashboardURL?: string
 }
@@ -97,6 +98,12 @@ export const LayoutHeader = ({
       return false
     }
   }, [orgUsage])
+
+  const isNewProject =
+    selectedProject?.inserted_at !== undefined &&
+    dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
+
+  const connectButtonType = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
@@ -216,7 +223,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
-                  <ConnectButton />
+                  <ConnectButton buttonType={connectButtonType} />
                 </motion.div>
               )}
             </AnimatePresence>
