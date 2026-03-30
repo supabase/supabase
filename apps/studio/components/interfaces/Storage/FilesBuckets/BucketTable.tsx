@@ -120,7 +120,9 @@ export const BucketTableRow = ({
           {bucket.public && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge variant="warning" className="flex">Public</Badge>
+                <Badge variant="warning" className="flex">
+                  Public
+                </Badge>
               </TooltipTrigger>
               <TooltipContent side="top">
                 This bucket is publicly readable. Anyone can list and access all objects stored in
