@@ -13,7 +13,7 @@ import {
   correctnessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
-  skillUsageScorer,
+  knowledgeUsageScorer,
   toolUsageScorer,
   urlValidityScorer,
 } from './scorer'
@@ -50,7 +50,7 @@ Eval('Assistant', {
   },
   scores: [
     toolUsageScorer,
-    skillUsageScorer,
+    knowledgeUsageScorer,
     sqlSyntaxScorer,
     sqlIdentifierQuotingScorer,
     goalCompletionScorer,

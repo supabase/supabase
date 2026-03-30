@@ -97,9 +97,9 @@ export async function generateAssistantResponse({
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
 
-      ## Available Skills
+      ## Available Knowledge
 
-      Before writing SQL or answering questions about the following topics, call \`load_skill\` to load detailed knowledge:
+      Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
       - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
       - \`rls\` — Row Level Security policies
       - \`edge_functions\` — Supabase Edge Functions

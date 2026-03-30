@@ -37,7 +37,7 @@ describe('ai/tools/rendering-tools', () => {
       const toolNames = Object.keys(tools)
 
       expect(toolNames).toHaveLength(4)
-      expect(toolNames).toContain('load_skill')
+      expect(toolNames).toContain('load_knowledge')
       expect(toolNames).toContain('execute_sql')
       expect(toolNames).toContain('deploy_edge_function')
       expect(toolNames).toContain('rename_chat')

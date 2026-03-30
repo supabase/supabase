@@ -8,14 +8,14 @@ import {
 import { fixSqlBackslashEscapes } from 'lib/ai/util'
 import { z } from 'zod'
 
-const SKILLS = {
+const KNOWLEDGE = {
   pg_best_practices: PG_BEST_PRACTICES,
   rls: RLS_PROMPT,
   edge_functions: EDGE_FUNCTION_PROMPT,
   realtime: REALTIME_PROMPT,
 } as const
 
-type SkillName = keyof typeof SKILLS
+type KnowledgeName = keyof typeof KNOWLEDGE
 
 export const getRenderingTools = () => ({
   execute_sql: tool({
@@ -56,14 +56,14 @@ export const getRenderingTools = () => ({
       return { status: 'Chat request sent to client' }
     },
   }),
-  load_skill: tool({
+  load_knowledge: tool({
     description:
       'Load detailed knowledge about a Supabase topic before answering questions about it.',
     inputSchema: z.object({
-      skill: z
-        .enum(Object.keys(SKILLS) as [SkillName, ...SkillName[]])
-        .describe('The topic to load knowledge for'),
+      name: z
+        .enum(Object.keys(KNOWLEDGE) as [KnowledgeName, ...KnowledgeName[]])
+        .describe('The knowledge to load'),
     }),
-    execute: ({ skill }) => SKILLS[skill],
+    execute: ({ name }) => KNOWLEDGE[name],
   }),
 })

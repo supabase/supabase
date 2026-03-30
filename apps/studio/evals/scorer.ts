@@ -28,7 +28,7 @@ export type AssistantEvalOutput = {
 
 export type Expected = {
   requiredTools?: string[]
-  requiredSkills?: string[]
+  requiredKnowledge?: string[]
   correctAnswer?: string
 }
 
@@ -93,26 +93,26 @@ export const toolUsageScorer: EvalScorer<
   }
 }
 
-export const skillUsageScorer: EvalScorer<
+export const knowledgeUsageScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
 > = async ({ output, expected }) => {
-  if (!expected.requiredSkills) return null
+  if (!expected.requiredKnowledge) return null
 
-  const loadedSkills = output.steps
+  const loadedKnowledge = output.steps
     .flatMap((step) => step.toolCalls)
-    .filter((call) => call.toolName === 'load_skill')
-    .map((call) => (call.input as { skill: string }).skill)
+    .filter((call) => call.toolName === 'load_knowledge')
+    .map((call) => (call.input as { name: string }).name)
 
-  const presentCount = expected.requiredSkills.filter((skill) =>
-    loadedSkills.includes(skill)
+  const presentCount = expected.requiredKnowledge.filter((knowledge) =>
+    loadedKnowledge.includes(knowledge)
   ).length
-  const totalCount = expected.requiredSkills.length
+  const totalCount = expected.requiredKnowledge.length
   const ratio = totalCount === 0 ? 1 : presentCount / totalCount
 
   return {
-    name: 'Skill Usage',
+    name: 'Knowledge Usage',
     score: ratio,
   }
 }

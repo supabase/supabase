@@ -237,7 +237,7 @@ export function MessagePartSwitcher({
     case 'tool-list_policies':
     case 'tool-search_docs':
     case 'tool-get_active_incidents':
-    case 'tool-load_skill': {
+    case 'tool-load_knowledge': {
       return <MessagePart.Tool toolPart={part} />
     }
     case 'reasoning':
