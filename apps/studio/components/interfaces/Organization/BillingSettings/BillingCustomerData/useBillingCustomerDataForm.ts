@@ -100,6 +100,7 @@ export function useBillingCustomerDataForm({
     stripeAddressValidationRef.current = 'unknown'
     setIsAddressDirty(false)
     setAddressCountry(initialStripeAddressValue.address.country || undefined)
+    setResetKey((c) => c + 1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialStripeAddressValue, initialTaxIdValues])
 
