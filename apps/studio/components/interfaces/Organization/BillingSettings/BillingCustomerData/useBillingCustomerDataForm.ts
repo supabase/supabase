@@ -104,25 +104,19 @@ export function useBillingCustomerDataForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialStripeAddressValue, initialTaxIdValues])
 
-  const onAddressChange = useCallback(
-    (evt: StripeAddressElementChangeEvent) => {
-      stripeAddressRef.current = evt.value
-      stripeAddressValidationRef.current = evt.complete ? 'complete' : 'incomplete'
-      setAddressCountry(evt.value.address.country || undefined)
-      setIsAddressDirty(!isAddressEqual(evt.value, savedStripeAddressRef.current))
-    },
-    []
-  )
+  const onAddressChange = useCallback((evt: StripeAddressElementChangeEvent) => {
+    stripeAddressRef.current = evt.value
+    stripeAddressValidationRef.current = evt.complete ? 'complete' : 'incomplete'
+    setAddressCountry(evt.value.address.country || undefined)
+    setIsAddressDirty(!isAddressEqual(evt.value, savedStripeAddressRef.current))
+  }, [])
 
-  const applyAddressElementValue = useCallback(
-    (result: StripeAddressElementValueResult) => {
-      stripeAddressRef.current = result.value
-      stripeAddressValidationRef.current = result.complete ? 'complete' : 'incomplete'
-      setAddressCountry(result.value.address.country || undefined)
-      setIsAddressDirty(!isAddressEqual(result.value, savedStripeAddressRef.current))
-    },
-    []
-  )
+  const applyAddressElementValue = useCallback((result: StripeAddressElementValueResult) => {
+    stripeAddressRef.current = result.value
+    stripeAddressValidationRef.current = result.complete ? 'complete' : 'incomplete'
+    setAddressCountry(result.value.address.country || undefined)
+    setIsAddressDirty(!isAddressEqual(result.value, savedStripeAddressRef.current))
+  }, [])
 
   const isDirty = isAddressDirty || form.formState.isDirty
 
@@ -139,7 +133,8 @@ export function useBillingCustomerDataForm({
 
   const handleSubmit = async () => {
     const address = stripeAddressRef.current
-    const addressWasEdited = isAddressDirty || !isAddressEqual(address, savedStripeAddressRef.current)
+    const addressWasEdited =
+      isAddressDirty || !isAddressEqual(address, savedStripeAddressRef.current)
 
     if (!address.name?.trim()) {
       return 'Full name is required.'
