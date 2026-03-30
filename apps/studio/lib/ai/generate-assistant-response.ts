@@ -99,8 +99,8 @@ export async function generateAssistantResponse({
 
       ## Available Skills
 
-      Before answering questions about the following topics, call \`load_skill\` to load detailed knowledge:
-      - \`pg_best_practices\` — PostgreSQL best practices
+      Before writing SQL or answering questions about the following topics, call \`load_skill\` to load detailed knowledge:
+      - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
       - \`rls\` — Row Level Security policies
       - \`edge_functions\` — Supabase Edge Functions
       - \`realtime\` — Supabase Realtime
