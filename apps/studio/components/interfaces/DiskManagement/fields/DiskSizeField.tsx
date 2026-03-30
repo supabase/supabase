@@ -45,11 +45,7 @@ export function DiskSizeField({
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
 
-  const {
-    isPending: isLoadingDiskAttributes,
-    error: diskAttributesError,
-    isError: isDiskAttributesError,
-  } = useDiskAttributesQuery(
+  const { error: diskAttributesError, isError: isDiskAttributesError } = useDiskAttributesQuery(
     { projectRef },
     { enabled: project && project.cloud_provider !== 'FLY' }
   )
@@ -92,7 +88,6 @@ export function DiskSizeField({
     newStorageType: getValues('storageType') as DiskType,
   })
 
-  const isAllocatedStorageDirty = !!dirtyFields.totalSize
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
@@ -101,7 +96,7 @@ export function DiskSizeField({
         <FormField_Shadcn_
           name="totalSize"
           control={control}
-          render={({ field }) => (
+          render={({ field, fieldState: { isDirty } }) => (
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <FormControl_Shadcn_ className="max-w-32">
                 <InputGroup>
