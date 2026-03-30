@@ -49,10 +49,8 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   const { data: allIntegrations, isPending: isAvailableIntegrationsLoading } =
     useAvailableIntegrations()
-  const {
-    installedIntegrations: installedIntegrations,
-    isLoading: isInstalledIntegrationsLoading,
-  } = useInstalledIntegrations()
+  const { installedIntegrations, isLoading: isInstalledIntegrationsLoading } =
+    useInstalledIntegrations()
 
   // everything is wrapped in useMemo to avoid UI resets when installing additional extensions like pg_net
   const integration = useMemo(() => allIntegrations.find((i) => i.id === id), [allIntegrations, id])
@@ -201,6 +199,10 @@ const IntegrationPage: NextPageWithLayout = () => {
               </Button>
             ) : isMarketplaceEnabled && !!integration && !installation ? (
               <InstallIntegrationSheet integration={integration} />
+            ) : isMarketplaceEnabled && !!integration && !!installation ? (
+              <Button disabled type="outline">
+                Installed
+              </Button>
             ) : null}
           </PageHeaderMeta>
         )}
