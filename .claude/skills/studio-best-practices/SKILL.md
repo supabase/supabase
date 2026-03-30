@@ -23,11 +23,16 @@ Extract complex conditions into named variables:
 
 ```tsx
 // ❌ inline multi-condition
-{!isSchemaLocked && isTableLike(selectedTable) && canUpdateColumns && !isLoading && <Button />}
+{
+  !isSchemaLocked && isTableLike(selectedTable) && canUpdateColumns && !isLoading && <Button />
+}
 
 // ✅ named variable
-const canShowAddButton = !isSchemaLocked && isTableLike(selectedTable) && canUpdateColumns && !isLoading
-{canShowAddButton && <Button />}
+const canShowAddButton =
+  !isSchemaLocked && isTableLike(selectedTable) && canUpdateColumns && !isLoading
+{
+  canShowAddButton && <Button />
+}
 ```
 
 Derive booleans — don't store them:
@@ -35,7 +40,9 @@ Derive booleans — don't store them:
 ```tsx
 // ❌ stored derived state
 const [isFormValid, setIsFormValid] = useState(false)
-useEffect(() => { setIsFormValid(name.length > 0 && email.includes('@')) }, [name, email])
+useEffect(() => {
+  setIsFormValid(name.length > 0 && email.includes('@'))
+}, [name, email])
 
 // ✅ derived
 const isFormValid = name.length > 0 && email.includes('@')
@@ -43,7 +50,10 @@ const isFormValid = name.length > 0 && email.includes('@')
 
 ## Component Structure
 
+See `vercel-composition-patterns` skill for compound component and composition patterns.
+
 Keep components under 200–300 lines. Split when you see:
+
 - Multiple distinct UI sections
 - Complex conditional rendering
 - Multiple unrelated `useState` calls
@@ -53,7 +63,13 @@ Co-locate sub-components in the same directory as the parent. Avoid barrel re-ex
 
 Extract repeated JSX patterns into small components.
 
-## Loading / Error / Success Pattern
+## Data Fetching
+
+All data fetching uses TanStack Query (React Query). See `studio-queries` skill for query/mutation patterns and `studio-error-handling` skill for error display conventions.
+
+### Loading / Error / Success Pattern
+
+Top level:
 
 ```tsx
 const { data, error, isLoading, isError, isSuccess } = useQuery(...)
@@ -66,11 +82,22 @@ return <DataDisplay data={data} />
 
 Use early returns — avoid deeply nested conditionals.
 
+Inline:
+
+```tsx
+<div>
+  {isLoading && <InlineLoader />}
+  {isError && <InlineError error={error} />}
+  {isSuccess && data.length === 0 && <EmptyState />}
+  {isSuccess && data.length > 0 && <DataDisplay data={data} />}
+</div>
+```
+
 ## State Management
 
 Keep state as local as possible; lift only when needed.
 
-Group related form state with `react-hook-form` rather than multiple `useState` calls:
+Group related form state with `react-hook-form` rather than multiple `useState` calls. See `studio-ui-patterns` skill for form layout and component conventions.
 
 ```tsx
 // ❌ multiple related useState
@@ -104,10 +131,10 @@ Use `useCallback` for handlers passed to memoized children; avoid unnecessary in
 
 ```tsx
 // Simple show/hide
-{isVisible && <Component />}
+<>{isVisible && <Component />}</>
 
 // Binary choice
-{isLoading ? <Spinner /> : <Content />}
+<>{isLoading ? <Spinner /> : <Content />}</>
 
 // Multiple conditions — use early returns, not nested ternaries
 if (isLoading) return <Spinner />
