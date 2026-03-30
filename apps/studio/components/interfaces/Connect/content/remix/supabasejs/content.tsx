@@ -40,7 +40,7 @@ import {
 } from "@supabase/ssr";
 
 export function createClient(request: Request) {
-  const headers = new Headers();
+  const responseHeaders = new Headers();
 
   const supabase = createServerClient(
     process.env.VITE_SUPABASE_URL!,
@@ -53,19 +53,22 @@ export function createClient(request: Request) {
             value: string;
           }[];
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append(
+            responseHeaders.append(
               "Set-Cookie",
               serializeCookieHeader(name, value, options)
             )
+          );
+          Object.entries(headers).forEach(([key, value]) =>
+            responseHeaders.append(key, value)
           );
         },
       },
     }
   );
 
-  return { supabase, headers };
+  return { supabase, headers: responseHeaders };
 }
 `}
         </SimpleCodeBlock>

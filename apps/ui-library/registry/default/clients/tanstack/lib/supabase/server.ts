@@ -16,7 +16,7 @@ export function createClient() {
               }) as { name: string; value: string }
           )
         },
-        setAll(cookies) {
+        setAll(cookies, _headers) {
           cookies.forEach((cookie) => {
             setCookie(cookie.name, cookie.value)
           })
