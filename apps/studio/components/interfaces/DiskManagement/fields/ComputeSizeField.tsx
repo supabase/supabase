@@ -88,7 +88,8 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return idx >= INITIALLY_VISIBLE_COUNT
   })
 
-  // Also expand if computeSize changes to a hidden size after mount (e.g. after a form reset)
+  // Expand whenever the selected size falls outside the visible set — covers both initial data
+  // load (availableOptions starts empty) and computeSize changes after mount (e.g. form reset)
   useEffect(() => {
     const idx = availableOptions.findIndex((o) => o.identifier === computeSize)
     if (idx >= INITIALLY_VISIBLE_COUNT) {
