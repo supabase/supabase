@@ -5,6 +5,7 @@ import type { ConnectSchema, StepDefinition } from './Connect.types'
  */
 export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
+  supabasessr: 'npm install @supabase/supabase-js @supabase/ssr',
   supabasepy: 'pip install supabase',
   supabaseflutter: 'flutter pub add supabase_flutter',
   supabaseswift:

@@ -84,8 +84,8 @@ export const FRAMEWORKS: ConnectionType[] = [
         icon: '',
         children: [
           {
-            key: 'supabasejs',
-            label: 'supabase-js',
+            key: 'supabasessr',
+            label: 'supabase-ssr',
             icon: 'supabase',
             children: [],
           },
@@ -97,8 +97,8 @@ export const FRAMEWORKS: ConnectionType[] = [
         icon: '',
         children: [
           {
-            key: 'supabasejs',
-            label: 'Supabase-js',
+            key: 'supabasessr',
+            label: 'supabase-ssr',
             children: [],
             icon: 'supabase',
           },
@@ -113,8 +113,8 @@ export const FRAMEWORKS: ConnectionType[] = [
     guideLink: `${DOCS_URL}/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader`,
     children: [
       {
-        key: 'supabasejs',
-        label: 'Supabase-js',
+        key: 'supabasessr',
+        label: 'supabase-ssr',
         children: [],
         icon: 'supabase',
       },
