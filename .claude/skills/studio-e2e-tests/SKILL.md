@@ -1,6 +1,9 @@
 ---
 name: e2e-studio-tests
-description: Run e2e tests in the Studio app. Use when asked to run e2e tests, run studio tests, playwright tests, or test the feature.
+description: Write and run Playwright E2E tests for Supabase Studio. Use when asked
+  to run e2e tests, write new E2E tests, or debug flaky tests. Covers running commands,
+  avoiding race conditions, waiting strategies, selectors, helper functions, and CI
+  vs local differences.
 ---
 
 # E2E Studio Tests
@@ -70,17 +73,20 @@ test.describe.configure({ mode: 'serial' })
 ### Selector priority (best to worst)
 
 1. **`getByRole` with accessible name** - Most robust, tests accessibility
+
    ```typescript
    page.getByRole('button', { name: 'Save' })
    page.getByRole('button', { name: 'Configure API privileges' })
    ```
 
 2. **`getByTestId`** - Stable, explicit test hooks
+
    ```typescript
    page.getByTestId('table-editor-side-panel')
    ```
 
 3. **`getByText` with exact match** - Good for unique text
+
    ```typescript
    page.getByText('Data API Access', { exact: true })
    ```
@@ -93,12 +99,14 @@ test.describe.configure({ mode: 'serial' })
 ### Patterns to avoid
 
 - **XPath selectors** - Fragile to DOM changes
+
   ```typescript
   // BAD
   locator('xpath=ancestor::div[contains(@class, "space-y")]')
   ```
 
 - **Parent traversal with `locator('..')`** - Breaks when structure changes
+
   ```typescript
   // BAD
   element.locator('..').getByRole('button')
@@ -123,6 +131,7 @@ When a component lacks a good accessible name, add one in the source code:
 ```
 
 Then use it in tests:
+
 ```typescript
 page.getByRole('button', { name: 'Configure API privileges' })
 ```
@@ -139,6 +148,76 @@ const toggle = sidePanel.getByRole('switch')
 // Good - find unique element, then scope from there
 const popover = page.locator('[data-radix-popper-content-wrapper]')
 const roleSection = popover.getByText('Anonymous (anon)', { exact: true })
+```
+
+## Avoiding Race Conditions
+
+**Set up API waiters BEFORE triggering actions.** This is the most common source of flaky tests.
+
+```ts
+// ❌ Race condition — response may complete before waiter is set up
+await page.getByRole('button', { name: 'Save' }).click()
+await waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
+
+// ✅ Waiter is ready before the action
+const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=table-create')
+await page.getByRole('button', { name: 'Save' }).click()
+await apiPromise
+```
+
+Same rule applies before navigation:
+
+```ts
+const loadPromise = waitForTableToLoad(page, ref)
+await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+await loadPromise
+```
+
+When an action triggers multiple API calls, wait for all of them:
+
+```ts
+const createTablePromise = waitForApiResponseWithTimeout(page, (r) =>
+  r.url().includes('query?key=table-create')
+)
+const tablesPromise = waitForApiResponseWithTimeout(page, (r) =>
+  r.url().includes('tables?include_columns=true')
+)
+
+await page.getByRole('button', { name: 'Save' }).click()
+await Promise.all([createTablePromise, tablesPromise])
+```
+
+## Waiting Strategies
+
+Playwright auto-waits for elements to be actionable — prefer this over manual timeouts.
+
+Use `expect.poll` for dynamic state changes:
+
+```ts
+await expect.poll(async () => await page.getByLabel(`View ${tableName}`).count()).toBe(0)
+```
+
+Use `waitForSelector` with state for element lifecycle:
+
+```ts
+await page.waitForSelector('[data-testid="side-panel"]', { state: 'detached' })
+```
+
+Avoid `networkidle` — use specific API waits instead:
+
+```ts
+// ❌ Unreliable and slow
+await page.waitForLoadState('networkidle')
+
+// ✅ Specific API response
+await waitForApiResponse(page, 'pg-meta', ref, 'tables')
+```
+
+Timeouts are acceptable only for client-side debounces:
+
+```ts
+await page.getByRole('textbox').fill('search term')
+await page.waitForTimeout(300) // allow debounce
 ```
 
 ## Avoiding `waitForTimeout`
@@ -173,6 +252,129 @@ await menuButton.click({ force: true })
 await tableRow.hover()
 await expect(menuButton).toBeVisible()
 await menuButton.click()
+```
+
+## Test Structure
+
+Always import from the custom test utility:
+
+```ts
+import { test } from '../utils/test.js'
+```
+
+Use `withFileOnceSetup` for expensive setup that should run once per file:
+
+```ts
+test.beforeAll(async ({ browser, ref }) => {
+  await withFileOnceSetup(import.meta.url, async () => {
+    const ctx = await browser.newContext()
+    const page = await ctx.newPage()
+    await deleteTestTables(page, ref)
+  })
+})
+
+test.afterAll(async () => {
+  await releaseFileOnceCleanup(import.meta.url)
+})
+```
+
+Dismiss toasts before interacting — they can overlay buttons:
+
+```ts
+const dismissToastsIfAny = async (page: Page) => {
+  const closeButtons = page.getByRole('button', { name: 'Close toast' })
+  const count = await closeButtons.count()
+  for (let i = 0; i < count; i++) {
+    await closeButtons.nth(i).click()
+  }
+}
+
+await dismissToastsIfAny(page)
+await page.getByRole('button', { name: 'New table' }).click()
+```
+
+## Assertions
+
+Always include descriptive messages for easier debugging:
+
+```ts
+// ❌ No context on failure
+await expect(page.getByRole('button', { name: 'Save' })).toBeVisible()
+
+// ✅ Clear message on failure
+await expect(
+  page.getByRole('button', { name: 'Save' }),
+  'Save button should be visible after form is filled'
+).toBeVisible()
+```
+
+Use explicit timeouts for slow operations:
+
+```ts
+await expect(
+  page.getByText(`Table ${tableName} is good to go!`),
+  'Success toast should be visible after table creation'
+).toBeVisible({ timeout: 50000 })
+```
+
+## Helper Functions
+
+Extract reusable operations into domain helpers (e.g. `e2e/studio/utils/storage-helpers.ts`).
+Use the existing wait utilities:
+
+```ts
+import {
+  createApiResponseWaiter,
+  waitForApiResponse,
+  waitForGridDataToLoad,
+  waitForTableToLoad,
+} from '../utils/wait-for-response.js'
+```
+
+Use `expectClipboardValue` instead of manual clipboard reads with hardcoded timeouts:
+
+```ts
+// ❌ Brittle
+await page.evaluate(() => navigator.clipboard.readText())
+await page.waitForTimeout(500)
+
+// ✅ Uses Playwright auto-retries
+await expectClipboardValue({ page, value: 'expectedValue' })
+```
+
+## API Mocking
+
+```ts
+await page.route('*/**/logs.all*', async (route) => {
+  await route.fulfill({ body: JSON.stringify(mockAPILogs) })
+})
+```
+
+Use soft waits for optional API calls:
+
+```ts
+await waitForApiResponse(page, 'pg-meta', ref, 'optional-endpoint', {
+  soft: true,
+  fallbackWaitMs: 1000,
+})
+```
+
+## Cleanup
+
+Clean up test data in `beforeAll`/`beforeEach`. Check before deleting to handle existing state gracefully:
+
+```ts
+const bucketRow = page.getByRole('row').filter({ hasText: bucketName })
+if ((await bucketRow.count()) === 0) return
+// proceed with deletion
+```
+
+Reset local storage after tests that modify it:
+
+```ts
+import { resetLocalStorage } from '../utils/reset-local-storage.js'
+
+await resetLocalStorage(page, ref)
 ```
 
 ## Debugging
