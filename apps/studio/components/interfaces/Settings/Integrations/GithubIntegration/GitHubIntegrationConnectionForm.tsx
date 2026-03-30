@@ -779,7 +779,7 @@ export const GitHubIntegrationConnectionForm = ({
                         </Button>
                       )}
                       <Button
-                        type="default"
+                        type="primary"
                         htmlType="submit"
                         disabled={
                           !hasAccessToGitHubIntegration ||
