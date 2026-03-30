@@ -55,8 +55,8 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
               <CardTitle className="truncate">{label}</CardTitle>
               {bucket?.public && (
                 <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="warning">Public</Badge>
+                  <TooltipTrigger asChild>
+                    <Badge variant="warning" className="flex">Public</Badge>
                   </TooltipTrigger>
                   <TooltipContent side="top">
                     This bucket is publicly readable. Anyone can list and access all objects stored
