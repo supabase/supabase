@@ -15,6 +15,8 @@ const SKILLS = {
   realtime: REALTIME_PROMPT,
 } as const
 
+type SkillName = keyof typeof SKILLS
+
 export const getRenderingTools = () => ({
   execute_sql: tool({
     description: 'Asks the user to execute a SQL statement and return the results',
@@ -59,9 +61,9 @@ export const getRenderingTools = () => ({
       'Load detailed knowledge about a Supabase topic before answering questions about it.',
     inputSchema: z.object({
       skill: z
-        .enum(['pg_best_practices', 'rls', 'edge_functions', 'realtime'])
+        .enum(Object.keys(SKILLS) as [SkillName, ...SkillName[]])
         .describe('The topic to load knowledge for'),
     }),
-    execute: async ({ skill }) => SKILLS[skill],
+    execute: ({ skill }) => SKILLS[skill],
   }),
 })

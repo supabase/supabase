@@ -41,7 +41,6 @@ export const toolSetValidationSchema = z.record(
     'getFunctions',
     'getEdgeFunctionKnowledge',
 
-    // Skill tools
     'load_skill',
   ]),
   basicToolSchema
