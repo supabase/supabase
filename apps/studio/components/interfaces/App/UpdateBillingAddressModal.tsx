@@ -102,6 +102,7 @@ export function UpdateBillingAddressModal() {
     resetKey,
     onAddressChange,
     applyAddressElementValue,
+    markCurrentValuesAsSaved,
     addressCountry,
     addressOptions,
   } = useBillingCustomerDataForm({
@@ -119,6 +120,7 @@ export function UpdateBillingAddressModal() {
         })
 
         await updateTaxId({ slug, taxId: data.tax_id })
+        markCurrentValuesAsSaved()
 
         await invalidateOrganizationsQuery(queryClient)
 

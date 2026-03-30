@@ -22,7 +22,7 @@ interface UseBillingCustomerDataFormProps {
     billing_name?: string
   } | null
   taxId?: CustomerTaxId | null
-  onCustomerDataChange: (data: BillingAddressPayload) => void
+  onCustomerDataChange: (data: BillingAddressPayload) => Promise<void>
 }
 
 export type BillingAddressPayload = {
@@ -36,7 +36,6 @@ export function useBillingCustomerDataForm({
   taxId,
   onCustomerDataChange,
 }: UseBillingCustomerDataFormProps) {
-  // Stripe-shaped snapshot of the server address, used to seed the ref and for dirty-checking
   const initialStripeAddressValue: StripeAddressValue = useMemo(
     () => ({
       name: customerProfile?.billing_name ?? '',
@@ -83,21 +82,10 @@ export function useBillingCustomerDataForm({
     defaultValues: initialTaxIdValues,
   })
 
-  // Reset RHF when initial tax ID data changes
-  useEffect(() => {
-    form.reset(initialTaxIdValues)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialTaxIdValues])
-
-  // Stripe address state — seeded with server data so the ref is never stale
   const stripeAddressRef = useRef<StripeAddressValue>(initialStripeAddressValue)
-
-  useEffect(() => {
-    stripeAddressRef.current = initialStripeAddressValue
-  }, [initialStripeAddressValue])
-
+  const savedStripeAddressRef = useRef<StripeAddressValue>(initialStripeAddressValue)
   const stripeAddressValidationRef = useRef<StripeAddressValidationState>('unknown')
-
+  const savedTaxIdValuesRef = useRef<TaxIdFormValues>(initialTaxIdValues)
   const [isAddressDirty, setIsAddressDirty] = useState(false)
   const [addressCountry, setAddressCountry] = useState<string | undefined>(
     initialStripeAddressValue.address.country || undefined
@@ -105,17 +93,24 @@ export function useBillingCustomerDataForm({
   const [resetKey, setResetKey] = useState(0)
 
   useEffect(() => {
+    savedStripeAddressRef.current = initialStripeAddressValue
+    savedTaxIdValuesRef.current = initialTaxIdValues
+    form.reset(initialTaxIdValues)
+    stripeAddressRef.current = initialStripeAddressValue
+    stripeAddressValidationRef.current = 'unknown'
+    setIsAddressDirty(false)
     setAddressCountry(initialStripeAddressValue.address.country || undefined)
-  }, [initialStripeAddressValue.address.country])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialStripeAddressValue, initialTaxIdValues])
 
   const onAddressChange = useCallback(
     (evt: StripeAddressElementChangeEvent) => {
       stripeAddressRef.current = evt.value
       stripeAddressValidationRef.current = evt.complete ? 'complete' : 'incomplete'
       setAddressCountry(evt.value.address.country || undefined)
-      setIsAddressDirty(!isAddressEqual(evt.value, initialStripeAddressValue))
+      setIsAddressDirty(!isAddressEqual(evt.value, savedStripeAddressRef.current))
     },
-    [initialStripeAddressValue]
+    []
   )
 
   const applyAddressElementValue = useCallback(
@@ -123,16 +118,27 @@ export function useBillingCustomerDataForm({
       stripeAddressRef.current = result.value
       stripeAddressValidationRef.current = result.complete ? 'complete' : 'incomplete'
       setAddressCountry(result.value.address.country || undefined)
-      setIsAddressDirty(!isAddressEqual(result.value, initialStripeAddressValue))
+      setIsAddressDirty(!isAddressEqual(result.value, savedStripeAddressRef.current))
     },
-    [initialStripeAddressValue]
+    []
   )
 
   const isDirty = isAddressDirty || form.formState.isDirty
 
+  const syncCurrentState = useCallback(
+    (addressValue: StripeAddressValue, taxIdValues: TaxIdFormValues) => {
+      form.reset(taxIdValues)
+      stripeAddressRef.current = addressValue
+      stripeAddressValidationRef.current = 'unknown'
+      setIsAddressDirty(false)
+      setAddressCountry(addressValue.address.country || undefined)
+    },
+    [form]
+  )
+
   const handleSubmit = async () => {
     const address = stripeAddressRef.current
-    const addressWasEdited = isAddressDirty || !isAddressEqual(address, initialStripeAddressValue)
+    const addressWasEdited = isAddressDirty || !isAddressEqual(address, savedStripeAddressRef.current)
 
     if (!address.name?.trim()) {
       return 'Full name is required.'
@@ -150,7 +156,7 @@ export function useBillingCustomerDataForm({
     const taxIdValues = form.getValues()
     const selectedTaxId = TAX_IDS.find((option) => option.name === taxIdValues.tax_id_name)
 
-    onCustomerDataChange({
+    const payload = {
       address: {
         line1: address.address.line1,
         line2: address.address.line2 || undefined,
@@ -171,17 +177,24 @@ export function useBillingCustomerDataForm({
               country: getEffectiveTaxCountry(selectedTaxId),
             }
           : null,
-    })
+    }
+
+    await onCustomerDataChange(payload)
 
     return null // no error
   }
 
+  const markCurrentValuesAsSaved = () => {
+    const currentAddress = stripeAddressRef.current
+    const currentTaxIdValues = form.getValues()
+
+    savedStripeAddressRef.current = currentAddress
+    savedTaxIdValuesRef.current = currentTaxIdValues
+    syncCurrentState(currentAddress, currentTaxIdValues)
+  }
+
   const handleReset = () => {
-    form.reset(initialTaxIdValues)
-    stripeAddressRef.current = initialStripeAddressValue
-    stripeAddressValidationRef.current = 'unknown'
-    setIsAddressDirty(false)
-    setAddressCountry(initialStripeAddressValue.address.country || undefined)
+    syncCurrentState(savedStripeAddressRef.current, savedTaxIdValuesRef.current)
     setResetKey((c) => c + 1)
   }
 
@@ -193,6 +206,7 @@ export function useBillingCustomerDataForm({
     resetKey,
     onAddressChange,
     applyAddressElementValue,
+    markCurrentValuesAsSaved,
     addressCountry,
     addressOptions,
   }

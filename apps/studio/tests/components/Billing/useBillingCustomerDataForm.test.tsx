@@ -73,6 +73,14 @@ const makeAddressChangeEvent = (
   },
 })
 
+const submitHook = async (submit: () => Promise<string | null>) => {
+  let result: string | null = null
+  await act(async () => {
+    result = await submit()
+  })
+  return result
+}
+
 describe('useBillingCustomerDataForm', () => {
   it('initializes tax ID fields and address country from the provided profile', () => {
     const customerProfile = makeCustomerProfile({
@@ -133,7 +141,7 @@ describe('useBillingCustomerDataForm', () => {
       }
     )
 
-    await expect(result.current.handleSubmit()).resolves.toBe('Full name is required.')
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBe('Full name is required.')
   })
 
   it('blocks submit when Stripe marks the address element as incomplete', async () => {
@@ -161,7 +169,7 @@ describe('useBillingCustomerDataForm', () => {
       )
     })
 
-    await expect(result.current.handleSubmit()).resolves.toBe(
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBe(
       'Please enter a valid billing address.'
     )
     expect(onCustomerDataChange).not.toHaveBeenCalled()
@@ -190,7 +198,10 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     await waitFor(() => expect(result.current.isDirty).toBe(true))
-    await expect(result.current.handleSubmit()).resolves.toBeNull()
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
+    act(() => {
+      result.current.markCurrentValuesAsSaved()
+    })
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: customerProfile.address,
@@ -201,6 +212,7 @@ describe('useBillingCustomerDataForm', () => {
         country: 'US',
       },
     })
+    expect(result.current.isDirty).toBe(false)
   })
 
   it('submits tax_id as null after an existing tax ID is removed', async () => {
@@ -227,7 +239,7 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     await waitFor(() => expect(result.current.isDirty).toBe(true))
-    await expect(result.current.handleSubmit()).resolves.toBeNull()
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: customerProfile.address,
@@ -266,7 +278,7 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     await waitFor(() => expect(result.current.addressCountry).toBe('AT'))
-    await expect(result.current.handleSubmit()).resolves.toBeNull()
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: {
@@ -312,7 +324,7 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     expect(result.current.isDirty).toBe(true)
-    await expect(result.current.handleSubmit()).resolves.toBeNull()
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: {
@@ -370,7 +382,7 @@ describe('useBillingCustomerDataForm', () => {
       result.current.form.setValue('tax_id_value', '12-3456789', { shouldDirty: true })
     })
 
-    await expect(result.current.handleSubmit()).resolves.toBeNull()
+    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
 
     expect(onCustomerDataChange).toHaveBeenLastCalledWith({
       address: customerProfile.address,

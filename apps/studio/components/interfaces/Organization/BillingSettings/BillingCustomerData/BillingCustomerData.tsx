@@ -75,6 +75,7 @@ export const BillingCustomerData = () => {
     resetKey,
     onAddressChange,
     applyAddressElementValue,
+    markCurrentValuesAsSaved,
     addressCountry,
     addressOptions,
   } = useBillingCustomerDataForm({
@@ -91,6 +92,7 @@ export const BillingCustomerData = () => {
         })
 
         await updateTaxId({ slug, taxId: data.tax_id })
+        markCurrentValuesAsSaved()
 
         toast.success('Successfully updated billing data')
 
