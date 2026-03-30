@@ -170,6 +170,6 @@ try/finally for resource cleanup. For E2E execution details, see the
 | E2E helpers pattern     | `e2e/studio/utils/filter-bar-helpers.ts`                                                                                                              |
 | Custom render           | `tests/lib/custom-render.tsx`                                                                                                                         |
 | MSW mock setup          | `tests/lib/msw.ts` (`addAPIMock`)                                                                                                                     |
-| Test README             | `tests/README.md`                                                                                                                                     |
+| Test README             | `apps/studio/tests/README.md`                                                                                                                         |
 | Vitest config           | `vitest.config.ts`                                                                                                                                    |
 | Related skills          | `studio-e2e-tests` (running E2E), `vitest` (API reference), `vercel-composition-patterns` (component architecture)                                    |

@@ -88,13 +88,14 @@ const { data, isPending, isError } = useQuery(xQueryOptions({ projectRef: projec
 
 ```ts
 const queryClient = useQueryClient()
+const { data: project } = useSelectedProjectQuery()
 
 const handleClick = useCallback(
   async (id: number) => {
-    const data = await queryClient.fetchQuery(xQueryOptions({ id, projectRef }))
+    const data = await queryClient.fetchQuery(xQueryOptions({ id, projectRef: project?.ref }))
     // use data...
   },
-  [projectRef, queryClient]
+  [project?.ref, queryClient]
 )
 ```
 
