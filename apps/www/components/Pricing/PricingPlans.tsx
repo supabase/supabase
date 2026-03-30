@@ -72,29 +72,37 @@ const PricingPlans = ({
                       )}
                     </div>
                   </div>
-                  <p
+                  <div
                     className={cn(
-                      'text-foreground-light text-sm 2xl:pr-4',
+                      'flex flex-col',
                       isProPlan &&
-                        (experimentVariant === 'flexibility_card' ||
-                          experimentVariant === 'hourly_rate')
-                        ? 'mb-2'
-                        : 'mb-4',
-                      isProPlan && 'xl:mb-12'
+                        (!experimentVariant || experimentVariant === 'control') &&
+                        'xl:mb-12'
                     )}
                   >
-                    {plan.description}
-                  </p>
-                  {isProPlan && experimentVariant === 'flexibility_card' && (
-                    <p className="text-brand text-xs mb-4 xl:mb-12">
-                      No lock-in. Scale up or down anytime — you only pay for the hours you use.
+                    <p
+                      className={cn(
+                        'text-foreground-light text-sm 2xl:pr-4',
+                        isUpgradablePlan &&
+                          (experimentVariant === 'flexibility_card' ||
+                            experimentVariant === 'hourly_rate')
+                          ? 'mb-2'
+                          : 'mb-4'
+                      )}
+                    >
+                      {plan.description}
                     </p>
-                  )}
-                  {isProPlan && experimentVariant === 'hourly_rate' && (
-                    <p className="text-brand text-xs mb-4 xl:mb-12">
-                      Compute from $0.01/hr. Scale anytime, pay only for what you use.
-                    </p>
-                  )}
+                    {isUpgradablePlan && experimentVariant === 'flexibility_card' && (
+                      <p className="text-brand text-xs mb-4">
+                        No lock-in. Scale up or down anytime — you only pay for the hours you use.
+                      </p>
+                    )}
+                    {isUpgradablePlan && experimentVariant === 'hourly_rate' && (
+                      <p className="text-brand text-xs mb-4">
+                        Compute from $0.01/hr. Scale anytime, pay only for what you use.
+                      </p>
+                    )}
+                  </div>
                   {isUpgradablePlan && hasExistingOrganizations ? (
                     <UpgradePlan
                       planId={plan.planId}
@@ -144,7 +152,7 @@ const PricingPlans = ({
                             </p>
                           </div>
 
-                          {isProPlan && experimentVariant === 'multi_project' ? (
+                          {isUpgradablePlan && experimentVariant === 'multi_project' ? (
                             <div className="mt-4 flex flex-col gap-1">
                               <span className="text-[13px] leading-4">
                                 First project included. Additional projects from $10/mo.
@@ -156,7 +164,7 @@ const PricingPlans = ({
                                 See how pricing scales
                               </Link>
                             </div>
-                          ) : isProPlan && experimentVariant === 'estimate_cta' ? (
+                          ) : isUpgradablePlan && experimentVariant === 'estimate_cta' ? (
                             <div className="mt-4 flex flex-col gap-1">
                               <span className="text-[13px] leading-4">
                                 {plan.warning}
