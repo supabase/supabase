@@ -34,7 +34,8 @@
       "reference_swift_v2",
       "reference_kotlin_v1",
       "reference_kotlin_v2",
-      "reference_kotlin_v3"
+      "reference_kotlin_v3",
+      "reference_elixir_v0"
     ]
   },
   {
@@ -52,13 +53,35 @@
       "reference_swift_v2",
       "reference_kotlin_v1",
       "reference_kotlin_v2",
-      "reference_kotlin_v3"
+      "reference_kotlin_v3",
+      "reference_elixir_v0"
     ]
   },
   {
     "type": "category",
     "title": "Database",
     "items": [
+      {
+        "id": "from",
+        "title": "Select a table",
+        "slug": "from",
+        "product": "database",
+        "type": "function",
+        "excludes": [
+          "reference_javascript_v1",
+          "reference_javascript_v2",
+          "reference_dart_v1",
+          "reference_dart_v2",
+          "reference_python_v2",
+          "reference_csharp_v0",
+          "reference_csharp_v1",
+          "reference_swift_v1",
+          "reference_swift_v2",
+          "reference_kotlin_v1",
+          "reference_kotlin_v2",
+          "reference_kotlin_v3"
+        ]
+      },
       {
         "id": "select",
         "title": "Fetch data",
@@ -351,6 +374,50 @@
             "product": "database",
             "parent": "modifiers",
             "type": "function"
+          },
+          {
+            "id": "execute",
+            "title": "Execute a query",
+            "slug": "execute",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "excludes": [
+              "reference_javascript_v1",
+              "reference_javascript_v2",
+              "reference_dart_v1",
+              "reference_dart_v2",
+              "reference_python_v2",
+              "reference_csharp_v0",
+              "reference_csharp_v1",
+              "reference_swift_v1",
+              "reference_swift_v2",
+              "reference_kotlin_v1",
+              "reference_kotlin_v2",
+              "reference_kotlin_v3"
+            ]
+          },
+          {
+            "id": "execute_to",
+            "title": "Execute and cast to struct",
+            "slug": "execute-to",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function",
+            "excludes": [
+              "reference_javascript_v1",
+              "reference_javascript_v2",
+              "reference_dart_v1",
+              "reference_dart_v2",
+              "reference_python_v2",
+              "reference_csharp_v0",
+              "reference_csharp_v1",
+              "reference_swift_v1",
+              "reference_swift_v2",
+              "reference_kotlin_v1",
+              "reference_kotlin_v2",
+              "reference_kotlin_v3"
+            ]
           },
           {
             "id": "maybe-single",
