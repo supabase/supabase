@@ -1,10 +1,10 @@
 'use client'
 
 import { ArrowDownIcon } from '@heroicons/react/outline'
-import { hasConsented, posthogClient } from 'common'
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
 import { useOrganizations } from '~/data/organizations'
+import { hasConsented, posthogClient } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
@@ -63,9 +63,9 @@ export default function PricingContent() {
   const [flagValue, setFlagValue] = useState<PricingPageExperimentVariant | false | undefined>(
     () =>
       posthogClient.getFeatureFlag(EXPERIMENT_ID) as
-      | PricingPageExperimentVariant
-      | false
-      | undefined
+        | PricingPageExperimentVariant
+        | false
+        | undefined
   )
 
   useEffect(() => {

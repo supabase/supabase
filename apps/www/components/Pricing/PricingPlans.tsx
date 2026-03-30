@@ -1,13 +1,13 @@
 'use client'
 
-import Link from 'next/link'
-
-import { Check } from 'lucide-react'
-import { plans } from 'shared-data/plans'
-import { Button, cn } from 'ui'
 import type { PricingPageExperimentVariant } from '~/app/pricing/PricingContent'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { Check } from 'lucide-react'
+import Link from 'next/link'
+import { plans } from 'shared-data/plans'
+import { Button, cn } from 'ui'
+
 import UpgradePlan from './UpgradePlan'
 
 interface PricingPlansProps {
@@ -166,9 +166,7 @@ const PricingPlans = ({
                             </div>
                           ) : isUpgradablePlan && experimentVariant === 'estimate_cta' ? (
                             <div className="mt-4 flex flex-col gap-1">
-                              <span className="text-[13px] leading-4">
-                                {plan.warning}
-                              </span>
+                              <span className="text-[13px] leading-4">{plan.warning}</span>
                               <Link
                                 href="#addon-compute"
                                 className="hover:underline text-brand text-[13px] m-0 p-0 leading-3 font-medium"
