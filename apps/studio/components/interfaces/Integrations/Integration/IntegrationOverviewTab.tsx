@@ -9,7 +9,7 @@ import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
 import { MissingExtensionAlert } from './MissingExtensionAlert'
 
-interface IntegrationOverviewTabProps {
+export interface IntegrationOverviewTabProps {
   actions?: ReactNode
   status?: string | ReactNode
   alert?: ReactNode
