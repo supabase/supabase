@@ -1,24 +1,47 @@
+import { useBreakpoint } from 'common'
+import { useMobileSheet } from 'components/layouts/Navigation/NavigationBar/MobileSheetContext'
+import { useEffect } from 'react'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { ResizableHandle, ResizablePanel, cn } from 'ui'
+import { cn, ResizableHandle, ResizablePanel } from 'ui'
 
-// Having these params as props as otherwise it's quite hard to visually check the sizes in DefaultLayout
-// as react resizeable panels requires all these values to be valid to render correctly
+import { SIDEBAR_KEYS, type TYPEOF_SIDEBAR_KEYS } from './LayoutSidebarProvider'
+
+function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
+  return (
+    typeof content === 'string' &&
+    Object.values(SIDEBAR_KEYS).includes(content as TYPEOF_SIDEBAR_KEYS)
+  )
+}
+
 interface LayoutSidebarProps {
-  order?: number
-  minSize?: number
-  maxSize?: number
-  defaultSize?: number
+  minSize?: string | number
+  maxSize?: string | number
+  defaultSize?: string | number
 }
 
 export const LayoutSidebar = ({
-  order = 2,
-  minSize = 30,
-  maxSize = 50,
-  defaultSize = 30,
+  minSize = '30',
+  maxSize = '50',
+  defaultSize = '30',
 }: LayoutSidebarProps) => {
   const { activeSidebar } = useSidebarManagerSnapshot()
+  const isMobile = useBreakpoint('md')
+  const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileSheetContent(null)
+      return
+    }
+    if (activeSidebar?.component) {
+      setMobileSheetContent(activeSidebar.id)
+    } else if (isSidebarId(sheetContent)) {
+      setMobileSheetContent(null)
+    }
+  }, [isMobile, activeSidebar, sheetContent, setMobileSheetContent])
 
   if (!activeSidebar?.component) return null
+  if (isMobile) return null
 
   return (
     <>
@@ -26,7 +49,6 @@ export const LayoutSidebar = ({
       <ResizablePanel
         id="panel-side"
         key={activeSidebar?.id ?? 'default'}
-        order={order}
         defaultSize={defaultSize}
         minSize={minSize}
         maxSize={maxSize}

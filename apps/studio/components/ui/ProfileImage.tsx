@@ -24,12 +24,12 @@ export const ProfileImage = ({ alt, src, placeholder, className }: ProfileImageP
       onError={() => setHasInvalidImg(true)}
     />
   ) : (
-    placeholder ?? (
+    (placeholder ?? (
       <figure
         className={cn('bg-foreground rounded-full flex items-center justify-center', className)}
       >
         <User size={18} strokeWidth={1.5} className="text-background" />
       </figure>
-    )
+    ))
   )
 }

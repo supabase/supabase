@@ -17,7 +17,7 @@ const ApiKeysLegacyPage: NextPageWithLayout = () => {
 
 ApiKeysLegacyPage.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>
+    <SettingsLayout title="API Keys (Legacy)">
       <ApiKeysLayout>{page}</ApiKeysLayout>
     </SettingsLayout>
   </DefaultLayout>

@@ -1,9 +1,8 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import Link from 'next/link'
-
 import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
 import { processIncidentData } from 'data/platform/incident-status-utils'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -54,7 +53,8 @@ const getStatusDescription = (
 }
 
 export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
-  const { data: incidents, isLoading, isError } = useIncidentStatusQuery()
+  const { data: allStatusPageEvents, isLoading, isError } = useIncidentStatusQuery()
+  const { incidents = [] } = allStatusPageEvents ?? {}
 
   // Don't render anything while loading, on error, or if no incidents
   if (isLoading || isError || !incidents || incidents.length === 0) {

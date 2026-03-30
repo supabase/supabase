@@ -1,13 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
-  parseSemver,
   compareSemver,
-  isGreaterThan,
-  isLessThan,
   isEqual,
+  isGreaterThan,
   isGreaterThanOrEqual,
+  isLessThan,
   isLessThanOrEqual,
   isValidSemver,
+  parseSemver,
 } from './semver'
 
 describe('parseSemver', () => {
@@ -17,14 +17,22 @@ describe('parseSemver', () => {
     expect(parseSemver('10.20.30')).toEqual({ major: 10, minor: 20, patch: 30 })
   })
 
+  it('should parse versions with fewer than 3 parts', () => {
+    expect(parseSemver('1')).toEqual({ major: 1, minor: 0, patch: 0 })
+    expect(parseSemver('1.5')).toEqual({ major: 1, minor: 5, patch: 0 })
+  })
+
+  it('should return null for versions with more than 3 parts', () => {
+    expect(parseSemver('1.2.3.4')).toBeNull()
+    expect(parseSemver('1.2.3.4.5')).toBeNull()
+  })
+
   it('should handle strings with extra whitespace', () => {
     expect(parseSemver(' 1.2.3 ')).toEqual({ major: 1, minor: 2, patch: 3 })
     expect(parseSemver('  1.2.3  ')).toEqual({ major: 1, minor: 2, patch: 3 })
   })
 
   it('should return null for invalid semver strings', () => {
-    expect(parseSemver('1.2')).toBeNull()
-    expect(parseSemver('1.2.3.4')).toBeNull()
     expect(parseSemver('1.2.x')).toBeNull()
     expect(parseSemver('a.b.c')).toBeNull()
     expect(parseSemver('')).toBeNull()
@@ -68,7 +76,6 @@ describe('compareSemver', () => {
   it('should return null for invalid versions', () => {
     expect(compareSemver('1.2.3', 'invalid')).toBeNull()
     expect(compareSemver('invalid', '1.2.3')).toBeNull()
-    expect(compareSemver('1.2', '1.2.3')).toBeNull()
   })
 
   it('should prioritize major version differences', () => {
@@ -79,6 +86,21 @@ describe('compareSemver', () => {
   it('should prioritize minor version differences when major is equal', () => {
     expect(compareSemver('1.3.0', '1.2.99')).toBe(1)
     expect(compareSemver('1.2.99', '1.3.0')).toBe(-1)
+  })
+
+  it('should compare variable-length versions treating missing parts as 0', () => {
+    expect(compareSemver('1.5', '1.5.0')).toBe(0)
+    expect(compareSemver('1.5.0', '1.5')).toBe(0)
+    expect(compareSemver('1', '1.0.0')).toBe(0)
+    expect(compareSemver('1.5', '1.5.1')).toBe(-1)
+    expect(compareSemver('1.5.1', '1.5')).toBe(1)
+    expect(compareSemver('2', '1.9.9')).toBe(1)
+    expect(compareSemver('1.9.9', '2')).toBe(-1)
+  })
+
+  it('should return null for versions with more than 3 parts', () => {
+    expect(compareSemver('1.2.3.4', '1.2.3')).toBeNull()
+    expect(compareSemver('1.2.3', '1.2.3.4')).toBeNull()
   })
 })
 
@@ -135,6 +157,16 @@ describe('isGreaterThanOrEqual', () => {
     expect(isGreaterThanOrEqual('1.0.0', '2.0.0')).toBe(false)
     expect(isGreaterThanOrEqual('1.2.3', 'invalid')).toBe(false)
   })
+
+  it('should handle variable-length versions', () => {
+    expect(isGreaterThanOrEqual('1.5', '1.5')).toBe(true)
+    expect(isGreaterThanOrEqual('1.6', '1.5')).toBe(true)
+    expect(isGreaterThanOrEqual('1.4', '1.5')).toBe(false)
+    expect(isGreaterThanOrEqual('1.5.0', '1.5')).toBe(true)
+    expect(isGreaterThanOrEqual('1.5.1', '1.5')).toBe(true)
+    expect(isGreaterThanOrEqual('2', '1.5')).toBe(true)
+    expect(isGreaterThanOrEqual('1', '1.5')).toBe(false)
+  })
 })
 
 describe('isLessThanOrEqual', () => {
@@ -157,10 +189,18 @@ describe('isValidSemver', () => {
     expect(isValidSemver('10.20.30')).toBe(true)
   })
 
-  it('should return false for invalid semver strings', () => {
-    expect(isValidSemver('1.2')).toBe(false)
+  it('should return true for versions with 1-3 parts', () => {
+    expect(isValidSemver('1')).toBe(true)
+    expect(isValidSemver('1.2')).toBe(true)
+  })
+
+  it('should return false for versions with more than 3 parts', () => {
     expect(isValidSemver('1.2.3.4')).toBe(false)
+  })
+
+  it('should return false for invalid semver strings', () => {
     expect(isValidSemver('invalid')).toBe(false)
     expect(isValidSemver('')).toBe(false)
+    expect(isValidSemver('1.x.3')).toBe(false)
   })
 })

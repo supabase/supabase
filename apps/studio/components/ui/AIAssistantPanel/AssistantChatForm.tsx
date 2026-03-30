@@ -5,6 +5,7 @@ import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 import { ButtonTooltip } from '../ButtonTooltip'
+import type { AssistantModelId } from 'lib/ai/model.utils'
 import { type SqlSnippet } from './AIAssistant.types'
 import { ModelSelector } from './ModelSelector'
 import { getSnippetContent, SnippetRow } from './SnippetRow'
@@ -45,9 +46,9 @@ export interface FormProps {
   /* If currently editing an existing message */
   isEditing?: boolean
   /* The currently selected AI model */
-  selectedModel: 'gpt-5' | 'gpt-5-mini'
+  selectedModel: AssistantModelId
   /* Callback when a model is chosen */
-  onSelectModel: (model: 'gpt-5' | 'gpt-5-mini') => void
+  onSelectModel: (model: AssistantModelId) => void
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(

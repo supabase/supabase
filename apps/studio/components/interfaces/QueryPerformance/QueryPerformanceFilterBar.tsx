@@ -1,56 +1,63 @@
-import { useDebounce } from '@uidotdev/usehooks'
-import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { ChangeEvent, ReactNode, useEffect, useState } from 'react'
-
 import {
   NumericFilter,
   ReportsNumericFilter,
 } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { ReactNode, useEffect, useState } from 'react'
+
+import { FilterInput } from './components/FilterInput'
+import { FilterPill } from './components/FilterPill'
+import { IndexAdvisorFilter } from './components/IndexAdvisorFilter'
+import { RolesFilterDropdown } from './components/RolesFilterDropdown'
+import { SortIndicator } from './components/SortIndicator'
+import { SourceFilterDropdown } from './components/SourceFilterDropdown'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 
 export const QueryPerformanceFilterBar = ({
   actions,
   showRolesFilter = false,
+  showSourceFilter = false,
 }: {
   actions?: ReactNode
   showRolesFilter?: boolean
+  showSourceFilter?: boolean
 }) => {
-  const { data: project } = useSelectedProjectQuery()
   const { sort, clearSort } = useQueryPerformanceSort()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [
-    { search: searchQuery, roles: defaultFilterRoles, callsFilter, indexAdvisor },
+    {
+      search: searchQuery,
+      roles: defaultFilterRoles,
+      sources: defaultFilterSources,
+      callsFilter: callsFilterRaw,
+      totalTimeFilter: totalTimeFilterRaw,
+      indexAdvisor,
+    },
     setSearchParams,
   ] = useQueryStates({
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
-    callsFilter: parseAsJson((value) => value as NumericFilter | null).withDefault({
-      operator: '>=',
-      value: 0,
-    } as NumericFilter),
+    sources: parseAsArrayOf(parseAsString).withDefault([]),
+    callsFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
+    totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
+      value === null || value === undefined ? null : (value as NumericFilter)
+    ),
     indexAdvisor: parseAsString.withDefault('false'),
   })
-  const { data, isPending: isLoadingRoles } = useDatabaseRolesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
 
-  const [filters, setFilters] = useState<{ roles: string[] }>({
+  const callsFilter = callsFilterRaw ?? null
+  const totalTimeFilter = totalTimeFilterRaw ?? null
+
+  const [filters, setFilters] = useState<{ roles: string[]; sources: string[] }>({
     roles: defaultFilterRoles,
+    sources: defaultFilterSources,
   })
   const [inputValue, setInputValue] = useState(searchQuery)
-  const debouncedInputValue = useDebounce(inputValue, 500)
-  // const debouncedMinCalls = useDebounce(minCallsInput, 300)
-  const searchValue = inputValue.length === 0 ? inputValue : debouncedInputValue
 
   const onSearchQueryChange = (value: string) => {
     setSearchParams({ search: value || '' })
@@ -61,92 +68,115 @@ export const QueryPerformanceFilterBar = ({
     setSearchParams({ roles })
   }
 
-  const onIndexAdvisorChange = (options: string[]) => {
-    setSearchParams({ indexAdvisor: options.includes('true') ? 'true' : 'false' })
+  const onFilterSourcesChange = (sources: string[]) => {
+    setFilters({ ...filters, sources })
+    setSearchParams({ sources })
+  }
+
+  const debouncedInputValue = useDebouncedValue(inputValue, 300)
+
+  const onIndexAdvisorToggle = () => {
+    setSearchParams({ indexAdvisor: indexAdvisor === 'true' ? 'false' : 'true' })
   }
 
   useEffect(() => {
-    onSearchQueryChange(searchValue)
+    onSearchQueryChange(debouncedInputValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue])
+  }, [debouncedInputValue])
 
-  const indexAdvisorOptions = [{ value: 'true', label: 'Index Advisor' }]
+  const getCallsFilterDisplay = () => {
+    if (!callsFilter) return null
+    return `${callsFilter.operator} ${callsFilter.value}`
+  }
+
+  const getTotalTimeFilterDisplay = () => {
+    if (!totalTimeFilter) return null
+    return `${totalTimeFilter.operator} ${totalTimeFilter.value}`
+  }
 
   return (
     <div className="px-4 py-1.5 bg-surface-200 border-t -mt-px flex justify-between items-center overflow-x-auto overflow-y-hidden w-full flex-shrink-0">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
-          <Input
-            size="tiny"
-            autoComplete="off"
-            icon={<Search />}
-            value={inputValue}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-            name="keyword"
-            id="keyword"
-            placeholder="Filter by query"
-            className="w-56"
-            actions={[
-              inputValue && (
-                <Button
-                  size="tiny"
-                  type="text"
-                  icon={<X />}
-                  onClick={() => setInputValue('')}
-                  className="p-0 h-5 w-5"
-                />
-              ),
-            ]}
-          />
+          <FilterInput value={inputValue} onChange={setInputValue} />
 
-          <ReportsNumericFilter
-            label="Calls"
-            value={callsFilter}
-            onChange={(value) => setSearchParams({ callsFilter: value })}
-            operators={['=', '>=', '<=', '>', '<', '!=']}
-            defaultOperator=">="
-            placeholder="e.g. 100"
-            min={0}
-            className="w-auto"
-          />
+          {callsFilter ? (
+            <FilterPill
+              label="Calls"
+              value={getCallsFilterDisplay() || ''}
+              onClear={(e) => {
+                e.stopPropagation()
+                setSearchParams({ callsFilter: null })
+              }}
+            />
+          ) : (
+            <ReportsNumericFilter
+              label="Calls"
+              value={callsFilter}
+              onChange={(value) => setSearchParams({ callsFilter: value })}
+              operators={['=', '>=', '<=', '>', '<', '!=']}
+              defaultOperator=">="
+              placeholder="e.g. 100"
+              min={0}
+              className="w-auto"
+            />
+          )}
 
-          {showRolesFilter && (
-            <FilterPopover
-              name="Roles"
-              options={roles}
-              labelKey="name"
-              valueKey="name"
-              activeOptions={isLoadingRoles ? [] : filters.roles}
-              onSaveFilters={onFilterRolesChange}
-              className="w-56"
+          {totalTimeFilter ? (
+            <FilterPill
+              label="Total Time"
+              value={getTotalTimeFilterDisplay() || ''}
+              onClear={(e) => {
+                e.stopPropagation()
+                setSearchParams({ totalTimeFilter: null })
+              }}
+            />
+          ) : (
+            <ReportsNumericFilter
+              label="Total Time"
+              value={totalTimeFilter}
+              onChange={(value) => setSearchParams({ totalTimeFilter: value })}
+              operators={['=', '>=', '<=', '>', '<', '!=']}
+              defaultOperator=">"
+              placeholder="e.g. 1000"
+              min={0}
+              className="w-auto"
+            />
+          )}
+
+          {showRolesFilter &&
+            (filters.roles && filters.roles.length > 0 ? (
+              <FilterPill
+                label="Roles"
+                value={filters.roles.join(', ')}
+                onClear={(e) => {
+                  e.stopPropagation()
+                  setFilters({ ...filters, roles: [] })
+                  setSearchParams({ ...filters, roles: [] })
+                }}
+              />
+            ) : (
+              <RolesFilterDropdown
+                activeOptions={filters.roles}
+                onSaveFilters={onFilterRolesChange}
+              />
+            ))}
+
+          {showSourceFilter && (
+            <SourceFilterDropdown
+              activeOptions={filters.sources}
+              onSaveFilters={onFilterSourcesChange}
             />
           )}
 
           {isIndexAdvisorEnabled && (
-            <FilterPopover
-              name="Warnings"
-              options={indexAdvisorOptions}
-              labelKey="label"
-              valueKey="value"
-              activeOptions={indexAdvisor === 'true' ? ['true'] : []}
-              onSaveFilters={onIndexAdvisorChange}
-              className="w-56"
+            <IndexAdvisorFilter
+              isActive={indexAdvisor === 'true'}
+              onToggle={onIndexAdvisorToggle}
             />
           )}
 
-          {sort && (
-            <div className="text-xs border rounded-md px-1.5 md:px-2.5 py-1 h-[26px] flex items-center gap-x-2">
-              <p className="md:inline-flex gap-x-1 hidden truncate">
-                Sort: {sort.column} <span className="text-foreground-lighter">{sort.order}</span>
-              </p>
-              <Tooltip>
-                <TooltipTrigger onClick={clearSort}>
-                  <X size={14} className="text-foreground-light hover:text-foreground" />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Clear sort</TooltipContent>
-              </Tooltip>
-            </div>
-          )}
+          {sort && <SortIndicator sort={sort} onClearSort={clearSort} />}
         </div>
       </div>
       <div className="flex gap-2 items-center pl-2">{actions}</div>

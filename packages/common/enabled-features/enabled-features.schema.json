@@ -61,6 +61,10 @@
       "type": "boolean",
       "description": "Show the providers section in the authentication Sign In / Providers page"
     },
+    "authentication:show_custom_providers": {
+      "type": "boolean",
+      "description": "Show the custom oAuth providers section in the authentication Sign In / Providers page"
+    },
     "authentication:show_manual_linking": {
       "type": "boolean",
       "description": "Show the manual linking toggle in the authentication Sign In / Providers page under User Signups"

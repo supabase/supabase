@@ -310,7 +310,7 @@ const ProjectLinker = ({
                     icon={
                       <div>
                         {selectedForeignProject
-                          ? getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon
+                          ? (getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon)
                           : integrationIcon}
                       </div>
                     }
@@ -328,7 +328,6 @@ const ProjectLinker = ({
                   side="bottom"
                   align="center"
                   sameWidthAsTrigger
-                  portal
                 >
                   <Command_Shadcn_>
                     <CommandInput_Shadcn_ placeholder="Search for a project" />

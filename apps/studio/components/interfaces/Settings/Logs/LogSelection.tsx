@@ -1,21 +1,21 @@
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
-  CodeBlock,
+  cn,
+  copyToClipboard,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
-  copyToClipboard,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+
 import type { LogData, QueryType } from './Logs.types'
 import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
+import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
 
 export interface LogSelectionProps {
   log?: LogData

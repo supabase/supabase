@@ -11,8 +11,9 @@ import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { FDW } from 'data/fdw/fdws-query'
 import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
@@ -62,6 +63,8 @@ export const EditWrapperSheet = ({
     undefined
   )
   const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
+  const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
+  const [pendingFormState, setPendingFormState] = useState<Record<string, string> | null>(null)
   const hasChangesRef = useRef(false)
 
   const initialValues = {
@@ -94,21 +97,19 @@ export const EditWrapperSheet = ({
     if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
     if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
       errors.tables = 'Please add at least one table'
-    if (!isEmpty(errors)) return setFormErrors(errors)
+    if (!isEmpty(errors)) {
+      setFormErrors(errors)
+      return
+    }
 
-    updateFDW({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      wrapper,
-      wrapperMeta,
-      formState: { ...values, server_name: `${wrapper_name}_server` },
-      tables: wrapperTables,
-    })
+    setFormErrors({})
+    setPendingFormState({ ...values, server_name: `${wrapper_name}_server` })
+    setIsUpdateConfirmationOpen(true)
   }
 
   const checkIsDirty = useCallback(() => hasChangesRef.current, [])
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
   })
@@ -362,7 +363,42 @@ export const EditWrapperSheet = ({
         </Form>
       </div>
 
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <ConfirmationModal
+        visible={isUpdateConfirmationOpen}
+        title="Recreate wrapper?"
+        size="medium"
+        variant="warning"
+        confirmLabel="Recreate wrapper"
+        confirmLabelLoading="Recreating wrapper"
+        loading={isSaving}
+        onCancel={() => {
+          setIsUpdateConfirmationOpen(false)
+          setPendingFormState(null)
+          onClose()
+        }}
+        onConfirm={() => {
+          if (pendingFormState === null) return
+          updateFDW({
+            projectRef: project?.ref,
+            connectionString: project?.connectionString,
+            wrapper,
+            wrapperMeta,
+            formState: pendingFormState,
+            tables: wrapperTables,
+          })
+          setIsUpdateConfirmationOpen(false)
+          setPendingFormState(null)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Saving changes will drop the existing wrapper and recreate it. Foreign servers and tables
+          will be recreated, and dependent objects like functions or views that reference those
+          tables may need to be updated manually afterwards.
+        </p>
+        <p className="text-sm text-foreground-light mt-2">Are you sure you want to continue?</p>
+      </ConfirmationModal>
+
+      <DiscardChangesConfirmationDialog {...modalProps} />
 
       <WrapperTableEditor
         visible={isEditingTable}
@@ -377,18 +413,3 @@ export const EditWrapperSheet = ({
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

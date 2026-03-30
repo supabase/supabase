@@ -45,7 +45,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash name=Terminal
-      cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-url-polyfill
+      cd my-app && npx expo install @supabase/supabase-js react-native-url-polyfill expo-sqlite
       ```
 
     </StepHikeCompact.Code>
@@ -82,7 +82,7 @@ hideToc: true
 
     Create a helper file at `lib/supabase.ts` to initialize the Supabase client using the environment variables.
 
-    The code below uses [AsyncStorage](https://www.npmjs.com/package/@react-native-async-storage/async-storage) to persist the user session in your app.
+    The code below uses Expo's localStorage polyfill to persist authentication sessions.
 
     </StepHikeCompact.Details>
 
@@ -91,14 +91,14 @@ hideToc: true
       ```ts name=lib/supabase.ts
       import 'react-native-url-polyfill/auto'
       import { createClient } from '@supabase/supabase-js'
-      import AsyncStorage from '@react-native-async-storage/async-storage'
+      import 'expo-sqlite/localStorage/install';
 
       const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
       const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
       export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
-          storage: AsyncStorage,
+          storage: localStorage,
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,

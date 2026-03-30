@@ -1,9 +1,9 @@
 import { ColumnDef } from '@tanstack/react-table'
-
-import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
 import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
 import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
@@ -63,7 +63,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     // Date column - always visible
     {
       accessorKey: 'date',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+      header: 'Date',
       cell: ({ row }) => {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
@@ -109,6 +109,11 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       header: '',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['status']>('status')
+        const label =
+          value != null
+            ? (STATUS_CODE_LABELS[String(value) as keyof typeof STATUS_CODE_LABELS] ??
+              'Unknown status')
+            : null
         return (
           <div className="flex items-center gap-1">
             {/* {row.original.auth_user && (
@@ -117,10 +122,24 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
                 <AuthUserHoverCard authUser={row.original.auth_user} />
               </div>
             )} */}
-            <DataTableColumnStatusCode
-              value={value}
-              level={row.getValue<ColumnSchema['level']>('level')}
-            />
+            {label ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <DataTableColumnStatusCode
+                      value={value}
+                      level={row.getValue<ColumnSchema['level']>('level')}
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{label}</TooltipContent>
+              </Tooltip>
+            ) : (
+              <DataTableColumnStatusCode
+                value={value}
+                level={row.getValue<ColumnSchema['level']>('level')}
+              />
+            )}
           </div>
         )
       },
@@ -175,7 +194,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Event message" />,
+      header: 'Event message',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logCount = row.original.log_count

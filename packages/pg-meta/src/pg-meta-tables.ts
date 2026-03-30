@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { coalesceRowsToArray, filterByList } from './helpers'
 import { ident, literal } from './pg-format'
@@ -140,14 +141,22 @@ type TableCreateParams = {
   name: string
   schema?: string
   comment?: string | null
+  no_transaction?: boolean
 }
 
-function create({ name, schema = 'public', comment }: TableCreateParams): { sql: string } {
+function create({ name, schema = 'public', comment, no_transaction = false }: TableCreateParams): {
+  sql: string
+} {
   const tableSql = `CREATE TABLE ${ident(schema)}.${ident(name)} ();`
   const commentSql =
     comment != undefined
       ? `COMMENT ON TABLE ${ident(schema)}.${ident(name)} IS ${literal(comment)};`
       : ''
+
+  if (no_transaction) {
+    const sql = `${tableSql} ${commentSql}`
+    return { sql }
+  }
   const sql = `BEGIN; ${tableSql} ${commentSql} COMMIT;`
   return { sql }
 }

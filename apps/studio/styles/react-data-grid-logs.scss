@@ -13,6 +13,11 @@
     text-overflow: clip;
   }
 
+  .rdg-cell {
+    display: flex;
+    align-items: center;
+  }
+
   .rdg-cell:first-child {
     @apply pl-5;
   }
@@ -46,6 +51,11 @@
     @apply text-foreground-light font-normal #{!important};
     overflow: visible;
     text-overflow: clip;
+  }
+
+  .rdg-cell {
+    display: flex;
+    align-items: center;
   }
 
   .rdg-cell:first-child {

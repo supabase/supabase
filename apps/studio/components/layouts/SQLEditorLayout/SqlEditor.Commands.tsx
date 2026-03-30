@@ -1,8 +1,4 @@
 import { type PostgresColumn } from '@supabase/postgres-meta'
-import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
@@ -13,14 +9,17 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { useProfile } from 'lib/profile'
+import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect, useMemo, useRef } from 'react'
 import {
   cn,
-  CodeBlock,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
@@ -208,6 +207,7 @@ function SnippetSelector({
           <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
               <CommandItem_Shadcn_
+                key={snippet.id}
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
                 value={snippetValue(snippet)}

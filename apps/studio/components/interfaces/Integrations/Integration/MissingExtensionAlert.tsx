@@ -1,7 +1,6 @@
-import { useState } from 'react'
-
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { EnableExtensionModal } from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
+import { useState } from 'react'
 import { Button } from 'ui'
 
 export const MissingExtensionAlert = ({ extension }: { extension: DatabaseExtension }) => {

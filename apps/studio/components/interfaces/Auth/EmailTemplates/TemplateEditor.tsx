@@ -29,6 +29,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SpamValidation } from './SpamValidation'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -203,21 +204,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }, [authConfig, properties, messageSlug, form])
 
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [hasUnsavedChanges])
-
-  useEffect(() => {
     if (projectRef && id && !!authConfig) {
       const [subjectKey] = Object.keys(properties)
 
@@ -376,6 +362,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           </>
         )}
       </form>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
     </Form_Shadcn_>
   )
 }

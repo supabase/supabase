@@ -1,18 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Terminal } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { PostgresTrigger } from '@supabase/postgres-meta'
+import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import FormBoxEmpty from 'components/ui/FormBoxEmpty'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
+import { Terminal } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -33,8 +32,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import ChooseFunctionForm from './ChooseFunctionForm'
 import {
   TRIGGER_ENABLED_MODES,
@@ -135,7 +135,7 @@ export const TriggerSheet = ({
   })
   const { function_name, function_schema } = form.watch()
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -189,7 +189,7 @@ export const TriggerSheet = ({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={confirmOnClose}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent size="lg" className="flex flex-col gap-0">
           <SheetHeader>
             <SheetTitle>
@@ -481,7 +481,7 @@ export const TriggerSheet = ({
             </Button>
           </SheetFooter>
 
-          <CloseConfirmationModal {...closeConfirmationModalProps} />
+          <DiscardChangesConfirmationDialog {...modalProps} />
         </SheetContent>
       </Sheet>
 
@@ -489,25 +489,10 @@ export const TriggerSheet = ({
         visible={showFunctionSelector}
         setVisible={setShowFunctionSelector}
         onChange={(fn) => {
-          form.setValue('function_name', fn.name)
-          form.setValue('function_schema', fn.schema)
+          form.setValue('function_name', fn.name, { shouldDirty: true })
+          form.setValue('function_schema', fn.schema, { shouldDirty: true })
         }}
       />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

@@ -20,7 +20,7 @@ export interface AdmonitionProps {
     title?: ComponentProps<typeof AlertTitle_Shadcn_>
     description?: ComponentProps<typeof AlertDescription_Shadcn_>
   }
-  layout?: 'horizontal' | 'vertical'
+  layout?: 'horizontal' | 'vertical' | 'responsive'
   actions?: ReactNode
   icon?: ReactNode
   className?: string
@@ -55,11 +55,11 @@ const InfoIcon = () => (
   </svg>
 )
 
-const WarningIcon = () => (
+export const WarningIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 22 20"
-    className="w-6 h-6"
+    className={cn('w-6 h-6', className)}
     fill="currentColor"
   >
     <path
@@ -111,6 +111,8 @@ export const Admonition = forwardRef<
         className={cn(
           // Handle occasional background elements
           'overflow-hidden',
+          // Container query context for responsive layout
+          layout === 'responsive' && '@container',
           // SVG icon
           admonitionSVG({ type: typeMapped }),
           props.className
@@ -126,9 +128,10 @@ export const Admonition = forwardRef<
         <div
           className={cn(
             'flex',
-            layout === 'vertical'
-              ? 'flex-col'
-              : 'flex-row items-center justify-between gap-x-6 lg:gap-x-8'
+            layout === 'vertical' && 'flex-col',
+            layout === 'horizontal' && 'flex-row items-center justify-between gap-x-6 lg:gap-x-8',
+            layout === 'responsive' &&
+              'flex-col @md:flex-row @md:items-center @md:justify-between @md:gap-x-6 @lg:gap-x-8'
           )}
         >
           {label || title ? (
@@ -167,7 +170,9 @@ export const Admonition = forwardRef<
             <div
               className={cn(
                 'flex flex-row gap-3',
-                layout === 'vertical' ? 'mt-3 items-start' : 'items-center'
+                layout === 'vertical' && 'mt-3 items-start',
+                layout === 'horizontal' && 'items-center',
+                layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
               )}
             >
               {actions}
