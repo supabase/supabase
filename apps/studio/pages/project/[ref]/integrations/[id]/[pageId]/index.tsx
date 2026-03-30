@@ -1,12 +1,10 @@
 import { useFlag, useParams } from 'common'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
@@ -47,6 +45,7 @@ const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { ref, id, pageId, childId } = useParams()
+
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
@@ -88,10 +87,10 @@ const IntegrationPage: NextPageWithLayout = () => {
     if (!integration?.navigation) return []
 
     // Only show navigation if the integration is installed, or if we're on the overview page
-    const showNavigation = installation || pageId === 'overview'
+    const showNavigation = isInstalled || pageId === 'overview'
     if (!showNavigation) return []
 
-    const availableTabs = installation
+    const availableTabs = isInstalled
       ? integration.navigation
       : integration.navigation.filter((tab) => tab.route === 'overview')
 
@@ -100,7 +99,7 @@ const IntegrationPage: NextPageWithLayout = () => {
       href: `/project/${ref}/integrations/${id}/${nav.route}`,
       active: pageId === nav.route,
     }))
-  }, [integration, ref, id, pageId, installation])
+  }, [integration, pageId, isInstalled, ref, id])
 
   useEffect(() => {
     // if the integration is not installed, redirect to the overview page
@@ -108,12 +107,12 @@ const IntegrationPage: NextPageWithLayout = () => {
       router &&
       router?.isReady &&
       !isInstalledIntegrationsLoading &&
-      !installation &&
+      !isInstalled &&
       pageId !== 'overview'
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isInstalledIntegrationsLoading, pageId, router, ref, id])
+  }, [isInstalled, isInstalledIntegrationsLoading, pageId, router, ref, id])
 
   // Determine page title, icon, and subtitle based on state
   const pageTitle = integration?.name || 'Integration not found'
