@@ -9,6 +9,7 @@ import pgMeta, {
   getEnableRLSSQL,
   getRemoveForeignKeySQL,
   getUpdateIdentitySequenceSQL,
+  getUpdateSerialSequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
@@ -1151,4 +1152,15 @@ const updateForeignKeys = async ({
       foreignKeys: relationsToUpdate,
     })
   }
+}
+export const getUpdateSerialSequenceSQL = ({
+  schema,
+  table,
+  column,
+}: {
+  schema: string
+  table: string
+  column: string
+}) => {
+  return `SELECT setval(pg_get_serial_sequence('${ident(schema)}.${ident(table)}', '${column}'), COALESCE((SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)}), 1))`
 }
