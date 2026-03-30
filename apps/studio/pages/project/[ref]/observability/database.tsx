@@ -129,9 +129,7 @@ const DatabaseUsage = () => {
   const entitledFeatures = getEntitlementSetValues()
 
   const isSpendCapEnabled =
-    entitledFeatures.includes('database') &&
-    !org?.usage_billing_enabled &&
-    project?.cloud_provider !== 'FLY'
+    entitledFeatures.includes('database') && !org?.usage_billing_enabled && true
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,

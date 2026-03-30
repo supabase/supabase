@@ -1,7 +1,6 @@
-import Link from 'next/link'
-
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
 import { Badge, NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
@@ -26,7 +25,7 @@ function DatabaseBackupsNav({ active }: Props) {
       href: `/project/${ref}/database/backups/pitr`,
     },
     {
-      enabled: databaseRestoreToNewProject && cloud_provider !== 'FLY',
+      enabled: databaseRestoreToNewProject,
       id: 'rtnp',
       label: (
         <div className="flex items-center gap-2">

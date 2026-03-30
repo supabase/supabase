@@ -78,7 +78,7 @@ export const InfrastructureInfo = () => {
     <>
       <ScaffoldDivider />
 
-      {project?.cloud_provider !== 'FLY' && showReplication && (
+      {showReplication && (
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
             <NoticeBar

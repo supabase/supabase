@@ -26,7 +26,6 @@ const ReportsMenu = () => {
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
 
-  // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(

@@ -47,7 +47,7 @@ export function DiskSizeField({
 
   const { error: diskAttributesError, isError: isDiskAttributesError } = useDiskAttributesQuery(
     { projectRef },
-    { enabled: project && project.cloud_provider !== 'FLY' }
+    { enabled: !!project }
   )
 
   const {
@@ -58,7 +58,7 @@ export function DiskSizeField({
     {
       projectRef: projectRef,
     },
-    { enabled: project && project.cloud_provider !== 'FLY' }
+    { enabled: !!project }
   )
 
   const error = diskUtilError || diskAttributesError

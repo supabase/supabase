@@ -236,8 +236,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
-            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
         {(isLoading || isLoadingProject) && (
           <Loader2 className="animate-spin text-foreground-light" />
         )}
