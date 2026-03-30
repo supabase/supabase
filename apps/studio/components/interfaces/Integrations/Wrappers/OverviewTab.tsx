@@ -15,7 +15,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
-  Separator,
   Sheet,
   SheetContent,
   WarningIcon,
@@ -24,7 +23,6 @@ import {
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
-import { useInstalledIntegrations } from '../Landing/useInstalledIntegrations'
 import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
@@ -60,8 +58,8 @@ const WrapperOverviewContent = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-5">
-        Recent wrappers
+      <div className="flex flex-col gap-y-5">
+        <p>Recent wrappers</p>
         <WrapperTable />
       </div>
 
@@ -70,10 +68,8 @@ const WrapperOverviewContent = () => {
           <SheetContent size="lg" tabIndex={undefined}>
             <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
-              onDirty={(dirty) => setIsDirty(dirty)}
-              onClose={() => {
-                setCreateWrapperShown(false)
-              }}
+              onDirty={setIsDirty}
+              onClose={() => setCreateWrapperShown(false)}
               onCloseWithConfirmation={confirmOnClose}
             />
           </SheetContent>
