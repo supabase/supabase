@@ -13,7 +13,7 @@
     "transform-tokens": "node ./transformTokens.js",
     "extract-design-tokens": "node internals/tokens/extract-design-tokens.js",
     "generate-styles": "pnpm run extract-design-tokens && pnpm run transform-tokens && pnpm run cleanse-css-for-tailwind && pnpm run generate-demo-tailwind-classes",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
     "test:report": "open coverage/lcov-report/index.html"

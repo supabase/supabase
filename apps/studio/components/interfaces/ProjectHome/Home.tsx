@@ -21,7 +21,7 @@ import type { ConnectSectionVariant } from './ConnectSection.config'
 import { CustomReportSection } from './CustomReportSection'
 import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
 import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
-import { DEFAULT_SECTION_ORDER, mergeSectionOrder, getSectionVisibility } from './Home.utils'
+import { DEFAULT_SECTION_ORDER, getSectionVisibility, mergeSectionOrder } from './Home.utils'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
 
 export const ProjectHome = () => {
@@ -94,14 +94,14 @@ export const ProjectHome = () => {
       <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
         <ScaffoldSection
           isFullWidth
-          className={cn(isPaused ? 'h-full flex justify-center !p-0' : 'pt-16 pb-0')}
+          className={cn(isPaused ? 'h-full flex justify-center !p-0' : 'pb-0')}
         >
           <TopSection />
         </ScaffoldSection>
       </ScaffoldContainer>
       {!isPaused && (
         <ScaffoldContainer size="large">
-          <ScaffoldSection isFullWidth className="gap-16 pb-32">
+          <ScaffoldSection isFullWidth className="gap-12 pb-32">
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
               <SortableContext
                 items={sectionOrder.filter((id) => {

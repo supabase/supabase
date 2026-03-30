@@ -19321,6 +19321,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_read"]
           }
         ],
         "summary": "Gets realtime configuration",
@@ -19433,6 +19436,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_write"]
           }
         ],
         "summary": "Updates realtime configuration",
@@ -19477,6 +19483,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_write"]
           }
         ],
         "summary": "Shutdowns realtime connections for a project",
