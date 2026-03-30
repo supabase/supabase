@@ -1,37 +1,45 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { ExternalLink, Info } from 'lucide-react'
-import Link from 'next/link'
-import { SetStateAction } from 'react'
-import { toast } from 'sonner'
-import { number, object } from 'yup'
-
 import { useParams } from 'common'
 import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import dayjs from 'dayjs'
+import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { ExternalLink, Info } from 'lucide-react'
+import Link from 'next/link'
+import { SetStateAction, useEffect, useMemo } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  Form,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
   InfoIcon,
-  InputNumber,
+  Input_Shadcn_,
   Modal,
+  PrePostTab,
   WarningIcon,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean
   hideModal: (value: SetStateAction<boolean>) => void
   loading: boolean
 }
+
+const formId = 'disk-size-form'
+const maxDiskSize = 200
 
 const DiskSizeConfigurationModal = ({
   visible,
@@ -69,27 +77,44 @@ const DiskSizeConfigurationModal = ({
       },
     })
 
-  const confirmResetDbPass = async (values: { [prop: string]: any }) => {
+  const currentDiskSize = project?.volumeSizeGb ?? 0
+
+  const INITIAL_VALUES = useMemo(
+    () => ({
+      'new-disk-size': currentDiskSize,
+    }),
+    [currentDiskSize]
+  )
+
+  const diskSizeValidationSchema = useMemo(
+    () =>
+      z.object({
+        'new-disk-size': z.coerce
+          .number({ required_error: 'Please enter a GB amount you want to resize the disk up to.' })
+          .min(Number(currentDiskSize ?? 0), `Must be at least ${currentDiskSize} GB`)
+          // to do, update with max_disk_volume_size_gb
+          .max(Number(maxDiskSize), `Must not be more than ${maxDiskSize} GB`),
+      }),
+    [currentDiskSize]
+  )
+
+  const handleSubmit: SubmitHandler<z.infer<typeof diskSizeValidationSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
     const volumeSize = values['new-disk-size']
     updateProjectUsage({ projectRef, volumeSize })
   }
 
-  const currentDiskSize = project?.volumeSizeGb ?? 0
-
-  const maxDiskSize = 200
-
-  const INITIAL_VALUES = {
-    'new-disk-size': currentDiskSize,
-  }
-
-  const diskSizeValidationSchema = object({
-    'new-disk-size': number()
-      .required('Please enter a GB amount you want to resize the disk up to.')
-      .min(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
-      // to do, update with max_disk_volume_size_gb
-      .max(Number(maxDiskSize), 'Must not be more than 200 GB'),
+  const form = useForm<z.infer<typeof diskSizeValidationSchema>>({
+    resolver: zodResolver(diskSizeValidationSchema),
+    defaultValues: INITIAL_VALUES,
   })
+  const { reset, formState } = form
+  const { isDirty } = formState
+
+  useEffect(() => {
+    if (isDirty) return
+    reset(INITIAL_VALUES)
+  }, [INITIAL_VALUES, isDirty, reset])
 
   return (
     <Modal
@@ -107,86 +132,100 @@ const DiskSizeConfigurationModal = ({
         </div>
       ) : projectSubscriptionData?.usage_billing_enabled === true &&
         hasAccessToDiskModifications ? (
-        <Form
-          name="disk-resize-form"
-          initialValues={INITIAL_VALUES}
-          validationSchema={diskSizeValidationSchema}
-          onSubmit={confirmResetDbPass}
-        >
-          {() =>
-            currentDiskSize >= maxDiskSize ? (
-              <Alert_Shadcn_ variant="warning" className="rounded-t-none border-0">
-                <WarningIcon />
-                <AlertTitle_Shadcn_>Maximum manual disk size increase reached</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <p>
-                    You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
-                    need more than this, contact us via support for help.
-                  </p>
-                  <Button asChild type="default" className="mt-3">
-                    <SupportLink
-                      queryParams={{
-                        projectRef,
-                        category: SupportCategories.PERFORMANCE_ISSUES,
-                        subject: 'Increase disk size beyond 200GB',
-                      }}
-                    >
-                      Contact support
-                    </SupportLink>
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            ) : (
-              <>
-                <Modal.Content className="w-full space-y-4">
-                  <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
-                    <Info size={16} />
-                    <AlertTitle_Shadcn_>
-                      This operation is only possible every 4 hours
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      <div className="mb-4">
-                        {isAbleToResizeDatabase
-                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}`
-                          : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
-                      </div>
-                      <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                        <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
-                          Read more about disk management
-                        </Link>
-                      </Button>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                  <InputNumber
-                    required
-                    id="new-disk-size"
-                    label="New disk size"
-                    labelOptional="GB"
-                    disabled={!isAbleToResizeDatabase}
-                  />
-                </Modal.Content>
-                <Modal.Separator />
-                <Modal.Content className="flex space-x-2 justify-end">
-                  <Button type="default" onClick={() => hideModal(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    htmlType="submit"
-                    type="primary"
-                    disabled={!isAbleToResizeDatabase || isUpdatingDiskSize}
-                    loading={isUpdatingDiskSize}
+        <>
+          {currentDiskSize >= maxDiskSize ? (
+            <Alert_Shadcn_ variant="warning" className="rounded-t-none border-0">
+              <WarningIcon />
+              <AlertTitle_Shadcn_>Maximum manual disk size increase reached</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <p>
+                  You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
+                  need more than this, contact us via support for help.
+                </p>
+                <Button asChild type="default" className="mt-3">
+                  <SupportLink
+                    queryParams={{
+                      projectRef,
+                      category: SupportCategories.PERFORMANCE_ISSUES,
+                      subject: 'Increase disk size beyond 200GB',
+                    }}
                   >
-                    Update disk size
-                  </Button>
-                </Modal.Content>
-              </>
-            )
-          }
-        </Form>
+                    Contact support
+                  </SupportLink>
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          ) : (
+            <>
+              <Modal.Content className="w-full space-y-4">
+                <Alert_Shadcn_ variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
+                  <Info size={16} />
+                  <AlertTitle_Shadcn_>
+                    This operation is only possible every 4 hours
+                  </AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    <div className="mb-4">
+                      {isAbleToResizeDatabase
+                        ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}`
+                        : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
+                            'DD MMM YYYY, HH:mm (ZZ)'
+                          )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                    </div>
+                    <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                      <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
+                        Read more about disk management
+                      </Link>
+                    </Button>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+                <Form_Shadcn_ {...form}>
+                  <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} noValidate>
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="new-disk-size"
+                      disabled={!isAbleToResizeDatabase}
+                      render={({ field }) => (
+                        <FormItemLayout
+                          name="new-disk-size"
+                          layout="vertical"
+                          label="New disk size"
+                        >
+                          <PrePostTab postTab="GB" className="w-full">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                {...field}
+                                id="new-disk-size"
+                                type="number"
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                              />
+                            </FormControl_Shadcn_>
+                          </PrePostTab>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </form>
+                </Form_Shadcn_>
+              </Modal.Content>
+              <Modal.Separator />
+              <Modal.Content className="flex space-x-2 justify-end">
+                <Button type="default" onClick={() => hideModal(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  form={formId}
+                  htmlType="submit"
+                  type="primary"
+                  disabled={!isAbleToResizeDatabase || isUpdatingDiskSize || !isDirty}
+                  loading={isUpdatingDiskSize}
+                >
+                  Update disk size
+                </Button>
+              </Modal.Content>
+            </>
+          )}
+        </>
       ) : (
         <Alert_Shadcn_ className="border-none">
           <InfoIcon />
