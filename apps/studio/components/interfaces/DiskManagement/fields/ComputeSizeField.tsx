@@ -375,6 +375,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               <Button
                 type="default"
                 size="tiny"
+                className="mt-2"
                 onClick={() => setShowAllSizes((prev) => !prev)}
                 icon={
                   <ChevronRight
