@@ -171,7 +171,7 @@ const HeaderBreadcrumbs = ({
         const isActive = crumb.index === breadcrumbs.length - 1
 
         return (
-          <div className="flex shrink-0 items-center" key={crumb.name}>
+          <div className="flex shrink-0 items-center" key={`${crumb.index}-${crumb.name}`}>
             {idx !== 0 && (
               <ChevronRight size={14} strokeWidth={2} className="text-foreground-muted mx-1" />
             )}
