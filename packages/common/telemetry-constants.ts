@@ -3019,27 +3019,6 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
- * User was exposed to the pricing calculator experiment on the /pricing page.
- *
- * @group Events
- * @source www
- * @page /pricing
- */
-export interface PricingCalculatorExperimentExposedEvent {
-  action: 'pricing_calculator_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'pricingCalculatorExperiment'
-    /**
-     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
-     */
-    variant: 'control' | 'test'
-  }
-}
-
-/**
  * User clicked the Run button in the log explorer.
  *
  * @group Events
@@ -3054,6 +3033,30 @@ export interface LogExplorerQueryRunButtonClickedEvent {
      */
     is_saved_query: boolean
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Navigate action in the storage explorer header.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateClickedEvent {
+  action: 'storage_explorer_navigate_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted a folder path from the storage explorer Navigate action.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateSubmittedEvent {
+  action: 'storage_explorer_navigate_submitted'
   groups: TelemetryGroups
 }
 
@@ -3131,6 +3134,8 @@ export type TelemetryEvent =
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
   | LogExplorerQueryRunButtonClickedEvent
+  | StorageExplorerNavigateClickedEvent
+  | StorageExplorerNavigateSubmittedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -3224,4 +3229,3 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
-  | PricingCalculatorExperimentExposedEvent

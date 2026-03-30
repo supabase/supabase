@@ -1,15 +1,15 @@
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { SqlEditor } from 'icons'
+import { Edit, Trash } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { DropdownMenuItem, DropdownMenuSeparator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
-import { Edit, Trash } from 'lucide-react'
-import { SqlEditor } from 'icons'
 import { LogsSidebarItem } from './SidebarV2/SidebarItem'
 
 interface SavedQueriesItemProps {
@@ -39,7 +39,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
       toast.error(`Failed to delete saved query: ${error.message}`)
     },
   })
-  const { mutate: updateContent } = useContentUpsertMutation({
+  const { mutateAsync: updateContent } = useContentUpsertMutation({
     onSuccess: () => {
       setShowUpdateModal(false)
       toast.success('Successfully updated query')
@@ -56,7 +56,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
 
   const onConfirmUpdate = async ({ name, description }: { name: string; description?: string }) => {
     if (!ref || typeof ref !== 'string') return console.error('Invalid project reference')
-    updateContent({
+    await updateContent({
       projectRef: ref,
       payload: {
         ...item,
@@ -110,14 +110,13 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
         </p>
       </ConfirmationModal>
       <UpdateSavedQueryModal
+        header="Update saved query"
         visible={showUpdateModal}
         initialValues={{ name: item.name, description: item.description }}
         onCancel={() => {
           setShowUpdateModal(false)
         }}
-        onSubmit={(newValues) => {
-          onConfirmUpdate(newValues)
-        }}
+        onSubmit={onConfirmUpdate}
       />
     </>
   )
