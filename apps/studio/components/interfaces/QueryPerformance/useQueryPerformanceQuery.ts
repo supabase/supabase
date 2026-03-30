@@ -7,7 +7,11 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
-import { QueryPerformanceRow, QueryPerformanceSort, QueryPerformanceSQLParams } from './QueryPerformance.types'
+import {
+  QueryPerformanceRow,
+  QueryPerformanceSort,
+  QueryPerformanceSQLParams,
+} from './QueryPerformance.types'
 
 const VALID_SORT_COLUMNS: ReadonlySet<string> = new Set<QueryPerformanceSort['column']>([
   'query',
