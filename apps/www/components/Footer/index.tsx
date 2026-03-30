@@ -2,16 +2,13 @@
 
 import { CheckIcon } from '@heroicons/react/outline'
 import { REALTIME_CHANNEL_STATES } from '@supabase/supabase-js'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect } from 'react'
-
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import footerData from 'data/Footer'
 import { usePathname } from 'next/navigation'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
+import SupabaseWordmark from '~/components/Nav/SupabaseWordmark'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
@@ -79,22 +76,7 @@ const Footer = (props: Props) => {
         <div className="xl:grid xl:grid-cols-7 xl:gap-4">
           <div className="space-y-8 xl:col-span-2">
             <Link href="#" as="/" className="w-40">
-              <Image
-                src={supabaseLogoWordmarkLight}
-                width={160}
-                height={30}
-                alt="Supabase Logo"
-                className="dark:hidden"
-                priority
-              />
-              <Image
-                src={supabaseLogoWordmarkDark}
-                width={160}
-                height={30}
-                alt="Supabase Logo"
-                className="hidden dark:block"
-                priority
-              />
+              <SupabaseWordmark className="w-40 h-[30px]" />
             </Link>
             <div className="flex space-x-5">
               <a

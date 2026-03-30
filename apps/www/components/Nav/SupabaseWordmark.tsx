@@ -1,9 +1,17 @@
-const SupabaseWordmark = () => (
+import { useId } from 'react'
+
+const SupabaseWordmark = ({ className }: { className?: string }) => {
+  const id = useId()
+  const grad0 = `${id}-paint0`
+  const grad1 = `${id}-paint1`
+
+  return (
   <svg
     viewBox="0 0 581 113"
     fill="none"
     width={124}
     height={24}
+    className={className}
     aria-label="Supabase Logo"
     role="img"
   >
@@ -41,11 +49,11 @@ const SupabaseWordmark = () => (
     />
     <path
       d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0627L99.1935 40.0627C107.384 40.0627 111.952 49.5228 106.859 55.9374L63.7076 110.284Z"
-      fill="url(#supabase_wordmark_nav__paint0_linear)"
+      fill={`url(#${grad0})`}
     />
     <path
       d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0627L99.1935 40.0627C107.384 40.0627 111.952 49.5228 106.859 55.9374L63.7076 110.284Z"
-      fill="url(#supabase_wordmark_nav__paint1_linear)"
+      fill={`url(#${grad1})`}
       fillOpacity="0.2"
     />
     <path
@@ -54,7 +62,7 @@ const SupabaseWordmark = () => (
     />
     <defs>
       <linearGradient
-        id="supabase_wordmark_nav__paint0_linear"
+        id={grad0}
         x1="53.9738"
         y1="54.974"
         x2="94.1635"
@@ -65,7 +73,7 @@ const SupabaseWordmark = () => (
         <stop offset="1" stopColor="#3ECF8E" />
       </linearGradient>
       <linearGradient
-        id="supabase_wordmark_nav__paint1_linear"
+        id={grad1}
         x1="36.1558"
         y1="30.578"
         x2="54.4844"
@@ -77,6 +85,7 @@ const SupabaseWordmark = () => (
       </linearGradient>
     </defs>
   </svg>
-)
+  )
+}
 
 export default SupabaseWordmark
