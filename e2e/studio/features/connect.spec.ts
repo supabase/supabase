@@ -3,7 +3,7 @@ import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
 test.describe('Connect', async () => {
-  test('Connect dialog opens when showConnect=true query param is present', async ({
+  test('ConnectSheet opens when showConnect=true query param is present', async ({
     page,
     ref,
   }) => {
@@ -13,30 +13,28 @@ test.describe('Connect', async () => {
     // Wait for the page to load
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 30000 })
 
-    // Check that either the Connect dialog or ConnectSheet is visible
-    // The Connect component renders a Dialog with title "Connect to your project"
-    // The ConnectSheet component renders a Sheet with title "Connect to your project"
+    // Check that the ConnectSheet is visible
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' })
     ).toBeVisible({ timeout: 30000 })
   })
 
-  test('Connect dialog closes when dismissed', async ({ page, ref }) => {
+  test('ConnectSheet closes when dismissed', async ({ page, ref }) => {
     // Navigate to project page with showConnect=true query param
     await page.goto(toUrl(`/project/${ref}?showConnect=true`))
 
     // Wait for the page to load
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 30000 })
 
-    // Wait for the Connect dialog/sheet to be visible
+    // Wait for the ConnectSheet to be visible
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' })
     ).toBeVisible({ timeout: 30000 })
 
-    // Close the dialog by pressing Escape
+    // Close the sheet by pressing Escape
     await page.keyboard.press('Escape')
 
-    // Verify the dialog is no longer visible
+    // Verify the sheet is no longer visible
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' })
     ).not.toBeVisible({ timeout: 10000 })
@@ -45,7 +43,7 @@ test.describe('Connect', async () => {
     await expect(page).not.toHaveURL(/showConnect=true/)
   })
 
-  test('Connect button in header opens the Connect dialog', async ({ page, ref }) => {
+  test('Connect button in header opens the ConnectSheet', async ({ page, ref }) => {
     // Navigate to project page without the query param
     await page.goto(toUrl(`/project/${ref}`))
 
@@ -55,7 +53,7 @@ test.describe('Connect', async () => {
     // Click the Connect button in the header
     await page.getByRole('button', { name: 'Connect' }).click()
 
-    // Verify the Connect dialog/sheet opens
+    // Verify the ConnectSheet opens
     await expect(
       page.getByRole('heading', { name: 'Connect to your project' })
     ).toBeVisible({ timeout: 30000 })
