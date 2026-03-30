@@ -56,22 +56,22 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 **Arsitektur**
 
 Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
-Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
+Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara local](https://supabase.com/docs/guides/local-development).
 
 ![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) adalah sistem basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
+- [PostgreSQL](https://www.postgresql.org/) adalah system basis data relasional objek dengan lebih dari 30 tahun pengembangan aktif yang telah membuatnya memiliki reputasi yang kuat dalam hal keandalan, ketangguhan fitur, dan kinerja.
 - [Realtime](https://github.com/supabase/realtime) adalah server Elixir yang memungkinkan Anda untuk mendengarkan penyisipan, pembaruan, dan penghapusan PostgreSQL menggunakan websocket. Realtime melakukan polling terhadap fungsionalitas replikasi bawaan Postgres untuk perubahan database, mengkonversi perubahan ke JSON, kemudian menyiarkan JSON melalui websockets ke klien yang berwenang.
 - [PostgREST](http://postgrest.org/) adalah server web yang mengubah basis data PostgreSQL Anda secara langsung menjadi RESTful API
 - [pg_graphql](http://github.com/supabase/pg_graphql/) ekstensi PostgreSQL yang mengekspos API GraphQL
 - [Storage](https://github.com/supabase/storage-api) menyediakan antarmuka RESTful untuk mengelola File yang disimpan di S3, menggunakan Postgres untuk mengelola izin.
-- [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, yang memungkinkan Anda untuk mengambil tabel, menambahkan peran, dan menjalankan kueri, dll.
+- [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk mengelola Postgres Anda, yang memungkinkan Anda untuk mengambil table, menambahkan peran, dan menjalankan kueri, dll.
 - [GoTrue](https://github.com/netlify/gotrue) adalah API berbasis SWT untuk mengelola pengguna dan menerbitkan token SWT.
 - [Kong](https://github.com/Kong/kong) adalah gateway API asli cloud.
 
 #### Perpustakaan klien
 
-Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah implementasi mandiri untuk satu sistem eksternal. Ini adalah salah satu cara kami mendukung alat bantu yang ada.
+Pendekatan kami untuk pustaka klien bersifat modular. Setiap sub-pustaka adalah implementasi mandiri untuk satu system eksternal. Ini adalah salah satu cara kami mendukung alat bantu yang ada.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>

@@ -31,7 +31,7 @@ Për dokumentimin e plotë, vizitoni [supabase.com/docs](https://supabase.com/do
 
 ## Statusi
 
-- [x] Alfa: Ne po testojmë Supabase me një grup të mbyllur klientësh
+- [x] Alfa: Ne po testojmë Supabase me një group të mbyllur klientësh
 - [x] Publike Alpha: Gjithkush mund të regjistrohet në [supabase.com/dashboard](https://supabase.com/dashboard). Por shkoni lehtë për ne, ka disa ngërçe
 - [x] Publike Beta: Mjaft e qëndrueshme për shumicën e rasteve të përdorimit për jo ndërmarrjet
 - [ ] Publike: Gati për Prodhim / Publikim
@@ -48,11 +48,11 @@ Supabase është një kombinim i mjeteve që janë projekte të hapura (open sou
 
 **Arkitektura Aktuale**
 
-Supabase është një [platform hostimi](https://supabase.com/dashboard). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
+Supabase është një [platform hostimi](https://supabase.com/dashboard). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim local, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
 
 ![Arkitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) është një objekt-relacional i databasës si sistem me më shumë se 30 vite zhvillim aktiv e cila ka fituar një reputacion të fortë për besueshmërinë, karakteristikë të qëndrueshmërisë ,dhe performancë.
+- [PostgreSQL](https://www.postgresql.org/) është një objekt-relacional i databasës si system me më shumë se 30 vite zhvillim aktiv e cila ka fituar një reputacion të fortë për besueshmërinë, karakteristikë të qëndrueshmërisë ,dhe performancë.
 - [Realtime](https://github.com/supabase/realtime) është një Elixir server që lejon të dëgjosh për insertime, fshirje dhe përdisime në databasën PostgreSQL duke përdorur websockets. Supabase dëgjon në Postgres' funksionaliteti i replikimit i integruar, ajo kthen rrjedhjen e bajteve të replikimit, pastaj transmeton JSON mbi/në websockets.
 - [PostgREST](http://postgrest.org/) është një ueb server që e kthen databasën tuaj PostgreSQL direk në RESTful API.
 - [Storage](https://github.com/supabase/storage-api) ofron një RESTful ndërfaqe (interface) për menaxhimin e fajllave të ruajtura në S3, duke përdorur Postgres për të menanxhuar akseset.
@@ -62,7 +62,7 @@ Supabase është një [platform hostimi](https://supabase.com/dashboard). Ti mun
 
 #### Libraritë e Klienteve
 
-Libraria jonë e klineteve është modulare, Secila nën librari është një implemetim i pavarur për një sistem të jashtëm i vetëm.
+Libraria jonë e klineteve është modulare, Secila nën librari është një implemetim i pavarur për një system të jashtëm i vetëm.
 
 - **`supabase-{lang}`**: Kombinon bibliotekat dhe shton pasurimet.
   - `postgrest-{lang}`: Libraria e klientit për të punuar meh [PostgREST](https://github.com/postgrest/postgrest)

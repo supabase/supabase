@@ -101,7 +101,7 @@ Nuestro enfoque para las bibliotecas cliente es modular. Cada sublibrería es un
   </tr>
   END ROW -->
   
-  <th colspan="7">⚡️ Oficial ⚡️</th>
+  <th colspan="7">⚡️ Official ⚡️</th>
   
   <tr>
     <td>JavaScript (TypeScript)</td>

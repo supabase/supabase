@@ -36,12 +36,12 @@ Lai uzzinātu, kā veikt iemaksas, apmeklējiet [Getting Started](../DEVELOPERS.
 - [E-pasta atbalsts](https://supabase.com/docs/support#business-support). Vislabāk piemērots: problēmām ar jūsu datu bāzi vai infrastruktūru.
 - [Discord](https://discord.supabase.com). Vislabākais: lai dalītos ar savām lietojumprogrammām un komunicētu ar kopienu.
 
-## Statuss
+## Status
 
 - [x] Alfa: Mēs testējam Supabase ar slēgtu klientu kopu
 - [x] Publiskā alfa versija: [supabase.com/dashboard](https://supabase.com/dashboard). Bet nesteidzieties, ir dažas nepilnības
 - [x] Publiskā beta versija: Pietiekami stabila lielākajai daļai ar uzņēmumu nesaistītu lietošanas gadījumu
-- [ ] Publisks: Vispārēja pieejamība [[statuss](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
+- [ ] Publisks: Vispārēja pieejamība [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]]
 
 Pašlaik mēs esam Publiskās beta versijas fāzē. Lai saņemtu paziņojumus par galvenajiem atjauninājumiem, skatiet šīs repozitorija "releases".
 
@@ -55,7 +55,7 @@ Supabase ir atvērtā koda rīku kombinācija. Mēs veidojam Firebase funkcijas,
 
 **Arhitektūra**
 
-Supabase ir [izvietota platforma](https://supabase.com/dashboard). Jūs varat reģistrēties un sākt izmantot Supabase, neko neinstalējot.
+Supabase ir [izvietota platforms](https://supabase.com/dashboard). Jūs varat reģistrēties un sākt izmantot Supabase, neko neinstalējot.
 Jūs varat arī [pašmāju resursus](https://supabase.com/docs/guides/hosting/overview) un [izstrādāt lokāli](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektūra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)

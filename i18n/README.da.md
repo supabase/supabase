@@ -25,7 +25,7 @@
 
 ## Dokumentation
 
-Du kan finde den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs)
+Du kan find den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs)
 
 For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 
@@ -41,7 +41,7 @@ For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 - [x] Alpha: Vi tester Supabase med et lukket sæt af kunder
 - [x] Offentlig Alpha: Alle kan tilmelde sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær forsigtig med os, der er et par knuder
 - [x] Public Beta: Stabil nok til de fleste ikke-virksomhedsrelaterede brugssager
-- [ ] Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Public: General tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 Vi er i øjeblikket i Public Beta. Hold øje med "releases" i denne repo for at få besked om større opdateringer.
 
@@ -51,12 +51,12 @@ Vi er i øjeblikket i Public Beta. Hold øje med "releases" i denne repo for at 
 
 ## Sådan fungerer det
 
-Supabase er en kombination af open source-værktøjer. Vi opbygger funktionerne i Firebase ved hjælp af open source-produkter i virksomhedskvalitet. Hvis værktøjerne og fællesskaberne findes med en MIT-, Apache 2- eller tilsvarende åben licens, vil vi bruge og støtte det pågældende værktøj. Hvis værktøjet ikke findes, udvikler og open source-udvikler vi det selv. Supabase er ikke en 1-til-1-mapping af Firebase. Vores mål er at give udviklere en Firebase-lignende udvikleroplevelse ved hjælp af open source-værktøjer.
+Supabase er en kombination af open source-værktøjer. Vi opbygger funktionerne i Firebase ved hjælp af open source-produkter i virksomhedskvalitet. Hvis værktøjerne og fællesskaberne findes med en MIT-, Apache 2- eller tilsvarende åben license, vil vi bruge og støtte det pågældende værktøj. Hvis værktøjet ikke findes, udvikler og open source-udvikler vi det self. Supabase er ikke en 1-til-1-mapping af Firebase. Vores mål er at give udviklere en Firebase-lignende udvikleroplevelse ved hjælp af open source-værktøjer.
 
 **Arkitektur**
 
 Supabase er en [hosted platform](https://supabase.com/dashboard). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
-Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
+Du kan også [self hoste](https://supabase.com/docs/guides/hosting/overview) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
