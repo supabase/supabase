@@ -158,14 +158,14 @@ export function useBillingCustomerDataForm({
 
     const payload = {
       address: {
-        line1: address.address.line1,
-        line2: address.address.line2 || undefined,
-        city: address.address.city,
-        state: address.address.state || undefined,
-        postal_code: address.address.postal_code,
-        country: address.address.country,
+        line1: address.address.line1.trim(),
+        line2: address.address.line2?.trim() || undefined,
+        city: address.address.city.trim(),
+        state: address.address.state?.trim() || undefined,
+        postal_code: address.address.postal_code.trim(),
+        country: address.address.country.trim(),
       },
-      billing_name: address.name,
+      billing_name: address.name.trim(),
       tax_id:
         selectedTaxId && taxIdValues.tax_id_type?.length && taxIdValues.tax_id_value?.length
           ? {
