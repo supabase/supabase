@@ -7,7 +7,19 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
-import { QueryPerformanceRow, QueryPerformanceSQLParams } from './QueryPerformance.types'
+import { QueryPerformanceRow, QueryPerformanceSort, QueryPerformanceSQLParams } from './QueryPerformance.types'
+
+const VALID_SORT_COLUMNS: ReadonlySet<string> = new Set<QueryPerformanceSort['column']>([
+  'query',
+  'rolname',
+  'total_time',
+  'prop_total_time',
+  'calls',
+  'avg_rows',
+  'max_time',
+  'mean_time',
+  'min_time',
+])
 
 export function generateQueryPerformanceSql({
   preset,
@@ -30,7 +42,12 @@ export function generateQueryPerformanceSql({
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
 
-  const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
+  const isValidOrderBy =
+    orderBy != null &&
+    VALID_SORT_COLUMNS.has(orderBy.column) &&
+    (orderBy.order === 'asc' || orderBy.order === 'desc')
+
+  const orderBySql = isValidOrderBy ? `ORDER BY ${orderBy!.column} ${orderBy!.order}` : undefined
 
   const whereConditions = []
   if (roles.length > 0) {
