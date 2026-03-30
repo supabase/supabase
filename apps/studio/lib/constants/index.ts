@@ -10,6 +10,12 @@ export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
  */
 export const IS_TEST_ENV = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
+/**
+ * Indicates that the app is running via the Supabase CLI (local development).
+ * When false and !IS_PLATFORM, we're in self-hosted docker mode.
+ */
+export const IS_CLI = !IS_PLATFORM && !!process.env.CURRENT_CLI_VERSION
+
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var

@@ -7,12 +7,10 @@ import { CopyCallbackContext } from 'ui-patterns/SimpleCodeBlock'
 
 import { getAddons } from '../Billing/Subscription/Subscription.utils'
 import type { projectKeys } from './Connect.types'
-import { getConnectionStrings } from './DatabaseSettings.utils'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useDeploymentModeQuery } from '@/data/config/deployment-mode-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -56,6 +54,10 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
 
       track('connection_string_copied', trackingProperties)
     }
+
+    const { data: deploymentMode } = useDeploymentModeQuery()
+    const isCliMode = deploymentMode?.is_cli_mode ?? false
+    const isSelfHosted = !IS_PLATFORM && !isCliMode
 
     const { data: settings } = useProjectSettingsV2Query({ projectRef })
     const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
@@ -120,7 +122,7 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
               transactionDedicated: connectionStringsDedicated?.pooler.uri,
               sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
               ipv4SupportedForDedicatedPooler: !!ipv4Addon,
-              direct: connectionStringsShared.direct.uri,
+              direct: isSelfHosted ? `postgresql://postgres:[YOUR-PASSWORD]@${connectionInfo.db_host}:${connectionInfo.db_port || 5432}/postgres` : connectionStringsShared.direct.uri,
             }}
             onCopy={handleCopy}
           />
