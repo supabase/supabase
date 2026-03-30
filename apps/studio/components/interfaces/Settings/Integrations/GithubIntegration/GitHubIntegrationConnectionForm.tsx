@@ -316,20 +316,20 @@ export const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    // if for some reason, the project doesn't have a default branch yet, create it.
-    if (existingBranches && existingBranches.length === 0) {
-      createBranch({
-        projectRef: selectedProject.ref,
-        gitBranch: data.enableProductionSync ? data.branchName : '',
-        branchName: data.branchName || 'main',
-        is_default: true,
-      })
-    } else if (prodBranch) {
+    if (prodBranch) {
       updateBranch({
         branchRef: prodBranch.project_ref,
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
         branchName: data.branchName || 'main',
+      })
+    } else {
+      // if for some reason, the project doesn't have a default branch yet, create it.
+      createBranch({
+        projectRef: selectedProject.ref,
+        gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName || 'main',
+        is_default: true,
       })
     }
 
