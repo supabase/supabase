@@ -84,25 +84,25 @@ export function RegisterContent() {
             <div className="flex-1 hidden md:block" />
 
             {/* Bottom content — two columns, bottom-aligned */}
-            <div className="max-w-[65rem] mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 md:grid-cols-[auto_1fr] items-end gap-8 lg:gap-24 transition-opacity [transition-duration:1200ms]">
+            <div className="max-w-[65rem] mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 md:grid-cols-[auto_1fr] items-end gap-8 lg:gap-20 transition-opacity [transition-duration:1200ms]">
               <div className="flex flex-col">
-                <h1 className="text-4xl md:text-6xl xl:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
+                <h1 className="text-6xl xl:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
                   The State <br /> of Startups
                   <br />
-                  <span className="text-brand-600 dark:text-brand font-medium">2026?</span>
+                  <span className="text-brand-600 dark:text-brand font-medium">2026</span>
                 </h1>
               </div>
 
               {/* Right: description + CTA */}
               <div className="flex flex-col items-start gap-6 max-w-[460px] md:justify-self-end">
-                <p className="text-foreground-light text-lg md:text-balance">
+                <p className="text-foreground-light text-lg md:text-pretty">
                   There's never been a better time to build. AI tools, smaller teams, faster product
                   cycles.
                 </p>
 
-                <p className="text-foreground-light text-lg md:text-balance">
-                  But a lot has changed in the last year. We want to know what that looks like from
-                  where you sit.
+                <p className="text-foreground-light text-lg md:text-pretty">
+                  Over 2000 people took the survey in 2025. But a lot has changed in the last year.
+                  We want to know what building at startups looks like from where you sit.
                 </p>
 
                 <Button asChild size="medium" iconRight={<ArrowRight size={12} />}>
