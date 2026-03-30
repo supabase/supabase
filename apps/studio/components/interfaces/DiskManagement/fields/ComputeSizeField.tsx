@@ -9,7 +9,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { DOCS_URL, InstanceSpecs } from 'lib/constants'
+import { DOCS_URL } from 'lib/constants'
 import { ChevronRight, CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -109,9 +109,15 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const projectComputeSize = project?.infra_compute_size ?? 'nano'
   const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
 
-  const visibleOptions = showAllSizes
-    ? availableOptions
-    : availableOptions.slice(0, INITIALLY_VISIBLE_COUNT)
+  const selectedOptionIndex = availableOptions.findIndex((o) => o.identifier === computeSize)
+  const selectedOptionIsHidden = selectedOptionIndex >= INITIALLY_VISIBLE_COUNT
+
+  // Always show all options if the selected one would be outside the visible slice,
+  // so the active card is never hidden from the user.
+  const visibleOptions =
+    showAllSizes || selectedOptionIsHidden
+      ? availableOptions
+      : availableOptions.slice(0, INITIALLY_VISIBLE_COUNT)
   const hasHiddenOptions = availableOptions.length > INITIALLY_VISIBLE_COUNT
 
   return (
@@ -180,7 +186,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               }
             >
               {isLoading ? (
-                Array(6)
+                Array(INITIALLY_VISIBLE_COUNT)
                   .fill(0)
                   .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
               ) : addonsError ? (
@@ -228,7 +234,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         key={compute.identifier}
                         value={compute.identifier}
                         className={cn(
-                          'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]',
+                          'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]',
                           lockedOption && 'opacity-50'
                         )}
                         disabled={disabled || lockedOption}
@@ -324,7 +330,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       value="larger-compute"
                       onClick={(e) => e.preventDefault()}
                       className={cn(
-                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]'
+                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]'
                       )}
                       label={
                         <SupportLink
@@ -376,6 +382,9 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 type="default"
                 size="tiny"
                 className="mt-4"
+                aria-expanded={showAllSizes}
+                // Prevent collapsing when the selected size would become hidden
+                disabled={showAllSizes && selectedOptionIsHidden}
                 onClick={() => setShowAllSizes((prev) => !prev)}
                 icon={
                   <ChevronRight
