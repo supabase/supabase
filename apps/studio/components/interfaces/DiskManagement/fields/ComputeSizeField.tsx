@@ -379,7 +379,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   <ChevronRight
                     size={14}
                     strokeWidth={1.5}
-                    className={cn('transition-transform', showAllSizes && 'rotate-90')}
+                    className={cn('transition-transform', showAllSizes && '-rotate-90')}
                   />
                 }
               >
