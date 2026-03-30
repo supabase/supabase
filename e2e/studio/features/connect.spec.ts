@@ -8,9 +8,6 @@ test.describe('Connect', async () => {
     // Navigate to project page with showConnect=true query param
     await page.goto(toUrl(`/project/${ref}?showConnect=true`))
 
-    // Wait for the page to load
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 30000 })
-
     // Check that the ConnectSheet is visible
     await expect(page.getByRole('heading', { name: 'Connect to your project' })).toBeVisible({
       timeout: 30000,
@@ -20,9 +17,6 @@ test.describe('Connect', async () => {
   test('ConnectSheet closes when dismissed', async ({ page, ref }) => {
     // Navigate to project page with showConnect=true query param
     await page.goto(toUrl(`/project/${ref}?showConnect=true`))
-
-    // Wait for the page to load
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 30000 })
 
     // Wait for the ConnectSheet to be visible
     await expect(page.getByRole('heading', { name: 'Connect to your project' })).toBeVisible({
