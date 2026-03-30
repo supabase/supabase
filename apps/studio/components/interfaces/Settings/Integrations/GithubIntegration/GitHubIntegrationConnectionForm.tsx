@@ -323,6 +323,14 @@ export const GitHubIntegrationConnectionForm = ({
         gitBranch: data.enableProductionSync ? data.branchName : '',
         branchName: data.branchName || 'main',
       })
+    } else {
+      // if for some reason, the project doesn't have a default branch yet, create it.
+      createBranch({
+        projectRef: selectedProject.ref,
+        gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName || 'main',
+        is_default: true,
+      })
     }
 
     setIsConfirmingBranchChange(false)
@@ -771,7 +779,7 @@ export const GitHubIntegrationConnectionForm = ({
                         </Button>
                       )}
                       <Button
-                        type="default"
+                        type="primary"
                         htmlType="submit"
                         disabled={
                           !hasAccessToGitHubIntegration ||

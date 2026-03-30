@@ -1,16 +1,14 @@
-import dynamic from 'next/dynamic'
 import { Check, PointerIcon, TrendingUp, ZapIcon } from 'lucide-react'
-import { cn, Image } from 'ui'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { cn } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
-
-import type { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { FeaturesSection, HeroSection, Metadata } from './solutions.utils'
-import type { Quotes } from './solutions.utils'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import type { FeaturesSection, HeroSection, Metadata, Quotes } from './solutions.utils'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(

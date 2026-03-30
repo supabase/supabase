@@ -2,8 +2,7 @@
 
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-
-import { cn } from '../../lib/utils/cn'
+import { cn } from 'ui'
 
 interface Props {
   label: string
@@ -15,7 +14,7 @@ interface Props {
   target?: '_blank' | '_self'
 }
 
-function TextLink({
+export function TextLink({
   url = '',
   label,
   className,
@@ -57,5 +56,3 @@ function TextLink({
     </Link>
   )
 }
-
-export default TextLink

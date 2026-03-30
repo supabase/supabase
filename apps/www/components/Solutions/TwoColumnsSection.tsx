@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
 import { ArrowUpRight, Check, Copy } from 'lucide-react'
-import { Button, cn, TextLink, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import SectionContainer from 'components/Layouts/SectionContainer'
+import Link from 'next/link'
+import React, { useState } from 'react'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
+
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 interface AIPrompt {
   id: string
