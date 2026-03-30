@@ -74,6 +74,11 @@ export const ProjectHome = () => {
 
   const showConnectSection = !isMatureProject && !!project
 
+  const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
+    if (id === 'connect') return showConnectSection
+    return true
+  })
+
   return (
     <div className="w-full h-full">
       <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
@@ -88,14 +93,8 @@ export const ProjectHome = () => {
         <ScaffoldContainer size="large">
           <ScaffoldSection isFullWidth className="gap-12 pb-32">
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-              <SortableContext
-                items={sectionOrder.filter((id) => {
-                  if (id === 'connect') return showConnectSection
-                  return true
-                })}
-                strategy={verticalListSortingStrategy}
-              >
-                {sectionOrder.map((id) => {
+              <SortableContext items={renderOrder} strategy={verticalListSortingStrategy}>
+                {renderOrder.map((id) => {
                   if (IS_PLATFORM && id === 'usage') {
                     return (
                       <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
