@@ -9,7 +9,7 @@ import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { formatBytes } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
-import { ChevronRight, Info } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Badge, TableCell, TableHead, TableHeader, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -110,8 +110,8 @@ export const BucketTableRow = ({
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
           {bucket.public && (
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge variant="warning">Public <Info size={9} /></Badge>
+                  <TooltipTrigger>
+                    <Badge variant="warning">Public</Badge>
                   </TooltipTrigger>
                   <TooltipContent side="top">
                     This bucket is publicly readable. Anyone can list and access all objects stored in it.

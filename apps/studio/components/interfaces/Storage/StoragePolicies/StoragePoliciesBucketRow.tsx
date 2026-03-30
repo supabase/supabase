@@ -3,7 +3,6 @@ import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/Po
 import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { noop } from 'lodash'
-import { Info } from 'lucide-react'
 import { forwardRef, type CSSProperties } from 'react'
 import {
   Badge,
@@ -56,8 +55,8 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
               <CardTitle className="truncate">{label}</CardTitle>
               {bucket?.public && (
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge variant="warning">Public <Info size={9} /></Badge>
+                  <TooltipTrigger>
+                    <Badge variant="warning">Public</Badge>
                   </TooltipTrigger>
                   <TooltipContent side="top">
                     This bucket is publicly readable. Anyone can list and access all objects stored

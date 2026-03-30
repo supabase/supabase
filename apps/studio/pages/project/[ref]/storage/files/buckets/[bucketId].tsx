@@ -9,7 +9,7 @@ import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPol
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
 import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { ChevronDown, FolderOpen, Info, Settings, Shield, Trash2 } from 'lucide-react'
+import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -75,9 +75,9 @@ const BucketPage: NextPageWithLayout = () => {
             <span className="truncate">{bucketId}</span>
             {bucket?.public && (
               <Tooltip>
-                <TooltipTrigger asChild>
+                <TooltipTrigger>
                   <Badge variant="warning" className="flex-shrink-0">
-                    Public <Info size={9} />
+                    Public
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
