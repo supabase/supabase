@@ -84,6 +84,10 @@ const Input = forwardRef<
           type={reveal && hidden ? 'password' : props.type}
           disabled={reveal && hidden && !isEmpty ? true : props.disabled}
           className={cn(...inputClasses, props.className)}
+          data-1p-ignore // 1Password
+          data-lpignore="true" // LastPass
+          data-form-type="other" // Dashlane
+          data-bwignore // Bitwarden
         />
         {icon && <InputGroupAddon align="inline-start">{icon}</InputGroupAddon>}
         {copy || actions ? (
