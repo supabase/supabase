@@ -125,4 +125,3 @@ Forms in sheets:
 
 - `layout="horizontal"` for wider sheets
 - `layout="vertical"` for narrow sheets (`size="sm"` or below)
-- See `studio-forms` patterns for canonical examples

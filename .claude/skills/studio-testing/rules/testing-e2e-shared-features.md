@@ -95,4 +95,4 @@ test('filters the table', async ({ page, ref }) => {
 ```
 
 For E2E execution details (running tests, selectors, debugging), use the
-`e2e-studio-tests` skill.
+`studio-e2e-tests` skill.
