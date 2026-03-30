@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { CodeBlock } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -165,7 +165,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
     }
   }, [connectionType, connectionParams, safeConnectionString])
 
-  const trackCopy = useCallback(() => {
+  const trackCopy = () => {
     const typeConfig = DATABASE_CONNECTION_TYPES.find((t) => t.id === connectionType)
     track('connection_string_copied', {
       connectionType: typeConfig?.label ?? connectionType,
@@ -174,7 +174,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
       connectionTab: 'Connection String',
       source: 'studio',
     })
-  }, [connectionType, connectionMethod, track])
+  }
 
   if (!resolvedConnectionString) {
     return (
