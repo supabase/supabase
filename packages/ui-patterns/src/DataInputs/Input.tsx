@@ -4,6 +4,7 @@ import React, {
   ComponentPropsWithoutRef,
   ElementRef,
   forwardRef,
+  useMemo,
   useState,
 } from 'react'
 import {
@@ -72,7 +73,6 @@ const Input = forwardRef<
     if (size) inputClasses.push(__styles.size[size])
     if (icon) inputClasses.push(__styles.with_icon[size ?? 'small'])
 
-    const isEmpty = props.value == null || props.value.toString().length === 0
     return (
       <InputGroup className={containerClassName}>
         <InputGroupInput
@@ -82,7 +82,7 @@ const Input = forwardRef<
           size={size}
           onCopy={onCopy}
           type={reveal && hidden ? 'password' : props.type}
-          disabled={reveal && hidden && !isEmpty ? true : props.disabled}
+          disabled={props.disabled}
           className={cn(...inputClasses, props.className)}
           data-1p-ignore // 1Password
           data-lpignore="true" // LastPass
