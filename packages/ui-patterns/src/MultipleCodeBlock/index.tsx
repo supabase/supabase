@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react'
-
-import {
-  CodeBlock,
-  CodeBlockLang,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-} from 'ui'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 interface MultipleCodeBlockFile {
   name: string

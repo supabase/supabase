@@ -2,7 +2,7 @@ import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/tabl
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
 import { minifyJSON, tryParseJson } from 'lib/helpers'
-import { compact, isEqual, isNull, isString, omitBy } from 'lodash'
+import { compact, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 import type { Dictionary } from 'types'
 
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -10,8 +10,8 @@ import {
   DATETIME_TYPES,
   JSON_TYPES,
   TEXT_TYPES,
-  TIMESTAMP_TYPES,
   TIME_TYPES,
+  TIMESTAMP_TYPES,
 } from '../SidePanelEditor.constants'
 import type { RowField } from './RowEditor.types'
 
@@ -20,7 +20,7 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
 
   if (isNewRow) {
     if (TEXT_TYPES.includes(column.format)) {
-      return null
+      return undefined
     } else if (column.format === 'bool') {
       if (column.default_value) {
         return column.default_value
@@ -28,7 +28,7 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
         return 'null'
       } else return null
     } else {
-      return ''
+      return undefined
     }
   } else {
     if (column.format === 'bool' && row[column.name] === null) {
@@ -165,8 +165,11 @@ const convertPostgresDatetimeToInputDatetime = (format: string, value: string) =
   }
 }
 
-const convertInputDatetimeToPostgresDatetime = (format: string, value: string | null) => {
-  if (!value || value.length == 0) return null
+const convertInputDatetimeToPostgresDatetime = (
+  format: string,
+  value: string | null | undefined
+) => {
+  if (!value || value.length === 0) return value
 
   switch (format) {
     case 'timestamptz':
@@ -182,26 +185,20 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
   }
 }
 
-// [Joshen] JFYI this presents a small problem in particular when creating a new row
-// given that we don't include null properties. Because of that if the column has a default
-// value, the column value will then always be the default value, instead of null
-// which may be considered a bug if e.g for a boolean column the user specifically selects "NULL" option
-// This would probably also apply to other column types like numbers (e.g user specifically wants a null value)
-export const generateRowObjectFromFields = (
-  fields: RowField[],
-  includeNullProperties = false
-): object => {
+/**
+ * Treat `undefined` as "no input" - all else values as valid inputs (e.g NULL or empty string)
+ */
+export const generateRowObjectFromFields = ({
+  fields,
+  includeUndefinedValues = false,
+}: {
+  fields: RowField[]
+  includeUndefinedValues?: boolean
+}): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
-
-    // Do not convert empty field inputs to NULL for text types
-    // so that we discern NULL and EMPTY
-    const value = TEXT_TYPES.includes(field.format)
-      ? field.value
-      : (field?.value ?? '').length === 0
-        ? null
-        : field.value
+    const value = field.value
 
     if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
@@ -224,12 +221,13 @@ export const generateRowObjectFromFields = (
       rowObject[field.name] = value
     }
   })
-  return includeNullProperties ? rowObject : omitBy(rowObject, isNull)
+
+  const results = includeUndefinedValues ? rowObject : omitBy(rowObject, isUndefined)
+  return results
 }
 
 export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) => {
-  const includeNullProperties = true
-  const rowObject = generateRowObjectFromFields(fields, includeNullProperties) as any
+  const rowObject = generateRowObjectFromFields({ fields, includeUndefinedValues: true }) as any
 
   const payload = {} as any
   const properties = Object.keys(rowObject)
@@ -251,7 +249,7 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
         payload[property] = rowObject[property]
       }
     } else {
-      const originalValue = originalRow[property] === undefined ? null : originalRow[property]
+      const originalValue = originalRow[property]
       const newValue = rowObject[property]
       if (!isEqual(originalValue, newValue)) {
         payload[property] = newValue

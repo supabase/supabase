@@ -23,7 +23,6 @@ import {
   CardHeader,
   CardTitle,
   cn,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -33,6 +32,7 @@ import {
   DialogTrigger,
   Separator,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
 

@@ -24,6 +24,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
@@ -71,9 +74,17 @@ const BucketPage: NextPageWithLayout = () => {
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="truncate">{bucketId}</span>
             {bucket?.public && (
-              <Badge variant="warning" className="flex-shrink-0">
-                Public
-              </Badge>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="warning" className="flex flex-shrink-0">
+                    Public
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  This bucket is publicly readable. Anyone can list and access all objects stored in
+                  it.
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         }
@@ -84,6 +95,7 @@ const BucketPage: NextPageWithLayout = () => {
           },
           {
             label: 'Buckets',
+            href: `/project/${ref}/storage/files`,
           },
         ]}
         primaryActions={
