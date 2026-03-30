@@ -14,12 +14,12 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef } from 'react'
 import {
   cn,
-  CodeBlock,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,

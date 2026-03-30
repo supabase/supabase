@@ -159,14 +159,11 @@ const FormField = ({
                   }
                 >
                   <FormControl_Shadcn_ className="col-span-6">
-                    <DataInput
-                      {...field}
-                      type={properties.isSecret ? 'password' : 'text'}
-                      id={name}
-                      size="small"
-                      copy
-                      reveal
-                    />
+                    {properties.isSecret ? (
+                      <DataInput {...field} id={name} size="small" copy reveal />
+                    ) : (
+                      <Input_Shadcn_ {...field} id={name} />
+                    )}
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}

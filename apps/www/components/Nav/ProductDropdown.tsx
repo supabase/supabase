@@ -1,19 +1,18 @@
 'use client'
 
-import React from 'react'
+import { useBreakpoint } from 'common'
+import { ChevronRight, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronRight, Sparkles } from 'lucide-react'
+import React from 'react'
+import { NavigationMenuLink } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { useBreakpoint } from 'common'
-import { TextLink } from 'ui'
-import { NavigationMenuLink } from 'ui/src/components/shadcn/ui/navigation-menu'
 import MenuItem from './MenuItem'
-
-import ComparisonsData from 'data/Comparisons'
-import CustomersData from 'data/CustomerStories'
-import MainProductsData from 'data/MainProducts'
-import ProductModulesData from 'data/ProductModules'
+import ComparisonsData from '@/data/Comparisons'
+import CustomersData from '@/data/CustomerStories'
+import MainProductsData from '@/data/MainProducts'
+import ProductModulesData from '@/data/ProductModules'
 
 export const ProductDropdown = () => {
   const isTablet = useBreakpoint(1279)
