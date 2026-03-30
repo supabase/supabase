@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   cn,
-  CodeBlock,
   DialogSectionSeparator,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -33,6 +32,7 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
