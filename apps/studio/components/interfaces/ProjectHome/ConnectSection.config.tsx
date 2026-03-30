@@ -1,5 +1,6 @@
 import { Box, Cable, Database, KeyRound, Sparkles } from 'lucide-react'
 import type { ReactNode } from 'react'
+
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
 
 export type ConnectAction = {
