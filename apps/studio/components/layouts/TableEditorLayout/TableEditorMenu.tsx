@@ -6,7 +6,7 @@ import { ExportDialog } from 'components/grid/components/header/ExportDialog'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { ErrorMatcher } from 'components/interfaces/ErrorHandling/ErrorMatcher'
+import { ErrorMatcherSidebarPanel } from 'components/interfaces/ErrorHandling/ErrorMatcherSidebarPanel'
 import EditorMenuListSkeleton from 'components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from 'components/ui/InfiniteList'
@@ -277,7 +277,7 @@ export const TableEditorMenu = () => {
           {isLoading && <EditorMenuListSkeleton />}
 
           {isError && (
-            <ErrorMatcher
+            <ErrorMatcherSidebarPanel
               title="Failed to load tables"
               error={error ?? 'Failed to load tables'}
               supportFormParams={{ projectRef: project?.ref }}
