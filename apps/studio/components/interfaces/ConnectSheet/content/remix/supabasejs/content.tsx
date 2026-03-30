@@ -30,7 +30,7 @@ export function createClient(request: Request) {
 
   const supabase = createServerClient(
     process.env.SUPABASE_URL!,
-    process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'},
+    process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'}!,
     {
       cookies: {
         getAll() {
