@@ -660,7 +660,7 @@ export default function FormPatternsSidePanel() {
                           <PopoverTrigger_Shadcn_ asChild>
                             <Button
                               type="outline"
-                              className="w-full justify-start text-left font-normal px-3 py-4"
+                              className="bg-control w-full justify-start text-left font-normal px-3 py-4"
                               icon={<CalendarIcon className="h-4 w-4" />}
                             >
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
