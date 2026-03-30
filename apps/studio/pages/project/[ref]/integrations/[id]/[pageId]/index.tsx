@@ -3,7 +3,9 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -43,9 +45,15 @@ type NavigationItem = { label: string; href: string; active?: boolean }
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data: allIntegrations, isPending: isAvailableIntegrationsLoading } =
     useAvailableIntegrations()
@@ -59,6 +67,14 @@ const IntegrationPage: NextPageWithLayout = () => {
     () => installedIntegrations.find((inst) => inst.id === id),
     [installedIntegrations, id]
   )
+
+  const installableExtensions = (extensions ?? []).filter((ext) =>
+    (integration?.requiredExtensions ?? []).includes(ext.name)
+  )
+  const extensionsInstalled = installableExtensions.every((x) => x.installed_version)
+
+  const isInstalled =
+    !!integration && (!!installation || (integration.type === 'wrapper' && extensionsInstalled))
 
   // Get the corresponding component dynamically
   const Component = useMemo(
@@ -197,9 +213,9 @@ const IntegrationPage: NextPageWithLayout = () => {
                   Install integration
                 </a>
               </Button>
-            ) : isMarketplaceEnabled && !!integration && !installation ? (
+            ) : isMarketplaceEnabled && !!integration && !isInstalled ? (
               <InstallIntegrationSheet integration={integration} />
-            ) : isMarketplaceEnabled && !!integration && !!installation ? (
+            ) : isMarketplaceEnabled && isInstalled ? (
               <Button disabled type="outline">
                 Installed
               </Button>
