@@ -162,14 +162,14 @@ try/finally for resource cleanup. For E2E execution details, see the
 
 ## Codebase References
 
-| What                    | Where                                                                                                                                                 |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Util test examples      | `tests/components/Grid/Grid.utils.test.ts`, `tests/components/Billing/TaxID.utils.test.ts`, `tests/components/Editor/SpreadsheetImport.utils.test.ts` |
-| Component test examples | `tests/features/logs/LogsFilterPopover.test.tsx`, `tests/components/CopyButton.test.tsx`                                                              |
-| E2E test example        | `e2e/studio/features/filter-bar.spec.ts`                                                                                                              |
-| E2E helpers pattern     | `e2e/studio/utils/filter-bar-helpers.ts`                                                                                                              |
-| Custom render           | `tests/lib/custom-render.tsx`                                                                                                                         |
-| MSW mock setup          | `tests/lib/msw.ts` (`addAPIMock`)                                                                                                                     |
-| Test README             | `apps/studio/tests/README.md`                                                                                                                         |
-| Vitest config           | `vitest.config.ts`                                                                                                                                    |
+| What                    | Where                                                                                                                                                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Util test examples      | `apps/studio/tests/components/Grid/Grid.utils.test.ts`, `apps/studio/tests/components/Billing/TaxID.utils.test.ts`, `apps/studio/tests/components/Editor/SpreadsheetImport.utils.test.ts` |
+| Component test examples | `apps/studio/tests/features/logs/LogsFilterPopover.test.tsx`, `apps/studio/tests/components/CopyButton.test.tsx`                                                                                      |
+| E2E test example        | `e2e/studio/features/filter-bar.spec.ts`                                                                                                                                                              |
+| E2E helpers pattern     | `e2e/studio/utils/filter-bar-helpers.ts`                                                                                                                                                              |
+| Custom render           | `apps/studio/tests/lib/custom-render.tsx`                                                                                                                                                             |
+| MSW mock setup          | `apps/studio/tests/lib/msw.ts` (`addAPIMock`)                                                                                                                                                         |
+| Test README             | `apps/studio/tests/README.md`                                                                                                                                                                         |
+| Vitest config           | `apps/studio/vitest.config.ts`                                                                                                                                                                        |
 | Related skills          | `studio-e2e-tests` (running E2E), `vitest` (API reference), `vercel-composition-patterns` (component architecture)                                    |
