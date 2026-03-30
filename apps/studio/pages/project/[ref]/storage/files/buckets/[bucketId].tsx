@@ -81,7 +81,8 @@ const BucketPage: NextPageWithLayout = () => {
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  This bucket is publicly readable. Anyone can list and access all objects stored in it.
+                  This bucket is publicly readable. Anyone can list and access all objects stored in
+                  it.
                 </TooltipContent>
               </Tooltip>
             )}

@@ -11,7 +11,16 @@ import { formatBytes } from 'lib/helpers'
 import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Badge, TableCell, TableHead, TableHeader, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Badge,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -109,15 +118,16 @@ export const BucketTableRow = ({
         <div className="flex items-center gap-2.5">
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
           {bucket.public && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="warning">Public</Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    This bucket is publicly readable. Anyone can list and access all objects stored in it.
-                  </TooltipContent>
-                </Tooltip>
-              )}
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge variant="warning">Public</Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                This bucket is publicly readable. Anyone can list and access all objects stored in
+                it.
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </BucketTableCell>
 
