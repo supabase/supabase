@@ -1,5 +1,5 @@
 ---
-applyTo: "e2e/studio/**,apps/studio/**"
+applyTo: 'e2e/studio/**,apps/studio/**'
 ---
 
 # Studio E2E Test Review Rules
@@ -9,16 +9,19 @@ All comments are **advisory**.
 ## Selector Priority (best to worst)
 
 1. **`getByRole` with accessible name** — most robust, tests accessibility
+
    ```typescript
    page.getByRole('button', { name: 'Save' })
    ```
 
 2. **`getByTestId`** — stable, explicit test hooks
+
    ```typescript
    page.getByTestId('table-editor-side-panel')
    ```
 
 3. **`getByText` with exact match** — good for unique text
+
    ```typescript
    page.getByText('Data API Access', { exact: true })
    ```
@@ -31,18 +34,21 @@ All comments are **advisory**.
 ## Patterns to Flag
 
 - **XPath selectors** — fragile to DOM changes
+
   ```typescript
   // BAD
   locator('xpath=ancestor::div[contains(@class, "space-y")]')
   ```
 
 - **Parent traversal with `locator('..')`** — breaks when structure changes
+
   ```typescript
   // BAD
   element.locator('..').getByRole('button')
   ```
 
 - **`waitForTimeout`** — never use; wait for something specific instead
+
   ```typescript
   // BAD
   await page.waitForTimeout(1000)
@@ -57,6 +63,7 @@ All comments are **advisory**.
   ```
 
 - **`force: true` on clicks** — make elements visible first instead
+
   ```typescript
   // BAD
   await menuButton.click({ force: true })
@@ -76,4 +83,4 @@ All comments are **advisory**.
 - Use `test.describe.configure({ mode: 'serial' })` for tests sharing database state
 - Add messages to expects: `await expect(locator, 'why').toBeVisible({ timeout: 30000 })`
 
-Canonical standard: `.claude/skills/e2e-studio-tests/SKILL.md`
+Canonical standard: `.claude/skills/studio-e2e-tests/SKILL.md`

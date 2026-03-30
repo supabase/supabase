@@ -72,7 +72,9 @@ Do not enable ISR on any route where authentication is handled or where a sessio
 
 When `@supabase/ssr` refreshes a session token server-side, it writes the updated JWT to the HTTP response via a `Set-Cookie` header. If your CDN (e.g. Vercel Edge, Cloudflare) caches that response and serves it to a different user, that user's browser will store the cached token and be signed in as the wrong person.
 
-To prevent this, set `Cache-Control: private, no-store` on responses from any route that handles authentication, typically your middleware. Most CDNs respect this header and will not cache the response.
+As of `@supabase/ssr` v0.10.0, the library automatically passes the necessary cache headers (`Cache-Control`, `Expires`, `Pragma`) to your `setAll` callback as a second argument whenever a token refresh occurs. If your `setAll` implementation applies those headers to the response (as shown in the examples in [Creating a Supabase client for SSR](/docs/guides/auth/server-side/creating-a-client)), no additional manual configuration is needed for most CDNs.
+
+If you are on an older version or need to set headers manually, add `Cache-Control: private, no-store` to responses from any route that handles authentication:
 
 #### Next.js middleware
 

@@ -28,8 +28,8 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { cn, CodeBlock, Collapsible, Tabs } from 'ui'
-import { Alert } from 'ui/src/components/shadcn/ui/alert'
+import { Alert_Shadcn_ as Alert, cn, Collapsible, Tabs } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { assumptions } from './assumptions'
 import { BaseUrlDialog } from './base-url-dialog'

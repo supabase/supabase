@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -35,6 +35,7 @@ import {
 } from 'ui-patterns'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
 
@@ -44,6 +45,7 @@ const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   const { data: allIntegrations, isPending: isAvailableIntegrationsLoading } =
     useAvailableIntegrations()
@@ -62,7 +64,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   // Get the corresponding component dynamically
   const Component = useMemo(
-    () => integration?.navigate(id!, pageId, childId),
+    () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
   )
 
@@ -191,13 +193,15 @@ const IntegrationPage: NextPageWithLayout = () => {
               <PageHeaderDescription className="truncate">{pageSubTitle}</PageHeaderDescription>
             </PageHeaderSummary>
 
-            {integration?.type === 'oauth' && (
+            {integration?.type === 'oauth' ? (
               <Button asChild type="primary" className="shrink-0">
                 <a target="_blank" rel="noreferrer" href={integration.siteUrl ?? '/'}>
                   Install integration
                 </a>
               </Button>
-            )}
+            ) : isMarketplaceEnabled && !!integration && !installation ? (
+              <InstallIntegrationSheet integration={integration} />
+            ) : null}
           </PageHeaderMeta>
         )}
 

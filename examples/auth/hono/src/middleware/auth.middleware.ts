@@ -38,8 +38,9 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
         getAll() {
           return parseCookieHeader(c.req.header('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, cacheHeaders) {
           cookiesToSet.forEach(({ name, value, options }) => setCookie(c, name, value, options))
+          Object.entries(cacheHeaders).forEach(([key, value]) => c.header(key, value))
         },
       },
     })

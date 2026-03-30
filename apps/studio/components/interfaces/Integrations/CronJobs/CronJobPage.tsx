@@ -15,11 +15,11 @@ import {
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
   cn,
-  CodeBlock,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import {
   PageHeader,
   PageHeaderAside,

@@ -1,9 +1,5 @@
 'use client'
 
-import staticContent from '.generated/staticContent/_index.json'
-import ProductModulesData from '~/data/ProductModules'
-import { DEFAULT_EASE } from '~/lib/animations'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import SupabaseWordmark from './SupabaseWordmark'
 import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
@@ -11,9 +7,14 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { Accordion, Button, TextLink } from 'ui'
+import { Accordion, Button } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
 
 import MenuItem from './MenuItem'
+import staticContent from '@/.generated/staticContent/_index.json'
+import ProductModulesData from '@/data/ProductModules'
+import { DEFAULT_EASE } from '@/lib/animations'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface Props {
   open: boolean
