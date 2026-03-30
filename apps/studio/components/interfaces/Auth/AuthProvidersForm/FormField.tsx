@@ -166,16 +166,20 @@ const FormField = ({
                         }
                         className="w-full"
                       >
-                        <DataInput
-                          {...field}
-                          type={properties.isSecret ? 'password' : 'text'}
-                          id={name}
-                          size="small"
-                          copy
-                          reveal
-                        />
+                        {properties.isSecret ? (
+                          <DataInput
+                            {...field}
+                            type={properties.isSecret ? 'password' : 'text'}
+                            id={name}
+                            size="small"
+                            copy
+                            reveal
+                          />
+                        ) : (
+                          <Input_Shadcn_ {...field} id={name} />
+                        )}
                       </PrePostTab>
-                    ) : (
+                    ) : properties.isSecret ? (
                       <DataInput
                         {...field}
                         type={properties.isSecret ? 'password' : 'text'}
@@ -184,6 +188,8 @@ const FormField = ({
                         copy
                         reveal
                       />
+                    ) : (
+                      <Input_Shadcn_ {...field} id={name} />
                     )}
                   </FormControl_Shadcn_>
                 </FormItemLayout>
