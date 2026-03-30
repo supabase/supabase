@@ -73,6 +73,7 @@ const IntegrationPage: NextPageWithLayout = () => {
   )
   const extensionsInstalled = installableExtensions.every((x) => x.installed_version)
 
+  // [Joshen] installedIntegrations doesn't return wrappers unless there's a wrapper created
   const isInstalled =
     !!integration && (!!installation || (integration.type === 'wrapper' && extensionsInstalled))
 
