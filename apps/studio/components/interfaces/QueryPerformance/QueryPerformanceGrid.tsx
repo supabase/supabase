@@ -8,7 +8,6 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
   cn,
-  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,6 +22,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 

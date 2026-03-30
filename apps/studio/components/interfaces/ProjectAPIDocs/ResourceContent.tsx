@@ -1,9 +1,10 @@
-import { SimpleCodeBlock } from 'ui'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
 import { Markdown } from '../Markdown'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface ResourceContentProps {
   selectedLanguage: 'js' | 'bash'

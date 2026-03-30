@@ -1,6 +1,7 @@
 import { DOCS_URL } from 'lib/constants'
 import { BarChart3, Code, Database, GitBranch, Shield, Table, Upload, UserPlus } from 'lucide-react'
-import { AiIconAnimation, CodeBlock } from 'ui'
+import { AiIconAnimation } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type { GettingStartedAction, GettingStartedStep } from './GettingStarted.types'
 import type { GettingStartedStatuses } from './useGettingStartedProgress'

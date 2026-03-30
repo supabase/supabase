@@ -27,10 +27,8 @@ import swift from 'react-syntax-highlighter/dist/cjs/languages/hljs/swift'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 import xml from 'react-syntax-highlighter/dist/cjs/languages/hljs/xml'
 import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
+import { Button, cn, copyToClipboard } from 'ui'
 
-import { copyToClipboard } from '../../lib/utils'
-import { cn } from '../../lib/utils/cn'
-import { Button } from '../Button/Button'
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
 export type CodeBlockLang =

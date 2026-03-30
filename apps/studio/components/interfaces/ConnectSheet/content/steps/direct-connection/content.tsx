@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
-import { CodeBlock } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '../../../DatabaseSettings.utils'

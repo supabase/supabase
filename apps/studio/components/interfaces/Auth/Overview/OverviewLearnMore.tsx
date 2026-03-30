@@ -1,14 +1,11 @@
 import { useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { Logs } from 'icons'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import { BookOpen } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle, Image } from 'ui'
+import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
+import { Image } from 'ui-patterns/Image'
 import {
   PageSection,
   PageSectionContent,
@@ -16,6 +13,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const OverviewLearnMore = () => {
   const [isMounted, setIsMounted] = useState(false)

@@ -1,3 +1,4 @@
+import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -8,6 +9,9 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
+import { enableDatabaseWebhooks } from '@/data/database/hooks-enable-mutation'
+import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export type Navigation = {
@@ -48,6 +52,10 @@ export type IntegrationDefinition = {
     pageId: string | undefined
     childId: string | undefined
   }) => ComponentType<{}> | null
+  /** SQL query for installing the entire integration */
+  installationSql?: string
+  /** Custom command to install the integration */
+  installationCommand?: (props: { ref: string }) => Promise<void>
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -230,7 +238,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       'Send real-time data from your database to another system when a table event occurs',
     docsUrl: DOCS_URL,
     author: authorSupabase,
-    requiredExtensions: [],
+    requiredExtensions: ['pg_net'],
     navigation: [
       {
         route: 'overview',
@@ -265,6 +273,12 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
           )
       }
       return null
+    },
+    installationSql: getEnableWebhooksSQL(),
+    installationCommand: async ({ ref }: { ref: string }) => {
+      const queryClient = getQueryClient()
+      await enableDatabaseWebhooks({ ref })
+      await invalidateSchemasQuery(queryClient, ref)
     },
   },
   {
