@@ -128,8 +128,7 @@ const DatabaseUsage = () => {
   )
   const entitledFeatures = getEntitlementSetValues()
 
-  const isSpendCapEnabled =
-    entitledFeatures.includes('database') && !org?.usage_billing_enabled
+  const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,

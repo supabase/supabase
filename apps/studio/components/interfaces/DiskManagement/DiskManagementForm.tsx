@@ -382,7 +382,7 @@ export function DiskManagementForm() {
               <NoticeBar
                 type="default"
                 visible={!(isAws || isAwsNimbus)}
-                title="Disk configuration is only available for projects in the AWS cloud provider"
+                title="Disk configuration is not available for this project"
                 description={
                   isAwsK8s
                     ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
