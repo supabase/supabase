@@ -184,7 +184,12 @@ export const InputField = ({
           actions={
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" icon={<Edit />} className="px-1.5" />
+                <Button
+                  data-testid={`${field.name}-field-actions`}
+                  type="default"
+                  icon={<Edit />}
+                  className="px-1.5"
+                />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28">
                 {isEditable && (
