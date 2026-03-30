@@ -20,7 +20,6 @@ import {
   Badge,
   Button,
   cn,
-  CodeBlock,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -32,6 +31,7 @@ import {
   SelectValue_Shadcn_,
   Separator,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
