@@ -1,6 +1,6 @@
 import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
 import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eye, MoreVertical, Trash } from 'lucide-react'
 import { createPortal } from 'react-dom'

@@ -5,7 +5,7 @@ import {
   queueRowAddWithOptimisticUpdate,
   queueRowDeletesWithOptimisticUpdate,
 } from 'components/grid/utils/queueOperationUtils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'

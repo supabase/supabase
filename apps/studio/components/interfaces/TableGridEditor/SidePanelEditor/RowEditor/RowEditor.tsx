@@ -1,4 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
+import { useIsQueueOperationsEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEmpty, noop, partition } from 'lodash'
@@ -21,7 +22,6 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export interface RowEditorProps {
   row?: Dictionary<any>

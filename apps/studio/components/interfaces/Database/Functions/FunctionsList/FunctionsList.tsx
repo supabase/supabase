@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { CreateFunction } from 'components/interfaces/Database/Functions/CreateFunction'
 import {
   ReportsSelectFilter,

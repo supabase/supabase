@@ -1,6 +1,6 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { TriggerSheet } from 'components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'

@@ -96,15 +96,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isDefaultOptIn: false,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
-      name: 'Queue table operations',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/42460',
-      enabled: true,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: false,
-    },
-    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
       name: 'New Table Filter Bar',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/42461',
