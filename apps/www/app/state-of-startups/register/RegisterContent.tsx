@@ -106,7 +106,7 @@ export function RegisterContent() {
                 </p>
 
                 <Button asChild size="medium" iconRight={<ArrowRight size={12} />}>
-                  <Link href="https://survey.supabase.com" target="_blank">
+                  <Link href="https://supabase.typeform.com/to/p2XiROl8" target="_blank">
                     Take the Survey
                   </Link>
                 </Button>
