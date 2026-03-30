@@ -45,7 +45,7 @@ import {
 } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
 import { sendEvent } from 'data/telemetry/send-event-mutation'
-import { timeout, tryParseJson } from 'lib/helpers'
+import { isObject, isObjectContainingKeys, timeout, tryParseJson } from 'lib/helpers'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -656,13 +656,13 @@ export const createTable = async ({
 
         if (importContent.file && importContent.rowCount > 0) {
           // Via a CSV file
-          const { error }: any = await insertRowsViaSpreadsheet(
+          const { error } = await insertRowsViaSpreadsheet({
             projectRef,
             connectionString,
-            importContent.file,
+            file: importContent.file,
             table,
-            importContent.selectedHeaders,
-            (progress: number) => {
+            selectedHeaders: importContent.selectedHeaders,
+            onProgressUpdate: (progress: number) => {
               toast.loading(
                 <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
                   <SparkBar
@@ -679,25 +679,27 @@ export const createTable = async ({
                 { id: toastId }
               )
             },
-            importContent.treatEmptyAsNull
-          )
+            treatEmptyAsNull: importContent.treatEmptyAsNull,
+          })
 
           if (error !== undefined) {
             span.setAttribute('import.error', 1)
             toast.error('Do check your spreadsheet if there are any discrepancies.')
-            const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
+            const message = isObjectContainingKeys(error, ['message'])
+              ? String(error.message)
+              : 'An unknown error occurred during data import.'
             toast.error(message)
             console.error('Error:', { error, message })
           }
         } else {
           // Via text copy and paste
-          await insertTableRows(
+          await insertTableRows({
             projectRef,
             connectionString,
             table,
-            importContent.rows,
-            importContent.selectedHeaders,
-            (progress: number) => {
+            rows: importContent.rows,
+            selectedHeaders: importContent.selectedHeaders,
+            onProgressUpdate: (progress: number) => {
               toast.loading(
                 <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
                   <SparkBar
@@ -713,8 +715,8 @@ export const createTable = async ({
                 { id: toastId }
               )
             },
-            importContent.treatEmptyAsNull
-          )
+            treatEmptyAsNull: importContent.treatEmptyAsNull,
+          })
         }
 
         // For identity columns, manually raise the sequences (batched for performance)
@@ -970,15 +972,20 @@ export const formatRowsForInsert = ({
   columns = [],
   treatEmptyAsNull = true,
 }: {
-  rows: any[]
+  rows: unknown[]
   headers: string[]
   columns?: RetrieveTableResult['columns']
   treatEmptyAsNull?: boolean
 }) => {
-  return rows.map((row: any) => {
-    const formattedRow: any = {}
+  return rows.map((row) => {
+    const formattedRow: Record<string, unknown> = {}
+    if (!isObject(row)) {
+      return formattedRow
+    }
+
     headers.forEach((header) => {
       const column = columns?.find((c) => c.name === header)
+
       const originalValue = row[header]
 
       if (originalValue === '' && treatEmptyAsNull && column?.is_nullable) {
@@ -1006,18 +1013,26 @@ export const formatRowsForInsert = ({
   })
 }
 
-export const insertRowsViaSpreadsheet = async (
-  projectRef: string,
-  connectionString: string | undefined | null,
-  file: any,
-  table: RetrieveTableResult,
-  selectedHeaders: string[],
-  onProgressUpdate: (progress: number) => void,
-  treatEmptyAsNull = true
-) => {
+export async function insertRowsViaSpreadsheet({
+  projectRef,
+  connectionString,
+  file,
+  table,
+  selectedHeaders,
+  onProgressUpdate,
+  treatEmptyAsNull = true,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  file: File
+  table: RetrieveTableResult
+  selectedHeaders: string[]
+  onProgressUpdate: (progress: number) => void
+  treatEmptyAsNull: boolean
+}): Promise<{ error: unknown }> {
   let chunkNumber = 0
-  let insertError: any = undefined
-  const t1: any = new Date()
+  let insertError: unknown = undefined
+  const t1 = new Date()
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
@@ -1026,7 +1041,7 @@ export const insertRowsViaSpreadsheet = async (
       skipEmptyLines: true,
       chunkSize: CHUNK_SIZE,
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
-      chunk: async (results: any, parser: any) => {
+      chunk: async (results, parser) => {
         parser.pause()
 
         const formattedData = formatRowsForInsert({
@@ -1054,24 +1069,34 @@ export const insertRowsViaSpreadsheet = async (
         parser.resume()
       },
       complete: () => {
-        const t2: any = new Date()
-        console.log(`Total time taken for importing spreadsheet: ${(t2 - t1) / 1000} seconds`)
+        const t2 = new Date()
+        console.log(
+          `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
+        )
         resolve({ error: insertError })
       },
     })
   })
 }
 
-export const insertTableRows = async (
-  projectRef: string,
-  connectionString: string | undefined | null,
-  table: RetrieveTableResult,
-  rows: any,
-  selectedHeaders: string[],
-  onProgressUpdate: (progress: number) => void,
-  treatEmptyAsNull = true
-) => {
-  let insertError = undefined
+export async function insertTableRows({
+  projectRef,
+  connectionString,
+  table,
+  rows,
+  selectedHeaders,
+  onProgressUpdate,
+  treatEmptyAsNull = true,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  table: RetrieveTableResult
+  rows: unknown[]
+  selectedHeaders: string[]
+  onProgressUpdate: (progress: number) => void
+  treatEmptyAsNull: boolean
+}): Promise<{ error: unknown }> {
+  let insertError: unknown = undefined
   let insertProgress = 0
 
   const formattedRows = formatRowsForInsert({
@@ -1082,7 +1107,7 @@ export const insertTableRows = async (
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)
-  const promises = batches.map((batch: any) => {
+  const tasks = batches.map((batch) => {
     return () => {
       return Promise.race([
         new Promise(async (resolve, reject) => {
@@ -1097,12 +1122,12 @@ export const insertTableRows = async (
           insertProgress = insertProgress + batch.length / rows.length
           resolve({})
         }),
-        timeout(30000),
+        timeout(30_000),
       ])
     }
   })
 
-  const batchedPromises = chunk(promises, 10)
+  const batchedPromises = chunk(tasks, 10)
   for (const batchedPromise of batchedPromises) {
     const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
     const hasFailedBatch = find(res, { status: 'rejected' })
