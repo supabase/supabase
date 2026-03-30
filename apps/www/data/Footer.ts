@@ -6,6 +6,10 @@ const footerData = [
     title: 'Product',
     links: [
       {
+        text: 'Pricing',
+        url: '/pricing',
+      },
+      {
         text: 'Database',
         url: '/database',
       },
@@ -36,10 +40,6 @@ const footerData = [
       {
         text: 'Feature Catalog',
         url: '/features',
-      },
-      {
-        text: 'Pricing',
-        url: '/pricing',
       },
       {
         text: 'Launch Week',
