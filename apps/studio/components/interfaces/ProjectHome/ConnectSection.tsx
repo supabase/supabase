@@ -33,7 +33,7 @@ export const ConnectSection = () => {
     if (!IS_PLATFORM) return
     if (hasTrackedExposure.current) return
     hasTrackedExposure.current = true
-    track('home_connect_section_exposed', {})
+    track('home_connect_section_exposed')
   }, [track])
 
   const handleActionClick = (action: (typeof CONNECT_ACTIONS)[number]) => {

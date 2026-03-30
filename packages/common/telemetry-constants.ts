@@ -1915,7 +1915,6 @@ export interface HomeNewExperimentExposedEvent {
  */
 export interface HomeConnectSectionExposedEvent {
   action: 'home_connect_section_exposed'
-  properties: Record<string, never>
   groups: TelemetryGroups
 }
 
