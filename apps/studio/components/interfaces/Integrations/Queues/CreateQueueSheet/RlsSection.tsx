@@ -1,6 +1,6 @@
 import { Markdown } from 'components/interfaces/Markdown'
 import { UseFormReturn } from 'react-hook-form'
-import { Badge, Checkbox_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, SheetSection } from 'ui'
+import { Badge, FormControl_Shadcn_, FormField_Shadcn_, SheetSection, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -32,7 +32,7 @@ export function RlsSection({
             description="Restrict access to your queue by enabling RLS and writing Postgres policies to control access for each role."
           >
             <FormControl_Shadcn_>
-              <Checkbox_Shadcn_
+              <Switch
                 checked={field.value}
                 onCheckedChange={field.onChange}
                 disabled={field.disabled || isExposed}
