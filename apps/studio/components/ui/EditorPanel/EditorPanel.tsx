@@ -41,7 +41,6 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   cn,
-  CodeBlock,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
@@ -57,7 +56,8 @@ import {
   PopoverTrigger_Shadcn_,
   SQL_ICON,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'

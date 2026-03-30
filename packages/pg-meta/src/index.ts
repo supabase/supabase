@@ -31,6 +31,7 @@ export * from './sql/studio/database'
 export * from './sql/studio/table-editor'
 export * from './sql/studio/sql-editor'
 export * from './sql/studio/role-impersonation'
+export * from './sql/studio/integrations'
 
 export default {
   roles,

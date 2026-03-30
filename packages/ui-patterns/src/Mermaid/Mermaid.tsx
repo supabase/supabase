@@ -3,8 +3,7 @@
 import mermaid from 'mermaid'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-
-import { cn } from '../../lib/utils/cn'
+import { cn } from 'ui'
 
 // @mildtomato - 28/11/2025
 // Colors are hardcoded because Mermaid's parser doesn't support CSS variables

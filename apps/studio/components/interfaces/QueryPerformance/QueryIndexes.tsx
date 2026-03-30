@@ -22,12 +22,12 @@ import {
   AlertTitle_Shadcn_,
   Button,
   cn,
-  CodeBlock,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
