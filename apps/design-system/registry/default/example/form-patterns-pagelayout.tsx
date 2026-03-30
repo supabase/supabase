@@ -22,7 +22,6 @@ import {
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  PrePostTab,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select_Shadcn_,
@@ -227,9 +226,7 @@ export default function FormPatternsPageLayout() {
                           <InputGroup>
                             <InputGroupInput {...field} type="number" min={5} max={30} />
                             <InputGroupAddon align="inline-end">
-                              <InputGroupText className="text-foreground-light text-xs font-mono">
-                                MB
-                              </InputGroupText>
+                              <InputGroupText className="font-mono">MB</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
@@ -282,9 +279,7 @@ export default function FormPatternsPageLayout() {
                               className="resize-none"
                             />
                             <InputGroupAddon align="block-end">
-                              <InputGroupText className="text-foreground-light text-xs">
-                                120 characters left
-                              </InputGroupText>
+                              <InputGroupText>120 characters left</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>

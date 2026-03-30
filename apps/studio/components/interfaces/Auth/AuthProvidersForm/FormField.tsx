@@ -10,10 +10,12 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  PrePostTab,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -157,34 +159,14 @@ const FormField = ({
                   }
                 >
                   <FormControl_Shadcn_ className="col-span-6">
-                    {properties.units ? (
-                      <PrePostTab
-                        postTab={
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {properties.units}
-                          </ReactMarkdown>
-                        }
-                        className="w-full"
-                      >
-                        <DataInput
-                          {...field}
-                          type={properties.isSecret ? 'password' : 'text'}
-                          id={name}
-                          size="small"
-                          copy
-                          reveal
-                        />
-                      </PrePostTab>
-                    ) : (
-                      <DataInput
-                        {...field}
-                        type={properties.isSecret ? 'password' : 'text'}
-                        id={name}
-                        size="small"
-                        copy
-                        reveal
-                      />
-                    )}
+                    <DataInput
+                      {...field}
+                      type={properties.isSecret ? 'password' : 'text'}
+                      id={name}
+                      size="small"
+                      copy
+                      reveal
+                    />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -249,21 +231,19 @@ const FormField = ({
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
-                      <PrePostTab
-                        postTab={
+                      <InputGroup>
+                        <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                             {properties.units}
                           </ReactMarkdown>
-                        }
-                        className="w-full"
-                      >
-                        <Input_Shadcn_
+                        </InputGroupAddon>
+                        <InputGroupInput
                           {...field}
                           id={name}
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                      </PrePostTab>
+                      </InputGroup>
                     ) : (
                       <Input_Shadcn_
                         {...field}
