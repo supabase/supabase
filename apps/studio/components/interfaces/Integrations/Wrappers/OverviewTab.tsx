@@ -48,13 +48,13 @@ const WrapperOverviewContent = () => {
 
   // [Joshen] Opting to declare custom wrapper sheets here instead of within Wrappers.constants.ts
   // as we'll easily run into circular dependencies doing so unfortunately
-  const CreateWrapperSheetComponent = !!wrapperMeta
-    ? wrapperMeta.customComponent
+  const CreateWrapperSheetComponent = !wrapperMeta
+    ? null
+    : wrapperMeta.customComponent
       ? wrapperMeta.name === 'iceberg_wrapper'
         ? CreateIcebergWrapperSheet
-        : ({}) => null
+        : null
       : CreateWrapperSheet
-    : null
 
   return (
     <>
