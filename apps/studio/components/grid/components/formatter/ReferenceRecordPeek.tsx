@@ -7,7 +7,12 @@ import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
 } from 'components/grid/utils/gridColumns'
-import { isArrayColumn, isBinaryColumn, isBoolColumn, isJsonColumn } from 'components/grid/utils/types'
+import {
+  isArrayColumn,
+  isBinaryColumn,
+  isBoolColumn,
+  isJsonColumn,
+} from 'components/grid/utils/types'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
