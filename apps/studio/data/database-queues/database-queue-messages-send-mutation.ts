@@ -30,7 +30,8 @@ export async function sendDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.send( '${queueName}', '${payload}', ${delay})`,
+    sql: `select * from pgmq.send($1::text, $2::jsonb, $3::integer)`,
+    parameters: [queueName, payload, delay],
     queryKey: databaseQueuesKeys.create(),
   })
 

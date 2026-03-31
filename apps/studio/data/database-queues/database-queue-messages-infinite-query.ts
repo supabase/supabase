@@ -67,13 +67,14 @@ export async function getDatabaseQueue({
         ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
       ) AS combined`
   if (afterTimestamp) {
-    query += ` WHERE enqueued_at > '${afterTimestamp}'`
+    query += ` WHERE enqueued_at > $1::timestamptz`
   }
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql: `${query} order by enqueued_at LIMIT ${QUEUE_MESSAGES_PAGE_SIZE}`,
+    ...(afterTimestamp ? { parameters: [afterTimestamp] } : {}),
   })
   return result as DatabaseQueueData
 }

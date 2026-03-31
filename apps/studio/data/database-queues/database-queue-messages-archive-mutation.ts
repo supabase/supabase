@@ -27,7 +27,8 @@ export async function archiveDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.archive('${queueName}', ${messageId})`,
+    sql: `SELECT * FROM pgmq.archive($1::text, $2::bigint)`,
+    parameters: [queueName, messageId],
     queryKey: databaseQueuesKeys.create(),
   })
 

@@ -30,7 +30,8 @@ export async function readDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.set_vt('${queueName}', ${messageId}, ${duration})`,
+    sql: `select * from pgmq.set_vt($1::text, $2::bigint, $3::integer)`,
+    parameters: [queueName, messageId, duration],
     queryKey: databaseQueuesKeys.create(),
   })
 

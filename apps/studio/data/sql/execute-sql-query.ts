@@ -25,6 +25,10 @@ export type ExecuteSqlVariables = {
   projectRef?: string
   connectionString?: string | null
   sql: string
+  /**
+   * Bound to PostgreSQL placeholders ($1, $2, …) in `sql`. Sent to pg-meta as `parameters`.
+   */
+  parameters?: unknown[]
   queryKey?: QueryKey
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
@@ -49,6 +53,7 @@ export async function executeSql<T = any>(
     projectRef,
     connectionString,
     sql,
+    parameters,
     queryKey,
     handleError,
     isRoleImpersonationEnabled = false,
@@ -59,6 +64,7 @@ export async function executeSql<T = any>(
   headersInit?: HeadersInit,
   fetcherOverride?: (options: {
     query: string
+    parameters?: unknown[]
     headers?: HeadersInit
   }) => Promise<{ data: T } | { error: ResponseError }>
 ): Promise<{ result: T }> {
@@ -77,7 +83,11 @@ export async function executeSql<T = any>(
   let error
 
   if (fetcherOverride) {
-    const result = await fetcherOverride({ query: sql, headers })
+    const result = await fetcherOverride({
+      query: sql,
+      ...(parameters !== undefined ? { parameters } : {}),
+      headers,
+    })
     if ('data' in result) {
       data = result.data
     } else {
@@ -109,6 +119,7 @@ export async function executeSql<T = any>(
         body: {
           query: `explain ${sql}`,
           disable_statement_timeout: isStatementTimeoutDisabled,
+          ...(parameters !== undefined ? { parameters } : {}),
         },
         params: {
           ...options.params,
@@ -133,7 +144,11 @@ export async function executeSql<T = any>(
       queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
     const result = await post('/platform/pg-meta/{ref}/query', {
       ...options,
-      body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
+      body: {
+        query: sql,
+        disable_statement_timeout: isStatementTimeoutDisabled,
+        ...(parameters !== undefined ? { parameters } : {}),
+      },
       params: {
         ...options.params,
         // @ts-expect-error: This is just a client side thing to identify queries better
@@ -201,6 +216,7 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     projectRef,
     connectionString,
     sql,
+    parameters,
     queryKey,
     handleError,
     isRoleImpersonationEnabled,
@@ -214,7 +230,15 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     queryKey: sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
     queryFn: ({ signal }) =>
       executeSql(
-        { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
+        {
+          projectRef,
+          connectionString,
+          sql,
+          parameters,
+          queryKey,
+          handleError,
+          isRoleImpersonationEnabled,
+        },
         signal
       ),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,

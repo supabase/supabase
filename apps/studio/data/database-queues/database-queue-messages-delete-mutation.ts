@@ -28,7 +28,8 @@ export async function deleteDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.delete('${queueName}', ${messageId})`,
+    sql: `SELECT * FROM pgmq.delete($1::text, $2::bigint)`,
+    parameters: [queueName, messageId],
     queryKey: databaseQueuesKeys.create(),
   })
 
