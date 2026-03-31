@@ -26,9 +26,9 @@ export function RLSTestResults({ results }: RLSTestResultsProps) {
   if (results.length === 0) return null
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="rls-test-results">
       <h3 className="text-sm font-medium text-foreground">Test Results</h3>
-      <div className="overflow-x-auto rounded-md border border-default">
+      <div className="overflow-x-auto rounded-md border border-default" data-testid="rls-test-results-table">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-default bg-surface-200">

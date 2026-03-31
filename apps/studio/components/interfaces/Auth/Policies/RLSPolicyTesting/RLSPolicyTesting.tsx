@@ -197,14 +197,15 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
   }[status]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="rls-policy-testing">
       {/* Table selector */}
       <div className="space-y-2">
         <label className="text-sm font-medium text-foreground">Select Table</label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" data-testid="rls-testing-table-selector">
           {tables.map((table) => (
             <button
               key={table.id}
+              data-testid={`rls-testing-table-${table.name}`}
               onClick={() => handleSelectTable(table.id)}
               className={cn(
                 'rounded-md border px-3 py-1.5 text-sm transition-colors',
@@ -235,7 +236,7 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
               <code className="rounded bg-surface-200 px-1">auth.role()</code>, and{' '}
               <code className="rounded bg-surface-200 px-1">auth.email()</code> like production.
             </p>
-            <div className="rounded-md border border-default overflow-hidden h-[200px]">
+            <div className="rounded-md border border-default overflow-hidden h-[200px]" data-testid="rls-testing-sql-editor">
               <Editor
                 theme="supabase"
                 language="pgsql"
@@ -372,6 +373,7 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
               }
               disabled={isRunning || isLoadingData || !policySql.trim()}
               onClick={handleRunTest}
+              data-testid="rls-testing-run-button"
             >
               {isRunning || isLoadingData ? 'Testing...' : 'Run Test'}
             </Button>
@@ -381,13 +383,14 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
                 type="default"
                 icon={<Save size={14} />}
                 onClick={() => setShowMigrationConfirm(true)}
+                data-testid="rls-testing-apply-migration-button"
               >
                 Apply as Migration
               </Button>
             )}
 
             {statusMessage && (
-              <div className="flex items-center gap-2 text-sm text-foreground-light">
+              <div className="flex items-center gap-2 text-sm text-foreground-light" data-testid="rls-testing-status">
                 {status === 'done' ? (
                   <CheckCircle2 size={14} className="text-brand-500" />
                 ) : status === 'error' ? (
