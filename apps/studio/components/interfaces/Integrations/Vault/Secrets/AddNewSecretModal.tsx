@@ -41,6 +41,11 @@ export const AddNewSecretModal = () => {
     parseAsBoolean.withDefault(false)
   )
 
+  const handleClose = () => {
+    setShowAddSecretModal(null)
+    form.reset()
+  }
+
   const onAddNewSecret: SubmitHandler<FormSchema> = async (values) => {
     if (!project) return console.error('Project is required')
 
@@ -53,7 +58,7 @@ export const AddNewSecretModal = () => {
         secret: values.secret,
       })
       toast.success(`Successfully added new secret ${values.name}`)
-      setShowAddSecretModal(null)
+      handleClose()
     } catch (error: any) {
       // [Joshen] No error handler required as they are all handled within the mutations already
     } finally {
@@ -68,7 +73,7 @@ export const AddNewSecretModal = () => {
   const { isDirty, isSubmitting } = form.formState
 
   return (
-    <Dialog open={showAddSecretModal} onOpenChange={(open) => setShowAddSecretModal(open)}>
+    <Dialog open={showAddSecretModal} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add new secret</DialogTitle>
@@ -119,11 +124,7 @@ export const AddNewSecretModal = () => {
           </Form_Shadcn_>
         </DialogSection>
         <DialogFooter>
-          <Button
-            type="default"
-            disabled={isSubmitting}
-            onClick={() => setShowAddSecretModal(null)}
-          >
+          <Button type="default" disabled={isSubmitting} onClick={handleClose}>
             Cancel
           </Button>
           <Button
