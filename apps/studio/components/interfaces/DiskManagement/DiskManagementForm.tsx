@@ -73,7 +73,8 @@ export function DiskManagementForm() {
   const { data: org } = useSelectedOrganizationQuery()
   const { setProjectStatus } = useSetProjectStatus()
 
-  const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled
+  const isSpendCapEnabled =
+    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
 
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
@@ -382,13 +383,13 @@ export function DiskManagementForm() {
               <NoticeBar
                 type="default"
                 visible={!(isAws || isAwsNimbus)}
-                title="Disk configuration is not available for this project"
+                title="Disk configuration is only available for projects in the AWS cloud provider"
                 description={
                   isAwsK8s
                     ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
                     : isBranch
                       ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
-                      : 'Disk configuration is only available for projects in the AWS cloud provider.'
+                      : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
                 }
               />
 

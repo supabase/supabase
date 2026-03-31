@@ -1,6 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
+
+import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,
@@ -11,8 +13,10 @@ import { Admonition } from 'ui-patterns/admonition'
 
 export function SpendCapDisabledSection() {
   const { data: org } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
 
-  const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled
+  const isSpendCapEnabled =
+    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
 
   return (
     <AnimatePresence>

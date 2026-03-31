@@ -272,6 +272,14 @@ export const SubscriptionPlanUpdateDialog = ({
                         <>You will be charged by them directly.</>
                       )}
                     </p>
+                    {billingViaPartner &&
+                      billingPartner === 'fly' &&
+                      subscriptionPreview?.plan_change_type === 'downgrade' && (
+                        <p className="text-sm">
+                          Your organization will be downgraded at the end of your current billing
+                          cycle.
+                        </p>
+                      )}
                   </div>
                 )}
               </div>
