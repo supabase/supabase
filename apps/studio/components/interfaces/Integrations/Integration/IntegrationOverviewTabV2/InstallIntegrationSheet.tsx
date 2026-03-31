@@ -80,7 +80,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   // [Joshen] Will hook these up in the future, applicable for stripe sync engine
   const involvesEdgeFunctions = false
 
-  const { data: extensions = [] } = useDatabaseExtensionsQuery(
+  const { data: extensions = [], isSuccess: isSuccessExtensions } = useDatabaseExtensionsQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
@@ -187,9 +187,9 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   }
 
   useEffect(() => {
-    if (extensions.length === 0) return
+    if (isSuccessExtensions) return
     setExtensionsSchema(defaultExtensionsSchema)
-  }, [extensions, defaultExtensionsSchema])
+  }, [isSuccessExtensions, defaultExtensionsSchema])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
