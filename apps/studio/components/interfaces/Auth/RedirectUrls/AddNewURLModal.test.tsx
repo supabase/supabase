@@ -121,7 +121,10 @@ describe('AddNewURLModal', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://existing.example.com,')
+    await user.type(
+      screen.getByPlaceholderText('https://mydomain.com'),
+      'https://existing.example.com,'
+    )
 
     fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
 

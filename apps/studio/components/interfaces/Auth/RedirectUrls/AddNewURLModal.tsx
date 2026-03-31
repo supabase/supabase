@@ -33,7 +33,10 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         value: z
           .string()
           .min(1, 'Please provide a value')
-          .refine((value) => redirectUrlRegex.test(normaliseUrl(value)), 'Please provide a valid URL')
+          .refine(
+            (value) => redirectUrlRegex.test(normaliseUrl(value)),
+            'Please provide a valid URL'
+          )
           .refine((value) => !allowList.includes(normaliseUrl(value)), {
             message: 'URL already exists in the allow list',
           }),
