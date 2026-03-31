@@ -298,6 +298,7 @@ Sentry.init({
     // === Third-party library race conditions ===
     // cmdk: useSyncExternalStore subscribe called before store context is available
     "Cannot read properties of undefined (reading 'subscribe')",
+    "undefined is not an object (evaluating 't.subscribe')",
 
     // === Misc known noise ===
     'r.default.setDefaultLevel is not a function',
