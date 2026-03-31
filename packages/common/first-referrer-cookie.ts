@@ -116,8 +116,7 @@ export function isOAuthRedirectReferrer(referrer: string): boolean {
     // GitHub — bare domain (no meaningful path) is OAuth redirect noise
     if (hostname === 'github.com') {
       const path = url.pathname
-      // Bare domain: "/" or "" (no path)
-      if (path === '/' || path === '') return true
+      if (path === '/') return true
       // Explicit OAuth path (rare — GitHub usually strips this)
       if (path.startsWith('/login/oauth')) return true
       // Any other path = genuine referral (README, repo, discussion, etc.)
@@ -245,7 +244,10 @@ export function hasPaidSignals(url: URL): boolean {
  * Decides whether the first-referrer cookie should be (re-)stamped.
  *
  * - No cookie + external referrer → stamp (first visit attribution)
+ * - No cookie + OAuth/SSO redirect referrer → skip (auth ≠ discovery)
  * - Cookie exists + paid signals in URL → stamp (paid traffic refresh)
+ *   Note: OAuth check intentionally skipped for paid refresh — the paid
+ *   signal comes from the URL (gclid, utm_medium=cpc), not the referrer.
  * - Otherwise → skip
  */
 export function shouldRefreshCookie(
