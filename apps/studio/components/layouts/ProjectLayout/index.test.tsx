@@ -47,6 +47,12 @@ vi.mock('common', () => ({
   mergeRefs:
     (..._refs: any[]) =>
     (_value: unknown) => {},
+  IS_PLATFORM: false,
+  LOCAL_STORAGE_KEYS: {
+    FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
+      `free-micro-upgrade-banner-dismissed-${ref}`,
+  },
+  isFeatureEnabled: () => false,
 }))
 
 vi.mock('framer-motion', () => ({
@@ -119,6 +125,23 @@ vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarni
 
 vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ appTitle: 'Supabase' }),
+}))
+
+vi.mock('@/hooks/misc/useLocalStorage', () => ({
+  useLocalStorageQuery: () => [false, vi.fn()],
+}))
+
+vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
+  BANNER_ID: { FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner' },
+  useBannerStack: () => ({ addBanner: vi.fn(), dismissBanner: vi.fn(), banners: [] }),
+}))
+
+vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
+  BannerFreeMicroUpgrade: () => null,
+}))
+
+vi.mock('data/usage/resource-warnings-query', () => ({
+  useResourceWarningsQuery: () => ({ data: undefined }),
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({

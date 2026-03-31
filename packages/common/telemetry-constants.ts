@@ -2931,6 +2931,44 @@ export interface LogExplorerQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked an upgrade CTA inside the compute badge hover card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ComputeBadgeUpgradeClickedEvent {
+  action: 'compute_badge_upgrade_clicked'
+  properties: {
+    computeSize: string
+    planId: string
+    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerDismissedEvent {
+  action: 'free_micro_upgrade_banner_dismissed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA on the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerCtaClickedEvent {
+  action: 'free_micro_upgrade_banner_cta_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -3119,3 +3157,6 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
+  | ComputeBadgeUpgradeClickedEvent
+  | FreeMicroUpgradeBannerDismissedEvent
+  | FreeMicroUpgradeBannerCtaClickedEvent

@@ -116,6 +116,9 @@ export const LOCAL_STORAGE_KEYS = {
 
   TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
     `table-editor-queue-operations-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-${ref}`,
+  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
 
   /**
    * COMMON
