@@ -68,7 +68,7 @@ import {
 const MAX_JWT_EXP = 604800
 const formSchema = z.object({
   JWT_EXP: z.preprocess(
-    (val) => (val ? val : undefined),
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
     z.coerce
       .number({
         required_error: 'Must have a JWT expiry value',
