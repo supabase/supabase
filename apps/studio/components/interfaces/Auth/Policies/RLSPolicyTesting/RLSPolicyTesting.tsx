@@ -6,9 +6,9 @@ import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useMigrationUpsertMutation } from 'data/database/migration-upsert-mutation'
 import { AlertCircle, CheckCircle2, Loader2, Play, Plus, Save, Trash2 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useId, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
+import { Button, cn, Select_Shadcn_, SelectContent_Shadcn_, SelectItem_Shadcn_, SelectTrigger_Shadcn_, SelectValue_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import type { TestRole } from './rls-test-worker'
@@ -22,9 +22,12 @@ CREATE POLICY "Users can view own data"
   TO authenticated
   USING (auth.uid() = user_id);`
 
-const DEFAULT_ROLES: TestRole[] = [
-  { name: 'anon', role: 'anon' },
+type RoleWithId = TestRole & { _id: string }
+
+const DEFAULT_ROLES: RoleWithId[] = [
+  { _id: 'default-anon', name: 'anon', role: 'anon' },
   {
+    _id: 'default-auth',
     name: 'authenticated',
     uid: '11111111-1111-1111-1111-111111111111',
     email: 'user@example.com',
@@ -37,18 +40,89 @@ interface RLSPolicyTestingProps {
   tables: (PostgresTable & { rls_enabled?: boolean })[]
 }
 
+function RoleEditor({
+  role,
+  canRemove,
+  onUpdate,
+  onRemove,
+}: {
+  role: RoleWithId
+  canRemove: boolean
+  onUpdate: (updates: Partial<TestRole>) => void
+  onRemove: () => void
+}) {
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-default bg-surface-100 p-3">
+      <div className="flex-1 grid grid-cols-3 gap-2">
+        <div>
+          <label className="text-xs text-foreground-lighter mb-1 block">Role</label>
+          <Select_Shadcn_
+            value={role.name}
+            onValueChange={(value) => onUpdate({ name: value, role: value })}
+          >
+            <SelectTrigger_Shadcn_ className="h-8 text-sm">
+              <SelectValue_Shadcn_ />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              <SelectItem_Shadcn_ value="anon">anon</SelectItem_Shadcn_>
+              <SelectItem_Shadcn_ value="authenticated">authenticated</SelectItem_Shadcn_>
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
+        </div>
+        <div>
+          <label className="text-xs text-foreground-lighter mb-1 block">User ID (uid)</label>
+          <Input
+            type="text"
+            size="tiny"
+            className="font-mono text-xs"
+            placeholder="UUID..."
+            value={role.uid ?? ''}
+            onChange={(e) => onUpdate({ uid: e.target.value })}
+            disabled={role.name === 'anon'}
+          />
+        </div>
+        <div>
+          <label className="text-xs text-foreground-lighter mb-1 block">Email</label>
+          <Input
+            type="text"
+            size="tiny"
+            className="font-mono text-xs"
+            placeholder="user@example.com"
+            value={role.email ?? ''}
+            onChange={(e) => onUpdate({ email: e.target.value })}
+            disabled={role.name === 'anon'}
+          />
+        </div>
+      </div>
+      {canRemove && (
+        <Button
+          type="text"
+          size="tiny"
+          icon={<Trash2 size={14} />}
+          className="text-foreground-lighter hover:text-foreground"
+          onClick={onRemove}
+        />
+      )}
+    </div>
+  )
+}
+
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err)
+}
+
 export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null)
   const [policySql, setPolicySql] = useState('')
-  const [roles, setRoles] = useState<TestRole[]>(DEFAULT_ROLES)
+  const [roles, setRoles] = useState<RoleWithId[]>(DEFAULT_ROLES)
   const [dataLimit, setDataLimit] = useState(50)
   const [isLoadingData, setIsLoadingData] = useState(false)
   const [showMigrationConfirm, setShowMigrationConfirm] = useState(false)
 
-  const { status, results, error, dataRowCount, runTest, dispose } = useRLSPolicyTest()
+  const { status, results, error, dataRowCount, runTest } = useRLSPolicyTest()
 
   const selectedTable = useMemo(
     () => tables.find((t) => t.id === selectedTableId),
@@ -89,6 +163,7 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
     setRoles((prev) => [
       ...prev,
       {
+        _id: crypto.randomUUID(),
         name: 'authenticated',
         uid: crypto.randomUUID(),
         email: `user${prev.length}@example.com`,
@@ -97,12 +172,12 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
     ])
   }, [])
 
-  const handleRemoveRole = useCallback((index: number) => {
-    setRoles((prev) => prev.filter((_, i) => i !== index))
+  const handleRemoveRole = useCallback((id: string) => {
+    setRoles((prev) => prev.filter((r) => r._id !== id))
   }, [])
 
-  const handleUpdateRole = useCallback((index: number, updates: Partial<TestRole>) => {
-    setRoles((prev) => prev.map((r, i) => (i === index ? { ...r, ...updates } : r)))
+  const handleUpdateRole = useCallback((id: string, updates: Partial<TestRole>) => {
+    setRoles((prev) => prev.map((r) => (r._id === id ? { ...r, ...updates } : r)))
   }, [])
 
   const fetchSampleData = useCallback(async (): Promise<string> => {
@@ -116,12 +191,11 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
       queryKey: ['rls-test-data', selectedTable.id, dataLimit],
     })
 
-    if (!result || (result as any[]).length === 0) return ''
+    if (!result || (result as unknown[]).length === 0) return ''
 
     const rows = result as Record<string, unknown>[]
     if (rows.length === 0) return ''
 
-    // Build INSERT statements from fetched data
     const columns = Object.keys(rows[0])
     const values = rows
       .map((row) => {
@@ -158,9 +232,9 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
         schema,
         roles,
       })
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoadingData(false)
-      toast.error(err.message)
+      toast.error(getErrorMessage(err))
     }
   }, [selectedTable, tableDDL, policySql, schema, roles, runTest, fetchSampleData])
 
@@ -180,8 +254,8 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
         query: migrationSql,
         name: `rls_policy_${selectedTable?.name ?? 'custom'}_${Date.now()}`,
       })
-    } catch (err: any) {
-      toast.error(`Failed to apply migration: ${err.message}`)
+    } catch (err: unknown) {
+      toast.error(`Failed to apply migration: ${getErrorMessage(err)}`)
     }
   }, [project, migrationSql, selectedTable, upsertMigration])
 
@@ -295,67 +369,14 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
             </div>
 
             <div className="space-y-2">
-              {roles.map((role, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 rounded-md border border-default bg-surface-100 p-3"
-                >
-                  <div className="flex-1 grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="text-xs text-foreground-lighter mb-1 block">
-                        Role
-                      </label>
-                      <select
-                        className="w-full rounded-md border border-default bg-surface-200 px-2 py-1 text-sm text-foreground"
-                        value={role.name}
-                        onChange={(e) =>
-                          handleUpdateRole(i, {
-                            name: e.target.value,
-                            role: e.target.value,
-                          })
-                        }
-                      >
-                        <option value="anon">anon</option>
-                        <option value="authenticated">authenticated</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-xs text-foreground-lighter mb-1 block">
-                        User ID (uid)
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full rounded-md border border-default bg-surface-200 px-2 py-1 text-xs font-mono text-foreground"
-                        placeholder="UUID..."
-                        value={role.uid ?? ''}
-                        onChange={(e) => handleUpdateRole(i, { uid: e.target.value })}
-                        disabled={role.name === 'anon'}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs text-foreground-lighter mb-1 block">
-                        Email
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full rounded-md border border-default bg-surface-200 px-2 py-1 text-xs font-mono text-foreground"
-                        placeholder="user@example.com"
-                        value={role.email ?? ''}
-                        onChange={(e) => handleUpdateRole(i, { email: e.target.value })}
-                        disabled={role.name === 'anon'}
-                      />
-                    </div>
-                  </div>
-                  {roles.length > 1 && (
-                    <Button
-                      type="text"
-                      size="tiny"
-                      icon={<Trash2 size={14} />}
-                      className="text-foreground-lighter hover:text-foreground"
-                      onClick={() => handleRemoveRole(i)}
-                    />
-                  )}
-                </div>
+              {roles.map((role) => (
+                <RoleEditor
+                  key={role._id}
+                  role={role}
+                  canRemove={roles.length > 1}
+                  onUpdate={(updates) => handleUpdateRole(role._id, updates)}
+                  onRemove={() => handleRemoveRole(role._id)}
+                />
               ))}
             </div>
           </div>

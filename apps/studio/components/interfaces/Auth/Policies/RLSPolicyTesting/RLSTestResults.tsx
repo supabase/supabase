@@ -2,11 +2,14 @@ import { Check, X } from 'lucide-react'
 import { cn } from 'ui'
 import type { RoleTestResult } from './rls-test-worker'
 
+const OPERATIONS = ['select', 'insert', 'update', 'delete'] as const
+type Operation = (typeof OPERATIONS)[number]
+
 interface RLSTestResultsProps {
   results: RoleTestResult[]
 }
 
-function Badge({ allowed }: { allowed: boolean }) {
+function StatusBadge({ allowed }: { allowed: boolean }) {
   return (
     <span
       className={cn(
@@ -19,6 +22,80 @@ function Badge({ allowed }: { allowed: boolean }) {
       {allowed ? <Check size={12} /> : <X size={12} />}
       {allowed ? 'Allowed' : 'Denied'}
     </span>
+  )
+}
+
+function VisibleRowsPreview({ result }: { result: RoleTestResult }) {
+  if (!result.select.allowed || result.select.rows.length === 0) return null
+
+  const columns = Object.keys(result.select.rows[0])
+
+  return (
+    <div className="space-y-2">
+      <h4 className="text-xs font-medium text-foreground-light">
+        Rows visible to <span className="font-mono">{result.role.name}</span>{' '}
+        ({result.select.rowCount})
+      </h4>
+      <div className="overflow-x-auto rounded-md border border-default max-h-[200px]">
+        <table className="w-full text-xs font-mono">
+          <thead>
+            <tr className="border-b border-default bg-surface-200 sticky top-0">
+              {columns.map((col) => (
+                <th key={col} className="px-3 py-1.5 text-left font-medium text-foreground-light">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {result.select.rows.slice(0, 20).map((row, ri) => (
+              <tr key={ri} className="border-b border-default last:border-b-0">
+                {Object.values(row).map((val, ci) => (
+                  <td key={ci} className="px-3 py-1 text-foreground-light truncate max-w-[200px]">
+                    {val === null ? <span className="text-foreground-muted italic">null</span> : String(val)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+function ErrorDetails({ results }: { results: RoleTestResult[] }) {
+  const errors = results.flatMap((r) =>
+    OPERATIONS.filter((op) => {
+      const err = r[op].error
+      return err && !err.includes('new row violates row-level security')
+    }).map((op) => ({
+      key: `${r.role.name}-${r.role.uid ?? 'no-uid'}-${op}`,
+      roleName: r.role.name,
+      operation: op.toUpperCase(),
+      message: r[op].error!,
+    }))
+  )
+
+  if (errors.length === 0) return null
+
+  return (
+    <div className="space-y-2">
+      <h4 className="text-xs font-medium text-foreground-light">Errors</h4>
+      <div className="space-y-1">
+        {errors.map((err) => (
+          <div
+            key={err.key}
+            className="rounded-md bg-destructive-200/50 px-3 py-2 text-xs text-destructive-600"
+          >
+            <span className="font-medium">
+              {err.roleName} / {err.operation}:
+            </span>{' '}
+            {err.message}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -41,104 +118,50 @@ export function RLSTestResults({ results }: RLSTestResultsProps) {
             </tr>
           </thead>
           <tbody>
-            {results.map((result, i) => (
-              <tr key={i} className="border-b border-default last:border-b-0">
-                <td className="px-4 py-2 font-mono text-xs text-foreground">
-                  {result.role.name}
-                </td>
-                <td className="px-4 py-2 font-mono text-xs text-foreground-light">
-                  {result.role.uid ? result.role.uid.slice(0, 8) + '...' : '—'}
-                </td>
-                <td className="px-4 py-2 text-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <Badge allowed={result.select.allowed} />
-                    {result.select.allowed && (
-                      <span className="text-xs text-foreground-lighter">
-                        {result.select.rowCount} row{result.select.rowCount !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-4 py-2 text-center">
-                  <Badge allowed={result.insert.allowed} />
-                </td>
-                <td className="px-4 py-2 text-center">
-                  <Badge allowed={result.update.allowed} />
-                </td>
-                <td className="px-4 py-2 text-center">
-                  <Badge allowed={result.delete.allowed} />
-                </td>
-              </tr>
-            ))}
+            {results.map((result) => {
+              const roleKey = `${result.role.name}-${result.role.uid ?? 'no-uid'}`
+              return (
+                <tr key={roleKey} className="border-b border-default last:border-b-0">
+                  <td className="px-4 py-2 font-mono text-xs text-foreground">
+                    {result.role.name}
+                  </td>
+                  <td className="px-4 py-2 font-mono text-xs text-foreground-light">
+                    {result.role.uid ? result.role.uid.slice(0, 8) + '...' : '—'}
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <div className="flex flex-col items-center gap-1">
+                      <StatusBadge allowed={result.select.allowed} />
+                      {result.select.allowed && (
+                        <span className="text-xs text-foreground-lighter">
+                          {result.select.rowCount} row{result.select.rowCount !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <StatusBadge allowed={result.insert.allowed} />
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <StatusBadge allowed={result.update.allowed} />
+                  </td>
+                  <td className="px-4 py-2 text-center">
+                    <StatusBadge allowed={result.delete.allowed} />
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
 
-      {/* Show visible rows per role */}
-      {results.map(
-        (result, i) =>
-          result.select.allowed &&
-          result.select.rows.length > 0 && (
-            <div key={i} className="space-y-2">
-              <h4 className="text-xs font-medium text-foreground-light">
-                Rows visible to <span className="font-mono">{result.role.name}</span>{' '}
-                ({result.select.rowCount})
-              </h4>
-              <div className="overflow-x-auto rounded-md border border-default max-h-[200px]">
-                <table className="w-full text-xs font-mono">
-                  <thead>
-                    <tr className="border-b border-default bg-surface-200 sticky top-0">
-                      {Object.keys(result.select.rows[0]).map((col) => (
-                        <th key={col} className="px-3 py-1.5 text-left font-medium text-foreground-light">
-                          {col}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {result.select.rows.slice(0, 20).map((row, ri) => (
-                      <tr key={ri} className="border-b border-default last:border-b-0">
-                        {Object.values(row).map((val, ci) => (
-                          <td key={ci} className="px-3 py-1 text-foreground-light truncate max-w-[200px]">
-                            {val === null ? <span className="text-foreground-muted italic">null</span> : String(val)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )
-      )}
+      {results.map((result) => (
+        <VisibleRowsPreview
+          key={`${result.role.name}-${result.role.uid ?? 'no-uid'}-rows`}
+          result={result}
+        />
+      ))}
 
-      {/* Show errors */}
-      {results.some(
-        (r) => r.select.error || r.insert.error || r.update.error || r.delete.error
-      ) && (
-        <div className="space-y-2">
-          <h4 className="text-xs font-medium text-foreground-light">Errors</h4>
-          <div className="space-y-1">
-            {results.map((r, i) =>
-              ['select', 'insert', 'update', 'delete'].map((op) => {
-                const err = (r as any)[op].error
-                if (!err || err.includes('new row violates row-level security')) return null
-                return (
-                  <div
-                    key={`${i}-${op}`}
-                    className="rounded-md bg-destructive-200/50 px-3 py-2 text-xs text-destructive-600"
-                  >
-                    <span className="font-medium">
-                      {r.role.name} / {op.toUpperCase()}:
-                    </span>{' '}
-                    {err}
-                  </div>
-                )
-              })
-            )}
-          </div>
-        </div>
-      )}
+      <ErrorDetails results={results} />
     </div>
   )
 }

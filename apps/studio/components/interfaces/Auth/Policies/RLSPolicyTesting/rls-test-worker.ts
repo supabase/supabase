@@ -211,8 +211,8 @@ async function testPolicy(
           rowCount: totalRows,
           rows: selectRes.rows as Record<string, unknown>[],
         }
-      } catch (e: any) {
-        result.select = { allowed: false, rowCount: 0, rows: [], error: e.message }
+      } catch (e: unknown) {
+        result.select = { allowed: false, rowCount: 0, rows: [], error: e instanceof Error ? e.message : String(e) }
       }
 
       // INSERT – try inserting a row with default values
@@ -221,8 +221,8 @@ async function testPolicy(
         await db.exec(`INSERT INTO ${qualifiedTable} DEFAULT VALUES;`)
         result.insert = { allowed: true }
         await db.exec('ROLLBACK TO insert_test;')
-      } catch (e: any) {
-        result.insert = { allowed: false, error: e.message }
+      } catch (e: unknown) {
+        result.insert = { allowed: false, error: e instanceof Error ? e.message : String(e) }
         try {
           await db.exec('ROLLBACK TO insert_test;')
         } catch {
@@ -245,8 +245,8 @@ async function testPolicy(
         )
         result.update = { allowed: true }
         await db.exec('ROLLBACK TO update_test;')
-      } catch (e: any) {
-        result.update = { allowed: false, error: e.message }
+      } catch (e: unknown) {
+        result.update = { allowed: false, error: e instanceof Error ? e.message : String(e) }
         try {
           await db.exec('ROLLBACK TO update_test;')
         } catch {
@@ -260,8 +260,8 @@ async function testPolicy(
         await db.exec(`DELETE FROM ${qualifiedTable} WHERE true;`)
         result.delete = { allowed: true }
         await db.exec('ROLLBACK TO delete_test;')
-      } catch (e: any) {
-        result.delete = { allowed: false, error: e.message }
+      } catch (e: unknown) {
+        result.delete = { allowed: false, error: e instanceof Error ? e.message : String(e) }
         try {
           await db.exec('ROLLBACK TO delete_test;')
         } catch {
@@ -312,7 +312,7 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
         }
         break
     }
-  } catch (err: any) {
-    respond({ type: 'error', message: err.message ?? String(err) })
+  } catch (err: unknown) {
+    respond({ type: 'error', message: err instanceof Error ? err.message : String(err) })
   }
 }
