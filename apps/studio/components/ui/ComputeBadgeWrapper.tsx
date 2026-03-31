@@ -102,7 +102,8 @@ export const ComputeBadgeWrapper = ({
   const isComputeNearExhaustion =
     !!resourceWarnings?.cpu_exhaustion ||
     !!resourceWarnings?.memory_and_swap_exhaustion ||
-    !!resourceWarnings?.disk_space_exhaustion
+    !!resourceWarnings?.disk_space_exhaustion ||
+    !!resourceWarnings?.disk_iops_exhaustion
   const showUpgradeGlow = isEligibleForFreeUpgrade && isComputeNearExhaustion
 
   const isLoading = isLoadingAddons || isLoadingSubscriptions
