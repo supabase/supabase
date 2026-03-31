@@ -2,10 +2,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AiIconAnimation, Button } from 'ui'
+
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 
 interface AIAssistantOptionProps {
   projectRef?: string | null

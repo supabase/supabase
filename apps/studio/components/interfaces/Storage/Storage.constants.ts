@@ -1,4 +1,4 @@
-import { DOCS_URL } from 'lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 // Original storage constants
 export enum URL_EXPIRY_DURATION {

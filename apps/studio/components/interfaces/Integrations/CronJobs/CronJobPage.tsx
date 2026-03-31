@@ -1,8 +1,5 @@
 import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
-import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -34,6 +31,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
+import { useCronJobQuery } from '@/data/database-cron-jobs/database-cron-job-query'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const CronJobPage = () => {
   const router = useRouter()

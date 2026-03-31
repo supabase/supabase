@@ -3,11 +3,11 @@ import { sortBy, take } from 'lodash'
 import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { uuidv4 } from 'lib/helpers'
-import { EMPTY_ARR } from 'lib/void'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import type { LogData } from './Messages.types'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { uuidv4 } from '@/lib/helpers'
+import { EMPTY_ARR } from '@/lib/void'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const DEFAULT_HEADERS = { 'X-Client-Info': 'supabase-js-web/studio' }
 

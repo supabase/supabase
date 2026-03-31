@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { formatBytes } from 'lib/helpers'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
@@ -20,7 +18,6 @@ import {
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { useContextMenu } from 'react-contexify'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
   cn,
@@ -49,6 +46,9 @@ import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { formatBytes } from '@/lib/helpers'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const RowIcon = ({
   view,

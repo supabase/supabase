@@ -1,11 +1,11 @@
 import { type MouseEvent, type UIEvent } from 'react'
-import DataGrid, { type Column, Row } from 'react-data-grid'
-
-import AlertError from 'components/ui/AlertError'
-import type { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import type { ResponseError } from 'types'
+import DataGrid, { Row, type Column } from 'react-data-grid'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import AlertError from '@/components/ui/AlertError'
+import type { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import type { ResponseError } from '@/types'
 
 interface CronJobsTabDataGridProps {
   columns: readonly Column<CronJob>[]

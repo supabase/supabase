@@ -1,6 +1,7 @@
-import { FeatureBanner } from 'components/ui/FeatureBanner'
 import { Import } from 'lucide-react'
 import { Button } from 'ui'
+
+import { FeatureBanner } from '@/components/ui/FeatureBanner'
 
 export const StartUsingJwtSigningKeysBanner = ({
   onClick,

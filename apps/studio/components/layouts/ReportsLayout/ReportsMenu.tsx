@@ -1,13 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
-import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Content, useContentQuery } from 'data/content/content-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProfile } from 'lib/profile'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,6 +11,14 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportMenuItem } from './ReportMenuItem'
+import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
+import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { Content, useContentQuery } from '@/data/content/content-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useProfile } from '@/lib/profile'
 
 const ReportsMenu = () => {
   const router = useRouter()

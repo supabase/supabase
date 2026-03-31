@@ -1,5 +1,4 @@
 import { formatRelative } from 'date-fns'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
@@ -16,6 +15,7 @@ import {
 
 import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const StripeSyncSettingsPage = () => {
   const { data: project } = useSelectedProjectQuery()

@@ -1,4 +1,4 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 export const checkHasNonPositiveValues = (data: Record<string, unknown>[], key: string): boolean =>
   data.some((row) => (row[key] as number) <= 0)

@@ -2,9 +2,9 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FileExplorerHeader } from './FileExplorerHeader'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { customRender as render } from 'tests/lib/custom-render'
+import { FileExplorerHeader } from './FileExplorerHeader'
+import { customRender as render } from '@/tests/lib/custom-render'
 
 const {
   mockTrack,

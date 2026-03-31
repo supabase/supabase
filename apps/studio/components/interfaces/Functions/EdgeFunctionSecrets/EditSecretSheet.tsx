@@ -1,9 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { ProjectSecret } from 'data/secrets/secrets-query'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -25,6 +21,11 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
+
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import { ProjectSecret } from '@/data/secrets/secrets-query'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 const FORM_ID = 'edit-secret-sidepanel'
 

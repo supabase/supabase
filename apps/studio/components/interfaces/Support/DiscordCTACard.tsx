@@ -1,11 +1,12 @@
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import router from 'next/router'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import { Button } from 'ui'
+
 import { NO_ORG_MARKER } from './SupportForm.utils'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 interface DiscordCTACardProps {
   organizationSlug?: string | null

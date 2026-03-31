@@ -1,8 +1,7 @@
-import type { Dictionary } from 'types'
-
 import type { ColumnField } from '../SidePanelEditor.types'
 import type { InferredColumnType } from '../SpreadsheetImport/SpreadsheetImport.utils'
 import type { Prettify } from '@/lib/type-helpers'
+import type { Dictionary } from '@/types'
 
 export type TableField = Prettify<{
   id: number

@@ -1,10 +1,11 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { Lint } from 'data/lint/lint-query'
 import { RefreshCw } from 'lucide-react'
 import { Button } from 'ui'
+
+import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { Lint } from '@/data/lint/lint-query'
 
 interface LinterFiltersProps {
   filterOptions: {
