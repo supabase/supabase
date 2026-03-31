@@ -27,6 +27,7 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { useVisibleKey } from 'hooks/ui/useVisibleKey'
 import { useTrack } from 'lib/telemetry/track'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
@@ -66,6 +67,7 @@ import type { ImportContent } from './TableEditor/TableEditor.types'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
+import { isObjectContainingKeys } from '@/lib/helpers'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 
 export type SaveTableParams =
@@ -201,6 +203,7 @@ export const SidePanelEditor = ({
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
+  const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -845,14 +848,13 @@ export const SidePanelEditor = ({
     )
 
     if (file && rowCount > 0) {
-      // CSV file upload
-      const res: any = await insertRowsViaSpreadsheet(
-        project.ref!,
-        project.connectionString,
+      const res = await insertRowsViaSpreadsheet({
+        projectRef: project.ref!,
+        connectionString: project.connectionString,
         file,
-        selectedTable,
+        table: selectedTable,
         selectedHeaders,
-        (progress: number) => {
+        onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
@@ -860,21 +862,24 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
-      )
+        },
+        treatEmptyAsNull: importContent.treatEmptyAsNull,
+      })
       if (res.error) {
-        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        const message = isObjectContainingKeys(res.error, ['message'])
+          ? res.error.message
+          : 'An unknown error occurred during import'
+        toast.error(`Failed to import data: ${message}`, { id: toastId })
         return resolve()
       }
     } else {
-      // Text paste
-      const res: any = await insertTableRows(
-        project.ref!,
-        project.connectionString,
-        selectedTable,
-        importContent.rows,
+      const res = await insertTableRows({
+        projectRef: project.ref!,
+        connectionString: project.connectionString,
+        table: selectedTable,
+        rows: importContent.rows,
         selectedHeaders,
-        (progress: number) => {
+        onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
@@ -884,10 +889,14 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
-      )
+        },
+        treatEmptyAsNull: importContent.treatEmptyAsNull,
+      })
       if (res.error) {
-        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        const message = isObjectContainingKeys(res.error, ['message'])
+          ? res.error.message
+          : 'An unknown error occurred during import'
+        toast.error(`Failed to import data: ${message}`, { id: toastId })
         return resolve()
       }
     }
@@ -990,6 +999,7 @@ export const SidePanelEditor = ({
         onSelect={onSaveForeignRow}
       />
       <SpreadsheetImport
+        key={csvImportKey}
         visible={snap.sidePanel?.type === 'csv-import'}
         selectedTable={selectedTable}
         saveContent={onImportData}

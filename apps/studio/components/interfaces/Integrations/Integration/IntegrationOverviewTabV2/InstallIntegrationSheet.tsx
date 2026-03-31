@@ -398,7 +398,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
           </SheetClose>
           <Button
             type="primary"
-            disabled={hasMissingExtensions}
+            disabled={hasMissingExtensions && !installationCommand}
             loading={isInstalling}
             onClick={onInstallIntegration}
           >

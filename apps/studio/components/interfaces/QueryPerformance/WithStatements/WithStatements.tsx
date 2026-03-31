@@ -96,16 +96,22 @@ export const WithStatements = ({
   useEffect(() => {
     if (mainQueryError) {
       const errorMessage = getErrorMessage(mainQueryError)
-      captureQueryPerformanceError(mainQueryError, {
-        projectRef: ref,
-        databaseIdentifier: state.selectedDatabaseId,
-        queryPreset: 'unified',
-        queryType: 'mainQuery',
-        postgresVersion: project?.dbVersion,
-        databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
-        sql: queryPerformanceQuery.resolvedSql,
-        errorMessage: errorMessage || undefined,
-      })
+      const isNotInstalled =
+        typeof errorMessage === 'string' &&
+        errorMessage.includes('pg_stat_statements') &&
+        errorMessage.includes('does not exist')
+      if (!isNotInstalled) {
+        captureQueryPerformanceError(mainQueryError, {
+          projectRef: ref,
+          databaseIdentifier: state.selectedDatabaseId,
+          queryPreset: 'unified',
+          queryType: 'mainQuery',
+          postgresVersion: project?.dbVersion,
+          databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
+          sql: queryPerformanceQuery.resolvedSql,
+          errorMessage: errorMessage || undefined,
+        })
+      }
     }
   }, [
     mainQueryError,
@@ -155,18 +161,31 @@ export const WithStatements = ({
         ? getErrorMessage(metricsError) || 'Failed to load query metrics'
         : null
 
+  const isPgStatStatementsNotInstalled =
+    typeof errorMessage === 'string' &&
+    errorMessage.includes('pg_stat_statements') &&
+    errorMessage.includes('does not exist')
+
   return (
     <>
       {hasError && (
         <div className="px-6 pt-4">
-          <Admonition
-            type="destructive"
-            title="Error loading query performance data"
-            description={
-              errorMessage ||
-              'An error occurred while loading query performance data. Please try refreshing the page.'
-            }
-          />
+          {isPgStatStatementsNotInstalled ? (
+            <Admonition
+              type="warning"
+              title="pg_stat_statements extension is not enabled"
+              description="Query Performance requires the pg_stat_statements extension. Enable it in Database → Extensions."
+            />
+          ) : (
+            <Admonition
+              type="destructive"
+              title="Error loading query performance data"
+              description={
+                errorMessage ||
+                'An error occurred while loading query performance data. Please try refreshing the page.'
+              }
+            />
+          )}
         </div>
       )}
       <QueryPerformanceMetrics />
