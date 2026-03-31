@@ -100,7 +100,11 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   return (
     <>
       <div
-        className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative', isStateOfStartupsPage && 'fixed left-0 right-0')}
+        className={cn(
+          'sticky top-0 z-40 transform',
+          disableStickyNav && 'relative',
+          isStateOfStartupsPage && 'fixed left-0 right-0'
+        )}
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
