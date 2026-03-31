@@ -9,7 +9,12 @@ import {
 } from '@/components/interfaces/Connect/ConnectTabs'
 import { IS_PLATFORM } from '@/lib/constants'
 
-const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
+const ContentFile = ({
+  connectionStringPooler,
+  isSelfHosted,
+}: ContentFileProps) => {
+  const isPlatform = IS_PLATFORM
+
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -28,11 +33,23 @@ DATABASE_URL="${connectionStringPooler.transactionDedicated}?pgbouncer=true"
 DIRECT_URL="${connectionStringPooler.sessionDedicated}"
         `
             : `
-# Connect to Supabase ${IS_PLATFORM ? 'via connection pooling' : ''}
-DATABASE_URL="${IS_PLATFORM ? `${connectionStringPooler.transactionShared}?pgbouncer=true` : connectionStringPooler.direct}"
+# Connect to Supabase ${isPlatform ? 'via connection pooling' : ''}
+DATABASE_URL="${
+                isPlatform
+                  ? `${connectionStringPooler.transactionShared}?pgbouncer=true`
+                  : isSelfHosted
+                    ? connectionStringPooler.sessionShared // Use session pooler for self-hosted by default
+                    : connectionStringPooler.direct
+              }"
 
 # Direct connection to the database. Used for migrations
-DIRECT_URL="${IS_PLATFORM ? connectionStringPooler.sessionShared : connectionStringPooler.direct}"
+DIRECT_URL="${
+                isPlatform
+                  ? connectionStringPooler.sessionShared
+                  : isSelfHosted
+                    ? `${connectionStringPooler.direct} // Manually configurable`
+                    : connectionStringPooler.direct
+              }"
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>

@@ -8,7 +8,14 @@ import {
   ConnectTabTriggers,
 } from '@/components/interfaces/Connect/ConnectTabs'
 
-const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
+const ContentFile = ({
+  connectionStringPooler,
+  isSelfHosted,
+}: ContentFileProps) => {
+  const connectionString = isSelfHosted
+    ? connectionStringPooler.sessionShared // Use session pooler for self-hosted
+    : connectionStringPooler.transactionDedicated || connectionStringPooler.transactionShared
+
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -19,7 +26,7 @@ const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
 
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
-          {`DATABASE_URL="${connectionStringPooler.transactionDedicated || connectionStringPooler.transactionShared}"`}
+          {`DATABASE_URL="${connectionString}"`}
         </SimpleCodeBlock>
       </ConnectTabContent>
 

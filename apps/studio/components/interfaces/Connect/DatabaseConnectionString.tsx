@@ -310,8 +310,11 @@ export const DatabaseConnectionString = () => {
   const hasCodeExamples = exampleFiles || exampleInstallCommands
   const fileTitle = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.fileTitle
 
-  // [Refactor] See if we can do this in an immutable way, technically not a good practice to do this
-  let stepNumber = 0
+  const hasFiles = exampleFiles && exampleFiles.length > 0
+  const installStepNumber = hasCodeExamples ? 1 : 0
+  const fileStepNumber = hasFiles ? (installStepNumber + 1) : 0
+  const connectStepNumber = Math.max(installStepNumber, fileStepNumber) + 1
+  const postInstallStepNumber = examplePostInstallCommands ? (connectStepNumber + 1) : 0
 
   const ipv4AddOnUrl = {
     text: 'IPv4 add-on',
@@ -420,7 +423,7 @@ export const DatabaseConnectionString = () => {
           {hasCodeExamples && (
             <div className="flex flex-col w-full">
               <div className="grid lg:grid-cols-3 gap-4 lg:gap-5 py-8 px-4 md:px-7">
-                <StepLabel number={++stepNumber} className="items-start">
+                <StepLabel number={installStepNumber} className="items-start">
                   Install the following
                 </StepLabel>
                 {exampleInstallCommands?.map((cmd) => (
@@ -436,9 +439,9 @@ export const DatabaseConnectionString = () => {
                   </CodeBlock>
                 ))}
               </div>
-              {exampleFiles && exampleFiles?.length > 0 && (
+              {hasFiles && (
                 <div className="grid lg:grid-cols-3 gap-4 lg:gap-5 border-t py-8 px-4 md:px-7">
-                  <StepLabel number={++stepNumber} className="items-start">
+                  <StepLabel number={fileStepNumber} className="items-start">
                     Add file to project
                   </StepLabel>
                   {exampleFiles?.map((file) => (
@@ -461,7 +464,7 @@ export const DatabaseConnectionString = () => {
           <div>
             {hasCodeExamples && (
               <div className="px-4 md:px-7 pt-8">
-                <StepLabel number={++stepNumber}>Connect to your database</StepLabel>
+                <StepLabel number={connectStepNumber}>Connect to your database</StepLabel>
               </div>
             )}
             <div className="px-4 md:px-7 py-8">
@@ -733,7 +736,7 @@ export const DatabaseConnectionString = () => {
 
           {examplePostInstallCommands && (
             <div className="grid lg:grid-cols-3 gap-4 lg:gap-5 w-full px-4 md:px-7 py-8">
-              <StepLabel number={++stepNumber} className="items-start">
+              <StepLabel number={postInstallStepNumber} className="items-start">
                 Add the configuration package to read the settings
               </StepLabel>
               {examplePostInstallCommands?.map((cmd) => (

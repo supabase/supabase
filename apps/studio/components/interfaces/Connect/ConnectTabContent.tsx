@@ -12,7 +12,11 @@ import { useDeploymentModeQuery } from '@/data/config/deployment-mode-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useTrack } from '@/lib/telemetry/track'
+import { getConnectionStrings } from './DatabaseSettings.utils'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
@@ -124,6 +128,8 @@ export const ConnectTabContent = forwardRef<HTMLDivElement, ConnectContentTabPro
               ipv4SupportedForDedicatedPooler: !!ipv4Addon,
               direct: isSelfHosted ? `postgresql://postgres:[YOUR-PASSWORD]@${connectionInfo.db_host}:${connectionInfo.db_port || 5432}/postgres` : connectionStringsShared.direct.uri,
             }}
+            isCliMode={isCliMode}
+            isSelfHosted={isSelfHosted}
             onCopy={handleCopy}
           />
         </CopyCallbackContext.Provider>
