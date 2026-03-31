@@ -92,7 +92,6 @@ export const CronJobTableCell = ({
   const [showToggleModal, setShowToggleModal] = useState(false)
 
   const value = row?.[col.id]
-  const hasValue = col.id in row
   const { jobid, schedule, latest_run, status, active, jobname } = row
 
   const formattedValue =
@@ -105,6 +104,8 @@ export const CronJobTableCell = ({
         : col.id === 'next_run'
           ? getNextRun(schedule, latest_run)
           : value
+
+  const hasValue = col.id === 'next_run' ? !!formattedValue : col.id in row
 
   const { mutate: runCronJob, isPending: isRunning } = useDatabaseCronJobRunCommandMutation({
     onSuccess: () => {
