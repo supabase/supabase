@@ -33,4 +33,3 @@ export const useIsQueueOperationsEnabled = () => {
   const { isQueueOperationsEnabled } = useIsQueueOperationsSetting()
   return isQueueOperationsEnabled ?? false
 }
-

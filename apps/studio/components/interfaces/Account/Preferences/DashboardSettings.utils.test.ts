@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { getDashboardSettingsUrl } from './DashboardSettings.utils'
+
 const mockIsPlatform = vi.hoisted(() => ({ value: true }))
 
 vi.mock('lib/constants', async () => {
@@ -12,8 +14,6 @@ vi.mock('lib/constants', async () => {
   }
 })
 
-import { getDashboardSettingsUrl } from './DashboardSettings.utils'
-
 describe('getDashboardSettingsUrl', () => {
   it('returns account page URL on platform', () => {
     mockIsPlatform.value = true
@@ -22,8 +22,6 @@ describe('getDashboardSettingsUrl', () => {
 
   it('returns project settings URL on self-hosted', () => {
     mockIsPlatform.value = false
-    expect(getDashboardSettingsUrl('my-ref')).toBe(
-      '/project/my-ref/settings/preferences#dashboard'
-    )
+    expect(getDashboardSettingsUrl('my-ref')).toBe('/project/my-ref/settings/preferences#dashboard')
   })
 })
