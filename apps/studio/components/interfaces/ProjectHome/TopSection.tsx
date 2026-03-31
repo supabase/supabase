@@ -7,6 +7,7 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
@@ -20,6 +21,8 @@ export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
+  const projectResourceWarnings = resourceWarnings?.find((w) => w.project === project?.ref)
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
   const { data: branches } = useBranchesQuery({
@@ -79,6 +82,7 @@ export const TopSection = () => {
                     slug={organization?.slug}
                     cloudProvider={project?.cloud_provider}
                     computeSize={project?.infra_compute_size}
+                    resourceWarnings={projectResourceWarnings}
                   />
                   {project?.high_availability && <HighAvailabilityBadge />}
                 </div>

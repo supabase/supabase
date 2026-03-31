@@ -115,7 +115,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
     const { addBanner, dismissBanner } = useBannerStack()
-    const { data: resourceWarnings } = useResourceWarningsQuery({ ref: selectedProject?.ref })
+    const { data: resourceWarnings } = useResourceWarningsQuery({
+      slug: selectedOrganization?.slug,
+    })
     const projectResourceWarnings = resourceWarnings?.find(
       (w) => w.project === selectedProject?.ref
     )
@@ -174,7 +176,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     useEffect(() => {
       if (!selectedProject?.ref) return
-      if (showUpgradeBanner && !isFreeMicroUpgradeBannerDismissed) {
+      const isProjectHomepage = router.pathname === '/project/[ref]'
+      if (isProjectHomepage && showUpgradeBanner && !isFreeMicroUpgradeBannerDismissed) {
         addBanner({
           id: BANNER_ID.FREE_MICRO_UPGRADE,
           isDismissed: false,
@@ -185,6 +188,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
         dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
       }
     }, [
+      router.pathname,
       selectedProject?.ref,
       showUpgradeBanner,
       isFreeMicroUpgradeBannerDismissed,
