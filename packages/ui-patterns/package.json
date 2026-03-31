@@ -34,6 +34,10 @@
       "import": "./src/AuthenticatedDropdownMenu/index.tsx",
       "types": "./src/AuthenticatedDropdownMenu/index.tsx"
     },
+    "./Banners/Announcement": {
+      "import": "./src/Banners/Announcement.tsx",
+      "types": "./src/Banners/Announcement.tsx"
+    },
     "./Banners/AnnouncementBanner": {
       "import": "./src/Banners/AnnouncementBanner.tsx",
       "types": "./src/Banners/AnnouncementBanner.tsx"
@@ -61,6 +65,18 @@
     "./Chart": {
       "import": "./src/Chart/index.tsx",
       "types": "./src/Chart/index.tsx"
+    },
+    "./CodeBlock/CodeBlock": {
+      "import": "./src/CodeBlock/CodeBlock.tsx",
+      "types": "./src/CodeBlock/CodeBlock.tsx"
+    },
+    "./CodeBlock/CodeBlock.utils": {
+      "import": "./src/CodeBlock/CodeBlock.utils.ts",
+      "types": "./src/CodeBlock/CodeBlock.utils.ts"
+    },
+    "./CodeBlock": {
+      "import": "./src/CodeBlock/index.tsx",
+      "types": "./src/CodeBlock/index.tsx"
     },
     "./CommandMenu/api/Badges": {
       "import": "./src/CommandMenu/api/Badges.tsx",
@@ -410,6 +426,18 @@
       "import": "./src/IconPanel/index.tsx",
       "types": "./src/IconPanel/index.tsx"
     },
+    "./Image/Image": {
+      "import": "./src/Image/Image.tsx",
+      "types": "./src/Image/Image.tsx"
+    },
+    "./Image/ZoomContent": {
+      "import": "./src/Image/ZoomContent.tsx",
+      "types": "./src/Image/ZoomContent.tsx"
+    },
+    "./Image": {
+      "import": "./src/Image/index.tsx",
+      "types": "./src/Image/index.tsx"
+    },
     "./InnerSideMenu": {
       "import": "./src/InnerSideMenu/index.tsx",
       "types": "./src/InnerSideMenu/index.tsx"
@@ -417,6 +445,10 @@
     "./LogsBarChart": {
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
+    },
+    "./Markdown": {
+      "import": "./src/Markdown/index.tsx",
+      "types": "./src/Markdown/index.tsx"
     },
     "./McpUrlBuilder/McpConfigPanel": {
       "import": "./src/McpUrlBuilder/McpConfigPanel.tsx",
@@ -473,6 +505,14 @@
     "./McpUrlBuilder/utils/mcpIconAssets": {
       "import": "./src/McpUrlBuilder/utils/mcpIconAssets.ts",
       "types": "./src/McpUrlBuilder/utils/mcpIconAssets.ts"
+    },
+    "./Mermaid/Mermaid": {
+      "import": "./src/Mermaid/Mermaid.tsx",
+      "types": "./src/Mermaid/Mermaid.tsx"
+    },
+    "./Mermaid": {
+      "import": "./src/Mermaid/index.tsx",
+      "types": "./src/Mermaid/index.tsx"
     },
     "./MetricCard": {
       "import": "./src/MetricCard/index.tsx",
@@ -566,6 +606,18 @@
       "import": "./src/ShimmeringLoader/index.tsx",
       "types": "./src/ShimmeringLoader/index.tsx"
     },
+    "./SimpleCodeBlock/SimpleCodeBlock": {
+      "import": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx",
+      "types": "./src/SimpleCodeBlock/SimpleCodeBlock.tsx"
+    },
+    "./SimpleCodeBlock": {
+      "import": "./src/SimpleCodeBlock/index.tsx",
+      "types": "./src/SimpleCodeBlock/index.tsx"
+    },
+    "./SimpleCodeBlock/prism": {
+      "import": "./src/SimpleCodeBlock/prism.ts",
+      "types": "./src/SimpleCodeBlock/prism.ts"
+    },
     "./SqlToRest/assumptions": {
       "import": "./src/SqlToRest/assumptions.ts",
       "types": "./src/SqlToRest/assumptions.ts"
@@ -602,6 +654,10 @@
       "import": "./src/StatusCode/index.tsx",
       "types": "./src/StatusCode/index.tsx"
     },
+    "./TextLink": {
+      "import": "./src/TextLink/index.tsx",
+      "types": "./src/TextLink/index.tsx"
+    },
     "./ThemeToggle": {
       "import": "./src/ThemeToggle.tsx",
       "types": "./src/ThemeToggle.tsx"
@@ -609,6 +665,10 @@
     "./TimestampInfo": {
       "import": "./src/TimestampInfo/index.tsx",
       "types": "./src/TimestampInfo/index.tsx"
+    },
+    "./Table": {
+      "import": "./src/Table/index.ts",
+      "types": "./src/Table/index.ts"
     },
     "./Toc": {
       "import": "./src/Toc/index.ts",
@@ -713,6 +773,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-visually-hidden": "^1.1.3",
     "@std/toml": "jsr:^1.0.11",
+    "@tanstack/react-table": "^8.21.3",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@vitest/coverage-v8": "^3.2.0",
@@ -725,13 +786,16 @@
     "framer-motion": "^11.1.9",
     "github-slugger": "^2.0.0",
     "icons": "workspace:*",
+    "highlightjs-curl": "^1.3.0",
     "js-yaml": "^3.14.1",
     "lodash": "catalog:",
     "lucide-react": "*",
+    "mermaid": "^11.12.1",
     "mdast": "^3.0.0",
     "monaco-editor": "*",
     "next-themes": "*",
     "openai": "^4.75.1",
+    "prism-react-renderer": "^2.3.1",
     "react": "catalog:",
     "react-countdown": "^2.3.5",
     "react-dom": "catalog:",
@@ -739,6 +803,7 @@
     "react-hook-form": "^7.45.0",
     "react-intersection-observer": "^9.8.2",
     "react-markdown": "^9.0.1",
+    "react-medium-image-zoom": "^5.2.4",
     "react-syntax-highlighter": "^15.6.6",
     "react-use": "^17.5.0",
     "recharts": "catalog:",
@@ -766,6 +831,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "tsx": "catalog:",

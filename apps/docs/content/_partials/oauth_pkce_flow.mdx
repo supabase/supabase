@@ -156,7 +156,7 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
           getAll() {
             return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet, _headers) {
             cookiesToSet.forEach(({ name, value, options }) =>
               Astro.cookies.set(name, value, options)
             )
@@ -191,7 +191,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const next = requestUrl.searchParams.get('next') || '/'
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
   if (code) {
     const supabase = createServerClient(
@@ -202,10 +202,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
           getAll() {
             return parseCookieHeader(request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet, cacheHeaders) {
             cookiesToSet.forEach(({ name, value, options }) =>
-              headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+              responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
             )
+            Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
           },
         },
       }
@@ -214,12 +215,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      return redirect(next, { headers })
+      return redirect(next, { headers: responseHeaders })
     }
   }
 
   // return the user to an error page with instructions
-  return redirect('/auth/auth-code-error', { headers })
+  return redirect('/auth/auth-code-error', { headers: responseHeaders })
 }
 ```
 
@@ -240,11 +241,14 @@ app.get("/auth/callback", async function (req, res) {
       process.env.SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
-        return parseCookieHeader(context.req.headers.cookie ?? '')
+        return parseCookieHeader(req.headers.cookie ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value, options }) =>
-          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+          res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+        Object.entries(headers).forEach(([key, value]) =>
+          res.setHeader(key, value)
         )
       },
     },
