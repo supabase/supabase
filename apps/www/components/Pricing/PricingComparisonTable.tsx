@@ -1,5 +1,6 @@
 'use client'
 
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -10,6 +11,7 @@ import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pric
 import Solutions from '~/data/MainProducts'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { getPricingPlanHref } from './getPricingPlanHref'
 import UpgradePlan from './UpgradePlan'
 
 const MobileHeader = ({
@@ -21,6 +23,8 @@ const MobileHeader = ({
   from = false,
   organizations,
   hasExistingOrganizations,
+  isLoggedIn,
+  isUserLoading,
 }: {
   description: string
   priceDescription: string
@@ -30,6 +34,8 @@ const MobileHeader = ({
   from?: boolean
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
+  isLoggedIn: boolean
+  isUserLoading: boolean
 }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -73,7 +79,7 @@ const MobileHeader = ({
       ) : (
         <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
-            href={selectedPlan.href}
+            href={getPricingPlanHref({ plan: selectedPlan, isLoggedIn, isUserLoading })}
             onClick={() =>
               sendTelemetryEvent({
                 action: 'www_pricing_plan_cta_clicked',
@@ -104,6 +110,8 @@ const PricingComparisonTable = ({
   hasExistingOrganizations,
 }: PricingComparisonTableProps) => {
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
 
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -140,6 +148,8 @@ const PricingComparisonTable = ({
               price={'0'}
               priceDescription={'/month'}
               description={'Perfect for hobby projects and experiments'}
+              isLoggedIn={isLoggedIn}
+              isUserLoading={isUserLoading}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -202,6 +212,8 @@ const PricingComparisonTable = ({
               description={'Everything you need to scale your project into production'}
               organizations={organizations}
               hasExistingOrganizations={hasExistingOrganizations}
+              isLoggedIn={isLoggedIn}
+              isUserLoading={isUserLoading}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -256,6 +268,8 @@ const PricingComparisonTable = ({
               description={'Collaborate with different permissions and access patterns'}
               organizations={organizations}
               hasExistingOrganizations={hasExistingOrganizations}
+              isLoggedIn={isLoggedIn}
+              isUserLoading={isUserLoading}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -308,6 +322,8 @@ const PricingComparisonTable = ({
               priceDescription={''}
               description={'Designated support team, account manager and technical specialist'}
               showDollarSign={false}
+              isLoggedIn={isLoggedIn}
+              isUserLoading={isUserLoading}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -428,7 +444,7 @@ const PricingComparisonTable = ({
                             block
                           >
                             <Link
-                              href={plan.href}
+                              href={getPricingPlanHref({ plan, isLoggedIn, isUserLoading })}
                               onClick={() =>
                                 sendTelemetryEvent({
                                   action: 'www_pricing_plan_cta_clicked',

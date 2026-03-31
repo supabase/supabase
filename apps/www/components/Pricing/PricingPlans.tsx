@@ -1,5 +1,6 @@
 'use client'
 
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
 
 import { Check } from 'lucide-react'
@@ -7,6 +8,7 @@ import { plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { getPricingPlanHref } from './getPricingPlanHref'
 import UpgradePlan from './UpgradePlan'
 
 interface PricingPlansProps {
@@ -16,6 +18,8 @@ interface PricingPlansProps {
 
 const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
 
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
@@ -87,7 +91,10 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                       type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
-                      <Link href={plan.href} onClick={sendPricingEvent}>
+                      <Link
+                        href={getPricingPlanHref({ plan, isLoggedIn, isUserLoading })}
+                        onClick={sendPricingEvent}
+                      >
                         {plan.cta}
                       </Link>
                     </Button>
