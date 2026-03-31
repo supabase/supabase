@@ -120,7 +120,6 @@ export function UpdateBillingAddressModal() {
         })
 
         await updateTaxId({ slug, taxId: data.tax_id })
-        markCurrentValuesAsSaved()
 
         await invalidateOrganizationsQuery(queryClient)
 
@@ -144,10 +143,15 @@ export function UpdateBillingAddressModal() {
       const addressResult = await addressElementRef.current.getValue()
       applyAddressElementValue(addressResult)
     }
-    const validationError = await handleSubmit()
-    if (validationError) {
-      toast.error(validationError)
+    const result = await handleSubmit()
+    if (result.status === 'error') {
+      toast.error(result.message)
+      return
     }
+    markCurrentValuesAsSaved(
+      result.submittedState.addressValue,
+      result.submittedState.taxIdValues
+    )
   }
 
   const stripeElementsOptions: StripeElementsOptions = useMemo(

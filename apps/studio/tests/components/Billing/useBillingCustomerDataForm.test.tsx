@@ -73,12 +73,12 @@ const makeAddressChangeEvent = (
   },
 })
 
-const submitHook = async (submit: () => Promise<string | null>) => {
-  let result: string | null = null
+const submitHook = async <TResult,>(submit: () => Promise<TResult>) => {
+  let result: TResult | undefined
   await act(async () => {
     result = await submit()
   })
-  return result
+  return result as TResult
 }
 
 describe('useBillingCustomerDataForm', () => {
@@ -141,7 +141,10 @@ describe('useBillingCustomerDataForm', () => {
       }
     )
 
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBe('Full name is required.')
+    await expect(submitHook(result.current.handleSubmit)).resolves.toEqual({
+      status: 'error',
+      message: 'Full name is required.',
+    })
   })
 
   it('blocks submit when Stripe marks the address element as incomplete', async () => {
@@ -169,9 +172,10 @@ describe('useBillingCustomerDataForm', () => {
       )
     })
 
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBe(
-      'Please enter a valid billing address.'
-    )
+    await expect(submitHook(result.current.handleSubmit)).resolves.toEqual({
+      status: 'error',
+      message: 'Please enter a valid billing address.',
+    })
     expect(onCustomerDataChange).not.toHaveBeenCalled()
   })
 
@@ -198,9 +202,13 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     await waitFor(() => expect(result.current.isDirty).toBe(true))
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
+    const submitResult = await submitHook(result.current.handleSubmit)
+    expect(submitResult.status).toBe('success')
     act(() => {
-      result.current.markCurrentValuesAsSaved()
+      result.current.markCurrentValuesAsSaved(
+        submitResult.submittedState.addressValue,
+        submitResult.submittedState.taxIdValues
+      )
     })
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
@@ -239,12 +247,84 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     await waitFor(() => expect(result.current.isDirty).toBe(true))
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
+    const submitResult = await submitHook(result.current.handleSubmit)
+    expect(submitResult).toEqual({
+      status: 'success',
+      submittedState: {
+        addressValue: {
+          name: 'Acme Inc',
+          address: customerProfile.address,
+        },
+        taxIdValues: {
+          tax_id_name: '',
+          tax_id_type: '',
+          tax_id_value: '',
+        },
+      },
+    })
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: customerProfile.address,
       billing_name: 'Acme Inc',
       tax_id: null,
+    })
+  })
+
+  it('keeps a removed tax ID cleared after an intermediate rerender during save', async () => {
+    const customerProfile = makeCustomerProfile()
+    const taxId = makeTaxId()
+    let rerenderHook:
+      | ((props: HookPropsWithTaxId) => void)
+      | undefined
+
+    const onCustomerDataChange: CustomerChangeHandler = vi.fn(async () => {
+      rerenderHook?.({
+        customerProfile: makeCustomerProfile({
+          address: {
+            ...customerProfile.address,
+            line1: '500 Market St',
+          },
+        }),
+        taxId,
+        onCustomerDataChange,
+      })
+      await Promise.resolve()
+    })
+
+    const { result, rerender } = renderHook(
+      ({ customerProfile, taxId, onCustomerDataChange }: HookPropsWithTaxId) =>
+        useBillingCustomerDataForm({
+          customerProfile,
+          taxId,
+          onCustomerDataChange,
+        }),
+      {
+        initialProps: { customerProfile, taxId, onCustomerDataChange },
+      }
+    )
+
+    rerenderHook = rerender
+
+    act(() => {
+      result.current.form.setValue('tax_id_name', '', { shouldDirty: true })
+      result.current.form.setValue('tax_id_type', '', { shouldDirty: true })
+      result.current.form.setValue('tax_id_value', '', { shouldDirty: true })
+    })
+
+    const submitResult = await submitHook(result.current.handleSubmit)
+    expect(submitResult.status).toBe('success')
+
+    act(() => {
+      result.current.markCurrentValuesAsSaved(
+        submitResult.submittedState.addressValue,
+        submitResult.submittedState.taxIdValues
+      )
+    })
+
+    expect(result.current.form.getValues()).toEqual({
+      tax_id_name: '',
+      tax_id_type: '',
+      tax_id_value: '',
     })
   })
 
@@ -278,7 +358,28 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     await waitFor(() => expect(result.current.addressCountry).toBe('AT'))
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
+    const submitResult = await submitHook(result.current.handleSubmit)
+    expect(submitResult).toEqual({
+      status: 'success',
+      submittedState: {
+        addressValue: {
+          name: 'Updated GmbH',
+          address: {
+            line1: '500 Market St',
+            line2: '',
+            city: 'Vienna',
+            state: 'CA',
+            postal_code: '1010',
+            country: 'AT',
+          },
+        },
+        taxIdValues: {
+          tax_id_name: 'AT VAT',
+          tax_id_type: 'eu_vat',
+          tax_id_value: '12345678',
+        },
+      },
+    })
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: {
@@ -324,7 +425,28 @@ describe('useBillingCustomerDataForm', () => {
     })
 
     expect(result.current.isDirty).toBe(true)
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
+    const submitResult = await submitHook(result.current.handleSubmit)
+    expect(submitResult).toEqual({
+      status: 'success',
+      submittedState: {
+        addressValue: {
+          name: 'Updated Company',
+          address: {
+            line1: '500 Market St',
+            line2: '',
+            city: 'Los Angeles',
+            state: 'CA',
+            postal_code: '90001',
+            country: 'US',
+          },
+        },
+        taxIdValues: {
+          tax_id_name: '',
+          tax_id_type: '',
+          tax_id_value: '',
+        },
+      },
+    })
 
     expect(onCustomerDataChange).toHaveBeenCalledWith({
       address: {
@@ -382,7 +504,21 @@ describe('useBillingCustomerDataForm', () => {
       result.current.form.setValue('tax_id_value', '12-3456789', { shouldDirty: true })
     })
 
-    await expect(submitHook(result.current.handleSubmit)).resolves.toBeNull()
+    const submitResult = await submitHook(result.current.handleSubmit)
+    expect(submitResult).toEqual({
+      status: 'success',
+      submittedState: {
+        addressValue: {
+          name: 'Acme Inc',
+          address: customerProfile.address,
+        },
+        taxIdValues: {
+          tax_id_name: 'US EIN',
+          tax_id_type: 'us_ein',
+          tax_id_value: '12-3456789',
+        },
+      },
+    })
 
     expect(onCustomerDataChange).toHaveBeenLastCalledWith({
       address: customerProfile.address,

@@ -92,7 +92,6 @@ export const BillingCustomerData = () => {
         })
 
         await updateTaxId({ slug, taxId: data.tax_id })
-        markCurrentValuesAsSaved()
 
         toast.success('Successfully updated billing data')
 
@@ -126,10 +125,15 @@ export const BillingCustomerData = () => {
       const addressResult = await addressElementRef.current.getValue()
       applyAddressElementValue(addressResult)
     }
-    const validationError = await handleSubmit()
-    if (validationError) {
-      toast.error(validationError)
+    const result = await handleSubmit()
+    if (result.status === 'error') {
+      toast.error(result.message)
+      return
     }
+    markCurrentValuesAsSaved(
+      result.submittedState.addressValue,
+      result.submittedState.taxIdValues
+    )
   }
 
   const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting

@@ -31,6 +31,21 @@ export type BillingAddressPayload = {
   tax_id: CustomerTaxId | null
 }
 
+type SubmittedBillingFormState = {
+  addressValue: StripeAddressValue
+  taxIdValues: TaxIdFormValues
+}
+
+type BillingFormSubmitResult =
+  | {
+      status: 'error'
+      message: string
+    }
+  | {
+      status: 'success'
+      submittedState: SubmittedBillingFormState
+    }
+
 export function useBillingCustomerDataForm({
   customerProfile,
   taxId,
@@ -131,22 +146,22 @@ export function useBillingCustomerDataForm({
     [form]
   )
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<BillingFormSubmitResult> => {
     const address = stripeAddressRef.current
     const addressWasEdited =
       isAddressDirty || !isAddressEqual(address, savedStripeAddressRef.current)
 
     if (!address.name?.trim()) {
-      return 'Full name is required.'
+      return { status: 'error', message: 'Full name is required.' }
     }
     if (!address.address.country?.trim()) {
-      return 'Country is required.'
+      return { status: 'error', message: 'Country is required.' }
     }
     if (!address.address.line1?.trim()) {
-      return 'Address Line 1 is required.'
+      return { status: 'error', message: 'Address Line 1 is required.' }
     }
     if (addressWasEdited && stripeAddressValidationRef.current === 'incomplete') {
-      return 'Please enter a valid billing address.'
+      return { status: 'error', message: 'Please enter a valid billing address.' }
     }
 
     const taxIdValues = form.getValues()
@@ -177,16 +192,19 @@ export function useBillingCustomerDataForm({
 
     await onCustomerDataChange(payload)
 
-    return null // no error
+    return {
+      status: 'success',
+      submittedState: { addressValue: address, taxIdValues },
+    }
   }
 
-  const markCurrentValuesAsSaved = () => {
-    const currentAddress = stripeAddressRef.current
-    const currentTaxIdValues = form.getValues()
-
-    savedStripeAddressRef.current = currentAddress
-    savedTaxIdValuesRef.current = currentTaxIdValues
-    syncCurrentState(currentAddress, currentTaxIdValues)
+  const markCurrentValuesAsSaved = (
+    addressValue: StripeAddressValue,
+    taxIdValues: TaxIdFormValues
+  ) => {
+    savedStripeAddressRef.current = addressValue
+    savedTaxIdValuesRef.current = taxIdValues
+    syncCurrentState(addressValue, taxIdValues)
   }
 
   const handleReset = () => {
