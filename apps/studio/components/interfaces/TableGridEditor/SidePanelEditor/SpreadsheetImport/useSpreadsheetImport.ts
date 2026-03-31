@@ -209,6 +209,19 @@ export function useSpreadsheetImport({
     return cleanup
   }, [cleanup])
 
+  // When the component mounts with a file already in global state (e.g. dropped onto the
+  // grid), the useState initializer above sets _tag to 'parsing_file' but does not start
+  // the actual parse. Kick it off here. useStaticEffectEvent ensures we always read the
+  // latest state/treatEmptyAsNull without re-triggering the effect.
+  const processOnMount = useStaticEffectEvent(async function processOnMount() {
+    if (state._tag === 'parsing_file') {
+      await processFile(state.file, { treatEmptyAsNull })
+    }
+  })
+  useEffect(() => {
+    processOnMount()
+  }, [processOnMount])
+
   const processSpreadsheet = useCallback(
     async function processSpreadsheet({ treatEmptyAsNull }: { treatEmptyAsNull: boolean }) {
       if (hasAttachedFile(state)) {
