@@ -211,7 +211,7 @@ const Footer = (props: Props) => {
             </div>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-5 xl:mt-0">
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-12 md:grid-cols-3 xl:grid-cols-6">
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
