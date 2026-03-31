@@ -7,6 +7,7 @@ import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/Polici
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { useIsRLSTestingEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RLSPolicyTesting } from 'components/interfaces/Auth/Policies/RLSPolicyTesting/RLSPolicyTesting'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
@@ -91,6 +92,8 @@ const getTableFilterState = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
+  const isRLSTestingEnabled = useIsRLSTestingEnabled()
+
   const [activeTab, setActiveTab] = useQueryState(
     'tab',
     parseAsString.withDefault('policies').withOptions({ history: 'replace', clearOnDefault: true })
@@ -291,10 +294,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                     <ShieldCheck size={14} />
                     Policies
                   </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="testing" className="gap-2">
-                    <FlaskConical size={14} />
-                    Testing
-                  </TabsTrigger_Shadcn_>
+                  {isRLSTestingEnabled && (
+                    <TabsTrigger_Shadcn_ value="testing" className="gap-2">
+                      <FlaskConical size={14} />
+                      Testing
+                    </TabsTrigger_Shadcn_>
+                  )}
                 </TabsList_Shadcn_>
 
                 <div className="flex flex-row gap-x-2">
@@ -382,15 +387,17 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 />
               </TabsContent_Shadcn_>
 
-              <TabsContent_Shadcn_ value="testing">
-                {isLoading && <GenericSkeletonLoader />}
+              {isRLSTestingEnabled && (
+                <TabsContent_Shadcn_ value="testing">
+                  {isLoading && <GenericSkeletonLoader />}
 
-                {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+                  {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
-                {isSuccess && (
-                  <RLSPolicyTesting schema={schema} tables={tables ?? []} />
-                )}
-              </TabsContent_Shadcn_>
+                  {isSuccess && (
+                    <RLSPolicyTesting schema={schema} tables={tables ?? []} />
+                  )}
+                </TabsContent_Shadcn_>
+              )}
             </Tabs_Shadcn_>
           </PageSectionContent>
         </PageSection>

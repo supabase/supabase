@@ -122,5 +122,14 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: false,
       isDefaultOptIn: true,
     },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTING,
+      name: 'RLS Policy Testing',
+      discussionsUrl: undefined,
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

@@ -9,6 +9,15 @@ const TABLE_NAME = 'pw_rls_testing_tab_table'
 const COLUMN_NAME = 'user_id'
 
 /**
+ * Enable the RLS Testing feature flag via localStorage before navigating.
+ */
+const enableRLSTestingFlag = async (page: Page) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('supabase-ui-rls-testing', 'true')
+  })
+}
+
+/**
  * Navigate to the policies page Testing tab and wait for it to load.
  */
 const navigateToTestingTab = async (page: Page, ref: string) => {
@@ -32,6 +41,10 @@ const navigateToPoliciesPage = async (page: Page, ref: string) => {
 }
 
 test.describe('RLS Policy Testing Tab', () => {
+  test.beforeEach(async ({ page }) => {
+    await enableRLSTestingFlag(page)
+  })
+
   test.describe('Tab Navigation', () => {
     test('should switch between Policies and Testing tabs', async ({ page, ref }) => {
       const tableName = 'pw_rls_tab_nav_table'

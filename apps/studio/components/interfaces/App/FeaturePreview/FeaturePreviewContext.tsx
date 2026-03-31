@@ -125,6 +125,11 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
+export const useIsRLSTestingEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTING]
+}
+
 export const useIsTableFilterBarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
