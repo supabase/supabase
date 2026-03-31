@@ -8,14 +8,13 @@ import Link from 'next/link'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 
-import { StateOfStartupsHeader } from './components/StateOfStartupsHeader'
 import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
 import { SurveyChapter } from './components/SurveyChapter'
 import { SurveyChapterSection } from './components/SurveyChapterSection'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
 
 interface FloatingTocProps {
-  tocRef: React.RefObject<HTMLDivElement>
+  tocRef: React.RefObject
   isTocOpen: boolean
   setIsTocOpen: (open: boolean) => void
   activeChapter: number
