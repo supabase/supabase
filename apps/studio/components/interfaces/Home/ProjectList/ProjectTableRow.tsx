@@ -137,6 +137,7 @@ export const ProjectTableRow = ({
                 projectRef={project.ref}
                 cloudProvider={project.cloud_provider}
                 computeSize={getComputeSize(project)}
+                resourceWarnings={resourceWarnings}
               />
             ) : (
               <span className="text-xs text-foreground-muted">–</span>

@@ -126,6 +126,8 @@ export const ProjectCard = ({
                     projectRef={project.ref}
                     cloudProvider={project.cloud_provider}
                     computeSize={getComputeSize(project)}
+                    resourceWarnings={resourceWarnings}
+                    badgeClassName="text-[10px] leading-none tracking-[0.07em]"
                   />
                 )}
                 {isVercelIntegrated && (
