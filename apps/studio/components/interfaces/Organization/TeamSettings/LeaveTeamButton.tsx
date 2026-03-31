@@ -42,6 +42,7 @@ export const LeaveTeamButton = () => {
   const currentUserRoleId = currentUserMember?.role_ids?.[0]
   const currentUserRole = roles.find((role) => role.id === currentUserRoleId)
   const isAdmin = currentUserRole?.name === 'Administrator'
+  const isBillingRole = currentUserRole?.name === 'Billing'
   const isOwner = selectedOrganization?.is_owner
 
   const canLeave = !isOwner || (isOwner && hasMultipleOwners(members, roles))
@@ -111,7 +112,7 @@ export const LeaveTeamButton = () => {
                 <li>Custom reports</li>
                 <li>Log Explorer queries</li>
               </ul>
-              {(isOwner || isAdmin) && (
+              {(isOwner || isAdmin || isBillingRole) && (
                 <div className="mt-2">
                   <p>
                     <span className="text-foreground">

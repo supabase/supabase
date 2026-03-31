@@ -127,6 +127,7 @@ export const SSOConfig = () => {
   const onSubmit: SubmitHandler<SSOConfigFormSchema> = (values) => {
     const roleOnJoin = (values.roleOnJoin || 'Developer') as
       | 'Administrator'
+      | 'Billing'
       | 'Developer'
       | 'Owner'
       | 'Read-only'

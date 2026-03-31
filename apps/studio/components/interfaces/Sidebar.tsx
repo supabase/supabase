@@ -43,6 +43,7 @@ import {
 } from 'ui'
 
 import { Route } from '../ui/ui.types'
+import { useCurrentUserOrgRole } from 'hooks/misc/useCurrentUserOrgRole'
 import {
   useIsAPIDocsSidePanelEnabled,
   useIsPlatformWebhooksEnabled,
@@ -374,6 +375,7 @@ const OrganizationLinks = () => {
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
   const showBilling = useIsFeatureEnabled('billing:all')
+  const { isBillingRole } = useCurrentUserOrgRole()
 
   const activeRoute = router.pathname.split('/')[3]
   const organizationSettingsRoutes = new Set([
@@ -385,7 +387,9 @@ const OrganizationLinks = () => {
     'documents',
   ])
 
-  const navMenuItems = [
+  const BILLING_ROLE_ALLOWED_KEYS = new Set(['usage', 'billing'])
+
+  const allNavMenuItems = [
     {
       label: 'Projects',
       href: `/org/${organizationSlug}`,
@@ -427,6 +431,10 @@ const OrganizationLinks = () => {
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
   ]
+
+  const navMenuItems = isBillingRole
+    ? allNavMenuItems.filter((item) => BILLING_ROLE_ALLOWED_KEYS.has(item.key))
+    : allNavMenuItems
 
   if (!organizationSlug) return null
 

@@ -12,6 +12,7 @@ import React, { useMemo } from 'react'
 import { Button, cn, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { useCurrentUserOrgRole } from 'hooks/misc/useCurrentUserOrgRole'
 import { getOrgMenuComponent } from './mobileOrgMenuRegistry'
 import type { OrgNavItem } from './OrgMenuContent.utils'
 import {
@@ -35,6 +36,7 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
   const showBilling = useIsFeatureEnabled('billing:all')
+  const { isBillingRole } = useCurrentUserOrgRole()
 
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
   const activeRoute = getOrgActiveRoute(pathname)
@@ -58,8 +60,10 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
     navigateBackToTop()
   }
 
-  const navMenuItems: OrgNavItem[] = useMemo(
-    () => [
+  const BILLING_ROLE_ALLOWED_KEYS = useMemo(() => new Set(['usage', 'billing']), [])
+
+  const navMenuItems: OrgNavItem[] = useMemo(() => {
+    const allItems: OrgNavItem[] = [
       {
         label: 'Projects',
         href: `/org/${organizationSlug}`,
@@ -100,9 +104,12 @@ export function OrgMenuContent({ onCloseSheet }: OrgMenuContentProps) {
         key: 'settings',
         icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       },
-    ],
-    [organizationSlug, showBilling]
-  )
+    ]
+
+    return isBillingRole
+      ? allItems.filter((item) => BILLING_ROLE_ALLOWED_KEYS.has(item.key))
+      : allItems
+  }, [organizationSlug, showBilling, isBillingRole, BILLING_ROLE_ALLOWED_KEYS])
 
   const sectionKeyToShow = viewLevel === 'section' ? selectedSectionKey : null
   const sectionLabel =
