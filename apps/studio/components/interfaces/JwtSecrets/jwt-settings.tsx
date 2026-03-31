@@ -49,8 +49,11 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Modal,
-  PrePostTab,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -64,9 +67,16 @@ import {
 
 const MAX_JWT_EXP = 604800
 const formSchema = z.object({
-  JWT_EXP: z.coerce
-    .number({ required_error: 'Must have a JWT expiry value' })
-    .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`),
+  JWT_EXP: z.preprocess(
+    (val) => (val ? val : undefined),
+    z.coerce
+      .number({
+        required_error: 'Must have a JWT expiry value',
+        invalid_type_error: 'Must have a JWT expiry value',
+      })
+      .positive('Must be greater than 0')
+      .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`)
+  ),
 })
 const formId = 'jwt-exp-form'
 
@@ -318,16 +328,23 @@ const JWTSettings = () => {
                           }
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="seconds" className="w-full">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 id="JWT_EXP"
                                 type="number"
                                 min={0}
                                 max={MAX_JWT_EXP}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                  field.onChange(
+                                    isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
+                                  )
+                                }
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
