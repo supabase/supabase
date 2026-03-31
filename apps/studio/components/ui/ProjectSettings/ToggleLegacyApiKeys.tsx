@@ -106,7 +106,7 @@ export const ToggleLegacyApiKeysPanel = () => {
               <ButtonTooltip
                 type="default"
                 onClick={
-                  authorizedApps?.length || isAuthorizedAppsError
+                  isLegacyKeysEnabled && (authorizedApps?.length || isAuthorizedAppsError)
                     ? () => setIsAppsWarningOpen(true)
                     : () => setIsConfirmOpen(true)
                 }
