@@ -22,12 +22,27 @@ export type Navigation = {
   children?: Navigation[]
 }
 
-export const Loading = () => (
-  <div className="p-10">
-    <GenericSkeletonLoader />
-  </div>
-)
+// [Joshen] Basing this on template.json for now
+type IntegrationInputs = {
+  [key: string]: {
+    label: string
+    type: 'text' | 'number' | 'password'
+    description?: string
+    required: boolean
+    actions: {
+      label: string
+      href: string
+    }[]
+  }
+}
 
+type IntegrationStep = {
+  label: string
+  description?: string
+}
+
+// [Joshen] For marketplace, we probably need to revisit this definition
+// What properties are obsolete, what properties we need from remote source
 export type IntegrationDefinition = {
   id: string
   name: string
@@ -52,10 +67,15 @@ export type IntegrationDefinition = {
     pageId: string | undefined
     childId: string | undefined
   }) => ComponentType<{}> | null
+
   /** SQL query for installing the entire integration */
   installationSql?: string
-  /** Custom command to install the integration */
+  /** Custom command to install the integration (if any - none atm) */
   installationCommand?: (props: { ref: string }) => Promise<void>
+
+  /** Inputs for template integrations */
+  inputs?: IntegrationInputs
+  steps?: IntegrationStep[]
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -451,7 +471,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
 const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'stripe_sync_engine',
-    type: 'custom' as const,
+    type: 'template' as const,
     requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
@@ -487,8 +507,8 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
-                (mod) => mod.StripeSyncInstallationPage
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
+                (mod) => mod.IntegrationOverviewTabV2
               ),
             { loading: Loading }
           )
@@ -503,6 +523,31 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       }
       return null
     },
+    inputs: {
+      stripe_api_key: {
+        type: 'password',
+        required: true,
+        label: 'Stripe API secret key',
+        description:
+          'Requires write access to Webhook Endpoints and read-only access to all other categories.',
+        actions: [
+          {
+            label: 'Get API key',
+            href: 'https://dashboard.stripe.com/apikeys',
+          },
+          {
+            label: 'What are Stripe API keys?',
+            href: 'https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them',
+          },
+        ],
+      },
+    },
+    steps: [
+      { label: 'Creates a new database schema named `stripe`' },
+      { label: 'Creates tables and views in the `stripe` schema for synced Stripe data' },
+      { label: 'Deploys Edge Functions to handle incoming webhooks from Stripe' },
+      { label: 'Schedules automatic Stripe data syncs using Supabase Queues' },
+    ],
   },
 ]
 
@@ -511,3 +556,9 @@ export const INTEGRATIONS: Array<IntegrationDefinition> = [
   ...SUPABASE_INTEGRATIONS,
   ...TEMPLATE_INTEGRATIONS,
 ]
+
+export const Loading = () => (
+  <div className="p-10">
+    <GenericSkeletonLoader />
+  </div>
+)
