@@ -99,7 +99,7 @@ SAML_PRIVATE_KEY=<your-base64-encoded-private-key>
 
 ## Step 3: Pass SAML variables to the Auth container
 
-In `docker-compose.yml`, add the SAML environment variables to the `auth` service. Place them after the existing environment block (for example, after the MFA or external provider section):
+In `docker-compose.yml`, add the SAML environment variables to the `auth` service. Auth expects the `GOTRUE_` prefix for all of its configuration variables:
 
 ```yaml
 auth:
@@ -518,12 +518,12 @@ The response should include `app_metadata.provider: "sso:saml"` and any mapped a
 {/* supa-mdx-lint-disable Rule003Spelling */}
 | Variable | Default | Description |
 |---|---|---|
-| `GOTRUE_SAML_ENABLED` | `false` | Enable the SAML SSO engine |
-| `GOTRUE_SAML_PRIVATE_KEY` | - | Base64-encoded PKCS#1 RSA private key (min 2048-bit). Used to sign SAML requests and optionally decrypt assertions. |
-| `GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS` | `false` | Accept encrypted SAML assertions from IdPs |
-| `GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD` | `2m0s` | How long relay state tokens remain valid. Increase if users on slow networks time out during the IdP redirect. |
-| `GOTRUE_SAML_EXTERNAL_URL` | `API_EXTERNAL_URL` | Override the base URL used for the SAML entity ID and ACS endpoint. Only needed if the SAML endpoints are served on a different URL than the rest of the Auth API. |
-| `GOTRUE_SAML_RATE_LIMIT_ASSERTION` | `15` | Maximum ACS requests per second. Protects against assertion replay floods. |
+| `SAML_ENABLED` | `false` | Enable the SAML SSO engine |
+| `SAML_PRIVATE_KEY` | - | Base64-encoded PKCS#1 RSA private key (min 2048-bit). Used to sign SAML requests and optionally decrypt assertions. |
+| `SAML_ALLOW_ENCRYPTED_ASSERTIONS` | `false` | Accept encrypted SAML assertions from IdPs |
+| `SAML_RELAY_STATE_VALIDITY_PERIOD` | `2m0s` | How long relay state tokens remain valid. Increase if users on slow networks time out during the IdP redirect. |
+| `SAML_EXTERNAL_URL` | `API_EXTERNAL_URL` | Override the base URL used for the SAML entity ID and ACS endpoint. Only needed if the SAML endpoints are served on a different URL than the rest of the Auth API. |
+| `SAML_RATE_LIMIT_ASSERTION` | `15` | Maximum ACS requests per second. Protects against assertion replay floods. |
 {/* supa-mdx-lint-enable Rule003Spelling */}
 
 ## Troubleshooting
