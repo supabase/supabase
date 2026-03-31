@@ -46,8 +46,6 @@ export * from './src/components/Toggle'
 export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
-export * from './src/components/PrePostTab'
-
 // layout
 export * from './src/components/LoadingLine'
 
@@ -201,6 +199,8 @@ export {
 export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
+
+export * from './src/components/shadcn/ui/input-group'
 
 export * from './src/components/shadcn/ui/switch'
 

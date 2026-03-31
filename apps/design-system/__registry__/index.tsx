@@ -731,6 +731,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "data-input-with-reveal-copy-editable": {
+      name: "data-input-with-reveal-copy-editable",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-reveal-copy-editable-empty": {
+      name: "data-input-with-reveal-copy-editable-empty",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable-empty")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable-empty.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "date-picker-demo": {
       name: "date-picker-demo",
       type: "components:example",
