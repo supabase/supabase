@@ -1,12 +1,19 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+import {
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { calculateThroughputPrice } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
@@ -16,8 +23,6 @@ import {
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from '../ui/DiskManagement.constants'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
-import FormMessage from '../ui/FormMessage'
-import { InputPostTab } from '../ui/InputPostTab'
 
 type ThroughputFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -113,35 +118,25 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </>
                 }
               >
-                <InputPostTab label="MB/s">
-                  {isLoading ? (
-                    <div
-                      className={cn(
-                        InputVariants({ size: 'small' }),
-                        'w-32 font-mono rounded-r-none'
-                      )}
-                    >
-                      <Skeleton className="w-10 h-4" />
-                    </div>
-                  ) : (
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        type="number"
-                        {...field}
-                        value={field.value}
-                        onChange={(e) => {
-                          setValue('throughput', e.target.valueAsNumber, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          })
-                        }}
-                        className="flex-grow font-mono rounded-r-none max-w-32"
-                        disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
-                      />
-                    </FormControl_Shadcn_>
-                  )}
-                </InputPostTab>
-                {error && <FormMessage type="error" message={error.message} />}
+                <FormControl_Shadcn_ className="max-w-32">
+                  <InputGroup>
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>MB/s</InputGroupText>
+                    </InputGroupAddon>
+                    <InputGroupInput
+                      type="number"
+                      {...field}
+                      value={field.value}
+                      onChange={(e) => {
+                        setValue('throughput', e.target.valueAsNumber, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }}
+                      disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
+                    />
+                  </InputGroup>
+                </FormControl_Shadcn_>
               </FormItemLayout>
             )}
           />

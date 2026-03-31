@@ -13,7 +13,10 @@ import {
   FormField_Shadcn_,
   Input,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -289,8 +292,11 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     description="Lowercase letters, numbers, and hyphens only. Used in SDK: signInWithOAuth({ provider: 'custom:my-company' })"
                   >
                     <FormControl_Shadcn_>
-                      <PrePostTab preTab="custom:" className="w-full">
-                        <Input_Shadcn_
+                      <InputGroup>
+                        <InputGroupAddon align="inline-start">
+                          <InputGroupText>custom:</InputGroupText>
+                        </InputGroupAddon>
+                        <InputGroupInput
                           {...field}
                           placeholder="my-company"
                           disabled={isEditMode}
@@ -300,7 +306,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                             field.onChange(userValue)
                           }}
                         />
-                      </PrePostTab>
+                      </InputGroup>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}

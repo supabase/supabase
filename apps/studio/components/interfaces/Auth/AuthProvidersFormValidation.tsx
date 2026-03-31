@@ -80,7 +80,7 @@ const PROVIDER_EMAIL = {
       title: 'Email OTP length',
       type: 'number',
       description: 'Number of digits in the email OTP.',
-      units: 'number',
+      units: 'digits',
     },
   },
   validationSchema: object().shape({

@@ -23,9 +23,11 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   InfoIcon,
-  Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Modal,
-  PrePostTab,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -192,16 +194,19 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <PrePostTab postTab="GB" className="w-full">
+                          <InputGroup>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>GB</InputGroupText>
+                            </InputGroupAddon>
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                              <InputGroupInput
                                 {...field}
                                 id="new-disk-size"
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
                             </FormControl_Shadcn_>
-                          </PrePostTab>
+                          </InputGroup>
                         </FormItemLayout>
                       )}
                     />

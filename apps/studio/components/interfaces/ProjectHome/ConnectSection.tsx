@@ -9,14 +9,10 @@ import { useEffect, useRef } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
-import { CONNECT_ACTIONS, type ConnectSectionVariant } from './ConnectSection.config'
+import { CONNECT_ACTIONS } from './ConnectSection.config'
 import { useAppStateSnapshot } from '@/state/app-state'
 
-interface ConnectSectionProps {
-  variant: ConnectSectionVariant
-}
-
-export const ConnectSection = ({ variant }: ConnectSectionProps) => {
+export const ConnectSection = () => {
   const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
@@ -37,8 +33,8 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
     if (!IS_PLATFORM) return
     if (hasTrackedExposure.current) return
     hasTrackedExposure.current = true
-    track('home_connect_section_exposed', { variant })
-  }, [variant, track])
+    track('home_connect_section_exposed')
+  }, [track])
 
   const handleActionClick = (action: (typeof CONNECT_ACTIONS)[number]) => {
     track('home_connect_action_clicked', { mode: action.id })

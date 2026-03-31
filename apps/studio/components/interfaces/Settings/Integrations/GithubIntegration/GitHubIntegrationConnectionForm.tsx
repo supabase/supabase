@@ -65,12 +65,10 @@ const GITHUB_ICON = (
 )
 
 interface GitHubIntegrationConnectionFormProps {
-  disabled?: boolean
   connection?: GitHubConnection
 }
 
 export const GitHubIntegrationConnectionForm = ({
-  disabled = false,
   connection,
 }: GitHubIntegrationConnectionFormProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
@@ -322,6 +320,14 @@ export const GitHubIntegrationConnectionForm = ({
         projectRef: selectedProject.ref,
         gitBranch: data.enableProductionSync ? data.branchName : '',
         branchName: data.branchName || 'main',
+      })
+    } else {
+      // if for some reason, the project doesn't have a default branch yet, create it.
+      createBranch({
+        projectRef: selectedProject.ref,
+        gitBranch: data.enableProductionSync ? data.branchName : '',
+        branchName: data.branchName || 'main',
+        is_default: true,
       })
     }
 
@@ -753,7 +759,7 @@ export const GitHubIntegrationConnectionForm = ({
                         <Button
                           type="outline"
                           onClick={handleRemoveIntegration}
-                          disabled={isDeletingConnection}
+                          disabled={isDeletingConnection || isCheckingBranch}
                           loading={isDeletingConnection}
                         >
                           Disable integration
@@ -765,13 +771,13 @@ export const GitHubIntegrationConnectionForm = ({
                         <Button
                           type="default"
                           onClick={() => githubSettingsForm.reset()}
-                          disabled={!canUpdateGitHubConnection}
+                          disabled={!canUpdateGitHubConnection || isCheckingBranch}
                         >
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="default"
+                        type="primary"
                         htmlType="submit"
                         disabled={
                           !hasAccessToGitHubIntegration ||
@@ -782,7 +788,7 @@ export const GitHubIntegrationConnectionForm = ({
                           (!connection && !githubSettingsForm.getValues().repositoryId) ||
                           (connection && !githubSettingsForm.formState.isDirty)
                         }
-                        loading={isCheckingBranch || isLoading}
+                        loading={isLoading}
                       >
                         {connection ? 'Save changes' : 'Enable integration'}
                       </Button>

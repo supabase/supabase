@@ -1,10 +1,8 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
-
 import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
 import { Bucket } from 'data/storage/buckets-query'
-
 import { FilesBucket as FilesBucketIcon } from 'icons'
+import { noop } from 'lodash'
 import { forwardRef, type CSSProperties } from 'react'
 import {
   Badge,
@@ -18,6 +16,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 interface StoragePoliciesBucketRowProps {
@@ -52,7 +53,19 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
             <FilesBucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
             <div className="flex flex-1 min-w-0 items-center gap-1.5">
               <CardTitle className="truncate">{label}</CardTitle>
-              {bucket?.public && <Badge variant="warning">Public</Badge>}
+              {bucket?.public && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="warning" className="flex">
+                      Public
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    This bucket is publicly readable. Anyone can list and access all objects stored
+                    in it.
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </div>
           <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
