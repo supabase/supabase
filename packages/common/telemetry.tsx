@@ -9,7 +9,7 @@ import { useLatest } from 'react-use'
 
 import { useUser } from './auth'
 import { hasConsented, useConsentState } from './consent-state'
-import { IS_PLATFORM, IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PLATFORM } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
 import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
@@ -19,22 +19,19 @@ import {
   parseMwDiagCookie,
 } from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
-import { useParams, useTelemetryCookie } from './hooks'
+import { useFirstTouchStore, useParams } from './hooks'
 import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
 import {
-  clearTelemetryDataCookie,
-  getSharedTelemetryData,
-  getTelemetryCookieOptions,
-} from './telemetry-utils'
+  clearFirstTouchData,
+  getFirstTouchData,
+  type SharedTelemetryData,
+} from './telemetry-first-touch-store'
+import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
 export { posthogClient, type ClientTelemetryEvent }
 
-const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
-
-// Reexports GoogleTagManager with the right API key set
 export const TelemetryTagManager = () => {
-  // useConsentState is used here to trigger a re-render when consent state changes
   const { hasAccepted } = useConsentState()
 
   const isGTMEnabled = Boolean(
@@ -53,11 +50,6 @@ export const TelemetryTagManager = () => {
     />
   )
 }
-
-//---
-// PAGE TELEMETRY
-//---
-type SharedTelemetryData = ReturnType<typeof getSharedTelemetryData>
 
 function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   const urlString = telemetryData.page_url
@@ -80,7 +72,6 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
       ...(getParam('utm_term') && { $utm_term: getParam('utm_term') }),
     }
 
-    // Ad network click IDs (first-touch attribution)
     const clickIdProps = {
       ...(getParam('gclid') && { gclid: getParam('gclid') }), // Google Ads
       ...(getParam('gbraid') && { gbraid: getParam('gbraid') }), // Google Ads (iOS)
@@ -126,14 +117,13 @@ function handlePageTelemetry({
   firstReferrerData,
   mwDiagData,
 }: HandlePageTelemetryOptions) {
-  // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const livePageData = getSharedTelemetryData(pathname)
     const liveReferrer = livePageData.ph.referrer
-    const cookieReferrer = telemetryDataOverride?.ph?.referrer
+    const storedReferrer = telemetryDataOverride?.ph?.referrer
 
-    const shouldUseCookieReferrer = Boolean(
-      cookieReferrer && isExternalReferrer(cookieReferrer) && !isExternalReferrer(liveReferrer)
+    const shouldUseStoredReferrer = Boolean(
+      storedReferrer && isExternalReferrer(storedReferrer) && !isExternalReferrer(liveReferrer)
     )
 
     const pageData = telemetryDataOverride
@@ -141,7 +131,7 @@ function handlePageTelemetry({
           ...livePageData,
           ph: {
             ...livePageData.ph,
-            referrer: shouldUseCookieReferrer ? cookieReferrer! : liveReferrer,
+            referrer: shouldUseStoredReferrer ? storedReferrer! : liveReferrer,
           },
         }
       : { ...livePageData, ph: { ...livePageData.ph } }
@@ -149,9 +139,6 @@ function handlePageTelemetry({
       ...(telemetryDataOverride ? getFirstTouchAttributionProps(telemetryDataOverride) : {}),
     }
 
-    // --- First-referrer edge cookie handoff ---
-    // If the edge cookie has external context and the current referrer is internal,
-    // override the referrer so PostHog gets the real acquisition source.
     const firstReferrerCookiePresent = Boolean(firstReferrerData)
     let firstReferrerCookieConsumed = false
 
@@ -163,7 +150,6 @@ function handlePageTelemetry({
       pageData.ph.referrer = firstReferrerData.referrer
       firstReferrerCookieConsumed = true
 
-      // Prefer attribution context captured at the external entry point.
       const { utms, click_ids, landing_url } = firstReferrerData
 
       Object.entries(utms).forEach(([key, value]) => {
@@ -200,7 +186,6 @@ function handlePageTelemetry({
       }
     })()
 
-    // Align frontend and backend session IDs for correlation
     if (pageData.session_id) {
       document.cookie = `session_id=${pageData.session_id}; ${getTelemetryCookieOptions()}`
     }
@@ -222,15 +207,11 @@ function handlePageTelemetry({
       ...Object.fromEntries(
         Object.entries(featureFlags || {}).map(([k, v]) => [`$feature/${k}`, v])
       ),
-      // Measurement properties for handoff observability
-      // Only included on the initial pageview (when firstReferrerData is explicitly
-      // passed as null or a value — subsequent pageviews leave it as undefined)
+      // Only included on the initial pageview — subsequent pageviews omit firstReferrerData entirely
       ...(firstReferrerData !== undefined && {
         first_referrer_cookie_present: firstReferrerCookiePresent,
         first_referrer_cookie_consumed: firstReferrerCookieConsumed,
       }),
-      // Phase 1 middleware diagnostic: present only when _sb_mw_diag cookie was found
-      // (i.e., the request was routed through www middleware on /dashboard or /docs)
       ...(mwDiagData && {
         mw_diag_hit: mwDiagData.hit,
         mw_diag_would_stamp: mwDiagData.would_stamp,
@@ -251,7 +232,6 @@ export function handlePageLeaveTelemetry(
   slug?: string,
   ref?: string
 ) {
-  // Send to PostHog client-side (only in browser)
   if (typeof window !== 'undefined') {
     const pageData = getSharedTelemetryData(pathname)
     posthogClient.capturePageLeave({
@@ -283,14 +263,13 @@ export const PageTelemetry = ({
   const pagesPathname = router?.pathname
   const appPathname = usePathname()
 
-  // Get from props or try to extract from URL params
   const params = useParams()
   const slug = organizationSlug || params.slug
   const ref = projectRef || params.ref
 
   const featureFlags = useFeatureFlags()
 
-  useTelemetryCookie({ enabled: enabled && IS_PLATFORM })
+  useFirstTouchStore({ enabled: enabled && IS_PLATFORM })
 
   const pathname =
     pagesPathname ?? appPathname ?? (isBrowser ? window.location.pathname : undefined)
@@ -327,98 +306,54 @@ export const PageTelemetry = ({
     })
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
-  // Handle initial page telemetry event
   const hasSentInitialPageTelemetryRef = useRef(false)
-
-  // Track previous pathname for App Router to detect actual changes
   const previousAppPathnameRef = useRef<string | null>(null)
 
-  // Initialize PostHog client when consent is accepted
   useEffect(() => {
     if (hasAcceptedConsent && IS_PLATFORM) {
       posthogClient.init(true)
     }
   }, [hasAcceptedConsent, IS_PLATFORM])
 
+  // Waiting for router.isReady before sending to avoid dynamic route placeholders
   useEffect(() => {
-    // Send page telemetry on first page load
-    // Waiting for router ready before sending page_view
-    // if not the path will be dynamic route instead of the browser url
     if (
       (router?.isReady ?? true) &&
+      enabled &&
       hasAcceptedConsent &&
       !hasSentInitialPageTelemetryRef.current
     ) {
-      // Read the edge-set cookies (cross-app handoff)
       const cookieHeader = document.cookie
       const firstReferrerData = parseFirstReferrerCookie(cookieHeader)
       const mwDiagData = parseMwDiagCookie(cookieHeader)
+      const firstTouchData = getFirstTouchData()
 
-      const cookies = cookieHeader.split(';')
-      const telemetryCookieValue = cookies
-        .map((cookie) => cookie.trim())
-        .find((cookie) => cookie.startsWith(`${TELEMETRY_DATA}=`))
-        ?.slice(`${TELEMETRY_DATA}=`.length)
-
-      if (telemetryCookieValue) {
-        try {
-          const telemetryData = JSON.parse(
-            decodeURIComponent(telemetryCookieValue)
-          ) as SharedTelemetryData
-          handlePageTelemetry({
-            apiUrl: API_URL,
-            pathname: pathnameRef.current,
-            featureFlags: featureFlagsRef.current,
-            slug,
-            ref,
-            telemetryDataOverride: telemetryData,
-            firstReferrerData,
-            mwDiagData,
-          })
-        } catch (error) {
-          if (!IS_PROD) {
-            console.warn('Invalid telemetry cookie data:', error)
-          }
-          handlePageTelemetry({
-            apiUrl: API_URL,
-            pathname: pathnameRef.current,
-            featureFlags: featureFlagsRef.current,
-            slug,
-            ref,
-            firstReferrerData,
-            mwDiagData,
-          })
-        } finally {
-          clearTelemetryDataCookie()
-        }
-      } else {
+      try {
         handlePageTelemetry({
           apiUrl: API_URL,
           pathname: pathnameRef.current,
           featureFlags: featureFlagsRef.current,
           slug,
           ref,
+          ...(firstTouchData && { telemetryDataOverride: firstTouchData }),
           firstReferrerData,
           mwDiagData,
         })
+      } finally {
+        clearFirstTouchData()
+        hasSentInitialPageTelemetryRef.current = true
       }
-
-      hasSentInitialPageTelemetryRef.current = true
     }
-  }, [router?.isReady, hasAcceptedConsent, slug, ref])
+  }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
 
   useEffect(() => {
-    // For pages router
     if (router === null) return
 
     function handleRouteChange() {
-      // Wait until we've sent the initial page telemetry event
       if (!hasSentInitialPageTelemetryRef.current) return
-
       sendPageTelemetry()
     }
 
-    // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
 
     return () => {
@@ -427,10 +362,8 @@ export const PageTelemetry = ({
   }, [router])
 
   useEffect(() => {
-    // For app router
     if (router !== null) return
 
-    // Only track if pathname actually changed (not initial mount)
     if (
       appPathname &&
       previousAppPathnameRef.current !== null &&
@@ -439,7 +372,6 @@ export const PageTelemetry = ({
       sendPageTelemetry()
     }
 
-    // Update previous pathname
     previousAppPathnameRef.current = appPathname
   }, [appPathname, router, sendPageTelemetry])
 
@@ -452,15 +384,10 @@ export const PageTelemetry = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled, sendPageLeaveTelemetry])
 
-  // Identify the user
   useTelemetryIdentify(API_URL)
 
   return null
 }
-
-// ---
-// EVENT TELEMETRY
-// ---
 
 type EventBody = components['schemas']['TelemetryEventBodyV2']
 

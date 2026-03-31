@@ -18,6 +18,9 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -298,42 +301,35 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
 
                                 {additionalFields.length > 0 && (
                                   <div className="col-span-full flex items-center mt-2">
-                                    <div className="grid grid-cols-2 gap-x-1 w-[85%]">
-                                      {additionalFields.map((x, index) => (
-                                        <div
-                                          key={x.name}
-                                          className="flex items-center"
-                                          style={
-                                            additionalFields.length % 2 === 1 && index % 2 === 0
-                                              ? { gridColumnStart: 2 }
-                                              : undefined
-                                          }
-                                        >
-                                          <div className="font-mono text-xs px-2 border border-r-0 rounded-l h-full flex items-center justify-center">
-                                            {x.name}
-                                          </div>
-                                          <FormField_Shadcn_
-                                            control={form.control}
-                                            key={`columns.${idx}.${x.name}`}
-                                            name={`columns.${idx}.${x.name}` as any}
-                                            render={({ field }) => (
+                                    <div className="flex items-center justify-end gap-1 w-[85%] ">
+                                      {additionalFields.map((x) => (
+                                        <FormField_Shadcn_
+                                          control={form.control}
+                                          key={`columns.${idx}.${x.name}`}
+                                          name={`columns.${idx}.${x.name}` as any}
+                                          render={({ field }) => (
+                                            <InputGroup>
+                                              <InputGroupAddon align="inline-start">
+                                                {x.name}
+                                              </InputGroupAddon>
                                               <FormControl_Shadcn_>
-                                                <Input_Shadcn_
+                                                <InputGroupInput
                                                   {...field}
                                                   type={x.type === 'number' ? 'number' : 'text'}
                                                   disabled={isCreating}
                                                   className="h-[34px] rounded-l-none"
-                                                  {...form.register(
-                                                    `columns.${idx}.${x.name}` as any,
-                                                    {
-                                                      valueAsNumber: true, // Ensure the value is handled as a number
-                                                    }
-                                                  )}
+                                                  onChange={(event) =>
+                                                    field.onChange(
+                                                      isNaN(event.target.valueAsNumber)
+                                                        ? null
+                                                        : event.target.valueAsNumber
+                                                    )
+                                                  }
                                                 />
                                               </FormControl_Shadcn_>
-                                            )}
-                                          />
-                                        </div>
+                                            </InputGroup>
+                                          )}
+                                        />
                                       ))}
                                     </div>
                                     <div className="w-4 h-[1.6rem] border-r border-b rounded-br mr-3 border-control -translate-y-3" />

@@ -43,8 +43,8 @@ export const UserReportPage: NextPageWithLayout = () => {
     const reports = data.content
       .filter((x) => x.type === 'report')
       .sort((a, b) => a.name.localeCompare(b.name))
-    if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
-    if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
+    if (reports.length >= 1) router.replace(`/project/${ref}/observability/${reports[0].id}`)
+    if (reports.length === 0) router.replace(`/project/${ref}/observability/api-overview`)
   }, [isSuccess, data, router, ref, showOverview, flagsLoaded])
 
   const { can: canCreateReport } = useAsyncCheckPermissions(

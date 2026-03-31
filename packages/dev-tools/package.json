@@ -11,7 +11,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"

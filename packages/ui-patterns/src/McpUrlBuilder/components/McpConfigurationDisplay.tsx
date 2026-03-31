@@ -5,7 +5,7 @@ import yaml from 'js-yaml'
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Button, cn } from 'ui'
-import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'

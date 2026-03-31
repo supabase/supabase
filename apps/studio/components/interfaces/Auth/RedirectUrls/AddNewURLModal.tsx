@@ -20,9 +20,12 @@ interface AddNewURLModalProps {
   onClose: () => void
 }
 
+const normaliseUrl = (value: string) => value.replace(/,\s*$/, '')
+
 export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalProps) => {
   const { ref } = useParams()
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const redirectUrlRegex = urlRegex()
 
   const FormSchema = z.object({
     urls: z
@@ -30,8 +33,11 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
         value: z
           .string()
           .min(1, 'Please provide a value')
-          .regex(urlRegex(), 'Please provide a valid URL')
-          .refine((value) => !allowList.includes(value), {
+          .refine(
+            (value) => redirectUrlRegex.test(normaliseUrl(value)),
+            'Please provide a valid URL'
+          )
+          .refine((value) => !allowList.includes(normaliseUrl(value)), {
             message: 'URL already exists in the allow list',
           }),
       })
@@ -47,9 +53,10 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
   const urls = form.watch('urls')
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const dedupedData = [...new Set(data.urls.map((url) => url.value))]
-    const addedCount = data.urls.length
-    const payload = allowList.concat(dedupedData.map((url) => url.replace(/,\s*$/, ''))).toString()
+    const dedupedUrls = [...new Set(data.urls.map((url) => normaliseUrl(url.value)))]
+    const payloadUrls = allowList.concat(dedupedUrls)
+    const addedCount = dedupedUrls.length
+    const payload = payloadUrls.toString()
 
     if (payload.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')

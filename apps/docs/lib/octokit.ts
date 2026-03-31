@@ -2,11 +2,17 @@ import 'server-only'
 
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
+import { retry } from '@octokit/plugin-retry'
 import crypto from 'node:crypto'
 
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { OCTOKIT_RETRY_OPTIONS } from './octokit.constants'
 
-let octokitInstance: Octokit
+export { OCTOKIT_RETRY_OPTIONS }
+
+const RetryOctokit = Octokit.plugin(retry)
+
+let octokitInstance: InstanceType<typeof RetryOctokit>
 
 export function octokit() {
   if (!octokitInstance) {
@@ -21,7 +27,7 @@ export function octokit() {
       format: 'pem',
     })
 
-    octokitInstance = new Octokit({
+    octokitInstance = new RetryOctokit({
       authStrategy: createAppAuth,
       auth: {
         appId: process.env.DOCS_GITHUB_APP_ID,
@@ -72,6 +78,7 @@ export async function getGitHubFileContents({
       repo: repo,
       path: path,
       ref: branch,
+      request: OCTOKIT_RETRY_OPTIONS,
       options: {
         fetch: fetch ?? fetchRevalidatePerDay,
       },
@@ -81,26 +88,23 @@ export async function getGitHubFileContents({
       `getGitHubFileContents: request failed for ${org}/${repo}/${path}@${branch}`,
       { cause: err }
     )
-    console.error(error)
     onError?.(error)
-    return ''
+    throw error
   }
 
   if (Array.isArray(response.data)) {
     const error = new Error(
       `getGitHubFileContents: ${path} in ${org}/${repo} is a directory, not a file`
     )
-    console.error(error)
     onError?.(error)
-    return ''
+    throw error
   }
   if (!('content' in response.data) || response.data.type !== 'file') {
     const error = new Error(
       `getGitHubFileContents: unexpected response for ${path} in ${org}/${repo} (type: ${'type' in response.data ? response.data.type : 'unknown'})`
     )
-    console.error(error)
     onError?.(error)
-    return ''
+    throw error
   }
 
   return Buffer.from(response.data.content, 'base64').toString('utf-8')
@@ -157,6 +161,7 @@ async function checkForImmutableCommit({
       headers: {
         'X-GitHub-Api-Version': '2022-11-28',
       },
+      request: OCTOKIT_RETRY_OPTIONS,
       options: {
         fetch: _fetch,
       },

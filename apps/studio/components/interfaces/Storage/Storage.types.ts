@@ -1,4 +1,5 @@
 import type { PolicyFormField } from 'components/interfaces/Auth/Policies/Policies.types'
+
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from './Storage.constants'
 
 export interface StoragePolicyFormField extends PolicyFormField {
@@ -19,6 +20,7 @@ export interface BucketCreatePayload extends BucketUpdatePayload {
 export interface StorageColumn {
   id: string | null
   name: string
+  path: string
   status: string
   items: StorageItem[]
   hasMoreItems?: boolean

@@ -1,32 +1,29 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { debounce, noop } from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useChanged } from 'hooks/misc/useChanged'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { noop } from 'lodash'
+import { useCallback, type ChangeEvent, type DragEvent } from 'react'
+import { toast } from 'sonner'
 import { SidePanel, Tabs } from 'ui'
+
 import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
-import SpreadSheetFileUpload from './SpreadSheetFileUpload'
+import { SpreadSheetFileUpload } from './SpreadSheetFileUpload'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
-import SpreadSheetTextInput from './SpreadSheetTextInput'
-import { EMPTY_SPREADSHEET_DATA } from './SpreadsheetImport.constants'
-import type { SpreadsheetData } from './SpreadsheetImport.types'
-import {
-  flagInvalidFileImport,
-  parseSpreadsheet,
-  parseSpreadsheetText,
-} from './SpreadsheetImport.utils'
 import { SpreadsheetImportPreview } from './SpreadsheetImportPreview'
+import SpreadSheetTextInput from './SpreadSheetTextInput'
+import {
+  hasAttachedFile,
+  hasAttachedText,
+  isEmptyState,
+  isFileTab,
+  isParsedState,
+  isParsingState,
+  useSpreadsheetImport,
+} from './useSpreadsheetImport'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface SpreadsheetImportProps {
-  debounceDuration?: number
-  headers?: string[]
-  rows?: any[]
   visible: boolean
   selectedTable?: PostgresTable
   saveContent: (prefillData: ImportContent) => void
@@ -34,14 +31,8 @@ interface SpreadsheetImportProps {
   updateEditorDirty?: (value: boolean) => void
 }
 
-const csvParseErrorMessage =
-  'Some issues have been detected. More details below the content preview.'
-
 export const SpreadsheetImport = ({
   visible = false,
-  debounceDuration = 250,
-  headers = [],
-  rows = [],
   selectedTable,
   saveContent,
   closePanel,
@@ -49,114 +40,37 @@ export const SpreadsheetImport = ({
 }: SpreadsheetImportProps) => {
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const tableEditorSnap = useTableEditorStateSnapshot()
 
-  const fileFromState =
-    tableEditorSnap.sidePanel?.type === 'csv-import' ? tableEditorSnap.sidePanel.file : undefined
-
-  const visiblityChanged = useChanged(visible)
-  const [tab, setTab] = useState<'fileUpload' | 'pasteText'>('fileUpload')
-  const [input, setInput] = useState<string>('')
-  const [uploadedFile, setUploadedFile] = useState<File>()
-  const [parseProgress, setParseProgress] = useState<number>(0)
-  const [spreadsheetData, setSpreadsheetData] = useState<SpreadsheetData>({
-    headers: headers,
-    rows: rows,
-    rowCount: 0,
-    columnTypeMap: {},
-  })
-  const [errors, setErrors] = useState<any>([])
-  const [selectedHeaders, setSelectedHeaders] = useState<string[]>([])
-
-  const { mutate: sendEvent } = useSendEventMutation()
+  const {
+    state,
+    treatEmptyAsNull,
+    handleSwitchTab,
+    handleToggleTreatEmptyAsNull,
+    handleInputText,
+    handleUploadFile,
+    handleRemoveFile,
+    handleToggleSelectedHeader,
+  } = useSpreadsheetImport({ markDirty: updateEditorDirty })
+  const tab = isFileTab(state) ? 'fileUpload' : 'pasteText'
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
-  const incompatibleHeaders = selectedHeaders.filter(
-    (header) => !selectedTableColumns.includes(header)
-  )
-  const isCompatible = selectedTable !== undefined ? incompatibleHeaders.length === 0 : true
+  const csvHeaders =
+    state._tag === 'file_parsed' || state._tag === 'text_parsed' ? state.data.headers : []
+  const incompatibleHeaders = csvHeaders.filter((header) => !selectedTableColumns.includes(header))
+  const isCompatible = !selectedTable || incompatibleHeaders.length === 0
 
-  const onProgressUpdate = (progress: number) => {
-    setParseProgress(progress)
-  }
-
-  // Process a file into table rows and columns (used for both upload and drop)
-  const processFile = useCallback(
-    async (file: File) => {
-      updateEditorDirty(true)
-      setUploadedFile(file)
-      setParseProgress(0)
-
-      const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
-        file,
-        onProgressUpdate
-      )
-
-      if (errors.length > 0) {
-        toast.error(csvParseErrorMessage)
-      }
-
-      setErrors(errors)
-      setSelectedHeaders(headers)
-      setSpreadsheetData({ headers, rows: previewRows, rowCount, columnTypeMap })
-    },
-    [updateEditorDirty]
-  )
-
-  // Handle file upload events from file input
-  const onFileUpload = useCallback(
-    async (event: any) => {
-      event.persist()
-      const [file] = event.target.files || event.dataTransfer.files
-      if (file && !flagInvalidFileImport(file)) {
-        await processFile(file)
-      }
-      event.target.value = ''
-    },
-    [processFile]
-  )
-
-  const resetSpreadsheetImport = useCallback(() => {
-    setInput('')
-    setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
-    setUploadedFile(undefined)
-    setErrors([])
-    updateEditorDirty(false)
-  }, [updateEditorDirty])
-
-  const readSpreadsheetText = async (text: string) => {
-    if (text.length > 0) {
-      const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText(text)
-      if (errors.length > 0) {
-        toast.error(csvParseErrorMessage)
-      }
-      setErrors(errors)
-      setSelectedHeaders(headers)
-      setSpreadsheetData({ headers, rows, rowCount: rows.length, columnTypeMap })
-    } else {
-      setSpreadsheetData(EMPTY_SPREADSHEET_DATA)
-    }
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handler = useCallback(debounce(readSpreadsheetText, debounceDuration), [])
-  const onInputChange = (event: any) => {
-    setInput(event.target.value)
-    handler(event.target.value)
-  }
-
-  const onToggleHeader = (header: string) => {
-    const updatedSelectedHeaders = selectedHeaders.includes(header)
-      ? selectedHeaders.filter((h) => h !== header)
-      : selectedHeaders.concat([header])
-    setSelectedHeaders(updatedSelectedHeaders)
-  }
-
+  const { mutate: sendEvent } = useSendEventMutation()
   const onConfirm = (resolve: () => void) => {
-    if (tab === 'fileUpload' && uploadedFile === undefined) {
+    if (state._tag === 'no_selected_file') {
       toast.error('Please upload a file to import your data with')
       resolve()
-    } else if (selectedHeaders.length === 0) {
+    } else if (state._tag === 'no_pasted_text') {
+      toast.error('Please paste some CSV text to import')
+      resolve()
+    } else if (state._tag === 'parsing_file' || state._tag === 'parsing_text') {
+      toast.error('Your data is still being processed, please wait a moment')
+      resolve()
+    } else if (state.selectedHeaders.length === 0) {
       toast.error('Please select at least one header from your CSV')
       resolve()
     } else if (!isCompatible) {
@@ -165,27 +79,19 @@ export const SpreadsheetImport = ({
       )
       resolve()
     } else {
-      saveContent({ file: uploadedFile, ...spreadsheetData, selectedHeaders, resolve })
+      saveContent({
+        file: state._tag === 'file_parsed' ? state.file : undefined,
+        ...state.data,
+        selectedHeaders: state.selectedHeaders,
+        treatEmptyAsNull: treatEmptyAsNull,
+        resolve,
+      })
       sendEvent({
         action: 'import_data_added',
         groups: { project: projectRef ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
       })
     }
   }
-
-  useEffect(() => {
-    if (visiblityChanged && visible) {
-      if (fileFromState) processFile(fileFromState)
-      else if (headers.length === 0) resetSpreadsheetImport()
-    }
-  }, [
-    visiblityChanged,
-    visible,
-    fileFromState,
-    processFile,
-    headers.length,
-    resetSpreadsheetImport,
-  ])
 
   return (
     <SidePanel
@@ -213,37 +119,44 @@ export const SpreadsheetImport = ({
     >
       <SidePanel.Content>
         <div className="pt-6">
-          <Tabs block type="pills" onChange={setTab}>
+          <Tabs block type="pills" activeId={tab} onChange={handleSwitchTab}>
             <Tabs.Panel id="fileUpload" label="Upload CSV">
-              <SpreadSheetFileUpload
-                parseProgress={parseProgress}
-                uploadedFile={uploadedFile}
-                onFileUpload={onFileUpload}
-                removeUploadedFile={resetSpreadsheetImport}
+              <SpreadsheetFileDropZone
+                file={hasAttachedFile(state) ? state.file : undefined}
+                parseProgress={
+                  isEmptyState(state) ? 0 : isParsingState(state) ? state.progress : 100
+                }
+                onUploadFile={handleUploadFile}
+                onRemoveFile={handleRemoveFile}
               />
             </Tabs.Panel>
             <Tabs.Panel id="pasteText" label="Paste text">
-              <SpreadSheetTextInput input={input} onInputChange={onInputChange} />
+              <SpreadsheetInputZone
+                text={hasAttachedText(state) ? state.text : ''}
+                onInputChange={handleInputText}
+              />
             </Tabs.Panel>
           </Tabs>
         </div>
       </SidePanel.Content>
-      {spreadsheetData.headers.length > 0 && (
+      {isParsedState(state) && state.data.headers.length > 0 && (
         <>
           <div className="pt-4">
             <SidePanel.Separator />
           </div>
           <SpreadsheetImportConfiguration
-            spreadsheetData={spreadsheetData}
-            selectedHeaders={selectedHeaders}
-            onToggleHeader={onToggleHeader}
+            spreadsheetData={state.data}
+            selectedHeaders={state.selectedHeaders}
+            onToggleHeader={handleToggleSelectedHeader}
+            treatEmptyAsNull={treatEmptyAsNull}
+            onToggleTreatEmptyAsNull={handleToggleTreatEmptyAsNull}
           />
           <SidePanel.Separator />
           <SpreadsheetImportPreview
             selectedTable={selectedTable}
-            spreadsheetData={spreadsheetData}
-            errors={errors}
-            selectedHeaders={selectedHeaders}
+            spreadsheetData={state.data}
+            errors={state.errors}
+            selectedHeaders={state.selectedHeaders}
             incompatibleHeaders={incompatibleHeaders}
           />
           <SidePanel.Separator />
@@ -251,4 +164,60 @@ export const SpreadsheetImport = ({
       )}
     </SidePanel>
   )
+}
+
+function isDragEvent(
+  event: DragEvent<HTMLDivElement> | ChangeEvent<HTMLInputElement>
+): event is DragEvent<HTMLDivElement> {
+  return event.type === 'drop'
+}
+
+interface SpreadsheetFileDropZoneProps {
+  file: File | undefined
+  parseProgress: number
+  onUploadFile: (file: File) => void
+  onRemoveFile: () => void
+}
+
+function SpreadsheetFileDropZone({
+  file,
+  parseProgress,
+  onUploadFile,
+  onRemoveFile,
+}: SpreadsheetFileDropZoneProps) {
+  const handleUploadFile = useCallback(
+    async function uploadFile(event: DragEvent<HTMLDivElement> | ChangeEvent<HTMLInputElement>) {
+      const [file] = isDragEvent(event) ? event.dataTransfer.files : (event.target.files ?? [])
+      if (!file) {
+        return
+      }
+      onUploadFile(file)
+    },
+    [onUploadFile]
+  )
+
+  return (
+    <SpreadSheetFileUpload
+      uploadedFile={file}
+      onFileUpload={handleUploadFile}
+      parseProgress={parseProgress}
+      removeUploadedFile={onRemoveFile}
+    />
+  )
+}
+
+interface SpreadsheetInputZoneProps {
+  text: string
+  onInputChange: (text: string) => void
+}
+
+function SpreadsheetInputZone({ text, onInputChange }: SpreadsheetInputZoneProps) {
+  const handleInputText = useCallback(
+    function inputText(event: ChangeEvent<HTMLTextAreaElement>) {
+      onInputChange(event.target.value)
+    },
+    [onInputChange]
+  )
+
+  return <SpreadSheetTextInput input={text} onInputChange={handleInputText} />
 }

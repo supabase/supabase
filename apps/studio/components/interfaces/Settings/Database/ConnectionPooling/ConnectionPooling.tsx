@@ -1,14 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { capitalize } from 'lodash'
-import { Fragment, useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
-import { Button } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
 import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -22,19 +15,28 @@ import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL } from 'lib/constants'
+import { capitalize } from 'lodash'
+import Link from 'next/link'
+import { Fragment, useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
-  cn,
+  Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionAside,
@@ -43,17 +45,22 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { Admonition } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import z from 'zod'
+
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import Link from 'next/link'
 
 const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
-  default_pool_size: z.number().nullable(),
-  max_client_conn: z.number().nullable(),
+  default_pool_size: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
+    z.coerce.number().optional()
+  ),
+  max_client_conn: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
+    z.coerce.number().optional()
+  ),
 })
 
 /**
@@ -104,7 +111,7 @@ export const ConnectionPooling = () => {
     resolver: zodResolver(PoolingConfigurationFormSchema),
     defaultValues: {
       default_pool_size: undefined,
-      max_client_conn: null,
+      max_client_conn: undefined,
     },
   })
   const { default_pool_size } = form.watch()
@@ -258,18 +265,25 @@ export const ConnectionPooling = () => {
                           className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div>div>div]:min-w-100"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="connections" className="uppercase">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>connections</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={field.value || ''}
+                                value={field.value ?? ''}
                                 placeholder={defaultPoolSize.toString()}
-                                {...form.register('default_pool_size', {
-                                  setValueAs: setValueAsNullableNumber,
-                                })}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                           {!!maxConnData &&
                             (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
@@ -292,6 +306,7 @@ export const ConnectionPooling = () => {
 
                     <FormField_Shadcn_
                       control={form.control}
+                      disabled
                       name="max_client_conn"
                       render={({ field }) => (
                         <FormItemLayout
@@ -314,19 +329,25 @@ export const ConnectionPooling = () => {
                           }
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="clients" className="uppercase">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={pgbouncerConfig?.max_client_conn || ''}
-                                disabled={true}
+                                value={pgbouncerConfig?.max_client_conn ?? ''}
                                 placeholder={defaultMaxClientConn.toString()}
-                                {...form.register('max_client_conn', {
-                                  setValueAs: setValueAsNullableNumber,
-                                })}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}

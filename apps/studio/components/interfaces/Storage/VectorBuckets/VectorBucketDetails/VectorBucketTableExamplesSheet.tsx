@@ -12,23 +12,23 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
-  CodeBlock,
+  cn,
+  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   Sheet,
   SheetContent,
   SheetHeader,
   SheetSection,
   SheetTitle,
   SheetTrigger,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'

@@ -1,27 +1,27 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -29,6 +29,8 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 
 export const RateLimits = () => {
@@ -191,14 +193,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="emails/h">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>emails/h</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig || !canUpdateEmailLimit}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateEmailLimit ? (
@@ -259,14 +264,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="sms/h">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>sms/h</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateSMSRateLimit ? (
@@ -305,14 +313,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>requests/5 min</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig && (
@@ -349,14 +360,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>requests/5 min</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig && (
@@ -393,14 +407,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/h">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>requests/h</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateAnonymousUsersRateLimit ? (
@@ -437,14 +454,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>requests/5 min</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig && (
@@ -481,14 +501,17 @@ export const RateLimits = () => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>requests/5 min</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={0}
                                 {...field}
                                 disabled={!canUpdateConfig || !canUpdateWeb3RateLimit}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </TooltipTrigger>
                         {!canUpdateConfig || !canUpdateWeb3RateLimit ? (

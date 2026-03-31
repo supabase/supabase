@@ -23,7 +23,6 @@ import {
 import {
   Badge,
   Button,
-  CodeBlock,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -48,6 +47,7 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 

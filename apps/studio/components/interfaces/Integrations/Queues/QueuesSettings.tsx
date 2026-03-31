@@ -35,8 +35,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-// [Joshen] Not convinced with the UI and layout but getting the functionality out first
-
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissions(

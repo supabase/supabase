@@ -28,7 +28,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
 const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
-      return error.dependents.join(', ')
+      return (error.dependents ?? []).join(', ') || 'Objects depending on pg_cron'
     case 'indexes_referencing_ll_to_earth':
       return `${error.schema_name}.${error.index_name}`
     case 'function_using_obsolete_lang':

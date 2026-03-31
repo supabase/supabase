@@ -13,12 +13,14 @@ import startupGrindContest from './events/startup-grind-2026/contest'
 import stripeSessionsContest from './events/stripe-sessions-2026/contest'
 import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
 import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-thank-you'
+import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-scheduler'
 import sxswContest from './events/sxsw-2026/contest'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
+import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 import boltWebinar from './webinar/bolt-webinar'
 import boltWebinarThankYou from './webinar/bolt-webinar-thank-you'
 import figmaWebinarMay2026 from './webinar/figma-webinar-may2026'
@@ -36,6 +38,7 @@ const pages: GoPageInput[] = [
   boltWebinarThankYou, // remove after March 31, 2026
   stripeExecDinner, // remove after May 31, 2026
   stripeExecDinnerThankYou, // remove after May 31, 2026
+  stripeMeetingScheduler, // remove after May 31, 2026
   stripeSessionsContest, // remove after May 31, 2026
   sxswContest, // remove after April 30, 2026
   accentureContest, // remove after May 31, 2026
@@ -48,6 +51,7 @@ const pages: GoPageInput[] = [
   aiEngineerEuropeContest,
   aiEngineerEuropeContestThankYou,
   startupGrindContest, // remove after May 31, 2026
+  supabaseStripeProjects,
 ]
 
 export default pages

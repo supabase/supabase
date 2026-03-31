@@ -240,21 +240,21 @@ const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
 
 function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinationSubmitValues {
   if (!HEADER_ENABLED_TYPES.includes(values.type as (typeof HEADER_ENABLED_TYPES)[number])) {
-    return values as LogDrainDestinationSubmitValues
+    return submitSchema.parse(values)
   }
 
   const { headerEntries = [], ...rest } = values as LogDrainDestinationFormValues & {
     headerEntries?: LogDrainHeaderRow[]
   }
   const headers = headerRowsToRecord(headerEntries)
+  const transformedValues =
+    rest.type === 'loki'
+      ? { ...rest, headers }
+      : Object.keys(headers).length > 0
+        ? { ...rest, headers }
+        : rest
 
-  if (rest.type === 'loki') {
-    return { ...rest, headers } as LogDrainDestinationSubmitValues
-  }
-
-  return (
-    Object.keys(headers).length > 0 ? { ...rest, headers } : rest
-  ) as LogDrainDestinationSubmitValues
+  return submitSchema.parse(transformedValues)
 }
 
 function LogDrainFormItem({

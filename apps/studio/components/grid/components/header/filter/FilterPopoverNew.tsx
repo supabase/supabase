@@ -59,7 +59,10 @@ function filterGroupToFilters(group: FilterGroup): Filter[] {
 
 // Custom date picker component for the FilterBar
 function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
+  const parsed = search ? new Date(search) : undefined
+  const [date, setDate] = useState<Date | undefined>(
+    parsed && !isNaN(parsed.getTime()) ? parsed : undefined
+  )
 
   return (
     <div className="w-[300px] space-y-4">

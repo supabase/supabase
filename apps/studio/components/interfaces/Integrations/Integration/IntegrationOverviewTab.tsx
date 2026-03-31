@@ -9,10 +9,11 @@ import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
 import { MissingExtensionAlert } from './MissingExtensionAlert'
 
-interface IntegrationOverviewTabProps {
+export interface IntegrationOverviewTabProps {
   actions?: ReactNode
   status?: string | ReactNode
   alert?: ReactNode
+  hideRequiredExtensionsSection?: boolean
 }
 
 export const IntegrationOverviewTab = ({
@@ -20,6 +21,7 @@ export const IntegrationOverviewTab = ({
   alert,
   status,
   children,
+  hideRequiredExtensionsSection = false,
 }: PropsWithChildren<IntegrationOverviewTabProps>) => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -56,7 +58,7 @@ export const IntegrationOverviewTab = ({
 
       <Separator />
 
-      {dependsOnExtension && (
+      {dependsOnExtension && !hideRequiredExtensionsSection && (
         <div className="px-4 md:px-10 max-w-4xl flex flex-col gap-y-4">
           <h4>Required extensions</h4>
           <Card>
@@ -103,10 +105,12 @@ export const IntegrationOverviewTab = ({
 
       {!!actions && (
         <div
-          aria-disabled={hasToInstallExtensions}
+          aria-disabled={hasToInstallExtensions && !hideRequiredExtensionsSection}
           className={cn(
             'px-10 max-w-4xl',
-            hasToInstallExtensions && 'opacity-25 [&_button]:pointer-events-none'
+            hasToInstallExtensions &&
+              !hideRequiredExtensionsSection &&
+              'opacity-25 [&_button]:pointer-events-none'
           )}
         >
           {actions}
