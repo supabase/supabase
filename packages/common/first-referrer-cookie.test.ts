@@ -393,5 +393,37 @@ describe('first-referrer-cookie', () => {
         })
       ).toEqual({ stamp: false })
     })
+
+    it('does not stamp for GitHub OAuth redirect (bare domain)', () => {
+      const result = shouldRefreshCookie(false, {
+        referrer: 'https://github.com/',
+        url: 'https://supabase.com/dashboard',
+      })
+      expect(result.stamp).toBe(false)
+    })
+
+    it('does not stamp for Google SSO redirect', () => {
+      const result = shouldRefreshCookie(false, {
+        referrer: 'https://accounts.google.com/',
+        url: 'https://supabase.com/dashboard',
+      })
+      expect(result.stamp).toBe(false)
+    })
+
+    it('still stamps for genuine GitHub referral with path', () => {
+      const result = shouldRefreshCookie(false, {
+        referrer: 'https://github.com/supabase/supabase?tab=readme-ov-file',
+        url: 'https://supabase.com/',
+      })
+      expect(result.stamp).toBe(true)
+    })
+
+    it('still re-stamps existing cookie for paid signals regardless of OAuth referrer', () => {
+      const result = shouldRefreshCookie(true, {
+        referrer: 'https://github.com/',
+        url: 'https://supabase.com/pricing?gclid=abc123',
+      })
+      expect(result.stamp).toBe(true)
+    })
   })
 })

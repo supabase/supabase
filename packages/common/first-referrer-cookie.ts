@@ -253,6 +253,7 @@ export function shouldRefreshCookie(
   request: { referrer: string; url: string }
 ): { stamp: boolean } {
   if (!existingCookie) {
+    if (isOAuthRedirectReferrer(request.referrer)) return { stamp: false }
     return { stamp: isExternalReferrer(request.referrer) }
   }
 
