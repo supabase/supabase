@@ -5,10 +5,11 @@ import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useMigrationUpsertMutation } from 'data/database/migration-upsert-mutation'
-import { AlertCircle, CheckCircle2, Loader2, Play, Plus, Save, Trash2, X } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Loader2, Play, Plus, Save, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import type { TestRole } from './rls-test-worker'
 import { RLSTestResults } from './RLSTestResults'
@@ -45,6 +46,7 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
   const [roles, setRoles] = useState<TestRole[]>(DEFAULT_ROLES)
   const [dataLimit, setDataLimit] = useState(50)
   const [isLoadingData, setIsLoadingData] = useState(false)
+  const [showMigrationConfirm, setShowMigrationConfirm] = useState(false)
 
   const { status, results, error, dataRowCount, runTest, dispose } = useRLSPolicyTest()
 
@@ -66,6 +68,7 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
     useMigrationUpsertMutation({
       onSuccess: () => {
         toast.success('Policy applied as migration successfully!')
+        setShowMigrationConfirm(false)
       },
     })
 
@@ -161,12 +164,15 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
     }
   }, [selectedTable, tableDDL, policySql, schema, roles, runTest, fetchSampleData])
 
-  const handleApplyAsMigration = useCallback(async () => {
-    if (!project?.ref || !policySql.trim()) return
-
-    const migrationSql = selectedTable
-      ? `-- Enable RLS on ${schema}.${selectedTable.name}\nALTER TABLE "${schema}"."${selectedTable.name}" ENABLE ROW LEVEL SECURITY;\n\n${policySql.trim()}`
+  const migrationSql = useMemo(() => {
+    if (!policySql.trim()) return ''
+    return selectedTable
+      ? `ALTER TABLE "${schema}"."${selectedTable.name}" ENABLE ROW LEVEL SECURITY;\n\n${policySql.trim()}`
       : policySql.trim()
+  }, [policySql, selectedTable, schema])
+
+  const handleApplyAsMigration = useCallback(async () => {
+    if (!project?.ref || !migrationSql) return
 
     try {
       await upsertMigration({
@@ -177,14 +183,14 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
     } catch (err: any) {
       toast.error(`Failed to apply migration: ${err.message}`)
     }
-  }, [project, policySql, selectedTable, schema, upsertMigration])
+  }, [project, migrationSql, selectedTable, upsertMigration])
 
   const isRunning = status === 'initializing' || status === 'loading_schema' || status === 'loading_data' || status === 'testing'
   const statusMessage = {
     idle: '',
     initializing: 'Starting local Postgres...',
     loading_schema: 'Loading table schema...',
-    loading_data: `Loading sample data...`,
+    loading_data: 'Loading sample data...',
     testing: 'Testing policy with each role...',
     done: `Tests complete (${dataRowCount} rows loaded)`,
     error: '',
@@ -253,8 +259,8 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
               Sample Data Rows
             </label>
             <p className="text-xs text-foreground-lighter">
-              Number of rows to load from your table for testing. Data is fetched ad-hoc and
-              runs entirely in-browser — nothing leaves your machine.
+              Number of rows to load from your table for testing. Data is fetched from your
+              database and loaded into an in-browser Postgres instance for local testing.
             </p>
             <Input
               type="number"
@@ -273,8 +279,8 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
               <div>
                 <label className="text-sm font-medium text-foreground">Test Roles</label>
                 <p className="text-xs text-foreground-lighter">
-                  Configure which roles to test the policy against. Each runs in an isolated
-                  worker thread.
+                  Configure which roles to test the policy against. Each role is tested
+                  in sequence within the same worker.
                 </p>
               </div>
               <Button
@@ -373,15 +379,8 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
             {status === 'done' && (
               <Button
                 type="default"
-                icon={
-                  isApplyingMigration ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <Save size={14} />
-                  )
-                }
-                disabled={isApplyingMigration}
-                onClick={handleApplyAsMigration}
+                icon={<Save size={14} />}
+                onClick={() => setShowMigrationConfirm(true)}
               >
                 Apply as Migration
               </Button>
@@ -416,6 +415,25 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
 
           {/* Results */}
           <RLSTestResults results={results} />
+
+          {/* Migration confirmation modal */}
+          <ConfirmationModal
+            visible={showMigrationConfirm}
+            variant="default"
+            title="Apply policy as migration"
+            description="This will create a new migration that enables RLS and applies the policy to your database. This action will be tracked in your migration history."
+            confirmLabel="Apply Migration"
+            confirmLabelLoading="Applying..."
+            loading={isApplyingMigration}
+            onCancel={() => setShowMigrationConfirm(false)}
+            onConfirm={handleApplyAsMigration}
+          >
+            <div className="rounded-md bg-surface-200 p-3 mt-2">
+              <pre className="text-xs font-mono text-foreground-light whitespace-pre-wrap overflow-x-auto max-h-[200px]">
+                {migrationSql}
+              </pre>
+            </div>
+          </ConfirmationModal>
         </>
       )}
     </div>

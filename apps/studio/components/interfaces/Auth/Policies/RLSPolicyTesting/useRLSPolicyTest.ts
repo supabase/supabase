@@ -8,37 +8,56 @@ import type {
 
 export type RLSTestStatus = 'idle' | 'initializing' | 'loading_schema' | 'loading_data' | 'testing' | 'done' | 'error'
 
+const WORKER_TIMEOUT_MS = 30_000
+
 export function useRLSPolicyTest() {
   const workerRef = useRef<Worker | null>(null)
-  const resolveRef = useRef<((msg: WorkerResponse) => void) | null>(null)
+  const pendingRef = useRef<{
+    resolve: (msg: WorkerResponse) => void
+    reject: (err: Error) => void
+    timer: ReturnType<typeof setTimeout>
+  } | null>(null)
 
   const [status, setStatus] = useState<RLSTestStatus>('idle')
   const [results, setResults] = useState<RoleTestResult[]>([])
   const [error, setError] = useState<string | null>(null)
   const [dataRowCount, setDataRowCount] = useState(0)
 
-  const sendMessage = useCallback((msg: WorkerRequest): Promise<WorkerResponse> => {
-    return new Promise((resolve, reject) => {
-      if (!workerRef.current) {
-        reject(new Error('Worker not available'))
-        return
-      }
-      resolveRef.current = resolve
-      workerRef.current.postMessage(msg)
-    })
+  const clearPending = useCallback(() => {
+    if (pendingRef.current) {
+      clearTimeout(pendingRef.current.timer)
+      pendingRef.current = null
+    }
   }, [])
 
-  const initWorker = useCallback(async () => {
-    // Dispose previous worker if any
-    if (workerRef.current) {
-      workerRef.current.terminate()
-      workerRef.current = null
-    }
+  const sendMessage = useCallback(
+    (msg: WorkerRequest, timeoutMs = WORKER_TIMEOUT_MS): Promise<WorkerResponse> => {
+      return new Promise((resolve, reject) => {
+        if (!workerRef.current) {
+          reject(new Error('Worker not available'))
+          return
+        }
 
-    setStatus('initializing')
-    setError(null)
-    setResults([])
-    setDataRowCount(0)
+        // Reject any pending promise before overwriting
+        if (pendingRef.current) {
+          clearTimeout(pendingRef.current.timer)
+          pendingRef.current.reject(new Error('Superseded by new message'))
+        }
+
+        const timer = setTimeout(() => {
+          pendingRef.current = null
+          reject(new Error(`Worker operation timed out after ${timeoutMs / 1000}s`))
+        }, timeoutMs)
+
+        pendingRef.current = { resolve, reject, timer }
+        workerRef.current.postMessage(msg)
+      })
+    },
+    []
+  )
+
+  const ensureWorker = useCallback(() => {
+    if (workerRef.current) return workerRef.current
 
     const worker = new Worker(
       new URL('./rls-test-worker.ts', import.meta.url),
@@ -47,27 +66,33 @@ export function useRLSPolicyTest() {
 
     worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
       const msg = event.data
+      const pending = pendingRef.current
+      if (!pending) return
+
+      clearTimeout(pending.timer)
+      pendingRef.current = null
+
       if (msg.type === 'error') {
         setError(msg.message)
         setStatus('error')
-        resolveRef.current?.(msg)
-        resolveRef.current = null
-        return
       }
-      resolveRef.current?.(msg)
-      resolveRef.current = null
+      pending.resolve(msg)
     }
 
     worker.onerror = (e) => {
+      const pending = pendingRef.current
+      if (pending) {
+        clearTimeout(pending.timer)
+        pendingRef.current = null
+        pending.reject(new Error(e.message))
+      }
       setError(e.message)
       setStatus('error')
     }
 
     workerRef.current = worker
-
-    await sendMessage({ type: 'init' })
     return worker
-  }, [sendMessage])
+  }, [])
 
   const runTest = useCallback(
     async ({
@@ -90,8 +115,11 @@ export function useRLSPolicyTest() {
         setResults([])
         setDataRowCount(0)
 
-        // 1. Init fresh PGlite
-        await initWorker()
+        // 1. Init fresh PGlite (reuses worker, creates new PGlite instance)
+        setStatus('initializing')
+        ensureWorker()
+        const initRes = await sendMessage({ type: 'init' })
+        if (initRes.type === 'error') throw new Error(initRes.message)
 
         // 2. Load schema
         setStatus('loading_schema')
@@ -125,26 +153,36 @@ export function useRLSPolicyTest() {
         setStatus('error')
       }
     },
-    [initWorker, sendMessage]
+    [ensureWorker, sendMessage]
   )
 
   const dispose = useCallback(() => {
+    clearPending()
     if (workerRef.current) {
-      workerRef.current.postMessage({ type: 'dispose' })
-      workerRef.current.terminate()
+      // Send dispose to let PGlite close, then terminate
+      workerRef.current.postMessage({ type: 'dispose' } satisfies WorkerRequest)
+      // Give it a moment to close cleanly, then force-terminate
+      const w = workerRef.current
+      setTimeout(() => w.terminate(), 500)
       workerRef.current = null
     }
     setStatus('idle')
     setResults([])
     setError(null)
     setDataRowCount(0)
-  }, [])
+  }, [clearPending])
 
   useEffect(() => {
     return () => {
-      workerRef.current?.terminate()
+      clearPending()
+      if (workerRef.current) {
+        workerRef.current.postMessage({ type: 'dispose' } satisfies WorkerRequest)
+        const w = workerRef.current
+        setTimeout(() => w.terminate(), 500)
+        workerRef.current = null
+      }
     }
-  }, [])
+  }, [clearPending])
 
   return {
     status,

@@ -19,6 +19,7 @@ export type WorkerRequest =
       schema: string
       policySql: string
       roles: TestRole[]
+      maxResultRows?: number
     }
   | { type: 'dispose' }
 
@@ -48,7 +49,17 @@ export type WorkerResponse =
 // ── worker state ───────────────────────────────────────────────────
 let db: PGlite | null = null
 
+function escapeLiteral(value: string): string {
+  return value.replace(/'/g, "''")
+}
+
 async function initDb() {
+  // Close previous instance if reusing the worker
+  if (db) {
+    await db.close()
+    db = null
+  }
+
   db = new PGlite()
 
   // Bootstrap the auth schema that Supabase RLS policies rely on
@@ -100,19 +111,26 @@ async function loadData(sql: string) {
 async function setRoleContext(role: TestRole) {
   if (!db) throw new Error('DB not initialised')
 
+  const sub = escapeLiteral(role.uid ?? '00000000-0000-0000-0000-000000000000')
+  const roleName = escapeLiteral(role.role ?? role.name)
+  const email = escapeLiteral(role.email ?? '')
+
   const claims: Record<string, unknown> = {
     sub: role.uid ?? '00000000-0000-0000-0000-000000000000',
     role: role.role ?? role.name,
     email: role.email ?? '',
     ...(role.additionalClaims ?? {}),
   }
+  const claimsJson = escapeLiteral(JSON.stringify(claims))
+
+  const pgRole = role.name === 'anon' ? 'anon' : 'authenticated'
 
   await db.exec(`
-    SET LOCAL role = '${role.name === 'anon' ? 'anon' : 'authenticated'}';
-    SELECT set_config('request.jwt.claims', '${JSON.stringify(claims)}', true);
-    SELECT set_config('request.jwt.claim.sub', '${claims.sub}', true);
-    SELECT set_config('request.jwt.claim.role', '${claims.role}', true);
-    SELECT set_config('request.jwt.claim.email', '${claims.email}', true);
+    SET LOCAL role = '${pgRole}';
+    SELECT set_config('request.jwt.claims', '${claimsJson}', true);
+    SELECT set_config('request.jwt.claim.sub', '${sub}', true);
+    SELECT set_config('request.jwt.claim.role', '${roleName}', true);
+    SELECT set_config('request.jwt.claim.email', '${email}', true);
   `)
 }
 
@@ -120,20 +138,23 @@ async function testPolicy(
   tableName: string,
   schema: string,
   policySql: string,
-  roles: TestRole[]
+  roles: TestRole[],
+  maxResultRows: number = 25
 ) {
   if (!db) throw new Error('DB not initialised')
 
   const qualifiedTable = `"${schema}"."${tableName}"`
 
-  // Enable RLS & apply the candidate policy inside a savepoint so we can
-  // roll back between role probes without losing the table data.
+  // Enable RLS & apply the candidate policy
   await db.exec(`ALTER TABLE ${qualifiedTable} ENABLE ROW LEVEL SECURITY;`)
   await db.exec(`ALTER TABLE ${qualifiedTable} FORCE ROW LEVEL SECURITY;`)
 
   // Create roles if they don't exist
+  const createdRoles = new Set<string>()
   for (const role of roles) {
     const pgRole = role.name === 'anon' ? 'anon' : 'authenticated'
+    if (createdRoles.has(pgRole)) continue
+    createdRoles.add(pgRole)
     try {
       await db.exec(`CREATE ROLE ${pgRole};`)
     } catch {
@@ -175,34 +196,29 @@ async function testPolicy(
     try {
       await setRoleContext(role)
 
-      // SELECT
+      // SELECT — cap rows sent back to avoid bloating postMessage payload
       try {
-        const selectRes = await db.query(`SELECT * FROM ${qualifiedTable};`)
+        const countRes = await db.query<{ count: string }>(
+          `SELECT count(*)::text as count FROM ${qualifiedTable};`
+        )
+        const totalRows = parseInt(countRes.rows[0]?.count ?? '0', 10)
+
+        const selectRes = await db.query(
+          `SELECT * FROM ${qualifiedTable} LIMIT ${maxResultRows};`
+        )
         result.select = {
           allowed: true,
-          rowCount: selectRes.rows.length,
+          rowCount: totalRows,
           rows: selectRes.rows as Record<string, unknown>[],
         }
       } catch (e: any) {
         result.select = { allowed: false, rowCount: 0, rows: [], error: e.message }
       }
 
-      // INSERT – try inserting a row with default/null values
+      // INSERT – try inserting a row with default values
       try {
         await db.exec('SAVEPOINT insert_test;')
-        // Get column info to build a minimal insert
-        const cols = await db.query<{ column_name: string; data_type: string }>(
-          `SELECT column_name, data_type FROM information_schema.columns
-           WHERE table_schema = $1 AND table_name = $2
-           AND is_generated = 'NEVER' AND column_default IS NULL
-           ORDER BY ordinal_position LIMIT 1`,
-          [schema, tableName]
-        )
-        if (cols.rows.length > 0) {
-          await db.exec(
-            `INSERT INTO ${qualifiedTable} DEFAULT VALUES;`
-          )
-        }
+        await db.exec(`INSERT INTO ${qualifiedTable} DEFAULT VALUES;`)
         result.insert = { allowed: true }
         await db.exec('ROLLBACK TO insert_test;')
       } catch (e: any) {
@@ -219,8 +235,9 @@ async function testPolicy(
         await db.exec('SAVEPOINT update_test;')
         const colInfo = await db.query<{ column_name: string }>(
           `SELECT column_name FROM information_schema.columns
-           WHERE table_schema = '${schema}' AND table_name = '${tableName}'
-           ORDER BY ordinal_position LIMIT 1`
+           WHERE table_schema = $1 AND table_name = $2
+           ORDER BY ordinal_position LIMIT 1`,
+          [schema, tableName]
         )
         const col = colInfo.rows[0]?.column_name ?? 'id'
         await db.exec(
@@ -280,7 +297,13 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
         await loadData(msg.sql)
         break
       case 'test_policy':
-        await testPolicy(msg.tableName, msg.schema, msg.policySql, msg.roles)
+        await testPolicy(
+          msg.tableName,
+          msg.schema,
+          msg.policySql,
+          msg.roles,
+          msg.maxResultRows
+        )
         break
       case 'dispose':
         if (db) {
