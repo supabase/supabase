@@ -475,10 +475,7 @@ const EXTERNAL_PROVIDER_APPLE = {
       is: true,
       then: (schema) =>
         schema
-          .matches(
-            /^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i,
-            'Secret key should be a JWT.'
-          )
+          .matches(/^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i, 'Secret key should be a JWT.')
           .test({
             message: 'Secret key is not a correctly generated JWT.',
             test: (value?: string): boolean => {
