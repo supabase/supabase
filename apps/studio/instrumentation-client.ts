@@ -280,6 +280,7 @@ Sentry.init({
     // === Non-Error throws (extensions, third-party libs throwing strings/objects) ===
     'Non-Error exception captured',
     'Non-Error promise rejection captured',
+    /^Object captured as exception with keys:/,
 
     // === Cross-origin script errors (no useful info) ===
     'Script error.',
