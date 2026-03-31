@@ -69,10 +69,10 @@ export function RegisterContent() {
           {/* Content wrapper — full height, flex col, nav top + content bottom */}
           <div className="relative z-10 flex flex-col" style={{ minHeight: '60vh' }}>
             {/* Top nav */}
-            <nav className="flex items-center justify-between px-8 py-6 w-full transition-opacity [transition-duration:1200ms]">
+            <nav className="flex items-center justify-between px-8 py-6 w-full">
               <Link
                 href="/state-of-startups"
-                className="font-mono uppercase tracking-wide text-sm text-white transition-colors"
+                className="font-mono uppercase tracking-wide text-sm text-white"
               >
                 State of Startups 2026
               </Link>
@@ -84,9 +84,9 @@ export function RegisterContent() {
             <div className="flex-1 hidden md:block" />
 
             {/* Bottom content — two columns, bottom-aligned */}
-            <div className="max-w-[65rem] mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 md:grid-cols-[auto_1fr] items-end gap-8 lg:gap-20 transition-opacity [transition-duration:1200ms]">
+            <div className="max-w-[65rem] mx-auto w-full px-8 pb-16 md:pb-24 pt-24 md:pt-0 grid grid-cols-1 lg:grid-cols-[auto_1fr] items-end gap-12 lg:gap-20 transition-opacity [transition-duration:1200ms]">
               <div className="flex flex-col">
-                <h1 className="text-6xl xl:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
+                <h1 className="text-6xl md:text-8xl font-light text-foreground leading-[0.92] tracking-tight">
                   The State <br /> of Startups
                   <br />
                   <span className="text-brand-600 dark:text-brand font-medium">2026</span>
