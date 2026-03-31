@@ -1779,62 +1779,6 @@ export interface DpaPdfOpenedEvent {
 }
 
 /**
- * User selected a workflow in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedWorkflowClickedEvent {
-  action: 'home_getting_started_workflow_clicked'
-  properties: {
-    /**
-     * The workflow selected by the user
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Whether this is switching from another workflow
-     */
-    is_switch: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on a step in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedStepClickedEvent {
-  action: 'home_getting_started_step_clicked'
-  properties: {
-    /**
-     * The workflow type (code or no-code)
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * The step number (1-based index)
-     */
-    step_number: number
-    /**
-     * The title of the step
-     */
-    step_title: string
-    /**
-     * The action type of the button clicked
-     */
-    action_type: 'primary' | 'ai_assist' | 'external_link'
-    /**
-     * Whether the step was already completed
-     */
-    was_completed: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User clicked on an activity stat in HomeV2.
  *
  * @group Events
@@ -1945,50 +1889,6 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * User dismissed the Getting Started section in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedClosedEvent {
-  action: 'home_getting_started_closed'
-  properties: {
-    /**
-     * The current workflow when dismissed
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Number of steps completed when dismissed
-     */
-    steps_completed: number
-    /**
-     * Total number of steps in the workflow
-     */
-    total_steps: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * Getting Started section was shown to the user in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedSectionExposedEvent {
-  action: 'home_getting_started_section_exposed'
-  properties: {
-    /**
-     * The current workflow shown (null if choosing workflow)
-     */
-    workflow: 'code' | 'no_code' | null
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User was exposed to the HomeV2 experiment (shown the new home page).
  *
  * @group Events
@@ -2007,7 +1907,7 @@ export interface HomeNewExperimentExposedEvent {
 }
 
 /**
- * Connect section was shown to the user as part of the connectSection experiment.
+ * Connect section was shown to the user on the project homepage.
  *
  * @group Events
  * @source studio
@@ -2015,12 +1915,6 @@ export interface HomeNewExperimentExposedEvent {
  */
 export interface HomeConnectSectionExposedEvent {
   action: 'home_connect_section_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: 'connect' | 'getting-started'
-  }
   groups: TelemetryGroups
 }
 
@@ -2035,9 +1929,9 @@ export interface HomeConnectActionClickedEvent {
   action: 'home_connect_action_clicked'
   properties: {
     /**
-     * The connect mode that was clicked
+     * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -3019,27 +2913,6 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
- * User was exposed to the pricing calculator experiment on the /pricing page.
- *
- * @group Events
- * @source www
- * @page /pricing
- */
-export interface PricingCalculatorExperimentExposedEvent {
-  action: 'pricing_calculator_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'pricingCalculatorExperiment'
-    /**
-     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
-     */
-    variant: 'control' | 'test'
-  }
-}
-
-/**
  * User clicked the Run button in the log explorer.
  *
  * @group Events
@@ -3054,6 +2927,30 @@ export interface LogExplorerQueryRunButtonClickedEvent {
      */
     is_saved_query: boolean
   }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Navigate action in the storage explorer header.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateClickedEvent {
+  action: 'storage_explorer_navigate_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted a folder path from the storage explorer Navigate action.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateSubmittedEvent {
+  action: 'storage_explorer_navigate_submitted'
   groups: TelemetryGroups
 }
 
@@ -3131,6 +3028,8 @@ export type TelemetryEvent =
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
   | LogExplorerQueryRunButtonClickedEvent
+  | StorageExplorerNavigateClickedEvent
+  | StorageExplorerNavigateSubmittedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -3169,10 +3068,6 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
-  | HomeGettingStartedWorkflowClickedEvent
-  | HomeGettingStartedStepClickedEvent
-  | HomeGettingStartedClosedEvent
-  | HomeGettingStartedSectionExposedEvent
   | HomeNewExperimentExposedEvent
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
@@ -3224,4 +3119,3 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
-  | PricingCalculatorExperimentExposedEvent

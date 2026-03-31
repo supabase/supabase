@@ -2,7 +2,7 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
 interface Props {
   table: PostgresTable
-  column: PostgresColumn
+  column?: PostgresColumn
 }
 
 export const HeaderTitle = ({ table, column }: Props) => {

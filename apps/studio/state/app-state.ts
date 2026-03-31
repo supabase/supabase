@@ -8,7 +8,6 @@ const getInitialState = () => {
     showProjectApiDocs: false,
     showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,

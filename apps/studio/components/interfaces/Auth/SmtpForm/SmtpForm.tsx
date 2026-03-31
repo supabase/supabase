@@ -7,7 +7,6 @@ import NoPermission from 'components/ui/NoPermission'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,10 +20,14 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as yup from 'yup'
 
@@ -49,7 +52,6 @@ export const SmtpForm = () => {
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
-  const [hidden, setHidden] = useState(true)
 
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -189,7 +191,6 @@ export const SmtpForm = () => {
           toast.error(`Failed to update settings: ${error.message}`)
         },
         onSuccess: () => {
-          setHidden(true)
           toast.success('Successfully updated settings')
         },
       }
@@ -394,14 +395,17 @@ export const SmtpForm = () => {
                               description="The minimum time in seconds between emails before another email can be sent to the same user."
                             >
                               <FormControl_Shadcn_>
-                                <PrePostTab postTab="seconds">
-                                  <Input_Shadcn_
+                                <InputGroup>
+                                  <InputGroupAddon align="inline-end">
+                                    <InputGroupText>seconds</InputGroupText>
+                                  </InputGroupAddon>
+                                  <InputGroupInput
                                     type="number"
                                     value={field.value}
                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                     disabled={!canUpdateConfig}
                                   />
-                                </PrePostTab>
+                                </InputGroup>
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}
@@ -435,25 +439,7 @@ export const SmtpForm = () => {
                               description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
                             >
                               <FormControl_Shadcn_>
-                                <PrePostTab
-                                  postTab={
-                                    <Button
-                                      type="text"
-                                      className="p-0"
-                                      onClick={() => setHidden(!hidden)}
-                                      icon={hidden ? <Eye /> : <EyeOff />}
-                                    />
-                                  }
-                                >
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type={hidden ? 'password' : 'text'}
-                                    placeholder={
-                                      authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'
-                                    }
-                                    disabled={!canUpdateConfig}
-                                  />
-                                </PrePostTab>
+                                <Input {...field} reveal copy disabled={!canUpdateConfig} />
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}

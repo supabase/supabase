@@ -133,7 +133,7 @@ export const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields(rowFields)
+        ? generateRowObjectFromFields({ fields: rowFields })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
@@ -226,6 +226,7 @@ export const RowEditor = ({
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         isEditable={editable}
+                        isNewRow={isNewRecord || '__tempId' in row}
                       />
                     )
                   })}
@@ -254,6 +255,7 @@ export const RowEditor = ({
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           isEditable={editable}
+                          isNewRow={isNewRecord || '__tempId' in row}
                         />
                       )
                     })}

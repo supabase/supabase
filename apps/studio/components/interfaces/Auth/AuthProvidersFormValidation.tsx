@@ -80,7 +80,7 @@ const PROVIDER_EMAIL = {
       title: 'Email OTP length',
       type: 'number',
       description: 'Number of digits in the email OTP.',
-      units: 'number',
+      units: 'digits',
     },
   },
   validationSchema: object().shape({
@@ -194,9 +194,25 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     }),
 
     // Phone SMS
-    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
-    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
-    SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_OTP_EXP: number()
+      .min(0, 'Must be more than 0')
+      .when('SMS_PROVIDER', {
+        is: (val: string) => val !== 'twilio_verify',
+        then: (schema) => schema.required('This is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMS_OTP_LENGTH: number()
+      .min(6, 'Must be 6 or more in length')
+      .when('SMS_PROVIDER', {
+        is: (val: string) => val !== 'twilio_verify',
+        then: (schema) => schema.required('This is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMS_TEMPLATE: string().when('SMS_PROVIDER', {
+      is: (val: string) => val !== 'twilio_verify',
+      then: (schema) => schema.required('SMS template is required.'),
+      otherwise: (schema) => schema,
+    }),
     SMS_TEST_OTP: string()
       .matches(
         /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,

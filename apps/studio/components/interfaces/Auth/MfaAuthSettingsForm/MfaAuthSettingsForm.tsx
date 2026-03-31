@@ -13,22 +13,25 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -369,15 +372,18 @@ export const MfaAuthSettingsForm = () => {
                         description="How many MFA factors can be enrolled at once per user."
                       >
                         <FormControl_Shadcn_>
-                          <PrePostTab postTab="factors">
-                            <Input_Shadcn_
+                          <InputGroup>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>factors</InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
                               type="number"
                               min={0}
                               max={30}
                               {...field}
                               disabled={!canUpdateConfig}
                             />
-                          </PrePostTab>
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -473,13 +479,18 @@ export const MfaAuthSettingsForm = () => {
                         description="Number of digits in OTP"
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="number"
-                            min={6}
-                            max={30}
-                            {...field}
-                            disabled={!canUpdateConfig || !hasAccessToMFA}
-                          />
+                          <InputGroup>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>digits</InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
+                              type="number"
+                              min={6}
+                              max={30}
+                              {...field}
+                              disabled={!canUpdateConfig || !hasAccessToMFA}
+                            />
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}

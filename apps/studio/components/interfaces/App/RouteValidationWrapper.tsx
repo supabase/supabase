@@ -52,7 +52,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     return excemptUrls.includes(router?.pathname)
   }
 
-  const { isError: isErrorProject } = useProjectDetailQuery({ ref })
+  const { isError: isErrorProject, error: projectError } = useProjectDetailQuery({ ref })
 
   const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
     enabled: isLoggedIn,
@@ -82,7 +82,10 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
     // A successful request to project details will validate access to both project and branches
     if (!!ref && isErrorProject) {
-      toast.error('You do not have access to this project')
+      // 404 means the project no longer exists (e.g. was deleted), not an access error
+      if (projectError?.code !== 404) {
+        toast.error('You do not have access to this project')
+      }
       router.push(DEFAULT_HOME)
       return
     }

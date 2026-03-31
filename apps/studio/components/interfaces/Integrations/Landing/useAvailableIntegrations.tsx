@@ -71,7 +71,7 @@ export const useAvailableIntegrations = () => {
           label: 'Overview',
         },
       ],
-      navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      navigate: ({ pageId = 'overview' }) => {
         switch (pageId) {
           case 'overview':
             return dynamic(

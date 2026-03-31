@@ -1,7 +1,6 @@
 import {
   Button,
   cn,
-  CodeBlock,
   Dialog,
   DialogClose,
   DialogContent,
@@ -11,6 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 interface ErrorDetailsDialogProps {
   open: boolean
