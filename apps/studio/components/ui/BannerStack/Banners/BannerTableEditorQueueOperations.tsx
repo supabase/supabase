@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
+import { getDashboardSettingsUrl } from 'components/interfaces/Account/Preferences/DashboardSettings.utils'
 import { useIsQueueOperationsEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import Link from 'next/link'
@@ -11,6 +12,7 @@ import { useBannerStack } from '../BannerStackProvider'
 export const BannerTableEditorQueueOperations = () => {
   const { ref } = useParams()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const dashboardSettingsUrl = getDashboardSettingsUrl(ref)
 
   const { dismissBanner } = useBannerStack()
   const [, setIsDismissed] = useLocalStorageQuery(
@@ -60,8 +62,8 @@ export const BannerTableEditorQueueOperations = () => {
           </p>
         </div>
         <Button asChild type="default" className="w-min">
-          <Link href="/account/me#dashboard">
-            {isQueueOperationsEnabled ? 'View' : 'Enable in'} account preferences
+          <Link href={dashboardSettingsUrl}>
+            {isQueueOperationsEnabled ? 'View' : 'Enable in'} preferences
           </Link>
         </Button>
       </div>

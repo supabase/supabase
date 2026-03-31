@@ -9,7 +9,16 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
+import { DashboardSettingsToggles } from '@/components/interfaces/Account/Preferences/DashboardSettingsToggles'
 import { DashboardPreferences } from '@/components/interfaces/Settings/General/DashboardPreferences'
 
 const Preferences: NextPageWithLayout = () => {
@@ -27,6 +36,19 @@ const Preferences: NextPageWithLayout = () => {
       </PageHeader>
       <PageContainer size="small">
         <DashboardPreferences />
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle id="dashboard">Dashboard</PageSectionTitle>
+              <PageSectionDescription>
+                Customize your dashboard editing experience.
+              </PageSectionDescription>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <DashboardSettingsToggles />
+          </PageSectionContent>
+        </PageSection>
       </PageContainer>
     </>
   )
