@@ -163,7 +163,6 @@ export const FilterPopover = <T extends Record<string, any>>({
       !isFetching &&
       !isFetchingNextPage
     ) {
-      console.log('Fetch next page')
       fetchNextPage()
     }
   }, [
