@@ -4,6 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
+import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from 'components/interfaces/ProjectCreation/ComputeSizeSelector'
 import { CustomPostgresVersionInput } from 'components/interfaces/ProjectCreation/CustomPostgresVersionInput'
 import { DatabasePasswordInput } from 'components/interfaces/ProjectCreation/DatabasePasswordInput'
@@ -94,6 +95,7 @@ const Wizard: NextPageWithLayout = () => {
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
+  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
 
   const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
   // Read the raw flag for telemetry — useDataApiGrantTogglesEnabled coerces undefined→false,
@@ -452,6 +454,10 @@ const Wizard: NextPageWithLayout = () => {
                     <>
                       <ProjectNameInput form={form} />
                       <HighAvailabilityInput form={form} />
+
+                      {cloudProviderEnabled && showNonProdFields && (
+                        <CloudProviderSelector form={form} />
+                      )}
 
                       {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
