@@ -109,7 +109,7 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     enabled: enabled && typeof projectRef !== 'undefined',
     initialPageParam: undefined,
     getNextPageParam(lastPage) {
-      const hasNextPage = lastPage.length <= QUEUE_MESSAGES_PAGE_SIZE
+      const hasNextPage = lastPage.length >= QUEUE_MESSAGES_PAGE_SIZE
       if (!hasNextPage) return undefined
       return last(lastPage)?.enqueued_at
     },

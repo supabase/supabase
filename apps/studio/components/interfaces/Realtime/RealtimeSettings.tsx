@@ -1,11 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
 import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
@@ -20,6 +14,10 @@ import {
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import Link from 'next/link'
+import { useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -29,13 +27,16 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormMessage_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
 const formId = 'realtime-configuration-form'
 
@@ -275,14 +276,17 @@ export const RealtimeSettings = () => {
                             description="Realtime Authorization uses this database pool to check client access"
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput
                                   {...field}
                                   type="number"
                                   disabled={!canUpdateConfig}
                                   value={field.value || ''}
                                 />
-                              </PrePostTab>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                           {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
@@ -308,14 +312,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of concurrent clients that can connect to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="clients">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -332,14 +339,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -383,14 +393,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of presence events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -434,14 +447,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="KB">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>KB</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}

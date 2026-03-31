@@ -171,7 +171,11 @@ const SpendCapSidePanel = () => {
                               <p className="text-xs pl-4">{item.title}</p>
                             </Table.td>
                             <Table.td>
-                              <p className="text-xs pl-4">{item.plans['pro']}</p>
+                              <p className="text-xs pl-4">
+                                {Array.isArray(item.plans['pro'])
+                                  ? item.plans['pro']?.join(', ')
+                                  : item.plans['pro']}
+                              </p>
                             </Table.td>
                           </Table.tr>
                         )

@@ -440,6 +440,18 @@ export const examples: Registry = [
     files: ['example/data-input-with-reveal-copy.tsx'],
   },
   {
+    name: 'data-input-with-reveal-copy-editable',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy-editable.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy-editable-empty',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy-editable-empty.tsx'],
+  },
+  {
     name: 'date-picker-demo',
     type: 'components:example',
     registryDependencies: ['button', 'calendar', 'popover'],

@@ -94,7 +94,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               wrappers.length === 0 ? 'border-t-0' : ''
             )}
           >
-            <TableRow>
+            <TableRow className="border-b-0">
               <TableCell colSpan={4}>
                 {wrappers.length} {integration?.name}
                 {wrappers.length === 0 || wrappers.length > 1 ? 's' : ''} created

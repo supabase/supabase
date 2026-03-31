@@ -11,10 +11,13 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  PrePostTab,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select_Shadcn_,
@@ -233,9 +236,12 @@ export default function FormPatternsSidePanel() {
                       description="Input with additional unit label"
                     >
                       <FormControl_Shadcn_ className="col-span-6">
-                        <PrePostTab postTab="MB" className="w-full">
-                          <Input_Shadcn_ {...field} type="number" min={5} max={30} />
-                        </PrePostTab>
+                        <InputGroup>
+                          <InputGroupInput {...field} type="number" min={5} max={30} />
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>MB</InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -653,7 +659,7 @@ export default function FormPatternsSidePanel() {
                           <PopoverTrigger_Shadcn_ asChild>
                             <Button
                               type="outline"
-                              className="w-full justify-start text-left font-normal px-3 py-4"
+                              className="bg-control w-full justify-start text-left font-normal px-3 py-4"
                               icon={<CalendarIcon className="h-4 w-4" />}
                             >
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}

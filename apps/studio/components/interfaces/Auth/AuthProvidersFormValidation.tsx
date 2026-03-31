@@ -80,7 +80,7 @@ const PROVIDER_EMAIL = {
       title: 'Email OTP length',
       type: 'number',
       description: 'Number of digits in the email OTP.',
-      units: 'number',
+      units: 'digits',
     },
   },
   validationSchema: object().shape({
@@ -1568,7 +1568,9 @@ const PROVIDER_SAML = {
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    SAML_EXTERNAL_URL: string()
+      .matches(urlRegex(), { message: 'Must be a valid URL', excludeEmptyString: true })
+      .optional(),
     SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {

@@ -192,7 +192,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/vault`,
     author: authorSupabase,
     navigation: [
       {
@@ -236,7 +236,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/webhooks`,
     author: authorSupabase,
     requiredExtensions: ['pg_net'],
     navigation: [
@@ -357,7 +357,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       />
     ),
     description: 'Run GraphQL queries through our interactive in-browser IDE',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/extensions/pg_graphql`,
     author: authorSupabase,
     navigation: [
       {
