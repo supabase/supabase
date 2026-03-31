@@ -7,6 +7,7 @@ import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/Polici
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { RLSPolicyTesting } from 'components/interfaces/Auth/Policies/RLSPolicyTesting/RLSPolicyTesting'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -24,14 +25,14 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
-import { Search, X } from 'lucide-react'
+import { FlaskConical, Search, ShieldCheck, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
 import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
+import { Button, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -90,6 +91,10 @@ const getTableFilterState = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
+  const [activeTab, setActiveTab] = useQueryState(
+    'tab',
+    parseAsString.withDefault('policies').withOptions({ history: 'replace', clearOnDefault: true })
+  )
   const [schema, setSchema] = useQueryState(
     'schema',
     parseAsString.withDefault('public').withOptions({ history: 'replace' })
@@ -268,7 +273,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Policies</PageHeaderTitle>
             <PageHeaderDescription>
-              Manage Row Level Security policies for your tables
+              Manage and test Row Level Security policies for your tables
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
@@ -279,85 +284,114 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent>
-            <div className="mb-4 flex flex-row gap-x-2">
-              <SchemaSelector
-                className="w-full lg:w-[180px]"
-                size="tiny"
-                align="end"
-                showError={false}
-                selectedSchemaName={schema}
-                onSelectSchema={(schemaName) => {
-                  setSchema(schemaName)
-                  setSearchString('')
-                }}
-              />
-              <Input
-                size="tiny"
-                placeholder="Filter tables and policies"
-                className="block w-full lg:w-52"
-                containerClassName="[&>div>svg]:-mt-0.5"
-                value={searchString || ''}
-                onChange={(e) => {
-                  const str = e.target.value
-                  setSearchString(str)
-                }}
-                icon={<Search size={14} />}
-                actions={
-                  searchString ? (
-                    <Button
+            <Tabs_Shadcn_ value={activeTab} onValueChange={setActiveTab}>
+              <div className="flex items-center justify-between mb-4">
+                <TabsList_Shadcn_ className="gap-0">
+                  <TabsTrigger_Shadcn_ value="policies" className="gap-2">
+                    <ShieldCheck size={14} />
+                    Policies
+                  </TabsTrigger_Shadcn_>
+                  <TabsTrigger_Shadcn_ value="testing" className="gap-2">
+                    <FlaskConical size={14} />
+                    Testing
+                  </TabsTrigger_Shadcn_>
+                </TabsList_Shadcn_>
+
+                <div className="flex flex-row gap-x-2">
+                  <SchemaSelector
+                    className="w-full lg:w-[180px]"
+                    size="tiny"
+                    align="end"
+                    showError={false}
+                    selectedSchemaName={schema}
+                    onSelectSchema={(schemaName) => {
+                      setSchema(schemaName)
+                      setSearchString('')
+                    }}
+                  />
+                  {activeTab === 'policies' && (
+                    <Input
                       size="tiny"
-                      type="text"
-                      className="p-0 h-5 w-5"
-                      icon={<X />}
-                      onClick={() => setSearchString('')}
+                      placeholder="Filter tables and policies"
+                      className="block w-full lg:w-52"
+                      containerClassName="[&>div>svg]:-mt-0.5"
+                      value={searchString || ''}
+                      onChange={(e) => {
+                        const str = e.target.value
+                        setSearchString(str)
+                      }}
+                      icon={<Search size={14} />}
+                      actions={
+                        searchString ? (
+                          <Button
+                            size="tiny"
+                            type="text"
+                            className="p-0 h-5 w-5"
+                            icon={<X />}
+                            onClick={() => setSearchString('')}
+                          />
+                        ) : null
+                      }
                     />
-                  ) : null
-                }
-              />
-            </div>
+                  )}
+                </div>
+              </div>
 
-            {isLoading && <GenericSkeletonLoader />}
+              <TabsContent_Shadcn_ value="policies">
+                {isLoading && <GenericSkeletonLoader />}
 
-            {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+                {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
-            {isSuccess && (
-              <PoliciesDataProvider
-                policies={policies ?? []}
-                isPoliciesLoading={isLoadingPolicies}
-                isPoliciesError={isPoliciesError}
-                policiesError={policiesError ?? undefined}
-                exposedSchemas={exposedSchemas}
-              >
-                <Policies
-                  search={deferredSearchString}
+                {isSuccess && (
+                  <PoliciesDataProvider
+                    policies={policies ?? []}
+                    isPoliciesLoading={isLoadingPolicies}
+                    isPoliciesError={isPoliciesError}
+                    policiesError={policiesError ?? undefined}
+                    exposedSchemas={exposedSchemas}
+                  >
+                    <Policies
+                      search={deferredSearchString}
+                      schema={schema}
+                      tables={tablesWithVisibility}
+                      hasTables={(tables ?? []).length > 0}
+                      isLocked={isSchemaLocked}
+                      visibleTableIds={visibleTableIds}
+                      onSelectCreatePolicy={handleSelectCreatePolicy}
+                      onSelectEditPolicy={handleSelectEditPolicy}
+                      onResetSearch={handleResetSearch}
+                    />
+                  </PoliciesDataProvider>
+                )}
+
+                <PolicyEditorPanel
+                  visible={showCreatePolicy || (isUpdatingPolicy && !!selectedPolicyToEdit)}
                   schema={schema}
-                  tables={tablesWithVisibility}
-                  hasTables={(tables ?? []).length > 0}
-                  isLocked={isSchemaLocked}
-                  visibleTableIds={visibleTableIds}
-                  onSelectCreatePolicy={handleSelectCreatePolicy}
-                  onSelectEditPolicy={handleSelectEditPolicy}
-                  onResetSearch={handleResetSearch}
+                  searchString={searchString}
+                  selectedTable={isUpdatingPolicy ? undefined : selectedTable}
+                  selectedPolicy={isUpdatingPolicy ? selectedPolicyToEdit : undefined}
+                  onSelectCancel={() => {
+                    setSelectedTable(undefined)
+                    if (isUpdatingPolicy) {
+                      setSelectedIdToEdit(null)
+                    } else {
+                      setShowCreatePolicy(false)
+                    }
+                  }}
+                  authContext="database"
                 />
-              </PoliciesDataProvider>
-            )}
+              </TabsContent_Shadcn_>
 
-            <PolicyEditorPanel
-              visible={showCreatePolicy || (isUpdatingPolicy && !!selectedPolicyToEdit)}
-              schema={schema}
-              searchString={searchString}
-              selectedTable={isUpdatingPolicy ? undefined : selectedTable}
-              selectedPolicy={isUpdatingPolicy ? selectedPolicyToEdit : undefined}
-              onSelectCancel={() => {
-                setSelectedTable(undefined)
-                if (isUpdatingPolicy) {
-                  setSelectedIdToEdit(null)
-                } else {
-                  setShowCreatePolicy(false)
-                }
-              }}
-              authContext="database"
-            />
+              <TabsContent_Shadcn_ value="testing">
+                {isLoading && <GenericSkeletonLoader />}
+
+                {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
+                {isSuccess && (
+                  <RLSPolicyTesting schema={schema} tables={tables ?? []} />
+                )}
+              </TabsContent_Shadcn_>
+            </Tabs_Shadcn_>
           </PageSectionContent>
         </PageSection>
       </PageContainer>
