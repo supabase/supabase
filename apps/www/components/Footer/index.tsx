@@ -179,24 +179,25 @@ const Footer = (props: Props) => {
               </a>
             </div>
             <div className="mt-8">
-              <p className="text-foreground-lighter text-sm">
-                Get product updates and news from Supabase.
-              </p>
               {newsletterStatus === 'success' ? (
-                <p className="text-brand text-sm mt-3">Thanks for subscribing!</p>
+                <p className="text-brand-link text-sm">Thanks for subscribing!</p>
               ) : (
-                <form onSubmit={handleNewsletterSubmit} className="mt-3 flex flex-col gap-2">
+                <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2">
+                  <p className="text-foreground-lighter text-sm">
+                    Get product updates and news from Supabase.
+                  </p>
                   <Input_Shadcn_
                     type="email"
                     placeholder="Your email"
+                    aria-label="Email for newsletter"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
-                    className="flex-1 md:max-w-72 xl:max-w-[80%]"
+                    className="flex-1 md:max-w-72 xl:max-w-[80%] !h-6 text-xs px-2"
                   />
                   <Button
                     type="primary"
-                    size="medium"
+                    size="tiny"
                     htmlType="submit"
                     loading={newsletterStatus === 'loading'}
                     className="w-fit"
