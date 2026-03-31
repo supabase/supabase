@@ -8,17 +8,10 @@ import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import Link from 'next/link'
+import { Admonition } from 'node_modules/ui-patterns'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Sheet,
-  SheetContent,
-  WarningIcon,
-} from 'ui'
+import { Button, Sheet, SheetContent } from 'ui'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
@@ -109,14 +102,10 @@ const AddNewWrapperCTA = () => {
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version === wrappersExtension?.default_version
 
-  return !!wrapperMeta && isWrappersExtensionInstalled && !hasRequiredVersion ? (
-    <div className="">
-      <Alert_Shadcn_ variant="warning">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>
-          Your extension version is outdated for this wrapper.
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+  if (!!wrapperMeta && isWrappersExtensionInstalled && !hasRequiredVersion) {
+    return (
+      <Admonition type="warning" title="Your extension version is outdated for this wrapper">
+        <div className="flex flex-col gap-y-2 [&>p]:!mb-0">
           <p>
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
@@ -129,23 +118,23 @@ const AddNewWrapperCTA = () => {
             Warning: Before reinstalling the wrapper extension, you must first remove all existing
             wrappers. Afterward, you can recreate the wrappers.
           </p>
-        </AlertDescription_Shadcn_>
-        <AlertDescription_Shadcn_ className="mt-3">
-          <Button asChild type="default">
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${project?.ref}/settings/infrastructure`
-                  : `/project/${project?.ref}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
-            </Link>
-          </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
-    </div>
-  ) : (
+        </div>
+        <Button asChild type="default" className="w-min mt-3">
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${project?.ref}/settings/infrastructure`
+                : `/project/${project?.ref}/database/extensions?filter=wrappers`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
+          </Link>
+        </Button>
+      </Admonition>
+    )
+  }
+
+  return (
     <div className="py-3 px-5 border rounded-md">
       <ButtonTooltip
         type="default"
