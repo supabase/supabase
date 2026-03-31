@@ -92,6 +92,44 @@ export function isExternalReferrer(referrer: string): boolean {
   }
 }
 
+/**
+ * Returns true if the referrer URL is an OAuth/SSO redirect that should NOT
+ * be treated as a genuine traffic source.
+ *
+ * A referrer should reflect how someone discovered Supabase, not how they
+ * authenticated. This function identifies auth provider redirects:
+ * - accounts.google.com — blocked entirely (dedicated SSO subdomain)
+ * - github.com with no path (bare domain) — blocked (OAuth strips the path
+ *   via origin-when-cross-origin Referrer-Policy)
+ * - github.com/login/oauth/* — blocked (explicit OAuth path, rare)
+ * - github.com with a specific path — allowed (genuine repo/README referrals)
+ */
+export function isOAuthRedirectReferrer(referrer: string): boolean {
+  if (!referrer) return false
+  try {
+    const url = new URL(referrer)
+    const hostname = url.hostname
+
+    // Google SSO — entire subdomain is auth traffic
+    if (hostname === 'accounts.google.com') return true
+
+    // GitHub — bare domain (no meaningful path) is OAuth redirect noise
+    if (hostname === 'github.com') {
+      const path = url.pathname
+      // Bare domain: "/" or "" (no path)
+      if (path === '/' || path === '') return true
+      // Explicit OAuth path (rare — GitHub usually strips this)
+      if (path.startsWith('/login/oauth')) return true
+      // Any other path = genuine referral (README, repo, discussion, etc.)
+      return false
+    }
+
+    return false
+  } catch {
+    return false
+  }
+}
+
 // ---------------------------------------------------------------------------
 // UTM + click-ID extraction
 // ---------------------------------------------------------------------------

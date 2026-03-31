@@ -6,6 +6,7 @@ import {
   MW_DIAG_COOKIE_NAME,
   hasPaidSignals,
   isExternalReferrer,
+  isOAuthRedirectReferrer,
   parseFirstReferrerCookie,
   parseMwDiagCookie,
   serializeFirstReferrerCookie,
@@ -33,6 +34,65 @@ describe('first-referrer-cookie', () => {
     it('returns false for invalid values', () => {
       expect(isExternalReferrer('')).toBe(false)
       expect(isExternalReferrer('not-a-url')).toBe(false)
+    })
+  })
+
+  describe('isOAuthRedirectReferrer', () => {
+    // Google SSO — block entire domain
+    it('returns true for accounts.google.com (bare)', () => {
+      expect(isOAuthRedirectReferrer('https://accounts.google.com/')).toBe(true)
+    })
+
+    it('returns true for accounts.google.com with path', () => {
+      expect(isOAuthRedirectReferrer('https://accounts.google.com/o/oauth2/auth?client_id=abc')).toBe(true)
+    })
+
+    // GitHub OAuth — block bare domain only
+    it('returns true for bare github.com/', () => {
+      expect(isOAuthRedirectReferrer('https://github.com/')).toBe(true)
+    })
+
+    it('returns true for bare github.com (no trailing slash)', () => {
+      expect(isOAuthRedirectReferrer('https://github.com')).toBe(true)
+    })
+
+    // GitHub genuine referrals — preserve these
+    it('returns false for github.com with repo path', () => {
+      expect(isOAuthRedirectReferrer('https://github.com/supabase/supabase')).toBe(false)
+    })
+
+    it('returns false for github.com with README path', () => {
+      expect(isOAuthRedirectReferrer('https://github.com/supabase/supabase?tab=readme-ov-file')).toBe(false)
+    })
+
+    it('returns false for github.com with discussion path', () => {
+      expect(isOAuthRedirectReferrer('https://github.com/orgs/supabase/discussions/42949')).toBe(false)
+    })
+
+    it('returns false for github.com with blob path', () => {
+      expect(isOAuthRedirectReferrer('https://github.com/supabase/supabase/blob/master/README.md')).toBe(false)
+    })
+
+    // GitHub OAuth explicit path (rare, but should still be caught)
+    it('returns true for github.com/login/oauth/authorize', () => {
+      expect(isOAuthRedirectReferrer('https://github.com/login/oauth/authorize?client_id=abc')).toBe(true)
+    })
+
+    // Non-OAuth domains — should not match
+    it('returns false for google.com (search)', () => {
+      expect(isOAuthRedirectReferrer('https://www.google.com/')).toBe(false)
+    })
+
+    it('returns false for claude.ai', () => {
+      expect(isOAuthRedirectReferrer('https://claude.ai/')).toBe(false)
+    })
+
+    it('returns false for empty string', () => {
+      expect(isOAuthRedirectReferrer('')).toBe(false)
+    })
+
+    it('returns false for malformed URL', () => {
+      expect(isOAuthRedirectReferrer('not-a-url')).toBe(false)
     })
   })
 
