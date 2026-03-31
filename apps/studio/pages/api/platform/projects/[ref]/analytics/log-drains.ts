@@ -83,7 +83,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         },
       }).then((r) => r.json())
 
-      const params = sources
+      const params = (Array.isArray(sources) ? sources : [])
         .filter((source: { name: string; metadata: { type: string } }) =>
           [
             'cloudflare.logs.prod',
