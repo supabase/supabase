@@ -73,7 +73,6 @@ export const createFormSchema = () =>
       data.columns.forEach((column, index) => {
         if (column.type === 'decimal') {
           if (column.precision == null) {
-            console.log(`columns.${index}.precision`)
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: 'Required',
@@ -81,7 +80,6 @@ export const createFormSchema = () =>
             })
           }
           if (column.scale == null) {
-            console.log(`columns.${index}.scale`)
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: 'Required',
@@ -92,7 +90,6 @@ export const createFormSchema = () =>
 
         if (column.type === 'fixed') {
           if (column.length == null) {
-            console.log(`columns.${index}.length`)
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: 'Required',
