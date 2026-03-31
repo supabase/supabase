@@ -115,11 +115,6 @@ export const ProjectCard = ({
                 <p className="text-sm text-foreground-lighter">{desc}</p>
               </div>
               <div className="flex items-center gap-x-1.5 relative overflow-hidden">
-                <ProjectCardStatus
-                  projectStatus={projectStatus}
-                  resourceWarnings={resourceWarnings}
-                  renderMode="badge"
-                />
                 {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
                   <ComputeBadgeWrapper
                     slug={slug}
@@ -148,7 +143,9 @@ export const ProjectCard = ({
               </div>
             </div>
           }
-          footer={<ProjectCardStatus projectStatus={projectStatus} />}
+          footer={
+            <ProjectCardStatus projectStatus={projectStatus} resourceWarnings={resourceWarnings} />
+          }
           containerElement={<ProjectIndexPageLink projectRef={projectRef} />}
         />
       </li>
