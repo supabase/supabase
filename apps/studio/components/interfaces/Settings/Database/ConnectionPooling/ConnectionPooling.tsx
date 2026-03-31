@@ -111,7 +111,7 @@ export const ConnectionPooling = () => {
     resolver: zodResolver(PoolingConfigurationFormSchema),
     defaultValues: {
       default_pool_size: undefined,
-      max_client_conn: null,
+      max_client_conn: undefined,
     },
   })
   const { default_pool_size } = form.watch()
