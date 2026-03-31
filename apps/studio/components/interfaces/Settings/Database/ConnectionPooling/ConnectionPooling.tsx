@@ -53,8 +53,14 @@ import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
-  default_pool_size: z.number().nullable(),
-  max_client_conn: z.number().nullable(),
+  default_pool_size: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
+    z.coerce.number().optional()
+  ),
+  max_client_conn: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
+    z.coerce.number().optional()
+  ),
 })
 
 /**
@@ -269,9 +275,13 @@ export const ConnectionPooling = () => {
                                 className="w-full"
                                 value={field.value || ''}
                                 placeholder={defaultPoolSize.toString()}
-                                {...form.register('default_pool_size', {
-                                  setValueAs: setValueAsNullableNumber,
-                                })}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
                               />
                             </InputGroup>
                           </FormControl_Shadcn_>
@@ -296,6 +306,7 @@ export const ConnectionPooling = () => {
 
                     <FormField_Shadcn_
                       control={form.control}
+                      disabled
                       name="max_client_conn"
                       render={({ field }) => (
                         <FormItemLayout
@@ -327,11 +338,14 @@ export const ConnectionPooling = () => {
                                 type="number"
                                 className="w-full"
                                 value={pgbouncerConfig?.max_client_conn || ''}
-                                disabled={true}
                                 placeholder={defaultMaxClientConn.toString()}
-                                {...form.register('max_client_conn', {
-                                  setValueAs: setValueAsNullableNumber,
-                                })}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
                               />
                             </InputGroup>
                           </FormControl_Shadcn_>
