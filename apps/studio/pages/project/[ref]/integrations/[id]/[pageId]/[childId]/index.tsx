@@ -1,12 +1,9 @@
-import { useRouter } from 'next/router'
-import { useEffect, useMemo } from 'react'
-
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { useCronJobsEstimatePrefetch } from 'hooks/misc/useCronJobsEstimatePrefetch'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -20,17 +17,19 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, id, pageId, childId } = useParams()
 
-  useCronJobsEstimatePrefetch(id)
-
+  const { data: allIntegrations } = useAvailableIntegrations()
   const { installedIntegrations: installedIntegrations, isLoading: isIntegrationsLoading } =
     useInstalledIntegrations()
 
   // everything is wrapped in useMemo to avoid UI resets when installing additional extensions like pg_net
-  const integration = useMemo(() => INTEGRATIONS.find((i) => i.id === id), [id])
+  const integration = useMemo(() => allIntegrations.find((i) => i.id === id), [allIntegrations, id])
 
   const installation = useMemo(
     () => installedIntegrations.find((inst) => inst.id === id),
@@ -39,7 +38,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   // Get the corresponding component dynamically
   const Component = useMemo(
-    () => integration?.navigate(id!, pageId, childId),
+    () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
   )
 
@@ -100,7 +99,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <IntegrationsLayout>{page}</IntegrationsLayout>
+    <ProjectIntegrationsLayout>{page}</ProjectIntegrationsLayout>
   </DefaultLayout>
 )
 

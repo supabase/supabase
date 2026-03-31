@@ -43,7 +43,6 @@ This situation often arises in large, high-write tables (e.g., `your_table`, whi
 Since the wraparound prevention autovacuum cannot be stopped, the best approach is to provide the database with sufficient resources to complete the operation as quickly and efficiently as possible.
 
 1.  **Upgrade your Database Compute Instance:**
-
     - **Action:** Temporarily scale up your instance's CPU (e.g., from `m6g.4xlarge` to `m6g.8xlarge` or higher).
     - **Why it helps:** More CPU cores and processing power will help the autovacuum operation run faster, reducing the overall time it impacts your database.
     - **Considerations:** This usually causes a brief downtime (typically 1-2 minutes) as the instance restarts. However, the autovacuum process is designed to pause and resume automatically.
@@ -51,7 +50,7 @@ Since the wraparound prevention autovacuum cannot be stopped, the best approach 
 2.  **Increase Disk Throughput/IOPS:**
     - **Action:** If disk I/O utilization is also consistently high (e.g., near 100%), consider temporarily increasing your disk's provisioned IOPS and throughput.
     - **Why it helps:** Autovacuum is an I/O-intensive operation, involving a lot of reading and writing. Higher disk performance can significantly speed up the process.
-    - **Considerations:** Cloud providers often have limitations, such as a cooldown period (e.g., 6 hours) between disk modification operations.
+    - **Considerations:** Cloud providers often have limitations, such as a cooldown period (e.g., 4 hours) between disk modification operations.
 
 ### **Monitoring progress and future prevention**
 

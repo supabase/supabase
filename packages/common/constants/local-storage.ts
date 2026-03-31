@@ -7,9 +7,13 @@ export const LOCAL_STORAGE_KEYS = {
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
+  PROJECTS_FILTER: 'projects-filter',
+  PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
+  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
+  DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
 
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
@@ -19,6 +23,11 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
+  UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
+  UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
+  UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
+  UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
+  UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -89,6 +98,10 @@ export const LOCAL_STORAGE_KEYS = {
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
+  HOTKEY_COPY_MARKDOWN: 'supabase-dashboard-hotkey-copy-markdown',
+  HOTKEY_COPY_JSON: 'supabase-dashboard-hotkey-copy-json',
+  HOTKEY_DOWNLOAD_CSV: 'supabase-dashboard-hotkey-download-csv',
+
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
 
@@ -97,6 +110,12 @@ export const LOCAL_STORAGE_KEYS = {
 
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
+
+  // Tax ID banner dismissed
+  TAX_ID_BANNER_DISMISSED: (slug: string) => `tax-id-banner-dismissed-${slug}`,
+
+  TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
+    `table-editor-queue-operations-banner-dismissed-${ref}`,
 
   /**
    * COMMON
@@ -118,10 +137,6 @@ export const LOCAL_STORAGE_KEYS = {
    * WWW
    */
   BLOG_VIEW: 'supabase-blog-view',
-
-  // Used to track if user has been exposed to table quickstart experiment (prevents duplicate exposure events)
-  TABLE_QUICKSTART_EXPOSURE_TRACKED: (userId: string) =>
-    `table-quickstart-exposure-tracked-${userId}`,
 } as const
 
 export type LocalStorageKey = (typeof LOCAL_STORAGE_KEYS)[keyof typeof LOCAL_STORAGE_KEYS]
@@ -138,6 +153,9 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,

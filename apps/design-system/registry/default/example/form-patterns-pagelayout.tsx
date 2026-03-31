@@ -1,10 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Plus, Trash2, Upload } from 'lucide-react'
+import { CalendarIcon, ExternalLink, Plus, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import {
   Button,
   Calendar,
@@ -12,11 +10,15 @@ import {
   CardContent,
   CardFooter,
   Checkbox_Shadcn_,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -30,8 +32,9 @@ import {
   Switch,
   Textarea,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -46,6 +49,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -62,6 +66,7 @@ const formSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   duration: z.number().min(5).max(30),
   redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
+  httpHeaders: z.array(z.object({ key: z.string(), value: z.string() })),
   apiKey: z.string().optional(),
 })
 
@@ -92,6 +97,7 @@ export default function FormPatternsPageLayout() {
       password: '',
       duration: 10,
       redirectUris: [{ value: '' }],
+      httpHeaders: [{ key: '', value: '' }],
       apiKey: fakeApiKey,
     },
   })
@@ -217,9 +223,12 @@ export default function FormPatternsPageLayout() {
                         description="Input with additional unit label"
                       >
                         <FormControl_Shadcn_>
-                          <PrePostTab postTab="MB" className="w-full">
-                            <Input_Shadcn_ {...field} type="number" min={5} max={30} />
-                          </PrePostTab>
+                          <InputGroup>
+                            <InputGroupInput {...field} type="number" min={5} max={30} />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText className="font-mono">MB</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -244,6 +253,35 @@ export default function FormPatternsPageLayout() {
                             placeholder="Enter multi-line text"
                             className="resize-none"
                           />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                {/* Textarea with addon */}
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Textarea"
+                        description="Multi-line text input for longer content with addon"
+                      >
+                        <FormControl_Shadcn_>
+                          <InputGroup>
+                            <InputGroupTextarea
+                              {...field}
+                              rows={4}
+                              placeholder="Enter multi-line text"
+                              className="resize-none"
+                            />
+                            <InputGroupAddon align="block-end">
+                              <InputGroupText>120 characters left</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -286,7 +324,7 @@ export default function FormPatternsPageLayout() {
                                 <Button
                                   type="default"
                                   size="tiny"
-                                  icon={<Trash2 size={12} />}
+                                  icon={<Trash size={12} />}
                                   onClick={() => {
                                     setLogoFile(undefined)
                                     setLogoUrl(undefined)
@@ -390,7 +428,7 @@ export default function FormPatternsPageLayout() {
                                       <Button
                                         type="default"
                                         size="tiny"
-                                        icon={<Trash2 size={12} />}
+                                        icon={<Trash size={12} />}
                                         onClick={() => {
                                           setUploadedFiles((prev) =>
                                             prev.filter((_, i) => i !== idx)
@@ -620,7 +658,7 @@ export default function FormPatternsPageLayout() {
                             <PopoverTrigger_Shadcn_ asChild>
                               <Button
                                 type="outline"
-                                className="w-full justify-start text-left font-normal px-3 py-4"
+                                className="bg-control w-full justify-start text-left font-normal px-3 py-4"
                                 icon={<CalendarIcon className="h-4 w-4" />}
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
@@ -670,7 +708,8 @@ export default function FormPatternsPageLayout() {
                                     <Button
                                       type="default"
                                       size="tiny"
-                                      icon={<Trash2 size={12} />}
+                                      htmlType="button"
+                                      icon={<Trash size={12} />}
                                       onClick={() => remove(index)}
                                     />
                                   )}
@@ -680,12 +719,40 @@ export default function FormPatternsPageLayout() {
                           ))}
                           <Button
                             type="default"
+                            htmlType="button"
                             icon={<Plus />}
                             onClick={() => append({ value: '' })}
                           >
                             Add redirect URI
                           </Button>
                         </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                {/* Key/Value Field Array */}
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="httpHeaders"
+                    render={() => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Key/Value Field Array"
+                        description="Repeated text pairs for headers, parameters, and config entries"
+                      >
+                        <KeyValueFieldArray
+                          control={form.control}
+                          name="httpHeaders"
+                          keyFieldName="key"
+                          valueFieldName="value"
+                          createEmptyRow={() => ({ key: '', value: '' })}
+                          keyPlaceholder="Header name"
+                          valuePlaceholder="Header value"
+                          addLabel="Add header"
+                          removeLabel="Remove header"
+                        />
                       </FormItemLayout>
                     )}
                   />

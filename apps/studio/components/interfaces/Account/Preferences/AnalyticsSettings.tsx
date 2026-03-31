@@ -1,11 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useConsentState } from 'common'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
-import { Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, Form_Shadcn_, Switch } from 'ui'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Card, CardContent, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -15,6 +13,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
 const AnalyticsSchema = z.object({
   telemetryEnabled: z.boolean(),

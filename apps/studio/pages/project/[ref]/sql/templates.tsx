@@ -12,7 +12,7 @@ import type { NextPageWithLayout } from 'types'
 
 const SqlTemplates: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams<{ ref: string }>()
+  const ref = useParams<{ ref: string }>()?.ref
   const tabs = useTabsStateSnapshot()
 
   useEffect(() => {

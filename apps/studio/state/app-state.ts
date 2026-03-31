@@ -1,6 +1,5 @@
-import { proxy, snapshot, useSnapshot } from 'valtio'
-
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 
 const getInitialState = () => {
   return {
@@ -9,7 +8,6 @@ const getInitialState = () => {
     showProjectApiDocs: false,
     showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
@@ -70,6 +68,11 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
+  },
+
+  connectSheetSource: 'header_button' as 'header_button' | 'connect_section',
+  setConnectSheetSource: (value: 'header_button' | 'connect_section') => {
+    appState.connectSheetSource = value
   },
 
   lastRouteBeforeVisitingAccountPage: '',

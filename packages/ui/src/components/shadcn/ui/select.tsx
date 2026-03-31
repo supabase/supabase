@@ -1,10 +1,10 @@
 'use client'
 
 import * as SelectPrimitive from '@radix-ui/react-select'
+import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import * as React from 'react'
 
-import { VariantProps, cva } from 'class-variance-authority'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
 import { cn } from '../../../lib/utils/cn'
 

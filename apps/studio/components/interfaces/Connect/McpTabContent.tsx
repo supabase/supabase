@@ -1,6 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
 import Panel from 'components/ui/Panel'
-import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
 import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
@@ -64,7 +63,6 @@ const McpTabContentInnerLoaded = ({
 
   return (
     <McpConfigPanel
-      basePath={BASE_PATH}
       projectRef={projectRef}
       theme={resolvedTheme as 'light' | 'dark'}
       isPlatform={IS_PLATFORM}

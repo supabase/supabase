@@ -1,3 +1,5 @@
+import type { FeatureKey } from 'data/entitlements/entitlements-query'
+
 export interface Enum {
   label: string
   value: string
@@ -22,7 +24,7 @@ export interface Provider {
       descriptionOptional?: string
       units?: string
       isSecret?: boolean
-      isPaid?: boolean
+      entitlementKey?: FeatureKey
       link?: string
     }
   }

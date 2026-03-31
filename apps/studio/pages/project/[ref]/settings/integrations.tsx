@@ -9,7 +9,7 @@ import {
 } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
-const OrgIntegrationSettings: NextPageWithLayout = () => {
+const ProjectSettingsIntegrations: NextPageWithLayout = () => {
   return (
     <>
       <ScaffoldContainer>
@@ -23,9 +23,9 @@ const OrgIntegrationSettings: NextPageWithLayout = () => {
   )
 }
 
-OrgIntegrationSettings.getLayout = (page) => (
+ProjectSettingsIntegrations.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>{page}</SettingsLayout>
+    <SettingsLayout title="Integrations">{page}</SettingsLayout>
   </DefaultLayout>
 )
-export default OrgIntegrationSettings
+export default ProjectSettingsIntegrations

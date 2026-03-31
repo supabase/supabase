@@ -1,3 +1,13 @@
+import '@/styles/code-block-variables.css'
+import '@/styles/mdx.css'
+
+import { allDocs } from 'contentlayer/generated'
+import { ChevronRight } from 'lucide-react'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import Balancer from 'react-wrap-balancer'
+import { ScrollArea } from 'ui'
+
 import { metadata as mainMetadata } from '@/app/layout'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
@@ -5,14 +15,6 @@ import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl, cn } from '@/lib/utils'
-import '@/styles/code-block-variables.css'
-import '@/styles/mdx.css'
-import { allDocs } from 'contentlayer/generated'
-import { ChevronRight } from 'lucide-react'
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import Balancer from 'react-wrap-balancer'
-import { ScrollArea } from 'ui'
 
 interface DocPageProps {
   params: Promise<{

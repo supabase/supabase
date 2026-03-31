@@ -3,9 +3,11 @@ import {
   Building2Icon,
   Code2Icon,
   HammerIcon,
+  Heart,
   LightbulbIcon,
   PointerIcon,
   PuzzleIcon,
+  ShieldCheck,
   TrendingUpIcon,
   UsersIcon,
   ZapIcon,
@@ -27,6 +29,10 @@ export enum Solutions {
   hackathon = 'hackathon',
   innovationTeams = 'innovation-teams',
   vibeCoders = 'vibe-coders',
+  b2bSaaS = 'b2b-saas',
+  finserv = 'finserv',
+  healthcare = 'healthcare',
+  agents = 'agents',
 }
 
 export const skillBasedSolutions = {
@@ -145,6 +151,40 @@ export const useCaseSolutions = {
   ],
 }
 
+export const appTypeSolutions = {
+  label: 'Solutions',
+  solutions: [
+    {
+      id: Solutions.b2bSaaS,
+      text: 'B2B SaaS',
+      description: '',
+      url: '/solutions/b2b-saas',
+      icon: Building2Icon,
+    },
+    {
+      id: Solutions.finserv,
+      text: 'FinServ',
+      description: '',
+      url: '/solutions/finserv',
+      icon: ShieldCheck,
+    },
+    {
+      id: Solutions.healthcare,
+      text: 'Healthcare',
+      description: '',
+      url: '/solutions/healthcare',
+      icon: Heart,
+    },
+    {
+      id: Solutions.agents,
+      text: 'Agents',
+      description: '',
+      url: '/solutions/agents',
+      icon: BotIcon,
+    },
+  ],
+}
+
 export const migrationSolutions = {
   label: 'Solutions',
   solutions: [
@@ -235,6 +275,16 @@ export const navData = {
       label: "Who it's for",
       links: [
         ...useCaseSolutions.solutions.map((solution) => ({
+          text: solution.text,
+          url: solution.url,
+          icon: solution.icon,
+        })),
+      ],
+    },
+    {
+      label: 'App Type',
+      links: [
+        ...appTypeSolutions.solutions.map((solution) => ({
           text: solution.text,
           url: solution.url,
           icon: solution.icon,

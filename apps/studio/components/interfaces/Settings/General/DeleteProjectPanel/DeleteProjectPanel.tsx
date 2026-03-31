@@ -30,9 +30,9 @@ export const DeleteProjectPanel = () => {
     <PageSection id="delete-project">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Delete Project</PageSectionTitle>
+          <PageSectionTitle>Delete project</PageSectionTitle>
           <PageSectionDescription>
-            Permanently remove your project and its database.
+            Permanently remove your project and its database
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

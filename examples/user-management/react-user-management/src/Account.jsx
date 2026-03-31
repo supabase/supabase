@@ -2,42 +2,47 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import Avatar from './Avatar'
 
-export default function Account({ session }) {
+export default function Account({ user }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
 
   useEffect(() => {
+    let ignore = false
     async function getProfile() {
       setLoading(true)
-      const { user } = session
 
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
         .eq('id', user.id)
         .single()
 
-      if (error) {
-        console.warn(error)
-      } else if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+      if (!ignore) {
+        if (error) {
+          console.warn(error)
+        } else if (data) {
+          setUsername(data.username)
+          setWebsite(data.website)
+          setAvatarUrl(data.avatar_url)
+        }
       }
 
       setLoading(false)
     }
 
     getProfile()
-  }, [session])
+
+    return () => {
+      ignore = true
+    }
+  }, [user])
 
   async function updateProfile(event, avatarUrl) {
     event.preventDefault()
 
     setLoading(true)
-    const { user } = session
 
     const updates = {
       id: user.id,
@@ -47,7 +52,7 @@ export default function Account({ session }) {
       updated_at: new Date(),
     }
 
-    let { error } = await supabase.from('profiles').upsert(updates)
+    const { error } = await supabase.from('profiles').upsert(updates)
 
     if (error) {
       alert(error.message)
@@ -68,7 +73,7 @@ export default function Account({ session }) {
       />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
+        <input id="email" type="text" value={user.email} disabled />
       </div>
       <div>
         <label htmlFor="username">Name</label>

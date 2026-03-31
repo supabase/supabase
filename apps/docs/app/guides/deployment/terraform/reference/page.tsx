@@ -2,25 +2,19 @@ import { codeBlock } from 'common-tags'
 import { Check, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+import { Heading, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import {
-  CodeBlock,
-  Heading,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
-
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import {
   terraformDocsBranch,
   terraformDocsDocsDir,
   terraformDocsOrg,
   terraformDocsRepo,
 } from '../terraformConstants'
+import { GuideTemplate, newEditLink } from '@/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '@/features/docs/GuidesMdx.utils'
+import { TabPanel, Tabs } from '@/features/ui/Tabs'
+import { getGitHubFileContents } from '@/lib/octokit'
 
 const meta = {
   title: 'Terraform Provider reference',
@@ -359,7 +353,7 @@ const TerraformReferencePage = async () => {
 
   return (
     <GuideTemplate meta={meta} editLink={editLink}>
-      The Terraform Provider provices access to{' '}
+      The Terraform Provider provides access to{' '}
       <Link
         href="https://developer.hashicorp.com/terraform/language/resources"
         rel="noopener noreferrer"
@@ -394,12 +388,14 @@ const TerraformReferencePage = async () => {
  * Fetch JSON schema from external repo
  */
 const getSchema = async () => {
-  let response = await fetchRevalidatePerDay(
-    `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${terraformDocsDocsDir}/schema.json`
+  const schema = JSON.parse(
+    await getGitHubFileContents({
+      org: terraformDocsOrg,
+      repo: terraformDocsRepo,
+      path: `${terraformDocsDocsDir}/schema.json`,
+      branch: terraformDocsBranch,
+    })
   )
-  if (!response.ok) throw Error('Failed to fetch Terraform JSON schema from GitHub')
-
-  const schema = await response.json()
 
   return {
     schema,

@@ -6,6 +6,8 @@ let options = {
   printWidth: 100,
   endOfLine: 'lf',
   sqlKeywordCase: 'lower',
+  sqlLiteralCase: 'lower',
+  sqlTypeCase: 'lower',
   plugins: ['prettier-plugin-sql-cst'],
   overrides: [
     {
@@ -15,16 +17,13 @@ let options = {
   ],
 }
 
-// Disable sorting imports when running a prettier command in CI. This is to make the sorting work in editors 
-// for easier migration. 
+// Disable sorting imports when running a prettier command in CI. This is to make the sorting work in editors
+// for easier migration.
 if (process.env.SORT_IMPORTS !== 'false') {
   options = {
     ...options,
-    plugins: [...options.plugins, '@trivago/prettier-plugin-sort-imports'],
-    importOrder: ['<THIRD_PARTY_MODULES>', '^(@|\.{1,2})\/(.*)$'],
-    importOrderSeparation: true,
-    importOrderSortSpecifiers: true,
-    importOrderSideEffects: false,
+    plugins: [...options.plugins, '@ianvs/prettier-plugin-sort-imports'],
+    importOrder: ['<THIRD_PARTY_MODULES>', '', '^(@|\\.{1,2})/(.*)$'],
   }
 }
 

@@ -1,11 +1,10 @@
-import pgMeta from '@supabase/pg-meta'
-import { ident } from '@supabase/pg-meta/src/pg-format'
+import { getEnableDatabaseExtensionSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { configKeys } from 'data/config/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtensionEnableVariables = {
@@ -30,11 +29,11 @@ export async function enableDatabaseExtension({
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { sql } = pgMeta.extensions.create({ schema, name, version, cascade })
+  const sql = getEnableDatabaseExtensionSQL({ schema, name, version, cascade, createSchema })
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: createSchema ? `create schema if not exists ${ident(schema)}; ${sql}` : sql,
+    sql,
     queryKey: ['extension', 'create'],
   })
 

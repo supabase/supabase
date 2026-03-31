@@ -1,5 +1,6 @@
-import { expect, test, describe } from 'vitest'
-import { prefixToUUID, stringRange } from '../../../src/sql/studio/get-users-common'
+import { describe, expect, test } from 'vitest'
+
+import { prefixToUUID, stringRange } from '../../../src/sql/studio/auth/get-users-common'
 
 describe('prefixToUUID', () => {
   test('returns UUID template with no prefix', () => {

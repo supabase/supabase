@@ -1,18 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Plus, Trash2, Upload } from 'lucide-react'
+import { CalendarIcon, ExternalLink, Plus, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import {
   Button,
   Calendar,
   Checkbox_Shadcn_,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -32,10 +34,10 @@ import {
   SheetTitle,
   Switch,
   Textarea,
-  PrePostTab,
 } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -43,6 +45,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import * as z from 'zod'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -59,6 +62,7 @@ const formSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   duration: z.number().min(5).max(30),
   redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
+  httpHeaders: z.array(z.object({ key: z.string(), value: z.string() })),
   apiKey: z.string().optional(),
 })
 
@@ -90,6 +94,7 @@ export default function FormPatternsSidePanel() {
       password: '',
       duration: 10,
       redirectUris: [{ value: '' }],
+      httpHeaders: [{ key: '', value: '' }],
       apiKey: fakeApiKey,
     },
   })
@@ -231,9 +236,12 @@ export default function FormPatternsSidePanel() {
                       description="Input with additional unit label"
                     >
                       <FormControl_Shadcn_ className="col-span-6">
-                        <PrePostTab postTab="MB" className="w-full">
-                          <Input_Shadcn_ {...field} type="number" min={5} max={30} />
-                        </PrePostTab>
+                        <InputGroup>
+                          <InputGroupInput {...field} type="number" min={5} max={30} />
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>MB</InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -304,7 +312,7 @@ export default function FormPatternsSidePanel() {
                               <Button
                                 type="default"
                                 size="tiny"
-                                icon={<Trash2 size={12} />}
+                                icon={<Trash size={12} />}
                                 onClick={() => {
                                   setLogoFile(undefined)
                                   setLogoUrl(undefined)
@@ -410,7 +418,7 @@ export default function FormPatternsSidePanel() {
                                     <Button
                                       type="default"
                                       size="tiny"
-                                      icon={<Trash2 size={12} />}
+                                      icon={<Trash size={12} />}
                                       onClick={() => {
                                         setUploadedFiles((prev) => prev.filter((_, i) => i !== idx))
                                       }}
@@ -651,7 +659,7 @@ export default function FormPatternsSidePanel() {
                           <PopoverTrigger_Shadcn_ asChild>
                             <Button
                               type="outline"
-                              className="w-full justify-start text-left font-normal px-3 py-4"
+                              className="bg-control w-full justify-start text-left font-normal px-3 py-4"
                               icon={<CalendarIcon className="h-4 w-4" />}
                             >
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
@@ -703,7 +711,8 @@ export default function FormPatternsSidePanel() {
                                   <Button
                                     type="default"
                                     size="tiny"
-                                    icon={<Trash2 size={12} />}
+                                    htmlType="button"
+                                    icon={<Trash size={12} />}
                                     onClick={() => remove(index)}
                                   />
                                 )}
@@ -713,11 +722,43 @@ export default function FormPatternsSidePanel() {
                         ))}
                         <Button
                           type="default"
+                          htmlType="button"
                           icon={<Plus />}
                           onClick={() => append({ value: '' })}
                         >
                           Add redirect URI
                         </Button>
+                      </div>
+                    </FormItemLayout>
+                  )}
+                />
+              </SheetSection>
+
+              <Separator className="-mx-5 w-[calc(100%+2.5rem)]" />
+
+              {/* Key/Value Field Array */}
+              <SheetSection>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="httpHeaders"
+                  render={() => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Key/Value Field Array"
+                      description="Repeated text pairs for headers, parameters, and config entries"
+                    >
+                      <div className="col-span-6">
+                        <KeyValueFieldArray
+                          control={form.control}
+                          name="httpHeaders"
+                          keyFieldName="key"
+                          valueFieldName="value"
+                          createEmptyRow={() => ({ key: '', value: '' })}
+                          keyPlaceholder="Header name"
+                          valuePlaceholder="Header value"
+                          addLabel="Add header"
+                          removeLabel="Remove header"
+                        />
                       </div>
                     </FormItemLayout>
                   )}

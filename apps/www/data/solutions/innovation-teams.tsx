@@ -1,15 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
 import { useBreakpoint } from 'common'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import { companyStats } from 'data/company-stats'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   ArrowLeftRight,
   Check,
@@ -17,7 +7,6 @@ import {
   FolderLock,
   Globe2,
   HeartPulse,
-  InfoIcon,
   Lightbulb,
   List,
   Lock,
@@ -25,23 +14,28 @@ import {
   ShieldCheck,
   Sparkles,
   Timer,
-  UserX,
   Users,
+  UserX,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { Image } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
 import {
-  type FeaturesSection,
   FrameworkLink,
-  type FrameworkLinkProps,
+  getEditors,
+  type FeaturesSection,
   type HeroSection,
   type Metadata,
-  getEditors,
 } from './solutions.utils'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { companyStats } from '@/data/company-stats'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -695,10 +689,10 @@ const data: () => {
         },
         {
           id: 'multi-region',
-          title: 'Multi-region Deployments',
+          title: 'Multi-region Options',
           description: (
             <>
-              Deploy databases across multiple regions for{' '}
+              Deploy in your chosen region with optional read replicas in other regions for{' '}
               <span className="text-foreground">global availability</span>.
             </>
           ),
@@ -711,8 +705,8 @@ const data: () => {
           description: (
             <>
               Enterprise plans offer{' '}
-              <span className="text-foreground">automatic failover and redundancy</span> for
-              mission-critical applications.
+              <span className="text-foreground">failover and redundancy</span> for mission-critical
+              applications.
             </>
           ),
           icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.4809C6.55899 16.1583 9.54013 19.1395 13.2175 19.1395C16.895 19.1395 19.8761 16.1583 19.8761 12.4809C19.8761 11.1095 19.4615 9.83483 18.7507 8.77557',

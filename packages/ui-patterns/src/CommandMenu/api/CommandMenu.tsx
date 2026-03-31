@@ -1,20 +1,20 @@
 'use client'
+
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
+import { useBreakpoint } from 'common'
+import useDragToClose from 'common/hooks/useDragToClose'
 import { AlertTriangle, ArrowLeft, Command, Search } from 'lucide-react'
 import type { HTMLAttributes, MouseEvent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-
-import { useBreakpoint } from 'common'
-import useDragToClose from 'common/hooks/useDragToClose'
 import {
   Button,
+  cn,
   Command_Shadcn_,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-  cn,
 } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
@@ -199,7 +199,7 @@ function CommandMenuTriggerInput({
             strokeWidth={1.5}
             className="group-hover:text-foreground-light transition-colors"
           />
-          <p className="flex text-sm pr-2 text-foreground-muted">{placeholder}</p>
+          <p className="flex text-xs pr-2 text-foreground-muted">{placeholder}</p>
         </div>
         {showShortcut && (
           <div className="command-shortcut hidden md:flex items-center space-x-1">
@@ -235,10 +235,23 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
   const query = useQuery()
   const setQuery = useSetQuery()
 
+  const telemetryContext = useCommandMenuTelemetryContext()
+
   const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && open && telemetryContext?.onTelemetry) {
+      telemetryContext.onTelemetry({
+        action: 'command_menu_closed',
+        properties: { app: telemetryContext.app },
+        groups: {},
+      })
+    }
+    setOpen(newOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       {trigger}
       <DialogContent
         id="command-menu-dialog-content"
@@ -246,10 +259,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         forceMount
         ref={contentRef}
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        onInteractOutside={() => setOpen(false)}
+        onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : setOpen(false)
+          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
         }}
         size={size}
         className={cn(
