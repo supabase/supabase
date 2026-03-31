@@ -124,7 +124,8 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const isComputeNearExhaustion =
       !!projectResourceWarnings?.cpu_exhaustion ||
       !!projectResourceWarnings?.memory_and_swap_exhaustion ||
-      !!projectResourceWarnings?.disk_space_exhaustion
+      !!projectResourceWarnings?.disk_space_exhaustion ||
+      !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
     const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
     const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(

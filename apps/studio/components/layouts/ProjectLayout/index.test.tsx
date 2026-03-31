@@ -264,6 +264,8 @@ describe('ProjectLayout title', () => {
 
 describe('FREE_MICRO_UPGRADE banner', () => {
   beforeEach(() => {
+    mockRouter.pathname = '/project/[ref]'
+    mockRouter.asPath = '/project/default'
     mockProjectState.current = {
       ref: 'default',
       name: 'Project 1',
@@ -284,6 +286,8 @@ describe('FREE_MICRO_UPGRADE banner', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+    mockRouter.pathname = '/project/[ref]/observability/query-performance'
+    mockRouter.asPath = '/project/default/observability/query-performance'
     mockProjectState.current = {
       ref: 'default',
       name: 'Project 1',
