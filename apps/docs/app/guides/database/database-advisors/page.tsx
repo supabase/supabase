@@ -6,7 +6,7 @@ import { Admonition } from 'ui-patterns'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import { getGitHubFileContents, octokit } from '~/lib/octokit'
+import { OCTOKIT_RETRY_OPTIONS, getGitHubFileContents, octokit } from '~/lib/octokit'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -151,6 +151,7 @@ const getLints = async () => {
     headers: {
       'X-GitHub-Api-Version': '2022-11-28',
     },
+    request: OCTOKIT_RETRY_OPTIONS,
   })
 
   if (response.status >= 400) {

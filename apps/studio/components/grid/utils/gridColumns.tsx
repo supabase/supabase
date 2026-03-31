@@ -200,14 +200,11 @@ function withPendingAddPlaceholders(
     const value = props.row[props.column.key]
 
     if (isPendingAddRow(props.row) && (value === undefined || value === null || value === '')) {
-      if (columnDef.defaultValue !== undefined && columnDef.defaultValue !== null) {
-        return <DefaultValue />
-      }
-      if (columnDef.isIdentity || columnDef.isGeneratable) {
-        return <DefaultValue />
-      }
-      if (columnDef.isNullable) {
+      if (value === null) {
         return <NullValue />
+      }
+      if (columnDef.defaultValue !== undefined || columnDef.isIdentity || columnDef.isGeneratable) {
+        return <DefaultValue />
       }
     }
 

@@ -39,6 +39,7 @@ export const ActivityStats = () => {
 
   const { data: migrationsData = EMPTY_ARR, isPending: isLoadingMigrations } = useMigrationsQuery({
     projectRef: project?.ref,
+    projectStatus: project?.status,
     connectionString: project?.connectionString,
   })
   const latestMigration = useMemo<DatabaseMigration | undefined>(
@@ -50,6 +51,7 @@ export const ActivityStats = () => {
 
   const { data: backupsData, isPending: isLoadingBackups } = useBackupsQuery({
     projectRef: project?.ref,
+    projectStatus: project?.status,
   })
   const latestBackup = useMemo(() => {
     const list = backupsData?.backups ?? []
