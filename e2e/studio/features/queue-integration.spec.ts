@@ -79,7 +79,7 @@ test.describe('Queues Integration', () => {
 
     await page.getByRole('button', { name: 'Create queue' }).click()
 
-    const dialog = page.locator('[role="dialog"]')
+    const dialog = page.getByRole('dialog')
     await expect(dialog.getByRole('heading', { name: 'Create a new queue' })).toBeVisible()
 
     await dialog.getByRole('textbox').fill(queueName)
@@ -104,7 +104,7 @@ test.describe('Queues Integration', () => {
 
     await page.getByRole('button', { name: 'Create queue' }).click()
 
-    const dialog = page.locator('[role="dialog"]')
+    const dialog = page.getByRole('dialog')
     await expect(dialog.getByRole('heading', { name: 'Create a new queue' })).toBeVisible()
 
     await dialog.getByRole('textbox').fill(queueName)
@@ -178,7 +178,7 @@ test.describe('Queues Integration', () => {
 
     await page.getByRole('button', { name: 'Add message' }).first().click()
 
-    const dialog = page.locator('[role="dialog"]')
+    const dialog = page.getByRole('dialog')
     await expect(dialog.getByRole('heading', { name: 'Add a message to the queue' })).toBeVisible()
 
     // Submit with default payload '{}' and delay
