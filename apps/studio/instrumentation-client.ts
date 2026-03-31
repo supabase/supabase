@@ -268,6 +268,7 @@ Sentry.init({
 
     // === Browser extensions & Google Translate DOM manipulation ===
     'Node.insertBefore: Child to insert before is not a child of this node',
+    'Node.removeChild: The node to be removed is not a child of this node',
     "NotFoundError: Failed to execute 'removeChild' on 'Node'",
     "NotFoundError: Failed to execute 'insertBefore' on 'Node'",
     'NotFoundError: The object can not be found here.',
@@ -292,6 +293,10 @@ Sentry.init({
 
     // === Web crawler / bot errors ===
     'instantSearchSDKJSBridgeClearHighlight',
+
+    // === Third-party library race conditions ===
+    // cmdk: useSyncExternalStore subscribe called before store context is available
+    "Cannot read properties of undefined (reading 'subscribe')",
 
     // === Misc known noise ===
     'r.default.setDefaultLevel is not a function',
