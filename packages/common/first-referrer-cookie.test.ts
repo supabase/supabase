@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   buildFirstReferrerData,
   FIRST_REFERRER_COOKIE_NAME,
-  MW_DIAG_COOKIE_NAME,
   hasPaidSignals,
   isExternalReferrer,
   isOAuthRedirectReferrer,
+  MW_DIAG_COOKIE_NAME,
   parseFirstReferrerCookie,
   parseMwDiagCookie,
   serializeFirstReferrerCookie,
@@ -44,7 +44,9 @@ describe('first-referrer-cookie', () => {
     })
 
     it('returns true for accounts.google.com with path', () => {
-      expect(isOAuthRedirectReferrer('https://accounts.google.com/o/oauth2/auth?client_id=abc')).toBe(true)
+      expect(
+        isOAuthRedirectReferrer('https://accounts.google.com/o/oauth2/auth?client_id=abc')
+      ).toBe(true)
     })
 
     // GitHub OAuth — block bare domain only
@@ -62,20 +64,28 @@ describe('first-referrer-cookie', () => {
     })
 
     it('returns false for github.com with README path', () => {
-      expect(isOAuthRedirectReferrer('https://github.com/supabase/supabase?tab=readme-ov-file')).toBe(false)
+      expect(
+        isOAuthRedirectReferrer('https://github.com/supabase/supabase?tab=readme-ov-file')
+      ).toBe(false)
     })
 
     it('returns false for github.com with discussion path', () => {
-      expect(isOAuthRedirectReferrer('https://github.com/orgs/supabase/discussions/42949')).toBe(false)
+      expect(isOAuthRedirectReferrer('https://github.com/orgs/supabase/discussions/42949')).toBe(
+        false
+      )
     })
 
     it('returns false for github.com with blob path', () => {
-      expect(isOAuthRedirectReferrer('https://github.com/supabase/supabase/blob/master/README.md')).toBe(false)
+      expect(
+        isOAuthRedirectReferrer('https://github.com/supabase/supabase/blob/master/README.md')
+      ).toBe(false)
     })
 
     // GitHub OAuth explicit path (rare, but should still be caught)
     it('returns true for github.com/login/oauth/authorize', () => {
-      expect(isOAuthRedirectReferrer('https://github.com/login/oauth/authorize?client_id=abc')).toBe(true)
+      expect(
+        isOAuthRedirectReferrer('https://github.com/login/oauth/authorize?client_id=abc')
+      ).toBe(true)
     })
 
     // Non-OAuth domains — should not match

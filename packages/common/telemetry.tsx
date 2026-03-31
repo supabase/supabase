@@ -125,9 +125,9 @@ function handlePageTelemetry({
 
     const shouldUseStoredReferrer = Boolean(
       storedReferrer &&
-        isExternalReferrer(storedReferrer) &&
-        !isOAuthRedirectReferrer(storedReferrer) &&
-        !isExternalReferrer(liveReferrer)
+      isExternalReferrer(storedReferrer) &&
+      !isOAuthRedirectReferrer(storedReferrer) &&
+      (!isExternalReferrer(liveReferrer) || isOAuthRedirectReferrer(liveReferrer))
     )
 
     const pageData = telemetryDataOverride
@@ -150,7 +150,7 @@ function handlePageTelemetry({
       firstReferrerData &&
       isExternalReferrer(firstReferrerData.referrer) &&
       !isOAuthRedirectReferrer(firstReferrerData.referrer) &&
-      !isExternalReferrer(pageData.ph.referrer)
+      (!isExternalReferrer(pageData.ph.referrer) || isOAuthRedirectReferrer(pageData.ph.referrer))
     ) {
       pageData.ph.referrer = firstReferrerData.referrer
       firstReferrerCookieConsumed = true
