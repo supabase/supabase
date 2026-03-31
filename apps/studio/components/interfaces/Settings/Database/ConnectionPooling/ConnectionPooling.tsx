@@ -273,7 +273,7 @@ export const ConnectionPooling = () => {
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={field.value || ''}
+                                value={field.value ?? ''}
                                 placeholder={defaultPoolSize.toString()}
                                 onChange={(event) =>
                                   field.onChange(
@@ -337,7 +337,7 @@ export const ConnectionPooling = () => {
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={pgbouncerConfig?.max_client_conn || ''}
+                                value={pgbouncerConfig?.max_client_conn ?? ''}
                                 placeholder={defaultMaxClientConn.toString()}
                                 onChange={(event) =>
                                   field.onChange(
