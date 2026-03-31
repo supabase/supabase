@@ -65,27 +65,6 @@ export function isCancellationRejection(event: Sentry.Event): boolean {
   return serialized?.type === 'cancelation'
 }
 
-// Filter cmdk useSyncExternalStore race condition
-// The subscribe call fails when the store context is not yet available
-// Examples: SUPABASE-APP-B1N, SUPABASE-APP-BMF, SUPABASE-APP-E4Q, SUPABASE-APP-E5M
-export function isCmdkSubscribeError(error: unknown, event: Sentry.Event): boolean {
-  const errorMessage = error instanceof Error ? error.message : ''
-  const eventMessage = event.message || ''
-  const exceptionMessages = event.exception?.values?.map((ex) => ex.value ?? '') ?? []
-  const messages = [errorMessage, eventMessage, ...exceptionMessages].filter(Boolean)
-
-  const isSubscribeError = messages.some(
-    (msg) => msg.includes("reading 'subscribe'") || msg.includes("evaluating 't.subscribe'")
-  )
-  if (!isSubscribeError) return false
-
-  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
-  return frames.some((frame) => {
-    const filename = frame.filename || frame.abs_path || ''
-    return filename.includes('cmdk')
-  })
-}
-
 // Filter challenge/captcha expired errors (user timeout)
 // These happen when users don't complete captcha in time - expected behavior
 // Example: SUPABASE-APP-ACC
@@ -231,9 +210,6 @@ Sentry.init({
     if (isBrowserWalletExtensionError(event)) {
       return null
     }
-    if (isCmdkSubscribeError(hint.originalException, event)) {
-      return null
-    }
     if (isUserAbortedOperation(hint.originalException, event)) {
       return null
     }
@@ -318,6 +294,11 @@ Sentry.init({
 
     // === Web crawler / bot errors ===
     'instantSearchSDKJSBridgeClearHighlight',
+
+    // === Third-party library race conditions ===
+    // cmdk: useSyncExternalStore subscribe called before store context is available
+    "Cannot read properties of undefined (reading 'subscribe')",
+    "undefined is not an object (evaluating 't.subscribe')",
 
     // === Misc known noise ===
     'r.default.setDefaultLevel is not a function',
