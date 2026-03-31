@@ -148,10 +148,7 @@ export function UpdateBillingAddressModal() {
       toast.error(result.message)
       return
     }
-    markCurrentValuesAsSaved(
-      result.submittedState.addressValue,
-      result.submittedState.taxIdValues
-    )
+    markCurrentValuesAsSaved(result.submittedState.addressValue, result.submittedState.taxIdValues)
   }
 
   const stripeElementsOptions: StripeElementsOptions = useMemo(

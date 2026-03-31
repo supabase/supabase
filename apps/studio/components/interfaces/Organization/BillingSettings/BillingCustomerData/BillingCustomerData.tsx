@@ -130,10 +130,7 @@ export const BillingCustomerData = () => {
       toast.error(result.message)
       return
     }
-    markCurrentValuesAsSaved(
-      result.submittedState.addressValue,
-      result.submittedState.taxIdValues
-    )
+    markCurrentValuesAsSaved(result.submittedState.addressValue, result.submittedState.taxIdValues)
   }
 
   const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting

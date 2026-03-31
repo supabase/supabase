@@ -273,9 +273,7 @@ describe('useBillingCustomerDataForm', () => {
   it('keeps a removed tax ID cleared after an intermediate rerender during save', async () => {
     const customerProfile = makeCustomerProfile()
     const taxId = makeTaxId()
-    let rerenderHook:
-      | ((props: HookPropsWithTaxId) => void)
-      | undefined
+    let rerenderHook: ((props: HookPropsWithTaxId) => void) | undefined
 
     const onCustomerDataChange: CustomerChangeHandler = vi.fn(async () => {
       rerenderHook?.({
