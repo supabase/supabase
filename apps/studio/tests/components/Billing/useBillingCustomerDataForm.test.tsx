@@ -16,6 +16,12 @@ type HookPropsWithTaxId = {
   onCustomerDataChange: CustomerChangeHandler
 }
 
+type HookPropsWithExistingTaxId = {
+  customerProfile: BillingProfile
+  taxId: CustomerTaxId
+  onCustomerDataChange: CustomerChangeHandler
+}
+
 type HookPropsWithoutTaxId = {
   customerProfile: BillingProfile
   onCustomerDataChange: CustomerChangeHandler
@@ -204,6 +210,9 @@ describe('useBillingCustomerDataForm', () => {
     await waitFor(() => expect(result.current.isDirty).toBe(true))
     const submitResult = await submitHook(result.current.handleSubmit)
     expect(submitResult.status).toBe('success')
+    if (submitResult.status !== 'success') {
+      throw new Error('Expected successful submit result')
+    }
     act(() => {
       result.current.markCurrentValuesAsSaved(
         submitResult.submittedState.addressValue,
@@ -273,7 +282,7 @@ describe('useBillingCustomerDataForm', () => {
   it('keeps a removed tax ID cleared after an intermediate rerender during save', async () => {
     const customerProfile = makeCustomerProfile()
     const taxId = makeTaxId()
-    let rerenderHook: ((props: HookPropsWithTaxId) => void) | undefined
+    let rerenderHook: ((props: HookPropsWithExistingTaxId) => void) | undefined
 
     const onCustomerDataChange: CustomerChangeHandler = vi.fn(async () => {
       rerenderHook?.({
@@ -311,6 +320,9 @@ describe('useBillingCustomerDataForm', () => {
 
     const submitResult = await submitHook(result.current.handleSubmit)
     expect(submitResult.status).toBe('success')
+    if (submitResult.status !== 'success') {
+      throw new Error('Expected successful submit result')
+    }
 
     act(() => {
       result.current.markCurrentValuesAsSaved(
