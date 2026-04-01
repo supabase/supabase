@@ -1,5 +1,7 @@
+import { useFlag } from 'common'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { IS_PLATFORM } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -12,37 +14,37 @@ import {
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
 import { DashboardSettingsToggles } from '@/components/interfaces/Account/Preferences/DashboardSettingsToggles'
-import { DashboardPreferences } from '@/components/interfaces/Settings/General/DashboardPreferences'
+import { QueryPreferences } from '@/components/interfaces/Settings/General/QueryPreferences'
 
 const Preferences: NextPageWithLayout = () => {
+  // [Joshen] Using this flag to determine whether to show query preferences or not
+  const showQueryPreferences = useFlag('dashboardPreferences')
+
   return (
     <>
       <PageHeader size="small">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Dashboard Preferences</PageHeaderTitle>
+            <PageHeaderTitle>Dashboard</PageHeaderTitle>
             <PageHeaderDescription>
-              Configure how the dashboard interacts with your project
+              General dashboard preferences for your project
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
-        <DashboardPreferences />
+        {IS_PLATFORM && showQueryPreferences && <QueryPreferences />}
+
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle id="dashboard">Dashboard</PageSectionTitle>
-              <PageSectionDescription>
-                Customize your dashboard editing experience.
-              </PageSectionDescription>
+              <PageSectionTitle id="edits">Edits</PageSectionTitle>
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>

@@ -33,8 +33,8 @@ export function DashboardToggle<T extends FieldValues>({
             layout="flex-row-reverse"
             label={label}
             description={
-              <span>
-                {description}
+              <>
+                <p className="text-balance">{description}</p>
                 {discussionsUrl && (
                   <Link
                     href={discussionsUrl}
@@ -46,7 +46,7 @@ export function DashboardToggle<T extends FieldValues>({
                     <ExternalLink size={12} strokeWidth={1.5} />
                   </Link>
                 )}
-              </span>
+              </>
             }
           >
             <FormControl_Shadcn_>

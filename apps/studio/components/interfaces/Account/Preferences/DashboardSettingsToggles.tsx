@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Card, Form_Shadcn_ } from 'ui'
 import * as z from 'zod'
 
@@ -38,6 +39,10 @@ export const DashboardSettingsToggles = () => {
       properties: { enabled: value },
       groups: { organization: org?.slug },
     })
+
+    toast(
+      `${value ? 'Editing entities will now be via the SQL Editor' : 'Editing entities will now be via a guided UI panel'}`
+    )
   }
 
   const handleQueueOperationsToggle = (value: boolean) => {
@@ -49,6 +54,10 @@ export const DashboardSettingsToggles = () => {
       properties: { enabled: value },
       groups: { organization: org?.slug },
     })
+
+    toast(
+      `${value ? 'Table edits in the Table Editor will now be queued' : 'Table edits in the Table Editor will now be saved immediately'}`
+    )
   }
 
   return (
@@ -58,14 +67,14 @@ export const DashboardSettingsToggles = () => {
           form={form}
           name="inlineEditorEnabled"
           label="Edit entities in SQL"
-          description="When enabled, view and edit policies, triggers, and functions directly in the SQL editor instead of a more beginner-friendly UI panel. Ideal for those comfortable with SQL."
+          description="Edit policies, triggers, and functions directly in the SQL editor instead of a guided UI panel. Ideal for those comfortable with SQL."
           onToggle={handleInlineEditorToggle}
         />
         <DashboardToggle
           form={form}
           name="queueOperationsEnabled"
           label="Queue table operations"
-          description="When enabled, table edits in the Table Editor are queued for review before saving to your database, allowing you to batch multiple changes and commit them together."
+          description="Queue table edits in the Table Editor for review before saving to your database, allowing you to batch multiple changes and commit them together."
           discussionsUrl="https://github.com/orgs/supabase/discussions/42460"
           onToggle={handleQueueOperationsToggle}
           isLast

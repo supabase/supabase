@@ -12,7 +12,6 @@ export const useGenerateSettingsMenu = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const showDashboardPreferences = useFlag('dashboardPreferences')
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
   const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
@@ -32,9 +31,9 @@ export const useGenerateSettingsMenu = () => {
             items: [],
           },
           {
-            name: 'Preferences',
-            key: 'preferences',
-            url: `/project/${ref}/settings/preferences`,
+            name: 'Dashboard',
+            key: 'dashboard',
+            url: `/project/${ref}/settings/dashboard`,
             items: [],
           },
         ],
@@ -116,23 +115,14 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
+        {
+          name: 'Dashboard',
+          key: 'dashboard',
+          url: `/project/${ref}/settings/dashboard`,
+          items: [],
+        },
       ],
     },
-    ...(IS_PLATFORM && showDashboardPreferences
-      ? [
-          {
-            title: 'Preferences',
-            items: [
-              {
-                name: 'Dashboard preferences',
-                key: 'preferences',
-                url: `/project/${ref}/settings/preferences`,
-                items: [],
-              },
-            ],
-          },
-        ]
-      : []),
     {
       title: 'Integrations',
       items: [

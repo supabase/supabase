@@ -23,7 +23,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
@@ -52,7 +58,7 @@ const DEFAULT_PREFERENCE: DashboardPreference = {
  * - Also, current database logic only applies to Table Editor atm, will need to extend it further to other pages
  */
 
-export const DashboardPreferences = () => {
+export const QueryPreferences = () => {
   const { ref: projectRef } = useParams()
 
   const [dashboardPreferences, setDashboardPreferences, { isLoading }] =
@@ -80,11 +86,17 @@ export const DashboardPreferences = () => {
 
   return (
     <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle id="queries">Queries</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+
       <PageSectionContent className="flex flex-col gap-y-4">
         {/* [Joshen] Ideally we're able to persist this for all users in the project, but will need support in our middleware */}
         <Admonition
           type="note"
-          title="Preferences currently do not affect other members of this project"
+          title="These preferences control only your experience in the dashboard. Other members of this project will not be affected"
         />
 
         {isLoading ? (
