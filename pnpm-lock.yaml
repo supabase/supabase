@@ -401,7 +401,7 @@ importers:
         version: 3.14.2
       jsrsasign:
         specifier: ^11.0.0
-        version: 11.0.0
+        version: 11.1.1
       katex:
         specifier: ^0.16.21
         version: 0.16.21
@@ -13491,8 +13491,8 @@ packages:
     resolution: {integrity: sha512-SavvDsUP9Xnqo2MoC6Wl6zNyX3f+I5199hRbXBtAITyP2NTPyAgyx5xM0bgcIljRjzsIvOBANbgfWe8XXlyeLA==}
     hasBin: true
 
-  jsrsasign@11.0.0:
-    resolution: {integrity: sha512-BtRwVKS+5dsgPpAtzJcpo5OoWjSs1/zllSBG0+8o8/aV0Ki76m6iZwHnwnsqoTdhfFZDN1XIdcaZr5ZkP+H2gg==}
+  jsrsasign@11.1.1:
+    resolution: {integrity: sha512-6w95OOXH8DNeGxakqLndBEqqwQ6A70zGaky1oxfg8WVLWOnghTfJsc5Tknx+Z88MHSb1bGLcqQHImOF8Lk22XA==}
 
   jsx-ast-utils@3.3.5:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
@@ -31323,7 +31323,7 @@ snapshots:
 
   jsonrepair@3.5.0: {}
 
-  jsrsasign@11.0.0: {}
+  jsrsasign@11.1.1: {}
 
   jsx-ast-utils@3.3.5:
     dependencies:
