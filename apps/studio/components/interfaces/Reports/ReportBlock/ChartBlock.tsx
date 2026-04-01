@@ -176,9 +176,8 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  const maxDataValue = data.length > 0
-    ? Math.max(...data.map((d: any) => Number(d[metricLabel]) || 0))
-    : 0
+  const maxDataValue =
+    data.length > 0 ? Math.max(...data.map((d: any) => Number(d[metricLabel]) || 0)) : 0
   const yAxisWidth = effectiveLogScale
     ? 52
     : isPercentage
