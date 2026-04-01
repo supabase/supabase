@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Badge, Button, Card, CardContent, CardHeader } from 'ui'
 
 import { BannerCard } from '../BannerCard'
@@ -9,6 +8,7 @@ import {
   useFeaturePreviewModal,
   useIsQueueOperationsEnabled,
 } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export const BannerTableEditorQueueOperations = () => {
   const { ref } = useParams()

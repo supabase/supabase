@@ -1,32 +1,10 @@
 import { useParams } from 'common'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import {
-  buildCountsByIso2,
-  computeMarkerRadius,
-  extractIso2FromFeatureProps,
-  getFillColor,
-  getFillOpacity,
-  isKnownCountryCode,
-  isMicroCountry,
-  iso2ToCountryName,
-  MAP_CHART_THEME,
-} from 'components/interfaces/Reports/utils/geo'
-import {
-  jsonSyntaxHighlight,
-  TextFormatter,
-} from 'components/interfaces/Settings/Logs/LogsFormatters'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import BarChart from 'components/ui/Charts/BarChart'
 import { geoCentroid } from 'd3-geo'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { BASE_PATH } from 'lib/constants'
 import sumBy from 'lodash/sumBy'
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Fragment, useRef, useState } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
-import type { ResponseError } from 'types'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -42,6 +20,28 @@ import * as z from 'zod'
 
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import {
+  buildCountsByIso2,
+  computeMarkerRadius,
+  extractIso2FromFeatureProps,
+  getFillColor,
+  getFillOpacity,
+  isKnownCountryCode,
+  isMicroCountry,
+  iso2ToCountryName,
+  MAP_CHART_THEME,
+} from '@/components/interfaces/Reports/utils/geo'
+import {
+  jsonSyntaxHighlight,
+  TextFormatter,
+} from '@/components/interfaces/Settings/Logs/LogsFormatters'
+import Table from '@/components/to-be-cleaned/Table'
+import AlertError from '@/components/ui/AlertError'
+import BarChart from '@/components/ui/Charts/BarChart'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { BASE_PATH } from '@/lib/constants'
+import type { ResponseError } from '@/types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{

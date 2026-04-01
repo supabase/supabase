@@ -9,11 +9,9 @@ import {
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { editorEntityTypes, useTabsStateSnapshot, type Tab } from 'state/tabs'
 import {
   cn,
   ContextMenu_Shadcn_,
@@ -30,6 +28,8 @@ import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
 import { useTabsScroll } from './Tabs.utils'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { editorEntityTypes, useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
 export const EditorTabs = () => {
   const { ref, id } = useParams()

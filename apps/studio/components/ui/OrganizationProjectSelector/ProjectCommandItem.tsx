@@ -1,7 +1,8 @@
-import type { OrgProject } from 'data/projects/org-projects-infinite-query'
 import { Check } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn, CommandItem_Shadcn_ } from 'ui'
+
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
 export interface ProjectCommandItemProps {
   project: OrgProject

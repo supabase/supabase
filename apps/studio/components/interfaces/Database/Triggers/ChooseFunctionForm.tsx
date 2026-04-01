@@ -1,20 +1,20 @@
 import { Transition } from '@headlessui/react'
 import { useParams } from 'common'
 import { map as lodashMap, uniqBy } from 'lodash'
+import { ChevronDown, HelpCircle, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import InformationBox from 'components/ui/InformationBox'
-import SqlEditor from 'components/ui/SqlEditor'
+import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import InformationBox from '@/components/ui/InformationBox'
+import SqlEditor from '@/components/ui/SqlEditor'
 import {
   useDatabaseFunctionsQuery,
   type DatabaseFunction,
-} from 'data/database-functions/database-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { ChevronDown, HelpCircle, Terminal } from 'lucide-react'
+} from '@/data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface ChooseFunctionFormProps {
   visible: boolean

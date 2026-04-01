@@ -6,9 +6,10 @@ import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const convertCronToString = (schedule: string) => {
   // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
+  // original schedule when cronstrue throws.
+  // pg_cron uses '$' for "last day of month"; cronstrue uses 'L' — normalize before parsing.
   try {
-    return CronToString(schedule)
+    return CronToString(schedule.replace(/\$/g, 'L'))
   } catch (error) {
     return schedule
   }

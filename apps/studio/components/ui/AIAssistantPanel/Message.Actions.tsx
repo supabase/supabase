@@ -1,9 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
-import { type PropsWithChildren, useEffect, useState } from 'react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
 import {
   Button,
   cn,
@@ -16,6 +14,8 @@ import {
   TextArea_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 
 export function MessageActions({

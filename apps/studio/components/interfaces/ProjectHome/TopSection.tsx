@@ -1,3 +1,4 @@
+import { ReactFlowProvider } from '@xyflow/react'
 import { ActivityStats } from 'components/interfaces/ProjectHome/ActivityStats'
 import { ProjectConnectionPopover } from 'components/interfaces/ProjectHome/ProjectConnectionPopover'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
@@ -6,19 +7,22 @@ import { InlineLink } from 'components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from 'components/ui/ProjectUpgradeFailedBanner'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
-import { ReactFlowProvider } from '@xyflow/react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
+  const projectResourceWarnings = resourceWarnings?.find((w) => w.project === project?.ref)
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
   const { data: branches } = useBranchesQuery({
@@ -78,7 +82,9 @@ export const TopSection = () => {
                     slug={organization?.slug}
                     cloudProvider={project?.cloud_provider}
                     computeSize={project?.infra_compute_size}
+                    resourceWarnings={projectResourceWarnings}
                   />
+                  {project?.high_availability && <HighAvailabilityBadge />}
                 </div>
               </div>
               <ProjectConnectionPopover projectRef={project?.ref} />

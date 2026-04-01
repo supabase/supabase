@@ -445,6 +445,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "single-value-field-array-demo": {
+      name: "single-value-field-array-demo",
+      type: "components:example",
+      registryDependencies: ["button","form","input"],
+      component: React.lazy(() => import("@/registry/default/example/single-value-field-array-demo")),
+      source: "",
+      files: ["registry/default/example/single-value-field-array-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "checkbox-demo": {
       name: "checkbox-demo",
       type: "components:example",
@@ -727,6 +738,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy")),
       source: "",
       files: ["registry/default/example/data-input-with-reveal-copy.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-reveal-copy-editable": {
+      name: "data-input-with-reveal-copy-editable",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-reveal-copy-editable-empty": {
+      name: "data-input-with-reveal-copy-editable-empty",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable-empty")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable-empty.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

@@ -4013,7 +4013,7 @@
           "500": { "description": "Failed to list database migrations" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
-        "summary": "[Beta] List applied migration versions",
+        "summary": "List applied migration versions",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4054,7 +4054,7 @@
           "500": { "description": "Failed to apply database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Apply a database migration",
+        "summary": "Apply a database migration",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4095,7 +4095,7 @@
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Upsert a database migration without applying",
+        "summary": "Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4128,7 +4128,7 @@
           "500": { "description": "Failed to rollback database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "summary": "Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4169,7 +4169,7 @@
           "500": { "description": "Failed to get database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
-        "summary": "[Beta] Fetch an existing entry from migration history",
+        "summary": "Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4209,7 +4209,7 @@
           "500": { "description": "Failed to patch database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Patch an existing entry in migration history",
+        "summary": "Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4383,7 +4383,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database password" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
@@ -8319,10 +8319,10 @@
             "type": "boolean",
             "nullable": true
           },
-          "sessions_inactivity_timeout": { "type": "integer", "nullable": true },
+          "sessions_inactivity_timeout": { "type": "number", "nullable": true },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "integer", "nullable": true },
+          "sessions_timebox": { "type": "number", "nullable": true },
           "site_url": { "type": "string", "nullable": true },
           "sms_autoconfirm": { "type": "boolean", "nullable": true },
           "sms_max_frequency": { "type": "integer", "nullable": true },
@@ -8706,8 +8706,8 @@
             "nullable": true
           },
           "security_captcha_secret": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "integer", "minimum": 0, "nullable": true },
-          "sessions_inactivity_timeout": { "type": "integer", "minimum": 0, "nullable": true },
+          "sessions_timebox": { "type": "number", "minimum": 0, "nullable": true },
+          "sessions_inactivity_timeout": { "type": "number", "minimum": 0, "nullable": true },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": {
             "type": "string",

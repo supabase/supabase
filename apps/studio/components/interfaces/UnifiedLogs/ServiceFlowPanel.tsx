@@ -1,10 +1,4 @@
 import { useParams } from 'common'
-import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import {
-  ServiceFlowType,
-  useUnifiedLogInspectionQuery,
-} from 'data/logs/unified-log-inspection-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useState } from 'react'
 import {
   cn,
@@ -31,6 +25,12 @@ import {
 import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import {
+  ServiceFlowType,
+  useUnifiedLogInspectionQuery,
+} from '@/data/logs/unified-log-inspection-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
   selectedRow: ColumnSchema

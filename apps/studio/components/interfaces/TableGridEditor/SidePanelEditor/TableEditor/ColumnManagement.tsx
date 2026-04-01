@@ -1,9 +1,4 @@
 import { useParams } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { isEmpty, noop, partition } from 'lodash'
 import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
@@ -33,6 +28,11 @@ import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
 import { Column } from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
+import InformationBox from '@/components/ui/InformationBox'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ColumnManagementProps {
   table: TableField

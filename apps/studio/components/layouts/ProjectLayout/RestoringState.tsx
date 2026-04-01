@@ -1,14 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -22,6 +14,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
+import { useProjectStatusQuery } from '@/data/projects/project-status-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export const RestoringState = () => {
   const { ref } = useParams()
