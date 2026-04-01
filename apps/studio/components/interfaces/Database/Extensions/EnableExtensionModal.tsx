@@ -185,7 +185,7 @@ export const EnableExtensionModal = ({
                     <Input_Shadcn_ disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
-                    Extension must be installed in the “{defaultSchema}” schema.
+                    Extension must be installed in the "{defaultSchema}" schema.
                   </p>
                 </div>
               ) : (
