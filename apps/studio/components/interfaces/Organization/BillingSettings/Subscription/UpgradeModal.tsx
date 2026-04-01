@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useSendUpgradeFeedbackMutation } from 'data/feedback/upgrade-survey-send'
-import type { OrgSubscription } from 'data/subscriptions/types'
 import { Input, Modal } from 'ui'
+
 import { generateUpgradeReasons } from '../helpers'
+import { useSendUpgradeFeedbackMutation } from '@/data/feedback/upgrade-survey-send'
+import type { OrgSubscription } from '@/data/subscriptions/types'
 
 export interface UpgradeSurveyModalProps {
   visible: boolean

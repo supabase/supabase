@@ -3,28 +3,28 @@ import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   Switch,
 } from 'ui'
+import * as z from 'zod'
+
 import { RealtimeConfig } from './useRealtimeMessages'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig

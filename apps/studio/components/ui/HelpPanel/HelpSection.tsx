@@ -1,8 +1,8 @@
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
 import { cn } from 'ui'
 
 import { HelpOptionsList } from './HelpOptionsList'
 import type { HelpOptionId } from './HelpPanel.constants'
+import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
 
 type HelpSectionProps = {
   excludeIds?: HelpOptionId[]

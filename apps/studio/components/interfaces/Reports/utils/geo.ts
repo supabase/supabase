@@ -1,5 +1,5 @@
-import { COUNTRIES } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingAddress.constants'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { COUNTRIES } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingAddress.constants'
+import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 
 export type CountryCountRow = { country: string | null; count: number | string }
 

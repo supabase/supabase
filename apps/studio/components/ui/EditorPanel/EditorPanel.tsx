@@ -2,26 +2,6 @@ import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { isExplainQuery } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { generateSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import {
-  createSqlSnippetSkeletonV2,
-  suffixWithLimit,
-} from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useAddDefinitions } from 'components/interfaces/SQLEditor/useAddDefinitions'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { SqlRunButton } from 'components/interfaces/SQLEditor/UtilityPanel/RunButton'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useContentIdQuery } from 'data/content/content-id-query'
-import { useContentQuery, type Content } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { contentKeys } from 'data/content/keys'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import {
   AlertCircle,
   Book,
@@ -35,9 +15,6 @@ import {
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { editorPanelState, useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
   cn,
@@ -65,6 +42,29 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
+import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
+import {
+  createSqlSnippetSkeletonV2,
+  suffixWithLimit,
+} from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
+import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useContentIdQuery } from '@/data/content/content-id-query'
+import { useContentQuery, type Content } from '@/data/content/content-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { contentKeys } from '@/data/content/keys'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
+import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export const EditorPanel = () => {
   const {

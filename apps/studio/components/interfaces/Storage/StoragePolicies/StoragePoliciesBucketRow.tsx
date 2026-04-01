@@ -1,6 +1,4 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
-import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { noop } from 'lodash'
 import { forwardRef, type CSSProperties } from 'react'
@@ -20,6 +18,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
+import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { Bucket } from '@/data/storage/buckets-query'
 
 interface StoragePoliciesBucketRowProps {
   table: string
@@ -60,10 +62,7 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
                       Public
                     </Badge>
                   </TooltipTrigger>
-                  <TooltipContent side="top">
-                    This bucket is publicly readable. Anyone can list and access all objects stored
-                    in it.
-                  </TooltipContent>
+                  <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
                 </Tooltip>
               )}
             </div>

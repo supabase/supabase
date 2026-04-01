@@ -1,11 +1,12 @@
 import { useIsMFAEnabled } from 'common'
-import { ActionCard } from 'components/ui/ActionCard'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import { Boxes, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment } from 'react'
-import type { Organization } from 'types'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { ActionCard } from '@/components/ui/ActionCard'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { Organization } from '@/types'
 
 export const OrganizationCard = ({
   organization,

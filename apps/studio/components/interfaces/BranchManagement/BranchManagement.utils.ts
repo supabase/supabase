@@ -1,13 +1,12 @@
-import { DiskAttributesData } from 'data/config/disk-attributes-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { estimateRestoreTimeFromSizeGb } from 'lib/restore-estimate'
-
 import {
   DISK_LIMITS,
   DISK_PRICING,
   DiskType,
   PLAN_DETAILS,
 } from '../DiskManagement/ui/DiskManagement.constants'
+import { DiskAttributesData } from '@/data/config/disk-attributes-query'
+import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { estimateRestoreTimeFromSizeGb } from '@/lib/restore-estimate'
 
 // Ref: https://supabase.com/docs/guides/platform/compute-and-disk
 const maxDiskForCompute = new Map([

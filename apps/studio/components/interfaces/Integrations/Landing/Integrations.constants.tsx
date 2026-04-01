@@ -110,7 +110,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Queues/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Queues/OverviewTab').then(
                 (mod) => mod.QueuesOverviewTab
               ),
             { loading: Loading }
@@ -166,7 +166,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
                 (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
@@ -209,7 +209,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
                 (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
@@ -254,7 +254,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Webhooks/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Webhooks/OverviewTab').then(
                 (mod) => mod.WebhooksOverviewTab
               ),
             {
@@ -264,7 +264,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'webhooks':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Webhooks/ListTab').then(
+              import('@/components/interfaces/Integrations/Webhooks/ListTab').then(
                 (mod) => mod.WebhooksListTab
               ),
             {
@@ -311,7 +311,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/OverviewTab').then(
+              import('@/components/interfaces/Integrations/DataApi/OverviewTab').then(
                 (mod) => mod.DataApiOverviewTab
               ),
             {
@@ -321,7 +321,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/SettingsTab').then(
+              import('@/components/interfaces/Integrations/DataApi/SettingsTab').then(
                 (mod) => mod.DataApiSettingsTab
               ),
             {
@@ -331,7 +331,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'docs':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/DocsTab').then(
+              import('@/components/interfaces/Integrations/DataApi/DocsTab').then(
                 (mod) => mod.DataApiDocsTab
               ),
             {
@@ -374,7 +374,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
                 (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
@@ -384,7 +384,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'graphiql':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
+              import('@/components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
                 (mod) => mod.GraphiQLTab
               ),
             {
@@ -425,7 +425,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Wrappers/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Wrappers/OverviewTab').then(
                 (mod) => mod.WrapperOverviewTab
               ),
             {
@@ -435,7 +435,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         case 'wrappers':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Wrappers/WrappersTab').then(
+              import('@/components/interfaces/Integrations/Wrappers/WrappersTab').then(
                 (mod) => mod.WrappersTab
               ),
             {
@@ -487,7 +487,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
                 (mod) => mod.StripeSyncInstallationPage
               ),
             { loading: Loading }
@@ -495,7 +495,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
                 (mod) => mod.StripeSyncSettingsPage
               ),
             { loading: Loading }

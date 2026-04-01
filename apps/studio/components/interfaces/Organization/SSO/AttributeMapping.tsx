@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { Button } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+
 import type { SSOConfigFormSchema } from './SSOConfig'
 
 type ProviderAttribute = 'emailMapping' | 'userNameMapping' | 'firstNameMapping' | 'lastNameMapping'

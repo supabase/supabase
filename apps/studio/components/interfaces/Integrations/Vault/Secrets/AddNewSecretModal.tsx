@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useVaultSecretCreateMutation } from 'data/vault/vault-secret-create-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,6 +19,9 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useVaultSecretCreateMutation } from '@/data/vault/vault-secret-create-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),

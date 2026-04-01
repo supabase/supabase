@@ -758,6 +758,267 @@ test.describe('Database', () => {
   })
 })
 
+test.describe('Database Extensions', () => {
+  test.describe.configure({ mode: 'serial' })
+
+  const EXTENSION_NAME = 'pgtap'
+
+  test('can enable an extension', async ({ page, ref }) => {
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+    await expect(
+      dialog.getByText(`Enable ${EXTENSION_NAME}`),
+      'Dialog title should match extension name'
+    ).toBeVisible()
+
+    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await enableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
+      'Success toast should appear after enabling extension'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be checked after enabling'
+    ).toBeChecked()
+  })
+
+  test('can disable an extension', async ({ page, ref }) => {
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Disable confirmation dialog should be visible').toBeVisible()
+    await expect(
+      dialog.getByText('Confirm to disable extension'),
+      'Dialog title should be correct'
+    ).toBeVisible()
+
+    const disableWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      `query?key=extension-delete-${EXTENSION_NAME}`
+    )
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.getByRole('button', { name: 'Disable' }).click()
+    await disableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`${EXTENSION_NAME} is off.`),
+      'Success toast should appear after disabling extension'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be unchecked after disabling'
+    ).not.toBeChecked()
+  })
+
+  test('can enable an extension in a different existing schema', async ({ page, ref }) => {
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Change schema to 'public'
+    await dialog.getByRole('combobox').click()
+    await page.getByRole('option', { name: 'public', exact: true }).click()
+
+    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await enableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
+      'Success toast should appear after enabling in public schema'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be checked after enabling in public schema'
+    ).toBeChecked()
+
+    // Cleanup
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+  })
+
+  test('can enable an extension in a new schema', async ({ page, ref }) => {
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(EXTENSION_NAME)
+
+    const row = page.getByRole('row').filter({ hasText: EXTENSION_NAME }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Select 'Create a new schema pgtap'
+    await dialog.getByRole('combobox').click()
+    await page.getByRole('option', { name: /Create a new schema/ }).click()
+
+    const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
+    const refetchWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await enableWait
+    await refetchWait
+
+    await expect(
+      page.getByText(`Extension "${EXTENSION_NAME}" is now enabled`),
+      'Success toast should appear after enabling in new schema'
+    ).toBeVisible({ timeout: 15000 })
+
+    await expect(
+      row.getByRole('switch'),
+      'Extension switch should be checked after enabling in new schema'
+    ).toBeChecked()
+
+    // Note: the created schema is owned by supabase_admin and cannot be dropped
+    // by the test query helper (runs as postgres). The schema is left empty after
+    // the extension is dropped and will be reused on subsequent runs via
+    // CREATE SCHEMA IF NOT EXISTS in the enable SQL.
+    await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
+  })
+
+  test('cannot change the schema for extensions with a fixed default schema', async ({
+    page,
+    ref,
+  }) => {
+    const FIXED_SCHEMA_EXTENSION = 'pgmq'
+    const FIXED_SCHEMA = 'pgmq'
+
+    await query(`DROP EXTENSION IF EXISTS ${FIXED_SCHEMA_EXTENSION} CASCADE;`)
+
+    const extensionsWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=database-extensions'
+    )
+    await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/extensions`))
+    await extensionsWait
+
+    await page.getByPlaceholder('Search for an extension').fill(FIXED_SCHEMA_EXTENSION)
+
+    const row = page.getByRole('row').filter({ hasText: FIXED_SCHEMA_EXTENSION }).first()
+    await expect(row, 'Extension row should be visible').toBeVisible()
+    await row.getByRole('switch').click()
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Schema selector (combobox) should NOT be present for fixed-schema extensions
+    await expect(
+      dialog.getByRole('combobox'),
+      'Schema selector should not be present for extensions with a fixed default schema'
+    ).not.toBeVisible()
+
+    // A disabled input showing the fixed schema should be present instead
+    const schemaInput = dialog.getByRole('textbox')
+    await expect(schemaInput, 'Fixed schema input should be visible').toBeVisible()
+    await expect(schemaInput, 'Fixed schema input should be disabled').toBeDisabled()
+    await expect(
+      schemaInput,
+      'Fixed schema input should display the required schema name'
+    ).toHaveValue(FIXED_SCHEMA)
+
+    // Helper text confirming the schema is required
+    await expect(
+      dialog.getByText(`Extension must be installed in the "${FIXED_SCHEMA}" schema.`),
+      'Helper text should indicate the schema is required'
+    ).toBeVisible()
+
+    // Cancel without enabling
+    await dialog.getByRole('button', { name: 'Cancel' }).click()
+    await expect(dialog, 'Dialog should be closed after canceling').not.toBeVisible()
+  })
+})
+
 test.describe('Database Enumerated Types', () => {
   test('actions works as expected', async ({ page, ref }) => {
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))

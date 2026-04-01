@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useIcebergNamespaceCreateMutation } from 'data/storage/iceberg-namespace-create-mutation'
-import {
-  NamespaceTableFields,
-  useIcebergNamespaceTableCreateMutation,
-} from 'data/storage/iceberg-namespace-table-create-mutation'
-import { useIcebergNamespaceTablesQuery } from 'data/storage/iceberg-namespace-tables-query'
-import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
 import { Plus, X } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -39,6 +32,13 @@ import { z } from 'zod'
 
 import { COLUMN_TYPE_FIELDS, COLUMN_TYPES } from './CreateTableSheet.constants'
 import { createFormSchema } from './CreateTableSheet.schema'
+import { useIcebergNamespaceCreateMutation } from '@/data/storage/iceberg-namespace-create-mutation'
+import {
+  NamespaceTableFields,
+  useIcebergNamespaceTableCreateMutation,
+} from '@/data/storage/iceberg-namespace-table-create-mutation'
+import { useIcebergNamespaceTablesQuery } from '@/data/storage/iceberg-namespace-tables-query'
+import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 
 const formId = 'create-namespace-table'
 const NEW_NAMESPACE_MARKER = 'new-namespace'

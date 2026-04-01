@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
 import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()

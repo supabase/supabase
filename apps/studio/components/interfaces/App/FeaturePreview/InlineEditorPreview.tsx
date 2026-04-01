@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH } from '@/lib/constants'
 
 export const InlineEditorPreview = () => {
   return (

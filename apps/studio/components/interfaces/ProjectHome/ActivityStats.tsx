@@ -1,16 +1,16 @@
 import { useParams } from 'common'
-import { SingleStat } from 'components/ui/SingleStat'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Archive, Database, GitBranch } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 
 import { ServiceStatus } from './ServiceStatus'
+import { SingleStat } from '@/components/ui/SingleStat'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
 
 export const ActivityStats = () => {

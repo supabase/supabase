@@ -1,19 +1,9 @@
 import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { Minus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
 import {
   Button,
   TableCell,
@@ -32,6 +22,16 @@ import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.c
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
+import { AlertError } from '@/components/ui/AlertError'
+import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 
 interface DestinationRowProps {
   destinationId: number

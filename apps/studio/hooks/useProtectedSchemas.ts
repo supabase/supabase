@@ -1,17 +1,17 @@
 import { QUEUES_SCHEMA } from '@supabase/pg-meta'
-import {
-  SUPABASE_TARGET_SCHEMA_OPTION,
-  WRAPPERS,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import {
-  convertKVStringArrayToJson,
-  wrapperMetaComparator,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { uniq, uniqBy } from 'lodash'
 import { useMemo } from 'react'
 
 import { useSelectedProjectQuery } from './misc/useSelectedProject'
+import {
+  SUPABASE_TARGET_SCHEMA_OPTION,
+  WRAPPERS,
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import {
+  convertKVStringArrayToJson,
+  wrapperMetaComparator,
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
 
 /**
  * A list of system schemas that users should not interact with

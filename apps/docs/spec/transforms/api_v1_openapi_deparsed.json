@@ -15918,7 +15918,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["database_write"]
+            "fga_permissions": ["database_config_write"]
           }
         ],
         "summary": "Updates the database password",

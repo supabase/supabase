@@ -1,17 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectRestartMutation } from 'data/projects/project-restart-mutation'
-import { useProjectRestartServicesMutation } from 'data/projects/project-restart-services-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsK8sCloudProvider,
-  useIsProjectActive,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -25,6 +13,19 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
+import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const RestartServerButton = () => {
   const router = useRouter()

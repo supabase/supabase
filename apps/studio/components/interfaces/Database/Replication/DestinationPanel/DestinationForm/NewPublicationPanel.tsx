@@ -1,11 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useParams } from 'common'
-import { useCreatePublicationMutation } from 'data/replication/publication-create-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
 import {
   Button,
   Form_Shadcn_,
@@ -22,6 +18,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
+import { z } from 'zod'
+
+import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
+import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 
 interface NewPublicationPanelProps {
   visible: boolean

@@ -1,26 +1,24 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import {
-  clearPersistedTransitionStartTime,
-  getPersistedTransitionStartTime,
-  getRemainingTransitionTimeMs,
-  hoursToMilliseconds,
-  MAX_PERSISTED_TRANSITION_AGE_HOURS,
-  minutesToMilliseconds,
-} from 'lib/project-transition-state'
-import { getRestoreLongRunningThresholdMinutes } from 'lib/restore-estimate'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
+import { useProjectStatusQuery } from '@/data/projects/project-status-query'
+import { useLongRunningTransitionState } from '@/hooks/misc/useLongRunningTransitionState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import {
+  clearPersistedTransitionStartTime,
+  minutesToMilliseconds,
+} from '@/lib/project-transition-state'
+import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
 
 export const RestoringState = () => {
   const { ref } = useParams()
@@ -28,7 +26,6 @@ export const RestoringState = () => {
 
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
-  const [isTakingLongerThanExpected, setIsTakingLongerThanExpected] = useState(false)
   const restoreStateStartStorageKey = ref
     ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
     : null
@@ -38,7 +35,10 @@ export const RestoringState = () => {
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
   const longRunningThresholdMinutes = getRestoreLongRunningThresholdMinutes(project?.volumeSizeGb)
   const longRunningThresholdMs = minutesToMilliseconds(longRunningThresholdMinutes)
-  const maxPersistedTransitionAgeMs = hoursToMilliseconds(MAX_PERSISTED_TRANSITION_AGE_HOURS)
+  const isTakingLongerThanExpected = useLongRunningTransitionState({
+    storageKey: restoreStateStartStorageKey,
+    thresholdMs: longRunningThresholdMs,
+  })
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
@@ -55,29 +55,6 @@ export const RestoringState = () => {
       },
     }
   )
-
-  useEffect(() => {
-    const startTime = restoreStateStartStorageKey
-      ? getPersistedTransitionStartTime(
-          restoreStateStartStorageKey,
-          Date.now(),
-          maxPersistedTransitionAgeMs
-        )
-      : Date.now()
-    const remainingThresholdMs = getRemainingTransitionTimeMs({
-      startTimeMs: startTime,
-      thresholdMs: longRunningThresholdMs,
-    })
-
-    if (remainingThresholdMs === 0) {
-      setIsTakingLongerThanExpected(true)
-      return
-    }
-
-    setIsTakingLongerThanExpected(false)
-    const timeoutId = setTimeout(() => setIsTakingLongerThanExpected(true), remainingThresholdMs)
-    return () => clearTimeout(timeoutId)
-  }, [longRunningThresholdMs, maxPersistedTransitionAgeMs, restoreStateStartStorageKey])
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
