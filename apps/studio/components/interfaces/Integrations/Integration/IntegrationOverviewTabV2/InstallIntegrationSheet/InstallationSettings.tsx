@@ -1,13 +1,18 @@
-import { type IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card, CardContent, SheetSection } from 'ui'
+import { UseFormReturn } from 'react-hook-form'
+import { Button, Card, CardContent, FormControl_Shadcn_, FormField_Shadcn_, SheetSection } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { type InstallIntegrationSheetProps } from './InstallIntegrationSheet'
 
-export const InstallationSettings = ({ integration }: InstallIntegrationSheetProps) => {
+export const InstallationSettings = ({
+  integration,
+  form,
+}: InstallIntegrationSheetProps & {
+  form: UseFormReturn<Record<string, string>, unknown, undefined>
+}) => {
   const { inputs = {} } = integration
 
   return (
@@ -25,14 +30,28 @@ export const InstallationSettings = ({ integration }: InstallIntegrationSheetPro
 
             return (
               <div key={key} className="flex flex-col gap-y-2 p-4">
-                <FormItemLayout
-                  layout="flex-row-reverse"
-                  isReactForm={false}
-                  label={label}
-                  description={description}
-                >
-                  <Input type={type} placeholder={required ? 'Provide a value' : undefined} />
-                </FormItemLayout>
+                <FormField_Shadcn_
+                  key={key}
+                  name={key}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      isReactForm={false}
+                      name={key}
+                      label={label}
+                      description={description}
+                    >
+                      <FormControl_Shadcn_>
+                        <Input
+                          type={type}
+                          placeholder={required ? 'Provide a value' : undefined}
+                          {...field}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
 
                 {actions.length > 0 && (
                   <div className="flex items-center gap-x-2">

@@ -1,9 +1,16 @@
-import { type IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useEffect, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  IntegrationInputs,
+  type IntegrationDefinition,
+} from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useTrack } from 'lib/telemetry/track'
+import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   DialogSectionSeparator,
+  Form_Shadcn_,
   Sheet,
   SheetClose,
   SheetContent,
@@ -13,17 +20,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
+import * as z from 'zod'
 
 import { getExtensionDefaultSchema } from '../IntegrationOverviewTabV2.utils'
 import { AdvancedSettings } from './AdvancedSettings'
 import { InstallationOverview } from './InstallationOverview'
 import { InstallationSettings } from './InstallationSettings'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from '@/data/database/schemas-query'
+import {
+  DatabaseExtension,
+  useDatabaseExtensionsQuery,
+} from '@/data/database-extensions/database-extensions-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { ResponseError } from '@/types'
 
 export interface InstallIntegrationSheetProps {
@@ -31,6 +40,8 @@ export interface InstallIntegrationSheetProps {
 }
 
 export type ExtensionsSchema = { [key: string]: { schema: string; value: string | undefined } }
+
+const formId = 'installation-settings'
 
 /**
  * [Joshen] Trying to figure out what the ideal data structure is between local + remote integrations
@@ -43,8 +54,8 @@ export type ExtensionsSchema = { [key: string]: { schema: string; value: string 
  */
 
 export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheetProps) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
-  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
 
   const [open, setOpen] = useState(false)
   const [isInstalling, setIsInstalling] = useState(false)
@@ -61,12 +72,34 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   const allowExtensionCustomSchema = !installationSql
   const involvesExtensions = requiredExtensionNames.length > 0
 
-  const { data: extensions = [], isSuccess: isSuccessExtensions } = useDatabaseExtensionsQuery(
-    { projectRef: project?.ref, connectionString: project?.connectionString },
-    { enabled: involvesExtensions }
-  )
+  const schema = useMemo(() => {
+    let baseSchema = z.object({})
+    Object.entries(inputs).forEach((entry) => {
+      const [key, input] = entry
+      baseSchema = baseSchema.extend({
+        [key]: z.string().min(1, `Please provide a value for ${input.label}`),
+      })
+    })
+    return baseSchema
+  }, [inputs])
 
-  const { data: schemas = [] } = useSchemasQuery(
+  const defaultValues = useMemo(() => {
+    let values = {} as Record<string, string>
+    Object.entries(inputs).forEach((entry) => {
+      const [key] = entry
+      values[key] = ''
+    })
+    return values
+  }, [inputs])
+
+  const form = useForm<Record<string, string>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(schema),
+    defaultValues,
+  })
+
+  const { data: extensions = [], isSuccess: isSuccessExtensions } = useDatabaseExtensionsQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
@@ -82,29 +115,31 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     useState<ExtensionsSchema>(defaultExtensionsSchema)
 
   const requiredExtensions = extensions.filter((ext) => requiredExtensionNames.includes(ext.name))
+  const requiredExtensionsToBeInstalled = requiredExtensions.filter((ext) => !ext.installed_version)
   // [Joshen] Integration requires extensions that are not available to install on the current database image
   const hasMissingExtensions = requiredExtensionNames.length !== requiredExtensions.length
 
-  const availableSchemas = schemas.filter(
-    (schema) => !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
-  )
-
-  const { mutateAsync: executeSql } = useExecuteSqlMutation({ onError: () => {} })
   const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
 
-  const onInstallIntegration = async () => {
+  /**
+   * [Joshen] This is a bit messy again while we're figuring out requirements
+   * If the integration has required extensions that are yet to be installed, we'll install those
+   * AND if the integration has a provided installation command, we'll run that too
+   */
+  const onSubmit: SubmitHandler<Record<string, string>> = async (values) => {
     if (!project) return console.error('Project is required')
 
     setIsInstalling(true)
     const toastId = toast.loading(`Installing ${name}`)
 
     try {
+      if (requiredExtensionsToBeInstalled.length > 0) {
+        toast.loading(`Installing required database extensions`, { id: toastId })
+        await installRequiredIntegrationExtensions(requiredExtensionsToBeInstalled)
+      }
       if (installationCommand) {
-        await installationCommand({ ref: project.ref })
-      } else if (installationSql) {
-        await installIntegrationViaSQL()
-      } else {
-        await installIntegrationExtensions()
+        toast.loading(`Installing ${name}`, { id: toastId })
+        await installationCommand({ ref: project.ref, track, ...values })
       }
 
       toast.success(`Successfully installed ${name}`, { id: toastId })
@@ -118,42 +153,30 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     }
   }
 
-  const installIntegrationViaSQL = async () => {
-    if (!project) return console.error('Project is required')
-    if (!installationSql) return console.error('Installation SQL is required')
-
-    const { ref: projectRef, connectionString } = project
-    await executeSql({ projectRef, connectionString, sql: installationSql })
-  }
-
-  const installIntegrationExtensions = async () => {
+  const installRequiredIntegrationExtensions = async (extensions: DatabaseExtension[]) => {
     if (!project) return console.error('Project is required')
 
     const { ref: projectRef, connectionString } = project
     const results = await Promise.allSettled(
-      requiredExtensions
-        .filter((ext) => !ext.installed_version)
-        .map((ext) => {
-          const { name, default_version: version } = ext
-          const createSchema = extensionsSchema[name].schema === 'custom'
+      extensions.map((ext) => {
+        const { name, default_version: version } = ext
+        const createSchema = extensionsSchema[name].schema === 'custom'
 
-          const defaultSchema = getExtensionDefaultSchema(ext)
-          const schema =
-            defaultSchema ||
-            (createSchema
-              ? (extensionsSchema[name].value as string)
-              : extensionsSchema[name].schema)
+        const defaultSchema = getExtensionDefaultSchema(ext)
+        const schema =
+          defaultSchema ||
+          (createSchema ? (extensionsSchema[name].value as string) : extensionsSchema[name].schema)
 
-          return enableExtension({
-            projectRef,
-            connectionString,
-            schema,
-            name,
-            version,
-            cascade: true,
-            createSchema,
-          })
+        return enableExtension({
+          projectRef,
+          connectionString,
+          schema,
+          name,
+          version,
+          cascade: true,
+          createSchema: createSchema || !schema.startsWith('pg_'),
         })
+      })
     )
 
     const failure = results.find((r) => r.status === 'rejected')
@@ -170,57 +193,68 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
       <SheetTrigger asChild>
         <Button type="primary">Install integration</Button>
       </SheetTrigger>
-      <SheetContent
-        size="default"
-        aria-describedby={undefined}
-        className="flex flex-col gap-0 !w-[650px]"
-      >
-        <SheetHeader className="flex items-center gap-x-4">
-          <div className="shrink-0 w-11 h-11 relative bg-white border rounded-md flex items-center justify-center">
-            {icon()}
-          </div>
-          <div className="flex flex-col">
-            <SheetTitle>Install {name}</SheetTitle>
-            <SheetDescription>Review and configure this integration</SheetDescription>
-          </div>
-        </SheetHeader>
 
-        <div className="flex-grow overflow-y-auto">
-          <div className="py-5 flex flex-col gap-y-7">
-            {Object.keys(inputs).length > 0 && <InstallationSettings integration={integration} />}
-            <InstallationOverview integration={integration} extensionsSchema={extensionsSchema} />
-          </div>
-
-          {allowExtensionCustomSchema && (
-            <>
-              <DialogSectionSeparator />
-              <AdvancedSettings
-                integration={integration}
-                extensionsSchema={extensionsSchema}
-                setExtensionsSchema={setExtensionsSchema}
-              />
-            </>
-          )}
-
-          <DialogSectionSeparator />
-        </div>
-
-        <SheetFooter>
-          <SheetClose asChild>
-            <Button type="default" disabled={isInstalling}>
-              Cancel
-            </Button>
-          </SheetClose>
-          <Button
-            type="primary"
-            disabled={hasMissingExtensions}
-            loading={isInstalling}
-            onClick={onInstallIntegration}
+      <Form_Shadcn_ {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          <SheetContent
+            size="default"
+            aria-describedby={undefined}
+            className="flex flex-col gap-0 !w-[650px]"
           >
-            Install integration
-          </Button>
-        </SheetFooter>
-      </SheetContent>
+            <SheetHeader className="flex items-center gap-x-4">
+              <div className="shrink-0 w-11 h-11 relative bg-white border rounded-md flex items-center justify-center">
+                {icon()}
+              </div>
+              <div className="flex flex-col">
+                <SheetTitle>Install {name}</SheetTitle>
+                <SheetDescription>Review and configure this integration</SheetDescription>
+              </div>
+            </SheetHeader>
+
+            <div className="flex-grow overflow-y-auto">
+              <div className="py-5 flex flex-col gap-y-7">
+                {Object.keys(inputs).length > 0 && (
+                  <InstallationSettings form={form} integration={integration} />
+                )}
+                <InstallationOverview
+                  integration={integration}
+                  extensionsSchema={extensionsSchema}
+                />
+              </div>
+
+              {allowExtensionCustomSchema && (
+                <>
+                  <DialogSectionSeparator />
+                  <AdvancedSettings
+                    integration={integration}
+                    extensionsSchema={extensionsSchema}
+                    setExtensionsSchema={setExtensionsSchema}
+                  />
+                </>
+              )}
+
+              <DialogSectionSeparator />
+            </div>
+
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button type="default" disabled={isInstalling}>
+                  Cancel
+                </Button>
+              </SheetClose>
+              <Button
+                form={formId}
+                htmlType="submit"
+                type="primary"
+                loading={isInstalling}
+                disabled={hasMissingExtensions}
+              >
+                Install integration
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </form>
+      </Form_Shadcn_>
     </Sheet>
   )
 }

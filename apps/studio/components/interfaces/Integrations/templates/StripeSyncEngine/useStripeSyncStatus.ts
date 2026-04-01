@@ -1,5 +1,5 @@
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useEffect } from 'react'
-import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import {
@@ -9,7 +9,7 @@ import {
   type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { useStripeSyncingState } from '@/data/database-integrations/stripe/sync-state-query'
-import { SchemasVariables, useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
 
 // Maximum time allowed for installation or uninstallation operations before the UI times out
 const OPERATION_TIME_OUT_MS: number = 5 * 60 * 1000 // 5 minutes
@@ -21,11 +21,10 @@ const OPERATION_TIME_OUT_MS: number = 5 * 60 * 1000 // 5 minutes
  * into a single source of truth. It returns a discriminated union status that
  * makes impossible states unrepresentable.
  */
-export function useStripeSyncStatus({
-  projectRef,
-  connectionString,
-}: SchemasVariables): StripeSyncStatusResult {
+export function useStripeSyncStatus(): StripeSyncStatusResult {
   const latestAvailableVersion = getCurrentVersion()
+  const { data: project } = useSelectedProjectQuery()
+  const { ref: projectRef, connectionString } = project || {}
 
   // Query schemas once
   const {

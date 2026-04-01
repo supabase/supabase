@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -7,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -24,6 +26,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
+import { IntegrationOverviewTabV2 } from '../../Integration/IntegrationOverviewTabV2'
 import { InstallationError } from './InstallationError'
 import { StatusDisplay } from './StatusDisplay'
 import {
@@ -50,13 +53,122 @@ const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
 })
 
-export const StripeSyncInstallationPage = () => {
+const UpgradeUninstallButtons = ({
+  className,
+  disabled,
+  upgradeAvailable,
+  installing,
+  uninstalling,
+  setShouldShowInstallSheet,
+  setIsUninstallInitiated,
+}: {
+  className?: string
+  disabled?: boolean
+  upgradeAvailable: boolean
+  installing: boolean
+  uninstalling: boolean
+  setShouldShowInstallSheet: (value: boolean) => void
+  setIsUninstallInitiated: (value: boolean) => void
+}) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { can: canManageSecrets } = useAsyncCheckPermissions(
+    PermissionAction.FUNCTIONS_SECRET_WRITE,
+    '*'
+  )
+
+  const [showUninstallModal, setShowUninstallModal] = useState(false)
+
+  const {
+    schemaComment: { status: installationStatus },
+  } = useStripeSyncStatus()
+  const uninstallError = hasUninstallError(installationStatus)
+
+  const { mutate: uninstallStripeSync, isPending: isUninstallRequested } =
+    useStripeSyncUninstallMutation({
+      onSuccess: () => {
+        toast.success('Stripe Sync uninstallation started')
+        setShowUninstallModal(false)
+        setIsUninstallInitiated(true)
+      },
+    })
+
+  const handleUninstall = useCallback(() => {
+    if (!project?.ref) return
+    uninstallStripeSync({ projectRef: project.ref, startTime: Date.now() })
+  }, [project?.ref, uninstallStripeSync])
+
+  return (
+    <>
+      <div className={cn('flex gap-x-2 justify-end', className)}>
+        {upgradeAvailable && !uninstallError && !uninstalling && (
+          <ButtonTooltip
+            type="primary"
+            onClick={() => setShouldShowInstallSheet(true)}
+            disabled={disabled}
+            loading={installing}
+            tooltip={{
+              content: {
+                text: !canManageSecrets
+                  ? 'You need additional permissions to upgrade the Stripe Sync Engine.'
+                  : undefined,
+              },
+            }}
+          >
+            Upgrade integration
+          </ButtonTooltip>
+        )}
+        <ButtonTooltip
+          type="default"
+          onClick={() => setShowUninstallModal(true)}
+          disabled={disabled}
+          loading={uninstalling}
+          tooltip={{
+            content: {
+              text: !canManageSecrets
+                ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
+                : undefined,
+            },
+          }}
+        >
+          {uninstallError ? 'Retry uninstallation' : 'Uninstall integration'}
+        </ButtonTooltip>
+      </div>
+      <ConfirmationModal
+        visible={showUninstallModal}
+        title="Uninstall Stripe Sync Engine"
+        confirmLabel="Uninstall"
+        confirmLabelLoading="Uninstalling..."
+        variant="destructive"
+        loading={isUninstallRequested}
+        onCancel={() => setShowUninstallModal(false)}
+        onConfirm={handleUninstall}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to uninstall the Stripe Sync Engine? This will:
+        </p>
+        <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
+          <li>
+            Remove the <code className="text-code-inline">stripe</code> schema and all tables
+          </li>
+          <li>Delete all synced Stripe data</li>
+          <li>Remove the associated Edge Functions</li>
+          <li>Remove the scheduled sync jobs</li>
+        </ul>
+        <p className="mt-4 text-sm text-foreground-light font-medium">
+          This action cannot be undone.
+        </p>
+      </ConfirmationModal>
+    </>
+  )
+}
+
+export const StripeSyncEngineOverviewTab = () => {
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
   const { data: project } = useSelectedProjectQuery()
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
-  const [showUninstallModal, setShowUninstallModal] = useState(false)
   // These flags bridge the gap between mutation success and schema update
   const [isInstallInitiated, setIsInstallInitiated] = useState(false)
   const [isUninstallInitiated, setIsUninstallInitiated] = useState(false)
@@ -73,10 +185,7 @@ export const StripeSyncInstallationPage = () => {
     schemaComment: { status: installationStatus },
     latestAvailableVersion,
     timedOut,
-  } = useStripeSyncStatus({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useStripeSyncStatus()
 
   // Check permissions for managing function secrets
   const { can: canManageSecrets } = useAsyncCheckPermissions(
@@ -128,7 +237,6 @@ export const StripeSyncInstallationPage = () => {
     useStripeSyncUninstallMutation({
       onSuccess: () => {
         toast.success('Stripe Sync uninstallation started')
-        setShowUninstallModal(false)
         setIsUninstallInitiated(true)
       },
     })
@@ -201,6 +309,34 @@ export const StripeSyncInstallationPage = () => {
     }
   }, [isUninstallInitiated, uninstallDone])
 
+  if (isMarketplaceEnabled) {
+    return (
+      <IntegrationOverviewTabV2>
+        <div className="flex items-center justify-between">
+          <StatusDisplay
+            status={installationStatus}
+            isInstallRequested={isInstallRequested}
+            isInstallInitiated={isInstallInitiated}
+            isUninstallRequested={isUninstallRequested}
+            isUninstallInitiated={isUninstallInitiated}
+            isUpgrade={upgradeAvailable}
+            timedOut={timedOut}
+          />
+          {(installed || uninstalling || uninstallError) && (
+            <UpgradeUninstallButtons
+              disabled={installing || uninstalling || !canManageSecrets}
+              upgradeAvailable={upgradeAvailable}
+              installing={installing}
+              uninstalling={uninstalling}
+              setShouldShowInstallSheet={setShouldShowInstallSheet}
+              setIsUninstallInitiated={setIsUninstallInitiated}
+            />
+          )}
+        </div>
+      </IntegrationOverviewTabV2>
+    )
+  }
+
   return (
     <IntegrationOverviewTab
       alert={
@@ -270,40 +406,15 @@ export const StripeSyncInstallationPage = () => {
               installationStatus={installationStatus}
               isUpgrade={upgradeAvailable}
             />
-            <div className="flex gap-x-2 justify-end mt-4">
-              {upgradeAvailable && !uninstallError && !uninstalling && (
-                <ButtonTooltip
-                  type="primary"
-                  onClick={() => setShouldShowInstallSheet(true)}
-                  disabled={installing || !canManageSecrets}
-                  loading={installing}
-                  tooltip={{
-                    content: {
-                      text: !canManageSecrets
-                        ? 'You need additional permissions to upgrade the Stripe Sync Engine.'
-                        : undefined,
-                    },
-                  }}
-                >
-                  Upgrade integration
-                </ButtonTooltip>
-              )}
-              <ButtonTooltip
-                type="default"
-                onClick={() => setShowUninstallModal(true)}
-                disabled={installing || uninstalling || !canManageSecrets}
-                loading={uninstalling}
-                tooltip={{
-                  content: {
-                    text: !canManageSecrets
-                      ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
-                      : undefined,
-                  },
-                }}
-              >
-                {uninstallError ? 'Retry uninstallation' : 'Uninstall integration'}
-              </ButtonTooltip>
-            </div>
+            <UpgradeUninstallButtons
+              className="mt-4"
+              disabled={installing || uninstalling || !canManageSecrets}
+              upgradeAvailable={upgradeAvailable}
+              installing={installing}
+              uninstalling={uninstalling}
+              setShouldShowInstallSheet={setShouldShowInstallSheet}
+              setIsUninstallInitiated={setIsUninstallInitiated}
+            />
           </>
         ) : null
       }
@@ -422,32 +533,6 @@ export const StripeSyncInstallationPage = () => {
           </Form_Shadcn_>
         </SheetContent>
       </Sheet>
-
-      <ConfirmationModal
-        visible={showUninstallModal}
-        title="Uninstall Stripe Sync Engine"
-        confirmLabel="Uninstall"
-        confirmLabelLoading="Uninstalling..."
-        variant="destructive"
-        loading={isUninstallRequested}
-        onCancel={() => setShowUninstallModal(false)}
-        onConfirm={handleUninstall}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to uninstall the Stripe Sync Engine? This will:
-        </p>
-        <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
-          <li>
-            Remove the <code className="text-code-inline">stripe</code> schema and all tables
-          </li>
-          <li>Delete all synced Stripe data</li>
-          <li>Remove the associated Edge Functions</li>
-          <li>Remove the scheduled sync jobs</li>
-        </ul>
-        <p className="mt-4 text-sm text-foreground-light font-medium">
-          This action cannot be undone.
-        </p>
-      </ConfirmationModal>
     </IntegrationOverviewTab>
   )
 }

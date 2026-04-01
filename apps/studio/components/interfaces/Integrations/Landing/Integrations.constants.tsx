@@ -1,7 +1,12 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
+import { stripeSyncKeys } from 'data/database-integrations/stripe/keys'
+import { installStripeSync } from 'data/database-integrations/stripe/stripe-sync-install-mutation'
+import { databaseKeys } from 'data/database/keys'
+import { useTrack } from 'lib/telemetry/track'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
+import { snakeCase } from 'node_modules/@types/lodash'
 import { ComponentType, ReactNode } from 'react'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -23,7 +28,7 @@ export type Navigation = {
 }
 
 // [Joshen] Basing this on template.json for now
-type IntegrationInputs = {
+export type IntegrationInputs = {
   [key: string]: {
     label: string
     type: 'text' | 'number' | 'password'
@@ -68,10 +73,14 @@ export type IntegrationDefinition = {
     childId: string | undefined
   }) => ComponentType<{}> | null
 
-  /** SQL query for installing the entire integration */
+  /** For showing the SQL query in the installation sheet */
   installationSql?: string
   /** Custom command to install the integration (if any - none atm) */
-  installationCommand?: (props: { ref: string }) => Promise<void>
+  installationCommand?: (props: {
+    ref: string
+    track?: ReturnType<typeof useTrack>
+    [key: string]: unknown
+  }) => Promise<void>
 
   /** Inputs for template integrations */
   inputs?: IntegrationInputs
@@ -507,8 +516,8 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
-                (mod) => mod.IntegrationOverviewTabV2
+              import('components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
+                (mod) => mod.StripeSyncEngineOverviewTab
               ),
             { loading: Loading }
           )
@@ -548,6 +557,22 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       { label: 'Deploys Edge Functions to handle incoming webhooks from Stripe' },
       { label: 'Schedules automatic Stripe data syncs using Supabase Queues' },
     ],
+    installationCommand: async ({ ref: projectRef, track, stripe_api_key }) => {
+      const startTime = Date.now()
+      await installStripeSync({ projectRef, startTime, stripeSecretKey: stripe_api_key as string })
+
+      if (track) track('integration_install_submitted', { integrationName: 'stripe_sync_engine' })
+
+      const queryClient = getQueryClient()
+      // Invalidate schemas query to refresh installation status
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
+      // Also invalidate any stripe sync related queries
+      await queryClient.invalidateQueries({ queryKey: stripeSyncKeys.all })
+    },
+
+    // trackProgress: () => {
+    //   await queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
+    // }
   },
 ]
 

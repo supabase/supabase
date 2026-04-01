@@ -102,11 +102,15 @@ export const InstallationOverview = ({
                   <div key={extName} className="py-3 px-4 flex items-center justify-between">
                     <code className="text-xs">{extName}</code>
                     {!ext ? (
-                      <Badge>Unavailable</Badge>
+                      <Badge variant="warning">Unavailable</Badge>
                     ) : ext.installed_version ? (
-                      <Badge>Installed</Badge>
+                      <Badge variant="secondary" className="text-foreground-lighter">
+                        Installed
+                      </Badge>
                     ) : (
-                      <Badge>Required</Badge>
+                      <Badge variant="default" className="text-foreground">
+                        Required
+                      </Badge>
                     )}
                   </div>
                 )
