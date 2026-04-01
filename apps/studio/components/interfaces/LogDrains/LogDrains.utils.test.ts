@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  HEADER_VALIDATION_ERRORS,
   getDefaultHeadersByType,
   getHeadersSectionDescription,
+  HEADER_VALIDATION_ERRORS,
   headerRecordToRows,
   headerRowsToRecord,
   logDrainHeaderEntriesSchema,
