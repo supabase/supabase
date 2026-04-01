@@ -103,13 +103,6 @@ const codexAddServerStep: StepDefinition = {
   content: 'steps/mcp/codex/add-server',
 }
 
-const codexEnableRemoteStep: StepDefinition = {
-  id: 'codex-enable-remote',
-  title: 'Enable remote MCP client support',
-  description: 'Add this to your ~/.codex/config.toml file.',
-  content: 'steps/mcp/codex/enable-remote',
-}
-
 const codexAuthenticateStep: StepDefinition = {
   id: 'codex-authenticate',
   title: 'Authenticate',
@@ -348,7 +341,6 @@ export const connectSchema: ConnectSchema = {
         mcpClient: {
           codex: [
             codexAddServerStep,
-            codexEnableRemoteStep,
             codexAuthenticateStep,
             codexVerifyStep,
             skillsInstallStep,
