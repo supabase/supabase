@@ -30,6 +30,7 @@ const MobileHeader = ({
   from?: boolean
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
+  isAuthenticated?: boolean
 }) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -73,7 +74,11 @@ const MobileHeader = ({
       ) : (
         <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
-            href={selectedPlan.href}
+            href={
+              !isAuthenticated && selectedPlan.planId !== 'enterprise'
+                ? `https://supabase.com/dashboard/sign-up?plan=${selectedPlan.planId}`
+                : selectedPlan.href
+            }
             onClick={() =>
               sendTelemetryEvent({
                 action: 'www_pricing_plan_cta_clicked',
@@ -97,11 +102,13 @@ const MobileHeader = ({
 interface PricingComparisonTableProps {
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
+  isAuthenticated?: boolean
 }
 
 const PricingComparisonTable = ({
   organizations,
   hasExistingOrganizations,
+  isAuthenticated = false,
 }: PricingComparisonTableProps) => {
   const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
 
@@ -202,6 +209,7 @@ const PricingComparisonTable = ({
               description={'Everything you need to scale your project into production'}
               organizations={organizations}
               hasExistingOrganizations={hasExistingOrganizations}
+              isAuthenticated={isAuthenticated}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -256,6 +264,7 @@ const PricingComparisonTable = ({
               description={'Collaborate with different permissions and access patterns'}
               organizations={organizations}
               hasExistingOrganizations={hasExistingOrganizations}
+              isAuthenticated={isAuthenticated}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -428,7 +437,11 @@ const PricingComparisonTable = ({
                             block
                           >
                             <Link
-                              href={plan.href}
+                              href={
+                                !isAuthenticated && plan.planId !== 'enterprise'
+                                  ? `https://supabase.com/dashboard/sign-up?plan=${plan.planId}`
+                                  : plan.href
+                              }
                               onClick={() =>
                                 sendTelemetryEvent({
                                   action: 'www_pricing_plan_cta_clicked',

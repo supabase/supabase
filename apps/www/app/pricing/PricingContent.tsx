@@ -54,7 +54,7 @@ export default function PricingContent() {
     }
   }, [pathname])
 
-  const { isLoading, organizations } = useOrganizations()
+  const { isLoading, organizations, isAuthenticated } = useOrganizations()
   const hasExistingOrganizations = !isLoading && organizations.length > 0
 
   // Pricing value/flexibility A/B experiment
@@ -111,6 +111,7 @@ export default function PricingContent() {
       <PricingPlans
         organizations={organizations}
         hasExistingOrganizations={hasExistingOrganizations}
+        isAuthenticated={isAuthenticated}
         experimentVariant={isInExperiment ? (flagValue as PricingPageExperimentVariant) : undefined}
       />
 
@@ -182,6 +183,7 @@ export default function PricingContent() {
       <PricingComparisonTable
         organizations={organizations}
         hasExistingOrganizations={hasExistingOrganizations}
+        isAuthenticated={isAuthenticated}
       />
 
       <div id="faq" className="border-t">

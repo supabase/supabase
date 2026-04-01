@@ -13,12 +13,14 @@ import UpgradePlan from './UpgradePlan'
 interface PricingPlansProps {
   organizations?: Organization[]
   hasExistingOrganizations?: boolean
+  isAuthenticated?: boolean
   experimentVariant?: PricingPageExperimentVariant
 }
 
 const PricingPlans = ({
   organizations,
   hasExistingOrganizations,
+  isAuthenticated = false,
   experimentVariant,
 }: PricingPlansProps) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -116,7 +118,14 @@ const PricingPlans = ({
                       type={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
-                      <Link href={plan.href} onClick={sendPricingEvent}>
+                      <Link
+                        href={
+                          !isAuthenticated && plan.planId !== 'enterprise'
+                            ? `https://supabase.com/dashboard/sign-up?plan=${plan.planId}`
+                            : plan.href
+                        }
+                        onClick={sendPricingEvent}
+                      >
                         {plan.cta}
                       </Link>
                     </Button>

@@ -9,6 +9,7 @@ export type Organization = components['schemas']['OrganizationResponse']
 export function useOrganizations() {
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -26,11 +27,12 @@ export function useOrganizations() {
       .then((data) => {
         if (isMounted) {
           setOrganizations(data)
+          setIsAuthenticated(true)
           setIsLoading(false)
         }
       })
       .catch(() => {
-        // eat all errors
+        // eat all errors — isAuthenticated stays false
         setIsLoading(false)
       })
 
@@ -43,5 +45,6 @@ export function useOrganizations() {
   return {
     organizations,
     isLoading,
+    isAuthenticated,
   } as const
 }
