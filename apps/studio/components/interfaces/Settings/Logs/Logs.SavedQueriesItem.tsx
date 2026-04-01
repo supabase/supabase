@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { SqlEditor } from 'icons'
 import { Edit, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -11,6 +9,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
 import { LogsSidebarItem } from './SidebarV2/SidebarItem'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 
 interface SavedQueriesItemProps {
   item: {

@@ -1,4 +1,3 @@
-import type { OrganizationMembersData } from 'data/organizations/organization-members-query'
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
@@ -12,6 +11,7 @@ import {
   parseCommaSeparatedCidrs,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
+import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
 
 describe('jitDbAccess.utils', () => {
   it('returns empty expiry string for never/custom-only fallback modes', () => {

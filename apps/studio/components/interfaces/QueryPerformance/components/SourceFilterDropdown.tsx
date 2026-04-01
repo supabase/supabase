@@ -1,4 +1,4 @@
-import { FilterPopover } from 'components/ui/FilterPopover'
+import { FilterPopover } from '@/components/ui/FilterPopover'
 
 interface SourceFilterDropdownProps {
   activeOptions: string[]

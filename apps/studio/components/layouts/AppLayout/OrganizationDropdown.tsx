@@ -1,7 +1,4 @@
 import { useParams } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Boxes } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -11,6 +8,9 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { OrganizationDropdownCommandContent } from './OrganizationDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface OrganizationDropdownProps {
   embedded?: boolean

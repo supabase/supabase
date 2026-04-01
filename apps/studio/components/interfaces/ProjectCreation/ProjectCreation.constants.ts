@@ -1,4 +1,4 @@
-import { DesiredInstanceSize } from 'data/projects/new-project.constants'
+import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 
 // [Joshen] Obtained from https://gist.github.com/tadast/8827699
 export const COUNTRY_LAT_LON = {

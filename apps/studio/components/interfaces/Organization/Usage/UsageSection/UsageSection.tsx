@@ -1,13 +1,13 @@
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import { DataPoint } from 'data/analytics/constants'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
 import { DiskUsage } from './DiskUsage'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { DataPoint } from '@/data/analytics/constants'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 
 export interface ChartMeta {
   [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }

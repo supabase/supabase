@@ -2,7 +2,7 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import type { PropsWithChildren } from 'react'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 
-import type { ResponseError } from 'types'
+import type { ResponseError } from '@/types'
 
 type TableKey = `${string}.${string}`
 

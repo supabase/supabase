@@ -1,20 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { setValueAsNullableNumber } from 'components/ui/Forms/Form.constants'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { usePgbouncerConfigurationUpdateMutation } from 'data/database/pgbouncer-config-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { capitalize } from 'lodash'
 import Link from 'next/link'
 import { Fragment, useEffect } from 'react'
@@ -49,12 +35,32 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { setValueAsNullableNumber } from '@/components/ui/Forms/Form.constants'
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbouncer-config-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const formId = 'pooling-configuration-form'
 
 const PoolingConfigurationFormSchema = z.object({
-  default_pool_size: z.number().nullable(),
-  max_client_conn: z.number().nullable(),
+  default_pool_size: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
+    z.coerce.number().optional()
+  ),
+  max_client_conn: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : val),
+    z.coerce.number().optional()
+  ),
 })
 
 /**
@@ -105,7 +111,7 @@ export const ConnectionPooling = () => {
     resolver: zodResolver(PoolingConfigurationFormSchema),
     defaultValues: {
       default_pool_size: undefined,
-      max_client_conn: null,
+      max_client_conn: undefined,
     },
   })
   const { default_pool_size } = form.watch()
@@ -267,11 +273,15 @@ export const ConnectionPooling = () => {
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={field.value || ''}
+                                value={field.value ?? ''}
                                 placeholder={defaultPoolSize.toString()}
-                                {...form.register('default_pool_size', {
-                                  setValueAs: setValueAsNullableNumber,
-                                })}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
                               />
                             </InputGroup>
                           </FormControl_Shadcn_>
@@ -296,6 +306,7 @@ export const ConnectionPooling = () => {
 
                     <FormField_Shadcn_
                       control={form.control}
+                      disabled
                       name="max_client_conn"
                       render={({ field }) => (
                         <FormItemLayout
@@ -326,12 +337,15 @@ export const ConnectionPooling = () => {
                                 {...field}
                                 type="number"
                                 className="w-full"
-                                value={pgbouncerConfig?.max_client_conn || ''}
-                                disabled={true}
+                                value={pgbouncerConfig?.max_client_conn ?? ''}
                                 placeholder={defaultMaxClientConn.toString()}
-                                {...form.register('max_client_conn', {
-                                  setValueAs: setValueAsNullableNumber,
-                                })}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
                               />
                             </InputGroup>
                           </FormControl_Shadcn_>

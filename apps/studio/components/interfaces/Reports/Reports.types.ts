@@ -1,4 +1,4 @@
-import type { ResponseError } from 'types'
+import type { ResponseError } from '@/types'
 
 export enum Presets {
   API = 'api',

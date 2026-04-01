@@ -1,7 +1,8 @@
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface UpgradeDatabaseAlertProps {
   minimumVersion?: string

@@ -1,5 +1,6 @@
-import { Markdown } from 'components/interfaces/Markdown'
 import { useEffect, useState } from 'react'
+
+import { Markdown } from '@/components/interfaces/Markdown'
 
 interface MarkdownContentProps {
   content: string | null | undefined

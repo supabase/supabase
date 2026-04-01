@@ -1,24 +1,24 @@
 import Editor from '@monaco-editor/react'
+import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
+import { Button } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useParams } from 'common'
-import { Footer } from 'components/grid/components/footer/Footer'
-import { useTableDefinitionQuery } from 'data/database/table-definition-query'
-import { useViewDefinitionQuery } from 'data/database/view-definition-query'
+import { Footer } from '@/components/grid/components/footer/Footer'
+import { useTableDefinitionQuery } from '@/data/database/table-definition-query'
+import { useViewDefinitionQuery } from '@/data/database/view-definition-query'
 import {
   Entity,
   isMaterializedView,
   isTableLike,
   isView,
   isViewLike,
-} from 'data/table-editor/table-editor-types'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
-import { timeout } from 'lib/helpers'
-import { Button } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
+import { timeout } from '@/lib/helpers'
 
 export interface TableDefinitionProps {
   entity?: Entity

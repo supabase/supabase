@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit, MoreVertical, Trash } from 'lucide-react'
-
-import CopyButton from 'components/ui/CopyButton'
-import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   DropdownMenu,
@@ -18,6 +14,10 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
+import CopyButton from '@/components/ui/CopyButton'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export interface OAuthAppRowProps {
   app: OAuthApp

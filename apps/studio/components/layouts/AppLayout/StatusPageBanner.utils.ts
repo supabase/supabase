@@ -1,4 +1,4 @@
-import type { IncidentCache } from 'lib/api/incident-status'
+import type { IncidentCache } from '@/lib/api/incident-status'
 
 type BannerIncident = { id: string; cache?: IncidentCache | null }
 

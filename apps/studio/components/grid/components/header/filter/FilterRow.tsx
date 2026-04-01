@@ -1,11 +1,11 @@
 import { ChevronDown, X } from 'lucide-react'
 import { KeyboardEvent, memo } from 'react'
-
-import { DropdownControl } from 'components/grid/components/common/DropdownControl'
-import type { Filter, FilterOperator } from 'components/grid/types'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, Input } from 'ui'
+
 import { FilterOperatorOptions } from './Filter.constants'
+import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
+import type { Filter, FilterOperator } from '@/components/grid/types'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterRowProps {
   filterIdx: number

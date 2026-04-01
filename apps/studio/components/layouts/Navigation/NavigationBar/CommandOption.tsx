@@ -1,8 +1,8 @@
 import { Command } from 'lucide-react'
 import { ReactNode } from 'react'
-
-import { detectOS } from 'lib/helpers'
 import { cn } from 'ui'
+
+import { detectOS } from '@/lib/helpers'
 
 interface CommandOptionProps {
   icon: ReactNode
