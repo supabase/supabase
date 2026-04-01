@@ -1331,7 +1331,7 @@ parameters:
     title: 'auth.mfa.totp.enroll_enabled'
     tags: ['auth']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Enable TOTP enrollment for multi-factor authentication.
     links:
@@ -1342,7 +1342,7 @@ parameters:
     title: 'auth.mfa.totp.verify_enabled'
     tags: ['auth']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Enable TOTP verification for multi-factor authentication.
     links:
