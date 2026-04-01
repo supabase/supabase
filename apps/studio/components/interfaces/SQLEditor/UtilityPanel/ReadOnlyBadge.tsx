@@ -1,6 +1,7 @@
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Badge } from 'ui'
+
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type ReadOnlyBadgeProps = { id: string }
 const ReadOnlyBadge = ({ id }: ReadOnlyBadgeProps) => {

@@ -1,6 +1,3 @@
-import AlertError from 'components/ui/AlertError'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
@@ -10,6 +7,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import AlertError from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 const CATEGORIES = [

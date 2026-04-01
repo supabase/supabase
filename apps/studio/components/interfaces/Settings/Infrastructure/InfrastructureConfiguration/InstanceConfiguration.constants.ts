@@ -1,9 +1,9 @@
 import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
-
-import { components } from 'data/api'
-import { PROJECT_STATUS } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
+
+import { components } from '@/data/api'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface Region {
   key: AWS_REGIONS_KEYS

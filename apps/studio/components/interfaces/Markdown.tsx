@@ -1,9 +1,9 @@
-import { InlineLink } from 'components/ui/InlineLink'
 import { PropsWithChildren } from 'react'
 import { ReactMarkdown, ReactMarkdownOptions } from 'react-markdown/lib/react-markdown'
 import remarkGfm from 'remark-gfm'
-
 import { cn } from 'ui'
+
+import { InlineLink } from '@/components/ui/InlineLink'
 
 interface MarkdownProps extends Omit<ReactMarkdownOptions, 'children' | 'node'> {
   className?: string

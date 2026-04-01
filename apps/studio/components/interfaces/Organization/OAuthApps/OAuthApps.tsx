@@ -1,13 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import NoPermission from 'components/ui/NoPermission'
-import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
-import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Check, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
@@ -39,6 +31,14 @@ import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'
 import { PublishAppSidePanel } from './PublishAppSidePanel'
 import { RevokeAppModal } from './RevokeAppModal'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { AuthorizedApp, useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
+import { OAuthApp, useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs

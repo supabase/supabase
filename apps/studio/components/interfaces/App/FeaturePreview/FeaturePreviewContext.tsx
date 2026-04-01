@@ -1,5 +1,4 @@
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { EMPTY_OBJ } from 'lib/void'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -14,6 +13,7 @@ import {
 
 import { useFeaturePreviews } from './useFeaturePreviews'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }

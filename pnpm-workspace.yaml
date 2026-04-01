@@ -6,10 +6,10 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.100.0
-  '@supabase/postgrest-js': 2.100.0
-  '@supabase/realtime-js': 2.100.0
-  '@supabase/supabase-js': 2.100.0
+  '@supabase/auth-js': 2.101.0
+  '@supabase/postgrest-js': 2.101.0
+  '@supabase/realtime-js': 2.101.0
+  '@supabase/supabase-js': 2.101.0
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
@@ -21,7 +21,7 @@ catalog:
   recharts: ^2.15.4
   tailwindcss: 3.4.1
   tsx: 4.20.3
-  typescript: ~5.9.0
+  typescript: ~6.0.0
   valtio: ^1.12.0
   vite: ^7.3.1
   vitest: ^3.2.0
@@ -50,6 +50,8 @@ minimumReleaseAgeExclude:
   - next
   - '@next/*'
   - h3
+  - typescript
+  - stripe-experiment-sync
 
 onlyBuiltDependencies:
   - node-pty

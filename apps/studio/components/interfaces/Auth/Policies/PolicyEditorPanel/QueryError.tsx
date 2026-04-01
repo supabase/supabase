@@ -1,17 +1,17 @@
+import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
-
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
-import { QueryResponseError } from 'data/sql/execute-sql-mutation'
 import {
-  AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  cn,
 } from 'ui'
+
+import { QueryResponseError } from '@/data/sql/execute-sql-mutation'
 
 export const QueryError = ({
   error,

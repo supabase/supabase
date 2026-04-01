@@ -1,5 +1,6 @@
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { z } from 'zod'
+
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 
 export const FormSchema = z
   .object({

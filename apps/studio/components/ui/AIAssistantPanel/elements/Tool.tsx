@@ -1,5 +1,4 @@
 import type { PropsWithChildren } from 'react'
-
 import {
   cn,
   Collapsible,

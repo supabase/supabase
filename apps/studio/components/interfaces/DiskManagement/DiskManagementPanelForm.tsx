@@ -1,7 +1,5 @@
-import Link from 'next/link'
-
 import { useParams } from 'common'
-import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import { Button } from 'ui'
 import {
   PageSection,
@@ -10,8 +8,10 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
-import { DocsButton } from '../../ui/DocsButton'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { DocsButton } from '../../ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 // [Joshen] Only used for non AWS projects
 export function DiskManagementPanelForm() {
