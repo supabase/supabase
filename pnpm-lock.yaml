@@ -70,7 +70,7 @@ overrides:
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  '@rollup/plugin-terser>serialize-javascript': ^7.0.3
+  '@rollup/plugin-terser>serialize-javascript': ^7.0.5
   '@tanstack/start-server-core': ^1.159.0
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
@@ -83,7 +83,7 @@ overrides:
   pgsql-parser>libpg-query: ^15.2.0
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
-  terser-webpack-plugin>serialize-javascript: ^7.0.3
+  terser-webpack-plugin>serialize-javascript: ^7.0.5
   tmp: ^0.2.4
   webpack: ^5.104.1
 
@@ -16603,8 +16603,8 @@ packages:
   sentence-case@3.0.4:
     resolution: {integrity: sha512-8LS0JInaQMCRoQ7YUytAo/xUu5W2XnQxV2HI/6uM6U7CITS1RqPElr30V6uIqyMKM9lJGRVFy5/4CuzcixNYSg==}
 
-  serialize-javascript@7.0.4:
-    resolution: {integrity: sha512-DuGdB+Po43Q5Jxwpzt1lhyFSYKryqoNjQSA9M92tyw0lyHIOur+XCalOUe0KTJpyqzT8+fQ5A0Jf7vCx/NKmIg==}
+  serialize-javascript@7.0.5:
+    resolution: {integrity: sha512-F4LcB0UqUl1zErq+1nYEEzSHJnIwb3AF2XWB94b+afhrekOUijwooAYqFyRbjYkm2PAKBabx6oYv/xDxNi8IBw==}
     engines: {node: '>=20.0.0'}
 
   seroval-plugins@1.5.0:
@@ -24811,7 +24811,7 @@ snapshots:
 
   '@rollup/plugin-terser@0.4.4(rollup@4.59.0)':
     dependencies:
-      serialize-javascript: 7.0.4
+      serialize-javascript: 7.0.5
       smob: 1.5.0
       terser: 5.39.0
     optionalDependencies:
@@ -35619,7 +35619,7 @@ snapshots:
       tslib: 2.8.1
       upper-case-first: 2.0.2
 
-  serialize-javascript@7.0.4: {}
+  serialize-javascript@7.0.5: {}
 
   seroval-plugins@1.5.0(seroval@1.5.0):
     dependencies:

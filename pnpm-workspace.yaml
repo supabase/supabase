@@ -48,6 +48,7 @@ minimumReleaseAgeExclude:
   # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
   - path-to-regexp
   - brace-expansion
+  - serialize-javascript
 
 onlyBuiltDependencies:
   - node-pty
@@ -59,7 +60,7 @@ overrides:
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  '@rollup/plugin-terser>serialize-javascript': ^7.0.3
+  '@rollup/plugin-terser>serialize-javascript': ^7.0.5
   '@tanstack/start-server-core': ^1.159.0
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
@@ -72,7 +73,7 @@ overrides:
   'pgsql-parser>libpg-query': ^15.2.0
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
-  'terser-webpack-plugin>serialize-javascript': ^7.0.3
+  'terser-webpack-plugin>serialize-javascript': ^7.0.5
   tmp: ^0.2.4
   webpack: ^5.104.1
 
