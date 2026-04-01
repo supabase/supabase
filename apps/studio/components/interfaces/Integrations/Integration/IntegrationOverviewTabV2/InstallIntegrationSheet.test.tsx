@@ -22,7 +22,7 @@ vi.mock('@/hooks/useProtectedSchemas', () => ({
 
 const mockExtensions = vi.fn()
 vi.mock('@/data/database-extensions/database-extensions-query', () => ({
-  useDatabaseExtensionsQuery: () => ({ data: mockExtensions() }),
+  useDatabaseExtensionsQuery: () => ({ data: mockExtensions(), isSuccess: true }),
 }))
 
 vi.mock('@/data/database/schemas-query', () => ({
@@ -72,7 +72,7 @@ describe('InstallIntegrationSheet', () => {
     mockExecuteSql.mockReset()
   })
 
-  it('install button is not disabled when extensions are missing but installationCommand exists', async () => {
+  it('install button is disabled when extensions are missing even if installationCommand exists', async () => {
     mockExtensions.mockReturnValue([])
 
     customRender(
@@ -84,7 +84,7 @@ describe('InstallIntegrationSheet', () => {
     )
 
     await userEvent.click(screen.getByRole('button', { name: 'Install integration' }))
-    expect(getInstallButton()).not.toBeDisabled()
+    expect(getInstallButton()).toBeDisabled()
   })
 
   it('install button is disabled when extensions are missing and no installationCommand', async () => {
