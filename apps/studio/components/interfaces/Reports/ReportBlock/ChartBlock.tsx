@@ -176,6 +176,15 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
+  const maxDataValue = data.length > 0
+    ? Math.max(...data.map((d: any) => Number(d[metricLabel]) || 0))
+    : 0
+  const yAxisWidth = effectiveLogScale
+    ? 52
+    : isPercentage
+      ? 36
+      : Math.max(36, (String(Math.round(maxDataValue)).length + 1) * 7)
+
   const getInitialHighlightedValue = useCallback(() => {
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
@@ -301,13 +310,12 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={effectiveLogScale ? 52 : undefined}
+                  width={yAxisWidth}
                   tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />
@@ -329,13 +337,12 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={effectiveLogScale ? 52 : undefined}
+                  width={yAxisWidth}
                   tickFormatter={effectiveLogScale ? formatLogTick : undefined}
                 />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[200px]"
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />
