@@ -61,8 +61,10 @@ export const BillingCustomerData = () => {
     isSuccess: loadedTaxId,
   } = useOrganizationTaxIdQuery({ slug })
 
-  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
-  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation({ onError: () => {} })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const addressElementRef = useRef<StripeAddressElement | null>(null)
@@ -85,13 +87,27 @@ export const BillingCustomerData = () => {
       setIsSubmitting(true)
 
       try {
-        await updateCustomerProfile({
-          slug,
-          address: data.address,
-          billing_name: data.billing_name,
-        })
+        try {
+          await updateCustomerProfile({
+            slug,
+            address: data.address,
+            billing_name: data.billing_name,
+          })
+        } catch (error) {
+          toast.error(
+            `Failed updating billing address: ${error instanceof Error ? error.message : 'Unknown error'}`
+          )
+          throw error
+        }
 
-        await updateTaxId({ slug, taxId: data.tax_id })
+        try {
+          await updateTaxId({ slug, taxId: data.tax_id })
+        } catch (error) {
+          toast.error(
+            `Failed updating tax ID: ${error instanceof Error ? error.message : 'Unknown error'}`
+          )
+          throw error
+        }
 
         toast.success('Successfully updated billing data')
 
@@ -104,14 +120,11 @@ export const BillingCustomerData = () => {
             )
           }
         )
-
-        setIsSubmitting(false)
-      } catch (error) {
-        toast.error(
-          `Failed updating billing data: ${error instanceof Error ? error.message : 'Unknown error'}`
-        )
-        setIsSubmitting(false)
+      }
+      catch (error) {
         throw error
+      } finally {
+        setIsSubmitting(false)
       }
     },
   })

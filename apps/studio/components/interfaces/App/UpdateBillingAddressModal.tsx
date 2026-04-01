@@ -92,8 +92,10 @@ export function UpdateBillingAddressModal() {
   const open =
     shouldShow && !dismissed && (!canManageBillingAddress || (!profileError && !taxIdError))
 
-  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
-  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation({ onError: () => {} })
 
   const {
     form,
@@ -113,21 +115,28 @@ export function UpdateBillingAddressModal() {
       setIsSubmitting(true)
 
       try {
-        await updateCustomerProfile({
-          slug,
-          address: data.address,
-          billing_name: data.billing_name,
-        })
+        try {
+          await updateCustomerProfile({
+            slug,
+            address: data.address,
+            billing_name: data.billing_name,
+          })
+        } catch (error: any) {
+          toast.error(`Failed to update billing address: ${error.message}`)
+          throw error
+        }
 
-        await updateTaxId({ slug, taxId: data.tax_id })
+        try {
+          await updateTaxId({ slug, taxId: data.tax_id })
+        } catch (error: any) {
+          toast.error(`Failed to update tax ID: ${error.message}`)
+          throw error
+        }
 
         await invalidateOrganizationsQuery(queryClient)
 
         toast.success('Successfully updated billing address')
         setDismissed(true)
-      } catch (error: any) {
-        toast.error(`Failed to update billing address: ${error.message}`)
-        throw error
       } finally {
         setIsSubmitting(false)
       }
