@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
-  type EdgeFunctionChartRawDatum,
   formatChartTimestamp,
   formatMetric,
   formatRate,
@@ -18,8 +17,9 @@ import {
   getMemoryTooltipDetail,
   getRollingTimeRange,
   getSegmentedButtonClassName,
-  toEdgeFunctionChartData,
   getUsageMetrics,
+  toEdgeFunctionChartData,
+  type EdgeFunctionChartRawDatum,
 } from './EdgeFunctionOverview.utils'
 
 describe('EdgeFunctionOverview.utils', () => {

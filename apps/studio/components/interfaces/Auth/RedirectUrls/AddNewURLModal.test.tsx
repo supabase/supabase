@@ -1,9 +1,8 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from 'sonner'
-
 import { render } from 'tests/helpers'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AddNewURLModal } from './AddNewURLModal'
 
