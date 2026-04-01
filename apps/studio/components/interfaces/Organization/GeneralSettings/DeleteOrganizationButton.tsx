@@ -1,20 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
-import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 
 import { DeleteOrganizationButtonListAck } from './DeleteOrganizationButton.ListAck'
 import { DeleteOrganizationButtonSingleAck } from './DeleteOrganizationButton.SingleAck'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
 
@@ -34,10 +32,10 @@ export const DeleteOrganizationButton = () => {
     isFetching,
     isError,
   } = useOrgProjectsInfiniteQuery(
-    { 
+    {
       slug: orgSlug,
       limit: MAX_PROJECT_ACKNOWLEDGEMENTS + 1,
-     },
+    },
     {
       enabled: isOpen,
       refetchOnMount: 'always',
@@ -49,8 +47,7 @@ export const DeleteOrganizationButton = () => {
   // rather than as "no projects". This avoids interpreting lack of data as
   // an empty list, which could allow deletion to proceed without any project
   // acknowledgement.
-  const isProjectsDataPending =
-    orgSlug !== undefined && projectsData === undefined && !isError
+  const isProjectsDataPending = orgSlug !== undefined && projectsData === undefined && !isError
 
   const projects =
     !isProjectsDataPending && projectsData !== undefined
@@ -58,12 +55,9 @@ export const DeleteOrganizationButton = () => {
       : undefined
 
   const shouldRenderChecklist =
-    projects !== undefined &&
-    projects.length > 0 &&
-    projects.length <= MAX_PROJECT_ACKNOWLEDGEMENTS
+    projects !== undefined && projects.length > 0 && projects.length <= MAX_PROJECT_ACKNOWLEDGEMENTS
 
-  const exceedsLimit =
-    projects !== undefined && projects.length > MAX_PROJECT_ACKNOWLEDGEMENTS
+  const exceedsLimit = projects !== undefined && projects.length > MAX_PROJECT_ACKNOWLEDGEMENTS
 
   const toggleProject = (ref: string, checked?: boolean | 'indeterminate') => {
     setCheckedProjects((prev) => ({
@@ -195,9 +189,7 @@ export const DeleteOrganizationButton = () => {
 
         {/* Final warning */}
         <p
-          className={`text-sm text-foreground-lighter ${
-            (projects?.length ?? 0) > 0 ? 'mt-4' : ''
-          }`}
+          className={`text-sm text-foreground-lighter ${(projects?.length ?? 0) > 0 ? 'mt-4' : ''}`}
         >
           This action <span className="text-foreground">cannot</span> be undone. This will
           permanently delete the <span className="text-foreground">{orgName}</span> organization and

@@ -1,6 +1,6 @@
-import { Checkbox_Shadcn_ } from 'ui'
 import { getComputeSize } from 'data/projects/org-projects-infinite-query'
 import type { OrgProject } from 'data/projects/org-projects-infinite-query'
+import { Checkbox_Shadcn_ } from 'ui'
 
 type Props = {
   projects: OrgProject[]
