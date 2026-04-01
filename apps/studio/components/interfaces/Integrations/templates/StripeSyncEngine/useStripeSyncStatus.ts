@@ -1,5 +1,3 @@
-import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
-import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
 import { useEffect } from 'react'
 import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
@@ -10,6 +8,8 @@ import {
   isInstalled,
   type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { useStripeSyncingState } from '@/data/database-integrations/stripe/sync-state-query'
+import { SchemasVariables, useSchemasQuery } from '@/data/database/schemas-query'
 
 // Maximum time allowed for installation or uninstallation operations before the UI times out
 const OPERATION_TIME_OUT_MS: number = 5 * 60 * 1000 // 5 minutes

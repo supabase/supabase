@@ -1,6 +1,4 @@
-import { Markdown } from 'components/interfaces/Markdown'
 import { format } from 'date-fns'
-import { BASE_PATH } from 'lib/constants'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
 import { type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
@@ -10,10 +8,12 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  PrePostTab,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -29,6 +29,8 @@ import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Enum } from './AuthProvidersForm.types'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { BASE_PATH } from '@/lib/constants'
 
 interface FormFieldProps {
   projectRef: string | undefined
@@ -157,33 +159,10 @@ const FormField = ({
                   }
                 >
                   <FormControl_Shadcn_ className="col-span-6">
-                    {properties.units ? (
-                      <PrePostTab
-                        postTab={
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {properties.units}
-                          </ReactMarkdown>
-                        }
-                        className="w-full"
-                      >
-                        <DataInput
-                          {...field}
-                          type={properties.isSecret ? 'password' : 'text'}
-                          id={name}
-                          size="small"
-                          copy
-                          reveal
-                        />
-                      </PrePostTab>
+                    {properties.isSecret ? (
+                      <DataInput {...field} id={name} size="small" copy reveal />
                     ) : (
-                      <DataInput
-                        {...field}
-                        type={properties.isSecret ? 'password' : 'text'}
-                        id={name}
-                        size="small"
-                        copy
-                        reveal
-                      />
+                      <Input_Shadcn_ {...field} id={name} />
                     )}
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -249,21 +228,19 @@ const FormField = ({
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
-                      <PrePostTab
-                        postTab={
+                      <InputGroup>
+                        <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                             {properties.units}
                           </ReactMarkdown>
-                        }
-                        className="w-full"
-                      >
-                        <Input_Shadcn_
+                        </InputGroupAddon>
+                        <InputGroupInput
                           {...field}
                           id={name}
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                      </PrePostTab>
+                      </InputGroup>
                     ) : (
                       <Input_Shadcn_
                         {...field}

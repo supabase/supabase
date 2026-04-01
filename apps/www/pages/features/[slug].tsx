@@ -3,16 +3,16 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
+import { Badge, Button, cn } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
-import { Badge, Button, cn, Image } from 'ui'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import PrevNextFeatureNav from '~/components/PrevNextFeatureNav'
-
-import type { FeatureType } from '~/data/features'
-import { features } from '~/data/features'
+import ShareArticleActions from '@/components/Blog/ShareArticleActions'
+import CTABanner from '@/components/CTABanner'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+import PrevNextFeatureNav from '@/components/PrevNextFeatureNav'
+import { features } from '@/data/features'
+import type { FeatureType } from '@/data/features'
 
 interface FeaturePageProps {
   feature: FeatureType

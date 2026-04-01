@@ -1,36 +1,50 @@
 import dayjs from 'dayjs'
-import { has, includes } from 'lodash'
+import { has } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-
-import { DOCS_URL } from 'lib/constants'
-import { tryParseJson } from 'lib/helpers'
 import { Button } from 'ui'
+
 import {
   MAX_TABLE_EDITOR_IMPORT_CSV_SIZE,
   UPLOAD_FILE_EXTENSIONS,
   UPLOAD_FILE_TYPES,
 } from './SpreadsheetImport.constants'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
+import { DOCS_URL } from '@/lib/constants'
+import { isObject, tryParseJson } from '@/lib/helpers'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
-export const parseSpreadsheetText: any = (text: string) => {
-  const columnTypeMap: Record<any, any> = {}
-  let previewRows: any[] = []
+export function parseSpreadsheetText({
+  text,
+  treatEmptyAsNull = false,
+}: {
+  text: string
+  treatEmptyAsNull?: boolean
+}): Promise<{
+  headers: Array<string>
+  rows: Array<unknown>
+  previewRows: Array<unknown>
+  columnTypeMap: Record<string, InferredColumnType>
+  errors: Array<Papa.ParseError & { data: unknown }>
+}> {
+  const columnTypeMap: Record<string, InferredColumnType> = {}
+  let previewRows: unknown[] = []
   return new Promise((resolve) => {
     Papa.parse(text, {
       header: true,
       dynamicTyping: false,
       skipEmptyLines: true,
+      transform: treatEmptyAsNull ? (value: string) => (value === '' ? null : value) : undefined,
       complete: (results) => {
         const headers = results.meta.fields || []
         const rows = results.data
-        const errors = results.errors
+        const errors = results.errors.map((error) => ({ ...error, data: results.data[error.row] }))
 
         headers.forEach((header) => {
-          const type = inferColumnType(header, results.data as any[])
+          const type = inferColumnType(header, results.data)
           if (!has(columnTypeMap, header)) {
             columnTypeMap[header] = type
           } else if (columnTypeMap[header] !== type) {
@@ -52,15 +66,21 @@ export const parseSpreadsheetText: any = (text: string) => {
  */
 export const parseSpreadsheet = (
   file: File,
-  onProgressUpdate: (progress: number) => void
-): Promise<any> => {
+  onProgressUpdate: (progress: number) => void,
+  treatEmptyAsNull = false
+): Promise<
+  Omit<SpreadsheetData, 'rows'> & {
+    previewRows: Array<unknown>
+    errors: Array<Papa.ParseError & { data: unknown }>
+  }
+> => {
   let headers: string[] = []
   let chunkNumber = 0
   let rowCount = 0
-  let previewRows: any[] = []
+  let previewRows: unknown[] = []
 
-  const columnTypeMap: Record<any, any> = {}
-  const errors: any[] = []
+  const columnTypeMap: Record<string, InferredColumnType> = {}
+  const errors: (Papa.ParseError & { data: unknown })[] = []
 
   return new Promise((resolve) => {
     Papa.parse(file, {
@@ -71,10 +91,21 @@ export const parseSpreadsheet = (
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
       chunkSize: CHUNK_SIZE,
       chunk: (results) => {
-        headers = results.meta.fields as string[]
+        headers = results.meta.fields ?? []
+
+        // transform option is silently ignored when worker: true, so we apply
+        // the empty → null conversion manually here instead
+        const data = treatEmptyAsNull
+          ? results.data.map((row) => {
+              const rowAsObject = isObject(row) ? row : {}
+              return Object.fromEntries(
+                Object.entries(rowAsObject).map(([k, v]) => [k, v === '' ? null : v])
+              )
+            })
+          : results.data
 
         headers.forEach((header) => {
-          const type = inferColumnType(header, results.data as any[])
+          const type = inferColumnType(header, data)
           if (!has(columnTypeMap, header)) {
             columnTypeMap[header] = type
           } else if (columnTypeMap[header] !== type) {
@@ -82,12 +113,16 @@ export const parseSpreadsheet = (
           }
         })
 
-        rowCount += results.data.length
-        previewRows = results.data.slice(0, 20)
+        if (chunkNumber === 0) {
+          previewRows = data.slice(0, 20)
+        }
+        rowCount += data.length
         if (results.errors.length > 0) {
-          const formattedErrors = results.errors.map((error) => {
-            if (error) return { ...error, data: results.data[error.row] }
-          })
+          const formattedErrors = results.errors
+            .map((error) => {
+              if (error) return { ...error, data: results.data[error.row] }
+            })
+            .filter((error) => error !== undefined)
           errors.push(...formattedErrors)
         }
 
@@ -107,7 +142,9 @@ export const revertSpreadsheet = (headers: string[], rows: any[]) => {
   return Papa.unparse(rows, { columns: headers })
 }
 
-export const inferColumnType = (column: string, rows: object[]) => {
+export type InferredColumnType = 'int8' | 'float8' | 'bool' | 'jsonb' | 'timestamptz' | 'text'
+
+export const inferColumnType = (column: string, rows: unknown[]): InferredColumnType => {
   // General strategy is to check the first row first, before checking across all the rows
   // to ensure uniformity in data type. Thinking we do this as an optimization instead of
   // checking all the rows up front.
@@ -115,8 +152,13 @@ export const inferColumnType = (column: string, rows: object[]) => {
   // If there are no rows to infer for, default to text
   if (rows.length === 0) return 'text'
 
-  const columnData = (rows[0] as any)[column]
-  const columnDataAcrossRows = rows.map((row: object) => (row as any)[column])
+  const firstRow = rows[0]
+  if (!isObject(firstRow)) {
+    return 'text'
+  }
+
+  const columnData = firstRow[column]
+  const columnDataAcrossRows = rows.map((row) => (isObject(row) ? row[column] : undefined))
 
   // Unable to infer any type as there's no data, default to text
   if (columnData === undefined || columnData === null) {
@@ -124,8 +166,9 @@ export const inferColumnType = (column: string, rows: object[]) => {
   }
 
   // Infer numerical data type (defaults to either int8 or float8)
-  if (Number(columnData)) {
-    const columnNumberCheck = rows.map((row: object) => Number((row as any)[column]))
+  const columnAsNumber = Number(columnData)
+  if (!Number.isNaN(columnAsNumber)) {
+    const columnNumberCheck = rows.map((row) => (isObject(row) ? Number(row[column]) : NaN))
     if (columnNumberCheck.includes(NaN)) {
       return 'text'
     } else {
@@ -135,10 +178,14 @@ export const inferColumnType = (column: string, rows: object[]) => {
   }
 
   // Infer boolean type
-  if (includes(['true', 'false'], columnData.toString().toLowerCase())) {
-    const isAllBoolean = columnDataAcrossRows.every((item: any) => {
-      if (item === null || item === undefined) return true
-      else return includes(['true', 'false'], item.toString().toLowerCase())
+  const firstCellLowerCase = columnData.toString().toLowerCase()
+  if (firstCellLowerCase === 'true' || firstCellLowerCase === 'false') {
+    const isAllBoolean = columnDataAcrossRows.every((item) => {
+      if (item === null || item === undefined) {
+        return true
+      }
+      const cellLowerCase = item.toString().toLowerCase()
+      return cellLowerCase === 'true' || cellLowerCase === 'false'
     })
     if (isAllBoolean) {
       return 'bool'
@@ -147,16 +194,16 @@ export const inferColumnType = (column: string, rows: object[]) => {
 
   // Infer json type
   if (tryParseJson(columnData)) {
-    const isAllJson = columnDataAcrossRows.every((item: any) => tryParseJson(columnData))
+    const isAllJson = columnDataAcrossRows.every((item) => tryParseJson(item))
     if (isAllJson) {
       return 'jsonb'
     }
   }
 
   // Infer datetime type
-  if (Date.parse(columnData)) {
+  if (Date.parse(String(columnData))) {
     const isAllTimestamptz = columnDataAcrossRows.every((item) =>
-      dayjs(item, 'YYYY-MM-DD hh:mm:ss').isValid()
+      dayjs(String(item), 'YYYY-MM-DD hh:mm:ss').isValid()
     )
 
     if (isAllTimestamptz) {

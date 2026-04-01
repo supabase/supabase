@@ -1,6 +1,6 @@
-import { FDW, FDWTable } from 'data/fdw/fdws-query'
-import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
+import { WRAPPER_HANDLERS, WRAPPERS } from './Wrappers.constants'
 import type { WrapperMeta } from './Wrappers.types'
+import { FDW, FDWTable } from '@/data/fdw/fdws-query'
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(

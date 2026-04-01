@@ -1,9 +1,8 @@
 'use client'
 
-import { SubMenu } from 'components/ui/ProductMenu/SubMenu'
-
-import { getActiveKey, toSubMenuSections } from './AccountLayout.utils'
 import type { SidebarSection } from './AccountLayout.types'
+import { getActiveKey, toSubMenuSections } from './AccountLayout.utils'
+import { SubMenu } from '@/components/ui/ProductMenu/SubMenu'
 
 export interface AccountMenuContentProps {
   sections: SidebarSection[]

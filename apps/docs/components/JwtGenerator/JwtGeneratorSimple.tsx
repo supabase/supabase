@@ -1,6 +1,7 @@
 import { KJUR } from 'jsrsasign'
 import { useState } from 'react'
-import { Button, CodeBlock } from 'ui'
+import { Button } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const JWT_HEADER = { alg: 'HS256', typ: 'JWT' }
 

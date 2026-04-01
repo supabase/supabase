@@ -1,13 +1,12 @@
-import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
-import type { Dictionary } from 'types'
-
 import { isPendingAddRow, PendingAddRow, SupaRow } from '../types'
+import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import {
   EditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
+import type { Dictionary } from '@/types'
 
 interface EditCellKeyOperation extends Omit<
   EditCellContentOperation,

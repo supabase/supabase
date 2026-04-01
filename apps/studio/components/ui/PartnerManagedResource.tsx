@@ -1,10 +1,10 @@
 import { ExternalLink } from 'lucide-react'
-
-import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
-import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+
 import PartnerIcon from './PartnerIcon'
-import { MANAGED_BY, ManagedBy } from 'lib/constants/infrastructure'
+import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
+import { useVercelRedirectQuery } from '@/data/integrations/vercel-redirect-query'
+import { MANAGED_BY, ManagedBy } from '@/lib/constants/infrastructure'
 
 interface PartnerManagedResourceProps {
   managedBy: ManagedBy

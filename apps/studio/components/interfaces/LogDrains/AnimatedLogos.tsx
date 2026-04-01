@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { cn } from 'ui'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Datadog, Grafana, Sentry } from 'icons'
 import { BracesIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 export const AnimatedLogos = () => {
   const [currIndex, setCurrIndex] = useState(0)

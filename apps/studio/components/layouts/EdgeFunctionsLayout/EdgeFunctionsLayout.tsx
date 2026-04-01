@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import type { ComponentProps, PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export const EdgeFunctionsProductMenu = () => {
   const { ref: projectRef = 'default' } = useParams()

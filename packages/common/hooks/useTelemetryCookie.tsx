@@ -8,9 +8,8 @@ interface UseTelemetryCookieProps {
 }
 
 /**
- * This hook saves the initial telemetry data to a cookie so we can preserve first-touch attribution
- * (e.g. `document.referrer`) until the initial pageview is emitted. If the user never
- * consents, this cookie is never used.
+ * @deprecated Superseded by `useFirstTouchStore` which uses an in-memory store
+ * instead of a cookie. Removal tracked under GROWTH-646.
  */
 export function useTelemetryCookie({ enabled }: UseTelemetryCookieProps) {
   const telemetryStorageKey = LOCAL_STORAGE_KEYS.TELEMETRY_DATA
