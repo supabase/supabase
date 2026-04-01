@@ -46,12 +46,6 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
-  - undici
-  - next
-  - '@next/*'
-  - h3
-  - typescript
-  - stripe-experiment-sync
 
 onlyBuiltDependencies:
   - node-pty
