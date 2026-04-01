@@ -44,6 +44,7 @@ vi.mock('@/components/interfaces/Database/Extensions/Extensions.constants', () =
 
 vi.mock('./IntegrationOverviewTabV2.utils', () => ({
   getEnableExtensionsSQL: () => 'CREATE EXTENSION IF NOT EXISTS pg_net;',
+  getExtensionDefaultSchema: () => 'extensions',
 }))
 
 const createIntegration = (overrides: Partial<IntegrationDefinition> = {}): IntegrationDefinition =>
