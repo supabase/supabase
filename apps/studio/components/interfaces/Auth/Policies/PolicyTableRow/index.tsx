@@ -66,18 +66,24 @@ const PolicyTableRowComponent = ({
     [exposedSchemas, table.schema]
   )
 
-  const { data: tablesWithAnonAuthAccess = new Set(), isLoading: isLoadingRolesAccess } =
-    useTablesRolesAccessQuery({
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: table.schema,
-    })
+  const {
+    data: tablesWithAnonAuthAccess = new Set(),
+    isLoading: isLoadingRolesAccess,
+    isError: isErrorRolesAccess,
+  } = useTablesRolesAccessQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: table.schema,
+  })
 
   const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
   const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
   const isPubliclyReadableWritable = !isRLSEnabled && hasApiAccess
   const rlsEnabledNoPolicies = isRLSEnabled && hasApiAccess && policies.length === 0
-  const isApiDisabledDueToRoles = isTableExposedThroughAPI && !hasAnonAuthenticatedRolesAccess
+  // Only flag API as disabled when the query succeeded — an errored query should not
+  // produce a false "API disabled" warning (common in local dev environments)
+  const isApiDisabledDueToRoles =
+    !isErrorRolesAccess && isTableExposedThroughAPI && !hasAnonAuthenticatedRolesAccess
   const isRealtimeSchema = table.schema === 'realtime'
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
