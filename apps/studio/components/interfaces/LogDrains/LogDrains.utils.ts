@@ -3,6 +3,7 @@
  * Extracted for testability
  */
 
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
 import { z } from 'zod'
 
 import { LogDrainType } from './LogDrains.constants'
@@ -74,46 +75,18 @@ export const logDrainHeaderEntriesSchema = z
   )
   .max(20, HEADER_VALIDATION_ERRORS.MAX_LIMIT)
   .superRefine((rows, ctx) => {
-    const rowIndexesByKey = new Map<string, number[]>()
-
-    rows.forEach((row, index) => {
-      const key = row.key.trim()
-      const value = row.value.trim()
-
-      if (!key && !value) return
-
-      if (key && !value) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: HEADER_VALIDATION_ERRORS.VALUE_REQUIRED,
-          path: [index, 'value'],
-        })
-        return
-      }
-
-      if (!key && value) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: HEADER_VALIDATION_ERRORS.KEY_REQUIRED,
-          path: [index, 'key'],
-        })
-        return
-      }
-
-      const existingIndexes = rowIndexesByKey.get(key) ?? []
-      existingIndexes.push(index)
-      rowIndexesByKey.set(key, existingIndexes)
-    })
-
-    rowIndexesByKey.forEach((indexes) => {
-      if (indexes.length < 2) return
-
-      indexes.forEach((index) => {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: HEADER_VALIDATION_ERRORS.DUPLICATE,
-          path: [index, 'key'],
-        })
+    getKeyValueFieldArrayValidationIssues({
+      rows,
+      keyFieldName: 'key',
+      valueFieldName: 'value',
+      keyRequiredMessage: HEADER_VALIDATION_ERRORS.KEY_REQUIRED,
+      valueRequiredMessage: HEADER_VALIDATION_ERRORS.VALUE_REQUIRED,
+      duplicateKeyMessage: HEADER_VALIDATION_ERRORS.DUPLICATE,
+    }).forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: issue.message,
+        path: issue.path,
       })
     })
   })

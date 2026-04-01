@@ -233,4 +233,19 @@ describe('PlatformWebhooksEndpointSheet', () => {
       expect.anything()
     )
   })
+
+  it('blocks submit when a custom header is missing its value', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet({
+      mode: 'edit',
+      endpoint: createEndpoint(),
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Add header' }))
+    await user.type(screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
+    submitForm()
+
+    expect(await screen.findByText('Header value is required')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
 })
