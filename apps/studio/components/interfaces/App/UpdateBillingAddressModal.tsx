@@ -127,6 +127,7 @@ export function UpdateBillingAddressModal() {
         setDismissed(true)
       } catch (error: any) {
         toast.error(`Failed to update billing address: ${error.message}`)
+        throw error
       } finally {
         setIsSubmitting(false)
       }

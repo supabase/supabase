@@ -111,6 +111,7 @@ export const BillingCustomerData = () => {
           `Failed updating billing data: ${error instanceof Error ? error.message : 'Unknown error'}`
         )
         setIsSubmitting(false)
+        throw error
       }
     },
   })
