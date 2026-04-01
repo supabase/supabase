@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
@@ -26,7 +27,7 @@ export async function purgeDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.purge_queue('${queueName}');`,
+    sql: `select * from pgmq.purge_queue(${quoteLiteral(queueName)});`,
     queryKey: databaseQueuesKeys.purge(queueName),
   })
 
@@ -39,7 +40,7 @@ export const useDatabaseQueuePurgeMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
+}: Omit
   UseCustomMutationOptions<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>,
   'mutationFn'
 > = {}) => {

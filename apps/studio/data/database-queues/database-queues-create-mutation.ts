@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import { tableKeys } from 'data/tables/keys'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
@@ -30,15 +31,15 @@ export async function createDatabaseQueue({
 
   const query =
     type === 'partitioned'
-      ? `select from pgmq.create_partitioned('${name}', '${partitionInterval}', '${retentionInterval}');`
+      ? `select from pgmq.create_partitioned(${quoteLiteral(name)}, ${quoteLiteral(String(partitionInterval))}, ${quoteLiteral(String(retentionInterval))});`
       : type === 'unlogged'
-        ? `SELECT pgmq.create_unlogged('${name}');`
-        : `SELECT pgmq.create('${name}');`
+        ? `SELECT pgmq.create_unlogged(${quoteLiteral(name)});`
+        : `SELECT pgmq.create(${quoteLiteral(name)});`
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim(),
+    sql: `${query} ${enableRls ? `alter table pgmq.${quoteLiteral('q_' + name)} enable row level security;` : ''}`.trim(),
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -51,7 +52,7 @@ export const useDatabaseQueueCreateMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
+}: Omit
   UseCustomMutationOptions<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>,
   'mutationFn'
 > = {}) => {

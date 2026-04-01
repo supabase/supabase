@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
@@ -30,7 +31,7 @@ export async function sendDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.send( '${queueName}', '${payload}', ${delay})`,
+    sql: `select * from pgmq.send(${quoteLiteral(queueName)}, ${quoteLiteral(payload)}, ${parseInt(String(delay), 10)})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -43,8 +44,8 @@ export const useDatabaseQueueMessageSendMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseCustomMutationOptions<
+}: Omit
+  UseCustomMutationOptions
     DatabaseQueueMessageSendData,
     ResponseError,
     DatabaseQueueMessageSendVariables
@@ -53,7 +54,7 @@ export const useDatabaseQueueMessageSendMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
+  return useMutation
     DatabaseQueueMessageSendData,
     ResponseError,
     DatabaseQueueMessageSendVariables

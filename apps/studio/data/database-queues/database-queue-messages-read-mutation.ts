@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
@@ -30,7 +31,7 @@ export async function readDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.set_vt('${queueName}', ${messageId}, ${duration})`,
+    sql: `select * from pgmq.set_vt(${quoteLiteral(queueName)}, ${parseInt(String(messageId), 10)}, ${parseInt(String(duration), 10)})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -43,8 +44,8 @@ export const useDatabaseQueueMessageReadMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseCustomMutationOptions<
+}: Omit
+  UseCustomMutationOptions
     DatabaseQueueMessageReadData,
     ResponseError,
     DatabaseQueueMessageReadVariables
@@ -53,7 +54,7 @@ export const useDatabaseQueueMessageReadMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
+  return useMutation
     DatabaseQueueMessageReadData,
     ResponseError,
     DatabaseQueueMessageReadVariables

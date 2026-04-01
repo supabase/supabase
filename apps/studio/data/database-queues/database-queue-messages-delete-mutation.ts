@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
@@ -28,7 +29,7 @@ export async function deleteDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.delete('${queueName}', ${messageId})`,
+    sql: `SELECT * FROM pgmq.delete(${quoteLiteral(queueName)}, ${parseInt(String(messageId), 10)})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -41,8 +42,8 @@ export const useDatabaseQueueMessageDeleteMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseCustomMutationOptions<
+}: Omit
+  UseCustomMutationOptions
     DatabaseQueueMessageDeleteData,
     ResponseError,
     DatabaseQueueMessageDeleteVariables
@@ -51,7 +52,7 @@ export const useDatabaseQueueMessageDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
+  return useMutation
     DatabaseQueueMessageDeleteData,
     ResponseError,
     DatabaseQueueMessageDeleteVariables

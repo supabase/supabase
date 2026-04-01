@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { quoteLiteral } from 'lib/pg-format'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
 
@@ -27,7 +28,7 @@ export async function archiveDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.archive('${queueName}', ${messageId})`,
+    sql: `SELECT * FROM pgmq.archive(${quoteLiteral(queueName)}, ${parseInt(String(messageId), 10)})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -40,8 +41,8 @@ export const useDatabaseQueueMessageArchiveMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<
-  UseCustomMutationOptions<
+}: Omit
+  UseCustomMutationOptions
     DatabaseQueueMessageArchiveData,
     ResponseError,
     DatabaseQueueMessageArchiveVariables
@@ -50,7 +51,7 @@ export const useDatabaseQueueMessageArchiveMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
+  return useMutation
     DatabaseQueueMessageArchiveData,
     ResponseError,
     DatabaseQueueMessageArchiveVariables
