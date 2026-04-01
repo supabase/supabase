@@ -114,7 +114,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
   const { ref: projectRef } = useParams()
-  const { data: endpointData } = useProjectApiUrl({ projectRef })
+  const { hostEndpoint: endpointData } = useProjectApiUrl({ projectRef })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,

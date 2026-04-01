@@ -1,11 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
+import { type DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -35,6 +29,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { extensionsWithRecommendedSchemas } from './Extensions.constants'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
@@ -79,7 +79,8 @@ export const EnableExtensionModal = ({
   )
 
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
-  const defaultSchema = extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_schema
+  const defaultSchema =
+    extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
@@ -185,7 +186,7 @@ export const EnableExtensionModal = ({
                     <Input_Shadcn_ disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
-                    Extension must be installed in the “{defaultSchema}” schema.
+                    Extension must be installed in the "{defaultSchema}" schema.
                   </p>
                 </div>
               ) : (

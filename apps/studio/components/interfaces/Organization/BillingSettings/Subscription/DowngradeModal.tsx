@@ -1,10 +1,11 @@
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
 import { MinusCircle, PauseCircle } from 'lucide-react'
 import { useMemo } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { Modal } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import type { OrgSubscription, ProjectAddon } from '@/data/subscriptions/types'
 
 export interface DowngradeModalProps {
   visible: boolean

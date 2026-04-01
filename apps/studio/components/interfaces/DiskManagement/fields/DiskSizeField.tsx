@@ -1,11 +1,5 @@
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import dayjs from 'dayjs'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, GB } from 'lib/constants'
 import { RotateCcw } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -28,6 +22,12 @@ import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadRepl
 import { DiskSpaceBar } from '../ui/DiskSpaceBar'
 import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSection'
 import FormMessage from '../ui/FormMessage'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, GB } from '@/lib/constants'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

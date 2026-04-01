@@ -48,7 +48,7 @@ export const useOAuthCustomProvidersQuery = <TData = OAuthCustomProvidersData>(
     ...options
   }: UseCustomQueryOptions<OAuthCustomProvidersData, OAuthCustomProvidersError, TData> = {}
 ) => {
-  const { data: clientEndpoint } = useProjectApiUrl({ projectRef })
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const { data: authConfig, isSuccess: isSuccessConfig } = useAuthConfigQuery({ projectRef })
   const isOAuthCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
 

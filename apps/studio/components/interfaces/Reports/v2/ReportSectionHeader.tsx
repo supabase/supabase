@@ -1,8 +1,8 @@
-import { Link, Check } from 'lucide-react'
+import { Check, Link } from 'lucide-react'
 import { useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { copyToClipboard } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface ReportSectionHeaderProps {
   id: string

@@ -1,7 +1,3 @@
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { Link, Menu, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
 import { DraggableProvidedDragHandleProps } from 'react-beautiful-dnd'
@@ -30,6 +26,10 @@ import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManagement.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR, EMPTY_OBJ } from '@/lib/void'
 
 /**
  * [Joshen] For context:

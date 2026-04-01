@@ -96,6 +96,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+
   const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
   // Read the raw flag for telemetry — useDataApiGrantTogglesEnabled coerces undefined→false,
   // which would record false for users whose flags haven't loaded yet. The raw value preserves

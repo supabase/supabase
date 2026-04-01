@@ -1,6 +1,4 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
-import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { noop } from 'lodash'
 import { forwardRef, type CSSProperties } from 'react'
@@ -20,6 +18,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
+import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { Bucket } from '@/data/storage/buckets-query'
 
 interface StoragePoliciesBucketRowProps {
   table: string

@@ -1834,23 +1834,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/organizations/fly/{fly_organization_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets organization linked to fly organization id */
-    get: operations['OrganizationsController_getOrganizationByFlyOrganizationId']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/pg-meta/{ref}/column-privileges': {
     parameters: {
       query?: never
@@ -3343,23 +3326,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/projects/fly/{fly_extension_id}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Gets project linked to fly extension id */
-    get: operations['ProjectsController_getProjectByFlyExtensionId']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/replication/{ref}/destinations': {
     parameters: {
       query?: never
@@ -4450,23 +4416,6 @@ export interface paths {
     }
     /** Stream telemetry events (local dev only) */
     get: operations['TelemetryStreamController_streamEvents']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/platform/tos/fly': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Redirects to Fly sso flow */
-    get: operations['TermsOfServiceController_flyTosAccepted']
     put?: never
     post?: never
     delete?: never
@@ -5746,7 +5695,8 @@ export interface components {
     }
     CreateSSOProviderBody:
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -5760,7 +5710,8 @@ export interface components {
           user_name_mapping?: string[]
         }
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -5774,7 +5725,8 @@ export interface components {
         }
     CreateSSOProviderResponse:
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -5788,7 +5740,8 @@ export interface components {
           user_name_mapping?: string[]
         }
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -6315,9 +6268,6 @@ export interface components {
       }
       with_delimiter?: boolean
     }
-    GetOrganizationByFlyOrganizationIdResponse: {
-      slug: string
-    }
     GetOrganizationIntegrationResponse: {
       added_by: {
         primary_email: string
@@ -6409,9 +6359,6 @@ export interface components {
           | 'CREATION_FAILED'
           | 'DELETING'
       }[]
-    }
-    GetProjectByFlyExtensionIdResponse: {
-      ref: string
     }
     GetProjectLintsResponse: {
       cache_key: string
@@ -6597,7 +6544,8 @@ export interface components {
     }
     GetSSOProviderResponse:
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -6611,7 +6559,8 @@ export interface components {
           user_name_mapping?: string[]
         }
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -8408,6 +8357,7 @@ export interface components {
       connectionString?: string | null
       db_host: string
       dbVersion?: string
+      high_availability: boolean
       id: number
       /** @enum {string} */
       infra_compute_size?:
@@ -10754,7 +10704,8 @@ export interface components {
     }
     UpdateSSOProviderBody:
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -10768,7 +10719,8 @@ export interface components {
           user_name_mapping?: string[]
         }
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -10782,7 +10734,8 @@ export interface components {
         }
     UpdateSSOProviderResponse:
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -10796,7 +10749,8 @@ export interface components {
           user_name_mapping?: string[]
         }
       | {
-          domains: string[]
+          /** @default [] */
+          domains?: string[]
           email_mapping: string[]
           enabled: boolean
           first_name_mapping?: string[]
@@ -17068,27 +17022,6 @@ export interface operations {
       }
     }
   }
-  OrganizationsController_getOrganizationByFlyOrganizationId: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        fly_organization_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetOrganizationByFlyOrganizationIdResponse']
-        }
-      }
-    }
-  }
   ColumnPrivilegesController_getColumnPrivileges: {
     parameters: {
       query?: never
@@ -22632,48 +22565,6 @@ export interface operations {
       }
     }
   }
-  ProjectsController_getProjectByFlyExtensionId: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        fly_extension_id: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
   ReplicationDestinationsController_getDestinations: {
     parameters: {
       query?: never
@@ -26503,26 +26394,6 @@ export interface operations {
       }
       /** @description Only available in local development */
       404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  TermsOfServiceController_flyTosAccepted: {
-    parameters: {
-      query: {
-        extension_id: string
-        organization_id: string
-      }
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
         headers: {
           [name: string]: unknown
         }

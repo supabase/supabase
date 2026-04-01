@@ -7,7 +7,6 @@ import { Item, Menu, useContextMenu } from 'react-contexify'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -36,6 +35,7 @@ import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useProfile } from '@/lib/profile'
+import type { ResponseError } from '@/types'
 
 interface Props {
   data?: LogData[]

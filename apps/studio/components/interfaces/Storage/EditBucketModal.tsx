@@ -1,20 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef, useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
 import { useParams } from 'common'
-import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
-import { Bucket } from 'data/storage/buckets-query'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
+import { useEffect, useRef, useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -24,20 +12,32 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
+import { Bucket } from '@/data/storage/buckets-query'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export interface EditBucketModalProps {
   visible: boolean

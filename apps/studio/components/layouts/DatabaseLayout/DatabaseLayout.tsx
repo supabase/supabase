@@ -1,10 +1,10 @@
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface DatabaseLayoutProps {
   title: string

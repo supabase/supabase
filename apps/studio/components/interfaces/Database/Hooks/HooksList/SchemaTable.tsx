@@ -1,6 +1,5 @@
-import Table from 'components/to-be-cleaned/Table'
-
 import { HookList } from './HookList'
+import Table from '@/components/to-be-cleaned/Table'
 
 interface SchemaTableProps {
   schema: string

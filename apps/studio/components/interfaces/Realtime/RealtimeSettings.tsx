@@ -1,19 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
-import {
-  REALTIME_DEFAULT_CONFIG,
-  useRealtimeConfigurationQuery,
-} from 'data/realtime/realtime-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -37,6 +24,20 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import AlertError from '@/components/ui/AlertError'
+import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useRealtimeConfigurationUpdateMutation } from '@/data/realtime/realtime-config-mutation'
+import {
+  REALTIME_DEFAULT_CONFIG,
+  useRealtimeConfigurationQuery,
+} from '@/data/realtime/realtime-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'realtime-configuration-form'
 

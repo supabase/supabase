@@ -1,9 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import type { Dictionary } from 'types'
 import { SidePanel, Toggle } from 'ui'
 
 import { ActionBar } from '../ActionBar'
@@ -22,6 +19,9 @@ import {
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>

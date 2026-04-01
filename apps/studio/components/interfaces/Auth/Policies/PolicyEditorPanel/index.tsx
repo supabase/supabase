@@ -3,37 +3,28 @@ import { Monaco } from '@monaco-editor/react'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import {
   Button,
   Checkbox_Shadcn_,
+  cn,
   Form_Shadcn_,
   Label_Shadcn_,
   ScrollArea,
   Sheet,
   SheetContent,
   SheetFooter,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
+import * as z from 'zod'
+
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
@@ -41,6 +32,15 @@ import { PolicyEditorPanelHeader } from './PolicyEditorPanelHeader'
 import { PolicyTemplates } from './PolicyTemplates'
 import { QueryError } from './QueryError'
 import { RLSCodeEditor } from './RLSCodeEditor'
+import { IStandaloneCodeEditor } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface PolicyEditorPanelProps {
   visible: boolean

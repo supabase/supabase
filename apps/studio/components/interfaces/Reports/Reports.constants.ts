@@ -1,8 +1,8 @@
-import { PlanId } from 'data/subscriptions/types'
 import dayjs from 'dayjs'
 
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 

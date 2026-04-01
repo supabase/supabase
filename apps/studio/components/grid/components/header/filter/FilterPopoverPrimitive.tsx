@@ -1,17 +1,17 @@
 import { isEqual } from 'lodash'
 import { Filter as FilterIcon, Plus } from 'lucide-react'
 import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
-
-import type { Filter } from 'components/grid/types'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
+
 import FilterRow from './FilterRow'
+import type { Filter } from '@/components/grid/types'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverPrimitiveProps {
   buttonText?: string

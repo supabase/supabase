@@ -1,7 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
-import type { PgRole } from 'data/database-roles/database-roles-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ChevronUp, MoreVertical, Trash } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -23,6 +20,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { ROLE_PERMISSIONS } from './Roles.constants'
+import { useDatabaseRoleUpdateMutation } from '@/data/database-roles/database-role-update-mutation'
+import type { PgRole } from '@/data/database-roles/database-roles-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface RoleRowProps {
   role: PgRole

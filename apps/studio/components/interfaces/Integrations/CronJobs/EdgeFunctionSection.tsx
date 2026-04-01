@@ -1,6 +1,4 @@
 import { useParams } from 'common/hooks'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useId, useMemo, useState } from 'react'
@@ -34,6 +32,8 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface HTTPRequestFieldsProps {
   form: UseFormReturn<CreateCronJobForm>

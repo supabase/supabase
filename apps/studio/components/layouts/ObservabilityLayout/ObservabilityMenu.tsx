@@ -1,21 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
-import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Content, ContentBase, useContentQuery } from 'data/content/content-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Fragment, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import type { Dashboards } from 'types'
 import { cn, Menu } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -24,6 +14,16 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { generateObservabilityMenuItems } from './ObservabilityMenu.utils'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
+import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
+import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { Content, ContentBase, useContentQuery } from '@/data/content/content-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
+import type { Dashboards } from '@/types'
 
 const ObservabilityMenu = () => {
   const router = useRouter()
@@ -33,7 +33,6 @@ const ObservabilityMenu = () => {
   const showOverview = useFlag('observabilityOverview')
   const { isSupamonitorEnabled } = useSupamonitorStatus()
 
-  // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(

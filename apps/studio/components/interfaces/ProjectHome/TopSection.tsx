@@ -1,3 +1,4 @@
+import { ReactFlowProvider } from '@xyflow/react'
 import { ActivityStats } from 'components/interfaces/ProjectHome/ActivityStats'
 import { ProjectConnectionPopover } from 'components/interfaces/ProjectHome/ProjectConnectionPopover'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
@@ -10,10 +11,10 @@ import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization
 import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
-import { ReactFlowProvider } from '@xyflow/react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { InstanceConfiguration } from '../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
+import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
@@ -79,6 +80,7 @@ export const TopSection = () => {
                     cloudProvider={project?.cloud_provider}
                     computeSize={project?.infra_compute_size}
                   />
+                  {project?.high_availability && <HighAvailabilityBadge />}
                 </div>
               </div>
               <ProjectConnectionPopover projectRef={project?.ref} />

@@ -1,4 +1,4 @@
-import CardButton from 'components/ui/CardButton'
+import CardButton from '@/components/ui/CardButton'
 
 export const ShimmeringCard = () => {
   return (

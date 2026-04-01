@@ -1,6 +1,5 @@
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -23,6 +22,7 @@ import {
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from '../ui/DiskManagement.constants'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 
 type ThroughputFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

@@ -4,11 +4,9 @@ import React, {
   ComponentPropsWithoutRef,
   ElementRef,
   forwardRef,
-  useMemo,
   useState,
 } from 'react'
 import {
-  Button,
   cn,
   copyToClipboard,
   Input_Shadcn_,
@@ -71,7 +69,6 @@ const Input = forwardRef<
 
     let inputClasses: string[] = []
     if (size) inputClasses.push(__styles.size[size])
-    if (icon) inputClasses.push(__styles.with_icon[size ?? 'small'])
 
     return (
       <InputGroup className={containerClassName}>
