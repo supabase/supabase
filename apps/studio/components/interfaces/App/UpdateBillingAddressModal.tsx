@@ -140,16 +140,23 @@ export function UpdateBillingAddressModal() {
 
   const onFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (addressElementRef.current) {
-      const addressResult = await addressElementRef.current.getValue()
-      applyAddressElementValue(addressResult)
+    try {
+      if (addressElementRef.current) {
+        const addressResult = await addressElementRef.current.getValue()
+        applyAddressElementValue(addressResult)
+      }
+      const result = await handleSubmit()
+      if (result.status === 'error') {
+        toast.error(result.message)
+        return
+      }
+      markCurrentValuesAsSaved(
+        result.submittedState.addressValue,
+        result.submittedState.taxIdValues
+      )
+    } catch {
+      // Save failure toasts are handled inside onCustomerDataChange.
     }
-    const result = await handleSubmit()
-    if (result.status === 'error') {
-      toast.error(result.message)
-      return
-    }
-    markCurrentValuesAsSaved(result.submittedState.addressValue, result.submittedState.taxIdValues)
   }
 
   const stripeElementsOptions: StripeElementsOptions = useMemo(
