@@ -5,7 +5,7 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { replicaKeys } from './keys'
-import { DashboardPreference } from '@/components/interfaces/Settings/General/DashboardPreferences'
+import { DashboardPreference } from '@/components/interfaces/Settings/General/QueryPreferences'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
