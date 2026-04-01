@@ -62,11 +62,12 @@ function addOverride(yamlContent: string, moduleName: string, version: string): 
 function findHighestVersionInLockfile(packageName: string): string | null {
   const lockfileContent = fs.readFileSync(LOCKFILE_PATH, 'utf-8')
   const escaped = escapeRegex(packageName)
-  // Scoped packages (@org/pkg) are keyed as /@org/pkg@x.y.z: in the packages section
-  // Unscoped packages are keyed as pkg@x.y.z:
+  // pnpm lockfile v9 format:
+  //   scoped:   `  '@org/pkg@x.y.z':`
+  //   unscoped: `  pkg@x.y.z:`
   const pattern = packageName.startsWith('@')
-    ? new RegExp(`^\\/${escaped}@(\\d+\\.\\d+\\.\\d+):`, 'gm')
-    : new RegExp(`^${escaped}@(\\d+\\.\\d+\\.\\d+):`, 'gm')
+    ? new RegExp(`^  '${escaped}@(\\d+\\.\\d+\\.\\d+)':`, 'gm')
+    : new RegExp(`^  ${escaped}@(\\d+\\.\\d+\\.\\d+):`, 'gm')
 
   const versions: string[] = []
   let match: RegExpExecArray | null
