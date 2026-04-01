@@ -67,7 +67,7 @@ export async function getDatabaseQueue({
         ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
       ) AS combined`
   if (afterTimestamp) {
-    query += ` WHERE enqueued_at > '${afterTimestamp}'`
+    query += ` WHERE enqueued_at > $1`
   }
 
   const { result } = await executeSql({
