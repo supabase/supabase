@@ -156,33 +156,27 @@ export function useRLSPolicyTest() {
     [ensureWorker, sendMessage]
   )
 
-  const dispose = useCallback(() => {
+  const terminateWorker = useCallback(() => {
     clearPending()
     if (workerRef.current) {
-      // Send dispose to let PGlite close, then terminate
       workerRef.current.postMessage({ type: 'dispose' } satisfies WorkerRequest)
-      // Give it a moment to close cleanly, then force-terminate
       const w = workerRef.current
       setTimeout(() => w.terminate(), 500)
       workerRef.current = null
     }
+  }, [clearPending])
+
+  const dispose = useCallback(() => {
+    terminateWorker()
     setStatus('idle')
     setResults([])
     setError(null)
     setDataRowCount(0)
-  }, [clearPending])
+  }, [terminateWorker])
 
   useEffect(() => {
-    return () => {
-      clearPending()
-      if (workerRef.current) {
-        workerRef.current.postMessage({ type: 'dispose' } satisfies WorkerRequest)
-        const w = workerRef.current
-        setTimeout(() => w.terminate(), 500)
-        workerRef.current = null
-      }
-    }
-  }, [clearPending])
+    return terminateWorker
+  }, [terminateWorker])
 
   return {
     status,

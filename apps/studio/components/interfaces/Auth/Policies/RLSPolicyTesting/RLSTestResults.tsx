@@ -3,7 +3,6 @@ import { cn } from 'ui'
 import type { RoleTestResult } from './rls-test-worker'
 
 const OPERATIONS = ['select', 'insert', 'update', 'delete'] as const
-type Operation = (typeof OPERATIONS)[number]
 
 interface RLSTestResultsProps {
   results: RoleTestResult[]

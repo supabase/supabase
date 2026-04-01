@@ -6,9 +6,17 @@ import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useMigrationUpsertMutation } from 'data/database/migration-upsert-mutation'
 import { AlertCircle, CheckCircle2, Loader2, Play, Plus, Save, Trash2 } from 'lucide-react'
-import { useCallback, useId, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, Select_Shadcn_, SelectContent_Shadcn_, SelectItem_Shadcn_, SelectTrigger_Shadcn_, SelectValue_Shadcn_ } from 'ui'
+import {
+  Button,
+  cn,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import type { TestRole } from './rls-test-worker'
@@ -191,10 +199,8 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
       queryKey: ['rls-test-data', selectedTable.id, dataLimit],
     })
 
-    if (!result || (result as unknown[]).length === 0) return ''
-
     const rows = result as Record<string, unknown>[]
-    if (rows.length === 0) return ''
+    if (!rows || rows.length === 0) return ''
 
     const columns = Object.keys(rows[0])
     const values = rows
@@ -259,7 +265,8 @@ export function RLSPolicyTesting({ schema, tables }: RLSPolicyTestingProps) {
     }
   }, [project, migrationSql, selectedTable, upsertMigration])
 
-  const isRunning = status === 'initializing' || status === 'loading_schema' || status === 'loading_data' || status === 'testing'
+  const RUNNING_STATUSES = ['initializing', 'loading_schema', 'loading_data', 'testing'] as const
+  const isRunning = (RUNNING_STATUSES as readonly string[]).includes(status)
   const statusMessage = {
     idle: '',
     initializing: 'Starting local Postgres...',

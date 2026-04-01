@@ -134,6 +134,26 @@ async function setRoleContext(role: TestRole) {
   `)
 }
 
+async function testWithSavepoint(
+  name: string,
+  fn: () => Promise<void>
+): Promise<{ allowed: boolean; error?: string }> {
+  if (!db) throw new Error('DB not initialised')
+  try {
+    await db.exec(`SAVEPOINT ${name};`)
+    await fn()
+    await db.exec(`ROLLBACK TO ${name};`)
+    return { allowed: true }
+  } catch (e: unknown) {
+    try {
+      await db.exec(`ROLLBACK TO ${name};`)
+    } catch {
+      // savepoint may not exist
+    }
+    return { allowed: false, error: e instanceof Error ? e.message : String(e) }
+  }
+}
+
 async function testPolicy(
   tableName: string,
   schema: string,
@@ -215,59 +235,27 @@ async function testPolicy(
         result.select = { allowed: false, rowCount: 0, rows: [], error: e instanceof Error ? e.message : String(e) }
       }
 
-      // INSERT – try inserting a row with default values
-      try {
-        await db.exec('SAVEPOINT insert_test;')
-        await db.exec(`INSERT INTO ${qualifiedTable} DEFAULT VALUES;`)
-        result.insert = { allowed: true }
-        await db.exec('ROLLBACK TO insert_test;')
-      } catch (e: unknown) {
-        result.insert = { allowed: false, error: e instanceof Error ? e.message : String(e) }
-        try {
-          await db.exec('ROLLBACK TO insert_test;')
-        } catch {
-          // savepoint may not exist
-        }
-      }
+      // Test INSERT, UPDATE, DELETE inside savepoints so each is isolated
+      result.insert = await testWithSavepoint('insert_test', async () => {
+        await db!.exec(`INSERT INTO ${qualifiedTable} DEFAULT VALUES;`)
+      })
 
-      // UPDATE – try a no-op update on the first column
-      try {
-        await db.exec('SAVEPOINT update_test;')
-        const colInfo = await db.query<{ column_name: string }>(
+      result.update = await testWithSavepoint('update_test', async () => {
+        const colInfo = await db!.query<{ column_name: string }>(
           `SELECT column_name FROM information_schema.columns
            WHERE table_schema = $1 AND table_name = $2
            ORDER BY ordinal_position LIMIT 1`,
           [schema, tableName]
         )
         const col = colInfo.rows[0]?.column_name ?? 'id'
-        await db.exec(
+        await db!.exec(
           `UPDATE ${qualifiedTable} SET "${col}" = "${col}" WHERE true;`
         )
-        result.update = { allowed: true }
-        await db.exec('ROLLBACK TO update_test;')
-      } catch (e: unknown) {
-        result.update = { allowed: false, error: e instanceof Error ? e.message : String(e) }
-        try {
-          await db.exec('ROLLBACK TO update_test;')
-        } catch {
-          // savepoint may not exist
-        }
-      }
+      })
 
-      // DELETE – try deleting
-      try {
-        await db.exec('SAVEPOINT delete_test;')
-        await db.exec(`DELETE FROM ${qualifiedTable} WHERE true;`)
-        result.delete = { allowed: true }
-        await db.exec('ROLLBACK TO delete_test;')
-      } catch (e: unknown) {
-        result.delete = { allowed: false, error: e instanceof Error ? e.message : String(e) }
-        try {
-          await db.exec('ROLLBACK TO delete_test;')
-        } catch {
-          // savepoint may not exist
-        }
-      }
+      result.delete = await testWithSavepoint('delete_test', async () => {
+        await db!.exec(`DELETE FROM ${qualifiedTable} WHERE true;`)
+      })
     } finally {
       await db.exec('ROLLBACK;')
     }
