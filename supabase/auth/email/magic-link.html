@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+</head>
+<body style="background: #f9f9f9; padding: 24px;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border: 1px solid #e9e9e9; border-radius: 5px; padding: 24px;">
+    <h2 style="color: #444; margin-bottom: 24px;">Login to Your Account</h2>
+    
+    <!-- Primary Magic Link -->
+    <div style="margin-bottom: 24px;">
+      <p style="color: #666;">Click the button below to sign in to your account:</p>
+      <div style="text-align: center;">
+        <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&redirect_to={{ .RedirectTo }}"
+           style="display: inline-block; padding: 12px 24px; background-color: #3ECF8E; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+          Sign In to Your Account
+        </a>
+      </div>
+    </div>
+
+    <!-- Backup OTP Code -->
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e9e9e9;">
+      <p style="color: #666;">Or use this temporary login code:</p>
+      <div style="background: #f4f4f4; padding: 12px; border-radius: 4px; text-align: center; font-family: monospace; font-size: 18px; margin: 12px 0;">
+        {{ .Token }}
+      </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e9e9e9;">
+      <p style="color: #999; font-size: 14px;">
+        If you didn't request this login, you can safely ignore this email.
+        This link and code will expire in 1 hour.
+      </p>
+    </div>
+  </div>
+</body>
+</html> 
