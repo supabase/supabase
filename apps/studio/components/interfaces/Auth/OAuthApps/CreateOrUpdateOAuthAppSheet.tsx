@@ -5,7 +5,7 @@ import type {
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import { Trash2, Upload, X, X } from 'lucide-react'
+import { Trash2, Upload, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
