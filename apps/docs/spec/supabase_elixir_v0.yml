@@ -11,7 +11,7 @@ info:
   libraries:
     - name: 'Elixir'
       id: 'elixir'
-      version: '0.5.0'
+      version: '1.0.0'
 
 functions:
   # ──────────────────────────────────────────────────
@@ -25,9 +25,11 @@ functions:
 
       supabase-ex provides two patterns:
 
-      1. **One-off clients**: Create clients on-demand. The client is returned as a struct and you manage its lifecycle.
+      1. **Module-based client (recommended)**: Define a client module with `use Supabase.Client, otp_app: :my_app`. This reads configuration from your application config and builds a fresh client struct on each call to `get_client!/0`. No supervision tree needed.
 
-      2. **Self-managed clients**: Define a client module with `use Supabase.Client, otp_app: :my_app` and add it to your supervision tree. The client runs as an Agent process managed by your application.
+      2. **Direct initialization**: Create clients on-demand with `Supabase.init_client/3`. The client is returned as a lightweight struct.
+
+      A default Finch HTTP pool is started automatically. You can point to your own Finch instance or swap in a completely different HTTP adapter via application config.
 
     params:
       - name: base_url
@@ -93,10 +95,33 @@ functions:
     notes: |
       - Returns `{:ok, %Supabase.Client{}}` on success or `{:error, reason}` on failure.
       - The raising variant `init_client!/2` returns the client directly or raises on error.
-      - For self-managed clients, `get_client/0` returns `{:ok, %Supabase.Client{}}`.
+      - For module-based clients, `get_client!/0` returns a `%Supabase.Client{}` directly (raises on misconfiguration).
     examples:
+      - id: module-based-client
+        name: Module-based client (recommended)
+        isSpotlight: true
+        code: |
+          ```elixir
+          # Define client module (lib/my_app/supabase.ex)
+          defmodule MyApp.Supabase do
+            use Supabase.Client, otp_app: :my_app
+          end
+
+          # Configure in config/config.exs
+          config :my_app, MyApp.Supabase,
+            base_url: "https://xyzcompany.supabase.co",
+            api_key: "public-anon-key",
+            db: [schema: "public"],
+            auth: [flow_type: :pkce]
+
+          # Usage — builds a fresh client struct from config each time
+          client = MyApp.Supabase.get_client!()
+
+          # Update access token for authenticated requests
+          client = MyApp.Supabase.set_auth!("user-access-token")
+          ```
       - id: init-client-basic
-        name: Basic initialization
+        name: Direct initialization
         code: |
           ```elixir
           {:ok, client} = Supabase.init_client(
@@ -105,7 +130,7 @@ functions:
           )
           ```
       - id: init-client-options
-        name: Initialization with options
+        name: With additional parameters
         code: |
           ```elixir
           {:ok, client} = Supabase.init_client(
@@ -116,45 +141,18 @@ functions:
             global: [headers: %{"x-api-version" => "2024-01-01"}]
           )
           ```
-      - id: init-client-raising
-        name: Initialization (raising variant)
+      - id: custom-http-client
+        name: Custom HTTP client
         code: |
           ```elixir
-          client = Supabase.init_client!(
-            "https://xyzcompany.supabase.co",
-            "public-anon-key"
-          )
-          ```
-      - id: self-managed-client
-        name: Self-managed client setup
-        code: |
-          ```elixir
-          # Define client module
-          defmodule MyApp.Supabase.Client do
-            use Supabase.Client, otp_app: :my_app
-          end
+          # Use your own Finch pool (the default pool won't be started)
+          config :supabase_potion, finch_name: MyApp.Finch
 
-          # Configure in config/config.exs
-          config :my_app, MyApp.Supabase.Client,
-            base_url: "https://xyzcompany.supabase.co",
-            api_key: "public-anon-key",
-            db: [schema: "public"],
-            auth: [flow_type: :implicit]
+          # Or use a completely custom HTTP adapter (must implement Supabase.Fetcher.Adapter)
+          config :supabase_potion, http_client: MyApp.CustomHTTPClient
 
-          # Add to supervision tree in application.ex
-          def start(_type, _args) do
-            children = [
-              {Finch, name: MyApp.Finch},
-              MyApp.Supabase.Client
-            ]
-            Supervisor.start_link(children, strategy: :one_for_one)
-          end
-
-          # Retrieve client
-          {:ok, client} = MyApp.Supabase.Client.get_client()
-
-          # Update auth token
-          MyApp.Supabase.Client.set_auth("new-access-token")
+          # Tune the default Finch pool size
+          config :supabase_potion, finch_pool: %{default: [size: 25]}
           ```
 
   # ──────────────────────────────────────────────────
@@ -2190,9 +2188,10 @@ functions:
     description: |
       Invokes a Supabase Edge Function with the specified name and optional body.
 
-      You can pass custom headers and specify the response type.
+      You can pass custom headers, specify the response type, and upload files via multipart.
     notes: |
       - Returns `{:ok, %Supabase.Fetcher.Response{}}` on success or `{:error, reason}` on failure.
+      - Supports multipart file uploads by passing `{:multipart, parts}` as the body.
     params:
       - name: client
         isOptional: false
@@ -2209,8 +2208,8 @@ functions:
         subContent:
           - name: body
             isOptional: true
-            type: map() | String.t()
-            description: The request body (will be JSON-encoded if a map)
+            type: map() | String.t() | {:multipart, list()}
+            description: "The request body — a map (JSON-encoded), a string, or `{:multipart, parts}` for file uploads"
           - name: headers
             isOptional: true
             type: map()
@@ -2225,6 +2224,17 @@ functions:
         code: |
           ```elixir
           {:ok, response} = Supabase.Functions.invoke(client, "hello-world", body: %{name: "Elixir"})
+          ```
+      - id: invoke-multipart
+        name: Upload a file via multipart
+        code: |
+          ```elixir
+          {:ok, response} = Supabase.Functions.invoke(client, "upload-handler",
+            body: {:multipart, [
+              {:file, "/path/to/image.png", filename: "image.png", content_type: "image/png"},
+              {:field, "description", "Profile photo"}
+            ]}
+          )
           ```
 
   # ──────────────────────────────────────────────────
