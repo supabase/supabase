@@ -158,7 +158,34 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it('ignores incomplete header rows instead of blocking submit', async () => {
+  it('allows fully empty header rows without blocking submit', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm()
+
+    await screen.findByRole('dialog')
+
+    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
+    await user.type(
+      screen.getByPlaceholderText('https://example.com/log-drain'),
+      'https://logs.example.com/ingest'
+    )
+    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'webhook',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    )
+    expect(screen.queryByText('undefined')).not.toBeInTheDocument()
+  })
+
+  it('shows an inline value error when a header key is entered without a value', async () => {
     const user = userEvent.setup()
     const { onSubmit } = renderForm()
 
@@ -176,15 +203,31 @@ describe('LogDrainDestinationSheetForm', () => {
 
     submitForm()
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'webhook',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+    expect(await screen.findByText('Header value is required')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.queryByText('undefined')).not.toBeInTheDocument()
+  })
+
+  it('shows an inline key error when a header value is entered without a key', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm()
+
+    await screen.findByRole('dialog')
+
+    await user.type(screen.getByPlaceholderText('My Destination'), 'Webhook sink')
+    await user.type(
+      screen.getByPlaceholderText('https://example.com/log-drain'),
+      'https://logs.example.com/ingest'
     )
+    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+
+    const headerValueInputs = screen.getAllByPlaceholderText('Header value')
+    await user.type(headerValueInputs[1], 'draft-value')
+
+    submitForm()
+
+    expect(await screen.findByText('Header name is required')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
     expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
 })

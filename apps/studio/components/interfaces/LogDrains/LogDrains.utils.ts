@@ -79,7 +79,26 @@ export const logDrainHeaderEntriesSchema = z
     rows.forEach((row, index) => {
       const key = row.key.trim()
       const value = row.value.trim()
-      if (!key || !value) return
+
+      if (!key && !value) return
+
+      if (key && !value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: HEADER_VALIDATION_ERRORS.VALUE_REQUIRED,
+          path: [index, 'value'],
+        })
+        return
+      }
+
+      if (!key && value) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: HEADER_VALIDATION_ERRORS.KEY_REQUIRED,
+          path: [index, 'key'],
+        })
+        return
+      }
 
       const existingIndexes = rowIndexesByKey.get(key) ?? []
       existingIndexes.push(index)

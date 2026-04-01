@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  HEADER_VALIDATION_ERRORS,
   getDefaultHeadersByType,
   getHeadersSectionDescription,
   headerRecordToRows,
@@ -98,15 +99,45 @@ describe('headerRowsToRecord', () => {
 })
 
 describe('logDrainHeaderEntriesSchema', () => {
-  it('accepts empty and partially filled draft rows', () => {
+  it('accepts fully empty draft rows', () => {
     const result = logDrainHeaderEntriesSchema.safeParse([
       { key: 'Content-Type', value: 'application/json' },
       { key: '', value: '' },
-      { key: 'X-Draft-Only', value: '' },
-      { key: '', value: 'draft-value' },
     ])
 
     expect(result.success).toBe(true)
+  })
+
+  it('rejects rows with a key but no value', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([{ key: 'X-Draft-Only', value: '' }])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: HEADER_VALIDATION_ERRORS.VALUE_REQUIRED,
+            path: [0, 'value'],
+          }),
+        ])
+      )
+    }
+  })
+
+  it('rejects rows with a value but no key', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([{ key: '', value: 'draft-value' }])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: HEADER_VALIDATION_ERRORS.KEY_REQUIRED,
+            path: [0, 'key'],
+          }),
+        ])
+      )
+    }
   })
 
   it('still rejects duplicate completed header names', () => {
