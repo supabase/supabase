@@ -11,6 +11,13 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+
+import { DeleteOrganizationButtonListAck } from './DeleteOrganizationButton.ListAck'
+import { DeleteOrganizationButtonSingleAck } from './DeleteOrganizationButton.SingleAck'
+
+const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
+
 export const DeleteOrganizationButton = () => {
   const router = useRouter()
 
@@ -57,11 +64,6 @@ export const DeleteOrganizationButton = () => {
 
   const exceedsLimit =
     projects !== undefined && projects.length > MAX_PROJECT_ACKNOWLEDGEMENTS
-
-  useEffect(() => {
-    setCheckedProjects({})
-    setAcknowledgedAll(false)
-  }, [orgSlug])
 
   const toggleProject = (ref: string, checked?: boolean | 'indeterminate') => {
     setCheckedProjects((prev) => ({
