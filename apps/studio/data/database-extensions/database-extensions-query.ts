@@ -9,7 +9,7 @@ import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseExtensionsKeys } from './keys'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension'] & {
-  default_schema: string | null
+  default_version_schema: string | null
 }
 
 export type DatabaseExtensionsVariables = {

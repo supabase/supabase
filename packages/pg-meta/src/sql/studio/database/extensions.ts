@@ -9,7 +9,7 @@ SELECT
   e.default_version,
   x.extversion AS installed_version,
   e.comment,
-  ev.schema AS default_schema
+  ev.schema AS default_version_schema
 FROM
   pg_available_extensions e
   LEFT JOIN pg_extension x ON e.name = x.extname

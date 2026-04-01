@@ -79,7 +79,8 @@ export const EnableExtensionModal = ({
   )
 
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
-  const defaultSchema = extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_schema
+  const defaultSchema =
+    extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
