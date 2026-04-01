@@ -30,6 +30,7 @@ export const DeleteOrganizationButton = () => {
   const {
     data: projectsData,
     isLoading,
+    isFetching,
     isError,
   } = useOrgProjectsInfiniteQuery(
     { slug: orgSlug },
@@ -61,11 +62,9 @@ export const DeleteOrganizationButton = () => {
     projects !== undefined && projects.length > MAX_PROJECT_ACKNOWLEDGEMENTS
 
   useEffect(() => {
-    if (isOpen) {
-      setCheckedProjects({})
-      setAcknowledgedAll(false)
-    }
-  }, [isOpen, orgSlug])
+    setCheckedProjects({})
+    setAcknowledgedAll(false)
+  }, [orgSlug])
 
   const toggleProject = (ref: string, checked?: boolean | 'indeterminate') => {
     setCheckedProjects((prev) => ({
@@ -122,7 +121,7 @@ export const DeleteOrganizationButton = () => {
       return
     }
 
-    if (isLoading) {
+    if (isLoading || isFetching) {
       toast.error('Projects are still loading, please wait')
       return
     }
@@ -147,7 +146,11 @@ export const DeleteOrganizationButton = () => {
           type="danger"
           disabled={!canDeleteOrganization || !orgSlug}
           loading={!orgSlug}
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setCheckedProjects({})
+            setAcknowledgedAll(false)
+            setIsOpen(true)
+          }}
           tooltip={{
             content: {
               side: 'bottom',
