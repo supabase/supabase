@@ -1,14 +1,14 @@
+import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
 import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
-
-import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
+
 import { ButtonTooltip } from '../ButtonTooltip'
-import type { AssistantModelId } from 'lib/ai/model.utils'
 import { type SqlSnippet } from './AIAssistant.types'
 import { ModelSelector } from './ModelSelector'
 import { getSnippetContent, SnippetRow } from './SnippetRow'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */

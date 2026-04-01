@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import { ConnectionTimeoutError } from 'types/api-errors'
-import { ResponseError } from 'types/base'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
+import { ConnectionTimeoutError } from '@/types/api-errors'
+import { ResponseError } from '@/types/base'
 
 vi.mock('lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 vi.mock('state/ai-assistant-state', () => ({

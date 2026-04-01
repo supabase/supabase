@@ -1,4 +1,3 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -31,6 +30,7 @@ import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),

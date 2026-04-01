@@ -1,9 +1,9 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
-
-import { formatSql } from 'lib/formatSql'
 import { LogoLoader } from 'ui'
+
+import { formatSql } from '@/lib/formatSql'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
 

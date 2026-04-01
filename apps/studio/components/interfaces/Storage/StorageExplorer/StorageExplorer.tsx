@@ -1,11 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import type { Bucket } from 'data/storage/buckets-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
@@ -16,7 +12,11 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()

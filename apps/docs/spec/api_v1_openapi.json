@@ -4383,7 +4383,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database password" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],

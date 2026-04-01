@@ -1,7 +1,3 @@
-import { type DatabaseRolesData, type PgRole } from 'data/database-roles/database-roles-query'
-import type { JitDbAccessMembersData } from 'data/jit-db-access/jit-db-access-members-query'
-import type { OrganizationMembersData } from 'data/organizations/organization-members-query'
-import type { ProjectMembersData } from 'data/projects/project-members-query'
 import dayjs from 'dayjs'
 import { IPv4CidrRange, IPv6CidrRange } from 'ip-num'
 
@@ -15,6 +11,10 @@ import type {
   JitUserRule,
   JitUserRuleDraft,
 } from './JitDbAccess.types'
+import { type DatabaseRolesData, type PgRole } from '@/data/database-roles/database-roles-query'
+import type { JitDbAccessMembersData } from '@/data/jit-db-access/jit-db-access-members-query'
+import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
+import type { ProjectMembersData } from '@/data/projects/project-members-query'
 
 export function getRelativeDatetimeByMode(mode: JitExpiryMode) {
   if (mode === '1h') return dayjs().add(1, 'hour').toISOString()

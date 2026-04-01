@@ -5,28 +5,28 @@ import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   SidePanel,
-  cn,
 } from 'ui'
-import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
+import * as z from 'zod'
+
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
+import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
+import { useEnumeratedTypeCreateMutation } from '@/data/enumerated-types/enumerated-type-create-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean

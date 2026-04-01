@@ -1,7 +1,6 @@
 import Editor from '@monaco-editor/react'
 import { Check, Copy } from 'lucide-react'
 import { useMemo, useState } from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 type SqlMonacoBlockProps = {

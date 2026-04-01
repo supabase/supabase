@@ -1,6 +1,4 @@
-import { Markdown } from 'components/interfaces/Markdown'
 import { format } from 'date-fns'
-import { BASE_PATH } from 'lib/constants'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
 import { type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
@@ -31,6 +29,8 @@ import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Enum } from './AuthProvidersForm.types'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { BASE_PATH } from '@/lib/constants'
 
 interface FormFieldProps {
   projectRef: string | undefined

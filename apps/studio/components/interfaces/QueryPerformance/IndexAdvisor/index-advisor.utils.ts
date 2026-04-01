@@ -1,10 +1,9 @@
 import { toast } from 'sonner'
 
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-
-import { INTERNAL_SCHEMAS } from 'hooks/useProtectedSchemas'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
 /**
  * Gets the required extensions for index advisor

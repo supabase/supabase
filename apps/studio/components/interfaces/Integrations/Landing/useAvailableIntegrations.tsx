@@ -76,7 +76,7 @@ export const useAvailableIntegrations = () => {
           case 'overview':
             return dynamic(
               () =>
-                import('components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
+                import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
                   (mod) => mod.IntegrationOverviewTabV2
                 ),
               {

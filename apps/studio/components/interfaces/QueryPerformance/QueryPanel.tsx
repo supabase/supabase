@@ -1,7 +1,7 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const QueryPanelContainer = ({
   children,

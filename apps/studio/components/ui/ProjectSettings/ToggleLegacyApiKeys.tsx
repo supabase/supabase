@@ -1,16 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,7 +12,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
+
 import Panel from '../Panel'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useToggleLegacyAPIKeysMutation } from '@/data/api-keys/legacy-api-key-toggle-mutation'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()

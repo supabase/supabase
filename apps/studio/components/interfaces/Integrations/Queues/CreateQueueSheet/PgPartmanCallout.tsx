@@ -1,9 +1,9 @@
-import { EnableExtensionModal } from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import { usePgPartmanStatus } from '../usePgPartmanStatus'
+import { EnableExtensionModal } from '@/components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export function PgPartmanCallout() {
   const { pgPartmanExtension, isAvailable, isInstalled } = usePgPartmanStatus()

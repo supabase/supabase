@@ -1,11 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { VectorBucketIndex } from 'data/storage/vector-buckets-indexes-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SqlEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
 import { ChevronDown, ListPlus } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -32,6 +27,11 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
 interface VectorBucketTableExamplesSheetProps {

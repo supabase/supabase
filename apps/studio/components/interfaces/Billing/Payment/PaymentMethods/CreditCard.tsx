@@ -1,8 +1,4 @@
 import { MoreHorizontal } from 'lucide-react'
-
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
-import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -12,7 +8,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { PlanId } from 'data/subscriptions/types'
+
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { OrganizationPaymentMethod } from '@/data/organizations/organization-payment-methods-query'
+import { PlanId } from '@/data/subscriptions/types'
+import { BASE_PATH } from '@/lib/constants'
 
 interface CreditCardProps {
   paymentMethod: OrganizationPaymentMethod

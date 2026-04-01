@@ -1,7 +1,7 @@
-import { ConnectionTimeoutError, UnknownAPIResponseError } from 'types/api-errors'
 import { describe, expect, it } from 'vitest'
 
 import { getMappingForError } from './ErrorMatcher.utils'
+import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
 
 describe('getMappingForError', () => {
   it('returns the mapping for a classified error with a known errorType', () => {

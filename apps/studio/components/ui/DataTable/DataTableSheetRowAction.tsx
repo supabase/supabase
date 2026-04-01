@@ -11,9 +11,6 @@ import {
   Search,
 } from 'lucide-react'
 import { ComponentPropsWithRef } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
-import { useCopyToClipboard } from 'hooks/ui/useCopyToClipboard'
 import {
   cn,
   DropdownMenu,
@@ -23,6 +20,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
+import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
 interface DataTableSheetRowActionProps<
   TData,

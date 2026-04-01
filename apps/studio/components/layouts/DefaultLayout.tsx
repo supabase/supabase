@@ -1,11 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AppBannerWrapper } from 'components/interfaces/App/AppBannerWrapper'
-import { Sidebar } from 'components/interfaces/Sidebar'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useCheckLatestDeploy } from 'hooks/use-check-latest-deploy'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
@@ -17,6 +12,11 @@ import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileShe
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
 import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
+import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
+import { Sidebar } from '@/components/interfaces/Sidebar'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export interface DefaultLayoutProps {
   headerTitle?: string

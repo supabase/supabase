@@ -1,4 +1,3 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { BarChart2, Settings2, Table } from 'lucide-react'
 import {
   Checkbox_Shadcn_,
@@ -16,6 +15,7 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 interface BlockViewConfigurationProps {
   columns: string[]
