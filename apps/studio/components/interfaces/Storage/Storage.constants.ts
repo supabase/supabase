@@ -88,3 +88,6 @@ export const BUCKET_TYPES = {
 }
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'
+
+export const PUBLIC_BUCKET_TOOLTIP =
+  'This bucket is publicly readable. Anyone with the object URL can access files stored in it.'
