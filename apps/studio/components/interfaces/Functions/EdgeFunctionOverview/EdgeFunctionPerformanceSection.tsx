@@ -15,8 +15,8 @@ import {
   formatMetric,
   getChartEmptyStateCopy,
 } from './EdgeFunctionOverview.utils'
-import { EdgeFunctionTimeSeriesChartCard } from './EdgeFunctionTimeSeriesChartCard'
 import type { EdgeFunctionChartDatum } from './EdgeFunctionOverview.utils'
+import { EdgeFunctionTimeSeriesChartCard } from './EdgeFunctionTimeSeriesChartCard'
 
 interface EdgeFunctionPerformanceSectionProps {
   data: EdgeFunctionChartDatum[]

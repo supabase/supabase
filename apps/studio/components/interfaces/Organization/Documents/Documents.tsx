@@ -1,12 +1,3 @@
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { Fragment } from 'react'
 
 import { CustomDocument } from './CustomDocument'
@@ -15,6 +6,15 @@ import { HIPAA } from './HIPAA'
 import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
 import { TIA } from './TIA'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import {
+  ScaffoldContainer,
+  ScaffoldDivider,
+  ScaffoldSection,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
 export const Documents = () => {
   const { organizationLegalDocuments } = useCustomContent(['organization:legal_documents'])

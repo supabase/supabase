@@ -1,10 +1,4 @@
 import { useParams, useViewport } from 'common'
-import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
-import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
-import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
 import { AnimatePresence } from 'framer-motion'
 import { Menu, Search, X } from 'lucide-react'
 import { useRef } from 'react'
@@ -15,6 +9,12 @@ import { useFloatingToolbarDrag } from './useFloatingToolbarDrag'
 import { useFloatingToolbarNavSize } from './useFloatingToolbarNavSize'
 import { useFloatingToolbarSheet } from './useFloatingToolbarSheet'
 import { useFloatingToolbarSidebarClick } from './useFloatingToolbarSidebarClick'
+import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
+import { AssistantButton } from '@/components/layouts/AppLayout/AssistantButton'
+import { InlineEditorButton } from '@/components/layouts/AppLayout/InlineEditorButton'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
 
 export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const navRef = useRef<HTMLElement | null>(null)

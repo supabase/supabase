@@ -1,6 +1,4 @@
 import dayjs from 'dayjs'
-import { DOCS_URL } from 'lib/constants'
-import { isObject, tryParseJson } from 'lib/helpers'
 import { has } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -14,6 +12,8 @@ import {
   UPLOAD_FILE_TYPES,
 } from './SpreadsheetImport.constants'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
+import { DOCS_URL } from '@/lib/constants'
+import { isObject, tryParseJson } from '@/lib/helpers'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 

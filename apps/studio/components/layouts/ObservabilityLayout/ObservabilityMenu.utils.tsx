@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM } from '@/lib/constants'
 
 interface ObservabilityMenuItem {
   name: string

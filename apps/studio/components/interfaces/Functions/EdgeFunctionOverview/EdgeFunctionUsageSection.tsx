@@ -17,8 +17,8 @@ import {
   getChartEmptyStateCopy,
   MEMORY_CHART_CONFIG,
 } from './EdgeFunctionOverview.utils'
-import { EdgeFunctionTimeSeriesChartCard } from './EdgeFunctionTimeSeriesChartCard'
 import type { EdgeFunctionChartDatum } from './EdgeFunctionOverview.utils'
+import { EdgeFunctionTimeSeriesChartCard } from './EdgeFunctionTimeSeriesChartCard'
 
 interface EdgeFunctionUsageSectionProps {
   data: EdgeFunctionChartDatum[]

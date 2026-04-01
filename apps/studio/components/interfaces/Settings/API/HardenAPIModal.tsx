@@ -1,12 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import InformationBox from 'components/ui/InformationBox'
-import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Check, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -26,6 +17,16 @@ import {
   WarningIcon,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import InformationBox from '@/components/ui/InformationBox'
+import { useCreateAndExposeAPISchemaMutation } from '@/data/api-settings/create-and-expose-api-schema-mutation'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface HardenAPIModalProps {
   visible: boolean

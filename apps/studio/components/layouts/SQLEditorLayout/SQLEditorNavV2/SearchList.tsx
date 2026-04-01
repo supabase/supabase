@@ -1,21 +1,21 @@
-import { Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
-import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
-import { useContentCountQuery } from 'data/content/content-count-query'
-import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
-import { Snippet, SNIPPET_PAGE_LIMIT } from 'data/content/sql-folders-query'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
+import { Loader2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { TreeView } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
+import { ShareSnippetModal } from './ShareSnippetModal'
 import { formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { ShareSnippetModal } from './ShareSnippetModal'
 import { UnshareSnippetModal } from './UnshareSnippetModal'
+import DownloadSnippetModal from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
+import RenameQueryModal from '@/components/interfaces/SQLEditor/RenameQueryModal'
+import { useContentCountQuery } from '@/data/content/content-count-query'
+import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
+import { Snippet, SNIPPET_PAGE_LIMIT } from '@/data/content/sql-folders-query'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SearchListProps {
   search: string

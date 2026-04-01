@@ -1,18 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import {
-  EDGE_FUNCTION_CHART_INTERVALS,
-  getBucketedTimeRange,
-  getExecutionMetrics,
-  getInvocationChartData,
-  getInvocationTotals,
-  getInvocationUpdateAnnotation,
-  getRollingTimeRange,
-  getUsageMetrics,
-  toEdgeFunctionChartData,
-} from './EdgeFunctionOverview.utils'
-import type { EdgeFunctionChartRawDatum } from './EdgeFunctionOverview.utils'
 import NoPermission from 'components/ui/NoPermission'
 import {
   FunctionsCombinedStatsVariables,
@@ -26,6 +14,18 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { EdgeFunctionInvocationsSection } from './EdgeFunctionInvocationsSection'
+import {
+  EDGE_FUNCTION_CHART_INTERVALS,
+  getBucketedTimeRange,
+  getExecutionMetrics,
+  getInvocationChartData,
+  getInvocationTotals,
+  getInvocationUpdateAnnotation,
+  getRollingTimeRange,
+  getUsageMetrics,
+  toEdgeFunctionChartData,
+} from './EdgeFunctionOverview.utils'
+import type { EdgeFunctionChartRawDatum } from './EdgeFunctionOverview.utils'
 import { EdgeFunctionPerformanceSection } from './EdgeFunctionPerformanceSection'
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
 import { EdgeFunctionUsageSection } from './EdgeFunctionUsageSection'

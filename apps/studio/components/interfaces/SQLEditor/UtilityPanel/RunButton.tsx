@@ -1,7 +1,7 @@
 import { Command, CornerDownLeft, Loader2 } from 'lucide-react'
-
-import { detectOS } from 'lib/helpers'
 import { Button } from 'ui'
+
+import { detectOS } from '@/lib/helpers'
 
 interface SqlRunButtonProps {
   isDisabled?: boolean

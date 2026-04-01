@@ -1,6 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
 import { IS_PLATFORM } from 'common'
-import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
 import dayjs, { Dayjs } from 'dayjs'
 import { get } from 'lodash'
 import uniqBy from 'lodash/uniqBy'
@@ -9,6 +8,8 @@ import logConstants from 'shared-data/log-constants'
 
 import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
+import type { PlanId } from '@/data/subscriptions/types'
 
 /**
  * Convert a micro timestamp from number/string to iso timestamp

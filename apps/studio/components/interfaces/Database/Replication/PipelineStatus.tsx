@@ -1,14 +1,14 @@
-import { Loader2 } from 'lucide-react'
-
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import type { ResponseError } from 'types'
+import { Loader2 } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { getPipelineStateMessages } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
+import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
+import type { ResponseError } from '@/types'
 
 interface PipelineStatusProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined

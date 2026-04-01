@@ -1,14 +1,4 @@
-import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
-import {
-  VirtualizedTableCell,
-  VirtualizedTableHead,
-  VirtualizedTableHeader,
-  VirtualizedTableRow,
-} from 'components/ui/VirtualizedTable'
-import { Bucket } from 'data/storage/buckets-query'
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { formatBytes } from 'lib/helpers'
-import { createNavigationHandler } from 'lib/navigation'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
@@ -21,6 +11,17 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
+import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
+import {
+  VirtualizedTableCell,
+  VirtualizedTableHead,
+  VirtualizedTableHeader,
+  VirtualizedTableRow,
+} from '@/components/ui/VirtualizedTable'
+import { Bucket } from '@/data/storage/buckets-query'
+import { formatBytes } from '@/lib/helpers'
+import { createNavigationHandler } from '@/lib/navigation'
 
 type BucketTableMode = 'standard' | 'virtualized'
 

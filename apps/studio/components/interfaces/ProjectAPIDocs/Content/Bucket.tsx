@@ -1,13 +1,13 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge } from 'ui'
 
-import { useQueryClient } from '@tanstack/react-query'
-import { useBucketInfoQueryPreferCached } from 'data/storage/buckets-query'
-import { formatBytes } from 'lib/helpers'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import { useBucketInfoQueryPreferCached } from '@/data/storage/buckets-query'
+import { formatBytes } from '@/lib/helpers'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
   const queryClient = useQueryClient()

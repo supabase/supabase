@@ -1,3 +1,5 @@
+import { Loader2 } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
   Area,
@@ -8,13 +10,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, cn } from 'ui'
-import { Loader2 } from 'lucide-react'
+import { cn, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+
 import type { ChartDataPoint } from '../QueryInsights.types'
-import { useTheme } from 'next-themes'
-import { QueryInsightsChartTooltip } from './QueryInsightsChartTooltip'
-import { CHART_TABS, LEGEND_ITEMS, CHART_TYPE, SEL_COLOR } from './QueryInsightsChart.constants'
+import { CHART_TABS, CHART_TYPE, LEGEND_ITEMS, SEL_COLOR } from './QueryInsightsChart.constants'
 import { formatTime } from './QueryInsightsChart.utils'
+import { QueryInsightsChartTooltip } from './QueryInsightsChartTooltip'
 
 interface QueryInsightsChartProps {
   chartData: ChartDataPoint[]

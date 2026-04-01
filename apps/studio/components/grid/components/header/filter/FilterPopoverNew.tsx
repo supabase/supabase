@@ -1,10 +1,6 @@
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
-import type { Filter } from 'components/grid/types'
-import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
 import { format } from 'date-fns'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
@@ -18,6 +14,10 @@ import {
 } from 'ui-patterns'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
+import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
+import type { Filter } from '@/components/grid/types'
+import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
   portal?: boolean

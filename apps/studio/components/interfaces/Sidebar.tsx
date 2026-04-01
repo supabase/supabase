@@ -1,26 +1,11 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
-import {
-  generateOtherRoutes,
-  generateProductRoutes,
-  generateSettingsRoutes,
-  generateToolRoutes,
-} from 'components/layouts/Navigation/NavigationBar/NavigationBar.utils'
-import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
-import { useHideSidebar } from 'hooks/misc/useHideSidebar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLints } from 'hooks/misc/useLints'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -48,6 +33,21 @@ import {
   useIsPlatformWebhooksEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  generateOtherRoutes,
+  generateProductRoutes,
+  generateSettingsRoutes,
+  generateToolRoutes,
+} from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLints } from '@/hooks/misc/useLints'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5

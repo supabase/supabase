@@ -1,22 +1,22 @@
+import { useParams } from 'common'
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
+import { SidePanel } from 'ui'
 
-import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import { ENV_VAR_RAW_KEYS } from '@/components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
 import ProjectLinker, {
   ForeignProject,
-} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
-import { Markdown } from 'components/interfaces/Markdown'
-import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { SidePanel } from 'ui'
+} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
+import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
+import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
+import { useSidePanelsStateSnapshot } from '@/state/side-panels'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
