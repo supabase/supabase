@@ -33,7 +33,10 @@ export const DeleteOrganizationButton = () => {
     isFetching,
     isError,
   } = useOrgProjectsInfiniteQuery(
-    { slug: orgSlug },
+    { 
+      slug: orgSlug,
+      limit: MAX_PROJECT_ACKNOWLEDGEMENTS + 1,
+     },
     {
       enabled: isOpen,
       refetchOnMount: 'always',
