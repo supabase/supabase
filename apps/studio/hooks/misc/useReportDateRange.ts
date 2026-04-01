@@ -1,16 +1,17 @@
+import dayjs from 'dayjs'
+import { createParser, useQueryState } from 'nuqs'
+import { useCallback, useMemo, useState } from 'react'
+
 import {
   REPORT_DATERANGE_HELPER_LABELS,
   REPORTS_DATEPICKER_HELPERS,
   ReportsDatetimeHelper,
-} from 'components/interfaces/Reports/Reports.constants'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { maybeShowUpgradePromptIfNotEntitled } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import dayjs from 'dayjs'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { createParser, useQueryState } from 'nuqs'
-import { useCallback, useMemo, useState } from 'react'
+} from '@/components/interfaces/Reports/Reports.constants'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useCurrentOrgPlan } from '@/hooks/misc/useCurrentOrgPlan'
 
 export const getIntervalGranularity = (from: string, to: string): AnalyticsInterval => {
   const diffInDays = dayjs(to).diff(from, 'day', true)
