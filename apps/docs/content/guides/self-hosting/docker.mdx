@@ -237,6 +237,12 @@ After a minute or less, all services should have a status `Up [...] (healthy)`. 
 docker compose logs analytics
 ```
 
+<Admonition type="warning">
+
+  On Windows, CRLF line endings can break mounted shell scripts, causing errors like `exec /home/kong/kong-entrypoint.sh: no such file or directory` when starting Kong. The Docker template includes `volumes/.gitattributes` to enforce LF line endings on fresh checkouts, and existing files can be fixed by converting `volumes/` to LF before restarting with `docker compose down -v && docker compose up -d`.
+
+</Admonition>
+
 To stop Supabase, use:
 
 ```sh
