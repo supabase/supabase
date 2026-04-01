@@ -1,10 +1,4 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -25,6 +19,12 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import AlertError from '@/components/ui/AlertError'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()

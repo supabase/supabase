@@ -1,11 +1,6 @@
 'use client'
 
 import { useIsMFAEnabled, useParams } from 'common'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { getPathnameWithoutQuery } from 'lib/pathname.utils'
-import { useTrack } from 'lib/telemetry/track'
 import { Blocks, Boxes, ChartArea, ChevronLeft, Receipt, Settings, Users } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
@@ -21,6 +16,11 @@ import {
 } from './OrgMenuContent.utils'
 import { OrgMenuItem } from './OrgMenuItem'
 import { orgItemHasSubmenu, useOrgMenuNavigation } from './useOrgMenuNavigation'
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface OrgMenuContentProps {
   onCloseSheet?: () => void

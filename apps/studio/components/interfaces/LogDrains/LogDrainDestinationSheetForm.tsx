@@ -1,8 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -50,6 +47,9 @@ import {
   getHeadersSectionDescription as getHeadersDescription,
   validateNewHeader,
 } from './LogDrains.utils'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const FORM_ID = 'log-drain-destination-form'

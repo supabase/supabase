@@ -217,6 +217,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/key-value-field-array',
           items: [],
         },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
       ],
     },
     {

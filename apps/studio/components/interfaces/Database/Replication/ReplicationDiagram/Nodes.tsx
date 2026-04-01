@@ -1,7 +1,7 @@
+import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
 import { PropsWithChildren, useMemo } from 'react'
-import { Handle, Position } from '@xyflow/react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 

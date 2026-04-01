@@ -1,6 +1,5 @@
 // Copy Pasta from: https://github.com/sadmann7/shadcn-table/blob/main/src/components/kbd.tsx#L54
 import { ComponentPropsWithoutRef, forwardRef } from 'react'
-
 import { cn } from 'ui'
 
 export const kdbClassName = cn(

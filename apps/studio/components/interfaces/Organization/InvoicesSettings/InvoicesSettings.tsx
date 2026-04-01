@@ -1,35 +1,35 @@
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
-import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { getInvoice } from 'data/invoices/invoice-query'
-import { getInvoiceReceipt } from 'data/invoices/invoice-receipt-query'
-import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
-import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import dayjs from 'dayjs'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { formatCurrency } from 'lib/helpers'
 import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Organization } from 'types/base'
 import {
   Button,
   Card,
   CardFooter,
+  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import InvoicePayButton from './InvoicePayButton'
+import { InvoiceStatus } from '@/components/interfaces/Billing/Invoices.types'
+import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBadge'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { getInvoice } from '@/data/invoices/invoice-query'
+import { getInvoiceReceipt } from '@/data/invoices/invoice-receipt-query'
+import { useInvoicesCountQuery } from '@/data/invoices/invoices-count-query'
+import { useInvoicesQuery } from '@/data/invoices/invoices-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { formatCurrency } from '@/lib/helpers'
+import { Organization } from '@/types/base'
 
 const PAGE_LIMIT = 5
 

@@ -1,21 +1,19 @@
 import { IS_PLATFORM } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
+import { ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
-import type { ConnectMode } from '../ConnectSheet/Connect.types'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
+import { CONNECT_ACTIONS } from './ConnectSection.config'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH, PROJECT_STATUS } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
-import { CONNECT_ACTIONS, type ConnectSectionVariant } from './ConnectSection.config'
 
-interface ConnectSectionProps {
-  variant: ConnectSectionVariant
-}
-
-export const ConnectSection = ({ variant }: ConnectSectionProps) => {
+export const ConnectSection = () => {
+  const router = useRouter()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
@@ -26,7 +24,7 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
 
   const availableModeIds = useAvailableConnectModes()
   const availableActions = CONNECT_ACTIONS.filter((action) =>
-    availableModeIds.includes(action.mode)
+    action.mode ? availableModeIds.includes(action.mode) : true
   )
 
   const hasTrackedExposure = useRef(false)
@@ -35,14 +33,22 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
     if (!IS_PLATFORM) return
     if (hasTrackedExposure.current) return
     hasTrackedExposure.current = true
-    track('home_connect_section_exposed', { variant })
-  }, [variant, track])
+    track('home_connect_section_exposed')
+  }, [track])
 
-  const handleConnectClick = (mode: ConnectMode) => {
-    track('home_connect_action_clicked', { mode })
-    setConnectTab(mode)
-    setConnectSheetSource('connect_section')
-    setShowConnect(true)
+  const handleActionClick = (action: (typeof CONNECT_ACTIONS)[number]) => {
+    track('home_connect_action_clicked', { mode: action.id })
+
+    if (action.mode) {
+      setConnectTab(action.mode)
+      setConnectSheetSource('connect_section')
+      setShowConnect(true)
+      return
+    }
+
+    if (action.href && selectedProject?.ref) {
+      router.push(action.href.replace('[ref]', selectedProject.ref))
+    }
   }
 
   return (
@@ -67,26 +73,35 @@ export const ConnectSection = ({ variant }: ConnectSectionProps) => {
         </div>
 
         <CardContent className="relative z-10 p-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 divide-y md:divide-y-0 md:divide-x border-muted">
+          <div className="grid grid-cols-1 xl:grid-cols-5 divide-y xl:divide-y-0 xl:divide-x border-muted">
             {availableActions.map((action) => (
               <button
-                key={action.mode}
+                key={action.id}
                 type="button"
-                disabled={!isActiveHealthy}
-                onClick={() => handleConnectClick(action.mode)}
+                disabled={
+                  (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
+                }
+                onClick={() => handleActionClick(action)}
                 className={cn(
-                  'group flex flex-col items-center justify-center gap-3 p-6 text-center transition-colors min-h-32',
+                  'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
                   'hover:bg-surface-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
-                  !isActiveHealthy && 'cursor-not-allowed opacity-50'
+                  'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
+                  ((action.requiresActiveProject ?? true)
+                    ? !isActiveHealthy
+                    : !selectedProject?.ref) && 'cursor-not-allowed opacity-50'
                 )}
               >
-                <span className="text-foreground-light group-hover:text-foreground">
+                <span className="shrink-0 text-foreground-light group-hover:text-foreground">
                   {action.icon}
                 </span>
-                <div className="flex flex-col gap-1">
+                <div className="flex min-w-0 flex-1 flex-col gap-1 xl:flex-initial">
                   <p className="text-sm">{action.heading}</p>
                   <p className="text-sm text-foreground-lighter">{action.subheading}</p>
                 </div>
+                <ChevronRight
+                  size={16}
+                  className="shrink-0 text-foreground-lighter group-hover:text-foreground xl:hidden"
+                />
               </button>
             ))}
           </div>

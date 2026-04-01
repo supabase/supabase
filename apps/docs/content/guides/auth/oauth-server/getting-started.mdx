@@ -212,7 +212,7 @@ export default async function ConsentPage({
     {
       cookies: {
         getAll: async () => (await cookies()).getAll(),
-        setAll: async (cookiesToSet) => {
+        setAll: async (cookiesToSet, _headers) => {
           const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
@@ -297,7 +297,7 @@ export async function POST(request: Request) {
     {
       cookies: {
         getAll: async () => (await cookies()).getAll(),
-        setAll: async (cookiesToSet) => {
+        setAll: async (cookiesToSet, _headers) => {
           const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },

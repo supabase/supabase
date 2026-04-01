@@ -327,15 +327,21 @@ function createStorageExplorerState({
         status: STORAGE_ROW_STATUS.LOADING,
         columnIndex: index,
       })
-      state.pushColumnAtIndex(
-        { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
-        index
-      )
-
       const prefix = state.openedFolders
         .slice(0, index + 1)
         .map((folder) => folder.name)
         .join('/')
+      state.pushColumnAtIndex(
+        {
+          id: folderId,
+          name: folderName,
+          path: prefix,
+          status: STORAGE_ROW_STATUS.LOADING,
+          items: [],
+        },
+        index
+      )
+
       const options = {
         limit: LIMIT,
         offset: OFFSET,
@@ -364,6 +370,7 @@ function createStorageExplorerState({
           {
             id: folderId || folderName,
             name: folderName,
+            path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
             hasMoreItems: formattedItems.length === LIMIT,
@@ -395,7 +402,6 @@ function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
-      const prefix = state.openedFolders.map((folder) => folder.name).join('/')
       const options = {
         limit: LIMIT,
         offset: column.items.length,
@@ -408,14 +414,14 @@ function createStorageExplorerState({
           {
             projectRef: state.projectRef,
             bucketId: state.selectedBucket.id,
-            path: prefix,
+            path: column.path,
             options,
           },
           abortController?.signal
         )
 
         // Add items to column
-        const formattedItems = formatFolderItems(data, prefix)
+        const formattedItems = formatFolderItems(data, column.path)
         state.columns = state.columns.map((col, idx) => {
           if (idx === index) {
             return {
@@ -454,7 +460,7 @@ function createStorageExplorerState({
 
       if (showLoading) {
         state.columns = [state.selectedBucket.name].concat(paths).map((path) => {
-          return { id: path, name: path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
+          return { id: path, name: path, path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
         })
       }
 
@@ -490,6 +496,7 @@ function createStorageExplorerState({
           id: null,
           status: STORAGE_ROW_STATUS.READY,
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
+          path: prefix,
           items: formattedItems,
           hasMoreItems: formattedItems.length === LIMIT,
           isLoadingMoreItems: false,

@@ -1,32 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { organizationKeys } from 'data/organizations/keys'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,
 } from './BillingCustomerDataForm'
 import { resolveStoredTaxId } from './TaxID.utils'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { organizationKeys } from '@/data/organizations/keys'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from '@/data/organizations/organization-tax-id-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()

@@ -1,12 +1,6 @@
-import { AlertCircle, HelpCircle } from 'lucide-react'
-
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { DOCS_URL } from 'lib/constants'
-import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
+import { AlertCircle, HelpCircle } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Button,
@@ -25,7 +19,13 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { MemberRow } from './MemberRow'
+import AlertError from '@/components/ui/AlertError'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 
 export interface MembersViewProps {
   searchString: string

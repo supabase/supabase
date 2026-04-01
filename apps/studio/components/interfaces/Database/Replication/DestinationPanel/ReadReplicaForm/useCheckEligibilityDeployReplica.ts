@@ -1,16 +1,16 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
 
-import { useParams } from 'common'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
+import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
 import {
   MAX_REPLICAS_ABOVE_XL,
   MAX_REPLICAS_BELOW_XL,
   useReadReplicasQuery,
-} from 'data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+} from '@/data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useCheckEligibilityDeployReplica = () => {
   const { ref: projectRef } = useParams()

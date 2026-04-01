@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useState } from 'react'
 
-import { useParams } from 'common'
-import { get } from 'data/fetchers'
 import { generateRegexpWhere } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
+import { get } from '@/data/fetchers'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {

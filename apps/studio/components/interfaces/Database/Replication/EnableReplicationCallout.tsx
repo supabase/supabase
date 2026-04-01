@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { useCreateTenantSourceMutation } from 'data/replication/create-tenant-source-mutation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -12,13 +12,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { DOCS_URL } from '@/lib/constants'
 
 const EnableReplicationModal = () => {

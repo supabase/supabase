@@ -2,13 +2,13 @@ import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@mona
 import { merge, noop } from 'lodash'
 import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
-import { timeout } from 'lib/helpers'
 import { cn, LogoLoader } from 'ui'
+
 import { alignEditor } from './CodeEditor.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
+import { timeout } from '@/lib/helpers'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
 const DEFAULT_ACTIONS = {

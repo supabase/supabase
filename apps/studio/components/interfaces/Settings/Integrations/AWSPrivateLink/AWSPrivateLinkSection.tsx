@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button, Card, CardContent, cn } from 'ui'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { IntegrationImageHandler } from '../IntegrationsSettings'
+import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
+import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
-import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { Button, Card, CardContent, cn } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
-import { IntegrationImageHandler } from '../IntegrationsSettings'
-import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
-import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
+} from '@/components/layouts/Scaffold'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAWSAccountDeleteMutation } from '@/data/aws-accounts/aws-account-delete-mutation'
+import { useAWSAccountsQuery } from '@/data/aws-accounts/aws-accounts-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()

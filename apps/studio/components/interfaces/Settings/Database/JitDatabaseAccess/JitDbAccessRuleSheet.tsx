@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
@@ -44,12 +42,14 @@ import {
 } from './JitDbAccess.utils'
 import { JitDbAccessRoleGrantFields } from './JitDbAccessRoleGrantFields'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useJitDbAccessGrantMutation } from '@/data/jit-db-access/jit-db-access-grant-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { DOCS_URL } from '@/lib/constants'
 
 const grantSchema = z.object({
   roleId: z.string(),

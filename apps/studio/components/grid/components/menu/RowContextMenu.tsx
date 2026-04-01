@@ -1,17 +1,17 @@
-import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
-import type { SupaRow } from 'components/grid/types'
-import { useIsTableFilterBarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Copy, Edit, ListFilter, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { copyToClipboard, DialogSectionSeparator } from 'ui'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
 import { buildFilterFromCellValue, isComplexValue } from '../header/filter/FilterPopoverNew.utils'
+import { ROW_CONTEXT_MENU_ID } from '@/components/grid/constants'
+import type { SupaRow } from '@/components/grid/types'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 type RowContextMenuProps = {
   rows: SupaRow[]
