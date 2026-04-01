@@ -1,14 +1,12 @@
 import { handleError } from 'data/fetchers'
 import type { TypedDocumentString } from './graphql'
 
-const CONTENT_API_URL = process.env.NEXT_PUBLIC_CONTENT_API_URL!
-
 export async function executeGraphQL<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
   { variables, signal }: { variables?: TVariables; signal?: AbortSignal }
 ) {
   try {
-    const response = await fetch(CONTENT_API_URL, {
+    const response = await fetch('/api/content/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

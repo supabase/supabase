@@ -1,6 +1,6 @@
+import { PlanId } from 'data/subscriptions/types'
 import dayjs from 'dayjs'
 
-import { PlanId } from 'data/subscriptions/types'
 import type { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
 
@@ -400,11 +400,11 @@ select
     -- mean_time,
     coalesce(statements.rows::numeric / nullif(statements.calls, 0), 0) as avg_rows,
     statements.rows as rows_read,
-    case 
-      when (statements.shared_blks_hit + statements.shared_blks_read) > 0 
+    case
+      when (statements.shared_blks_hit + statements.shared_blks_read) > 0
       then round(
-        (statements.shared_blks_hit * 100.0) / 
-        (statements.shared_blks_hit + statements.shared_blks_read), 
+        (statements.shared_blks_hit * 100.0) /
+        (statements.shared_blks_hit + statements.shared_blks_read),
         2
       )
       else 0
@@ -430,7 +430,8 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by statements.calls desc'}
   limit 20`,
       },
@@ -440,6 +441,11 @@ select
         -- reports-query-performance-most-time-consuming
 set search_path to public, extensions;
 
+-- compute total time once up front so we don't need a window function over all rows
+with grand_total as (
+  select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+  from pg_stat_statements where calls > 0
+)
 select
     auth.rolname,
     statements.query,
@@ -448,7 +454,7 @@ select
     statements.mean_exec_time + statements.mean_plan_time as mean_time,
     coalesce(
       ((statements.total_exec_time + statements.total_plan_time) /
-        nullif(sum(statements.total_exec_time + statements.total_plan_time) OVER(), 0)) *
+        (select v from grand_total)) *
         100,
       0
     ) as prop_total_time${
@@ -473,7 +479,8 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by total_time desc'}
   limit 20`,
       },
@@ -519,7 +526,8 @@ select
     }
   from pg_stat_statements as statements
     inner join pg_authid as auth on statements.userid = auth.oid
-  ${where || ''}
+  -- skip queries that were never actually executed
+  WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
   ${orderBy || 'order by max_time desc'}
   limit 20`,
       },
@@ -538,12 +546,35 @@ select
       },
       unified: {
         queryType: 'db',
-        sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => {
+        sql: (
+          _params,
+          where,
+          orderBy,
+          runIndexAdvisor = false,
+          filterIndexAdvisor = false,
+          page = 1,
+          pageSize = 20
+        ) => {
+          const offset = (page - 1) * pageSize
+          // When filtering by index suggestions we need a larger scan window since we don't
+          // know how many rows will match. Cap at a reasonable upper bound to avoid running
+          // index_advisor() across the entire dataset on any code path where it's active.
+          const INDEX_ADVISOR_SCAN_CAP = 500
+          const baseScanTarget =
+            filterIndexAdvisor && runIndexAdvisor ? offset + pageSize * 10 : offset + pageSize
+          const baseCteLimit = runIndexAdvisor
+            ? Math.min(baseScanTarget, INDEX_ADVISOR_SCAN_CAP)
+            : baseScanTarget
           const baseQuery = `
         -- reports-query-performance-unified
         set search_path to public, extensions;
 
-        with base as (
+        -- compute total time once up front so we don't need a window function over all rows
+        with grand_total as (
+          select coalesce(nullif(sum(total_exec_time + total_plan_time), 0), 1) as v
+          from pg_stat_statements where calls > 0
+        ),
+        base as (
           select
             auth.rolname,
             statements.query,
@@ -564,15 +595,16 @@ select
             end as cache_hit_rate,
             coalesce(
               ((statements.total_exec_time + statements.total_plan_time) /
-                nullif(sum(statements.total_exec_time + statements.total_plan_time) OVER(), 0)) *
+                (select v from grand_total)) *
                 100,
               0
             ) as prop_total_time
           from pg_stat_statements as statements
             inner join pg_authid as auth on statements.userid = auth.oid
-          ${where || ''}
+          -- skip queries that were never actually executed
+          WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
           ${orderBy || 'order by total_time desc'}
-          limit 50
+          ${baseCteLimit !== null ? `limit ${baseCteLimit}` : ''}
         ),
         query_results as (
           select
@@ -602,7 +634,7 @@ select
         from query_results
         ${filterIndexAdvisor && runIndexAdvisor ? `where (index_advisor_result->>'has_suggestion')::boolean = true` : ''}
         ${orderBy || 'order by total_time desc'}
-        limit 20`
+        limit ${pageSize} offset ${offset}`
 
           return baseQuery
         },
@@ -615,28 +647,30 @@ select
 
         -- Count of slow queries (> 1 second average)
         SELECT count(*) as slow_queries_count
-        FROM pg_stat_statements 
-        WHERE statements.mean_exec_time > 1000;`,
+        -- alias needed to reference columns in WHERE
+        FROM pg_stat_statements as statements
+        -- skip never-executed queries; mean_exec_time > 1000ms = avg over 1 second
+        WHERE statements.calls > 0 AND statements.mean_exec_time > 1000;`,
       },
       queryMetrics: {
         queryType: 'db',
         sql: (_params, where, orderBy, runIndexAdvisor = false, filterIndexAdvisor = false) => `
         -- reports-query-performance-metrics
         set search_path to public, extensions;
-      
-        SELECT 
+
+        SELECT
           COALESCE(ROUND(AVG(statements.rows::numeric / NULLIF(statements.calls, 0)), 1), 0) as avg_rows_per_call,
           COUNT(*) FILTER (WHERE statements.total_exec_time + statements.total_plan_time > 1000) as slow_queries,
           COALESCE(
             ROUND(
-              SUM(statements.shared_blks_hit) * 100.0 / 
-              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0), 
+              SUM(statements.shared_blks_hit) * 100.0 /
+              NULLIF(SUM(statements.shared_blks_hit + statements.shared_blks_read), 0),
               2
             ), 0
           ) || '%' as cache_hit_rate
         FROM pg_stat_statements as statements
-        WHERE statements.calls > 0
-        ${where || ''}
+        -- skip queries that were never actually executed
+        WHERE statements.calls > 0 ${where ? where.replace(/^WHERE/, 'AND') : ''}
         ${orderBy || ''}`,
       },
     },

@@ -1,13 +1,14 @@
-import { useMemo, useRef } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Card,
   cn,
+  Sheet,
+  SheetContent,
   Table,
   TableBody,
   TableCell,
@@ -16,7 +17,10 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import { DeleteWrapperModal } from './DeleteWrapperModal'
+import { EditWrapperSheet } from './EditWrapperSheet'
 import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
 
@@ -29,7 +33,9 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const { data: project } = useSelectedProjectQuery()
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
-  const { data } = useFDWsQuery({
+  const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
+
+  const { data, isSuccess } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -42,27 +48,15 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     [data, integration]
   )
 
-  // Track the ID being deleted to exclude it from error checking
-  const deletingWrapperIdRef = useRef<string | null>(null)
+  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
+  const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
 
-  const { setValue: setSelectedWrapperToEdit, value: selectedWrapperToEdit } =
-    useQueryStateWithSelect({
-      urlKey: 'edit',
-      select: (wrapperId: string) =>
-        wrapperId ? wrappers.find((w) => w.id.toString() === wrapperId) : undefined,
-      enabled: !!wrappers.length,
-      onError: () => toast.error(`Wrapper not found`),
-    })
-
-  const { setValue: setSelectedWrapperToDelete, value: selectedWrapperToDelete } =
-    useQueryStateWithSelect({
-      urlKey: 'delete',
-      select: (wrapperId: string) =>
-        wrapperId ? wrappers.find((w) => w.id.toString() === wrapperId) : undefined,
-      enabled: !!wrappers.length,
-      onError: (_error, selectedId) =>
-        handleErrorOnDelete(deletingWrapperIdRef, selectedId, `Wrapper not found`),
-    })
+  useEffect(() => {
+    if (isSuccess && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
+      toast('Wrapper not found')
+      setSelectedWrapperToEdit(null)
+    }
+  }, [isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -73,50 +67,66 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   }
 
   return (
-    <Card className="max-w-5xl">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[220px]">Name</TableHead>
-            <TableHead>Tables</TableHead>
-            <TableHead>Encrypted key</TableHead>
-            <TableHead className="w-24">
-              <span className="sr-only">Actions</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-            return (
-              <WrapperRow
-                key={x.id}
-                wrapper={x}
-                selectedWrapperToEdit={selectedWrapperToEdit}
-                selectedWrapperToDelete={selectedWrapperToDelete}
-                setSelectedWrapperToEdit={setSelectedWrapperToEdit}
-                setSelectedWrapperToDelete={setSelectedWrapperToDelete}
-                deletingWrapperIdRef={deletingWrapperIdRef}
-              />
-            )
-          })}
-        </TableBody>
-        <TableFooter
-          className={cn(
-            'text-xs font-normal text-center text-foreground-muted',
-            // Prevent the footer from being highlighted on hover
-            '[&>tr>td]:hover:bg-inherit',
-            // Conditionally remove the border-top if there are no wrappers
-            wrappers.length === 0 ? 'border-t-0' : ''
+    <>
+      <Card className="max-w-5xl">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[220px]">Name</TableHead>
+              <TableHead>Tables</TableHead>
+              <TableHead>Encrypted key</TableHead>
+              <TableHead className="w-24">
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
+              return <WrapperRow key={x.id} wrapper={x} />
+            })}
+          </TableBody>
+          <TableFooter
+            className={cn(
+              'text-xs font-normal text-center text-foreground-muted',
+              // Prevent the footer from being highlighted on hover
+              '[&>tr>td]:hover:bg-inherit',
+              // Conditionally remove the border-top if there are no wrappers
+              wrappers.length === 0 ? 'border-t-0' : ''
+            )}
+          >
+            <TableRow>
+              <TableCell colSpan={4}>
+                {wrappers.length} {integration?.name}
+                {wrappers.length === 0 || wrappers.length > 1 ? 's' : ''} created
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </Card>
+
+      <Sheet
+        open={!!selectedWrapperToEdit}
+        onOpenChange={(open) => {
+          if (!open) setIsClosingEditWrapper(true)
+        }}
+      >
+        <SheetContent size="lg" tabIndex={undefined}>
+          {selectedWrapperToEdit && (
+            <EditWrapperSheet
+              wrapper={selectedWrapperToEdit}
+              wrapperMeta={integration.meta}
+              onClose={() => {
+                setSelectedWrapperToEdit(null)
+                setIsClosingEditWrapper(false)
+              }}
+              isClosing={isClosingEditWrapper}
+              setIsClosing={setIsClosingEditWrapper}
+            />
           )}
-        >
-          <TableRow>
-            <TableCell colSpan={4}>
-              {wrappers.length} {integration?.name}
-              {wrappers.length > 1 ? 's' : ''} created
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </Card>
+        </SheetContent>
+      </Sheet>
+
+      <DeleteWrapperModal />
+    </>
   )
 }

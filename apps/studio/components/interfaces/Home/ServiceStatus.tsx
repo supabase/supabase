@@ -195,7 +195,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
-      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : restStatus?.status ?? 'UNHEALTHY',
+      status: extractDbSchema(restStatus) === '' ? 'DISABLED' : (restStatus?.status ?? 'UNHEALTHY'),
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -325,7 +325,7 @@ export const ServiceStatus = () => {
           {isBranch ? 'Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ portal className="p-0 w-56" side="bottom" align="center">
+      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
           <Link
             href={`/project/${ref}${service.logsUrl}`}

@@ -1,8 +1,24 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { Button, Form, Input, Listbox, Modal } from 'ui'
-
 import { DATETIME_FORMAT } from 'lib/constants'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+import {
+  Button,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  Modal,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { useCopyUrl } from './useCopyUrl'
 
 const unitMap = {
@@ -10,7 +26,21 @@ const unitMap = {
   weeks: 3600 * 24 * 7,
   months: 3600 * 24 * 30,
   years: 3600 * 24 * 365,
-}
+} as const
+
+const formSchema = z.object({
+  expiresIn: z.preprocess(
+    (val) => (val ? val : undefined),
+    z.coerce
+      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .positive('Expiry duration must be greater than 0')
+  ),
+  units: z.enum(['days', 'weeks', 'months', 'years']),
+})
+
+type FormSchema = z.infer<typeof formSchema>
+
+const formId = 'storage-custom-expiry-form'
 
 export const CustomExpiryModal = () => {
   const { onCopyUrl } = useCopyUrl()
@@ -20,6 +50,27 @@ export const CustomExpiryModal = () => {
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
 
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { expiresIn: 0, units: 'days' },
+  })
+
+  const handleClose = () => {
+    onClose()
+    form.reset()
+  }
+
+  const { isDirty, isSubmitting, isValid } = form.formState
+  const handleSubmit: SubmitHandler<FormSchema> = async (values) => {
+    await onCopyUrl(selectedFileCustomExpiry!.path!, values.expiresIn * unitMap[values.units])
+    handleClose()
+  }
+
+  const [expiresIn, units] = useWatch({
+    name: ['expiresIn', 'units'],
+    control: form.control,
+  })
+
   return (
     <Modal
       hideFooter
@@ -28,75 +79,86 @@ export const CustomExpiryModal = () => {
       visible={visible}
       alignFooter="right"
       confirmText="Get URL"
-      onCancel={() => onClose()}
+      onCancel={handleClose}
     >
-      <Form
-        validateOnBlur
-        initialValues={{ expiresIn: '', units: 'days' }}
-        onSubmit={async (values: any, { setSubmitting }: any) => {
-          setSubmitting(true)
-          await onCopyUrl(
-            selectedFileCustomExpiry!.name,
-            values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
-          )
-          setSubmitting(false)
-          onClose()
-        }}
-        validate={(values: any) => {
-          const errors: any = {}
-          if (values.expiresIn !== '' && values.expiresIn <= 0) {
-            errors.expiresIn = 'Expiry duration cannot be less than 0'
-          }
-          return errors
-        }}
-      >
-        {({ values, isSubmitting }: { values: any; isSubmitting: boolean }) => (
-          <>
-            <Modal.Content>
-              <p className="text-sm text-foreground-light mb-2">
-                Enter the duration for which the URL will be valid for:
-              </p>
-              <div className="flex items-center space-x-2">
-                <Input disabled={isSubmitting} type="number" id="expiresIn" className="w-full" />
-                <Listbox id="units" className="w-[150px]">
-                  <Listbox.Option id="days" label="days" value="days">
-                    days
-                  </Listbox.Option>
-                  <Listbox.Option id="weeks" label="weeks" value="weeks">
-                    weeks
-                  </Listbox.Option>
-                  <Listbox.Option id="months" label="months" value="months">
-                    months
-                  </Listbox.Option>
-                  <Listbox.Option id="years" label="years" value="years">
-                    years
-                  </Listbox.Option>
-                </Listbox>
-              </div>
-              {values.expiresIn !== '' && (
-                <p className="text-sm text-foreground-light mt-2">
-                  URL will expire on{' '}
-                  {dayjs().add(values.expiresIn, values.units).format(DATETIME_FORMAT)}
-                </p>
-              )}
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end space-x-2">
-              <Button type="default" onClick={() => onClose()}>
-                Cancel
-              </Button>
-              <Button
-                disabled={values.expiresIn === '' || isSubmitting}
-                loading={isSubmitting}
-                htmlType="submit"
-                type="primary"
-              >
-                Get signed URL
-              </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
+      <Form_Shadcn_ {...form}>
+        <Modal.Content>
+          <p className="text-sm text-foreground-light mb-4">
+            Enter the duration for which the URL will be valid for:
+          </p>
+          <form
+            id={formId}
+            onSubmit={form.handleSubmit(handleSubmit)}
+            noValidate
+            className="flex items-start space-x-2"
+          >
+            <div className="flex-grow">
+              <FormField_Shadcn_
+                control={form.control}
+                name="expiresIn"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Duration">
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        {...field}
+                        type="number"
+                        onChange={(e) => {
+                          field.onChange(
+                            isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
+                          )
+                        }}
+                      />
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </div>
+            <div>
+              <FormField_Shadcn_
+                control={form.control}
+                name="units"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Units">
+                    <FormControl_Shadcn_>
+                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger_Shadcn_>
+                          <SelectValue_Shadcn_ aria-label="Units" placeholder="Select an option" />
+                        </SelectTrigger_Shadcn_>
+                        <SelectContent_Shadcn_>
+                          <SelectItem_Shadcn_ value="days">days</SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="weeks">weeks</SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="months">months</SelectItem_Shadcn_>
+                          <SelectItem_Shadcn_ value="years">years</SelectItem_Shadcn_>
+                        </SelectContent_Shadcn_>
+                      </Select_Shadcn_>
+                    </FormControl_Shadcn_>
+                  </FormItemLayout>
+                )}
+              />
+            </div>
+          </form>
+          {isDirty && isValid && (
+            <p className="text-sm text-foreground-light mt-2">
+              URL will expire on {dayjs().add(expiresIn, units).format(DATETIME_FORMAT)}
+            </p>
+          )}
+        </Modal.Content>
+        <Modal.Separator />
+        <Modal.Content className="flex items-center justify-end space-x-2">
+          <Button type="default" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button
+            form={formId}
+            disabled={!isDirty || isSubmitting}
+            loading={isSubmitting}
+            htmlType="submit"
+            type="primary"
+          >
+            Get signed URL
+          </Button>
+        </Modal.Content>
+      </Form_Shadcn_>
     </Modal>
   )
 }

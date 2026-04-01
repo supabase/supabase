@@ -114,7 +114,7 @@ export const NetworkRestrictions = () => {
       <PageSection id="network-restrictions">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Network Restrictions</PageSectionTitle>
+            <PageSectionTitle>Network restrictions</PageSectionTitle>
           </PageSectionSummary>
           <PageSectionAside className="flex items-center gap-x-2">
             <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
@@ -206,8 +206,8 @@ export const NetworkRestrictions = () => {
               {isUninitialized || isAllowedAll ? (
                 <CardContent className="flex items-center justify-between">
                   <div className="flex items-start space-x-4">
-                    <div className="space-y-1">
-                      <p className="text-foreground-light text-sm">
+                    <div className="space-y-0.5">
+                      <p className="text-foreground text-sm">
                         Your database can be accessed by all IP addresses
                       </p>
                       <p className="text-foreground-light text-sm">

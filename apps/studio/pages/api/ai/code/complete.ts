@@ -5,6 +5,7 @@ import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   EDGE_FUNCTION_PROMPT,
@@ -65,12 +66,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // For code completion, we always use the limited model
     const {
-      model,
+      modelParams,
       error: modelError,
       promptProviderOptions,
     } = await getModel({
       provider: 'openai',
-      routingKey: projectRef,
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
@@ -154,7 +155,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const { text } = await generateText({
-      model,
+      ...modelParams,
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools,

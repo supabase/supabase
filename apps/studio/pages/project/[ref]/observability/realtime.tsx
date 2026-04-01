@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -23,6 +23,7 @@ import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/S
 import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
 import { realtimeReports } from 'data/reports/v2/realtime.config'
 import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns'
 import { ObservabilityLink } from 'components/ui/ObservabilityLink'
 
 const RealtimeReport: NextPageWithLayout = () => {
@@ -45,6 +46,7 @@ export default RealtimeReport
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { db, chart, ref } = useParams()
+  const showEUAlert = useFlag('realtimeReportEUAlert')
 
   const {
     selectedDateRange,
@@ -132,6 +134,13 @@ const RealtimeUsage = () => {
   return (
     <>
       <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      {showEUAlert ? (
+        <Admonition
+          type="warning"
+          title="EU projects metrics limitation"
+          description="For EU projects, Realtime metrics may not be accurate at this time. Please do not rely on these numbers for the time being."
+        />
+      ) : null}
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3">

@@ -1,9 +1,8 @@
+import { HomeIcon } from 'components/layouts/Navigation/LayoutHeader/HomeIcon'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { BoxPlus } from 'icons'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import {
   Button,
   Card,
@@ -16,21 +15,13 @@ import {
   TableRow,
 } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
+
 import { ShimmeringCard } from './ShimmeringCard'
 
 export const Header = () => {
   return (
-    <div className="border-default border-b p-3">
-      <div className="flex items-center space-x-2">
-        <Link href="/projects">
-          <img
-            src={`${BASE_PATH}/img/supabase-logo.svg`}
-            alt="Supabase"
-            className="border-default rounded border p-1 hover:border-white"
-            style={{ height: 24 }}
-          />
-        </Link>
-      </div>
+    <div className="flex items-center border-default border-b px-4 py-3.5">
+      <HomeIcon />
     </div>
   )
 }

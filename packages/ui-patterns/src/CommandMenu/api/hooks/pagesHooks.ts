@@ -1,11 +1,11 @@
 'use client'
 
-import { isEqual } from 'lodash'
-import { useEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo } from 'react'
+import { useLatest } from 'react-use'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
-import { type PageDefinition, isComponentPage } from '../../internal/state/pagesState'
+import { isComponentPage, type PageDefinition } from '../../internal/state/pagesState'
 import { useSetQuery } from './queryHooks'
 
 const useCurrentPage = () => {
@@ -60,37 +60,18 @@ const useRegisterPage = (
   const { pagesState } = useCommandContext()
   const { registerNewPage } = useSnapshot(pagesState)
 
-  const prevDeps = useRef(deps)
-  const prevEnabled = useRef(enabled)
+  const definitionRef = useLatest(definition)
 
-  const unsubscribe = useRef<() => void>()
+  // useLayoutEffect runs synchronously after DOM mutations but before paint.
+  // This ensures the page is registered before any subsequent code (e.g. in
+  // child components) tries to access it, avoiding a timing gap that would
+  // exist with useEffect.
+  useLayoutEffect(() => {
+    if (!enabled) return
 
-  /**
-   * useEffect handles the registration on first render, since React runs the
-   * first render twice in development. (Otherwise the first render would leave
-   * a dangling subscription.)
-   *
-   * It also handles final cleanup, since useMemo can't do this.
-   *
-   * useMemo handles the registration on subsequent renders, to ensure it
-   * happens synchronously.
-   */
-  useMemo(() => {
-    if (!isEqual(prevDeps.current, deps) || prevEnabled.current !== enabled) {
-      unsubscribe.current?.()
-
-      unsubscribe.current = enabled ? registerNewPage(name, definition) : undefined
-
-      prevDeps.current = deps
-      prevEnabled.current = enabled
-    }
-  }, [registerNewPage, name, definition, deps, enabled])
-
-  useEffect(() => {
-    unsubscribe.current = enabled ? registerNewPage(name, definition) : undefined
-
-    return () => unsubscribe.current?.()
-  }, [])
+    const unsubscribe = registerNewPage(name, definitionRef.current)
+    return unsubscribe
+  }, [registerNewPage, name, enabled, ...deps])
 }
 
-export { useCurrentPage, useRegisterPage, useSetPage, usePopPage, usePageComponent }
+export { useCurrentPage, usePageComponent, usePopPage, useRegisterPage, useSetPage }

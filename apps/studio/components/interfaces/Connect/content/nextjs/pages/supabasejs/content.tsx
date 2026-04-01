@@ -1,12 +1,12 @@
-import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
-import { SimpleCodeBlock } from 'ui'
+import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
 import {
   ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
-} from 'components/interfaces/Connect/ConnectTabs'
+} from '@/components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -53,7 +53,7 @@ function Page() {
   const [todos, setTodos] = useState([])
 
   useEffect(() => {
-    function getTodos() {
+    async function getTodos() {
       const { data: todos } = await supabase.from('todos').select()
 
       if (todos.length > 1) {

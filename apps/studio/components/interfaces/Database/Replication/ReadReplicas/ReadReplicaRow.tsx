@@ -1,18 +1,8 @@
-import { Loader2, Minus, MoreVertical, RotateCcw, Trash } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
-import DropReplicaConfirmationModal from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { type Database } from '@/data/read-replicas/replicas-query'
-import {
-  DatabaseStatus,
-  ReplicaInitializationStatus,
-} from '@/data/read-replicas/replicas-status-query'
-import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useParams } from 'common'
 import { Database as DatabaseIcon } from 'icons'
+import { Loader2, Minus, MoreVertical, RotateCcw, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import {
   Badge,
@@ -24,21 +14,28 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
 
+import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
+import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { type Database } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+
 interface ReadReplicaRow {
   replica: Database
-  replicaStatus?: DatabaseStatus
   onUpdateReplica: () => void
 }
 
-export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: ReadReplicaRow) => {
+export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => {
   const { ref } = useParams()
-  const { identifier, region, status: baseStatus } = replica
-
-  const status = replicaStatus?.status ?? baseStatus
-  const replicaInitializationStatus = replicaStatus?.replicaInitializationStatus
+  const { identifier, region, status } = replica
   const formattedId = formatDatabaseID(identifier ?? '')
 
   const {
@@ -57,54 +54,10 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
   const [showConfirmRestart, setShowConfirmRestart] = useState(false)
   const [showConfirmDrop, setShowConfirmDrop] = useState(false)
 
-  const initStatus = replicaInitializationStatus?.status
-  const regionLabel = Object.values(AWS_REGIONS).find((x) => x.code === region)?.displayName
+  const regionMeta = Object.values(AWS_REGIONS).find((x) => x.code === region)
 
-  const isInTransition =
-    (
-      [
-        REPLICA_STATUS.UNKNOWN,
-        REPLICA_STATUS.COMING_UP,
-        REPLICA_STATUS.GOING_DOWN,
-        REPLICA_STATUS.RESTORING,
-        REPLICA_STATUS.RESTARTING,
-        REPLICA_STATUS.RESIZING,
-        REPLICA_STATUS.INIT_READ_REPLICA,
-      ] as string[]
-    ).includes(status) || initStatus === ReplicaInitializationStatus.InProgress
-
-  const statusLabel = useMemo(() => {
-    if (
-      initStatus === ReplicaInitializationStatus.InProgress ||
-      status === REPLICA_STATUS.COMING_UP ||
-      status === REPLICA_STATUS.UNKNOWN ||
-      status === REPLICA_STATUS.INIT_READ_REPLICA
-    ) {
-      return 'Coming up'
-    }
-
-    if (
-      initStatus === ReplicaInitializationStatus.Failed ||
-      status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED
-    ) {
-      return 'Failed'
-    }
-
-    switch (status) {
-      case REPLICA_STATUS.GOING_DOWN:
-        return 'Going down'
-      case REPLICA_STATUS.RESTARTING:
-        return 'Restarting'
-      case REPLICA_STATUS.RESIZING:
-        return 'Resizing'
-      case REPLICA_STATUS.RESTORING:
-        return 'Restoring'
-      case REPLICA_STATUS.ACTIVE_HEALTHY:
-        return 'Healthy'
-      default:
-        return 'Unhealthy'
-    }
-  }, [initStatus, status])
+  const isInTransition = useMemo(() => getIsInTransition({ status }), [status])
+  const statusLabel = useMemo(() => getStatusLabel({ status }), [status])
 
   return (
     <>
@@ -115,8 +68,13 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
 
         <TableCell>
           <div>
-            <p>{regionLabel}</p>
-            <p className="text-foreground-lighter">Read Replica (ID: {formattedId})</p>
+            <p>Read Replica (ID: {formattedId})</p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <p className="text-foreground-lighter w-fit">{regionMeta?.displayName}</p>
+              </TooltipTrigger>
+              <TooltipContent side="right">{regionMeta?.code}</TooltipContent>
+            </Tooltip>
           </div>
         </TableCell>
 
@@ -153,21 +111,30 @@ export const ReadReplicaRow = ({ replica, replicaStatus, onUpdateReplica }: Read
 
         <TableCell>
           <div className="flex items-center justify-end gap-x-2">
-            {/* [Joshen] Temporarily hidden - will work on the replica detail page in another PR */}
-            {/* <Button asChild type="default" className="relative">
-              <Link href={`/project/${ref}/database/replication`}>View replication</Link>
-            </Button> */}
+            <Button asChild type="default" className="relative" disabled={status === 'GOING_DOWN'}>
+              <Link href={`/project/${ref}/database/replication/replica/${replica.identifier}`}>
+                View replication
+              </Link>
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button type="default" icon={<MoreVertical />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem className="gap-x-2" onClick={() => setShowConfirmRestart(true)}>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  disabled={status !== 'ACTIVE_HEALTHY'}
+                  onClick={() => setShowConfirmRestart(true)}
+                >
                   <RotateCcw size={14} />
                   <span>Restart replica</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-x-2" onClick={() => setShowConfirmDrop(true)}>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  disabled={status === 'GOING_DOWN'}
+                  onClick={() => setShowConfirmDrop(true)}
+                >
                   <Trash size={14} />
                   <span>Drop replica</span>
                 </DropdownMenuItem>

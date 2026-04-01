@@ -24,7 +24,7 @@ export const KeyboardShortcut = ({ keys }: { keys: string[] }) => {
         <span
           className={cn(
             ['Shift', 'Ctrl'].includes(key) ? 'px-1.5 py-0.5' : 'w-[23px] h-[23px]',
-            'border border-foreground-lightest',
+            'border border-control',
             'rounded flex items-center justify-center cursor-default'
           )}
           key={key}

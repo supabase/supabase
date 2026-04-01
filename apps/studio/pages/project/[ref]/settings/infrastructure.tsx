@@ -1,6 +1,6 @@
 import { InfrastructureActivity } from 'components/interfaces/Settings/Infrastructure/InfrastructureActivity'
-import InfrastructureInfo from 'components/interfaces/Settings/Infrastructure/InfrastructureInfo'
-import DefaultLayout from 'components/layouts/DefaultLayout'
+import { InfrastructureInfo } from 'components/interfaces/Settings/Infrastructure/InfrastructureInfo'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,

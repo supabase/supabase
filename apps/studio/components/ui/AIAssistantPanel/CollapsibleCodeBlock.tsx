@@ -1,14 +1,12 @@
 import { Code, X } from 'lucide-react'
-
 import {
   Button,
-  CodeBlock,
-  CodeBlockProps,
   cn,
   HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
 } from 'ui'
+import { CodeBlock, type CodeBlockProps } from 'ui-patterns/CodeBlock'
 
 interface CollapsibleCodeBlockProps extends CodeBlockProps {
   onRemove?: () => void

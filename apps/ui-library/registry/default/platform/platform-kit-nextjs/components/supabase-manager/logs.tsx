@@ -1,5 +1,10 @@
 'use client'
 
+import { Check, ChevronsUpDown, Logs, Terminal } from 'lucide-react'
+import { useMemo, useState } from 'react'
+
+import { genDefaultQuery, LogsTableName } from '../../lib/logs'
+import { cn } from '@/lib/utils'
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -26,10 +31,6 @@ import {
   TableRow,
 } from '@/registry/default/components/ui/table'
 import { useGetLogs } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-logs'
-import { LogsTableName, genDefaultQuery } from '../../lib/logs'
-import { cn } from '@/lib/utils'
-import { Check, ChevronsUpDown, Logs, Terminal } from 'lucide-react'
-import { useMemo, useState } from 'react'
 
 // Define log types with names and descriptions
 const logTypes = [

@@ -1,12 +1,7 @@
-// Markdown components
-
-export * from './src/lib/Markdown'
-
 // GENERAL
 
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
-export * from './src/components/Image'
 
 // DISPLAYS
 
@@ -15,9 +10,6 @@ export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
 export * from './src/components/Collapsible'
-export * from './src/components/CodeBlock'
-export * from './src/components/SimpleCodeBlock'
-export * from './src/components/Mermaid'
 
 // NAV
 
@@ -126,6 +118,8 @@ export {
   AlertTitle as AlertTitle_Shadcn_,
   AlertDescription as AlertDescription_Shadcn_,
 } from './src/components/shadcn/ui/alert'
+
+export * from './src/components/AlertCollapsible'
 
 export {
   Field as Field_Shadcn_,
@@ -266,16 +260,9 @@ export * from './src/components/TreeView'
 export * from './src/components/shadcn/ui/chart'
 export * from './src/components/shadcn/ui/sidebar'
 
-// links
-
-export * from './src/components/TextLink'
-
-// used for LW
-export * from './src/layout/banners'
-
+// ICONS
 export * from './src/components/StatusIcon'
 
-// ICONS
 // export icons
 export * from './src/components/Icon/icons/IconBriefcase2'
 export * from './src/components/Icon/icons/IconBroadcast'
@@ -298,5 +285,6 @@ export * from './src/components/Icon/icons/IconYoutubeSolid'
 
 // Export hooks
 export * from './src/lib/Hooks'
+export * from './src/components/hooks/use-mobile'
 
 export * from './src/components/KeyboardShortcut/KeyboardShortcut'

@@ -31,7 +31,7 @@ async function updateBucket({
   allowed_mime_types,
 }: BucketUpdateVariables): Promise<BucketUpdateResult> {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const payload: Partial<UpdateStorageBucketBody> = { public: isPublic }
   if (file_size_limit !== undefined) payload.file_size_limit = file_size_limit

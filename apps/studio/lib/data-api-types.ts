@@ -1,7 +1,8 @@
 import type { TablePrivilegesGrant } from 'data/privileges/table-privileges-grant-mutation'
+
 import type { DeepReadonly } from './type-helpers'
 
-export const API_ACCESS_ROLES = ['anon', 'authenticated'] as const
+export const API_ACCESS_ROLES = ['anon', 'authenticated', 'service_role'] as const
 export type ApiAccessRole = (typeof API_ACCESS_ROLES)[number]
 
 export const isApiAccessRole = (value: string): value is ApiAccessRole => {
@@ -28,11 +29,13 @@ export type ApiPrivilegesByRole = Record<ApiAccessRole, ApiPrivilegeType[]>
 export const DEFAULT_DATA_API_PRIVILEGES: DeepReadonly<ApiPrivilegesByRole> = {
   anon: [...API_PRIVILEGE_TYPES],
   authenticated: [...API_PRIVILEGE_TYPES],
+  service_role: [...API_PRIVILEGE_TYPES],
 }
 
 export const EMPTY_DATA_API_PRIVILEGES: DeepReadonly<ApiPrivilegesByRole> = {
   anon: [],
   authenticated: [],
+  service_role: [],
 }
 
 export const checkDataApiPrivilegesNonEmpty = (

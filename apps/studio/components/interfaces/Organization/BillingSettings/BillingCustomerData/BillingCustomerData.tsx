@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -15,6 +16,7 @@ import { useOrganizationCustomerProfileQuery } from 'data/organizations/organiza
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
 import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
+import { organizationKeys } from 'data/organizations/keys'
 import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
@@ -23,11 +25,12 @@ import {
   BillingCustomerDataForm,
   type BillingCustomerDataFormValues,
 } from './BillingCustomerDataForm'
-import { TAX_IDS } from './TaxID.constants'
+import { resolveStoredTaxId } from './TaxID.utils'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()
+  const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
@@ -63,9 +66,8 @@ export const BillingCustomerData = () => {
       tax_id_type: taxId?.type,
       tax_id_value: taxId?.value,
       tax_id_name: taxId
-        ? TAX_IDS.find(
-            (option) => option.type === taxId.type && option.countryIso2 === taxId.country
-          )?.name || ''
+        ? (resolveStoredTaxId(taxId.type, taxId.country, customerProfile?.address?.country)?.name ??
+          '')
         : '',
     }),
     [customerProfile, taxId]
@@ -92,9 +94,24 @@ export const BillingCustomerData = () => {
 
         toast.success('Successfully updated billing data')
 
+        // Optimistically update organization_missing_tax_id in the cached organizations list
+        // so the TaxIdBanner hides immediately. The server responds 304 Not Modified for a
+        // while after the tax ID is saved, so invalidation/refetch won't work here.
+        queryClient.setQueriesData<any[]>(
+          { queryKey: organizationKeys.list(), exact: true },
+          (prev) => {
+            if (!prev) return prev
+            return prev.map((org) =>
+              org.slug === slug ? { ...org, organization_missing_tax_id: data.tax_id == null } : org
+            )
+          }
+        )
+
         setIsSubmitting(false)
-      } catch (error: any) {
-        toast.error(`Failed updating billing data: ${error.message}`)
+      } catch (error) {
+        toast.error(
+          `Failed updating billing data: ${error instanceof Error ? error.message : 'Unknown error'}`
+        )
         setIsSubmitting(false)
       }
     },
