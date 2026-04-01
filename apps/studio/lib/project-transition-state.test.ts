@@ -49,9 +49,7 @@ describe('project-transition-state', () => {
       )
 
       expect(startTime).toBe(hoursToMilliseconds(30))
-      expect(window.localStorage.getItem('transition-key')).toBe(
-        String(hoursToMilliseconds(30))
-      )
+      expect(window.localStorage.getItem('transition-key')).toBe(String(hoursToMilliseconds(30)))
     })
   })
 
