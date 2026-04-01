@@ -12,7 +12,6 @@ import {
   Badge,
   Button,
   cn,
-  CodeBlock,
   ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
@@ -41,14 +40,18 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const getNextRun = (schedule: string, lastRun?: string) => {
   // cron-parser can only deal with the traditional cron syntax but technically users can also
   // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
   // (can't guarantee as scope is quite big)
-  if (schedule.includes('*')) {
+  if (schedule.includes('*') || schedule.includes('$')) {
     try {
-      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
+      // pg_cron uses '$' for "last day of month", but cron-parser uses 'L'
+      // Convert pg_cron syntax to cron-parser syntax before parsing
+      const normalizedSchedule = schedule.replace(/\$/g, 'L')
+      const interval = parser.parseExpression(normalizedSchedule, { tz: 'UTC' })
       return interval.next().getTime()
     } catch (error) {
       return undefined
@@ -89,7 +92,6 @@ export const CronJobTableCell = ({
   const [showToggleModal, setShowToggleModal] = useState(false)
 
   const value = row?.[col.id]
-  const hasValue = col.id in row
   const { jobid, schedule, latest_run, status, active, jobname } = row
 
   const formattedValue =
@@ -102,6 +104,8 @@ export const CronJobTableCell = ({
         : col.id === 'next_run'
           ? getNextRun(schedule, latest_run)
           : value
+
+  const hasValue = col.id === 'next_run' ? !!formattedValue : col.id in row
 
   const { mutate: runCronJob, isPending: isRunning } = useDatabaseCronJobRunCommandMutation({
     onSuccess: () => {

@@ -15,11 +15,11 @@ import {
   BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
   Button,
   cn,
-  CodeBlock,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import {
   PageHeader,
   PageHeaderAside,
@@ -70,7 +70,7 @@ export const CronJobPage = () => {
           <span className="cursor-pointer underline decoration-dotted lowercase">
             {isSecondsFormat(job.schedule)
               ? job.schedule.toLowerCase()
-              : CronToString(job.schedule.toLowerCase())}
+              : CronToString(job.schedule.toLowerCase().replace(/\$/g, 'L'))}
           </span>
         </TooltipTrigger>
         <TooltipContent side="bottom" align="center">

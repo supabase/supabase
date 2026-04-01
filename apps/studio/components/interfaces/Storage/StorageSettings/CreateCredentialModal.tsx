@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Form_Shadcn_,
+  FormField_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -126,22 +127,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
             <DialogSectionSeparator />
             <DialogSection className="flex flex-col gap-4">
               <FormItemLayout label="Access key ID" isReactForm={false}>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createS3KeyData?.access_key}
-                />
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.access_key} />
               </FormItemLayout>
               <FormItemLayout label={'Secret access key'} isReactForm={false}>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createS3KeyData?.secret_key}
-                />
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.secret_key} />
               </FormItemLayout>
             </DialogSection>
             <DialogFooter>
@@ -168,15 +157,15 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
             <Form_Shadcn_ {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogSection>
-                  <FormField
+                  <FormField_Shadcn_
                     name="description"
-                    render={() => (
+                    render={({ field }) => (
                       <FormItemLayout label="Description">
                         <Input
                           autoComplete="off"
                           placeholder="My test key"
                           type="text"
-                          {...form.register('description')}
+                          {...field}
                         />
                       </FormItemLayout>
                     )}

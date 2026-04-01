@@ -14,8 +14,6 @@ import type { StreamdownProps } from 'streamdown'
 import {
   Button,
   cn,
-  CodeBlock,
-  CodeBlockLang,
   Dialog,
   DialogClose,
   DialogContent,
@@ -24,8 +22,9 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  markdownComponents,
 } from 'ui'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
+import { markdownComponents } from 'ui-patterns/Markdown'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'

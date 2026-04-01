@@ -10,6 +10,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import { useVisibleKey } from 'hooks/ui/useVisibleKey'
 import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { DOCS_URL } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
@@ -94,6 +95,7 @@ export const TableEditor = ({
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const spreadsheetImportKey = useVisibleKey(isImportingSpreadsheet)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
   const { data: types } = useEnumeratedTypesQuery({
@@ -487,9 +489,8 @@ export const TableEditor = ({
         )}
 
         <SpreadsheetImport
+          key={spreadsheetImportKey}
           visible={isImportingSpreadsheet}
-          headers={importContent?.headers}
-          rows={importContent?.rows}
           saveContent={(prefillData: ImportContent) => {
             setImportContent(prefillData)
             setIsImportingSpreadsheet(false)

@@ -7,7 +7,6 @@ import Link from 'next/link'
 import {
   Button,
   cn,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -17,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 interface InsertDataDialogProps {
   table: string

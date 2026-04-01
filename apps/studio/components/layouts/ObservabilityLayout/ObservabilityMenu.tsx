@@ -33,7 +33,6 @@ const ObservabilityMenu = () => {
   const showOverview = useFlag('observabilityOverview')
   const { isSupamonitorEnabled } = useSupamonitorStatus()
 
-  // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(

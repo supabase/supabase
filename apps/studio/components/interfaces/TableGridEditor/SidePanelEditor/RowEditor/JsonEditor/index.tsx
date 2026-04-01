@@ -108,7 +108,7 @@ export const JsonEditor = ({
 
   useEffect(() => {
     if (visible) {
-      const temp = prettifyJSON(jsonString)
+      const temp = prettifyJSON(jsonString ?? '')
       setJsonStr(temp)
     }
   }, [visible])
@@ -174,7 +174,7 @@ export const JsonEditor = ({
               key={jsonString}
               readOnly={readOnly}
               onInputChange={(val) => setJsonStr(val ?? '')}
-              value={jsonStr.toString()}
+              value={(jsonStr ?? '').toString()}
             />
           </div>
         ) : (
