@@ -33,13 +33,13 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import {
   buildGroupAssistantPrompt,
   formatLogTimestamp,
-  getStatusBadgeVariant,
   formatSingleLineMessage,
   getFunctionRuntimeLogsSql,
   getRecentErrorGroups,
   getRecentErrorGroupsBase,
   getRecentErrorInvocationsSql,
   getRelatedExecutionIds,
+  getStatusBadgeVariant,
   toAlertError,
   type RecentErrorGroup,
 } from './EdgeFunctionRecentErrors.utils'

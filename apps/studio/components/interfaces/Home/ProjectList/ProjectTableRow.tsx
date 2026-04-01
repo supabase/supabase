@@ -1,29 +1,29 @@
-import { Github, MoreVertical, Settings, Copy, Check } from 'lucide-react'
+import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
-import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
-
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { BASE_PATH } from 'lib/constants'
-import { createNavigationHandler } from 'lib/navigation'
-import type { Organization } from 'types'
+import InlineSVG from 'react-inlinesvg'
+import { toast } from 'sonner'
 import {
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
+  Button,
+  copyToClipboard,
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   TableCell,
   TableRow,
-  Button,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { toast } from 'sonner'
-import { copyToClipboard } from 'ui'
+import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
+import { BASE_PATH } from '@/lib/constants'
+import { createNavigationHandler } from '@/lib/navigation'
+import type { Organization } from '@/types'
 
 export interface ProjectTableRowProps {
   project: OrgProject

@@ -5,13 +5,6 @@ import type {
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
-import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
-import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
-import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
-import { DOCS_URL } from 'lib/constants'
 import { Trash2, Upload, X } from 'lucide-react'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useForm } from 'react-hook-form'
@@ -40,6 +33,14 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthServerAppCreateMutation } from '@/data/oauth-server-apps/oauth-server-app-create-mutation'
+import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
+import { useOAuthServerAppUpdateMutation } from '@/data/oauth-server-apps/oauth-server-app-update-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean

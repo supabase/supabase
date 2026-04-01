@@ -1,6 +1,5 @@
 import { AiAssistantSource } from 'common/telemetry-constants'
 import { Chatgpt, Claude } from 'icons'
-import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
@@ -17,6 +16,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
+import { useTrack } from '@/lib/telemetry/track'
 
 type TelemetrySource = AiAssistantSource
 

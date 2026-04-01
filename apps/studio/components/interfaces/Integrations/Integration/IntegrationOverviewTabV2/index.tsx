@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
 import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
 import { useAvailableIntegrations } from '../../Landing/useAvailableIntegrations'
 import { FilesViewer } from './FilesViewer'
 import { MarkdownContent } from './MarkdownContent'
+import { Markdown } from '@/components/interfaces/Markdown'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 
 const getSiteUrlLabel = (url: string | undefined | null) => {

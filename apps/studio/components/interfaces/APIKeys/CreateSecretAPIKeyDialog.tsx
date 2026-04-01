@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { Plus, ShieldCheck } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -26,6 +25,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 const NAME_SCHEMA = z
   .string()

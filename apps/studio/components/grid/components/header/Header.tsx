@@ -1,33 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import { GridHeaderActions } from 'components/interfaces/TableGridEditor/GridHeaderActions'
-import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import {
-  useExportAllRowsAsCsv,
-  useExportAllRowsAsJson,
-  useExportAllRowsAsSql,
-} from 'components/layouts/TableEditorLayout/ExportAllRows'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { RoleImpersonationState } from 'lib/role-impersonation'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  useRoleImpersonationStateSnapshot,
-  useSubscribeToImpersonatedRole,
-} from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import {
   Button,
   cn,
@@ -43,6 +19,30 @@ import { ExportDialog } from './ExportDialog'
 import { FilterPopover } from './filter/FilterPopover'
 import { formatRowsForCSV } from './Header.utils'
 import { SortPopover } from './sort/SortPopover'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
+import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  useExportAllRowsAsCsv,
+  useExportAllRowsAsJson,
+  useExportAllRowsAsSql,
+} from '@/components/layouts/TableEditorLayout/ExportAllRows'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import {
+  useRoleImpersonationStateSnapshot,
+  useSubscribeToImpersonatedRole,
+} from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export type HeaderProps = {
   customHeader: ReactNode

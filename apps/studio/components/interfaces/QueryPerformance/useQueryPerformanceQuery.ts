@@ -1,10 +1,4 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import useDbQuery from 'hooks/analytics/useDbQuery'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
@@ -13,6 +7,12 @@ import {
   QueryPerformanceSort,
   QueryPerformanceSQLParams,
 } from './QueryPerformance.types'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import useDbQuery from '@/hooks/analytics/useDbQuery'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const VALID_SORT_COLUMNS: ReadonlySet<string> = new Set<QueryPerformanceSort['column']>([
   'query',

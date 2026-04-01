@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest'
+
 import { formatRowsForInsert, getRowFromSidePanel } from './SidePanelEditor.utils'
-import type { SidePanel } from 'state/table-editor'
-import type { SupaRow } from 'components/grid/types'
+import type { SupaRow } from '@/components/grid/types'
+import type { SidePanel } from '@/state/table-editor'
 
 describe('SidePanelEditor.utils.test.ts', () => {
   test('formatRowsForInsert should for format rows with basic data types correctly', () => {

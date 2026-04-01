@@ -5,7 +5,6 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { noop } from 'lodash'
 import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -20,6 +19,7 @@ import {
 } from 'ui'
 
 import type { Suggestion } from './ColumnEditor.types'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 const MAX_SUGGESTIONS = 3
 

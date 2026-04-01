@@ -1,8 +1,3 @@
-import {
-  NumericFilter,
-  ReportsNumericFilter,
-} from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { ReactNode, useEffect, useState } from 'react'
 
@@ -14,6 +9,11 @@ import { SortIndicator } from './components/SortIndicator'
 import { SourceFilterDropdown } from './components/SourceFilterDropdown'
 import { useIndexAdvisorStatus } from './hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
+import {
+  NumericFilter,
+  ReportsNumericFilter,
+} from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
 
 export const QueryPerformanceFilterBar = ({
   actions,

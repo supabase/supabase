@@ -1,9 +1,7 @@
 import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
-import { minifyJSON, tryParseJson } from 'lib/helpers'
 import { compact, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
-import type { Dictionary } from 'types'
 
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {
@@ -14,6 +12,8 @@ import {
   TIMESTAMP_TYPES,
 } from '../SidePanelEditor.constants'
 import type { RowField } from './RowEditor.types'
+import { minifyJSON, tryParseJson } from '@/lib/helpers'
+import type { Dictionary } from '@/types'
 
 const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary<any> }) => {
   const isNewRow = row === undefined

@@ -1,9 +1,9 @@
 import { AlertOctagon, Lock, ShieldOff } from 'lucide-react'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { DOCS_URL } from 'lib/constants'
 import { Alert } from 'ui'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { DOCS_URL } from '@/lib/constants'
 
 export function RLSDisableModalContent() {
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
