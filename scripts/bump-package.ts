@@ -1,12 +1,11 @@
 import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import * as readline from 'node:readline'
 
 const WORKSPACE_YAML_PATH = path.join(process.cwd(), 'pnpm-workspace.yaml')
-const LOCKFILE_PATH = path.join(process.cwd(), 'pnpm-lock.yaml')
+export const LOCKFILE_PATH = path.join(process.cwd(), 'pnpm-lock.yaml')
 
-function compareSemver(a: string, b: string): number {
+export function compareSemver(a: string, b: string): number {
   const pa = a.split('.').map(Number)
   const pb = b.split('.').map(Number)
   for (let i = 0; i < 3; i++) {
@@ -79,16 +78,6 @@ function findHighestVersionInLockfile(packageName: string): string | null {
   return versions.sort(compareSemver).at(-1)!
 }
 
-function promptInput(question: string): Promise<string> {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close()
-      resolve(answer.trim())
-    })
-  })
-}
-
 function handleMinimumReleaseAgeError(output: string): void {
   const blocks = output.split('ERR_PNPM_NO_MATCHING_VERSION')
   for (const block of blocks.slice(1)) {
@@ -114,32 +103,37 @@ function handleMinimumReleaseAgeError(output: string): void {
   }
 }
 
-async function main(): Promise<void> {
-  const [packageName, versionArg] = process.argv.slice(2)
+interface BumpResult {
+  previousVersion: string | null
+  finalVersion: string | null
+}
 
-  if (!packageName) {
-    console.error('Usage: ts-node scripts/bump-package.ts <package-name> [version]')
-    process.exit(1)
-  }
-
+/**
+ * Bumps a package to the given override version (or patch+1 of the current highest if omitted).
+ * First tries a plain `pnpm install`; if that doesn't move the version, falls back to adding
+ * a temporary override in pnpm-workspace.yaml. Reverts and throws on failure.
+ */
+export async function bumpPackage(
+  packageName: string,
+  overrideVersion?: string
+): Promise<BumpResult> {
   const currentHighest = findHighestVersionInLockfile(packageName)
-  if (currentHighest === null) {
-    console.error(`Package "${packageName}" not found in pnpm-lock.yaml`)
-    process.exit(1)
-  }
 
-  let overrideVersion: string
-  if (versionArg) {
-    overrideVersion = `^${versionArg}`
+  let targetVersion: string
+  if (overrideVersion) {
+    targetVersion = overrideVersion
     console.log(`Package: ${packageName}`)
-    console.log(`Current highest in lockfile: ${currentHighest}`)
-    console.log(`Target version (explicit): ${overrideVersion}`)
+    if (currentHighest) console.log(`Current highest in lockfile: ${currentHighest}`)
+    console.log(`Target version (explicit): ${targetVersion}`)
   } else {
+    if (!currentHighest) {
+      throw new Error(`Package "${packageName}" not found in pnpm-lock.yaml`)
+    }
     const [major, minor, patch] = currentHighest.split('.').map(Number)
-    overrideVersion = `^${major}.${minor}.${patch + 1}`
+    targetVersion = `^${major}.${minor}.${patch + 1}`
     console.log(`Package: ${packageName}`)
     console.log(`Current highest in lockfile: ${currentHighest}`)
-    console.log(`Target version (minimal bump): ${overrideVersion}`)
+    console.log(`Target version (minimal bump): ${targetVersion}`)
   }
 
   // Attempt 1: plain pnpm install, no override
@@ -147,9 +141,11 @@ async function main(): Promise<void> {
   execSync('pnpm install --silent', { stdio: 'pipe', encoding: 'utf-8' })
 
   const afterPlainInstall = findHighestVersionInLockfile(packageName)
-  if (afterPlainInstall && compareSemver(afterPlainInstall, currentHighest) > 0) {
-    console.log(`\nSUCCESS: ${packageName} bumped to ${afterPlainInstall} via plain install (no override needed).`)
-    process.exit(0)
+  if (currentHighest && afterPlainInstall && compareSemver(afterPlainInstall, currentHighest) > 0) {
+    console.log(
+      `\n${packageName} bumped to ${afterPlainInstall} via plain install (no override needed).`
+    )
+    return { previousVersion: currentHighest, finalVersion: afterPlainInstall }
   }
 
   console.log('No change from plain install. Proceeding with override...')
@@ -166,8 +162,8 @@ async function main(): Promise<void> {
   }
 
   // Attempt 2: add override
-  console.log(`\nAttempt 2: adding override ${packageName}: ${overrideVersion}`)
-  const updatedYaml = addOverride(originalYaml, packageName, overrideVersion)
+  console.log(`\nAttempt 2: adding override ${packageName}: ${targetVersion}`)
+  const updatedYaml = addOverride(originalYaml, packageName, targetVersion)
   fs.writeFileSync(WORKSPACE_YAML_PATH, updatedYaml, 'utf-8')
   console.log('Updated pnpm-workspace.yaml')
 
@@ -178,12 +174,13 @@ async function main(): Promise<void> {
     const output = (error.stdout ?? '') + (error.stderr ?? '')
     if (output.includes('ERR_PNPM_NO_MATCHING_VERSION')) {
       console.error(
-        `\nNo matching version found for "${packageName}@${overrideVersion}" — blocked by minimumReleaseAge.`
+        `\nNo matching version found for "${packageName}@${targetVersion}" — blocked by minimumReleaseAge.`
       )
       handleMinimumReleaseAgeError(output)
       revert()
-      process.exit(1)
+      throw new Error(`Blocked by minimumReleaseAge`)
     }
+    revert()
     throw error
   }
 
@@ -192,9 +189,32 @@ async function main(): Promise<void> {
   fs.writeFileSync(WORKSPACE_YAML_PATH, originalYaml, 'utf-8')
   execSync('pnpm install --silent', { stdio: 'pipe', encoding: 'utf-8' })
 
-  const finalHighest = findHighestVersionInLockfile(packageName)
-  if (!finalHighest || compareSemver(finalHighest, currentHighest) <= 0) {
-    revert()
+  return {
+    previousVersion: currentHighest,
+    finalVersion: findHighestVersionInLockfile(packageName),
+  }
+}
+
+async function main(): Promise<void> {
+  const [packageName, versionArg] = process.argv.slice(2)
+
+  if (!packageName) {
+    console.error('Usage: ts-node scripts/bump-package.ts <package-name> [version]')
+    process.exit(1)
+  }
+
+  const overrideVersion = versionArg ? `^${versionArg}` : undefined
+
+  let result: BumpResult
+  try {
+    result = await bumpPackage(packageName, overrideVersion)
+  } catch (error: any) {
+    console.error(error.message ?? error)
+    process.exit(1)
+  }
+
+  const { previousVersion, finalVersion } = result
+  if (!finalVersion || (previousVersion && compareSemver(finalVersion, previousVersion) <= 0)) {
     console.error(
       `\nERROR: "${packageName}" was not bumped after removing override. ` +
         `Consider using scoped overrides or updating the parent dependency.`
@@ -202,12 +222,12 @@ async function main(): Promise<void> {
     process.exit(1)
   }
 
-  console.log(
-    `\nSUCCESS: ${packageName} bumped from ${currentHighest} to ${finalHighest} via override-assisted lockfile update.`
-  )
+  console.log(`\nSUCCESS: ${packageName} bumped from ${previousVersion} to ${finalVersion}.`)
 }
 
-main().catch((error) => {
-  console.error('Fatal error:', error)
-  process.exit(1)
-})
+if (require.main === module) {
+  main().catch((error) => {
+    console.error('Fatal error:', error)
+    process.exit(1)
+  })
+}
