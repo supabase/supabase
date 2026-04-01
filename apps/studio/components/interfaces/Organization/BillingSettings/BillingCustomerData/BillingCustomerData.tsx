@@ -120,8 +120,7 @@ export const BillingCustomerData = () => {
             )
           }
         )
-      }
-      catch (error) {
+      } catch (error) {
         throw error
       } finally {
         setIsSubmitting(false)
