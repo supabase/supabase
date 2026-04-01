@@ -1,35 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import {
-  useDiskAttributesQuery,
-  useRemainingDurationForDiskAttributeUpdate,
-} from 'data/config/disk-attributes-query'
-import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
-import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
-import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AddonVariantId } from 'data/subscriptions/types'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsCloudProvider,
-  useIsAwsK8sCloudProvider,
-  useIsAwsNimbusCloudProvider,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, GB, PROJECT_STATUS } from 'lib/constants'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -66,6 +38,38 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import {
+  MAX_WIDTH_CLASSES,
+  PADDING_CLASSES,
+  ScaffoldContainer,
+} from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import {
+  useDiskAttributesQuery,
+  useRemainingDurationForDiskAttributeUpdate,
+} from '@/data/config/disk-attributes-query'
+import { useUpdateDiskAttributesMutation } from '@/data/config/disk-attributes-update-mutation'
+import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-config-query'
+import { useUpdateDiskAutoscaleConfigMutation } from '@/data/config/disk-autoscale-config-update-mutation'
+import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { AddonVariantId } from '@/data/subscriptions/types'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsCloudProvider,
+  useIsAwsK8sCloudProvider,
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, GB, PROJECT_STATUS } from '@/lib/constants'
 
 export function DiskManagementForm() {
   const { ref: projectRef } = useParams()

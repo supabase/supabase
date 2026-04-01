@@ -1,10 +1,10 @@
-import { Markdown } from 'components/interfaces/Markdown'
 import { UseFormReturn } from 'react-hook-form'
 import { Badge, FormControl_Shadcn_, FormField_Shadcn_, SheetSection, Switch } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateQueueForm } from './CreateQueueSheet.schema'
+import { Markdown } from '@/components/interfaces/Markdown'
 
 export function RlsSection({
   form,

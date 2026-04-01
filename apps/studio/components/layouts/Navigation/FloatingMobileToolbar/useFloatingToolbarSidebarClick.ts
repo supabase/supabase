@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export function useFloatingToolbarSidebarClick() {
   const { setContent: setSheetContent } = useMobileSheet()

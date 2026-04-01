@@ -1,14 +1,4 @@
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { isEqual } from 'lodash'
 import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -44,6 +34,19 @@ import {
   formatMemberRoleToProjectRoleConfiguration,
   ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import {
+  OrgProject,
+  useOrgProjectsInfiniteQuery,
+} from '@/data/projects/org-projects-infinite-query'
+import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface UpdateRolesPanelProps {
   visible: boolean

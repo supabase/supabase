@@ -1,6 +1,3 @@
-import { ActionBar } from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Check, ChevronsUpDown, Database, Plus } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import {
@@ -28,6 +25,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
+import { ActionBar } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
   visible: boolean

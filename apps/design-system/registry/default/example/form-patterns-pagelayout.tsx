@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Plus, Trash, Upload } from 'lucide-react'
+import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Calendar,
@@ -35,6 +35,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -100,11 +101,6 @@ export default function FormPatternsPageLayout() {
       httpHeaders: [{ key: '', value: '' }],
       apiKey: fakeApiKey,
     },
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'redirectUris',
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -690,42 +686,15 @@ export default function FormPatternsPageLayout() {
                         label="Field Array"
                         description="Dynamic list for adding/removing items"
                       >
-                        <div className="space-y-2 w-full">
-                          {fields.map((field, index) => (
-                            <FormField_Shadcn_
-                              key={field.id}
-                              control={form.control}
-                              name={`redirectUris.${index}.value`}
-                              render={({ field: inputField }) => (
-                                <div className="flex gap-2">
-                                  <FormControl_Shadcn_>
-                                    <Input_Shadcn_
-                                      {...inputField}
-                                      placeholder="https://example.com/callback"
-                                    />
-                                  </FormControl_Shadcn_>
-                                  {fields.length > 1 && (
-                                    <Button
-                                      type="default"
-                                      size="tiny"
-                                      htmlType="button"
-                                      icon={<Trash size={12} />}
-                                      onClick={() => remove(index)}
-                                    />
-                                  )}
-                                </div>
-                              )}
-                            />
-                          ))}
-                          <Button
-                            type="default"
-                            htmlType="button"
-                            icon={<Plus />}
-                            onClick={() => append({ value: '' })}
-                          >
-                            Add redirect URI
-                          </Button>
-                        </div>
+                        <SingleValueFieldArray
+                          control={form.control}
+                          name="redirectUris"
+                          valueFieldName="value"
+                          createEmptyRow={() => ({ value: '' })}
+                          placeholder="https://example.com/callback"
+                          addLabel="Add redirect URI"
+                          removeLabel="Remove redirect URI"
+                        />
                       </FormItemLayout>
                     )}
                   />

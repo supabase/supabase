@@ -1,16 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-
-import { useParams } from 'common'
-import { NoPermission } from 'components/ui/NoPermission'
-import Panel from 'components/ui/Panel'
-import { permissionKeys } from 'data/permissions/keys'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   FormControl_Shadcn_,
@@ -23,8 +16,15 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { OrgNotFound } from '../Organization/OrgNotFound'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { NoPermission } from '@/components/ui/NoPermission'
+import Panel from '@/components/ui/Panel'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { permissionKeys } from '@/data/permissions/keys'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<CreateProjectForm>

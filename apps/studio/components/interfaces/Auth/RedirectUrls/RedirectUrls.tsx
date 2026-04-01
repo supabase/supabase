@@ -1,10 +1,4 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { DOCS_URL } from 'lib/constants'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Modal, ScrollArea } from 'ui'
@@ -21,6 +15,12 @@ import {
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()

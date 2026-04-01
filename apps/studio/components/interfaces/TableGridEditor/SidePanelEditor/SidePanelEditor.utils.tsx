@@ -13,43 +13,9 @@ import pgMeta, {
 } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid/types'
-import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import SparkBar from 'components/ui/SparkBar'
-import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
-import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
-import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
-import { createDatabasePolicy } from 'data/database-policies/database-policy-create-mutation'
-import type { Constraint } from 'data/database/constraints-query'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { databaseKeys } from 'data/database/keys'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { lintKeys } from 'data/lint/keys'
-import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
-import { getQueryClient } from 'data/query-client'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { executeWithRetry } from 'data/table-rows/table-rows-query'
-import { tableKeys } from 'data/tables/keys'
-import {
-  getTable,
-  getTableQuery,
-  RetrievedTableColumn,
-  RetrieveTableResult,
-} from 'data/tables/table-retrieve-query'
-import {
-  UpdateTableBody,
-  updateTable as updateTableMutation,
-} from 'data/tables/table-update-mutation'
-import { getTables } from 'data/tables/tables-query'
-import { sendEvent } from 'data/telemetry/send-event-mutation'
-import { isObject, isObjectContainingKeys, timeout, tryParseJson } from 'lib/helpers'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import type { SidePanel } from 'state/table-editor'
 
 import {
   generateCreateColumnPayload,
@@ -58,7 +24,41 @@ import {
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import type { SupaRow } from '@/components/grid/types'
+import { GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
+import SparkBar from '@/components/ui/SparkBar'
+import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
+import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
+import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
+import { createDatabasePolicy } from '@/data/database-policies/database-policy-create-mutation'
+import type { Constraint } from '@/data/database/constraints-query'
+import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import { databaseKeys } from '@/data/database/keys'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { lintKeys } from '@/data/lint/keys'
+import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
+import { getQueryClient } from '@/data/query-client'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { executeWithRetry } from '@/data/table-rows/table-rows-query'
+import { tableKeys } from '@/data/tables/keys'
+import {
+  getTable,
+  getTableQuery,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from '@/data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from '@/data/tables/table-update-mutation'
+import { getTables } from '@/data/tables/tables-query'
+import { sendEvent } from '@/data/telemetry/send-event-mutation'
+import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { DeepReadonly } from '@/lib/type-helpers'
+import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB

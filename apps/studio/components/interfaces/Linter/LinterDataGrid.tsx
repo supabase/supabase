@@ -1,13 +1,4 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import {
-  LintCategoryBadge,
-  LintEntity,
-  lintInfoMap,
-  NoIssuesFound,
-} from 'components/interfaces/Linter/Linter.utils'
-import { Lint } from 'data/lint/lint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
@@ -18,6 +9,15 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import LintDetail from './LintDetail'
 import { EntityTypeIcon } from './Linter.utils'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import {
+  LintCategoryBadge,
+  LintEntity,
+  lintInfoMap,
+  NoIssuesFound,
+} from '@/components/interfaces/Linter/Linter.utils'
+import { Lint } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface LinterDataGridProps {
   isLoading: boolean

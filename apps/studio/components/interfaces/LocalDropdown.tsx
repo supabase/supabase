@@ -1,4 +1,3 @@
-import { ProfileImage } from 'components/ui/ProfileImage'
 import { Command, FlaskConical } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -19,6 +18,7 @@ import {
 import { useSetCommandMenuOpen } from 'ui-patterns'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { ProfileImage } from '@/components/ui/ProfileImage'
 
 export const LocalDropdown = ({
   triggerClassName,

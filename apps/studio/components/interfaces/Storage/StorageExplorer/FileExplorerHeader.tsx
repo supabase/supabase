@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useTrack } from 'lib/telemetry/track'
 import { compact, isEqual, noop } from 'lodash'
 import {
   ArrowLeft,
@@ -20,14 +15,13 @@ import {
   X,
 } from 'lucide-react'
 import {
-  type ChangeEvent,
-  type ChangeEventHandler,
-  type SyntheticEvent,
   useEffect,
   useRef,
   useState,
+  type ChangeEvent,
+  type ChangeEventHandler,
+  type SyntheticEvent,
 } from 'react'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   cn,
@@ -52,6 +46,12 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from '@/components/ui/APIDocsButton'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useTrack } from '@/lib/telemetry/track'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
