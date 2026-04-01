@@ -31,11 +31,13 @@ export const DeleteOrganizationButton = () => {
     data: projectsData,
     isLoading,
     isError,
-  } = useOrgProjectsInfiniteQuery({
-    slug: orgSlug,
-    enabled: isOpen,
-    refetchOnMount: 'always',
-  })
+  } = useOrgProjectsInfiniteQuery(
+    { slug: orgSlug },
+    {
+      enabled: isOpen,
+      refetchOnMount: 'always',
+    }
+  )
 
   // When an organization slug is present but the projects query has not yet
   // produced any data (and hasn't errored), treat this as a "pending" state
@@ -73,6 +75,9 @@ export const DeleteOrganizationButton = () => {
   }
 
   const isDeletionConfirmed = () => {
+    // While project data is pending or unavailable, treat deletion as not confirmed
+    if (!projects) return false
+
     if (projects.length === 0) return true
 
     if (shouldRenderChecklist) {
@@ -187,7 +192,11 @@ export const DeleteOrganizationButton = () => {
         )}
 
         {/* Final warning */}
-        <p className={`text-sm text-foreground-lighter ${projects.length > 0 ? 'mt-4' : ''}`}>
+        <p
+          className={`text-sm text-foreground-lighter ${
+            (projects?.length ?? 0) > 0 ? 'mt-4' : ''
+          }`}
+        >
           This action <span className="text-foreground">cannot</span> be undone. This will
           permanently delete the <span className="text-foreground">{orgName}</span> organization and
           remove all of its projects.
