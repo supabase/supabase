@@ -1,5 +1,5 @@
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function usePgPartmanStatus() {
   const { data: project } = useSelectedProjectQuery()

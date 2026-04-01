@@ -1,10 +1,7 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
-import { LintException } from 'data/lint/lint-rules-query'
 import {
   Button,
   Dialog,
@@ -16,7 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+
 import { LintInfo } from '../Linter/Linter.constants'
+import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'
+import { LintException } from '@/data/lint/lint-rules-query'
 
 interface EnableRuleModalProps {
   lint: LintInfo

@@ -5,9 +5,7 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-import { getProjectDetail } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
-import { DOCS_URL } from 'lib/constants'
 import { partition } from 'lodash'
 import { Book, Github, Hash, MessageSquare } from 'lucide-react'
 import {
@@ -18,9 +16,11 @@ import {
   type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
-import type { Organization } from 'types'
 
 import { CATEGORY_OPTIONS } from './Support.constants'
+import { getProjectDetail } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'

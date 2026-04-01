@@ -1,9 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -26,6 +21,11 @@ import { PgPartmanCallout } from './PgPartmanCallout'
 import { QueueNameField } from './QueueNameField'
 import { QueueTypeSelector } from './QueueTypeSelector'
 import { RlsSection } from './RlsSection'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useDatabaseQueueCreateMutation } from '@/data/database-queues/database-queues-create-mutation'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 export interface CreateQueueSheetProps {
   visible: boolean

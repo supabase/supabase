@@ -2,8 +2,8 @@ import { format } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ReferenceArea, XAxis } from 'recharts'
 import type { CategoricalChartFunc } from 'recharts/types/chart/generateCategoricalChart'
-
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+
 import { useDataTable } from './providers/DataTableProvider'
 
 export type BaseChartSchema = { timestamp: number; [key: string]: number }

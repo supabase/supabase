@@ -1,16 +1,16 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { guessLocalTimezone } from 'lib/dayjs'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { Alert, Button } from 'ui'
+
 import { InlineLink } from './InlineLink'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useProjectUpgradingStatusQuery } from '@/data/config/project-upgrade-status-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { guessLocalTimezone } from '@/lib/dayjs'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 

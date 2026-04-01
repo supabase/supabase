@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
 import { CircleDotDashed, GitMerge, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { ActionRun } from '@/data/actions/action-detail-query'
-import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 interface WorkflowLogsCardProps {
   workflowRun: ActionRun | null | undefined

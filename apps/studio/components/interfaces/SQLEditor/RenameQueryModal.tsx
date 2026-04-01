@@ -1,25 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { getContentById } from 'data/content/content-id-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   AiIconAnimation,
   Button,
@@ -34,6 +18,22 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { getContentById } from '@/data/content/content-id-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import type { SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface RenameQueryModalProps {
   snippet?: SqlSnippet | Snippet

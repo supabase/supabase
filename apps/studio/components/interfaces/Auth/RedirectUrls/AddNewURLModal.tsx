@@ -1,16 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Label } from '@ui/components/shadcn/ui/label'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { Label } from '@ui/components/shadcn/ui/label'
-import { useParams } from 'common'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { Button, cn, DialogSectionSeparator, Form_Shadcn_, Modal, ScrollArea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+import * as z from 'zod'
+
 import { urlRegex } from '../Auth.constants'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 
 const MAX_URLS_LENGTH = 2 * 1024
 

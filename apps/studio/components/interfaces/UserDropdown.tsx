@@ -1,12 +1,7 @@
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfileNameAndPicture } from 'lib/profile'
 import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -24,6 +19,11 @@ import {
 } from 'ui'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export function UserDropdown({
   triggerClassName,

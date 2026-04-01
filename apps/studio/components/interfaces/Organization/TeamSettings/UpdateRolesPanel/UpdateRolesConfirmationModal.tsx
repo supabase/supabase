@@ -1,16 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { organizationKeys } from 'data/organization-members/keys'
-import { useOrganizationMemberAssignRoleMutation } from 'data/organization-members/organization-member-role-assign-mutation'
-import { useOrganizationMemberUnassignRoleMutation } from 'data/organization-members/organization-member-role-unassign-mutation'
-import { useOrganizationMemberUpdateRoleMutation } from 'data/organization-members/organization-member-role-update-mutation'
-import {
-  OrganizationRole,
-  useOrganizationRolesV2Query,
-} from 'data/organization-members/organization-roles-query'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -21,6 +10,17 @@ import {
   formatMemberRoleToProjectRoleConfiguration,
   ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
+import { organizationKeys } from '@/data/organization-members/keys'
+import { useOrganizationMemberAssignRoleMutation } from '@/data/organization-members/organization-member-role-assign-mutation'
+import { useOrganizationMemberUnassignRoleMutation } from '@/data/organization-members/organization-member-role-unassign-mutation'
+import { useOrganizationMemberUpdateRoleMutation } from '@/data/organization-members/organization-member-role-update-mutation'
+import {
+  OrganizationRole,
+  useOrganizationRolesV2Query,
+} from '@/data/organization-members/organization-roles-query'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface UpdateRolesConfirmationModal {
   visible: boolean

@@ -1,10 +1,10 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Plug } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { ComponentProps } from 'react'
 import { Button, cn } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
 

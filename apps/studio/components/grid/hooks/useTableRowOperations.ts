@@ -1,24 +1,24 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import type { SupaRow } from 'components/grid/types'
+import { useCallback } from 'react'
+import { toast } from 'sonner'
+
+import type { PendingAddRow } from '../types'
+import type { SupaRow } from '@/components/grid/types'
 import {
   queueCellEditWithOptimisticUpdate,
   queueRowAddWithOptimisticUpdate,
   queueRowDeletesWithOptimisticUpdate,
-} from 'components/grid/utils/queueOperationUtils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
-import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import type { TableRowsData } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useCallback } from 'react'
-import { toast } from 'sonner'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import type { Dictionary } from 'types'
-
-import type { PendingAddRow } from '../types'
+} from '@/components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { useTableRowCreateMutation } from '@/data/table-rows/table-row-create-mutation'
+import { useTableRowUpdateMutation } from '@/data/table-rows/table-row-update-mutation'
+import type { TableRowsData } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import type { Dictionary } from '@/types'
 
 export interface EditCellParams {
   table: Entity

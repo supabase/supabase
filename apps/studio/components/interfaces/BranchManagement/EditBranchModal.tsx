@@ -1,27 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from 'components/ui/AlertError'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import {
   Badge,
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -29,15 +18,26 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_ as Label,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
+import { useIsBranching2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 interface EditBranchModalProps {
   branch?: Branch
