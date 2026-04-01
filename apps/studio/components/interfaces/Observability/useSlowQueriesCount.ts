@@ -1,5 +1,6 @@
-import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useMemo } from 'react'
+
+import useDbQuery from '@/hooks/analytics/useDbQuery'
 
 export function buildSlowQueriesCountSql(): string {
   return `

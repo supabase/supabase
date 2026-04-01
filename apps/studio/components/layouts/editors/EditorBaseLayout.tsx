@@ -1,13 +1,13 @@
 import { useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
-import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode

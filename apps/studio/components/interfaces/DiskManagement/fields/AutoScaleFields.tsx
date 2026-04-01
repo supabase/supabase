@@ -1,6 +1,5 @@
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
 import { UseFormReturn } from 'react-hook-form'
 import {
   cn,
@@ -16,6 +15,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DISK_AUTOSCALE_CONFIG_DEFAULTS } from '../ui/DiskManagement.constants'
+import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-config-query'
 
 type AutoScaleFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

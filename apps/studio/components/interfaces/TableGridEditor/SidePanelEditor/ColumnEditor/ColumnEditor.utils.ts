@@ -1,11 +1,7 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { uuidv4 } from 'lib/helpers'
 import { isNull } from 'lodash'
 import { toast } from 'sonner'
-import type { Dictionary } from 'types'
 
 import {
   ColumnField,
@@ -13,6 +9,10 @@ import {
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { RetrievedTableColumn, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { uuidv4 } from '@/lib/helpers'
+import type { Dictionary } from '@/types'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true

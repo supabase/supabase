@@ -22,8 +22,8 @@ import {
   getChartEmptyStateCopy,
   getSegmentedButtonClassName,
 } from './EdgeFunctionOverview.utils'
-import { toAlertError } from './EdgeFunctionRecentErrors.utils'
 import type { InvocationChartDatum, InvocationUpdateAnnotation } from './EdgeFunctionOverview.utils'
+import { toAlertError } from './EdgeFunctionRecentErrors.utils'
 
 interface EdgeFunctionInvocationsSectionProps {
   interval: string

@@ -1,14 +1,15 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { Kbd } from 'components/ui/DataTable/primitives/Kbd'
-import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo } from 'react'
 import { Badge, Button, Separator } from 'ui'
+
 import { LogTypeIcon } from '../../components/LogTypeIcon'
 import { ColumnSchema } from '../../UnifiedLogs.schema'
 import { getStatusLevel } from '../../UnifiedLogs.utils'
 import { TruncatedTextWithPopover } from './shared/TruncatedTextWithPopover'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { Kbd } from '@/components/ui/DataTable/primitives/Kbd'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 
 interface ServiceFlowHeaderProps {
   selectedRow: ColumnSchema

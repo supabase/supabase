@@ -1,17 +1,17 @@
 import { useParams } from 'common'
-import type {
-  ProductMenuGroup,
-  ProductMenuGroupItem,
-} from 'components/ui/ProductMenu/ProductMenu.types'
-import { IS_PLATFORM } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsColumnLevelPrivilegesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import type {
+  ProductMenuGroup,
+  ProductMenuGroupItem,
+} from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const ExternalLinkIcon = <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
 

@@ -1,7 +1,8 @@
-import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
-import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
-import { DOCS_URL } from 'lib/constants'
 import { boolean, number, object, string } from 'yup'
+
+import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { DOCS_URL } from '@/lib/constants'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))

@@ -1,6 +1,7 @@
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { PropsWithChildren } from 'react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 
 interface DropdownControlProps {
   options: {

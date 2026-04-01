@@ -1,10 +1,10 @@
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, cn, Loading } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 
 const colorClassMap: Record<string, string> = {
   muted: 'bg-muted',

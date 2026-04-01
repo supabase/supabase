@@ -1,14 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { IS_PLATFORM } from 'lib/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -36,6 +28,15 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import * as z from 'zod'
+
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function HoursOrNeverText({ value }: { value: number }) {
   if (value === 0) {

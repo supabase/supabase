@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {

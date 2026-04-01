@@ -1,26 +1,10 @@
+import { useParams } from 'common'
+import { SqlEditor, TableEditor } from 'icons'
 import { uniq } from 'lodash'
 import { Eye, Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import {
-  convertKVStringArrayToJson,
-  formatWrapperTables,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { getDecryptedParameters } from 'components/interfaces/Storage/Storage.utils'
-import { DotPing } from 'components/ui/DotPing'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
-import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { SqlEditor, TableEditor } from 'icons'
 import {
   Button,
   cn,
@@ -36,6 +20,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { HIDE_REPLICATION_USER_FLOW } from '../AnalyticsBucketDetails.constants'
 import {
   getAnalyticsBucketFDWServerName,
@@ -45,6 +30,21 @@ import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssoc
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 import { InsertDataDialog } from './InsertDataDialog'
 import { inferPostgresTableFromNamespaceTable } from './NamespaceWithTables.utils'
+import {
+  convertKVStringArrayToJson,
+  formatWrapperTables,
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { getDecryptedParameters } from '@/components/interfaces/Storage/Storage.utils'
+import { DotPing } from '@/components/ui/DotPing'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useFDWDropForeignTableMutation } from '@/data/fdw/fdw-drop-foreign-table-mutation'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useUpdatePublicationMutation } from '@/data/replication/publication-update-mutation'
+import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useIcebergNamespaceTableDeleteMutation } from '@/data/storage/iceberg-namespace-table-delete-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableRowComponentProps {
   table: { id: number; name: string; isConnected: boolean }
