@@ -1,7 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { ChevronDown, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -39,6 +36,9 @@ import type {
   WebhookScope,
 } from './PlatformWebhooks.types'
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const endpointFormSchema = z

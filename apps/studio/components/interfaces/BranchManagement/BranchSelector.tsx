@@ -1,20 +1,20 @@
 import { Check, GitMerge, Shield } from 'lucide-react'
 import { useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Branch } from 'data/branches/branches-query'
 import {
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Branch } from '@/data/branches/branches-query'
 
 interface BranchSelectorProps {
   branches: Branch[]

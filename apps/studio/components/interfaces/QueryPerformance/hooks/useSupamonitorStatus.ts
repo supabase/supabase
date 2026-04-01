@@ -1,5 +1,5 @@
-import { useSupamonitorEnabledQuery } from 'data/database/supamonitor-enabled-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useSupamonitorEnabledQuery } from '@/data/database/supamonitor-enabled-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useSupamonitorStatus() {
   const { data: project } = useSelectedProjectQuery()

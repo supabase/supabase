@@ -1,9 +1,9 @@
-import { get } from 'data/fetchers'
 import {
   RawAuthMetricsResponseSchema,
   type RawAuthMetricsResponse,
   type RawAuthMetricsRow,
 } from './OverviewUsage.schema'
+import { get } from '@/data/fetchers'
 
 export type AuthMetricsResponse = RawAuthMetricsResponse
 

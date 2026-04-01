@@ -1,10 +1,11 @@
-import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
-import type { Route } from 'components/ui/ui.types'
-import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
-import type { Project } from 'data/projects/project-detail-query'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
+import type { Route } from '@/components/ui/ui.types'
+import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
+import type { Project } from '@/data/projects/project-detail-query'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 interface RouteContext {
   ref?: string

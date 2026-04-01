@@ -1,34 +1,29 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { IS_PLATFORM } from 'lib/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -43,6 +38,15 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { boolean, number, object, string } from 'yup'
+
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -369,15 +373,18 @@ export const MfaAuthSettingsForm = () => {
                         description="How many MFA factors can be enrolled at once per user."
                       >
                         <FormControl_Shadcn_>
-                          <PrePostTab postTab="factors">
-                            <Input_Shadcn_
+                          <InputGroup>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>factors</InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
                               type="number"
                               min={0}
                               max={30}
                               {...field}
                               disabled={!canUpdateConfig}
                             />
-                          </PrePostTab>
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -473,13 +480,18 @@ export const MfaAuthSettingsForm = () => {
                         description="Number of digits in OTP"
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="number"
-                            min={6}
-                            max={30}
-                            {...field}
-                            disabled={!canUpdateConfig || !hasAccessToMFA}
-                          />
+                          <InputGroup>
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>digits</InputGroupText>
+                            </InputGroupAddon>
+                            <InputGroupInput
+                              type="number"
+                              min={6}
+                              max={30}
+                              {...field}
+                              disabled={!canUpdateConfig || !hasAccessToMFA}
+                            />
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}

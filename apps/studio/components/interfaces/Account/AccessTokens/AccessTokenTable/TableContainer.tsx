@@ -7,6 +7,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui/src/components/shadcn/ui/table'
+
 import { AccessTokenSort, AccessTokenSortColumn } from '../AccessToken.types'
 
 const tableHeaderClass = 'text-left font-mono uppercase text-xs text-foreground-lighter py-2'

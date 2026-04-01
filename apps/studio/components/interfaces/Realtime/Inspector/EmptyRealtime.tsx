@@ -1,12 +1,12 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, cn } from 'ui'
 
 import { AnimatedCursors } from './AnimatedCursors'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 /**
  * Acts as a container component for the entire log display

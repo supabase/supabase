@@ -1,5 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { Branch } from 'data/branches/branches-query'
 import dayjs from 'dayjs'
 import { Github } from 'lucide-react'
 import Link from 'next/link'
@@ -10,6 +8,8 @@ import { TimestampInfo } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { WorkflowLogs } from './WorkflowLogs'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchManagementSectionProps {
   header: string | ReactNode

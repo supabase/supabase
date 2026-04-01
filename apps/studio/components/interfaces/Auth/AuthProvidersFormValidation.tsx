@@ -1,7 +1,8 @@
-import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
-import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
-import { DOCS_URL } from 'lib/constants'
 import { boolean, number, object, string } from 'yup'
+
+import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { DOCS_URL } from '@/lib/constants'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -80,7 +81,7 @@ const PROVIDER_EMAIL = {
       title: 'Email OTP length',
       type: 'number',
       description: 'Number of digits in the email OTP.',
-      units: 'number',
+      units: 'digits',
     },
   },
   validationSchema: object().shape({
@@ -1568,7 +1569,9 @@ const PROVIDER_SAML = {
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    SAML_EXTERNAL_URL: string()
+      .matches(urlRegex(), { message: 'Must be a valid URL', excludeEmptyString: true })
+      .optional(),
     SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {

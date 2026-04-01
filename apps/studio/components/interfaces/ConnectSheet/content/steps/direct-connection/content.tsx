@@ -12,7 +12,6 @@ import {
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
-import { useTrack } from 'lib/telemetry/track'
 import {
   buildConnectionParameters,
   buildSafeConnectionString,
@@ -26,6 +25,7 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { pluckObjectFields } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 
 const buildPsqlCommand = (params: { host: string; port: string; database: string; user: string }) =>
   `psql -h ${params.host} -p ${params.port} -d ${params.database} -U ${params.user}`

@@ -1,24 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { getFDWs } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, Form_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Modal, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { formatWrapperTables } from '../Integrations/Wrappers/Wrappers.utils'
 import { SchemaEditor } from '../TableGridEditor/SidePanelEditor/SchemaEditor'
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './AnalyticsBuckets/AnalyticsBucketDetails/useAnalyticsBucketAssociatedEntities'
 import { getDecryptedParameters } from './Storage.utils'
+import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { getFDWs } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface ImportForeignSchemaDialogProps {
   namespace: string

@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { CardContent, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 
 interface SpamValidationProps {
   spamRules?: ValidateSpamResponse['rules']

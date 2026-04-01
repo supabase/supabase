@@ -117,7 +117,7 @@
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
-		"LIVE_SUPABASE_SECRET_KEY"
+        "LIVE_SUPABASE_SECRET_KEY"
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
@@ -196,7 +196,8 @@
         "NEXT_PUBLIC_SUPASQUAD_APPLICATION_FORM_URL",
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
-        "CUSTOMERIO_APP_API_KEY"
+        "CUSTOMERIO_APP_API_KEY",
+        "HUBSPOT_MEETINGS_TOKEN"
       ],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"]
     },

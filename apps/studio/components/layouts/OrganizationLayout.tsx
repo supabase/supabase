@@ -1,12 +1,3 @@
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
-import { useAwsRedirectQuery } from 'data/integrations/aws-redirect-query'
-import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { withAuth } from 'hooks/misc/withAuth'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { buildStudioPageTitle } from 'lib/page-title'
 import { ExternalLink } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -14,6 +5,15 @@ import type { PropsWithChildren } from 'react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 
 import { useRegisterOrgMenu } from './OrganizationLayout/useRegisterOrgMenu'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
+import { useAwsRedirectQuery } from '@/data/integrations/aws-redirect-query'
+import { useVercelRedirectQuery } from '@/data/integrations/vercel-redirect-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
 interface OrganizationLayoutProps {
   title: string

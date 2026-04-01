@@ -1,14 +1,14 @@
 import { format } from 'date-fns'
 import { User } from 'lucide-react'
-
-import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
-import { DataTableFilterField, Option } from 'components/ui/DataTable/DataTable.types'
-import { getLevelColor } from 'components/ui/DataTable/DataTable.utils'
 import { cn } from 'ui'
+
 import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { LogsMeta, SheetField } from './UnifiedLogs.types'
 import { getLevelLabel } from './UnifiedLogs.utils'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
+import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
