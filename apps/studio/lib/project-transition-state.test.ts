@@ -4,6 +4,7 @@ import {
   clearPersistedTransitionStartTime,
   getPersistedTransitionStartTime,
   getRemainingTransitionTimeMs,
+  hoursToMilliseconds,
   minutesToMilliseconds,
 } from './project-transition-state'
 
@@ -23,7 +24,7 @@ describe('project-transition-state', () => {
     it('reuses an existing stored start time', () => {
       window.localStorage.setItem('transition-key', '2_000'.replace('_', ''))
 
-      const startTime = getPersistedTransitionStartTime('transition-key', 1_000)
+      const startTime = getPersistedTransitionStartTime('transition-key', 3_000)
 
       expect(startTime).toBe(2_000)
       expect(window.localStorage.getItem('transition-key')).toBe('2000')
@@ -36,6 +37,21 @@ describe('project-transition-state', () => {
 
       expect(startTime).toBe(3_000)
       expect(window.localStorage.getItem('transition-key')).toBe('3000')
+    })
+
+    it('replaces stale stored values when they exceed the allowed max age', () => {
+      window.localStorage.setItem('transition-key', '1_000'.replace('_', ''))
+
+      const startTime = getPersistedTransitionStartTime(
+        'transition-key',
+        hoursToMilliseconds(30),
+        hoursToMilliseconds(24)
+      )
+
+      expect(startTime).toBe(hoursToMilliseconds(30))
+      expect(window.localStorage.getItem('transition-key')).toBe(
+        String(hoursToMilliseconds(30))
+      )
     })
   })
 

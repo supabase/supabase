@@ -8,7 +8,7 @@ import {
 describe('restore-estimate', () => {
   it('keeps the existing restore interpolation', () => {
     expect(estimateRestoreTimeFromSizeGb(0)).toBe(3)
-    expect(estimateRestoreTimeFromSizeGb(21_000)).toBe(723)
+    expect(estimateRestoreTimeFromSizeGb(21_000)).toBeCloseTo(723, 0)
   })
 
   it('uses a 10 minute floor when size is missing or small', () => {

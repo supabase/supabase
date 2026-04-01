@@ -10,6 +10,8 @@ import {
   FALLBACK_LONG_RUNNING_STATE_THRESHOLD_MINUTES,
   getPersistedTransitionStartTime,
   getRemainingTransitionTimeMs,
+  hoursToMilliseconds,
+  MAX_PERSISTED_TRANSITION_AGE_HOURS,
   minutesToMilliseconds,
 } from 'lib/project-transition-state'
 import { Circle, Loader } from 'lucide-react'
@@ -18,6 +20,7 @@ import { Badge, Button } from 'ui'
 
 const LONG_RUNNING_STATE_THRESHOLD_MINUTES = FALLBACK_LONG_RUNNING_STATE_THRESHOLD_MINUTES
 const LONG_RUNNING_STATE_THRESHOLD_MS = minutesToMilliseconds(LONG_RUNNING_STATE_THRESHOLD_MINUTES)
+const MAX_PERSISTED_TRANSITION_AGE_MS = hoursToMilliseconds(MAX_PERSISTED_TRANSITION_AGE_HOURS)
 
 export interface PausingStateProps {
   project: Project
@@ -74,7 +77,11 @@ export const PausingState = ({ project }: PausingStateProps) => {
 
   useEffect(() => {
     const startTime = pauseStateStartStorageKey
-      ? getPersistedTransitionStartTime(pauseStateStartStorageKey)
+      ? getPersistedTransitionStartTime(
+          pauseStateStartStorageKey,
+          Date.now(),
+          MAX_PERSISTED_TRANSITION_AGE_MS
+        )
       : Date.now()
     const remainingThresholdMs = getRemainingTransitionTimeMs({
       startTimeMs: startTime,

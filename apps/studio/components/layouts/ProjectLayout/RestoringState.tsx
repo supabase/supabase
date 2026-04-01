@@ -12,6 +12,8 @@ import {
   clearPersistedTransitionStartTime,
   getPersistedTransitionStartTime,
   getRemainingTransitionTimeMs,
+  hoursToMilliseconds,
+  MAX_PERSISTED_TRANSITION_AGE_HOURS,
   minutesToMilliseconds,
 } from 'lib/project-transition-state'
 import { getRestoreLongRunningThresholdMinutes } from 'lib/restore-estimate'
@@ -36,6 +38,7 @@ export const RestoringState = () => {
   const logicalBackups = backups.filter((b) => !b.isPhysicalBackup)
   const longRunningThresholdMinutes = getRestoreLongRunningThresholdMinutes(project?.volumeSizeGb)
   const longRunningThresholdMs = minutesToMilliseconds(longRunningThresholdMinutes)
+  const maxPersistedTransitionAgeMs = hoursToMilliseconds(MAX_PERSISTED_TRANSITION_AGE_HOURS)
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
@@ -55,7 +58,11 @@ export const RestoringState = () => {
 
   useEffect(() => {
     const startTime = restoreStateStartStorageKey
-      ? getPersistedTransitionStartTime(restoreStateStartStorageKey)
+      ? getPersistedTransitionStartTime(
+          restoreStateStartStorageKey,
+          Date.now(),
+          maxPersistedTransitionAgeMs
+        )
       : Date.now()
     const remainingThresholdMs = getRemainingTransitionTimeMs({
       startTimeMs: startTime,
@@ -70,7 +77,7 @@ export const RestoringState = () => {
     setIsTakingLongerThanExpected(false)
     const timeoutId = setTimeout(() => setIsTakingLongerThanExpected(true), remainingThresholdMs)
     return () => clearTimeout(timeoutId)
-  }, [longRunningThresholdMs, restoreStateStartStorageKey])
+  }, [longRunningThresholdMs, maxPersistedTransitionAgeMs, restoreStateStartStorageKey])
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
