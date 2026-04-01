@@ -12,10 +12,11 @@ import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
+import { getStripeSyncSchemaComment } from '../templates/StripeSyncEngine/useStripeSyncStatus'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
 import { enableDatabaseWebhooks } from '@/data/database/hooks-enable-mutation'
-import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { getSchemas, invalidateSchemasQuery } from '@/data/database/schemas-query'
 import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
@@ -46,8 +47,10 @@ type IntegrationStep = {
   description?: string
 }
 
-// [Joshen] For marketplace, we probably need to revisit this definition
-// What properties are obsolete, what properties we need from remote source
+/**
+ * [Joshen] For marketplace, we probably need to revisit this definition
+ * What properties are obsolete, what properties we need from remote source
+ */
 export type IntegrationDefinition = {
   id: string
   name: string
@@ -81,9 +84,19 @@ export type IntegrationDefinition = {
     track?: ReturnType<typeof useTrack>
     [key: string]: unknown
   }) => Promise<void>
-
-  /** Inputs for template integrations */
+  /**
+   * Used for long polling to track the progress of the integration installation if async
+   * The component calling this handles the polling logic, and should terminate the poll depending on the returned value
+   * Depending on how we want this to work, this method will thereafter also call any RQ invalidation if required
+   * */
+  checkInstallationStatus?: (props: {
+    ref?: string
+    connectionString?: string | null
+    [key: string]: unknown
+  }) => Promise<'installed' | 'installing'>
+  /** User inputs for template integrations */
   inputs?: IntegrationInputs
+  /** Purely visual, just to show what are the changes on the project from installing the integration */
   steps?: IntegrationStep[]
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
@@ -564,15 +577,26 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       if (track) track('integration_install_submitted', { integrationName: 'stripe_sync_engine' })
 
       const queryClient = getQueryClient()
-      // Invalidate schemas query to refresh installation status
-      await queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
-      // Also invalidate any stripe sync related queries
       await queryClient.invalidateQueries({ queryKey: stripeSyncKeys.all })
     },
+    checkInstallationStatus: async (props) => {
+      const queryClient = getQueryClient()
+      const { projectRef, connectionString } = props || {}
 
-    // trackProgress: () => {
-    //   await queryClient.invalidateQueries({ queryKey: databaseKeys.schemas(projectRef) })
-    // }
+      const schemas = await getSchemas({
+        projectRef: projectRef as string,
+        connectionString: connectionString as string,
+      })
+
+      const { status } = getStripeSyncSchemaComment(schemas)
+
+      if (status === 'installed') {
+        await queryClient.invalidateQueries({
+          queryKey: databaseKeys.schemas(projectRef as string),
+        })
+      }
+      return status === 'installed' ? 'installed' : 'installing'
+    },
   },
 ]
 

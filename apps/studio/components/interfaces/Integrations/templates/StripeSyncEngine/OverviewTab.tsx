@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -28,6 +27,7 @@ import * as z from 'zod'
 import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../../Integration/IntegrationOverviewTabV2'
 import { InstallationError } from './InstallationError'
+import { IntegrationInstalledActions, IntegrationNotInstalledActions } from './IntegrationActions'
 import { StatusDisplay } from './StatusDisplay'
 import {
   canInstall as checkCanInstall,
@@ -41,7 +41,6 @@ import {
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from '@/data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -53,121 +52,13 @@ const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
 })
 
-const UpgradeUninstallButtons = ({
-  className,
-  disabled,
-  upgradeAvailable,
-  installing,
-  uninstalling,
-  setShouldShowInstallSheet,
-  setIsUninstallInitiated,
-}: {
-  className?: string
-  disabled?: boolean
-  upgradeAvailable: boolean
-  installing: boolean
-  uninstalling: boolean
-  setShouldShowInstallSheet: (value: boolean) => void
-  setIsUninstallInitiated: (value: boolean) => void
-}) => {
-  const { data: project } = useSelectedProjectQuery()
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
-  )
-
-  const [showUninstallModal, setShowUninstallModal] = useState(false)
-
-  const {
-    schemaComment: { status: installationStatus },
-  } = useStripeSyncStatus()
-  const uninstallError = hasUninstallError(installationStatus)
-
-  const { mutate: uninstallStripeSync, isPending: isUninstallRequested } =
-    useStripeSyncUninstallMutation({
-      onSuccess: () => {
-        toast.success('Stripe Sync uninstallation started')
-        setShowUninstallModal(false)
-        setIsUninstallInitiated(true)
-      },
-    })
-
-  const handleUninstall = useCallback(() => {
-    if (!project?.ref) return
-    uninstallStripeSync({ projectRef: project.ref, startTime: Date.now() })
-  }, [project?.ref, uninstallStripeSync])
-
-  return (
-    <>
-      <div className={cn('flex gap-x-2 justify-end', className)}>
-        {upgradeAvailable && !uninstallError && !uninstalling && (
-          <ButtonTooltip
-            type="primary"
-            onClick={() => setShouldShowInstallSheet(true)}
-            disabled={disabled}
-            loading={installing}
-            tooltip={{
-              content: {
-                text: !canManageSecrets
-                  ? 'You need additional permissions to upgrade the Stripe Sync Engine.'
-                  : undefined,
-              },
-            }}
-          >
-            Upgrade integration
-          </ButtonTooltip>
-        )}
-        <ButtonTooltip
-          type="default"
-          onClick={() => setShowUninstallModal(true)}
-          disabled={disabled}
-          loading={uninstalling}
-          tooltip={{
-            content: {
-              text: !canManageSecrets
-                ? 'You need additional permissions to uninstall the Stripe Sync Engine.'
-                : undefined,
-            },
-          }}
-        >
-          {uninstallError ? 'Retry uninstallation' : 'Uninstall integration'}
-        </ButtonTooltip>
-      </div>
-      <ConfirmationModal
-        visible={showUninstallModal}
-        title="Uninstall Stripe Sync Engine"
-        confirmLabel="Uninstall"
-        confirmLabelLoading="Uninstalling..."
-        variant="destructive"
-        loading={isUninstallRequested}
-        onCancel={() => setShowUninstallModal(false)}
-        onConfirm={handleUninstall}
-      >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to uninstall the Stripe Sync Engine? This will:
-        </p>
-        <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
-          <li>
-            Remove the <code className="text-code-inline">stripe</code> schema and all tables
-          </li>
-          <li>Delete all synced Stripe data</li>
-          <li>Remove the associated Edge Functions</li>
-          <li>Remove the scheduled sync jobs</li>
-        </ul>
-        <p className="mt-4 text-sm text-foreground-light font-medium">
-          This action cannot be undone.
-        </p>
-      </ConfirmationModal>
-    </>
-  )
-}
-
 export const StripeSyncEngineOverviewTab = () => {
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
   const { data: project } = useSelectedProjectQuery()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
+  const [showUninstallModal, setShowUninstallModal] = useState(false)
   const [shouldShowInstallSheet, setShouldShowInstallSheet] = useState(false)
   // These flags bridge the gap between mutation success and schema update
   const [isInstallInitiated, setIsInstallInitiated] = useState(false)
@@ -237,6 +128,7 @@ export const StripeSyncEngineOverviewTab = () => {
     useStripeSyncUninstallMutation({
       onSuccess: () => {
         toast.success('Stripe Sync uninstallation started')
+        setShowUninstallModal(false)
         setIsUninstallInitiated(true)
       },
     })
@@ -309,230 +201,246 @@ export const StripeSyncEngineOverviewTab = () => {
     }
   }, [isUninstallInitiated, uninstallDone])
 
-  if (isMarketplaceEnabled) {
-    return (
-      <IntegrationOverviewTabV2>
-        <div className="flex items-center justify-between">
-          <StatusDisplay
-            status={installationStatus}
-            isInstallRequested={isInstallRequested}
-            isInstallInitiated={isInstallInitiated}
-            isUninstallRequested={isUninstallRequested}
-            isUninstallInitiated={isUninstallInitiated}
-            isUpgrade={upgradeAvailable}
-            timedOut={timedOut}
-          />
-          {(installed || uninstalling || uninstallError) && (
-            <UpgradeUninstallButtons
-              disabled={installing || uninstalling || !canManageSecrets}
-              upgradeAvailable={upgradeAvailable}
+  return (
+    <>
+      {isMarketplaceEnabled ? (
+        <IntegrationOverviewTabV2>
+          {hasError && (
+            <InstallationError
+              error={uninstallError ? 'uninstall' : 'install'}
+              handleUninstall={handleUninstall}
+              handleOpenInstallSheet={handleOpenInstallSheet}
+              isUpgrade={upgradeAvailable}
               installing={installing}
               uninstalling={uninstalling}
-              setShouldShowInstallSheet={setShouldShowInstallSheet}
-              setIsUninstallInitiated={setIsUninstallInitiated}
             />
           )}
-        </div>
-      </IntegrationOverviewTabV2>
-    )
-  }
 
-  return (
-    <IntegrationOverviewTab
-      alert={
-        hasError ? (
-          <InstallationError
-            error={uninstallError ? 'uninstall' : 'install'}
-            handleUninstall={handleUninstall}
-            handleOpenInstallSheet={handleOpenInstallSheet}
-            isUpgrade={upgradeAvailable}
-            installing={installing}
-            uninstalling={uninstalling}
-          />
-        ) : null
-      }
-      status={
-        <StatusDisplay
-          status={installationStatus}
-          isInstallRequested={isInstallRequested}
-          isInstallInitiated={isInstallInitiated}
-          isUninstallRequested={isUninstallRequested}
-          isUninstallInitiated={isUninstallInitiated}
-          isUpgrade={upgradeAvailable}
-          timedOut={timedOut}
-        />
-      }
-      actions={
-        !installed && !uninstalling && !uninstallError ? (
-          <>
-            <StripeSyncChangesCard
-              installationStatus={installationStatus}
-              isUpgrade={upgradeAvailable}
-            />
-            <div className="flex gap-x-2 justify-end mt-4">
-              <ButtonTooltip
-                type="primary"
-                onClick={() => setShouldShowInstallSheet(true)}
-                disabled={!canInstall || !canManageSecrets}
-                loading={installing}
-                tooltip={{
-                  content: {
-                    text: !canInstall
-                      ? 'Your database already uses a schema named "stripe"'
-                      : !canManageSecrets
-                        ? 'You need additional permissions to install the Stripe Sync Engine.'
-                        : undefined,
-                  },
-                }}
-              >
-                {installError
-                  ? upgradeAvailable
-                    ? 'Retry upgrade'
-                    : 'Retry installation'
-                  : upgradeAvailable
-                    ? 'Upgrade integration'
-                    : 'Install integration'}
-              </ButtonTooltip>
-              {installError && (
-                <Button type="default" loading={isUninstallRequested} onClick={handleUninstall}>
-                  Uninstall
-                </Button>
-              )}
-            </div>
-          </>
-        ) : installed || uninstalling || uninstallError ? (
-          <>
-            <StripeSyncChangesCard
-              installationStatus={installationStatus}
-              isUpgrade={upgradeAvailable}
-            />
-            <UpgradeUninstallButtons
-              className="mt-4"
-              disabled={installing || uninstalling || !canManageSecrets}
-              upgradeAvailable={upgradeAvailable}
+          {!installed && !uninstalling && !uninstallError ? (
+            <IntegrationNotInstalledActions
+              hideInstallCTA
               installing={installing}
-              uninstalling={uninstalling}
+              canInstall={canInstall}
+              isUninstallRequested={isUninstallRequested}
+              handleUninstall={handleUninstall}
               setShouldShowInstallSheet={setShouldShowInstallSheet}
-              setIsUninstallInitiated={setIsUninstallInitiated}
             />
-          </>
-        ) : null
-      }
-    >
-      <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
-        <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
-          <Form_Shadcn_ {...form}>
-            <form
-              id={formId}
-              onSubmit={form.handleSubmit(({ stripeSecretKey }) => {
-                if (!project?.ref) return
-                installStripeSync({
-                  projectRef: project.ref,
-                  stripeSecretKey,
-                  startTime: Date.now(),
-                })
-              })}
-              className="overflow-auto flex-grow px-0 flex flex-col"
-            >
-              <SheetHeader>
-                <SheetTitle>
-                  {upgradeAvailable ? 'Upgrade' : 'Install'} Stripe Sync Engine
-                </SheetTitle>
-              </SheetHeader>
-              <SheetSection className="flex-1 flex flex-col gap-y-6">
+          ) : (
+            (installed || uninstalling || uninstallError) && (
+              <IntegrationInstalledActions
+                disabled={installing || uninstalling || !canManageSecrets}
+                upgradeAvailable={upgradeAvailable}
+                installing={installing}
+                uninstalling={uninstalling}
+                isUninstallRequested={isUninstallRequested}
+                setShouldShowInstallSheet={setShouldShowInstallSheet}
+                setShowUninstallModal={setShowUninstallModal}
+              />
+            )
+          )}
+        </IntegrationOverviewTabV2>
+      ) : (
+        <IntegrationOverviewTab
+          alert={
+            hasError ? (
+              <InstallationError
+                error={uninstallError ? 'uninstall' : 'install'}
+                handleUninstall={handleUninstall}
+                handleOpenInstallSheet={handleOpenInstallSheet}
+                isUpgrade={upgradeAvailable}
+                installing={installing}
+                uninstalling={uninstalling}
+              />
+            ) : null
+          }
+          status={
+            <StatusDisplay
+              status={installationStatus}
+              isInstallRequested={isInstallRequested}
+              isInstallInitiated={isInstallInitiated}
+              isUninstallRequested={isUninstallRequested}
+              isUninstallInitiated={isUninstallInitiated}
+              isUpgrade={upgradeAvailable}
+              timedOut={timedOut}
+            />
+          }
+          actions={
+            !installed && !uninstalling && !uninstallError ? (
+              <>
                 <StripeSyncChangesCard
                   installationStatus={installationStatus}
                   isUpgrade={upgradeAvailable}
                 />
+                <IntegrationNotInstalledActions
+                  className="mt-4"
+                  installing={installing}
+                  canInstall={canInstall}
+                  isUninstallRequested={isUninstallRequested}
+                  handleUninstall={handleUninstall}
+                  setShouldShowInstallSheet={setShouldShowInstallSheet}
+                />
+              </>
+            ) : installed || uninstalling || uninstallError ? (
+              <>
+                <StripeSyncChangesCard
+                  installationStatus={installationStatus}
+                  isUpgrade={upgradeAvailable}
+                />
+                <IntegrationInstalledActions
+                  className="mt-4"
+                  disabled={installing || uninstalling || !canManageSecrets}
+                  upgradeAvailable={upgradeAvailable}
+                  installing={installing}
+                  uninstalling={uninstalling}
+                  isUninstallRequested={isUninstallRequested}
+                  setShouldShowInstallSheet={setShouldShowInstallSheet}
+                  setShowUninstallModal={setShowUninstallModal}
+                />
+              </>
+            ) : null
+          }
+        >
+          <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
+            <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
+              <Form_Shadcn_ {...form}>
+                <form
+                  id={formId}
+                  onSubmit={form.handleSubmit(({ stripeSecretKey }) => {
+                    if (!project?.ref) return
+                    installStripeSync({
+                      projectRef: project.ref,
+                      stripeSecretKey,
+                      startTime: Date.now(),
+                    })
+                  })}
+                  className="overflow-auto flex-grow px-0 flex flex-col"
+                >
+                  <SheetHeader>
+                    <SheetTitle>
+                      {upgradeAvailable ? 'Upgrade' : 'Install'} Stripe Sync Engine
+                    </SheetTitle>
+                  </SheetHeader>
+                  <SheetSection className="flex-1 flex flex-col gap-y-6">
+                    <StripeSyncChangesCard
+                      installationStatus={installationStatus}
+                      isUpgrade={upgradeAvailable}
+                    />
 
-                <h3 className="heading-default">Configuration</h3>
+                    <h3 className="heading-default">Configuration</h3>
 
-                <div className="flex flex-col gap-y-2">
-                  <FormField_Shadcn_
-                    control={form.control}
-                    name="stripeSecretKey"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Stripe API secret key"
-                        description="Your Stripe secret key. Requires write access to Webhook Endpoints and read-only access to all other categories."
-                      >
-                        <FormControl_Shadcn_ className="col-span-8">
-                          <Input
-                            id="stripe_api_key"
-                            name="stripe_api_key"
-                            placeholder="Enter your Stripe API key"
-                            autoComplete="stripe-api-key"
-                            reveal={false}
-                            disabled={isInstallRequested}
-                            type="password"
-                            value={field.value}
-                            onChange={(e) => field.onChange(e.target.value)}
-                          />
-                        </FormControl_Shadcn_>
-                      </FormItemLayout>
+                    <div className="flex flex-col gap-y-2">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="stripeSecretKey"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="flex-row-reverse"
+                            label="Stripe API secret key"
+                            description="Your Stripe secret key. Requires write access to Webhook Endpoints and read-only access to all other categories."
+                          >
+                            <FormControl_Shadcn_ className="col-span-8">
+                              <Input
+                                id="stripe_api_key"
+                                name="stripe_api_key"
+                                placeholder="Enter your Stripe API key"
+                                autoComplete="stripe-api-key"
+                                reveal={false}
+                                disabled={isInstallRequested}
+                                type="password"
+                                value={field.value}
+                                onChange={(e) => field.onChange(e.target.value)}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+
+                      <div className="flex items-center gap-x-2">
+                        <Button asChild type="default" icon={<ExternalLink />}>
+                          <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://dashboard.stripe.com/apikeys"
+                          >
+                            Get Stripe API key
+                          </Link>
+                        </Button>
+                        <Button asChild type="default" icon={<ExternalLink />}>
+                          <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them"
+                          >
+                            What are Stripe API keys?
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {installRequestError && (
+                      <Admonition
+                        type="destructive"
+                        title="Installation failed"
+                        description={installRequestError.message}
+                      />
                     )}
-                  />
+                  </SheetSection>
 
-                  <div className="flex items-center gap-x-2">
-                    <Button asChild type="default" icon={<ExternalLink />}>
-                      <Link
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://dashboard.stripe.com/apikeys"
-                      >
-                        Get Stripe API key
-                      </Link>
+                  <SheetFooter>
+                    <Button
+                      type="default"
+                      disabled={isInstallRequested}
+                      onClick={() => handleCloseInstallSheet(false)}
+                    >
+                      Cancel
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink />}>
-                      <Link
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them"
-                      >
-                        What are Stripe API keys?
-                      </Link>
+                    <Button
+                      form={formId}
+                      htmlType="submit"
+                      type="primary"
+                      loading={isInstallRequested}
+                      disabled={!form.formState.isValid || isInstallRequested}
+                    >
+                      {isInstallRequested
+                        ? upgradeAvailable
+                          ? 'Upgrading'
+                          : 'Installing'
+                        : upgradeAvailable
+                          ? 'Upgrade integration'
+                          : 'Install integration'}
                     </Button>
-                  </div>
-                </div>
-
-                {installRequestError && (
-                  <Admonition
-                    type="destructive"
-                    title="Installation failed"
-                    description={installRequestError.message}
-                  />
-                )}
-              </SheetSection>
-
-              <SheetFooter>
-                <Button
-                  type="default"
-                  disabled={isInstallRequested}
-                  onClick={() => handleCloseInstallSheet(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  form={formId}
-                  htmlType="submit"
-                  type="primary"
-                  loading={isInstallRequested}
-                  disabled={!form.formState.isValid || isInstallRequested}
-                >
-                  {isInstallRequested
-                    ? upgradeAvailable
-                      ? 'Upgrading'
-                      : 'Installing'
-                    : upgradeAvailable
-                      ? 'Upgrade integration'
-                      : 'Install integration'}
-                </Button>
-              </SheetFooter>
-            </form>
-          </Form_Shadcn_>
-        </SheetContent>
-      </Sheet>
-    </IntegrationOverviewTab>
+                  </SheetFooter>
+                </form>
+              </Form_Shadcn_>
+            </SheetContent>
+          </Sheet>
+        </IntegrationOverviewTab>
+      )}
+      <ConfirmationModal
+        visible={showUninstallModal}
+        title="Uninstall Stripe Sync Engine"
+        confirmLabel="Uninstall"
+        confirmLabelLoading="Uninstalling..."
+        variant="destructive"
+        loading={isUninstallRequested}
+        onCancel={() => setShowUninstallModal(false)}
+        onConfirm={handleUninstall}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to uninstall the Stripe Sync Engine? This will:
+        </p>
+        <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
+          <li>
+            Remove the <code className="text-code-inline">stripe</code> schema and all tables
+          </li>
+          <li>Delete all synced Stripe data</li>
+          <li>Remove the associated Edge Functions</li>
+          <li>Remove the scheduled sync jobs</li>
+        </ul>
+        <p className="mt-4 text-sm text-foreground-light font-medium">
+          This action cannot be undone.
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }

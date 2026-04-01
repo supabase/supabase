@@ -66,6 +66,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     inputs = {},
     installationSql,
     installationCommand,
+    checkInstallationStatus,
     requiredExtensions: requiredExtensionNames,
   } = integration
 
@@ -142,13 +143,28 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
         await installationCommand({ ref: project.ref, track, ...values })
       }
 
-      toast.success(`Successfully installed ${name}`, { id: toastId })
-      setOpen(false)
+      if (!!checkInstallationStatus) {
+        const pollInstallationStatus = async () => {
+          const { ref: projectRef, connectionString } = project || {}
+          const status = await checkInstallationStatus({ projectRef, connectionString })
+          if (status === 'installed') {
+            toast.success(`Successfully installed ${name}`, { id: toastId })
+            setOpen(false)
+            setIsInstalling(false)
+          } else {
+            setTimeout(() => pollInstallationStatus(), 5000)
+          }
+        }
+        pollInstallationStatus()
+      } else {
+        toast.success(`Successfully installed ${name}`, { id: toastId })
+        setOpen(false)
+        setIsInstalling(false)
+      }
     } catch (error) {
       toast.error(`Failed to install ${name}: ${(error as ResponseError).message}`, {
         id: toastId,
       })
-    } finally {
       setIsInstalling(false)
     }
   }
