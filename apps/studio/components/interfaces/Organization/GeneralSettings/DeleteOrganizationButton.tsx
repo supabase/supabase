@@ -26,6 +26,11 @@ export const DeleteOrganizationButton = () => {
   const [acknowledgedAll, setAcknowledgedAll] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
+  useEffect(() => {
+    setCheckedProjects({})
+    setAcknowledgedAll(false)
+  }, [orgSlug])
+
   const {
     data: projectsData,
     isLoading,
@@ -114,7 +119,7 @@ export const DeleteOrganizationButton = () => {
       return
     }
 
-    if (isLoading || isFetching) {
+    if (isLoading || isFetching || isProjectsDataPending) {
       toast.error('Projects are still loading, please wait')
       return
     }
