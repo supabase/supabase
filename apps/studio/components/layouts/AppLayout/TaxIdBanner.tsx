@@ -1,10 +1,10 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useRouter } from 'next/router'
 
 import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 

@@ -1,8 +1,8 @@
-import { QueryPerformanceRow } from '../QueryPerformance.types'
 import {
   filterProtectedSchemaIndexAdvisorResult,
   queryInvolvesProtectedSchemas,
 } from '../IndexAdvisor/index-advisor.utils'
+import { QueryPerformanceRow } from '../QueryPerformance.types'
 
 export const transformStatementDataToRows = (
   data: any[],

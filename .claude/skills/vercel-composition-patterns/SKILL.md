@@ -1,7 +1,6 @@
 ---
 name: vercel-composition-patterns
-description:
-  React composition patterns that scale. Use when refactoring components with
+description: React composition patterns that scale. Use when refactoring components with
   boolean prop proliferation, building flexible component libraries, or
   designing reusable APIs. Triggers on tasks involving compound components,
   render props, context providers, or component architecture. Includes React 19
@@ -64,7 +63,7 @@ Reference these guidelines when:
 
 ### 4. React 19 APIs (MEDIUM)
 
-> **⚠️ React 19+ only.** Skip this section if using React 18 or earlier.
+> **⚠️ React 19+ only.** Supabase Studio currently uses React 18 — skip these patterns in Studio code.
 
 - `react19-no-forwardref` - Don't use `forwardRef`; use `use()` instead of `useContext()`
 

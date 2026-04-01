@@ -1,15 +1,6 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import SparkBar from 'components/ui/SparkBar'
-import {
-  DatabaseInitEstimations,
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import dayjs from 'dayjs'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
@@ -38,6 +29,15 @@ import {
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import SparkBar from '@/components/ui/SparkBar'
+import {
+  DatabaseInitEstimations,
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {

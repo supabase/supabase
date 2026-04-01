@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -8,7 +6,6 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
   cn,
-  CodeBlock,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,6 +20,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -40,6 +38,8 @@ import {
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]

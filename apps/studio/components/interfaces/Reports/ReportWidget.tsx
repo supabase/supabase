@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { ExternalLink, HelpCircle } from 'lucide-react'
 import { NextRouter, useRouter } from 'next/router'
 import { ReactNode } from 'react'
+import { Button, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { Button, Loading, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
+import Panel from '@/components/ui/Panel'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]

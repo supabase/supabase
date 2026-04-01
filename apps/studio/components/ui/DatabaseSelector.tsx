@@ -1,17 +1,10 @@
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
 import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   ButtonProps,
@@ -28,6 +21,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface DatabaseSelectorProps {
   selectedDatabaseId?: string // To override initial state

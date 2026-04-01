@@ -1,6 +1,6 @@
-import { createSupportStorageClient } from 'components/interfaces/Support/support-storage-client'
-import { generateAttachmentURLs } from 'data/support/generate-attachment-urls-mutation'
-import { uuidv4 } from 'lib/helpers'
+import { createSupportStorageClient } from '@/components/interfaces/Support/support-storage-client'
+import { generateAttachmentURLs } from '@/data/support/generate-attachment-urls-mutation'
+import { uuidv4 } from '@/lib/helpers'
 
 export const convertB64toBlob = (image: string) => {
   const contentType = 'image/png'

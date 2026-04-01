@@ -1,10 +1,6 @@
-import { ExternalLink } from 'lucide-react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { FeatureBanner } from 'components/ui/FeatureBanner'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { APIKeysData } from 'data/api-keys/api-keys-query'
+import { ExternalLink } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -16,9 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+
 import { SupportLink } from '../Support/SupportLink'
 import { ApiKeyPill } from './ApiKeyPill'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
+import { FeatureBanner } from '@/components/ui/FeatureBanner'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
+import { APIKeysData } from '@/data/api-keys/api-keys-query'
 
 // Mock API Keys for demo
 const mockApiKeys = [

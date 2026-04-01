@@ -1,20 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { ChevronLeft, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Card, LogoLoader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { PublicationsTableItem } from './PublicationsTableItem'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const PublicationsTables = () => {
   const { ref, id } = useParams()

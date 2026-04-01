@@ -1,10 +1,10 @@
 'use client'
 
-import type { Route } from 'components/ui/ui.types'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
+import type { Route } from '@/components/ui/ui.types'
 
 const TOP_LEVEL_DIRECT_LINK_KEYS = ['editor', 'sql'] as const
 

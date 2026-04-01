@@ -1,8 +1,8 @@
-import type { OrgProject } from 'data/projects/org-projects-infinite-query'
 import type { ReactNode } from 'react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectCommandItem } from './ProjectCommandItem'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
 export interface EmbeddedProjectListProps {
   projects: OrgProject[]

@@ -1,13 +1,13 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import { cn } from 'ui'
+
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { MessageActions } from './Message.Actions'
 import type { AddToolResult, MessageInfo } from './Message.Context'
-import { MessageDisplay } from './Message.Display'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
+import { MessageDisplay } from './Message.Display'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
   const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
