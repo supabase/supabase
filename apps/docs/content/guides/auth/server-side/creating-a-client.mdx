@@ -183,7 +183,7 @@ The Proxy is responsible for:
 
     The cookies object lets the Supabase client know how to access the cookies, so it can read and write the user session data. To make `@supabase/ssr` framework-agnostic, the cookies methods aren't hard-coded. These utility functions adapt `@supabase/ssr`'s cookie handling for Next.js.
 
-    The `set` and `remove` methods for the server client need error handlers, because Next.js throws an error if cookies are set from Server Components. You can safely ignore this error because you'll set up Proxy in the next step to write refreshed cookies to storage.
+    `setAll` is called whenever the library needs to write cookies, for example after a token refresh. It receives two arguments: the array of cookies to set, and a `headers` object containing cache headers (`Cache-Control`, `Expires`, `Pragma`) that must be applied to the HTTP response to prevent CDNs from caching the response and leaking the session to other users. In the Proxy, apply these headers to the response. In Server Components, the headers cannot be set, which is why the `setAll` call is wrapped in a try/catch and the error is ignored. The Proxy handles writing cookies and headers on every request.
 
     The cookie is named `sb-<project_ref>-auth-token` by default.
 
@@ -346,9 +346,12 @@ const supabase = createServerClient(
       getAll() {
         return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) =>
           Astro.cookies.set(name, value))
+        Object.entries(headers).forEach(([key, value]) =>
+          Astro.response.headers.set(key, value)
+        )
       },
     },
   }
@@ -388,7 +391,7 @@ export async function GET(context: APIContext) {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, _headers) {
           cookiesToSet.forEach(({ name, value }) =>
             context.cookies.set(name, value))
         },
@@ -417,7 +420,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         getAll() {
           return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, _headers) {
           cookiesToSet.forEach(({ name, value }) => context.cookies.set(name, value))
         },
       },
@@ -452,7 +455,7 @@ import { type LoaderFunctionArgs } from '@remix-run/node'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
   const supabase = createServerClient(
     process.env.SUPABASE_URL!,
@@ -462,17 +465,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
         getAll() {
           return parseCookieHeader(request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, cacheHeaders) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
           )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
         },
       },
     }
   )
 
   return new Response('...', {
-    headers,
+    headers: responseHeaders,
   })
 }
 ```
@@ -486,7 +490,7 @@ import { type ActionFunctionArgs } from '@remix-run/node'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function action({ request }: ActionFunctionArgs) {
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
   const supabase = createServerClient(
     process.env.SUPABASE_URL!,
@@ -496,17 +500,18 @@ export async function action({ request }: ActionFunctionArgs) {
         getAll() {
           return parseCookieHeader(request.headers.get('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, cacheHeaders) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
           )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
         },
       },
     }
   )
 
   return new Response('...', {
-    headers,
+    headers: responseHeaders,
   })
 }
 ```
@@ -563,23 +568,24 @@ import { LoaderFunctionArgs } from 'react-router'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
   const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
     cookies: {
       getAll() {
         return parseCookieHeader(request.headers.get('Cookie') ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, cacheHeaders) {
         cookiesToSet.forEach(({ name, value }) =>
-          headers.append('Set-Cookie', serializeCookieHeader(name, value))
+          responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
         )
+        Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
       },
     },
   })
 
   return new Response('...', {
-    headers,
+    headers: responseHeaders,
   })
 }
 ```
@@ -593,23 +599,24 @@ import { type ActionFunctionArgs } from '@react-router'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
 export async function action({ request }: ActionFunctionArgs) {
-  const headers = new Headers()
+  const responseHeaders = new Headers()
 
   const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
     cookies: {
       getAll() {
         return parseCookieHeader(request.headers.get('Cookie') ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, cacheHeaders) {
         cookiesToSet.forEach(({ name, value }) =>
-          headers.append('Set-Cookie', serializeCookieHeader(name, value))
+          responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
         )
+        Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
       },
     },
   })
 
   return new Response('...', {
-    headers,
+    headers: responseHeaders,
   })
 }
 ```
@@ -670,10 +677,11 @@ exports.createClient = (context) => {
       getAll() {
         return parseCookieHeader(context.req.headers.cookie ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) =>
           context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value))
         )
+        Object.entries(headers).forEach(([key, value]) => context.res.setHeader(key, value))
       },
     },
   })

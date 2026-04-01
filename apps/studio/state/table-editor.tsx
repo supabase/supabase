@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { useConstant } from 'common'
 import type { SupaRow } from 'components/grid/types'
@@ -105,6 +106,11 @@ export const createTableEditorState = () => {
 
     /* Tables */
     onAddTable: (templateData?: Partial<TableField>) => {
+      // Record that the table creator was opened
+      Sentry.startSpan({ name: 'table_creator.opened', op: 'ui.action' }, (span) => {
+        span.setAttribute('table_creator.opened', 1)
+      })
+
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'table', mode: 'new', templateData },
@@ -297,6 +303,16 @@ export const createTableEditorState = () => {
       state.operationQueue.operations = state.operationQueue.operations.filter(
         (op) => op.id !== operationId
       )
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
+     * Undo the latest operation from the queue
+     */
+    undoLatestOperation: () => {
+      state.operationQueue.operations = state.operationQueue.operations.slice(0, -1)
       if (state.operationQueue.operations.length === 0) {
         state.operationQueue.status = 'idle'
       }

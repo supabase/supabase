@@ -2,7 +2,6 @@ import type { McpClient, McpClientConfig } from '../types'
 import { getMcpClientIconSrc } from './getMcpIconSrc'
 
 interface GetMcpButtonDataOptions {
-  basePath: string
   theme?: 'light' | 'dark'
   client: McpClient
   clientConfig: McpClientConfig
@@ -10,7 +9,6 @@ interface GetMcpButtonDataOptions {
 }
 
 export function getMcpButtonData({
-  basePath,
   theme,
   client,
   clientConfig,
@@ -22,8 +20,6 @@ export function getMcpButtonData({
 
     // If the theme is dark, the button background will be light and vice-versa
     const imageSrc = getMcpClientIconSrc({
-      basePath,
-      iconFolder: 'mcp-clients',
       icon: client.icon!,
       useDarkVariant: theme === 'light',
       hasDistinctDarkIcon: client.hasDistinctDarkIcon,

@@ -1,21 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useOrganizationDeleteMutation } from 'data/organizations/organization-delete-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-
-import { DeleteOrganizationButtonListAck } from './DeleteOrganizationButton.ListAck'
-import { DeleteOrganizationButtonSingleAck } from './DeleteOrganizationButton.SingleAck'
-
-const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const DeleteOrganizationButton = () => {
   const router = useRouter()

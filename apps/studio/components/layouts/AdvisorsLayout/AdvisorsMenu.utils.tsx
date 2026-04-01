@@ -1,7 +1,8 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
+
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from '@/data/projects/project-detail-query'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'

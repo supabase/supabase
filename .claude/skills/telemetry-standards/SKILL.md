@@ -14,9 +14,9 @@ reviewing PRs that touch tracking or when implementing new tracking.
 
 **Format:** `[object]_[verb]` in snake_case
 
-**Approved verbs only:**
-opened, clicked, submitted, created, removed, updated, retrieved, intended, evaluated, added,
-enabled, disabled, copied, exposed, failed, converted
+**Approved verbs only** (canonical list — derived from `packages/common/telemetry-constants.ts`):
+opened, clicked, submitted, created, removed, updated, intended, evaluated, added,
+enabled, disabled, copied, exposed, failed, converted, closed, completed, applied, sent, moved
 
 **Flag these:**
 - Unapproved verbs (saved, viewed, seen, pressed, etc.)

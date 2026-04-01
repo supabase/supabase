@@ -1,19 +1,20 @@
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { Card } from 'ui'
+
+import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './AnalyticsBucketDetails.constants'
+import { CopyEnvButton } from './CopyEnvButton'
+import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
+import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
+import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
 import {
   ScaffoldHeader,
   ScaffoldSection,
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
-import { Card } from 'ui'
-import { DESCRIPTIONS, LABELS, OPTION_ORDER } from './AnalyticsBucketDetails.constants'
-import { CopyEnvButton } from './CopyEnvButton'
-import { DecryptedReadOnlyInput } from './DecryptedReadOnlyInput'
-import { useAnalyticsBucketWrapperInstance } from './useAnalyticsBucketWrapperInstance'
+} from '@/components/layouts/Scaffold'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string }) => {
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')

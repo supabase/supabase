@@ -1,21 +1,21 @@
 import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { VIOLATION_TYPE_LABELS } from 'data/usage/constants'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import { usePathname } from 'next/navigation'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   CriticalIcon,
   WarningIcon,
 } from 'ui'
+
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { VIOLATION_TYPE_LABELS } from '@/data/usage/constants'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export const Restriction = () => {
   const { data: org } = useSelectedOrganizationQuery()
@@ -156,7 +156,7 @@ export const Restriction = () => {
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . Fair Use Policy applies now. Stay below your plan’s quota or{' '}
+              . Fair Use Policy applies now. Stay below your plan's quota or{' '}
               {org.plan.id === 'free' ? 'upgrade your plan' : 'disable spend cap'} if you expect to
               exceed it. If you exceed your quota, requests will respond with a 402 status code.
             </p>
@@ -193,10 +193,12 @@ export const Restriction = () => {
           <AlertDescription_Shadcn_>
             <p>
               Fair Use Policy applies and your service is restricted. Your projects are not able to
-              serve requests and will respond with a 402 status code. You have exceeded your plan’s
+              serve requests and will respond with a 402 status code. You have exceeded your plan's
               quota{violationLabels && ` ${violationLabels}`}.{' '}
               {org.plan.id === 'free' ? 'Upgrade your plan' : 'Disable spend cap'} to lift
-              restrictions or wait until your quota refills on your next billing period.
+              restrictions immediately, or wait until your quota refills at the start of your next
+              billing period. Note that there may be a short delay after your billing period resets
+              before restrictions are fully lifted.
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild type="default">

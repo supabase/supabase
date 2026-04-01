@@ -1,18 +1,18 @@
+import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { isNull } from 'lodash'
-import type { Dictionary } from 'types'
-
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { uuidv4 } from 'lib/helpers'
 import { toast } from 'sonner'
+
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { RetrievedTableColumn, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { uuidv4 } from '@/lib/helpers'
+import type { Dictionary } from '@/types'
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -32,7 +32,9 @@ const isSQLExpression = (input: string) => {
   return false
 }
 
-export const generateColumnField = (field: any = {}): ColumnField => {
+export const generateColumnField = (
+  field: { name?: string; table?: string; schema?: string; format?: string } = {}
+): ColumnField => {
   const { name, table, schema, format } = field
   return {
     id: uuidv4(),
@@ -173,7 +175,7 @@ export const generateUpdateColumnPayload = (
 }
 
 export const validateFields = (field: ColumnField) => {
-  const errors = {} as Dictionary<any>
+  const errors = {} as Dictionary<string>
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
     toast.error(errors['name'])

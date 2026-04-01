@@ -1,8 +1,10 @@
 import type { RenderEditCellProps } from 'react-data-grid'
 import { Select } from 'ui'
 
-interface SelectEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface SelectEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   isNullable?: boolean
   options: { label: string; _value: string }[]
 }

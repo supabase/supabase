@@ -1,20 +1,20 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
-import { useAdvisorStateSnapshot } from 'state/advisor-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Row } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Markdown } from '../Markdown'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAdvisorStateSnapshot } from '@/state/advisor-state'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
@@ -95,7 +95,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
         </div>
       ) : errorLints.length > 0 ? (
         <>
-          <Row columns={[3, 2, 1]}>
+          <Row maxColumns={4} minWidth={280}>
             {errorLints.map((lint) => {
               return (
                 <Card

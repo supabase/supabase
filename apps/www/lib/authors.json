@@ -607,6 +607,14 @@
     "author_image_url": "https://github.com/saxonf.png"
   },
   {
+    "author_id": "sara_read",
+    "author": "Sara Read",
+    "username": "supa-sara",
+    "position": "Incident Manager",
+    "author_url": "https://github.com/supa-sara",
+    "author_image_url": "https://github.com/supa-sara.png"
+  },
+  {
     "author_id": "gregpapas",
     "author": "Greg Papas",
     "username": "gregpapas",
@@ -705,7 +713,7 @@
     "author": "Harry Roper",
     "position": "Founder and CEO",
     "company": "Imaginary Space",
-    "author_url": "https://www.linkedin.com/in/harry-roper",
+    "author_url": "https://www.linkedin.com/in/harryroper/",
     "author_image_url": "/images/avatars/harry-roper.png"
   },
   {
@@ -713,7 +721,7 @@
     "author": "Zimo Holdijk",
     "position": "Lead Product Builder",
     "company": "Brthrs",
-    "author_url": "https://www.linkedin.com/in/zimoholdijk",
+    "author_url": "https://www.linkedin.com/in/zimo-holdijk/",
     "author_image_url": "/images/avatars/zimo-holdijk.png"
   },
   {
@@ -851,6 +859,14 @@
     "author_image_url": "https://github.com/deepthi.png"
   },
   {
+    "author_id": "joe_sciarrino",
+    "author": "Joe Sciarrino",
+    "username": "jhydra12",
+    "position": "Head of Product, Supabase Warehouse",
+    "author_url": "https://github.com/jhydra12",
+    "author_image_url": "https://github.com/jhydra12.png"
+  },
+  {
     "author_id": "manan_gupta",
     "author": "Manan Gupta",
     "username": "GuptaManan100",
@@ -865,5 +881,45 @@
     "position": "Head of Multigres",
     "author_url": "https://github.com/sougou",
     "author_image_url": "https://github.com/sougou.png"
+  },
+  {
+    "author_id": "gerardo_estaba",
+    "author": "Gerardo Estaba",
+    "username": "ge8",
+    "position": "Customer Solutions Architect",
+    "author_url": "https://github.com/ge8",
+    "author_image_url": "https://github.com/ge8.png"
+  },
+  {
+    "author_id": "michel_ferreira",
+    "author": "Michel Ferreira",
+    "position": "Designer Advocate",
+    "company": "Figma",
+    "author_url": "https://www.figma.com",
+    "author_image_url": "/images/blog/avatars/michel-ferreira.jpeg"
+  },
+  {
+    "author_id": "victor_orozco",
+    "author": "Victor Orozco",
+    "position": "CTO",
+    "company": "Performanze",
+    "author_url": "#",
+    "author_image_url": "/images/blog/avatars/victor-orozco.jpeg"
+  },
+  {
+    "author_id": "ana_mogul",
+    "author": "Ana Mogul",
+    "username": "ana1337x",
+    "position": "Product Marketing Manager",
+    "author_url": "https://linkedin.com/in/amogul",
+    "author_image_url": "/images/blog/avatars/ana-mogul.jpeg"
+  },
+  {
+    "author_id": "gregor_vand",
+    "author": "Gregor Vand",
+    "username": "gregorvand",
+    "position": "Technical Program Manager",
+    "author_url": "https://www.linkedin.com/in/gregorvand/",
+    "author_image_url": "https://github.com/gregorvand.png"
   }
 ]

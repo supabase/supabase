@@ -1,32 +1,32 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { FormActions } from 'components/ui/Forms/FormActions'
-import type {
-  EnvironmentTargets,
-  Integration,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import Link from 'next/link'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Switch,
 } from 'ui'
+import * as z from 'zod'
+
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import type {
+  EnvironmentTargets,
+  Integration,
+  IntegrationProjectConnection,
+} from '@/data/integrations/integrations.types'
+import { useVercelConnectionUpdateMutation } from '@/data/integrations/vercel-connection-update-mutate'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 const VercelIntegrationConnectionForm = ({
   disabled,
@@ -41,7 +41,7 @@ const VercelIntegrationConnectionForm = ({
   // but through a separate marketplace mechanism. It's not theoretically necessary, but we might have some stale data.
   const { data: org } = useSelectedOrganizationQuery()
   const envSyncTargets =
-    org?.managed_by === 'vercel-marketplace' ? [] : connection.env_sync_targets ?? []
+    org?.managed_by === 'vercel-marketplace' ? [] : (connection.env_sync_targets ?? [])
 
   const FormSchema = z.object({
     environmentVariablesProduction: z.boolean().default(envSyncTargets.includes('production')),

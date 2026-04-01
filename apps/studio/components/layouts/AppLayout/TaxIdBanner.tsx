@@ -1,10 +1,10 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useRouter } from 'next/router'
 
 import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -20,13 +20,14 @@ export const TaxIdBanner = () => {
     false
   )
 
-  const shouldFetch =
+  const shouldFetch = Boolean(
     !!slug &&
     org?.plan?.id !== 'free' &&
+    !org?.billing_partner &&
     isDismissLoaded &&
     !isDismissed &&
     !!org?.organization_missing_tax_id
-
+  )
   const { data: customerProfile } = useOrganizationCustomerProfileQuery(
     { slug },
     { enabled: shouldFetch, staleTime: 1000 * 60 * 30 }
@@ -39,6 +40,7 @@ export const TaxIdBanner = () => {
     router.pathname.includes('sign-in') ||
     !org ||
     org.plan?.id === 'free' ||
+    org.billing_partner ||
     !isDismissLoaded ||
     isDismissed ||
     !org.organization_missing_tax_id ||
@@ -53,7 +55,7 @@ export const TaxIdBanner = () => {
       title="Missing tax ID"
       description={
         <>
-          Registered businesses should{' '}
+          Registered businesses must{' '}
           <InlineLink href={`/org/${slug}/billing#address`}>add a tax ID</InlineLink> to their
           billing details
         </>

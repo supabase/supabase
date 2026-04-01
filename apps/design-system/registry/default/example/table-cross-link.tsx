@@ -1,6 +1,19 @@
-import { DatabaseZap, Edit2, EllipsisVertical } from 'lucide-react'
+import { Copy, DatabaseZap, Edit2, EllipsisVertical, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Button,
+  Card,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 
 const triggers = [
   {
@@ -71,16 +84,29 @@ export default function TableCrossLink() {
                 </Link>
               </TableCell>
               <TableCell className="flex items-center gap-x-2">
-                <Button type="default" size="tiny" icon={<Edit2 />}>
+                <Button type="default" size="tiny" icon={<Edit2 />} className="hit-area-2">
                   Edit
                 </Button>
-                <Button
-                  icon={<EllipsisVertical />}
-                  aria-label={`More actions`}
-                  type="default"
-                  size="tiny"
-                  className="w-7"
-                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="default"
+                      icon={<EllipsisVertical />}
+                      aria-label="More actions"
+                      className="w-7 hit-area-2"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="end" className="w-40">
+                    <DropdownMenuItem className="gap-x-2">
+                      <Copy size={14} />
+                      <span>Duplicate trigger</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="gap-x-2">
+                      <Trash2 size={14} />
+                      <span>Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}

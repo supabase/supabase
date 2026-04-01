@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Plus, Trash2, Upload } from 'lucide-react'
+import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Calendar,
@@ -14,10 +14,14 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  InputGroupTextarea,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  PrePostTab,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select_Shadcn_,
@@ -30,6 +34,8 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -61,6 +67,7 @@ const formSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   duration: z.number().min(5).max(30),
   redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
+  httpHeaders: z.array(z.object({ key: z.string(), value: z.string() })),
   apiKey: z.string().optional(),
 })
 
@@ -91,13 +98,9 @@ export default function FormPatternsPageLayout() {
       password: '',
       duration: 10,
       redirectUris: [{ value: '' }],
+      httpHeaders: [{ key: '', value: '' }],
       apiKey: fakeApiKey,
     },
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'redirectUris',
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -216,9 +219,12 @@ export default function FormPatternsPageLayout() {
                         description="Input with additional unit label"
                       >
                         <FormControl_Shadcn_>
-                          <PrePostTab postTab="MB" className="w-full">
-                            <Input_Shadcn_ {...field} type="number" min={5} max={30} />
-                          </PrePostTab>
+                          <InputGroup>
+                            <InputGroupInput {...field} type="number" min={5} max={30} />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText className="font-mono">MB</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -243,6 +249,35 @@ export default function FormPatternsPageLayout() {
                             placeholder="Enter multi-line text"
                             className="resize-none"
                           />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                {/* Textarea with addon */}
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Textarea"
+                        description="Multi-line text input for longer content with addon"
+                      >
+                        <FormControl_Shadcn_>
+                          <InputGroup>
+                            <InputGroupTextarea
+                              {...field}
+                              rows={4}
+                              placeholder="Enter multi-line text"
+                              className="resize-none"
+                            />
+                            <InputGroupAddon align="block-end">
+                              <InputGroupText>120 characters left</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
                     )}
@@ -285,7 +320,7 @@ export default function FormPatternsPageLayout() {
                                 <Button
                                   type="default"
                                   size="tiny"
-                                  icon={<Trash2 size={12} />}
+                                  icon={<Trash size={12} />}
                                   onClick={() => {
                                     setLogoFile(undefined)
                                     setLogoUrl(undefined)
@@ -389,7 +424,7 @@ export default function FormPatternsPageLayout() {
                                       <Button
                                         type="default"
                                         size="tiny"
-                                        icon={<Trash2 size={12} />}
+                                        icon={<Trash size={12} />}
                                         onClick={() => {
                                           setUploadedFiles((prev) =>
                                             prev.filter((_, i) => i !== idx)
@@ -619,7 +654,7 @@ export default function FormPatternsPageLayout() {
                             <PopoverTrigger_Shadcn_ asChild>
                               <Button
                                 type="outline"
-                                className="w-full justify-start text-left font-normal px-3 py-4"
+                                className="bg-control w-full justify-start text-left font-normal px-3 py-4"
                                 icon={<CalendarIcon className="h-4 w-4" />}
                               >
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
@@ -651,40 +686,42 @@ export default function FormPatternsPageLayout() {
                         label="Field Array"
                         description="Dynamic list for adding/removing items"
                       >
-                        <div className="space-y-2 w-full">
-                          {fields.map((field, index) => (
-                            <FormField_Shadcn_
-                              key={field.id}
-                              control={form.control}
-                              name={`redirectUris.${index}.value`}
-                              render={({ field: inputField }) => (
-                                <div className="flex gap-2">
-                                  <FormControl_Shadcn_>
-                                    <Input_Shadcn_
-                                      {...inputField}
-                                      placeholder="https://example.com/callback"
-                                    />
-                                  </FormControl_Shadcn_>
-                                  {fields.length > 1 && (
-                                    <Button
-                                      type="default"
-                                      size="tiny"
-                                      icon={<Trash2 size={12} />}
-                                      onClick={() => remove(index)}
-                                    />
-                                  )}
-                                </div>
-                              )}
-                            />
-                          ))}
-                          <Button
-                            type="default"
-                            icon={<Plus />}
-                            onClick={() => append({ value: '' })}
-                          >
-                            Add redirect URI
-                          </Button>
-                        </div>
+                        <SingleValueFieldArray
+                          control={form.control}
+                          name="redirectUris"
+                          valueFieldName="value"
+                          createEmptyRow={() => ({ value: '' })}
+                          placeholder="https://example.com/callback"
+                          addLabel="Add redirect URI"
+                          removeLabel="Remove redirect URI"
+                        />
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                {/* Key/Value Field Array */}
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="httpHeaders"
+                    render={() => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Key/Value Field Array"
+                        description="Repeated text pairs for headers, parameters, and config entries"
+                      >
+                        <KeyValueFieldArray
+                          control={form.control}
+                          name="httpHeaders"
+                          keyFieldName="key"
+                          valueFieldName="value"
+                          createEmptyRow={() => ({ key: '', value: '' })}
+                          keyPlaceholder="Header name"
+                          valuePlaceholder="Header value"
+                          addLabel="Add header"
+                          removeLabel="Remove header"
+                        />
                       </FormItemLayout>
                     )}
                   />

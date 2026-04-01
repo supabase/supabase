@@ -1,29 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useEdgeFunctionTestMutation } from 'data/edge-functions/edge-function-test-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
-import { prettifyJSON } from 'lib/helpers'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { Loader2, Plus, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import {
-  RoleImpersonationStateContextProvider,
-  useGetImpersonatedRoleState,
-} from 'state/role-impersonation-state'
-import {
   Badge,
   Button,
-  CodeBlock,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -48,11 +31,28 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
+import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import { prettifyJSON } from '@/lib/helpers'
+import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import {
+  RoleImpersonationStateContextProvider,
+  useGetImpersonatedRoleState,
+} from '@/state/role-impersonation-state'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean

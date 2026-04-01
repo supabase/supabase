@@ -16,8 +16,10 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Skeleton,
   Switch,
   useWatch_Shadcn_,
@@ -51,8 +53,8 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from '@/lib/constants'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+import { IS_PLATFORM } from '@/lib/constants'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
 
@@ -608,15 +610,18 @@ export const PostgrestConfig = () => {
                             description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="rows">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>rows</InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
                                   onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
-                              </PrePostTab>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
@@ -635,8 +640,11 @@ export const PostgrestConfig = () => {
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
@@ -649,7 +657,7 @@ export const PostgrestConfig = () => {
                                   }
                                   value={field.value === null ? '' : field.value}
                                 />
-                              </PrePostTab>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>

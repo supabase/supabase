@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CodeBlock } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 

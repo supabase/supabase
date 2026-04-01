@@ -1,7 +1,5 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { ChevronsUpDown, HelpCircle } from 'lucide-react'
 import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
@@ -23,6 +21,11 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EmbeddedProjectList } from './OrganizationProjectSelector/EmbeddedProjectList'
 import { ProjectCommandItem } from './OrganizationProjectSelector/ProjectCommandItem'
+import {
+  OrgProject,
+  useOrgProjectsInfiniteQuery,
+} from '@/data/projects/org-projects-infinite-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface OrganizationProjectSelectorSelectorProps {
   slug?: string
@@ -280,7 +283,7 @@ export const OrganizationProjectSelector = ({
             {isLoadingProjects || isFetching ? (
               <ShimmeringLoader className="w-44 py-2" />
             ) : (
-              selectedProject?.name ?? 'Select a project'
+              (selectedProject?.name ?? 'Select a project')
             )}
           </Button>
         )}

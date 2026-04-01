@@ -56,7 +56,7 @@ const page: GoPageInput = {
       id: 'form',
       title: 'Early Access Request Form',
       description:
-        "If you are interested in participating in BYOC early access when it becomes available later in 2026, please fill out the form below. A member of the Supabase team will reach out if you've been selected.",
+        "If you are interested in participating in BYOC early access when it becomes available, please fill out the form below. A member of the Supabase team will reach out if you've been selected.",
       fields: [
         {
           type: 'text',

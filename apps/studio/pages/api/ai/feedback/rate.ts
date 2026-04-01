@@ -1,10 +1,11 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
 import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -96,24 +97,18 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   try {
-    const {
-      model,
-      error: modelError,
-      providerOptions,
-    } = await getModel({
+    const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      isLimited: true,
-      routingKey: 'feedback',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const { object } = await generateObject({
-      model,
-      providerOptions,
-      schema: rateMessageResponseSchema,
+    const { output } = await generateText({
+      ...modelParams,
+      output: Output.object({ schema: rateMessageResponseSchema }),
       prompt: `
 Your job is to look at a Supabase Assistant conversation, which the user has given feedback on, and classify it.
 
@@ -148,7 +143,7 @@ Instructions:
         })
         logger?.updateSpan({
           id: spanId,
-          metadata: { feedbackCategory: object.category },
+          metadata: { feedbackCategory: output.category },
         })
       } catch (error) {
         console.error('Failed to log feedback to Braintrust:', error)
@@ -156,7 +151,7 @@ Instructions:
     }
 
     return res.json({
-      category: object.category,
+      category: output.category,
     })
   } catch (error) {
     if (error instanceof Error) {

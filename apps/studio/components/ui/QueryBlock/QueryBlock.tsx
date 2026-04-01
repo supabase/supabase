@@ -1,11 +1,9 @@
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import dayjs from 'dayjs'
 import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
-import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
+import { Badge, Button, ChartContainer, ChartTooltipContent, cn } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -14,6 +12,9 @@ import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
+import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',

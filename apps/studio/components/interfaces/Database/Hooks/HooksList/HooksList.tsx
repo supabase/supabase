@@ -1,12 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import { Search } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -16,6 +8,14 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()

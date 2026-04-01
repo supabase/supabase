@@ -24,19 +24,25 @@ function buildUrlMatcher(basePath: string, ref: string, action: string, method?:
   // Normalize inputs and build a tolerant matcher that works across environments
   const trimmedBasePath = basePath.replace(/^\/+|\/+$/g, '')
   const refAlternatives = [ref, 'default']
+  const [actionPath, actionQuery] = action.split('?')
+  const trimmedActionPath = actionPath.replace(/^\/+/, '')
+  const expectedSearchParams = new URLSearchParams(actionQuery ?? '')
 
   return (response: any) => {
-    const url = response.url()
+    const url = new URL(response.url())
     const requestMethod = response.request().method()
 
     // Must include base path and one of the ref alternatives
-    const hasBasePath = url.includes(`${trimmedBasePath}/`)
-    const hasRef = refAlternatives.some((r) => url.includes(`/${r}/`))
+    const hasBasePath = url.pathname.includes(`/${trimmedBasePath}/`)
+    const hasRef = refAlternatives.some((r) => url.pathname.includes(`/${r}/`))
 
-    // Action match should be tolerant to extra query params ordering
-    const hasAction = url.includes(action)
+    const hasActionPath =
+      trimmedActionPath.length === 0 || url.pathname.includes(`/${trimmedActionPath}`)
+    const hasExpectedSearchParams = [...expectedSearchParams.entries()].every(([key, value]) =>
+      url.searchParams.getAll(key).some((actualValue) => actualValue.includes(value))
+    )
 
-    const urlMatches = hasBasePath && hasRef && hasAction
+    const urlMatches = hasBasePath && hasRef && hasActionPath && hasExpectedSearchParams
     if (method) return urlMatches && requestMethod === method
     return urlMatches
   }

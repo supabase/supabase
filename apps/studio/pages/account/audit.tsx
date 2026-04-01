@@ -1,8 +1,7 @@
 import { AuditLogs } from 'components/interfaces/Account/AuditLogs'
 import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -36,9 +35,7 @@ const Audit: NextPageWithLayout = () => {
 Audit.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Audit Logs">{page}</AccountLayout>
-      </OrganizationLayout>
+      <AccountLayout title="Audit Logs">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

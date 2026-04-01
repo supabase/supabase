@@ -1,0 +1,43 @@
+---
+title: Key/Value Field Array
+description: A shared form fragment for repeated text key/value pairs.
+component: true
+fragment: true
+---
+
+<ComponentPreview
+  name="key-value-field-array-demo"
+  description="A shared form fragment for repeated text key/value pairs."
+  peekCode
+  showDottedGrid
+  wide
+/>
+
+## Usage
+
+Use `KeyValueFieldArray` when each row is two text inputs backed by `react-hook-form`, such as HTTP headers, query parameters, or configuration parameters.
+
+```tsx
+import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+```
+
+```tsx
+<KeyValueFieldArray
+  control={form.control}
+  name="headers"
+  keyFieldName="name"
+  valueFieldName="value"
+  createEmptyRow={() => ({ name: '', value: '' })}
+  keyPlaceholder="Header name"
+  valuePlaceholder="Header value"
+  addLabel="Add header"
+/>
+```
+
+`KeyValueFieldArray` owns the row add/remove behavior and renders the per-input form messages for you. Compose it inside `FormItemLayout` when you want the standard label, description, and message treatment around the entire section.
+
+## When to use it
+
+- Use [Single Value Field Array](./single-value-field-array) for repeated single values such as redirect URIs.
+- Use `KeyValueFieldArray` for repeated text/text pairs such as headers, parameters, and config entries.
+- Build a custom row UI instead when each row mixes different controls, such as a text input paired with a `Select`.

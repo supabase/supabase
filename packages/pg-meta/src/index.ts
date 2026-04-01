@@ -18,13 +18,20 @@ import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
 
-// Studio SQL queries
-export { getUserSQL } from './sql/studio/auth/get-user'
-export { getIndexStatusesSQL, USER_SEARCH_INDEXES } from './sql/studio/auth/get-index-statuses'
-export { getIndexWorkerStatusSQL } from './sql/studio/auth/get-index-worker-status'
-export { type OptimizedSearchColumns } from './sql/studio/auth/get-users-types'
-export { getPaginatedUsersSQL, type UsersCursor } from './sql/studio/auth/get-users-paginated'
-export { getUsersCountSQL } from './sql/studio/auth/get-users-count'
+/**
+ * Studio specific SQL queries
+ * [Joshen] If it gets cumbersome, we can also consider path exports for studio queries
+ * So consumption can look something like:
+ * import { ... } from '@supabase/pg-meta/table-editor'
+ */
+export * from './sql/studio/advisor'
+export * from './sql/studio/auth'
+export * from './sql/studio/storage'
+export * from './sql/studio/database'
+export * from './sql/studio/table-editor'
+export * from './sql/studio/sql-editor'
+export * from './sql/studio/role-impersonation'
+export * from './sql/studio/integrations'
 
 export default {
   roles,

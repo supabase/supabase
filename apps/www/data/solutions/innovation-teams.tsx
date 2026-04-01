@@ -1,15 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
 import { useBreakpoint } from 'common'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import { companyStats } from 'data/company-stats'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   ArrowLeftRight,
   Check,
@@ -17,7 +7,6 @@ import {
   FolderLock,
   Globe2,
   HeartPulse,
-  InfoIcon,
   Lightbulb,
   List,
   Lock,
@@ -25,23 +14,28 @@ import {
   ShieldCheck,
   Sparkles,
   Timer,
-  UserX,
   Users,
+  UserX,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { Image } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
 import {
-  type FeaturesSection,
   FrameworkLink,
-  type FrameworkLinkProps,
+  getEditors,
+  type FeaturesSection,
   type HeroSection,
   type Metadata,
-  getEditors,
 } from './solutions.utils'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { companyStats } from '@/data/company-stats'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))

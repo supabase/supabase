@@ -1,6 +1,6 @@
+import { useStatusPageBannerVisibility } from './useStatusPageBannerVisibility'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useStatusPageBannerVisibility } from './useStatusPageBannerVisibility'
 
 const BANNER_DESCRIPTION = (
   <>
