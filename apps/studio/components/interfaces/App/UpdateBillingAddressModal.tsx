@@ -121,6 +121,7 @@ export function UpdateBillingAddressModal() {
             address: data.address,
             billing_name: data.billing_name,
           })
+          await invalidateOrganizationsQuery(queryClient)
         } catch (error: any) {
           toast.error(`Failed to update billing address: ${error.message}`)
           throw error
@@ -132,8 +133,6 @@ export function UpdateBillingAddressModal() {
           toast.error(`Failed to update tax ID: ${error.message}`)
           throw error
         }
-
-        await invalidateOrganizationsQuery(queryClient)
 
         toast.success('Successfully updated billing address')
         setDismissed(true)
