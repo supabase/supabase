@@ -379,15 +379,17 @@ curl 'http://<your-domain>/auth/v1/admin/sso/providers' \
   -H 'apikey: your-service-role-key'
 ```
 
-Filter by resource ID:
+Filter by resource ID using exact match:
 
 ```sh
-# Exact match
 curl 'http://<your-domain>/auth/v1/admin/sso/providers?resource_id=my-idp' \
   -H 'Authorization: Bearer your-service-role-key' \
   -H 'apikey: your-service-role-key'
+```
 
-# Prefix match
+or prefix match:
+
+```sh
 curl 'http://<your-domain>/auth/v1/admin/sso/providers?resource_id_prefix=prod-' \
   -H 'Authorization: Bearer your-service-role-key' \
   -H 'apikey: your-service-role-key'
@@ -467,18 +469,22 @@ Both methods return an object with a `url` property - redirect the user to this 
 
 ### Using the REST API directly
 
+By domain:
+
 ```sh
-# By domain
-curl -X POST 'http://<your-domain>/sso' \
+curl -X POST 'http://<your-domain>/auth/v1/sso' \
   -H 'Content-Type: application/json' \
   -H 'apikey: your-anon-key' \
   -d '{
     "domain": "example.com",
     "skip_http_redirect": true
   }'
+```
 
-# By provider ID
-curl -X POST 'http://<your-domain>/sso' \
+By provider ID:
+
+```sh
+curl -X POST 'http://<your-domain>/auth/v1/sso' \
   -H 'Content-Type: application/json' \
   -H 'apikey: your-anon-key' \
   -d '{
