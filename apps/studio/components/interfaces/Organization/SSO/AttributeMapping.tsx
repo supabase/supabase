@@ -1,15 +1,7 @@
-import { Plus, Trash } from 'lucide-react'
-import { useFieldArray, UseFormReturn } from 'react-hook-form'
-import {
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { UseFormReturn } from 'react-hook-form'
+import { Button } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import type { SSOConfigFormSchema } from './SSOConfig'
 
 type ProviderAttribute = 'emailMapping' | 'userNameMapping' | 'firstNameMapping' | 'lastNameMapping'
@@ -169,55 +161,26 @@ const MappingFieldArray = ({
   required: boolean
   placeholder?: string
 }) => {
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: fieldName,
-  })
-
   return (
     <div className="w-full min-w-0 space-y-1">
       <div className="flex items-center justify-between gap-2">
         <span className="text-foreground-light">{label}</span>
         {!required ? <span className="text-foreground-muted">Optional</span> : null}
       </div>
-      <div className="grid w-full min-w-0 gap-2">
-        {fields.map((field, idx) => (
-          <div key={field.id} className="flex min-w-0 items-start gap-2">
-            <FormField_Shadcn_
-              name={`${fieldName}.${idx}.value`}
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="min-w-0 flex-1">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      {...field}
-                      className="min-w-0"
-                      placeholder={placeholder}
-                      autoComplete="off"
-                    />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
-              )}
-            />
-            <Button
-              type="default"
-              icon={<Trash size={12} />}
-              className="h-[34px] w-[34px] shrink-0"
-              disabled={fields.length <= 1}
-              onClick={() => remove(idx)}
-            />
-          </div>
-        ))}
-
-        <Button
-          type="default"
-          icon={<Plus className="w-4 h-4" />}
-          onClick={() => append({ value: '' })}
-          className="w-auto self-start justify-self-start"
-        >
-          Add another
-        </Button>
-      </div>
+      <SingleValueFieldArray
+        control={form.control}
+        name={fieldName}
+        valueFieldName="value"
+        createEmptyRow={() => ({ value: '' })}
+        placeholder={placeholder ?? ''}
+        addLabel="Add another"
+        removeLabel={`Remove ${label} mapping`}
+        minimumRows={1}
+        inputAutoComplete="off"
+        rowsClassName="grid gap-2 w-full"
+        addButtonType="default"
+        addButtonClassName="w-auto self-start justify-self-start"
+      />
     </div>
   )
 }

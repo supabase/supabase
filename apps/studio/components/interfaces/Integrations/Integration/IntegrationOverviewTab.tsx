@@ -105,10 +105,12 @@ export const IntegrationOverviewTab = ({
 
       {!!actions && (
         <div
-          aria-disabled={hasToInstallExtensions}
+          aria-disabled={hasToInstallExtensions && !hideRequiredExtensionsSection}
           className={cn(
             'px-10 max-w-4xl',
-            hasToInstallExtensions && 'opacity-25 [&_button]:pointer-events-none'
+            hasToInstallExtensions &&
+              !hideRequiredExtensionsSection &&
+              'opacity-25 [&_button]:pointer-events-none'
           )}
         >
           {actions}

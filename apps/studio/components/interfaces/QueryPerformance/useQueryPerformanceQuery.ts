@@ -3,11 +3,28 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 import { PRESET_CONFIG } from '../Reports/Reports.constants'
 import { Presets } from '../Reports/Reports.types'
-import { QueryPerformanceRow, QueryPerformanceSQLParams } from './QueryPerformance.types'
+import {
+  QueryPerformanceRow,
+  QueryPerformanceSort,
+  QueryPerformanceSQLParams,
+} from './QueryPerformance.types'
+
+const VALID_SORT_COLUMNS: ReadonlySet<string> = new Set<QueryPerformanceSort['column']>([
+  'query',
+  'rolname',
+  'total_time',
+  'prop_total_time',
+  'calls',
+  'avg_rows',
+  'max_time',
+  'mean_time',
+  'min_time',
+])
 
 export function generateQueryPerformanceSql({
   preset,
@@ -30,7 +47,12 @@ export function generateQueryPerformanceSql({
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
 
-  const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
+  const isValidOrderBy =
+    orderBy != null &&
+    VALID_SORT_COLUMNS.has(orderBy.column) &&
+    (orderBy.order === 'asc' || orderBy.order === 'desc')
+
+  const orderBySql = isValidOrderBy ? `ORDER BY ${orderBy!.column} ${orderBy!.order}` : undefined
 
   const whereConditions = []
   if (roles.length > 0) {
@@ -150,7 +172,9 @@ export const useQueryPerformanceInfiniteQuery = (
       },
       // Don't run until we have a connection string for the selected database.
       // For replicas this prevents a silent fallback to the primary before replicas load.
-      enabled: Boolean(project?.ref) && Boolean(effectiveConnectionString),
+      // In self-hosted mode (IS_PLATFORM=false) there is no real connection string, so we
+      // skip the check — executeSql works fine without one on self-hosted deployments.
+      enabled: Boolean(project?.ref) && (!IS_PLATFORM || Boolean(effectiveConnectionString)),
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     })

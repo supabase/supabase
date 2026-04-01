@@ -13,8 +13,8 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
       role="group"
       className={cn(
         'group/input-group relative items-center outline-none transition-[color,box-shadow]',
-        'flex h-10 w-full rounded-md border border-control bg-foreground/[.026] py-2 text-sm',
-        'h-9 has-[>textarea]:h-auto',
+        'flex rounded-md border border-control bg-foreground/[.026] text-sm',
+        'has-[>textarea]:h-auto',
 
         // Variants based on alignment.
         'has-[>[data-align=inline-start]]:[&>input]:pl-2',
@@ -42,16 +42,16 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const inputGroupAddonVariants = cva(
-  "text-foreground-light flex h-auto cursor-text select-none items-center justify-center gap-2 py-1.5 text-sm group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-4",
+  "text-foreground-light flex h-auto cursor-text select-none items-center justify-center gap-2 text-sm group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-4",
   {
     variants: {
       align: {
-        'inline-start': 'order-first pl-3 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem]',
-        'inline-end': 'order-last pr-3 has-[>button]:mr-[-0.4rem] has-[>kbd]:mr-[-0.35rem]',
+        'inline-start': 'order-first pl-2 has-[>button]:ml-[-0.45rem] has-[>kbd]:ml-[-0.35rem]',
+        'inline-end': 'order-last pr-2 has-[>button]:mr-[-0.4rem] has-[>kbd]:mr-[-0.35rem]',
         'block-start':
-          '[.border-b]:pb-3 order-first w-full justify-start px-3 pt-3 group-has-[>input]/input-group:pt-2.5',
+          '[.border-b]:pb-3 order-first w-full justify-start px-2 pt-2 group-has-[>input]/input-group:pt-2.5',
         'block-end':
-          '[.border-t]:pt-3 order-last w-full justify-start px-3 pb-3 group-has-[>input]/input-group:pb-2.5',
+          '[.border-t]:pt-3 order-last w-full justify-start px-2 pb-2 group-has-[>input]/input-group:pb-2.5',
       },
     },
     defaultVariants: {
@@ -128,7 +128,7 @@ function InputGroupInput({ className, ...props }: InputProps) {
     <Input
       data-slot="input-group-control"
       className={cn(
-        'flex-1 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+        'flex-1 rounded-none border-0 -m-px bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
         className
       )}
       {...props}

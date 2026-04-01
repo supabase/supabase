@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
+import { EdgeFunctionOverview } from 'components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
 import { EdgeFunctionRecentInvocations } from 'components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -26,6 +27,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
+  LogoLoader,
   WarningIcon,
 } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -62,7 +64,7 @@ const CHART_INTERVALS: ChartIntervals[] = [
   },
 ]
 
-const PageLayout: NextPageWithLayout = () => {
+const LegacyEdgeFunctionOverview = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
 
@@ -427,6 +429,21 @@ const PageLayout: NextPageWithLayout = () => {
       </PageSection>
     </PageContainer>
   )
+}
+
+const PageLayout: NextPageWithLayout = () => {
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const showNewOverview = useFlag('edgeFunctionsOverview') === true
+
+  if (IS_PLATFORM && !flagsLoaded) {
+    return <LogoLoader />
+  }
+
+  if (showNewOverview) {
+    return <EdgeFunctionOverview />
+  }
+
+  return <LegacyEdgeFunctionOverview />
 }
 
 PageLayout.getLayout = (page) => (
