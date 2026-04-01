@@ -1,8 +1,8 @@
 import Link from 'next/link'
-
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, Modal } from 'ui'
+
 import { TIER_QUERY_LIMITS } from './Logs.constants'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface Props {
   show: boolean

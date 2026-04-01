@@ -1,5 +1,5 @@
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import type { ServerOption, WrapperMeta } from './Wrappers.types'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',

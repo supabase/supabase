@@ -1,8 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -18,6 +14,11 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
 
 export interface CreateReportModal {
   visible: boolean

@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 import { useMobileSheet } from '../NavigationBar/MobileSheetContext'
 import { isMenuContent, shouldShowMenuButton } from './FloatingMobileToolbar.utils'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export function useFloatingToolbarSheet(hideMobileMenu?: boolean) {
   const router = useRouter()

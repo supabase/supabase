@@ -1,6 +1,5 @@
 import { X } from 'lucide-react'
-
-import { SheetClose, SheetHeader, SheetTitle, cn } from 'ui'
+import { cn, SheetClose, SheetHeader, SheetTitle } from 'ui'
 
 interface CreateFunctionHeaderProps {
   selectedFunction?: string

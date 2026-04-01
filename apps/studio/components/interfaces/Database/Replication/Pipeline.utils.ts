@@ -1,9 +1,9 @@
+import { PipelineStatusName } from './Replication.constants'
 import {
   ReplicationPipelineStatus,
   ReplicationPipelineStatusData,
-} from 'data/replication/pipeline-status-query'
-import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-import { PipelineStatusName } from './Replication.constants'
+} from '@/data/replication/pipeline-status-query'
+import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
 export const PIPELINE_ERROR_MESSAGES = {
   RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',

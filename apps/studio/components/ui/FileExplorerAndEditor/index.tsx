@@ -1,5 +1,4 @@
 import { IS_PLATFORM } from 'common'
-import { AIEditor } from 'components/ui/AIEditor'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -15,6 +14,7 @@ import {
   isZipFile,
 } from './FileExplorerAndEditor.utils'
 import { FileExplorerAndEditorRow } from './FileExplorerAndEditorRow'
+import { AIEditor } from '@/components/ui/AIEditor'
 
 interface FileExplorerAndEditorProps {
   files: FileData[]

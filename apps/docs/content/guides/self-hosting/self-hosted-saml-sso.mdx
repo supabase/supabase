@@ -1,0 +1,588 @@
+---
+title: 'Configure SAML SSO'
+description: 'Set up SAML 2.0 Single Sign-On for self-hosted Supabase with Docker.'
+subtitle: 'Set up SAML 2.0 Single Sign-On for self-hosted Supabase with Docker.'
+---
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+SAML 2.0 SSO lets your users authenticate through an enterprise Identity Provider (IdP) such as Okta, Azure AD (Entra ID), Google Workspace, or any SAML 2.0-compliant provider. Unlike OAuth providers, SAML IdPs are not configured through environment variables - they are managed dynamically at runtime through the Auth admin API.
+
+This guide covers the full setup: generating a signing key, enabling SAML in your Supabase instance, registering an IdP, and integrating SSO into your application.
+
+<Admonition type="note">
+
+Client-side integration uses the same `supabase.auth.signInWithSSO()` method documented in the [SSO with SAML 2.0](/docs/guides/auth/enterprise-sso/auth-sso-saml) guide. This guide focuses on the self-hosted server configuration.
+
+</Admonition>
+
+## Before you begin
+
+You need:
+
+- A running self-hosted Supabase instance (see the [setup guide](/docs/guides/self-hosting/docker))
+- Open SSL installed (for key generation)
+- Your IdP's SAML metadata URL or metadata XML
+- The `SERVICE_ROLE_KEY` from your `.env` file (needed for admin API calls)
+- `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>`). This URL is used as the SAML Service Provider entity ID and for constructing the ACS endpoint URL
+
+## How SAML SSO works in Supabase
+
+SAML SSO is configured in two layers:
+
+1. **Global SAML enable (environment variables)** - a small set of env vars that enable the SAML engine and provide a signing key. These go in `.env` and `docker-compose.yml`.
+2. **Per-IdP configuration (admin API)** - individual Identity Providers are registered, updated, and deleted at runtime via the Auth admin API. No restart is needed when adding or removing providers.
+
+The login flow works as follows:
+
+1. Your app calls `POST /sso` with a domain or provider_id
+2. Auth generates a SAML `AuthnRequest` and returns a redirect URL to the IdP
+3. The user authenticates at the IdP
+4. The IdP POSTs a SAML Response to `POST /sso/saml/acs`
+5. Auth validates the assertion, creates or links the user, and issues a session
+6. The user is redirected back to your app with session tokens
+
+## Step 1: Generate an RSA private key
+
+SAML requests must be signed. The value expected by `GOTRUE_SAML_PRIVATE_KEY` is a Base64-encoded PKCS#1 DER RSA private key (with a 2048-bit key as the minimum requirement). Generate it with:
+
+```sh
+openssl genpkey -algorithm RSA -out pk_pkcs8.pem -quiet && \
+openssl pkey -in pk_pkcs8.pem -out pk_rsa1.der -outform DER -traditional && \
+base64 -w 0 -i pk_rsa1.der
+```
+
+The commands above:
+
+1. Generate an RSA private key in PKCS#8 PEM format
+2. Convert the key to PKCS#1 DER format
+3. Base64-encode the key for use as the value of `GOTRUE_SAML_PRIVATE_KEY`
+
+Save the Base64 output - make sure to copy it as single line, ignoring the trailing newline. Remove the temporary files.
+
+<Admonition type="caution">
+
+Keep this key secret. Anyone with the private key can forge SAML requests on behalf of your Service Provider. Do not commit it to the version control system.
+
+</Admonition>
+
+<Admonition type="tip">
+
+For a production deployment, consider using a 4096-bit key by adding `-pkeyopt rsa_keygen_bits:4096` to the `openssl genpkey` command above.
+
+</Admonition>
+
+## Step 2: Add environment variables
+
+Add the following to your `.env` file:
+
+```sh
+############
+# SAML SSO
+############
+
+SAML_ENABLED=true
+SAML_PRIVATE_KEY=<your-base64-encoded-private-key>
+
+# Optional: accept encrypted SAML assertions from IdPs (default: false)
+# SAML_ALLOW_ENCRYPTED_ASSERTIONS=false
+
+# Optional: how long relay state tokens remain valid (default: 2m0s)
+# SAML_RELAY_STATE_VALIDITY_PERIOD=2m0s
+
+# Optional: override the SAML entity ID / ACS base URL
+# Defaults to API_EXTERNAL_URL if not set
+# SAML_EXTERNAL_URL=https://supabase.example.com:8000
+
+# Optional: rate limit on the ACS endpoint (requests per second, default: 15)
+# SAML_RATE_LIMIT_ASSERTION=15
+```
+
+## Step 3: Pass SAML variables to the Auth container
+
+In `docker-compose.yml`, add the SAML environment variables to the `auth` service. Auth expects the `GOTRUE_` prefix for all of its configuration variables:
+
+```yaml
+auth:
+  environment:
+    # ... existing variables ...
+
+    # SAML SSO
+    GOTRUE_SAML_ENABLED: ${SAML_ENABLED}
+    GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
+    # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
+    # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
+    # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
+    # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
+```
+
+## Step 4: Restart the containers
+
+Apply the configuration changes:
+
+```sh
+docker compose down && \
+docker compose up -d
+```
+
+Verify the Auth service is healthy:
+
+```sh
+docker compose ps auth
+```
+
+## Step 5: Retrieve your service provider metadata
+
+Once SAML is enabled, your Supabase instance exposes service provider (SP) metadata at `{API_EXTERNAL_URL}/sso/saml/metadata`.
+
+Verify it using `curl`:
+
+```sh
+curl http://<your-domain>/sso/saml/metadata
+```
+
+This returns an XML document containing your SP entity ID, ACS endpoint URL, and signing certificate. You will need to provide this to your IdP.
+
+<Admonition type="tip">
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+Add `?download=true` to the request URL to get the metadata as a downloadable XML file with a 5-year validity period - this is useful for IdPs that require a file upload instead of a URL.
+
+</Admonition>
+
+Key values in the metadata:
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+| Field | Value |
+|---|---|
+| Entity ID | `{API_EXTERNAL_URL}/sso/saml/metadata` |
+| ACS URL | `{API_EXTERNAL_URL}/sso/saml/acs` |
+| NameID formats | `persistent`, `emailAddress` |
+| Signing certificate | Derived from your `SAML_PRIVATE_KEY` |
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+## Step 6: Register an identity provider
+
+Use the Auth admin API to register your IdP. You need the `SERVICE_ROLE_KEY` for authentication.
+
+### Option A: Register with a metadata URL (recommended)
+
+If your IdP provides a metadata URL, Auth will fetch and cache the metadata automatically and refresh it when it becomes stale:
+
+```sh
+curl -X POST 'http://<your-domain>/auth/v1/admin/sso/providers' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: your-service-role-key' \
+  -d '{
+    "type": "saml",
+    "metadata_url": "https://idp.example.com/saml/metadata",
+    "domains": ["example.com"],
+    "attribute_mapping": {
+      "keys": {
+        "email": {
+          "name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+        },
+        "name": {
+          "name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        }
+      }
+    }
+  }'
+```
+
+### Option B: Register with inline metadata XML
+
+If you have the IdP metadata as an XML string:
+
+```sh
+curl -X POST 'http://<your-domain>/auth/v1/admin/sso/providers' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: your-service-role-key' \
+  -d '{
+    "type": "saml",
+    "metadata_xml": "<EntityDescriptor ...>...</EntityDescriptor>",
+    "domains": ["example.com"]
+  }'
+```
+
+<Admonition type="note">
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+When using `metadata_url`, the URL must use HTTPS. Auth validates the metadata XML format and checks that the EntityID is unique across all registered providers.
+
+</Admonition>
+
+The response includes the provider `id` (UUID) - save this for use in your application or for later management:
+
+```json
+{
+  "id": "d3f5a1b2-...",
+  "resource_id": null,
+  "disabled": false,
+  "saml": {
+    "entity_id": "https://idp.example.com/saml",
+    "metadata_url": "https://idp.example.com/saml/metadata"
+  },
+  "domains": [{ "domain": "example.com" }],
+  "created_at": "...",
+  "updated_at": "..."
+}
+```
+
+### Registration parameters reference
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+| Parameter | Required | Description |
+|---|---|---|
+| `type` | Yes | Must be `"saml"` |
+| `metadata_url` | One of these | HTTPS URL to the IdP's SAML metadata (auto-refreshed) |
+| `metadata_xml` | One of these | Raw IdP metadata XML string |
+| `domains` | No | Array of email domains to associate (e.g., `["acme.com"]`). Used for domain-based SSO lookup. |
+| `attribute_mapping` | No | Map SAML attributes to user claims (see [Attribute mapping](#attribute-mapping)) |
+| `name_id_format` | No | Request a specific NameID format: `persistent`, `emailAddress`, `transient`, or `unspecified` |
+| `resource_id` | No | A custom external identifier for the provider |
+| `disabled` | No | Set to `true` to register but disable the provider |
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+## Step 8: Configure your identity provider
+
+On the IdP side, create a new SAML application and configure it with your SP details:
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+| IdP setting | Value |
+|---|---|
+| SP Entity ID / Audience | `{API_EXTERNAL_URL}/sso/saml/metadata` |
+| ACS URL / Reply URL | `{API_EXTERNAL_URL}/sso/saml/acs` |
+| NameID format | `persistent` (recommended) or `emailAddress` |
+| Signing certificate | Upload from the SP metadata XML or provide the metadata URL |
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+### IdP-specific configuration
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="okta"
+>
+
+<TabPanel id="okta" label="Okta">
+
+**Okta setup:**
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+- Create a "SAML 2.0" application
+- Single Sign-On URL: `{API_EXTERNAL_URL}/sso/saml/acs`
+- Audience URI (SP Entity ID): `{API_EXTERNAL_URL}/sso/saml/metadata`
+- Default RelayState: leave blank
+- Name ID format: `Persistent`
+  {/* supa-mdx-lint-enable Rule003Spelling */}
+
+</TabPanel>
+
+<TabPanel id="azure" label="Azure">
+
+**Azure AD (Entra ID):**
+
+- Create an "Enterprise Application" → "Non-gallery application"
+- Set up single sign-on → SAML
+- Identifier (Entity ID): `{API_EXTERNAL_URL}/sso/saml/metadata`
+- Reply URL (ACS): `{API_EXTERNAL_URL}/sso/saml/acs`
+- Metadata URL for Auth: App Federation Metadata URL (from the SAML Signing Certificate section)
+
+</TabPanel>
+
+<TabPanel id="google" label="Google">
+
+**Google Workspace:**
+
+- Admin console → Apps → Web and mobile apps → Add custom SAML app
+- ACS URL: `{API_EXTERNAL_URL}/sso/saml/acs`
+- Entity ID: `{API_EXTERNAL_URL}/sso/saml/metadata`
+- Name ID format: `PERSISTENT`
+
+</TabPanel>
+
+</Tabs>
+
+## Attribute mapping
+
+Attribute mapping lets you control how SAML assertion attributes are translated into Supabase user claims. If no mapping is provided, Auth uses sensible defaults:
+
+**Default email detection order:**
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+1. `urn:oid:0.9.2342.19200300.100.1.3` (LDAP mail OID)
+2. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`
+3. `http://schemas.xmlsoap.org/claims/EmailAddress`
+4. Attributes named `mail`, `Mail`, or `email`
+5. Subject NameID (if it looks like an email address)
+   {/* supa-mdx-lint-enable Rule003Spelling */}
+
+**Default user ID detection:**
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+1. `urn:oasis:names:tc:SAML:attribute:subject-id` attribute
+2. Subject NameID (if format is `persistent`)
+   {/* supa-mdx-lint-enable Rule003Spelling */}
+
+### Custom attribute mapping example
+
+Map IdP-specific attributes to user metadata:
+
+```json
+{
+  "attribute_mapping": {
+    "keys": {
+      "email": {
+        "name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+      },
+      "name": {
+        "name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+      },
+      "department": {
+        "name": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/department",
+        "default": "unknown"
+      },
+      "groups": {
+        "name": "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups",
+        "array": true
+      },
+      "role": {
+        "names": ["http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "role", "Role"],
+        "default": "member"
+      }
+    }
+  }
+}
+```
+
+Each mapping key supports:
+
+| Field     | Description                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| `name`    | Primary SAML attribute name to look for (matched against both `Name` and `FriendlyName`, case-insensitive) |
+| `names`   | Array of fallback attribute names to try in order                                                          |
+| `default` | Default value if the attribute is not present in the assertion                                             |
+| `array`   | Set to `true` to collect all values (for multi-valued attributes like groups)                              |
+
+Mapped attributes are stored in the user's `raw_user_meta_data` and are available via `user.user_metadata` in your application.
+
+## Managing providers
+
+### List all providers
+
+```sh
+curl 'http://<your-domain>/auth/v1/admin/sso/providers' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'apikey: your-service-role-key'
+```
+
+Filter by resource ID:
+
+```sh
+# Exact match
+curl 'http://<your-domain>/auth/v1/admin/sso/providers?resource_id=my-idp' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'apikey: your-service-role-key'
+
+# Prefix match
+curl 'http://<your-domain>/auth/v1/admin/sso/providers?resource_id_prefix=prod-' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'apikey: your-service-role-key'
+```
+
+### Get a specific provider
+
+```sh
+curl 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'apikey: your-service-role-key'
+```
+
+### Update a provider
+
+```sh
+curl -X PUT 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: your-service-role-key' \
+  -d '{
+    "domains": ["example.com", "subsidiary.com"],
+    "attribute_mapping": {
+      "keys": {
+        "email": {
+          "name": "mail"
+        }
+      }
+    }
+  }'
+```
+
+### Disable a provider (without deleting)
+
+```sh
+curl -X PUT 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: your-service-role-key' \
+  -d '{ "disabled": true }'
+```
+
+### Delete a provider
+
+```sh
+curl -X DELETE 'http://<your-domain>/auth/v1/admin/sso/providers/{provider_id}' \
+  -H 'Authorization: Bearer your-service-role-key' \
+  -H 'apikey: your-service-role-key'
+```
+
+## Client-side integration
+
+### Using supabase-js
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('http://<your-domain>', 'your-anon-key')
+
+// Option 1: SSO by email domain
+const { data, error } = await supabase.auth.signInWithSSO({
+  domain: 'example.com',
+})
+
+// Option 2: SSO by provider ID
+const { data, error } = await supabase.auth.signInWithSSO({
+  providerId: 'd3f5a1b2-...',
+})
+
+// Redirect the user to the IdP
+if (data?.url) {
+  window.location.href = data.url
+}
+```
+
+Both methods return an object with a `url` property - redirect the user to this URL to begin authentication at the IdP.
+
+### Using the REST API directly
+
+```sh
+# By domain
+curl -X POST 'http://<your-domain>/sso' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: your-anon-key' \
+  -d '{
+    "domain": "example.com",
+    "skip_http_redirect": true
+  }'
+
+# By provider ID
+curl -X POST 'http://<your-domain>/sso' \
+  -H 'Content-Type: application/json' \
+  -H 'apikey: your-anon-key' \
+  -d '{
+    "provider_id": "d3f5a1b2-...",
+    "skip_http_redirect": true
+  }'
+```
+
+Both return `{ "url": "https://idp.example.com/sso?SAMLRequest=..." }`.
+
+### Domain-based vs provider-based lookup
+
+| Method       | Use case                                                                                                                                |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `domain`     | Extract the domain from the user's email and let Auth find the right IdP. Best for login forms where the user enters their email first. |
+| `providerId` | Use when you know the exact provider - for example, a dedicated "Sign in with Okta" button.                                             |
+
+## Test the login flow
+
+1. Open your application and trigger SSO login (or use the curl command above)
+2. You should be redirected to your IdP's login page
+3. After authenticating, the IdP posts back to the ACS endpoint
+4. Auth processes the assertion and redirects you back to your `SITE_URL` (or `redirect_to` URL) with session tokens
+
+To verify the session was created:
+
+```sh
+curl 'http://<your-domain>/auth/v1/user' \
+  -H 'Authorization: Bearer user-session-token' \
+  -H 'apikey: your-anon-key'
+```
+
+The response should include `app_metadata.provider: "sso:saml"` and any mapped attributes in `user_metadata`.
+
+## Environment variable reference
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+| Variable | Default | Description |
+|---|---|---|
+| `SAML_ENABLED` | `false` | Enable the SAML SSO engine |
+| `SAML_PRIVATE_KEY` | - | Base64-encoded PKCS#1 RSA private key (min 2048-bit). Used to sign SAML requests and optionally decrypt assertions. |
+| `SAML_ALLOW_ENCRYPTED_ASSERTIONS` | `false` | Accept encrypted SAML assertions from IdPs |
+| `SAML_RELAY_STATE_VALIDITY_PERIOD` | `2m0s` | How long relay state tokens remain valid. Increase if users on slow networks time out during the IdP redirect. |
+| `SAML_EXTERNAL_URL` | `API_EXTERNAL_URL` | Override the base URL used for the SAML entity ID and ACS endpoint. Only needed if the SAML endpoints are served on a different URL than the rest of the Auth API. |
+| `SAML_RATE_LIMIT_ASSERTION` | `15` | Maximum ACS requests per second. Protects against assertion replay floods. |
+{/* supa-mdx-lint-enable Rule003Spelling */}
+
+## Troubleshooting
+
+### "SAML is not enabled on this server"
+
+The `GOTRUE_SAML_ENABLED` variable is not set to `true`, or the Auth container did not pick up the change. Verify the env var is passed through `docker-compose.yml` and restart:
+
+```sh
+docker compose down && docker compose up -d
+```
+
+### "Invalid private key" on startup
+
+The `GOTRUE_SAML_PRIVATE_KEY` value is malformed. Ensure it is:
+
+- Base64-encoded (single line, no line breaks)
+- In PKCS#1 format (`openssl pkey ... -traditional` output)
+- At least 2048-bit RSA
+
+Regenerate if needed:
+
+```sh
+openssl genpkey -algorithm RSA -out pk_pkcs8.pem -quiet && \
+openssl pkey -in pk_pkcs8.pem -out pk_rsa1.der -outform DER -traditional && \
+base64 -w 0 -i pk_rsa1.der
+```
+
+### IdP cannot reach the ACS endpoint
+
+- Verify `API_EXTERNAL_URL` is set to a URL the IdP can reach (not `localhost` unless testing locally)
+- Check that the Kong routes for `/sso/saml/acs` and `/sso/saml/metadata` are configured as open (no `key-auth` plugin).
+- Check the Auth container logs: `docker compose logs auth`
+
+### "No SSO provider found for this domain"
+
+- Verify the domain is registered: list providers and check the `domains` array
+- Domain matching is exact and case-insensitive - `Example.com` matches `example.com`
+
+### Assertion validation fails
+
+- Ensure the IdP's signing certificate matches what is in the metadata registered with Auth
+- If using `metadata_url`, Auth automatically refreshes stale metadata (after `ValidUntil`, `CacheDuration`, or 24 hours). Force a refresh by updating the provider.
+- Check clock sync between your server and the IdP - SAML assertions have time-based validity windows (`NotBefore` / `NotOnOrAfter`)
+
+### User is created but attributes are missing
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+
+- Check your `attribute_mapping` configuration. Use the IdP's SAML assertion viewer (most IdPs have one) to see the exact attribute names being sent.
+- Attribute names are matched case-insensitively against both the `Name` and `FriendlyName` fields in the assertion.
+- Mapped attributes appear in `user.user_metadata`.
+
+### Relay state expired
+
+The user took too long between initiating SSO and completing authentication at the IdP. Increase `GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD` (default is 2 minutes).
+
+## Additional resources
+
+- [SSO with SAML 2.0](/docs/guides/auth/enterprise-sso/auth-sso-saml) - Client-side SAML integration guide
+- [Auth server configuration reference](/docs/guides/self-hosting/auth/config) - Full list of Auth environment variables
+- [SAML 2.0 specification](http://docs.oasis-open.org/security/saml/v2.0/) - The underlying standard

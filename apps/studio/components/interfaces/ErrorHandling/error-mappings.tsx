@@ -1,9 +1,9 @@
 import { ComponentType } from 'react'
-import { ConnectionTimeoutError } from 'types/api-errors'
-import type { ClassifiedError, KnownErrorType } from 'types/api-errors'
-import type { ResponseError } from 'types/base'
 
 import { ConnectionTimeoutTroubleshooting } from './errorMappings/ConnectionTimeout'
+import { ConnectionTimeoutError } from '@/types/api-errors'
+import type { ClassifiedError, KnownErrorType } from '@/types/api-errors'
+import type { ResponseError } from '@/types/base'
 
 export interface ErrorMapping {
   id: KnownErrorType

@@ -1,26 +1,5 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import { PaymentConfirmation } from 'components/interfaces/Billing/Payment/PaymentConfirmation'
-import type { PaymentMethodElementRef } from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
-import {
-  billingPartnerLabel,
-  getPlanChangeType,
-} from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import AlertError from 'components/ui/AlertError'
-import { OrganizationBillingSubscriptionPreviewResponse } from 'data/organizations/organization-billing-subscription-preview'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
-import { useConfirmPendingSubscriptionChangeMutation } from 'data/subscriptions/org-subscription-confirm-pending-change'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { SubscriptionTier } from 'data/subscriptions/types'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import {
-  DOCS_URL,
-  PRICING_TIER_PRODUCT_IDS,
-  PROJECT_STATUS,
-  STRIPE_PUBLIC_KEY,
-} from 'lib/constants'
-import { formatCurrency } from 'lib/helpers'
 import { Check, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -33,6 +12,27 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import { PaymentConfirmation } from '@/components/interfaces/Billing/Payment/PaymentConfirmation'
+import type { PaymentMethodElementRef } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import {
+  billingPartnerLabel,
+  getPlanChangeType,
+} from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import AlertError from '@/components/ui/AlertError'
+import { OrganizationBillingSubscriptionPreviewResponse } from '@/data/organizations/organization-billing-subscription-preview'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useConfirmPendingSubscriptionChangeMutation } from '@/data/subscriptions/org-subscription-confirm-pending-change'
+import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
+import { SubscriptionTier } from '@/data/subscriptions/types'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  DOCS_URL,
+  PRICING_TIER_PRODUCT_IDS,
+  PROJECT_STATUS,
+  STRIPE_PUBLIC_KEY,
+} from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 

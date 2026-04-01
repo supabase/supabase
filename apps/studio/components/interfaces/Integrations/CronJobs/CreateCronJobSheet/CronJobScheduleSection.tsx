@@ -1,11 +1,6 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useDebounce } from 'use-debounce'
-
-import { useSqlCronGenerateMutation } from 'data/ai/sql-cron-mutation'
-import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -23,9 +18,14 @@ import {
   Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { useDebounce } from 'use-debounce'
+
 import { formatScheduleString, getScheduleMessage } from '../CronJobs.utils'
 import CronSyntaxChart from '../CronSyntaxChart'
 import { type CreateCronJobForm } from './CreateCronJobSheet.constants'
+import { useSqlCronGenerateMutation } from '@/data/ai/sql-cron-mutation'
+import { useCronTimezoneQuery } from '@/data/database-cron-jobs/database-cron-timezone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>

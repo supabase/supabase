@@ -2,18 +2,12 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAWSAccountCreateMutation } from 'data/aws-accounts/aws-account-create-mutation'
-import type { AWSAccount } from 'data/aws-accounts/aws-accounts-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Sheet,
   SheetContent,
@@ -25,6 +19,12 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAWSAccountCreateMutation } from '@/data/aws-accounts/aws-account-create-mutation'
+import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface AWSPrivateLinkFormProps {
   account?: AWSAccount
