@@ -46,10 +46,6 @@ import { withAuth } from '@/hooks/misc/withAuth'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
-import {
-  getLocalMockProjectBlockingState,
-  isLongRunningProjectBlockingState,
-} from '@/lib/project-transition-state'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -307,9 +303,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const requiresDbConnection = !routesToIgnoreDBConnection.some((x) => router.pathname.includes(x))
   const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
-  const mockProjectBlockingState = getLocalMockProjectBlockingState(router.asPath)
-  const mockLongRunningProjectBlockingState =
-    isLongRunningProjectBlockingState(mockProjectBlockingState)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
   const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
@@ -340,21 +333,6 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
     return router.pathname.endsWith('[ref]') ? <LoadingState /> : <LogoLoader />
-  }
-
-  if (selectedProject !== undefined) {
-    if (mockProjectBlockingState?.startsWith('pausing')) {
-      return (
-        <PausingState
-          project={selectedProject}
-          forceLongRunning={mockLongRunningProjectBlockingState}
-        />
-      )
-    }
-
-    if (requiresDbConnection && mockProjectBlockingState?.startsWith('restoring')) {
-      return <RestoringState forceLongRunning={mockLongRunningProjectBlockingState} />
-    }
   }
 
   if (isRestarting && !isBackupsPage) {

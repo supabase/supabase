@@ -21,10 +21,9 @@ const LONG_RUNNING_STATE_THRESHOLD_MS = minutesToMilliseconds(LONG_RUNNING_STATE
 
 export interface PausingStateProps {
   project: Project
-  forceLongRunning?: boolean
 }
 
-export const PausingState = ({ project, forceLongRunning = false }: PausingStateProps) => {
+export const PausingState = ({ project }: PausingStateProps) => {
   const { ref } = useParams()
   const [startPolling, setStartPolling] = useState(false)
   const [isTakingLongerThanExpected, setIsTakingLongerThanExpected] = useState(false)
@@ -74,11 +73,6 @@ export const PausingState = ({ project, forceLongRunning = false }: PausingState
   }, [])
 
   useEffect(() => {
-    if (forceLongRunning) {
-      setIsTakingLongerThanExpected(true)
-      return
-    }
-
     const startTime = pauseStateStartStorageKey
       ? getPersistedTransitionStartTime(pauseStateStartStorageKey)
       : Date.now()
@@ -95,7 +89,7 @@ export const PausingState = ({ project, forceLongRunning = false }: PausingState
     setIsTakingLongerThanExpected(false)
     const timeoutId = setTimeout(() => setIsTakingLongerThanExpected(true), remainingThresholdMs)
     return () => clearTimeout(timeoutId)
-  }, [forceLongRunning, pauseStateStartStorageKey])
+  }, [pauseStateStartStorageKey])
 
   return (
     <div className="mx-auto my-16 w-full max-w-7xl space-y-16">

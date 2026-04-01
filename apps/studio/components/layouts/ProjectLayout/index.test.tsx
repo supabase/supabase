@@ -1,11 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MobileSheetProvider } from '../Navigation/NavigationBar/MobileSheetContext'
 import { ProjectLayout } from './index'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
-import { LOCAL_PROJECT_BLOCKING_STATE_PARAM } from '@/lib/project-transition-state'
 
 const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
   mockRouter: {
@@ -98,22 +97,14 @@ vi.mock('./ConnectingState', () => ({ default: () => null }))
 vi.mock('./LoadingState', () => ({ LoadingState: () => null }))
 vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => null }))
 vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
-vi.mock('./PausingState', () => ({
-  PausingState: ({ forceLongRunning }: { forceLongRunning?: boolean }) => (
-    <div data-testid={forceLongRunning ? 'pausing-state-long-running' : 'pausing-state'} />
-  ),
-}))
+vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 vi.mock('./ResizingState', () => ({ ResizingState: () => null }))
 vi.mock('./RestartingState', () => ({ default: () => null }))
 vi.mock('./RestoreFailedState', () => ({ RestoreFailedState: () => null }))
-vi.mock('./RestoringState', () => ({
-  RestoringState: ({ forceLongRunning }: { forceLongRunning?: boolean }) => (
-    <div data-testid={forceLongRunning ? 'restoring-state-long-running' : 'restoring-state'} />
-  ),
-}))
+vi.mock('./RestoringState', () => ({ RestoringState: () => null }))
 vi.mock('./UpgradingState', () => ({ UpgradingState: () => null }))
 
 vi.mock('@/components/interfaces/BranchManagement/CreateBranchModal', () => ({
@@ -217,33 +208,5 @@ describe('ProjectLayout title', () => {
         )
       )
     })
-  })
-
-  it('supports locally mocking the pausing blocker state from the URL', () => {
-    mockRouter.asPath = `/project/default/observability/query-performance?${LOCAL_PROJECT_BLOCKING_STATE_PARAM}=pausing`
-
-    render(
-      <MobileSheetProvider>
-        <ProjectLayout product="Observability">
-          <div>Page Content</div>
-        </ProjectLayout>
-      </MobileSheetProvider>
-    )
-
-    expect(screen.getByTestId('pausing-state')).toBeInTheDocument()
-  })
-
-  it('supports locally mocking the long-running restoring blocker state from the URL', () => {
-    mockRouter.asPath = `/project/default/observability/query-performance?${LOCAL_PROJECT_BLOCKING_STATE_PARAM}=restoring-long-running`
-
-    render(
-      <MobileSheetProvider>
-        <ProjectLayout product="Observability">
-          <div>Page Content</div>
-        </ProjectLayout>
-      </MobileSheetProvider>
-    )
-
-    expect(screen.getByTestId('restoring-state-long-running')).toBeInTheDocument()
   })
 })

@@ -2,10 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   clearPersistedTransitionStartTime,
-  getLocalMockProjectBlockingState,
   getPersistedTransitionStartTime,
   getRemainingTransitionTimeMs,
-  isLongRunningProjectBlockingState,
   minutesToMilliseconds,
 } from './project-transition-state'
 
@@ -65,29 +63,5 @@ describe('project-transition-state', () => {
         now: minutesToMilliseconds(10) + 5_000,
       })
     ).toBe(0)
-  })
-
-  it('parses a valid local mock project blocking state from the URL', () => {
-    expect(
-      getLocalMockProjectBlockingState('/project/default?mockProjectBlockingState=pausing')
-    ).toBe('pausing')
-    expect(
-      getLocalMockProjectBlockingState(
-        '/project/default?mockProjectBlockingState=restoring-long-running'
-      )
-    ).toBe('restoring-long-running')
-  })
-
-  it('ignores invalid local mock project blocking states', () => {
-    expect(
-      getLocalMockProjectBlockingState('/project/default?mockProjectBlockingState=unexpected')
-    ).toBeNull()
-    expect(getLocalMockProjectBlockingState('/project/default')).toBeNull()
-  })
-
-  it('detects long-running local mock project blocking states', () => {
-    expect(isLongRunningProjectBlockingState('pausing')).toBe(false)
-    expect(isLongRunningProjectBlockingState('restoring-long-running')).toBe(true)
-    expect(isLongRunningProjectBlockingState(null)).toBe(false)
   })
 })

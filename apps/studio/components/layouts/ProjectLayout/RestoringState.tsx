@@ -20,11 +20,7 @@ import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-export interface RestoringStateProps {
-  forceLongRunning?: boolean
-}
-
-export const RestoringState = ({ forceLongRunning = false }: RestoringStateProps) => {
+export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -58,11 +54,6 @@ export const RestoringState = ({ forceLongRunning = false }: RestoringStateProps
   )
 
   useEffect(() => {
-    if (forceLongRunning) {
-      setIsTakingLongerThanExpected(true)
-      return
-    }
-
     const startTime = restoreStateStartStorageKey
       ? getPersistedTransitionStartTime(restoreStateStartStorageKey)
       : Date.now()
@@ -79,7 +70,7 @@ export const RestoringState = ({ forceLongRunning = false }: RestoringStateProps
     setIsTakingLongerThanExpected(false)
     const timeoutId = setTimeout(() => setIsTakingLongerThanExpected(true), remainingThresholdMs)
     return () => clearTimeout(timeoutId)
-  }, [forceLongRunning, longRunningThresholdMs, restoreStateStartStorageKey])
+  }, [longRunningThresholdMs, restoreStateStartStorageKey])
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
