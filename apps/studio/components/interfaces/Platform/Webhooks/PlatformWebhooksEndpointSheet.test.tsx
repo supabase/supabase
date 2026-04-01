@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { WebhookEndpoint } from './PlatformWebhooks.types'
-import { PlatformWebhooksEndpointSheet } from './PlatformWebhooksEndpointSheet'
 import { customRender } from '@/tests/lib/custom-render'
+import type { WebhookEndpoint } from './PlatformWebhooks.types'
+import { PlatformWebhooksEndpointSheet, toEndpointPayload } from './PlatformWebhooksEndpointSheet'
 
 const { generateWebhookEndpointNameMock } = vi.hoisted(() => ({
   generateWebhookEndpointNameMock: vi.fn(() => 'winged-envelope'),
@@ -247,5 +247,26 @@ describe('PlatformWebhooksEndpointSheet', () => {
 
     expect(await screen.findByText('Header value is required')).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('strips fully empty custom header rows from the payload', () => {
+    expect(
+      toEndpointPayload({
+        name: 'Billing events',
+        url: 'https://hooks.example.com/billing',
+        description: '',
+        enabled: true,
+        subscribeAll: false,
+        eventTypes: ['project.updated'],
+        customHeaders: [
+          { key: 'X-Webhook-Secret', value: 'super-secret' },
+          { key: '', value: '' },
+        ],
+      })
+    ).toEqual(
+      expect.objectContaining({
+        customHeaders: [{ key: 'X-Webhook-Secret', value: 'super-secret' }],
+      })
+    )
   })
 })

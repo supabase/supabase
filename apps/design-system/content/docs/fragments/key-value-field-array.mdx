@@ -44,6 +44,8 @@ import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValue
 - fully empty rows may remain drafts
 - partially filled rows should show inline errors on the missing cell
 
+If you persist the array rows directly, strip fully empty draft rows before saving them.
+
 ```tsx
 const formSchema = z
   .object({

@@ -22,6 +22,35 @@ type GetKeyValueFieldArrayValidationIssuesParams<
 
 const getTrimmedString = (value: unknown) => (typeof value === 'string' ? value.trim() : '')
 
+export type StripEmptyKeyValueFieldArrayRowsParams<
+  TRow extends Record<string, unknown>,
+  TKeyFieldName extends Extract<keyof TRow, string>,
+  TValueFieldName extends Extract<keyof TRow, string>,
+> = {
+  rows: TRow[]
+  keyFieldName: TKeyFieldName
+  valueFieldName: TValueFieldName
+}
+
+/**
+ * Removes fully empty draft rows before persisting field-array values.
+ */
+export const stripEmptyKeyValueFieldArrayRows = <
+  TRow extends Record<string, unknown>,
+  TKeyFieldName extends Extract<keyof TRow, string>,
+  TValueFieldName extends Extract<keyof TRow, string>,
+>({
+  rows,
+  keyFieldName,
+  valueFieldName,
+}: StripEmptyKeyValueFieldArrayRowsParams<TRow, TKeyFieldName, TValueFieldName>) =>
+  rows.filter((row) => {
+    const key = getTrimmedString(row[keyFieldName])
+    const value = getTrimmedString(row[valueFieldName])
+
+    return key.length > 0 || value.length > 0
+  })
+
 /**
  * Returns per-cell validation issues for draft-friendly key/value rows.
  *

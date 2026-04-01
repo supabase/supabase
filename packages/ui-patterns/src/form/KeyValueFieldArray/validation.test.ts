@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { getKeyValueFieldArrayValidationIssues } from './validation'
+import {
+  getKeyValueFieldArrayValidationIssues,
+  stripEmptyKeyValueFieldArrayRows,
+} from './validation'
 
 describe('getKeyValueFieldArrayValidationIssues', () => {
   it('allows fully empty draft rows by default', () => {
@@ -83,5 +86,36 @@ describe('getKeyValueFieldArrayValidationIssues', () => {
         valueRequiredMessage: 'Header value is required',
       })
     ).toEqual([])
+  })
+})
+
+describe('stripEmptyKeyValueFieldArrayRows', () => {
+  it('removes fully empty draft rows', () => {
+    expect(
+      stripEmptyKeyValueFieldArrayRows({
+        rows: [
+          { key: 'Authorization', value: 'Bearer token' },
+          { key: '', value: '' },
+        ],
+        keyFieldName: 'key',
+        valueFieldName: 'value',
+      })
+    ).toEqual([{ key: 'Authorization', value: 'Bearer token' }])
+  })
+
+  it('keeps partially filled rows so schema validation can handle them', () => {
+    expect(
+      stripEmptyKeyValueFieldArrayRows({
+        rows: [
+          { name: 'Authorization', value: '' },
+          { name: '', value: 'Bearer token' },
+        ],
+        keyFieldName: 'name',
+        valueFieldName: 'value',
+      })
+    ).toEqual([
+      { name: 'Authorization', value: '' },
+      { name: '', value: 'Bearer token' },
+    ])
   })
 })

@@ -28,7 +28,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
-import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
+import {
+  getKeyValueFieldArrayValidationIssues,
+  stripEmptyKeyValueFieldArrayRows,
+} from 'ui-patterns/form/KeyValueFieldArray/validation'
 import * as z from 'zod'
 
 import type {
@@ -139,7 +142,11 @@ export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndp
   description: values.description,
   enabled: values.enabled,
   eventTypes: toEventTypes(values),
-  customHeaders: values.customHeaders,
+  customHeaders: stripEmptyKeyValueFieldArrayRows({
+    rows: values.customHeaders,
+    keyFieldName: 'key',
+    valueFieldName: 'value',
+  }),
 })
 
 interface EndpointSheetProps {
