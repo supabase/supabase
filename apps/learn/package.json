@@ -25,6 +25,7 @@
     "next-contentlayer2": "0.4.6",
     "next-themes": "^0.3.0",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "react-wrap-balancer": "^1.1.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-pretty-code": "^0.9.0",

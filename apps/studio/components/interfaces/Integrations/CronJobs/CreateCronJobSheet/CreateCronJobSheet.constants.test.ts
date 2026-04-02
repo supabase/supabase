@@ -50,4 +50,50 @@ describe('CreateCronJobSheet FormSchema', () => {
       ).toBe(true)
     }
   })
+
+  it('rejects key-only http_request headers', () => {
+    const result = FormSchema.safeParse({
+      name: 'Send webhook',
+      supportsSeconds: false,
+      schedule: '* * * * *',
+      values: {
+        type: 'http_request' as const,
+        method: 'POST' as const,
+        endpoint: 'https://hooks.example.com/webhook',
+        timeoutMs: 1000,
+        httpHeaders: [{ name: 'X-Test', value: '' }],
+        snippet: '',
+      },
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.some((issue) => issue.message === 'Header value is required')
+      ).toBe(true)
+    }
+  })
+
+  it('rejects value-only edge function headers', () => {
+    const result = FormSchema.safeParse({
+      name: 'Invoke edge function',
+      supportsSeconds: false,
+      schedule: '* * * * *',
+      values: {
+        type: 'edge_function' as const,
+        method: 'POST' as const,
+        edgeFunctionName: 'my-function',
+        timeoutMs: 1000,
+        httpHeaders: [{ name: '', value: 'test-value' }],
+        snippet: '',
+      },
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.message === 'Header name is required')).toBe(
+        true
+      )
+    }
+  })
 })
