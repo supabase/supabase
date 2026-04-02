@@ -15,6 +15,10 @@ const page: GoPageInput = {
     subtitle: 'Supabase, Stigg & Dreambase at Stripe Sessions 2026',
     description:
       "Great hanging out with you at Stripe Sessions. We're giving away a MacBook Neo to one lucky attendee. Complete the steps below to enter.",
+    image: {
+      src: '/images/landing-pages/sxsw-2026/macbook-neo.png',
+      alt: 'MacBook Neo in four colors',
+    },
     ctas: [
       {
         label: 'Get started',
