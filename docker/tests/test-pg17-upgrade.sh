@@ -167,7 +167,7 @@ SELECT ok(
     'postgres role is not superuser'
 );
 
-SELECT * FROM finish();
+SELECT * FROM finish(true);
 EOSQL
 
 # --- Check service connectivity --------------------------------------------

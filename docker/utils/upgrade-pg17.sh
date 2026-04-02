@@ -77,6 +77,7 @@ staging_dir=""
 pg_password=""
 current_image=""
 drop_extensions=""
+db_config_vol=""
 
 # Remove leftover containers and staging dir on exit.
 # Uses an alpine container for rm because the tarball build runs as root
@@ -96,8 +97,6 @@ on_interrupt() {
     echo ""
     warn "Interrupted. Cleaning up..."
     # If db-config was chowned to PG17, restore for PG15 rollback
-    local db_config_vol
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' 2>/dev/null | head -n 1)
     if [ -n "$db_config_vol" ] && [ -n "$current_image" ]; then
         docker run --rm -v "${db_config_vol}:/vol" "$current_image" \
             chown -R postgres:postgres /vol/ 2>/dev/null || true
@@ -153,6 +152,11 @@ preflight() {
     [ -f docker-compose.yml ] || die "Run this script from the docker/ directory."
     [ -f docker-compose.pg17.yml ] || die "Missing docker-compose.pg17.yml."
     [ -f .env ] || die "Missing .env file."
+
+    # Resolve db-config volume (exact match on _db-config suffix or bare db-config)
+    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' \
+        | grep -E '^db-config$|_db-config$' | head -n 1)
+    [ -n "$db_config_vol" ] || die "Could not find db-config volume. Is Supabase running?"
 
     # Read the target PG17 image from the compose overlay (what the user will run)
     PG17_TARGET_IMAGE=$(grep 'image:.*postgres' docker-compose.pg17.yml | awk '{print $2}' | head -n 1)
@@ -271,6 +275,8 @@ pull_image() {
 build_tarball() {
     local tmpbase="${TMPDIR:-/tmp}"
     staging_dir=$(mktemp -d "${tmpbase%/}/supabase-pg17-upgrade.XXXXXX")
+    # World-writable so Docker containers can write to bind mounts on macOS,
+    # where the VM's root user has no special access to host directories.
     chmod 777 "$staging_dir"
     echo "  Staging directory: $staging_dir"
 
@@ -375,9 +381,7 @@ drop_incompatible_extensions() {
 
 stop_and_backup() {
     info "Backing up pgsodium root key"
-    local db_config_vol key_backup="./volumes/db/pgsodium_root.key.bak.pg15"
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -n 1)
-    [ -n "$db_config_vol" ] || die "Could not find db-config volume."
+    local key_backup="./volumes/db/pgsodium_root.key.bak.pg15"
     docker run --rm -v "${db_config_vol}:/src:ro" -v "$(pwd)/volumes/db:/dst" \
         alpine cp /src/pgsodium_root.key /dst/pgsodium_root.key.bak.pg15 \
         || die "Failed to back up pgsodium root key from db-config volume."
@@ -397,12 +401,10 @@ stop_and_backup() {
 # /data_migration) operate on symlinks rather than bind mounts.
 
 run_upgrade() {
-    local db_config_vol abs_data_dir abs_migration_dir
-
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -n 1)
-    [ -n "$db_config_vol" ] || die "Could not find db-config volume."
+    local abs_data_dir abs_migration_dir
 
     mkdir -p "$MIGRATION_DIR"
+    # World-writable for macOS Docker bind mount compatibility (see build_tarball)
     chmod 777 "$MIGRATION_DIR"
     abs_data_dir=$(cd "$DATA_DIR" && pwd)
     abs_migration_dir=$(cd "$MIGRATION_DIR" && pwd)
@@ -484,10 +486,8 @@ run_upgrade() {
 # where the binaries are native - no nix extraction or LD_LIBRARY_PATH needed.
 
 run_complete() {
-    local db_config_vol abs_migration_dir
+    local abs_migration_dir
 
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -n 1)
-    [ -n "$db_config_vol" ] || die "Could not find db-config volume."
     abs_migration_dir=$(cd "$MIGRATION_DIR" && pwd)
 
     info "Starting PG17 container for complete.sh"
@@ -589,14 +589,10 @@ start_pg17() {
     # Ensure db-config volume has correct ownership and structure for PG17.
     # complete.sh does this too, but just in case of partial
     # failures from previous runs.
-    local db_config_vol
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -n 1)
-    if [ -n "$db_config_vol" ]; then
-        docker run --rm -v "${db_config_vol}:/vol" "$PG17_TARGET_IMAGE" sh -c '
-            mkdir -p /vol/conf.d
-            chown -R postgres:postgres /vol/
-        '
-    fi
+    docker run --rm -v "${db_config_vol}:/vol" "$PG17_TARGET_IMAGE" sh -c '
+        mkdir -p /vol/conf.d
+        chown -R postgres:postgres /vol/
+    '
 
     docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 
@@ -673,7 +669,7 @@ apply_role_migrations() {
         docker exec -i \
             -e PGPASSWORD="$pg_password" \
             "$DB_CONTAINER" \
-            psql -h localhost -U supabase_admin -d postgres \
+            psql -h localhost -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \
                 -f "${migration_dir}/${m}" || warn "  $m failed (non-fatal)"
     done
 }
