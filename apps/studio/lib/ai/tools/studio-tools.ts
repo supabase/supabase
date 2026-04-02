@@ -17,7 +17,7 @@ const KNOWLEDGE = {
 
 type KnowledgeName = keyof typeof KNOWLEDGE
 
-export const getRenderingTools = () => ({
+export const getStudioTools = () => ({
   execute_sql: tool({
     description: 'Asks the user to execute a SQL statement and return the results',
     inputSchema: z.object({

@@ -653,7 +653,7 @@ export const OUTPUT_ONLY_PROMPT = `
 - **CRITICAL: Final message must be only raw code needed to fulfill the request.**
 - **If you lack privelages to use a tool, do your best to generate the code without it. No need to explain why you couldn't use the tool.**
 - **No explanations, no commentary, no markdown**. Do not wrap output in backticks.
-- **Do not call UI display tools** (no \`display_query\`, no \`display_edge_function\").
+- **Do not call UI display tools** (no \`execute_sql\`, no \`deploy_edge_function\`).
 `
 
 export const SECURITY_PROMPT = `

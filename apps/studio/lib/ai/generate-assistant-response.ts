@@ -61,7 +61,7 @@ export async function generateAssistantResponse({
   const run = async (span?: Span) => {
     // Only returns last 7 messages
     // Filters out tools with invalid states
-    // Filters out tool outputs based on opt-in level using renderingToolOutputParser
+    // Filters out tool outputs based on opt-in level
     const messages = (rawMessages || []).slice(-7).map((msg) => {
       if (msg && msg.role === 'assistant' && 'results' in msg) {
         const cleanedMsg = { ...msg }
