@@ -51,6 +51,7 @@ minimumReleaseAgeExclude:
   - path-to-regexp
   - brace-expansion
   - serialize-javascript
+  - turbo
 
 onlyBuiltDependencies:
   - node-pty
