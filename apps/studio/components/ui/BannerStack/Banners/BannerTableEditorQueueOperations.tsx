@@ -5,14 +5,14 @@ import { Badge, Button, Card, CardContent, CardHeader } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
-import { getDashboardSettingsUrl } from '@/components/interfaces/Account/Preferences/DashboardSettings.utils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+
+const DASHBOARD_SETTINGS_URL = '/account/me#dashboard'
 
 export const BannerTableEditorQueueOperations = () => {
   const { ref } = useParams()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
-  const dashboardSettingsUrl = getDashboardSettingsUrl()
 
   const { dismissBanner } = useBannerStack()
   const [, setIsDismissed] = useLocalStorageQuery(
@@ -62,7 +62,7 @@ export const BannerTableEditorQueueOperations = () => {
           </p>
         </div>
         <Button asChild type="default" className="w-min">
-          <Link href={dashboardSettingsUrl}>
+          <Link href={DASHBOARD_SETTINGS_URL}>
             {isQueueOperationsEnabled ? 'View' : 'Enable in'} preferences
           </Link>
         </Button>
