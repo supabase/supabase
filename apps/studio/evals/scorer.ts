@@ -103,7 +103,11 @@ export const knowledgeUsageScorer: EvalScorer<
   const loadedKnowledge = output.steps
     .flatMap((step) => step.toolCalls)
     .filter((call) => call.toolName === 'load_knowledge')
-    .map((call) => (call.input as { name: string }).name)
+    .flatMap((call) => {
+      const input = call.input
+      if (typeof input !== 'object' || input === null || !('name' in input) || typeof input.name !== 'string') return []
+      return [input.name]
+    })
 
   const presentCount = expected.requiredKnowledge.filter((knowledge) =>
     loadedKnowledge.includes(knowledge)
