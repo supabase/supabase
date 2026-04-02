@@ -38,6 +38,7 @@ Always include both compose files when running commands. If you omit the overrid
 
 The rest of the setup is the same as the standard Docker guide. All init scripts (`roles.sql`, `jwt.sql`, `webhooks.sql`, etc.) are compatible with Postgres 17.
 
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 If the new Postgres 17 container fails to start, make sure to check for an old `db-config` Docker volume. See [Postgres 17 fails to start with a leftover db-config volume](#postgres-17-fails-to-start-with-a-leftover-db-config-volume) for details.
 
 ## Upgrade an existing Postgres 15 deployment
@@ -239,6 +240,7 @@ sudo TMPDIR=/mnt/my-tmp bash utils/upgrade-pg17.sh
 
 If you run out of space mid-upgrade, the safest path is to roll back and free up disk space before retrying.
 
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 ### Postgres 17 fails to start with a leftover db-config volume
 
 If you are starting a **fresh** Postgres 17 deployment (not upgrading from Postgres 15) and the container fails to start, the most likely cause is a leftover `db-config` volume from a previous Postgres 15 installation. Try to start the containers without the `-d` option and/or check the logs for errors about `postgresql.conf` or other configuration mismatch.
