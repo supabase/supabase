@@ -241,6 +241,7 @@ sudo TMPDIR=/mnt/my-tmp bash utils/upgrade-pg17.sh
 If you run out of space mid-upgrade, the safest path is to roll back and free up disk space before retrying.
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+
 ### Postgres 17 fails to start with a leftover db-config volume
 
 If you are starting a **fresh** Postgres 17 deployment (not upgrading from Postgres 15) and the container fails to start, the most likely cause is a leftover `db-config` volume from a previous Postgres 15 installation. Try to start the containers without the `-d` option and/or check the logs for errors about `postgresql.conf` or other configuration mismatch.
