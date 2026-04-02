@@ -1,10 +1,10 @@
 import { useBreakpoint } from 'common'
-import { useMobileSheet } from 'components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { useEffect } from 'react'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
 
 import { SIDEBAR_KEYS, type TYPEOF_SIDEBAR_KEYS } from './LayoutSidebarProvider'
+import { useMobileSheet } from '@/components/layouts/Navigation/NavigationBar/MobileSheetContext'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
   return (

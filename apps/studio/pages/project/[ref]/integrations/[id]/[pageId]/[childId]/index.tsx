@@ -38,7 +38,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   // Get the corresponding component dynamically
   const Component = useMemo(
-    () => integration?.navigate(id!, pageId, childId),
+    () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
   )
 

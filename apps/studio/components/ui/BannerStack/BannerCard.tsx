@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
 import { Button, Card, CardContent, cn } from 'ui'
-import { BASE_PATH } from 'lib/constants'
+
+import { BASE_PATH } from '@/lib/constants'
 
 interface BannerCardProps {
   onDismiss?: () => void

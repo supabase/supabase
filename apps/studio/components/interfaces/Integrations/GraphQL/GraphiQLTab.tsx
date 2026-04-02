@@ -1,17 +1,18 @@
 import '@graphiql/react/dist/style.css'
+
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
+import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
 import { LogoLoader } from 'ui'
+
+import GraphiQL from '@/components/interfaces/GraphQL/GraphiQL'
+import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { API_URL, IS_PLATFORM } from '@/lib/constants'
+import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()

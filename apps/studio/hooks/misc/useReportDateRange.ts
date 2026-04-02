@@ -1,16 +1,28 @@
+import dayjs from 'dayjs'
+import { createParser, useQueryState } from 'nuqs'
+import { useCallback, useMemo, useState } from 'react'
+
 import {
   REPORT_DATERANGE_HELPER_LABELS,
   REPORTS_DATEPICKER_HELPERS,
   ReportsDatetimeHelper,
-} from 'components/interfaces/Reports/Reports.constants'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { maybeShowUpgradePromptIfNotEntitled } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import dayjs from 'dayjs'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { createParser, useQueryState } from 'nuqs'
-import { useCallback, useMemo, useState } from 'react'
+} from '@/components/interfaces/Reports/Reports.constants'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useCurrentOrgPlan } from '@/hooks/misc/useCurrentOrgPlan'
+
+export const getIntervalGranularity = (from: string, to: string): AnalyticsInterval => {
+  const diffInDays = dayjs(to).diff(from, 'day', true)
+  const diffInHours = dayjs(to).diff(from, 'hour', true)
+
+  if (diffInHours <= 1) return '1m'
+  if (diffInHours <= 12) return '2m'
+  if (diffInHours <= 24) return '10m'
+  if (diffInDays <= 7) return '30m'
+  return '1d'
+}
 
 export const DATERANGE_LIMITS: { [key: string]: number } = {
   free: 1,
@@ -186,23 +198,12 @@ export const useReportDateRange = (
     return getDefaultHelper().helper.text
   }, [timestampStartValue, timestampEndValue, helperTextValue, getDefaultHelper])
 
-  const handleIntervalGranularity = (from: string, to: string): AnalyticsInterval => {
-    const diffInDays = dayjs(to).diff(from, 'day', true)
-    const diffInHours = dayjs(to).diff(from, 'hour', true)
-
-    if (diffInHours <= 1) return '1m'
-    if (diffInHours <= 12) return '2m'
-    if (diffInHours <= 24) return '10m'
-    if (diffInDays <= 7) return '1h'
-    return '1d'
-  }
-
   // Derive selectedDateRange from current values
   const selectedDateRange: ReportDateRange = useMemo(
     () => ({
       period_start: { date: timestampStart, time_period: '1d' },
       period_end: { date: timestampEnd, time_period: 'today' },
-      interval: handleIntervalGranularity(timestampStart, timestampEnd),
+      interval: getIntervalGranularity(timestampStart, timestampEnd),
     }),
     [timestampStart, timestampEnd]
   )

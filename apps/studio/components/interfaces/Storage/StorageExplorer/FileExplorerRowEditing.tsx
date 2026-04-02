@@ -1,10 +1,10 @@
 import { has } from 'lodash'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { RowIcon } from './FileExplorerRow'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerRowEditingProps {
   item: StorageItem

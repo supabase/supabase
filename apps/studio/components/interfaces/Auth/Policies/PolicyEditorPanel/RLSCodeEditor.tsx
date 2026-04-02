@@ -4,8 +4,8 @@ import type { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { formatSql } from 'lib/formatSql'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { formatSql } from '@/lib/formatSql'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
 // Feels like we're creating multiple copies of Editor. I'm keen to make this one the defacto as well so lets make sure

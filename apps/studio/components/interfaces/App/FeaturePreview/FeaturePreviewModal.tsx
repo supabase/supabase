@@ -1,7 +1,4 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode } from 'react'
@@ -30,13 +27,17 @@ import { Branching2Preview } from './Branching2Preview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
+import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { QueueOperationsPreview } from './QueueOperationsPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
@@ -49,6 +50,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]: <FloatingMobileToolbarPreview />,
 }
 
@@ -65,10 +67,11 @@ export const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const [isDismissedTableFilterBar, setIsDismissedTableFilterBar] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.TABLE_EDITOR_NEW_FILTER_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
+  const [isDismissedTableQueueOperations, setIsDismissedTableQueueOperations] =
+    useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
+      false
+    )
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const allFeaturePreviews = (
@@ -90,10 +93,10 @@ export const FeaturePreviewModal = () => {
     })
 
     if (
-      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR &&
-      !isDismissedTableFilterBar
+      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS &&
+      !isDismissedTableQueueOperations
     ) {
-      setIsDismissedTableFilterBar(true)
+      setIsDismissedTableQueueOperations(true)
     }
   }
 

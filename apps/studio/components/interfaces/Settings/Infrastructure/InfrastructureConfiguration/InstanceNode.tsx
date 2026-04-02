@@ -1,18 +1,9 @@
+import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import SparkBar from 'components/ui/SparkBar'
-import {
-  DatabaseInitEstimations,
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import dayjs from 'dayjs'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
-import { Handle, NodeProps, Position } from 'reactflow'
 import {
   Badge,
   Button,
@@ -30,40 +21,26 @@ import {
 import {
   ERROR_STATES,
   INIT_PROGRESS,
+  LoadBalancerData,
   NODE_SEP,
   NODE_WIDTH,
-  Region,
+  PrimaryNodeData,
   REPLICA_STATUS,
+  ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import SparkBar from '@/components/ui/SparkBar'
+import {
+  DatabaseInitEstimations,
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-interface NodeData {
-  id: string
-  provider: string
-  region: Region
-  computeSize?: string
-  status: string
-  inserted_at: string
-}
-
-interface PrimaryNodeData extends NodeData {
-  numReplicas: number
-  numRegions: number
-  hasLoadBalancer: boolean
-}
-
-interface LoadBalancerData extends NodeData {
-  numDatabases: number
-}
-
-interface ReplicaNodeData extends NodeData {
-  onSelectRestartReplica: () => void
-  onSelectResizeReplica: () => void
-  onSelectDropReplica: () => void
-}
-
-export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
+export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
   const { ref } = useParams()
   const { numDatabases } = data
 
@@ -105,7 +82,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
   )
 }
 
-export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
+export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
 
@@ -176,7 +153,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   )
 }
 
-export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
+export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
   const { ref } = useParams()
   const { id, region, computeSize, status, inserted_at } = data
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([

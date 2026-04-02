@@ -1,6 +1,7 @@
-import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
-import { withAuth } from 'hooks/misc/withAuth'
 import { ReactNode } from 'react'
+
+import { OngoingQueriesPanel } from '@/components/interfaces/SQLEditor/OngoingQueriesPanel'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface SQLEditorLayoutProps {
   children: ReactNode

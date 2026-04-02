@@ -30,9 +30,9 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableHeadSort,
   TableRow,
 } from 'ui'
+import { TanStackTableHeadSort } from 'ui-patterns/Table'
 
 const data: Payment[] = [
   {
@@ -99,19 +99,23 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Status</TanStackTableHeadSort>,
     enableSorting: true,
     cell: ({ row }) => <div className="capitalize">{row.getValue('status')}</div>,
   },
   {
     accessorKey: 'email',
-    header: 'Email',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Email</TanStackTableHeadSort>,
     enableSorting: true,
     cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
   },
   {
     accessorKey: 'amount',
-    header: () => <div className="text-right">Amount</div>,
+    header: ({ column }) => (
+      <TanStackTableHeadSort column={column} className="justify-end">
+        Amount
+      </TanStackTableHeadSort>
+    ),
     enableSorting: true,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'))
@@ -163,33 +167,6 @@ export default function DataTableDemo() {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-
-  // Convert TanStack Table's SortingState to the string format expected by TableHeadSort
-  const getSortString = React.useMemo(() => {
-    if (sorting.length === 0) return ''
-    const sort = sorting[0]
-    return `${sort.id}:${sort.desc ? 'desc' : 'asc'}`
-  }, [sorting])
-
-  // Handle sort changes from TableHeadSort and convert to TanStack Table's SortingState
-  const handleSortChange = React.useCallback(
-    (column: string) => {
-      const currentSort = sorting.find((s) => s.id === column)
-      if (currentSort) {
-        if (currentSort.desc) {
-          // Cycle: desc -> remove sort
-          setSorting([])
-        } else {
-          // Cycle: asc -> desc
-          setSorting([{ id: column, desc: true }])
-        }
-      } else {
-        // New column, start with asc
-        setSorting([{ id: column, desc: false }])
-      }
-    },
-    [sorting]
-  )
 
   const table = useReactTable({
     data,
@@ -254,11 +231,20 @@ export default function DataTableDemo() {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   const columnId = header.column.id
-                  const canSort = header.column.getCanSort()
+                  const sort = header.column.getIsSorted()
 
                   return (
                     <TableHead
                       key={header.id}
+                      aria-sort={
+                        header.column.getCanSort()
+                          ? sort === 'asc'
+                            ? 'ascending'
+                            : sort === 'desc'
+                              ? 'descending'
+                              : 'none'
+                          : undefined
+                      }
                       className={
                         columnId === 'amount'
                           ? 'text-right'
@@ -267,18 +253,9 @@ export default function DataTableDemo() {
                             : undefined
                       }
                     >
-                      {header.isPlaceholder ? null : canSort ? (
-                        <TableHeadSort
-                          column={columnId}
-                          currentSort={getSortString}
-                          onSortChange={handleSortChange}
-                          className={columnId === 'amount' ? 'justify-end' : undefined}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHeadSort>
-                      ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
-                      )}
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
                 })}

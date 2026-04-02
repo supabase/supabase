@@ -2,14 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
-import { useProjectCloneMutation } from 'data/projects/clone-mutation'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
 import {
   Button,
   Dialog,
@@ -26,8 +18,16 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
 import { NewProjectPrice } from './RestoreToNewProject.utils'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useProjectCloneMutation } from '@/data/projects/clone-mutation'
+import { useCloneBackupsQuery } from '@/data/projects/clone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
 
 interface CreateNewProjectDialogProps {
   open: boolean

@@ -15,10 +15,11 @@ export type FeaturePreview = {
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const tableEditorNewFilterBar = useFlag('tableEditorNewFilterBar')
+
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
 
   return [
     {
@@ -68,6 +69,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: platformWebhooksEnabled,
     },
     {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+      name: 'JIT database access',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
+      isDefaultOptIn: false,
+      enabled: jitDbAccessEnabled,
+    },
+    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
       name: 'Project API documentation',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
@@ -101,7 +111,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: true,
       isNew: true,
       isPlatformOnly: false,
-      isDefaultOptIn: tableEditorNewFilterBar,
+      isDefaultOptIn: true,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,

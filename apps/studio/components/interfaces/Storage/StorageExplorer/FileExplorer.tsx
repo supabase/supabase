@@ -1,14 +1,14 @@
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
-
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
+
 import { CONTEXT_MENU_KEYS, STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { ColumnContextMenu } from './ColumnContextMenu'
 import { FileExplorerColumn } from './FileExplorerColumn'
 import { FolderContextMenu } from './FolderContextMenu'
 import { ItemContextMenu } from './ItemContextMenu'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
   columns: StorageColumn[]
@@ -57,7 +57,7 @@ export const FileExplorer = ({
 
       {isLoading ? (
         <FileExplorerColumn
-          column={{ id: '', name: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
+          column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
         />
       ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">

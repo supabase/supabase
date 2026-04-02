@@ -1,14 +1,10 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Eye, EyeOff, RefreshCw, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { Button, Calendar, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { Button, Calendar, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type {
   CustomOptionProps,
   FilterCondition,
@@ -16,9 +12,13 @@ import type {
   FilterProperty,
 } from 'ui-patterns/FilterBar'
 import { FilterBar } from 'ui-patterns/FilterBar'
-import { DatePickerValue } from './Logs.DatePickers'
+
 import { FILTER_OPTIONS, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function isBooleanMap(v: unknown): v is Record<string, boolean> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)

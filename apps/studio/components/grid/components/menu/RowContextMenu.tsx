@@ -1,22 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { ROW_CONTEXT_MENU_ID } from 'components/grid/constants'
-import type { SupaRow } from 'components/grid/types'
-import { queueRowDeletesWithOptimisticUpdate } from 'components/grid/utils/queueOperationUtils'
-import {
-  useIsQueueOperationsEnabled,
-  useIsTableFilterBarEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Copy, Edit, ListFilter, Trash } from 'lucide-react'
 import { useCallback } from 'react'
 import { Item, ItemParams, Menu } from 'react-contexify'
 import { toast } from 'sonner'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { copyToClipboard, DialogSectionSeparator } from 'ui'
 
+import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
 import { buildFilterFromCellValue, isComplexValue } from '../header/filter/FilterPopoverNew.utils'
+import { ROW_CONTEXT_MENU_ID } from '@/components/grid/constants'
+import type { SupaRow } from '@/components/grid/types'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 type RowContextMenuProps = {
   rows: SupaRow[]
@@ -25,12 +20,10 @@ type RowContextMenuProps = {
 type RowContextMenuItemProps = ItemParams<{ rowIdx: number }, string>
 
 export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
-  const queryClient = useQueryClient()
-  const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const isTableFilterBarEnabled = useIsTableFilterBarEnabled()
+  const { deleteRows } = useTableRowOperations()
 
   function onDeleteRow(p: RowContextMenuItemProps) {
     const rowIdx = p.props?.rowIdx
@@ -42,18 +35,7 @@ export const RowContextMenu = ({ rows }: RowContextMenuProps) => {
       return
     }
 
-    if (isQueueOperationsEnabled) {
-      queueRowDeletesWithOptimisticUpdate({
-        rows: [row],
-        table: snap.originalTable,
-        queryClient,
-        queueOperation: tableEditorSnap.queueOperation,
-        projectRef: project?.ref,
-      })
-      return
-    }
-
-    tableEditorSnap.onDeleteRows([row])
+    deleteRows({ rows: [row], table: snap.originalTable })
   }
 
   function onEditRowClick(p: RowContextMenuItemProps) {

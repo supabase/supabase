@@ -1,7 +1,8 @@
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
 import Link from 'next/link'
-import type { Organization } from 'types'
 import { Admonition } from 'ui-patterns'
+
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { Organization } from '@/types'
 
 interface NoProjectsOnPaidOrgInfoProps {
   organization?: Organization

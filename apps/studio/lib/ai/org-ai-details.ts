@@ -37,12 +37,12 @@ export const getOrgAIDetails = async ({
   }
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
-  const isLimited = !advanceModelAccess.hasAccess
+  const hasAccessToAdvanceModel = advanceModelAccess.hasAccess
   const isHipaaEnabled = subscriptionHasHipaaAddon(subscription) && !!projectSettings?.is_sensitive
 
   return {
     aiOptInLevel,
-    isLimited,
+    hasAccessToAdvanceModel,
     isHipaaEnabled,
     orgId: selectedOrg?.id,
     planId: selectedOrg?.plan.id,

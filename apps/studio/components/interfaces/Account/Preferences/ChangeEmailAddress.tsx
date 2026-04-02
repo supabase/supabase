@@ -3,10 +3,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import { useEmailUpdateMutation } from 'data/profile/profile-update-email-mutation'
 import {
   Button,
   DialogFooter,
@@ -17,6 +13,10 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useEmailUpdateMutation } from '@/data/profile/profile-update-email-mutation'
 
 export const GitHubChangeEmailAddress = () => {
   return (

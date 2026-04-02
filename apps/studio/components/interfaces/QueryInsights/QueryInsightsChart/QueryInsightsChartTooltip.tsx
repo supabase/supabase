@@ -1,13 +1,15 @@
 import dayjs from 'dayjs'
 import type { TooltipProps } from 'recharts'
+
 import { formatDuration } from '../QueryInsightsTable/QueryInsightsTable.utils'
 import { isTimeMetric } from './QueryInsightsChart.utils'
+import { guessLocalTimezone } from '@/lib/dayjs'
 
 export const QueryInsightsChartTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   if (!active || !payload?.length) return null
 
   const time = payload[0]?.payload?.time
-  const localTimeZone = dayjs.tz.guess()
+  const localTimeZone = guessLocalTimezone()
 
   return (
     <div className="grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl">

@@ -1,20 +1,21 @@
+import { useParams } from 'common'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { BlockKeys } from '../common/BlockKeys'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
 
 const verifyJSON = (value: string) => {
   try {
@@ -56,6 +57,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -74,6 +76,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const isTruncated = isValueTruncated(initialValue)
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
@@ -187,7 +190,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                     <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">⏎</span>
                     </div>
-                    <p className="text-xs text-foreground-light">Save changes</p>
+                    <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">

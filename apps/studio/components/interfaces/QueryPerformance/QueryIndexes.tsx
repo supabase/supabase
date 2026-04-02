@@ -1,16 +1,4 @@
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import {
-  GetIndexAdvisorResultResponse,
-  useGetIndexAdvisorResult,
-} from 'data/database/retrieve-index-advisor-result-query'
-import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -22,12 +10,12 @@ import {
   AlertTitle_Shadcn_,
   Button,
   cn,
-  CodeBlock,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIndexInvalidation } from './hooks/useIndexInvalidation'
@@ -41,6 +29,18 @@ import { IndexAdvisorDisabledState } from './IndexAdvisor/IndexAdvisorDisabledSt
 import { IndexImprovementText } from './IndexAdvisor/IndexImprovementText'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 import { QueryPerformanceRow } from './QueryPerformance.types'
+import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import {
+  GetIndexAdvisorResultResponse,
+  useGetIndexAdvisorResult,
+} from '@/data/database/retrieve-index-advisor-result-query'
+import { useGetIndexesFromSelectQuery } from '@/data/database/retrieve-index-from-select-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface QueryIndexesProps {
   selectedRow: Pick<QueryPerformanceRow, 'query'>

@@ -1,5 +1,4 @@
-import { createNavigationHandler } from 'lib/navigation'
-import { ChevronRight, Eye, MoreVertical, Plus, Search, Trash2 } from 'lucide-react'
+import { ChevronRight, Eye, MoreVertical, Plus, Search, Trash2, Webhook } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import {
@@ -23,6 +22,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
+import { createNavigationHandler } from '@/lib/navigation'
 
 interface PlatformWebhooksEndpointListProps {
   filteredEndpoints: WebhookEndpoint[]
@@ -93,6 +93,7 @@ export const PlatformWebhooksEndpointList = ({
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-foreground text-xl">Endpoints</h2>
       </div>
+
       <div className="flex items-center justify-between gap-x-2">
         <Input
           placeholder="Search endpoints"
@@ -102,6 +103,7 @@ export const PlatformWebhooksEndpointList = ({
           className="w-full lg:w-52"
           onChange={(event) => onSearchChange(event.target.value)}
         />
+
         <Button type="primary" icon={<Plus />} onClick={onCreateEndpoint}>
           New endpoint
         </Button>
@@ -109,6 +111,7 @@ export const PlatformWebhooksEndpointList = ({
 
       {filteredEndpoints.length === 0 ? (
         <EmptyStatePresentational
+          icon={Webhook}
           title="No endpoints yet"
           description="Create an endpoint to start receiving webhook deliveries."
         >
@@ -171,15 +174,17 @@ export const PlatformWebhooksEndpointList = ({
                     <TableCell className="max-w-[420px]">
                       <p className="truncate">{displayName}</p>
                       {hasName && (
-                        <p className="text-xs text-foreground-lighter truncate">{endpoint.url}</p>
+                        <p className="text-xs text-foreground-lighter truncate mt-0.5">
+                          {endpoint.url}
+                        </p>
                       )}
                     </TableCell>
                     <TableCell className="max-w-[280px] truncate">
                       {formatEventCount(endpoint.eventTypes)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="max-w-[220px]">
                       <TimestampInfo className="text-sm" utcTimestamp={endpoint.createdAt} />
-                      <p className="text-xs text-foreground-lighter mt-0.5">
+                      <p className="text-xs text-foreground-lighter mt-0.5 truncate">
                         by {endpoint.createdBy}
                       </p>
                     </TableCell>

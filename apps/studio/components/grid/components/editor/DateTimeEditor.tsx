@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
-
 import {
   Button,
   cn,
@@ -16,7 +15,9 @@ import {
 } from 'ui'
 import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { BlockKeys } from '../common/BlockKeys'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface BaseEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
   TRow,
@@ -42,10 +43,12 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
 }: BaseEditorProps<TRow, TSummaryRow>) {
   const ref = useRef<HTMLInputElement>(null)
   const format = FORMAT_MAP[type]
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const value = row[column.key as keyof TRow] as unknown as string
   const [inputValue, setInputValue] = useState(value)
   const timeValue = inputValue ? Number(dayjs(inputValue, format)) : inputValue
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
   const saveChanges = (value: string | null) => {
     if ((typeof value === 'string' && value.length === 0) || timeValue === 'Invalid Date') return
@@ -126,7 +129,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
               <div className="px-1.5 h-[22px] rounded bg-surface-300 border border-strong flex items-center justify-center">
                 <span className="text-[10px]">⏎</span>
               </div>
-              <p className="text-xs text-foreground-light">Save changes</p>
+              <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="px-1 h-[22px] rounded bg-surface-300 border border-strong flex items-center justify-center">

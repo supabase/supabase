@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { useMemo } from 'react'
 import {
   createMcpCopyHandler,
@@ -13,6 +11,8 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 function McpCursorContent({ state, projectKeys }: StepContentProps) {
   const { ref: projectRef } = useParams()

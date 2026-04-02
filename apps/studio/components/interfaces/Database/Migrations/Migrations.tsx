@@ -1,11 +1,4 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { parseMigrationVersion } from 'lib/migration-utils'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -28,6 +21,13 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { parseMigrationVersion } from '@/lib/migration-utils'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -210,7 +210,10 @@ const Migrations = () => {
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={selectedMigration?.statements?.join('\n')}
+              defaultValue={
+                selectedMigration?.statements?.join(';\n') +
+                (selectedMigration?.statements?.length ? ';' : '')
+              }
             />
           </div>
         </div>

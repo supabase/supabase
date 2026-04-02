@@ -235,6 +235,12 @@ export const examples: Registry = [
     registryDependencies: ['calendar', 'form', 'popover'],
     files: ['example/calendar-form.tsx'],
   },
+  {
+    name: 'single-value-field-array-demo',
+    type: 'components:example',
+    registryDependencies: ['button', 'form', 'input'],
+    files: ['example/single-value-field-array-demo.tsx'],
+  },
   // {
   //   name: 'card-demo',
   //   type: 'components:example',
@@ -438,6 +444,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['data-input'],
     files: ['example/data-input-with-reveal-copy.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy-editable',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy-editable.tsx'],
+  },
+  {
+    name: 'data-input-with-reveal-copy-editable-empty',
+    type: 'components:example',
+    registryDependencies: ['data-input'],
+    files: ['example/data-input-with-reveal-copy-editable-empty.tsx'],
   },
   {
     name: 'date-picker-demo',
@@ -1106,6 +1124,12 @@ export const examples: Registry = [
     name: 'form-item-layout-demo',
     type: 'components:example',
     files: ['example/form-item-layout-demo.tsx'],
+  },
+  {
+    name: 'key-value-field-array-demo',
+    type: 'components:example',
+    registryDependencies: ['button', 'form', 'input'],
+    files: ['example/key-value-field-array-demo.tsx'],
   },
   {
     name: 'field-choice-card',

@@ -1,6 +1,6 @@
 import { ExternalLink, HelpCircle, LockKeyholeOpen, RectangleEllipsis } from 'lucide-react'
-
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+
 import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
 
 interface AlgorithmHoverCardProps {

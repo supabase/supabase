@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-
-import { useParams } from 'common'
-import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, cn } from 'ui'
+
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { BASE_PATH } from '@/lib/constants'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey

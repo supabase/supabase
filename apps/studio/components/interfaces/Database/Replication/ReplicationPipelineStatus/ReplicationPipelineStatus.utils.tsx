@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
-
-import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { formatBytes } from 'lib/helpers'
-import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
 import { Badge } from 'ui'
+
 import { getPipelineStateMessages } from '../Pipeline.utils'
 import { RetryPolicy, TableState } from './ReplicationPipelineStatus.types'
+import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
+import { formatBytes } from '@/lib/helpers'
+import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
 const numberFormatter = new Intl.NumberFormat()
 

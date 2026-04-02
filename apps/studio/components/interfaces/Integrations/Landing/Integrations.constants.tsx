@@ -1,3 +1,4 @@
+import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -8,6 +9,9 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
+import { enableDatabaseWebhooks } from '@/data/database/hooks-enable-mutation'
+import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export type Navigation = {
@@ -29,7 +33,7 @@ export type IntegrationDefinition = {
   name: string
   status?: 'alpha' | 'beta'
   categories?: string[]
-  icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
+  icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
   files?: string[]
@@ -43,11 +47,15 @@ export type IntegrationDefinition = {
   /** Optional component to render if the integration requires extensions that are not available on the current database image */
   missingExtensionsAlert?: ReactNode
   navigation?: Array<Navigation>
-  navigate: (
-    id: string,
-    pageId: string | undefined,
+  navigate: (props: {
+    id: string | undefined
+    pageId: string | undefined
     childId: string | undefined
-  ) => ComponentType<{}> | null
+  }) => ComponentType<{}> | null
+  /** SQL query for installing the entire integration */
+  installationSql?: string
+  /** Custom command to install the integration */
+  installationCommand?: (props: { ref: string }) => Promise<void>
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -92,7 +100,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Settings',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
         return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
           loading: Loading,
@@ -102,7 +110,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Queues/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Queues/OverviewTab').then(
                 (mod) => mod.QueuesOverviewTab
               ),
             { loading: Loading }
@@ -148,7 +156,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         ),
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
         return dynamic(() => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage), {
           loading: Loading,
@@ -158,8 +166,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+                (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
               loading: Loading,
@@ -184,7 +192,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/vault`,
     author: authorSupabase,
     navigation: [
       {
@@ -196,13 +204,13 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Secrets',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+                (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
               loading: Loading,
@@ -228,9 +236,9 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/webhooks`,
     author: authorSupabase,
-    requiredExtensions: [],
+    requiredExtensions: ['pg_net'],
     navigation: [
       {
         route: 'overview',
@@ -241,12 +249,12 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Webhooks',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Webhooks/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Webhooks/OverviewTab').then(
                 (mod) => mod.WebhooksOverviewTab
               ),
             {
@@ -256,7 +264,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'webhooks':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Webhooks/ListTab').then(
+              import('@/components/interfaces/Integrations/Webhooks/ListTab').then(
                 (mod) => mod.WebhooksListTab
               ),
             {
@@ -265,6 +273,12 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
           )
       }
       return null
+    },
+    installationSql: getEnableWebhooksSQL(),
+    installationCommand: async ({ ref }: { ref: string }) => {
+      const queryClient = getQueryClient()
+      await enableDatabaseWebhooks({ ref })
+      await invalidateSchemasQuery(queryClient, ref)
     },
   },
   {
@@ -292,12 +306,12 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Docs',
       },
     ],
-    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/OverviewTab').then(
+              import('@/components/interfaces/Integrations/DataApi/OverviewTab').then(
                 (mod) => mod.DataApiOverviewTab
               ),
             {
@@ -307,7 +321,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/SettingsTab').then(
+              import('@/components/interfaces/Integrations/DataApi/SettingsTab').then(
                 (mod) => mod.DataApiSettingsTab
               ),
             {
@@ -317,7 +331,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'docs':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/DocsTab').then(
+              import('@/components/interfaces/Integrations/DataApi/DocsTab').then(
                 (mod) => mod.DataApiDocsTab
               ),
             {
@@ -343,7 +357,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       />
     ),
     description: 'Run GraphQL queries through our interactive in-browser IDE',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/extensions/pg_graphql`,
     author: authorSupabase,
     navigation: [
       {
@@ -355,13 +369,13 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'GraphiQL',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
+                (mod) => mod.IntegrationOverviewTabWrapper
               ),
             {
               loading: Loading,
@@ -370,7 +384,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'graphiql':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
+              import('@/components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
                 (mod) => mod.GraphiQLTab
               ),
             {
@@ -406,12 +420,12 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         label: 'Wrappers',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Wrappers/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Wrappers/OverviewTab').then(
                 (mod) => mod.WrapperOverviewTab
               ),
             {
@@ -421,7 +435,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         case 'wrappers':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Wrappers/WrappersTab').then(
+              import('@/components/interfaces/Integrations/Wrappers/WrappersTab').then(
                 (mod) => mod.WrappersTab
               ),
             {
@@ -468,12 +482,12 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Settings',
       },
     ],
-    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
                 (mod) => mod.StripeSyncInstallationPage
               ),
             { loading: Loading }
@@ -481,7 +495,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
                 (mod) => mod.StripeSyncSettingsPage
               ),
             { loading: Loading }

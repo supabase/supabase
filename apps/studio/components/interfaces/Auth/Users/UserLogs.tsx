@@ -1,9 +1,4 @@
 import { useParams } from 'common'
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { User } from 'data/auth/users-infinite-query'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
 import { ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
@@ -14,6 +9,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { User } from '@/data/auth/users-infinite-query'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 
 interface UserLogsProps {
   user: User

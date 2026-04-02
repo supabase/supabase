@@ -1,17 +1,17 @@
 import { useParams } from 'common'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import AlertError from 'components/ui/AlertError'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { ProductMenuItem } from 'components/ui/ProductMenu/ProductMenuItem'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getPathnameWithoutQuery } from 'lib/pathname.utils'
 import { useRouter } from 'next/router'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 import { getCategoryParamFromAsPath, getIntegrationsPageFromPathname } from './Integrations.utils'
 import { generateIntegrationsMenu } from './IntegrationsMenu.utils'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import AlertError from '@/components/ui/AlertError'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuItem } from '@/components/ui/ProductMenu/ProductMenuItem'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 
 export function IntegrationsProductMenu() {
   const router = useRouter()

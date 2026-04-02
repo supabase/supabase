@@ -1,17 +1,4 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useContentQuery } from 'data/content/content-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -34,6 +21,19 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
+import {
+  useFeaturePreviewModal,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useContentQuery } from '@/data/content/content-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (

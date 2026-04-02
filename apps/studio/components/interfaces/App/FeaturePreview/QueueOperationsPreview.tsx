@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
 import { InlineLink } from '@/components/ui/InlineLink'
+import { BASE_PATH } from '@/lib/constants'
 
 export const QueueOperationsPreview = () => {
   const { ref = '_' } = useParams()
