@@ -10057,7 +10057,7 @@
                       "nullable": true
                     },
                     "sessions_inactivity_timeout": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -10069,7 +10069,7 @@
                       "nullable": true
                     },
                     "sessions_timebox": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "site_url": {
@@ -10744,12 +10744,12 @@
                     "nullable": true
                   },
                   "sessions_timebox": {
-                    "type": "integer",
+                    "type": "number",
                     "minimum": 0,
                     "nullable": true
                   },
                   "sessions_inactivity_timeout": {
-                    "type": "integer",
+                    "type": "number",
                     "minimum": 0,
                     "nullable": true
                   },
@@ -12273,7 +12273,7 @@
                       "nullable": true
                     },
                     "sessions_inactivity_timeout": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -12285,7 +12285,7 @@
                       "nullable": true
                     },
                     "sessions_timebox": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "site_url": {
@@ -15125,7 +15125,7 @@
             "fga_permissions": ["database_migrations_read"]
           }
         ],
-        "summary": "[Beta] List applied migration versions",
+        "summary": "List applied migration versions",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15210,7 +15210,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Apply a database migration",
+        "summary": "Apply a database migration",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15295,7 +15295,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Upsert a database migration without applying",
+        "summary": "Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15358,7 +15358,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "summary": "Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15457,7 +15457,7 @@
             "fga_permissions": ["database_migrations_read"]
           }
         ],
-        "summary": "[Beta] Fetch an existing entry from migration history",
+        "summary": "Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15537,7 +15537,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Patch an existing entry in migration history",
+        "summary": "Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15918,7 +15918,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["database_write"]
+            "fga_permissions": ["database_config_write"]
           }
         ],
         "summary": "Updates the database password",
@@ -16516,6 +16516,78 @@
         "summary": "Delete JIT access by user-id",
         "tags": ["Database"],
         "x-endpoint-owners": ["security"]
+      }
+    },
+    "/v1/projects/{ref}/database/openapi": {
+      "get": {
+        "description": "Returns the PostgREST OpenAPI specification for the project. This is the replacement for querying `/rest/v1/` directly with the anon key.",
+        "operationId": "v1-get-database-openapi",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "schema",
+            "required": false,
+            "in": "query",
+            "description": "The database schema to generate the OpenAPI spec for",
+            "schema": {
+              "default": "public",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to fetch PostgREST OpenAPI spec"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["database_read"]
+          }
+        ],
+        "summary": "Get PostgREST OpenAPI spec",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/functions": {
@@ -19249,6 +19321,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_read"]
           }
         ],
         "summary": "Gets realtime configuration",
@@ -19361,6 +19436,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_write"]
           }
         ],
         "summary": "Updates realtime configuration",
@@ -19405,6 +19483,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_write"]
           }
         ],
         "summary": "Shutdowns realtime connections for a project",
@@ -20653,9 +20734,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -20729,9 +20815,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -25157,7 +25248,7 @@
             "nullable": true
           },
           "sessions_inactivity_timeout": {
-            "type": "integer",
+            "type": "number",
             "nullable": true
           },
           "sessions_single_per_user": {
@@ -25169,7 +25260,7 @@
             "nullable": true
           },
           "sessions_timebox": {
-            "type": "integer",
+            "type": "number",
             "nullable": true
           },
           "site_url": {
@@ -25789,12 +25880,12 @@
             "nullable": true
           },
           "sessions_timebox": {
-            "type": "integer",
+            "type": "number",
             "minimum": 0,
             "nullable": true
           },
           "sessions_inactivity_timeout": {
-            "type": "integer",
+            "type": "number",
             "minimum": 0,
             "nullable": true
           },
@@ -29558,9 +29649,14 @@
           "status": {
             "type": "string",
             "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+          },
+          "completed_on": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
-        "required": ["name", "status"]
+        "required": ["name", "status", "completed_on"]
       },
       "V1UndoBody": {
         "type": "object",

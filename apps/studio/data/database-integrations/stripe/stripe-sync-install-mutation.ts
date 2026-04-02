@@ -1,16 +1,17 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
-
 import { getAccessToken } from 'common'
 import { databaseKeys } from 'data/database/keys'
 import { BASE_PATH } from 'lib/constants'
 import { useTrack } from 'lib/telemetry/track'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types'
+
 import { stripeSyncKeys } from './keys'
 
 export type StripeSyncInstallVariables = {
   projectRef: string
   stripeSecretKey: string
+  startTime: number
 }
 
 export type StripeSyncInstallResponse = {
@@ -21,6 +22,7 @@ export type StripeSyncInstallResponse = {
 export async function installStripeSync({
   projectRef,
   stripeSecretKey,
+  startTime,
 }: StripeSyncInstallVariables): Promise<StripeSyncInstallResponse> {
   const accessToken = await getAccessToken()
 
@@ -33,6 +35,7 @@ export async function installStripeSync({
     body: JSON.stringify({
       projectRef,
       stripeSecretKey,
+      startTime,
     }),
   })
 

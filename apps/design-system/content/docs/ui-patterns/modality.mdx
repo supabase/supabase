@@ -96,6 +96,7 @@ Implementation checklist:
 - Render a separate discard confirmation dialog when dirty.
 - Keep `Cancel` non-destructive; use `Discard`/`Discard changes` for one-click destructive exits.
 - Guard controlled close attempts only; do not try to block route changes or arbitrary unmounts.
+- If dismissal is route-driven or tied to page unload, use a navigation guard that composes the same discard-confirmation UI instead of extending the dialog/sheet close guard.
 
 Studio implementation (preferred in Studio code):
 
@@ -103,8 +104,13 @@ Studio implementation (preferred in Studio code):
 import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 
+const form = useForm(...)
+// Always destructure formState values otherwise they won't be updated
+// See https://react-hook-form.com/docs/useform/formstate
+const { isDirty } = form.formState
+
 const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-  checkIsDirty: () => form.formState.isDirty,
+  checkIsDirty: () => isDirty,
   onClose,
 })
 

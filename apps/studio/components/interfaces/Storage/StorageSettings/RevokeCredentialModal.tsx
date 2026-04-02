@@ -1,7 +1,5 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -13,6 +11,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+
+import { useS3AccessKeyDeleteMutation } from '@/data/storage/s3-access-key-delete-mutation'
 
 interface RevokeCredentialModalProps {
   visible: boolean

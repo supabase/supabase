@@ -45,15 +45,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import {
-  Button,
-  Form,
-  Input,
-  Modal,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from 'ui'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+
+import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
@@ -98,7 +92,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
   const PLACEHOLDER_QUERY = IS_PLATFORM
-    ? logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY
+    ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
     : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
@@ -148,7 +142,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const { mutate: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
+  const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
       const error = e as { message: string }
       console.error(error)
@@ -254,13 +248,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   type SaveQueryFormValues = { name: string; description?: string }
 
-  const handleCreateQuery = async (
-    values: SaveQueryFormValues,
-    { setSubmitting }: { setSubmitting: (value: boolean) => void }
-  ) => {
+  const handleCreateQuery = async (values: SaveQueryFormValues) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!profile) return console.error('Profile is required')
-    setSubmitting(true)
 
     const id = uuidv4()
     const payload: UpsertContentPayload = {
@@ -277,7 +267,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       owner_id: profile.id,
       visibility: 'user' as const,
     }
-    upsertContent(
+    await upsertContent(
       { projectRef, payload },
       {
         onSuccess: () => router.push(`/project/${projectRef}/logs/explorer?queryId=${id}`),
@@ -285,12 +275,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     )
   }
 
-  function handleOnSave() {
+  async function handleOnSave() {
     if (!projectRef) return console.error('Project ref is required')
 
     // if we have a queryId, we are editing a saved query
     if (queryId && query) {
-      upsertContent({
+      await upsertContent({
         projectRef: projectRef!,
         payload: {
           ...query,
@@ -392,6 +382,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor
+            // Ensure we reset the editor to the query content whenever the selected query changes
+            key={queryId}
             id={editorId}
             editorRef={editorRef}
             language="pgsql"
@@ -424,52 +416,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         </ResizablePanel>
       </ResizablePanelGroup>
 
-      <Modal
-        size="medium"
-        onCancel={() => setSaveModalOpen(!saveModalOpen)}
+      <UpdateSavedQueryModal
         header="Save log query"
         visible={saveModalOpen}
-        hideFooter
-      >
-        <Form
-          initialValues={{
-            name: '',
-            description: '',
-          }}
-          onSubmit={handleCreateQuery}
-        >
-          {() => (
-            <>
-              <Modal.Content className="space-y-6">
-                <Input layout="horizontal" label="Name" id="name" />
-                <div className="text-area-text-sm">
-                  <Input.TextArea
-                    layout="horizontal"
-                    labelOptional="Optional"
-                    label="Description"
-                    id="description"
-                    rows={2}
-                  />
-                </div>
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end gap-2">
-                <Button size="tiny" type="default" onClick={() => setSaveModalOpen(!saveModalOpen)}>
-                  Cancel
-                </Button>
-                <Button
-                  size="tiny"
-                  loading={isUpsertingContent}
-                  disabled={isUpsertingContent}
-                  htmlType="submit"
-                >
-                  Save
-                </Button>
-              </Modal.Content>
-            </>
-          )}
-        </Form>
-      </Modal>
+        initialValues={{ name: '', description: '' }}
+        onCancel={() => {
+          setSaveModalOpen(false)
+        }}
+        onSubmit={handleCreateQuery}
+      />
     </div>
   )
 }

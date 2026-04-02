@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-create-mutation'
-import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
-import { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
+import { useState } from 'react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
+
 import { SecretRow } from './SecretRow'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useClientSecretCreateMutation } from '@/data/oauth-secrets/client-secret-create-mutation'
+import { CreatedSecret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
+import { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 interface Props {
   selectedApp?: OAuthApp

@@ -1,4 +1,9 @@
-import { sanitizeTaxIdValue } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import {
+  getEffectiveTaxCountry,
+  resolveStoredTaxId,
+  sanitizeTaxIdValue,
+} from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
 import { describe, test, expect } from 'vitest'
 
 /**
@@ -46,5 +51,39 @@ describe('TaxID utils: sanitizeTaxID', () => {
 
     const sanitizedID = sanitizeTaxIdValue(unitedStatesID)
     expect(sanitizedID).toBe('12-3456789')
+  })
+})
+
+describe('TaxID utils: getEffectiveTaxCountry', () => {
+  test('returns countryIso2 when no override is set', () => {
+    const ukVat = TAX_IDS.find((t) => t.name === 'UK VAT')!
+    expect(getEffectiveTaxCountry(ukVat)).toBe('GB')
+  })
+
+  test('returns taxCountryIso2 when override is set', () => {
+    const imVat = TAX_IDS.find((t) => t.name === 'IM VAT')!
+    expect(getEffectiveTaxCountry(imVat)).toBe('GB')
+  })
+})
+
+describe('TaxID utils: resolveStoredTaxId', () => {
+  test('resolves GB customer to UK VAT with billingCountry', () => {
+    const ukVat = TAX_IDS.find((t) => t.name === 'UK VAT')!
+    expect(resolveStoredTaxId('gb_vat', 'GB', 'GB')).toBe(ukVat)
+  })
+
+  test('resolves IM customer to IM VAT with billingCountry', () => {
+    const imVat = TAX_IDS.find((t) => t.name === 'IM VAT')!
+    expect(resolveStoredTaxId('gb_vat', 'GB', 'IM')).toBe(imVat)
+  })
+
+  test('resolves GB customer to UK VAT without billingCountry', () => {
+    // Without billingCountry, falls back to countryIso2 match — UK VAT has countryIso2 'GB'
+    const ukVat = TAX_IDS.find((t) => t.name === 'UK VAT')!
+    expect(resolveStoredTaxId('gb_vat', 'GB')).toBe(ukVat)
+  })
+
+  test('returns undefined for unknown type', () => {
+    expect(resolveStoredTaxId('unknown_type', 'XX')).toBeUndefined()
   })
 })

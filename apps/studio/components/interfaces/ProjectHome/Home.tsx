@@ -1,24 +1,24 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { ProjectUsageSection as ProjectUsageSectionV1 } from 'components/interfaces/Home/ProjectUsageSection'
-import { SortableSection } from 'components/interfaces/ProjectHome/SortableSection'
-import { TopSection } from 'components/interfaces/ProjectHome/TopSection'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import dayjs from 'dayjs'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { useEffect, useRef } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
 import { AdvisorSection } from './AdvisorSection'
+import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
-import { type GettingStartedState } from './GettingStarted/GettingStarted.types'
-import { GettingStartedSection } from './GettingStarted/GettingStartedSection'
+import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
 import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
+import { ProjectUsageSection as ProjectUsageSectionV1 } from '@/components/interfaces/Home/ProjectUsageSection'
+import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSection'
+import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ProjectHome = () => {
   const { enableBranching } = useParams()
@@ -36,12 +36,7 @@ export const ProjectHome = () => {
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
-    ['getting-started', 'usage', 'advisor', 'custom-report']
-  )
-
-  const [gettingStartedState, setGettingStartedState] = useLocalStorage<GettingStartedState>(
-    `home-getting-started-${project?.ref || 'default'}`,
-    'empty'
+    DEFAULT_SECTION_ORDER
   )
 
   const UsageSection = showHomepageUsageV2 ? ProjectUsageSectionV2 : ProjectUsageSectionV1
@@ -73,27 +68,33 @@ export const ProjectHome = () => {
     }
   }, [enableBranching, snap])
 
+  useEffect(() => {
+    setSectionOrder(mergeSectionOrder)
+  }, [setSectionOrder])
+
+  const showConnectSection = !isMatureProject && !!project
+
+  const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
+    if (id === 'connect') return showConnectSection
+    return true
+  })
+
   return (
     <div className="w-full h-full">
       <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
         <ScaffoldSection
           isFullWidth
-          className={cn(isPaused ? 'h-full flex justify-center !p-0' : 'pt-16 pb-0')}
+          className={cn(isPaused ? 'h-full flex justify-center !p-0' : 'pb-0')}
         >
           <TopSection />
         </ScaffoldSection>
       </ScaffoldContainer>
       {!isPaused && (
         <ScaffoldContainer size="large">
-          <ScaffoldSection isFullWidth className="gap-16 pb-32">
+          <ScaffoldSection isFullWidth className="gap-12 pb-32">
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-              <SortableContext
-                items={sectionOrder.filter(
-                  (id) => id !== 'getting-started' || gettingStartedState !== 'hidden'
-                )}
-                strategy={verticalListSortingStrategy}
-              >
-                {sectionOrder.map((id) => {
+              <SortableContext items={renderOrder} strategy={verticalListSortingStrategy}>
+                {renderOrder.map((id) => {
                   if (IS_PLATFORM && id === 'usage') {
                     return (
                       <div key={id} className={cn(isComingUp && 'opacity-60 pointer-events-none')}>
@@ -103,18 +104,10 @@ export const ProjectHome = () => {
                       </div>
                     )
                   }
-                  if (
-                    id === 'getting-started' &&
-                    !isMatureProject &&
-                    project &&
-                    gettingStartedState !== 'hidden'
-                  ) {
+                  if (id === 'connect' && showConnectSection) {
                     return (
                       <SortableSection key={id} id={id}>
-                        <GettingStartedSection
-                          value={gettingStartedState}
-                          onChange={setGettingStartedState}
-                        />
+                        <ConnectSection />
                       </SortableSection>
                     )
                   }

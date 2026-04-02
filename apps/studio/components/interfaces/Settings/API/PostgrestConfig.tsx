@@ -16,8 +16,10 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Skeleton,
   Switch,
   useWatch_Shadcn_,
@@ -52,6 +54,7 @@ import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantToggl
 import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+import { IS_PLATFORM } from '@/lib/constants'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
 
@@ -125,7 +128,10 @@ export const PostgrestConfig = () => {
   const schemas = useMemo(
     () =>
       allSchemas
-        .filter((x) => !INTERNAL_SCHEMAS.some((schema) => schema === x.name))
+        .filter((x) => {
+          if (x.name === 'graphql_public') return true
+          return !INTERNAL_SCHEMAS.includes(x.name)
+        })
         .map((x) => {
           return {
             id: x.id,
@@ -149,8 +155,9 @@ export const PostgrestConfig = () => {
 
   const formId = 'project-postgres-config'
 
-  const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
+  const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+  const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
@@ -603,15 +610,18 @@ export const PostgrestConfig = () => {
                             description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="rows">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>rows</InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
                                   onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
-                              </PrePostTab>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
@@ -630,8 +640,11 @@ export const PostgrestConfig = () => {
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
@@ -644,7 +657,7 @@ export const PostgrestConfig = () => {
                                   }
                                   value={field.value === null ? '' : field.value}
                                 />
-                              </PrePostTab>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
@@ -655,40 +668,44 @@ export const PostgrestConfig = () => {
               )}
             </form>
           </Form_Shadcn_>
-          <CardFooter className="border-t">
-            <FormActions
-              form={formId}
-              isSubmitting={isUpdating}
-              hasChanges={form.formState.isDirty}
-              handleReset={resetForm}
-              disabled={!canUpdatePostgrestConfig}
-              helper={
-                isPermissionsLoaded && !canUpdatePostgrestConfig
-                  ? "You need additional permissions to update your project's API settings"
-                  : undefined
-              }
-            />
-          </CardFooter>
+          {IS_PLATFORM && (
+            <CardFooter className="border-t">
+              <FormActions
+                form={formId}
+                isSubmitting={isUpdating}
+                hasChanges={form.formState.isDirty}
+                handleReset={resetForm}
+                disabled={!canUpdatePostgrestConfig}
+                helper={
+                  isPermissionsLoaded && !canUpdatePostgrestConfigPermission
+                    ? "You need additional permissions to update your project's API settings"
+                    : undefined
+                }
+              />
+            </CardFooter>
+          )}
         </Card>
-        <Card className="mb-4">
-          <CardContent>
-            <FormItemLayout
-              isReactForm={false}
-              layout="flex-row-reverse"
-              label="Harden Data API"
-              description="Expose a custom schema instead of the public schema"
-            >
-              <div className="flex gap-2 items-center justify-end">
-                <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
-                  Harden Data API
-                </Button>
-              </div>
-            </FormItemLayout>
-          </CardContent>
-        </Card>
+        {IS_PLATFORM && (
+          <Card className="mb-4">
+            <CardContent>
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="Harden Data API"
+                description="Expose a custom schema instead of the public schema"
+              >
+                <div className="flex gap-2 items-center justify-end">
+                  <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                    Harden Data API
+                  </Button>
+                </div>
+              </FormItemLayout>
+            </CardContent>
+          </Card>
+        )}
       </PageSectionContent>
 
-      <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />
+      {IS_PLATFORM && <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />}
     </PageSection>
   )
 }

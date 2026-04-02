@@ -1,7 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
 import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -22,6 +18,10 @@ import {
 
 import { algorithmLabels } from '../algorithm-details'
 import { statusColors } from '../jwt.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 export function RotateKeyDialog({
   projectRef,

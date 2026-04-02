@@ -2,13 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsAwsNimbusCloudProvider, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatCurrency } from 'lib/helpers'
 import {
   Alert_Shadcn_,
   AlertTitle_Shadcn_,
@@ -32,6 +25,7 @@ import {
   TableRow,
   WarningIcon,
 } from 'ui'
+
 import { DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
 import {
@@ -46,6 +40,15 @@ import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequ
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsNimbusCloudProvider,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { formatCurrency } from '@/lib/helpers'
 
 const TableHeaderRow = () => (
   <TableRow>

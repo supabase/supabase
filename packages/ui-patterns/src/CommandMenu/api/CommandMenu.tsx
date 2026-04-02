@@ -235,10 +235,23 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
   const query = useQuery()
   const setQuery = useSetQuery()
 
+  const telemetryContext = useCommandMenuTelemetryContext()
+
   const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && open && telemetryContext?.onTelemetry) {
+      telemetryContext.onTelemetry({
+        action: 'command_menu_closed',
+        properties: { app: telemetryContext.app },
+        groups: {},
+      })
+    }
+    setOpen(newOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       {trigger}
       <DialogContent
         id="command-menu-dialog-content"
@@ -246,10 +259,10 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         forceMount
         ref={contentRef}
         onOpenAutoFocus={(e) => isMobile && e.preventDefault()}
-        onInteractOutside={() => setOpen(false)}
+        onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : setOpen(false)
+          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
         }}
         size={size}
         className={cn(

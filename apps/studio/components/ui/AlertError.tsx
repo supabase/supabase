@@ -1,13 +1,15 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useTrack } from 'lib/telemetry/track'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useTrack } from '@/lib/telemetry/track'
+
 export interface AlertErrorProps {
   projectRef?: string
   subject?: string
+  description?: string
   error?: { message: string } | null
   layout?: 'vertical' | 'horizontal' | 'responsive'
   className?: string
@@ -46,6 +48,7 @@ export const ContactSupportButton = ({
 export const AlertError = ({
   projectRef,
   subject,
+  description = 'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.',
   error,
   className,
   showIcon = true,
@@ -87,12 +90,7 @@ export const AlertError = ({
               {formattedErrorMessage}
             </p>
           )}
-          {showInstructions && (
-            <p>
-              Try refreshing your browser, but if the issue persists for more than a few minutes,
-              please reach out to us via support.
-            </p>
-          )}
+          {showInstructions && <p>{description}</p>}
           {children}
         </>
       }

@@ -1,16 +1,17 @@
-import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
-import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { DOCS_URL } from 'lib/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import Panel from '@/components/ui/Panel'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
+import { useCustomDomainActivateMutation } from '@/data/custom-domains/custom-domains-activate-mutation'
+import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from '@/data/custom-domains/custom-domains-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export type CustomDomainActivateProps = {
   projectRef?: string

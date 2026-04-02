@@ -4,7 +4,7 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'thank-you',
-  slug: 'stripe/exec-dinner/thank-you',
+  slug: 'exec-dinner-april-2026/thank-you',
   metadata: {
     title: "You're confirmed | Supabase Executive Dinner",
     description:

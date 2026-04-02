@@ -1,11 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { PostgresExtension } from '@supabase/postgres-meta'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
+import { type DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -18,24 +12,29 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { extensionsWithRecommendedSchemas } from './Extensions.constants'
-import { useDatabaseExtensionDefaultSchemaQuery } from '@/data/database-extensions/database-extension-schema-query'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
@@ -51,7 +50,7 @@ const FormSchema = z.object({ name: z.string(), schema: z.string() }).superRefin
 
 interface EnableExtensionModalProps {
   visible: boolean
-  extension: PostgresExtension
+  extension: DatabaseExtension
   onCancel: () => void
 }
 
@@ -66,7 +65,7 @@ export const EnableExtensionModal = ({
 
   const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
 
-  const { data: schemas = [], isPending: isSchemasLoading } = useSchemasQuery(
+  const { data: schemas = [], isPending: isLoading } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -79,19 +78,9 @@ export const EnableExtensionModal = ({
       !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
   )
 
-  const { data: extensionMeta, isPending: fetchingSchemaInfo } =
-    useDatabaseExtensionDefaultSchemaQuery(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        extension: extension.name,
-      },
-      { enabled: visible }
-    )
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
-  const defaultSchema = extension.name === 'pg_cron' ? 'pg_catalog' : extensionMeta?.schema
-
-  const isLoading = fetchingSchemaInfo || isSchemasLoading
+  const defaultSchema =
+    extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
@@ -197,7 +186,7 @@ export const EnableExtensionModal = ({
                     <Input_Shadcn_ disabled value={defaultSchema} />
                   </FormItemLayout>
                   <p className="text-sm text-foreground-light">
-                    Extension must be installed in the “{defaultSchema}” schema.
+                    Extension must be installed in the "{defaultSchema}" schema.
                   </p>
                 </div>
               ) : (

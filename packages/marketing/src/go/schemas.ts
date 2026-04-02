@@ -207,6 +207,10 @@ export const featureGridSectionSchema = z.object({
   type: z.literal('feature-grid'),
   title: z.string().optional(),
   description: z.string().optional(),
+  columns: z
+    .union([z.literal(1), z.literal(2), z.literal(3)])
+    .optional()
+    .default(3),
   items: z.array(featureGridItemSchema).min(1).max(6),
 })
 
@@ -229,6 +233,71 @@ export const tweetsSectionSchema = z.object({
   ctas: z.array(ctaSchema).optional(),
 })
 
+export const faqItemSchema = z.object({
+  question: z.string().min(1),
+  answer: z.string().min(1),
+})
+
+export const faqSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('faq'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  items: z.array(faqItemSchema).min(1),
+})
+
+export const codeFileSchema = z.object({
+  filename: z.string().min(1),
+  code: z.string().min(1),
+  language: z.string().optional().default('sql'),
+})
+
+export const codeBlockSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('code-block'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  /** Single-file mode */
+  code: z.string().optional(),
+  language: z.string().optional().default('sql'),
+  filename: z.string().optional(),
+  /** Multi-file mode — takes precedence over code/filename/language when set */
+  files: z.array(codeFileSchema).optional(),
+})
+
+export const stepItemSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  content: z.any().optional(),
+  icon: z.string().optional(),
+})
+
+export const stepsSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('steps'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  items: z.array(stepItemSchema).min(1),
+})
+
+export const quoteSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('quote'),
+  quote: z.string().min(1),
+  author: z.string().min(1),
+  role: z.string().optional(),
+  avatar: imageSchema.optional(),
+})
+
+export const hubspotMeetingSectionSchema = z.object({
+  ...sectionBase,
+  type: z.literal('hubspot-meeting'),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  /** The HubSpot meeting link path, e.g. "your-name/meeting-type" */
+  meetingSlug: z.string().min(1),
+})
+
 // ----- Dynamic sections -----
 
 export const goSectionSchema = z.discriminatedUnion('type', [
@@ -239,6 +308,11 @@ export const goSectionSchema = z.discriminatedUnion('type', [
   featureGridSectionSchema,
   metricsSectionSchema,
   tweetsSectionSchema,
+  faqSectionSchema,
+  codeBlockSectionSchema,
+  stepsSectionSchema,
+  quoteSectionSchema,
+  hubspotMeetingSectionSchema,
 ])
 
 // ----- Page-level schemas -----
@@ -303,6 +377,14 @@ export type GoFeatureGridSection = z.infer<typeof featureGridSectionSchema>
 export type GoMetricItem = z.infer<typeof metricItemSchema>
 export type GoMetricsSection = z.infer<typeof metricsSectionSchema>
 export type GoTweetsSection = z.infer<typeof tweetsSectionSchema>
+export type GoFaqItem = z.infer<typeof faqItemSchema>
+export type GoFaqSection = z.infer<typeof faqSectionSchema>
+export type GoCodeFile = z.infer<typeof codeFileSchema>
+export type GoCodeBlockSection = z.infer<typeof codeBlockSectionSchema>
+export type GoStepItem = z.infer<typeof stepItemSchema>
+export type GoStepsSection = z.infer<typeof stepsSectionSchema>
+export type GoQuoteSection = z.infer<typeof quoteSectionSchema>
+export type GoHubSpotMeetingSection = z.infer<typeof hubspotMeetingSectionSchema>
 export type GoSection = z.infer<typeof goSectionSchema>
 export type GoMetadata = z.infer<typeof metadataSchema>
 

@@ -1,10 +1,15 @@
 import { cn } from 'ui'
 
 import type { GoSection } from '../schemas'
+import CodeBlockSection from './CodeBlockSection'
+import FaqSection from './FaqSection'
 import FeatureGridSection from './FeatureGridSection'
 import FormSection from './FormSection'
+import HubSpotMeetingSection from './HubSpotMeetingSection'
 import MetricsSection from './MetricsSection'
+import QuoteSection from './QuoteSection'
 import SingleColumnSection from './SingleColumnSection'
+import StepsSection from './StepsSection'
 import ThreeColumnSection from './ThreeColumnSection'
 import TwoColumnSection from './TwoColumnSection'
 
@@ -51,6 +56,21 @@ export default function SectionRenderer({ section, customRenderers }: SectionRen
         break
       case 'tweets':
         // Tweets requires app-specific dependencies — must be provided via customRenderers
+        break
+      case 'faq':
+        content = <FaqSection section={section} />
+        break
+      case 'code-block':
+        content = <CodeBlockSection section={section} />
+        break
+      case 'steps':
+        content = <StepsSection section={section} />
+        break
+      case 'quote':
+        content = <QuoteSection section={section} />
+        break
+      case 'hubspot-meeting':
+        content = <HubSpotMeetingSection section={section} />
         break
       default: {
         const _exhaustive: never = section

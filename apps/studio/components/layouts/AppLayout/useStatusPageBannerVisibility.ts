@@ -1,10 +1,10 @@
-import { useQueries } from '@tanstack/react-query'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useCallback, useMemo } from 'react'
 
 import { getRelevantIncidentIds, shouldShowBanner } from './StatusPageBanner.utils'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
+import { incidentBannerQueryOptions } from '@/data/platform/incident-banner-query'
 import { projectKeys } from '@/data/projects/keys'
 import {
   getOrganizationProjects,
@@ -18,10 +18,10 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
   const showIncidentBannerOverride =
     useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
 
-  const { data: allStatusPageEvents } = useIncidentStatusQuery()
-  const { incidents: allIncidents = [] } = allStatusPageEvents ?? {}
-  const incidents = allIncidents.filter((i) => i.impact !== 'none')
+  const { data: incidentBannerData } = useQuery(incidentBannerQueryOptions())
 
+  const bannerItems = incidentBannerData?.incidents ?? []
+  const incidents = bannerItems.map((i) => ({ id: i.id, cache: i.metadata }))
   const hasActiveIncidents = incidents.length > 0
 
   const { data: organizations } = useOrganizationsQuery({
@@ -75,14 +75,9 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
 
   if (!hasActiveIncidents || !isProjectsFetched) return null
 
-  // Filter out individually dismissed incidents. An incident stays dismissed as
-  // long as its ID remains in the stored set, regardless of whether other
-  // incidents are added or removed.
   const dismissedIdSet = new Set(dismissedIds)
   const undismissedIncidents = incidents.filter((i) => !dismissedIdSet.has(i.id))
 
-  // If dismissed state hasn't loaded yet, hide to prevent a flash of the banner.
-  // If all relevant incidents have been dismissed, hide the banner.
   if (
     !isDismissedLoaded ||
     !shouldShowBanner({
@@ -98,8 +93,5 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
     ? 'We are investigating a technical issue'
     : 'Project creation may be impacted in some regions'
 
-  return {
-    title,
-    dismiss,
-  }
+  return { title, dismiss }
 }
