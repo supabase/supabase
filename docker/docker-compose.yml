@@ -220,6 +220,14 @@ services:
       # GOTRUE_MFA_PHONE_VERIFY_ENABLED: ${MFA_PHONE_VERIFY_ENABLED}
       # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
 
+      # SAML SSO
+      # GOTRUE_SAML_ENABLED: ${SAML_ENABLED}
+      # GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
+      # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
+      # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
+      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
+      # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
+
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
       # full list of hooks and additional details about custom_access_token_hook

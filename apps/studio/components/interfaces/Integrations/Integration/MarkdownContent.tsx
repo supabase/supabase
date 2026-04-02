@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import { Markdown } from 'components/interfaces/Markdown'
 import { cn } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 

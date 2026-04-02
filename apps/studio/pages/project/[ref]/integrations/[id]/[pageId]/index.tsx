@@ -1,10 +1,10 @@
-import { useParams } from 'common'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useFlag, useParams } from 'common'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { UnknownInterface } from 'components/ui/UnknownInterface'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
+import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
@@ -35,6 +35,7 @@ import {
 } from 'ui-patterns'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
 
@@ -42,15 +43,21 @@ type NavigationItem = { label: string; href: string; active?: boolean }
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
   const { ref, id, pageId, childId } = useParams()
+
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data: allIntegrations, isPending: isAvailableIntegrationsLoading } =
     useAvailableIntegrations()
-  const {
-    installedIntegrations: installedIntegrations,
-    isLoading: isInstalledIntegrationsLoading,
-  } = useInstalledIntegrations()
+  const { installedIntegrations, isLoading: isInstalledIntegrationsLoading } =
+    useInstalledIntegrations()
 
   // everything is wrapped in useMemo to avoid UI resets when installing additional extensions like pg_net
   const integration = useMemo(() => allIntegrations.find((i) => i.id === id), [allIntegrations, id])
@@ -60,9 +67,18 @@ const IntegrationPage: NextPageWithLayout = () => {
     [installedIntegrations, id]
   )
 
+  const installableExtensions = (extensions ?? []).filter((ext) =>
+    (integration?.requiredExtensions ?? []).includes(ext.name)
+  )
+  const extensionsInstalled = installableExtensions.every((x) => x.installed_version)
+
+  // [Joshen] installedIntegrations doesn't return wrappers unless there's a wrapper created
+  const isInstalled =
+    !!integration && (!!installation || (integration.type === 'wrapper' && extensionsInstalled))
+
   // Get the corresponding component dynamically
   const Component = useMemo(
-    () => integration?.navigate(id!, pageId, childId),
+    () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
   )
 
@@ -71,10 +87,10 @@ const IntegrationPage: NextPageWithLayout = () => {
     if (!integration?.navigation) return []
 
     // Only show navigation if the integration is installed, or if we're on the overview page
-    const showNavigation = installation || pageId === 'overview'
+    const showNavigation = isInstalled || pageId === 'overview'
     if (!showNavigation) return []
 
-    const availableTabs = installation
+    const availableTabs = isInstalled
       ? integration.navigation
       : integration.navigation.filter((tab) => tab.route === 'overview')
 
@@ -83,7 +99,7 @@ const IntegrationPage: NextPageWithLayout = () => {
       href: `/project/${ref}/integrations/${id}/${nav.route}`,
       active: pageId === nav.route,
     }))
-  }, [integration, ref, id, pageId, installation])
+  }, [integration, pageId, isInstalled, ref, id])
 
   useEffect(() => {
     // if the integration is not installed, redirect to the overview page
@@ -91,12 +107,12 @@ const IntegrationPage: NextPageWithLayout = () => {
       router &&
       router?.isReady &&
       !isInstalledIntegrationsLoading &&
-      !installation &&
+      !isInstalled &&
       pageId !== 'overview'
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-  }, [installation, isInstalledIntegrationsLoading, pageId, router, ref, id])
+  }, [isInstalled, isInstalledIntegrationsLoading, pageId, router, ref, id])
 
   // Determine page title, icon, and subtitle based on state
   const pageTitle = integration?.name || 'Integration not found'
@@ -191,13 +207,19 @@ const IntegrationPage: NextPageWithLayout = () => {
               <PageHeaderDescription className="truncate">{pageSubTitle}</PageHeaderDescription>
             </PageHeaderSummary>
 
-            {integration?.type === 'oauth' && (
+            {integration?.type === 'oauth' ? (
               <Button asChild type="primary" className="shrink-0">
                 <a target="_blank" rel="noreferrer" href={integration.siteUrl ?? '/'}>
                   Install integration
                 </a>
               </Button>
-            )}
+            ) : isMarketplaceEnabled && !!integration && !isInstalled ? (
+              <InstallIntegrationSheet integration={integration} />
+            ) : isMarketplaceEnabled && isInstalled ? (
+              <Button disabled type="outline">
+                Installed
+              </Button>
+            ) : null}
           </PageHeaderMeta>
         )}
 

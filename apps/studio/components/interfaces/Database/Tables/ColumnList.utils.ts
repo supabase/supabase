@@ -1,4 +1,4 @@
-import { POSTGRES_DATA_TYPE_OPTIONS } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { POSTGRES_DATA_TYPE_OPTIONS } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 
 type TableConstraintSource = {
   schema: string

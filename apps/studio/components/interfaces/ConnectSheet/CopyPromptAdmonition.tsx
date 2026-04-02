@@ -1,9 +1,9 @@
-import { BASE_PATH } from 'lib/constants'
 import { type RefObject } from 'react'
 import { Badge } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import CopyButton from '@/components/ui/CopyButton'
+import { BASE_PATH } from '@/lib/constants'
 
 interface CopyPromptAdmonitionProps {
   stepsContainerRef: RefObject<HTMLDivElement | null>

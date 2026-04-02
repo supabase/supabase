@@ -1,9 +1,10 @@
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge } from 'ui'
+
 import { CategoryAttribute } from './Usage.constants'
+import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
 
 export interface SectionContent {
   section: Pick<CategoryAttribute, 'name' | 'description' | 'links'>

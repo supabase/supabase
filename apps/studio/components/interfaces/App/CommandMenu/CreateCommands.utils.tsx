@@ -1,24 +1,25 @@
 import { useParams } from 'common'
-import type { Hook } from 'components/interfaces/Auth/Hooks/hooks.constants'
-import { HOOKS_DEFINITIONS } from 'components/interfaces/Auth/Hooks/hooks.constants'
-import { extractMethod, isValidHook } from 'components/interfaces/Auth/Hooks/hooks.utils'
+import { useMemo } from 'react'
+import { useSetPage } from 'ui-patterns/CommandMenu'
+
+import type { Hook } from '@/components/interfaces/Auth/Hooks/hooks.constants'
+import { HOOKS_DEFINITIONS } from '@/components/interfaces/Auth/Hooks/hooks.constants'
+import { extractMethod, isValidHook } from '@/components/interfaces/Auth/Hooks/hooks.utils'
 import {
   INTEGRATIONS,
   type IntegrationDefinition,
-} from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+} from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
-} from 'data/config/project-storage-config-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useMemo } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSetPage } from 'ui-patterns/CommandMenu'
+} from '@/data/config/project-storage-config-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export function getIntegrationRoute(
   integration: IntegrationDefinition,

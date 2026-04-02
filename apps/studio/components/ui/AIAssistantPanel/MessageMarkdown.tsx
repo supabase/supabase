@@ -1,4 +1,3 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import {
@@ -14,8 +13,6 @@ import type { StreamdownProps } from 'streamdown'
 import {
   Button,
   cn,
-  CodeBlock,
-  CodeBlockLang,
   Dialog,
   DialogClose,
   DialogContent,
@@ -24,14 +21,16 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  markdownComponents,
 } from 'ui'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
+import { markdownComponents } from 'ui-patterns/Markdown'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
 import { AssistantSnippetProps } from './AIAssistant.types'
 import { CollapsibleCodeBlock } from './CollapsibleCodeBlock'
 import { DisplayBlockRenderer } from './DisplayBlockRenderer'
 import { defaultUrlTransform, wrapPlaceholderUrls } from './Message.utils'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 const Streamdown = dynamic<StreamdownProps>(
   () => import('streamdown').then((mod) => mod.Streamdown),

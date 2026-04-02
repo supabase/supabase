@@ -1,47 +1,47 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useFlag, useParams } from 'common'
 import { AlertCircle, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useFlag, useParams } from 'common'
-import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { Markdown } from 'components/interfaces/Markdown'
-import { extractPostgresVersionDetails } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import {
-  ProjectUpgradeTargetVersion,
-  useProjectUpgradeEligibilityQuery,
-} from 'data/config/project-upgrade-eligibility-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
-import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Badge,
   Button,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
   Modal,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import { PLAN_DETAILS } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import {
+  ProjectUpgradeTargetVersion,
+  useProjectUpgradeEligibilityQuery,
+} from '@/data/config/project-upgrade-eligibility-query'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectUpgradeMutation } from '@/data/projects/project-upgrade-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 
 const formatValue = ({ postgres_version, release_channel }: ProjectUpgradeTargetVersion) => {
   return `${postgres_version}|${release_channel}`

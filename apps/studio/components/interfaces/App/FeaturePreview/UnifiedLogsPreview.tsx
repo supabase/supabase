@@ -1,7 +1,8 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { BASE_PATH } from '@/lib/constants'
 
 export const UnifiedLogsPreview = () => {
   const { ref = '_' } = useParams()

@@ -1,19 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { FormActions } from 'components/ui/Forms/FormActions'
-import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { ResponseError } from 'types'
 import {
   Card,
   CardContent,
@@ -21,10 +12,18 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_ as Input,
-  PrePostTab,
+  Input_Shadcn_,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { FormActions } from '@/components/ui/Forms/FormActions'
+import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
+import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { ResponseError } from '@/types'
 
 const OrgDetailsSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),
@@ -92,7 +91,10 @@ export const OrganizationDetailsForm = () => {
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
                   <FormControl_Shadcn_>
-                    <Input {...field} disabled={!canUpdateOrganization || isUpdatingDetails} />
+                    <Input_Shadcn_
+                      {...field}
+                      disabled={!canUpdateOrganization || isUpdatingDetails}
+                    />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -100,14 +102,7 @@ export const OrganizationDetailsForm = () => {
           </CardContent>
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
-              <PrePostTab
-                className="w-full [&>div:first-child]:flex-grow [&>div:last-child]:px-1.5"
-                postTab={
-                  <CopyButton type="text" iconOnly text={selectedOrganization?.slug ?? ''} />
-                }
-              >
-                <Input disabled id="slug" value={selectedOrganization?.slug ?? ''} />
-              </PrePostTab>
+              <Input copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>
           </CardContent>
           <CardFooter className="flex justify-end p-4 md:px-8">

@@ -1,9 +1,10 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
-import { VirtualizedTableCell, VirtualizedTableRow } from 'components/ui/VirtualizedTable'
 import { useEffect, type ReactNode } from 'react'
 import { TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns'
+
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
+import { VirtualizedTableCell, VirtualizedTableRow } from '@/components/ui/VirtualizedTable'
 
 type LoadMoreRowProps = {
   mode: 'standard' | 'virtualized'

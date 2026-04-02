@@ -1,11 +1,11 @@
 import dayjs from 'dayjs'
 import type { ReactNode } from 'react'
 
-import { RESTRICTION_MESSAGES } from 'components/interfaces/Organization/restriction.constants'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
+import { RESTRICTION_MESSAGES } from '@/components/interfaces/Organization/restriction.constants'
+import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export type WarningBannerProps = {
   variant: 'danger' | 'warning' | 'note'

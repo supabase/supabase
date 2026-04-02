@@ -1,9 +1,9 @@
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
-
-import { CloneStatus } from 'data/projects/clone-status-query'
 import { TimestampInfo } from 'ui-patterns'
+
 import { StatusBadge } from './StatusBadge'
+import { CloneStatus } from '@/data/projects/clone-status-query'
 
 export const PreviousRestoreItem = ({ clone }: { clone: CloneStatus['clones'][number] }) => {
   if (clone.status === 'REMOVED') {

@@ -1,10 +1,10 @@
 import { Table } from '@tanstack/react-table'
 import { HTMLAttributes, memo } from 'react'
-
-import { DataTableFilterField } from 'components/ui/DataTable/DataTable.types'
-import { DataTableSheetRowAction } from 'components/ui/DataTable/DataTableSheetRowAction'
 import { cn, Skeleton } from 'ui'
+
 import { SheetField } from '../UnifiedLogs.types'
+import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
+import { DataTableSheetRowAction } from '@/components/ui/DataTable/DataTableSheetRowAction'
 
 interface SheetDetailsContentSkeletonProps<TData, TMeta> {
   fields: SheetField<TData, TMeta>[]

@@ -1,13 +1,12 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-
 import { TroubleshootingAccordion } from '../TroubleshootingAccordion'
 import {
   FixWithAITroubleshootingSection,
   RestartDatabaseTroubleshootingSection,
   TroubleshootingGuideSection,
 } from '../TroubleshootingSections'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const ERROR_TYPE = 'connection-timeout'
 

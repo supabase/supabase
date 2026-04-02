@@ -12,13 +12,6 @@ import {
   type SetupIntent,
 } from '@stripe/stripe-js'
 import { Form } from '@ui/components/shadcn/ui/form'
-import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
-import {
-  resolveStoredTaxId,
-  getEffectiveTaxCountry,
-} from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import { getURL } from 'lib/helpers'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -44,6 +37,14 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
+
+import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import {
+  getEffectiveTaxCountry,
+  resolveStoredTaxId,
+} from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { getURL } from '@/lib/helpers'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),

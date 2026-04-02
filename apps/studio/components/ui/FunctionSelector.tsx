@@ -1,9 +1,4 @@
 import { useParams } from 'common'
-import {
-  DatabaseFunctionsData,
-  useDatabaseFunctionsQuery,
-} from 'data/database-functions/database-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { uniqBy } from 'lodash'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -26,6 +21,12 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import {
+  DatabaseFunctionsData,
+  useDatabaseFunctionsQuery,
+} from '@/data/database-functions/database-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type DatabaseFunction = DatabaseFunctionsData[number]
 

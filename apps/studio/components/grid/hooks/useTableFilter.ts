@@ -1,7 +1,8 @@
-import { filtersToUrlParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import type { Filter } from 'components/grid/types'
-import { useTableEditorFiltersSort } from 'hooks/misc/useTableEditorFiltersSort'
 import { useCallback } from 'react'
+
+import { filtersToUrlParams, formatFilterURLParams } from '@/components/grid/SupabaseGrid.utils'
+import type { Filter } from '@/components/grid/types'
+import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
 
 /**
  * Hook for managing table filter URL parameters and saving.
