@@ -1,11 +1,11 @@
 import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
-import type { ChartDataPoint, ParsedLogEntry } from '../QueryInsights.types'
 import {
-  SUPAMONITOR_EXCLUDED_ROLES,
-  SUPAMONITOR_EXCLUDED_APP_NAMES,
-  TRANSACTION_CONTROL_REGEX,
   SCHEMA_INTROSPECTION_REGEX,
+  SUPAMONITOR_EXCLUDED_APP_NAMES,
+  SUPAMONITOR_EXCLUDED_ROLES,
+  TRANSACTION_CONTROL_REGEX,
 } from '../QueryInsights.constants'
+import type { ChartDataPoint, ParsedLogEntry } from '../QueryInsights.types'
 
 export function filterSystemLogs(
   logs: ParsedLogEntry[],

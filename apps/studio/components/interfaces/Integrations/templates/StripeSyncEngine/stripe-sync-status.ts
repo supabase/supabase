@@ -1,9 +1,10 @@
+import { SchemaInstallationStatus, StripeSchemaComment } from 'stripe-experiment-sync/supabase'
+
 import type {
   StripeSyncState,
   StripeSyncStateData,
-} from 'data/database-integrations/stripe/sync-state-query'
-import type { Schema } from 'data/database/schemas-query'
-import { SchemaInstallationStatus, StripeSchemaComment } from 'stripe-experiment-sync/supabase'
+} from '@/data/database-integrations/stripe/sync-state-query'
+import type { Schema } from '@/data/database/schemas-query'
 
 /**
  * Complete Stripe Sync status including schema, installation state, and sync state

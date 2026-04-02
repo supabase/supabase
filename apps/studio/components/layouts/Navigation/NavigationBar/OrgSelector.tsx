@@ -1,9 +1,4 @@
 import { useBreakpoint, useParams } from 'common'
-import { OrgCommandItem } from 'components/layouts/AppLayout/OrgCommandItem'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Boxes, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,6 +22,11 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { OrgSelectorSheet } from './OrgSelectorSheet'
+import { OrgCommandItem } from '@/components/layouts/AppLayout/OrgCommandItem'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export function OrgSelector() {
   const router = useRouter()

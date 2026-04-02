@@ -1,8 +1,4 @@
 import { UseFormReturn } from 'react-hook-form'
-
-import Panel from 'components/ui/Panel'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { PROVIDERS } from 'lib/constants'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -14,7 +10,11 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
+import Panel from '@/components/ui/Panel'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { PROVIDERS } from '@/lib/constants'
 
 interface CloudProviderSelectorProps {
   form: UseFormReturn<CreateProjectForm>

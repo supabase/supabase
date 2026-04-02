@@ -1,29 +1,32 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { checkHasNonPositiveValues, formatLogTick } from 'components/ui/QueryBlock/QueryBlock.utils'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
-import {
-  InfraMonitoringAttribute,
-  useInfraMonitoringAttributesQuery,
-} from 'data/analytics/infra-monitoring-query'
-import {
-  ProjectDailyStatsAttribute,
-  useProjectDailyStatsQuery,
-} from 'data/analytics/project-daily-stats-query'
 import dayjs from 'dayjs'
-import { METRICS } from 'lib/constants/metrics'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { Dashboards } from 'types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, WarningIcon } from 'ui'
 
 import { METRIC_THRESHOLDS } from './ReportBlock.constants'
 import { ReportBlockContainer } from './ReportBlockContainer'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import {
+  checkHasNonPositiveValues,
+  formatLogTick,
+} from '@/components/ui/QueryBlock/QueryBlock.utils'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import {
+  InfraMonitoringAttribute,
+  useInfraMonitoringAttributesQuery,
+} from '@/data/analytics/infra-monitoring-query'
+import {
+  ProjectDailyStatsAttribute,
+  useProjectDailyStatsQuery,
+} from '@/data/analytics/project-daily-stats-query'
+import { METRICS } from '@/lib/constants/metrics'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { Dashboards } from '@/types'
 
 interface ChartBlockProps {
   label: string

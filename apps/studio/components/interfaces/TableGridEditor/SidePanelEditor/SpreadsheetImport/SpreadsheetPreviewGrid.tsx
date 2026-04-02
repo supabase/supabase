@@ -39,7 +39,7 @@ const SpreadsheetPreviewGrid = ({
             </div>
           ),
           renderCell: ({ row }: { row: any }) => {
-            const isEmpty = !row[header]
+            const isEmpty = row[header] === null || row[header] === undefined
             return (
               <span className={cn('text-sm flex items-center', isEmpty && 'text-foreground-light')}>
                 {isEmpty ? 'NULL' : row[header]}

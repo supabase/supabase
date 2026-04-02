@@ -1,21 +1,21 @@
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
+import { useParams } from 'common'
 import { AlignLeft } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { Button, cn, SidePanel } from 'ui'
 
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { Button, SidePanel, cn } from 'ui'
 import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
 import { JsonCodeEditor } from './JsonCodeEditor'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
@@ -108,7 +108,7 @@ export const JsonEditor = ({
 
   useEffect(() => {
     if (visible) {
-      const temp = prettifyJSON(jsonString)
+      const temp = prettifyJSON(jsonString ?? '')
       setJsonStr(temp)
     }
   }, [visible])
@@ -174,7 +174,7 @@ export const JsonEditor = ({
               key={jsonString}
               readOnly={readOnly}
               onInputChange={(val) => setJsonStr(val ?? '')}
-              value={jsonStr.toString()}
+              value={(jsonStr ?? '').toString()}
             />
           </div>
         ) : (

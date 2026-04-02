@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { IS_PLATFORM } from 'lib/constants'
 import { useMemo } from 'react'
 import {
   FEATURE_GROUPS_NON_PLATFORM,
@@ -8,6 +7,7 @@ import {
 } from 'ui-patterns/McpUrlBuilder'
 
 import { StepContentProps } from './Connect.types'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export function useMcpUrl(
   state: StepContentProps['state'],

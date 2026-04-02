@@ -1,19 +1,19 @@
-import { usePlatformAppDeleteMutation } from 'data/platform-apps/platform-app-delete-mutation'
-import { usePlatformAppInstallationDeleteMutation } from 'data/platform-apps/platform-app-installation-delete-mutation'
 import { AppWindow, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 
-import { PrivateApp, usePrivateApps } from '../../PrivateAppsContext'
 import { PromoteInstallationModal } from '../../Installations/PromoteInstallationModal'
+import { PrivateApp, usePrivateApps } from '../../PrivateAppsContext'
 import type { AppsSort } from '../Apps.types'
 import { handleSortChange, sortApps } from '../Apps.utils'
 import { DeleteAppModal } from '../DeleteAppModal'
 import { ViewAppSheet } from '../ViewAppSheet/ViewAppSheet'
 import { AppsListLoading } from './AppsListLoading'
 import { AppsListTable } from './AppsListTable'
+import { usePlatformAppDeleteMutation } from '@/data/platform-apps/platform-app-delete-mutation'
+import { usePlatformAppInstallationDeleteMutation } from '@/data/platform-apps/platform-app-installation-delete-mutation'
 
 interface AppsListProps {
   onCreateApp: () => void

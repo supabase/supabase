@@ -3,16 +3,33 @@ import { useForm } from 'react-hook-form'
 import { Button, Form_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
 import { z } from 'zod'
 
-const formSchema = z.object({
-  headers: z.array(
-    z.object({
-      name: z.string(),
-      value: z.string(),
+const formSchema = z
+  .object({
+    headers: z.array(
+      z.object({
+        name: z.string().trim(),
+        value: z.string().trim(),
+      })
+    ),
+  })
+  .superRefine((data, ctx) => {
+    getKeyValueFieldArrayValidationIssues({
+      rows: data.headers,
+      keyFieldName: 'name',
+      valueFieldName: 'value',
+      keyRequiredMessage: 'Header name is required',
+      valueRequiredMessage: 'Header value is required',
+    }).forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: issue.message,
+        path: ['headers', ...issue.path],
+      })
     })
-  ),
-})
+  })
 
 export default function KeyValueFieldArrayDemo() {
   const form = useForm<z.infer<typeof formSchema>>({

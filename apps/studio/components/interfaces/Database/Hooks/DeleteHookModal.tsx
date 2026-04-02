@@ -1,11 +1,11 @@
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDatabaseTriggerDeleteMutation } from '@/data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DeleteHookModal = () => {
   const { data: project } = useSelectedProjectQuery()

@@ -1,17 +1,17 @@
-import { createLintSummaryPrompt, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { Lint } from 'data/lint/lint-query'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button } from 'ui'
 
 import { Markdown } from '../Markdown'
 import { EntityTypeIcon, LintCTA, LintEntity } from './Linter.utils'
+import { createLintSummaryPrompt, lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { Lint } from '@/data/lint/lint-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface LintDetailProps {
   lint: Lint

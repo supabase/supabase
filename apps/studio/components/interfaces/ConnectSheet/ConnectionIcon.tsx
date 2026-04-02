@@ -1,8 +1,7 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 
-import { BASE_PATH } from 'lib/constants'
-import { cn } from 'ui'
+import { BASE_PATH } from '@/lib/constants'
 
 interface ConnectionIconProps {
   icon: string
@@ -37,12 +36,6 @@ export const ConnectionIcon = ({
       }${imageExtension}.svg`
 
   return (
-    <Image
-      className={cn('transition-all group-hover:scale-110', className)}
-      src={iconImgSrc}
-      alt={`${icon} logo`}
-      width={size}
-      height={size}
-    />
+    <Image className={className} src={iconImgSrc} alt={`${icon} logo`} width={size} height={size} />
   )
 }

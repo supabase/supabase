@@ -59,12 +59,14 @@ Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+David Alvarez
 David Birdsong
 David Camacho Cateura
 David Weitzman
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dimitrios Liappis
 Div Arora
 Divit D
 Douglas Hunley
@@ -105,6 +107,7 @@ Illia Basalaiev
 Inian P
 Ivan Vasilov
 Jamie Boyd
+Jared Patterson
 Jason Farber
 Jean-Paul Argudo
 Jeezy
@@ -115,6 +118,7 @@ Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joanna Michniewicz
 Joaquim Moreno
 Joel Low
 Joey Freeland
@@ -171,6 +175,7 @@ Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
@@ -201,6 +206,7 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Samir Ketema
 Sana Cordeaux
 Sara Read
 Sean Oliver
@@ -235,6 +241,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

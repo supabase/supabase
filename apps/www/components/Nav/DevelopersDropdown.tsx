@@ -1,8 +1,7 @@
+import staticContent from '.generated/staticContent/_index.json'
+import { data as DevelopersData } from 'data/Developers'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-
-import { data as DevelopersData } from 'data/Developers'
-import staticContent from '.generated/staticContent/_index.json'
 
 type LinkProps = {
   text: string
@@ -58,7 +57,7 @@ export const DevelopersDropdown = () => {
             <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <ul className="flex flex-col gap-5">
-            {latestBlogPosts?.slice(0, 2).map((post) => (
+            {latestBlogPosts?.slice(0, 2).map((post: any) => (
               <li key={post.title}>
                 <Link
                   href={post.url}

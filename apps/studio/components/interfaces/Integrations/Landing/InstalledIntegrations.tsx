@@ -1,6 +1,6 @@
-import AlertError from 'components/ui/AlertError'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import AlertError from '@/components/ui/AlertError'
 
 export const InstalledIntegrations = () => {
   const { installedIntegrations, error, isLoading, isSuccess, isError } = useInstalledIntegrations()

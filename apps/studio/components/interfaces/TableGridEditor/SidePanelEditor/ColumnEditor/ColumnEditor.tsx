@@ -1,19 +1,5 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import {
-  Constraint,
-  CONSTRAINT_TYPE,
-  useTableConstraintsQuery,
-} from 'data/database/constraints-query'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
 import { isEmpty, noop } from 'lodash'
 import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -59,6 +45,24 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import { HeaderTitle } from './HeaderTitle'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
+import {
+  Constraint,
+  CONSTRAINT_TYPE,
+  useTableConstraintsQuery,
+} from '@/data/database/constraints-query'
+import {
+  ForeignKeyConstraint,
+  useForeignKeyConstraintsQuery,
+} from '@/data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface ColumnEditorProps {
   column?: Readonly<PostgresColumn>

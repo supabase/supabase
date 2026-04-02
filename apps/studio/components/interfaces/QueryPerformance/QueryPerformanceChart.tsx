@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformance.constants'
 import { Loader2 } from 'lucide-react'
-import { ComposedChart } from 'components/ui/Charts/ComposedChart'
-import type { MultiAttribute } from 'components/ui/Charts/ComposedChart.utils'
+import { useMemo, useState } from 'react'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+
 import type { ChartDataPoint } from '../QueryInsights/QueryInsights.types'
+import { QUERY_PERFORMANCE_CHART_TABS } from './QueryPerformance.constants'
+import { ComposedChart } from '@/components/ui/Charts/ComposedChart'
+import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 
 interface QueryPerformanceChartProps {
   dateRange?: {
