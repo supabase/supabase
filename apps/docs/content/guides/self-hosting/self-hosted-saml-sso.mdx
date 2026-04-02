@@ -34,7 +34,7 @@ SAML SSO is configured in two layers:
 
 The login flow works as follows:
 
-1. Your app calls `POST /sso` with a domain or provider_id
+1. Your app calls `POST /auth/v1/sso` with a domain or provider_id
 2. Auth generates a SAML `AuthnRequest` and returns a redirect URL to the IdP
 3. The user authenticates at the IdP
 4. The IdP POSTs a SAML Response to `POST /sso/saml/acs`
