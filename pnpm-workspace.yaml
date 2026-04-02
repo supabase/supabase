@@ -15,7 +15,7 @@ catalog:
   '@types/react-dom': ^18.3.0
   lodash: ^4.17.23
   lodash-es: ^4.17.23
-  next: ^15.5.13
+  next: ~16.1.7
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -46,9 +46,12 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
+  - '@react-router/*'
+  - react-router
   - path-to-regexp
   - brace-expansion
   - serialize-javascript
+  - turbo
 
 onlyBuiltDependencies:
   - node-pty

@@ -1,12 +1,13 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
-import { last } from 'lodash'
-
 import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
+import dayjs from 'dayjs'
 import { DATE_FORMAT } from 'lib/constants'
+import { last } from 'lodash'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueueVariables = {
@@ -67,7 +68,7 @@ export async function getDatabaseQueue({
         ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
       ) AS combined`
   if (afterTimestamp) {
-    query += ` WHERE enqueued_at > '${afterTimestamp}'`
+    query += ` WHERE enqueued_at > ${literal(afterTimestamp)}`
   }
 
   const { result } = await executeSql({
