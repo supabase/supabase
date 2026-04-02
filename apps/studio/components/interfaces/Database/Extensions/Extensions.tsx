@@ -1,14 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
 import { AlertCircle, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Card,
   Input,
@@ -21,32 +15,38 @@ import {
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ExtensionRow } from './ExtensionRow'
 import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
+import InformationBox from '@/components/ui/InformationBox'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const Extensions = () => {
   const { filter } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [filterString, setFilterString] = useState<string>('')
 
-  const { data, isPending: isLoading } = useDatabaseExtensionsQuery({
+  const { data = [], isPending: isLoading } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
+  const visibleExtensions = data.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const extensions =
     filterString.length === 0
-      ? (data ?? [])
-      : (data ?? []).filter((ext) => {
+      ? visibleExtensions
+      : visibleExtensions.filter((ext) => {
           const nameMatchesSearch = ext.name.toLowerCase().includes(filterString.toLowerCase())
           const searchTermsMatchesSearch = (SEARCH_TERMS[ext.name] || []).some((x) =>
             x.includes(filterString.toLowerCase())
           )
           return nameMatchesSearch || searchTermsMatchesSearch
         })
-  const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const [enabledExtensions, disabledExtensions] = partition(
-    extensionsWithoutHidden,
+    extensions,
     (ext) => !isNull(ext.installed_version)
   )
 

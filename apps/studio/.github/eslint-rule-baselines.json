@@ -150,7 +150,6 @@
       "pages/project/[ref]/settings/jwt/legacy.tsx": 1,
       "pages/project/[ref]/sql/quickstarts.tsx": 1,
       "pages/project/[ref]/sql/templates.tsx": 1,
-      "pages/sign-in-fly-tos.tsx": 1,
       "pages/sign-in-mfa.tsx": 1,
       "state/role-impersonation-state.tsx": 1,
       "state/sidebar-manager-state.tsx": 1,

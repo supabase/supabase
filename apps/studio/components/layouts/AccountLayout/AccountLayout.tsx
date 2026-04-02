@@ -1,20 +1,20 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
-import { buildStudioPageTitle } from 'lib/page-title'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { IS_PLATFORM } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export interface AccountLayoutProps {
   title: string

@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { parseAsString, useQueryStates } from 'nuqs'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
 import type { ReportFilter, ReportFilterItem, ReportFilterProperty } from './Reports.types'
 
 export enum ReportFilterKeys {

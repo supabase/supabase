@@ -1,13 +1,13 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { getDashboardSettingsUrl } from 'components/interfaces/Account/Preferences/DashboardSettings.utils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import Link from 'next/link'
 import { Badge, Button, Card, CardContent, CardHeader } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
+import { getDashboardSettingsUrl } from '@/components/interfaces/Account/Preferences/DashboardSettings.utils'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export const BannerTableEditorQueueOperations = () => {
   const { ref } = useParams()

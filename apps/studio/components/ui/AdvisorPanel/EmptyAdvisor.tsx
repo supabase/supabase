@@ -1,6 +1,7 @@
 import { TextSearch } from 'lucide-react'
 import { Button } from 'ui'
-import { AdvisorTab } from 'state/advisor-state'
+
+import { AdvisorTab } from '@/state/advisor-state'
 
 interface EmptyAdvisorProps {
   activeTab: AdvisorTab

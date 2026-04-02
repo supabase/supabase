@@ -1,4 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ChevronLeft, X } from 'lucide-react'
 import { Badge } from 'ui'
 
@@ -9,6 +8,7 @@ import {
   severityBadgeVariants,
   severityLabels,
 } from './AdvisorPanel.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface AdvisorPanelHeaderProps {
   selectedItem: AdvisorItem | undefined

@@ -1,10 +1,9 @@
-import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import { CommandGroup } from '@ui/components/shadcn/ui/command'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
   Button,
   cn,

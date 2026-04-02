@@ -46,8 +46,6 @@ export * from './src/components/Toggle'
 export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
-export * from './src/components/PrePostTab'
-
 // layout
 export * from './src/components/LoadingLine'
 
@@ -202,6 +200,8 @@ export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-ar
 
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
 
+export * from './src/components/shadcn/ui/input-group'
+
 export * from './src/components/shadcn/ui/switch'
 
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
@@ -272,6 +272,7 @@ export * from './src/components/Icon/icons/IconDiscord'
 export * from './src/components/Icon/icons/IconDiscussions'
 export * from './src/components/Icon/icons/IconDocumentation'
 export * from './src/components/Icon/icons/IconGitHubSolid'
+export * from './src/components/Icon/icons/IconInstagram'
 export * from './src/components/Icon/icons/IconIntegrations'
 export * from './src/components/Icon/icons/IconLifeBuoy2'
 export * from './src/components/Icon/icons/IconLinkedinSolid'
@@ -279,6 +280,7 @@ export * from './src/components/Icon/icons/IconMicSolid'
 export * from './src/components/Icon/icons/IconPartners'
 export * from './src/components/Icon/icons/IconPresence'
 export * from './src/components/Icon/icons/IconProductHunt'
+export * from './src/components/Icon/icons/IconTikTok'
 export * from './src/components/Icon/icons/IconTwitterX'
 export * from './src/components/Icon/icons/IconYCombinator'
 export * from './src/components/Icon/icons/IconYoutubeSolid'

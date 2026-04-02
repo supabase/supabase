@@ -1,9 +1,9 @@
 import { RefObject, useMemo } from 'react'
 import type { DataGridHandle } from 'react-data-grid'
 
-import { SupaRow } from 'components/grid/types'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { useKeyboardShortcuts } from './Hooks'
+import { SupaRow } from '@/components/grid/types'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 type ShortcutsProps = {
   gridRef: RefObject<DataGridHandle>

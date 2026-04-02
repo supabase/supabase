@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { PrivacyUpdateBanner } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
 import { NoOrganizationsState } from 'components/interfaces/Home/ProjectList/EmptyStates'
 import { OrganizationCard } from 'components/interfaces/Organization/OrganizationCard'
 import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
@@ -66,7 +65,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
       </Head>
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
-          <PrivacyUpdateBanner />
           {orgNotFound && (
             <Admonition
               type="destructive"
