@@ -5,7 +5,7 @@ import pageData from '~/data/surveys/state-of-startups-2026'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useRef, useState, type RefObject } from 'react'
 import { Button, cn } from 'ui'
 
 import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
@@ -14,7 +14,7 @@ import { SurveyChapterSection } from './components/SurveyChapterSection'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
 
 interface FloatingTocProps {
-  tocRef: React.RefObject
+  tocRef: RefObject<HTMLDivElement>
   isTocOpen: boolean
   setIsTocOpen: (open: boolean) => void
   activeChapter: number
