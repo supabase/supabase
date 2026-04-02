@@ -42,14 +42,11 @@ describe('useGenerateSettingsMenu (self-hosted)', () => {
     expect(configGroup?.items.some((item) => item.key === 'log-drains')).toBe(true)
   })
 
-  it('includes Preferences in self-hosted mode', () => {
+  it('does not include dashboard settings in self-hosted mode', () => {
     const { result } = renderHook(() => useGenerateSettingsMenu())
     const configGroup = result.current.find((group) => group.title === 'Configuration')
 
-    expect(configGroup?.items.some((item) => item.key === 'preferences')).toBe(true)
-    expect(configGroup?.items.find((item) => item.key === 'preferences')?.url).toBe(
-      '/project/project-ref/settings/preferences'
-    )
+    expect(configGroup?.items.some((item) => item.key === 'dashboard')).toBe(false)
   })
 
   it('does not include platform-only settings in self-hosted mode', () => {

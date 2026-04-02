@@ -11,6 +11,7 @@ export const useGenerateSettingsMenu = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
+  const showDashboardPreferences = useFlag('dashboardPreferences')
 
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
@@ -28,12 +29,6 @@ export const useGenerateSettingsMenu = () => {
             name: `Log Drains`,
             key: `log-drains`,
             url: `/project/${ref}/settings/log-drains`,
-            items: [],
-          },
-          {
-            name: 'Dashboard',
-            key: 'dashboard',
-            url: `/project/${ref}/settings/dashboard`,
             items: [],
           },
         ],
@@ -115,12 +110,16 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
-        {
-          name: 'Dashboard',
-          key: 'dashboard',
-          url: `/project/${ref}/settings/dashboard`,
-          items: [],
-        },
+        ...(showDashboardPreferences
+          ? [
+              {
+                name: 'Dashboard',
+                key: 'dashboard',
+                url: `/project/${ref}/settings/dashboard`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
     {

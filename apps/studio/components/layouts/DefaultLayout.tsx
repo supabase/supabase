@@ -50,9 +50,11 @@ export const DefaultLayout = ({
   const backToDashboardURL = router.pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
-      : !!lastVisitedOrganization
+      : IS_PLATFORM && !!lastVisitedOrganization
         ? `/org/${lastVisitedOrganization}`
-        : '/organizations'
+        : IS_PLATFORM
+          ? '/organizations'
+          : '/project/default'
     : undefined
 
   useCheckLatestDeploy()

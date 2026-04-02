@@ -16,7 +16,7 @@ export const DashboardSettings = () => {
         <PageSectionSummary>
           <PageSectionTitle id="dashboard">Dashboard</PageSectionTitle>
           <PageSectionDescription>
-            Customize your dashboard editing experience.
+            Customize how the dashboard works on this browser and device.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

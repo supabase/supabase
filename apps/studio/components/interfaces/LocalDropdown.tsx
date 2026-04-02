@@ -1,6 +1,9 @@
 import { ProfileImage } from 'components/ui/ProfileImage'
-import { Command, FlaskConical } from 'lucide-react'
+import { FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -16,7 +19,6 @@ import {
   singleThemes,
   Theme,
 } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 
@@ -27,8 +29,9 @@ export const LocalDropdown = ({
   triggerClassName?: string
   contentClassName?: string
 }) => {
+  const router = useRouter()
   const { theme, setTheme } = useTheme()
-  const setCommandMenuOpen = useSetCommandMenuOpen()
+  const appStateSnapshot = useAppStateSnapshot()
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
   return (
@@ -42,6 +45,19 @@ export const LocalDropdown = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className={cn('w-44', contentClassName)}>
+        <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
+          <Link
+            href="/account/me"
+            onClick={() => {
+              if (router.pathname !== '/account/me') {
+                appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+              }
+            }}
+          >
+            <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+            Preferences
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem
           className="flex gap-2 cursor-pointer"
           onClick={() => toggleFeaturePreviewModal(true)}
@@ -49,13 +65,6 @@ export const LocalDropdown = ({
         >
           <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className="flex gap-2 cursor-pointer"
-          onClick={() => setCommandMenuOpen(true)}
-        >
-          <Command size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-          Command menu
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

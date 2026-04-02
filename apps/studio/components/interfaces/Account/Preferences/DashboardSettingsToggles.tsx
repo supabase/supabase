@@ -67,14 +67,14 @@ export const DashboardSettingsToggles = () => {
           form={form}
           name="inlineEditorEnabled"
           label="Edit entities in SQL"
-          description="Edit policies, triggers, and functions directly in the SQL editor instead of a guided UI panel. Ideal for those comfortable with SQL."
+          description="Edit policies, triggers, and functions in the SQL editor instead of the guided UI."
           onToggle={handleInlineEditorToggle}
         />
         <DashboardToggle
           form={form}
           name="queueOperationsEnabled"
           label="Queue table operations"
-          description="Queue table edits in the Table Editor for review before saving to your database, allowing you to batch multiple changes and commit them together."
+          description="Review and batch table edits in Table Editor before saving them to your database."
           discussionsUrl="https://github.com/orgs/supabase/discussions/42460"
           onToggle={handleQueueOperationsToggle}
           isLast

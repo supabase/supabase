@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
 import { CardContent, FormControl_Shadcn_, FormField_Shadcn_, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -8,7 +9,7 @@ interface DashboardToggleProps<T extends FieldValues> {
   form: UseFormReturn<T>
   name: Path<T>
   label: string
-  description: string
+  description: ReactNode
   onToggle: (value: boolean) => void
   discussionsUrl?: string
   isLast?: boolean
@@ -33,20 +34,23 @@ export function DashboardToggle<T extends FieldValues>({
             layout="flex-row-reverse"
             label={label}
             description={
-              <>
-                <p className="text-balance">{description}</p>
+              <p className="text-balance">
+                {description}
                 {discussionsUrl && (
-                  <Link
-                    href={discussionsUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-x-1 text-foreground-light hover:text-foreground transition mt-2"
-                  >
-                    Give feedback
-                    <ExternalLink size={12} strokeWidth={1.5} />
-                  </Link>
+                  <>
+                    {' '}
+                    <Link
+                      href={discussionsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-x-1 text-foreground-light hover:text-foreground transition"
+                    >
+                      Give feedback
+                      <ExternalLink size={12} strokeWidth={1.5} />
+                    </Link>
+                  </>
                 )}
-              </>
+              </p>
             }
           >
             <FormControl_Shadcn_>

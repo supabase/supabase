@@ -12,7 +12,7 @@ import { useBannerStack } from '../BannerStackProvider'
 export const BannerTableEditorQueueOperations = () => {
   const { ref } = useParams()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
-  const dashboardSettingsUrl = getDashboardSettingsUrl(ref)
+  const dashboardSettingsUrl = getDashboardSettingsUrl()
 
   const { dismissBanner } = useBannerStack()
   const [, setIsDismissed] = useLocalStorageQuery(

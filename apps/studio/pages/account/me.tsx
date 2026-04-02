@@ -11,6 +11,7 @@ import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { AlertError } from 'components/ui/AlertError'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 import { Card, CardContent } from 'ui'
@@ -25,12 +26,12 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const User: NextPageWithLayout = () => {
-  return <ProfileCard />
+  return IS_PLATFORM ? <PlatformPreferences /> : <SelfHostedPreferences />
 }
 
 User.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout headerTitle={IS_PLATFORM ? 'Account' : 'Preferences'}>
       <AccountLayout title="Preferences">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
@@ -38,7 +39,18 @@ User.getLayout = (page) => (
 
 export default User
 
-const ProfileCard = () => {
+const PreferencesPageHeader = ({ description }: { description: string }) => (
+  <PageHeader size="small">
+    <PageHeaderMeta>
+      <PageHeaderSummary>
+        <PageHeaderTitle>Preferences</PageHeaderTitle>
+        <PageHeaderDescription>{description}</PageHeaderDescription>
+      </PageHeaderSummary>
+    </PageHeaderMeta>
+  </PageHeader>
+)
+
+const PlatformPreferences = () => {
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
       'profile:show_information',
@@ -49,16 +61,7 @@ const ProfileCard = () => {
 
   return (
     <>
-      <PageHeader size="small">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Preferences</PageHeaderTitle>
-            <PageHeaderDescription>
-              Manage your account profile, connections, and dashboard experience.
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
+      <PreferencesPageHeader description="Manage your account profile, connections, and dashboard experience." />
       <PageContainer size="small">
         {isLoading && (
           <Card>
@@ -94,6 +97,21 @@ const ProfileCard = () => {
         {profileShowAnalyticsAndMarketing && <AnalyticsSettings />}
 
         {profileShowAccountDeletion && <AccountDeletion />}
+      </PageContainer>
+    </>
+  )
+}
+
+const SelfHostedPreferences = () => {
+  return (
+    <>
+      <PreferencesPageHeader description="Manage how the dashboard looks and behaves on this browser and device." />
+      <PageContainer size="small">
+        <ThemeSettings />
+
+        <HotkeySettings />
+
+        <DashboardSettings />
       </PageContainer>
     </>
   )
