@@ -56,7 +56,11 @@ export const SpreadsheetImport = ({
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
   const csvHeaders =
     state._tag === 'file_parsed' || state._tag === 'text_parsed' ? state.data.headers : []
-  const incompatibleHeaders = csvHeaders.filter((header) => !selectedTableColumns.includes(header))
+  const selectedHeaders =
+    state._tag === 'file_parsed' || state._tag === 'text_parsed' ? state.selectedHeaders : []
+  const incompatibleHeaders = selectedHeaders.filter(
+    (header) => !selectedTableColumns.includes(header)
+  )
   const isCompatible = !selectedTable || incompatibleHeaders.length === 0
 
   const { mutate: sendEvent } = useSendEventMutation()

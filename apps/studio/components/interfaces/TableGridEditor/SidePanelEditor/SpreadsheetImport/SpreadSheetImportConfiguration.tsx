@@ -29,6 +29,7 @@ const SpreadsheetImportConfiguration = ({
             <p className="text-sm">Configure import data</p>
             <Button
               type="text"
+              aria-label="Toggle import configuration"
               icon={
                 <ChevronDown
                   size={18}
@@ -71,6 +72,8 @@ const SpreadsheetImportConfiguration = ({
                   <Button
                     key={header}
                     type={isSelected ? 'primary' : 'default'}
+                    aria-label={`Toggle column ${header}`}
+                    aria-pressed={isSelected}
                     className={cn('transition', isSelected ? 'opacity-100' : 'opacity-75')}
                     onClick={() => onToggleHeader(header)}
                   >
