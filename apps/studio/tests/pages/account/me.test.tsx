@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import PreferencesPage from './me'
+import PreferencesPage from 'pages/account/me'
 
 const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -97,7 +97,7 @@ describe('/account/me', () => {
   it('renders hosted account sections on platform', () => {
     mockIsPlatform.value = true
 
-    render(<PreferencesPage />)
+    render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
     expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
@@ -112,7 +112,7 @@ describe('/account/me', () => {
   it('renders only local preferences on self-hosted', () => {
     mockIsPlatform.value = false
 
-    render(<PreferencesPage />)
+    render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()

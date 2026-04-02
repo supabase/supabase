@@ -109,7 +109,7 @@ vi.mock('ui', async () => {
     }) => (
       <div>
         {React.Children.map(children, (child: ReactNode) =>
-          React.isValidElement<{ value: string }>(child)
+          React.isValidElement<{ value: string; onClick?: () => void }>(child)
             ? React.cloneElement(child, {
                 onClick: () => onValueChange(child.props.value),
               })

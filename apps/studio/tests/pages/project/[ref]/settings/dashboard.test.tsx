@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import DashboardPage from './dashboard'
+import DashboardPage from 'pages/project/[ref]/settings/dashboard'
 
 const { mockIsPlatform, mockRouter, mockUseFlag } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -52,7 +52,7 @@ describe('/project/[ref]/settings/dashboard', () => {
   })
 
   it('renders only query preferences on platform', () => {
-    render(<DashboardPage />)
+    render(<DashboardPage dehydratedState={{}} />)
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument()
     expect(screen.getByText('QueryPreferences')).toBeInTheDocument()
@@ -62,7 +62,7 @@ describe('/project/[ref]/settings/dashboard', () => {
   it('redirects self-hosted visits to account preferences', async () => {
     mockIsPlatform.value = false
 
-    render(<DashboardPage />)
+    render(<DashboardPage dehydratedState={{}} />)
 
     await waitFor(() => {
       expect(mockRouter.replace).toHaveBeenCalledWith('/account/me#dashboard')
