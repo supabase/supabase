@@ -18,10 +18,9 @@ import { Mermaid } from 'ui-patterns/Mermaid'
 
 const Avatar = dynamic(() => import('~/components/Avatar'))
 const Chart = dynamic(() => import('~/components/Charts/PGCharts'))
-const DeveloperGrowthChart = dynamic(
-  () => import('~/components/Charts/DeveloperGrowthChart'),
-  { ssr: false }
-)
+const DeveloperGrowthChart = dynamic(() => import('~/components/Charts/DeveloperGrowthChart'), {
+  ssr: false,
+})
 const CodeBlock = dynamic(() => import('~/components/CodeBlock/CodeBlock'))
 const Tabs = dynamic(() => import('~/components/Tabs/Tabs'), { ssr: false })
 const TabPanel = dynamic(
