@@ -1335,6 +1335,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/documents/dpa-signed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Check if organization has signed any version of the DPA
+     * @description Results are cached per organization for up to 24 hours. Signed status may not reflect immediately after a document is completed.
+     */
+    get: operations['OrgDocumentsController_getDpaSignedStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/documents/soc2-type-2-report': {
     parameters: {
       query?: never
@@ -6099,6 +6119,11 @@ export interface components {
       }
       timestamp: string
     }
+    DocumentSignedStatusResponse: {
+      /** Format: date-time */
+      checked_at: string
+      signed: boolean
+    }
     DownloadableBackupsResponse: {
       backups: {
         id: number
@@ -7660,7 +7685,10 @@ export interface components {
         name: string
         projects: {
           name: string
-          /** @description Project ref */
+          /**
+           * @description Project ref
+           * @example abcdefghijklmnopqrst
+           */
           ref: string
         }[]
       }[]
@@ -7671,7 +7699,10 @@ export interface components {
         name: string
         projects: {
           name: string
-          /** @description Project ref */
+          /**
+           * @description Project ref
+           * @example abcdefghijklmnopqrst
+           */
           ref: string
         }[]
       }[]
@@ -8181,6 +8212,117 @@ export interface components {
         key: string
         message: string
       }[]
+    }
+    PreviewSubscriptionChangeResponse: {
+      active_projects: {
+        /** @enum {string} */
+        instance_size:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        name: string
+        ref: string
+        /** @enum {string} */
+        status:
+          | 'INACTIVE'
+          | 'ACTIVE_HEALTHY'
+          | 'ACTIVE_UNHEALTHY'
+          | 'COMING_UP'
+          | 'UNKNOWN'
+          | 'GOING_DOWN'
+          | 'INIT_FAILED'
+          | 'REMOVED'
+          | 'RESTORING'
+          | 'UPGRADING'
+          | 'PAUSING'
+          | 'RESTORE_FAILED'
+          | 'RESTARTING'
+          | 'PAUSE_FAILED'
+          | 'RESIZING'
+      }[]
+      billed_via_partner: boolean
+      breakdown: {
+        breakdown?: {
+          amount?: number
+          /** @enum {string} */
+          project_db_instance_size?:
+            | 'pico'
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+            | '24xlarge'
+            | '24xlarge_optimized_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_high_memory'
+            | '48xlarge'
+            | '48xlarge_optimized_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_high_memory'
+          project_name: string
+          project_ref: string
+          /** @enum {string} */
+          project_status?:
+            | 'INACTIVE'
+            | 'ACTIVE_HEALTHY'
+            | 'ACTIVE_UNHEALTHY'
+            | 'COMING_UP'
+            | 'UNKNOWN'
+            | 'GOING_DOWN'
+            | 'INIT_FAILED'
+            | 'REMOVED'
+            | 'RESTORING'
+            | 'UPGRADING'
+            | 'PAUSING'
+            | 'RESTORE_FAILED'
+            | 'RESTARTING'
+            | 'PAUSE_FAILED'
+            | 'RESIZING'
+          usage: number
+        }[]
+        description: string
+        quantity?: number
+        total_price: number
+        unit_price?: number
+        unit_price_desc?: string
+      }[]
+      number_of_projects: number
+      /** @enum {boolean} */
+      pending_subscription_flow: true
+      /** @enum {string} */
+      plan_change_type: 'upgrade' | 'downgrade' | 'none'
+      slug: string
+      upfront_charge: {
+        customer_balance: number
+        prorated_credit: number
+        tax: number
+        taxable_amount: number
+        total: number
+      } | null
     }
     PrivateLinkResponse: {
       appliedSuccessfully: boolean
@@ -10264,6 +10406,9 @@ export interface components {
       slug: string
       stripe_customer_id: string
     }
+    /** @example {
+     *       "password": "correct-horse-battery-staple"
+     *     } */
     UpdatePasswordBody: {
       password: string
     }
@@ -10767,6 +10912,14 @@ export interface components {
       file_size_limit?: number | null
       public: boolean
     }
+    /** @example {
+     *       "fileSizeLimit": 10485760,
+     *       "features": {
+     *         "imageTransformation": {
+     *           "enabled": true
+     *         }
+     *       }
+     *     } */
     UpdateStorageConfigBody: {
       external?: {
         /** @enum {string} */
@@ -14705,7 +14858,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PreviewSubscriptionChangeResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -15015,6 +15170,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CreateDpaDocumentResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgDocumentsController_getDpaSignedStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentSignedStatusResponse']
         }
       }
       /** @description Unauthorized */
