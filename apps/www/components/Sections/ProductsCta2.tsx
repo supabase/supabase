@@ -27,7 +27,7 @@ function ProductsCta(props: Props) {
         <h2 className="h2 w-max">Ready to start building?</h2>
         <div className="flex gap-2 py-2">
           <Button asChild type="primary" size="small" className="h-full">
-            <Link href="https://supabase.com/dashboard">Start for free</Link>
+            <Link href="https://supabase.com/signup">Start for free</Link>
           </Button>
           <Button asChild type="default" size="small">
             <Link href="https://forms.supabase.com/enterprise">Contact Enterprise</Link>
