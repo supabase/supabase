@@ -71,6 +71,7 @@
         "CUSTOMERIO_SITE_ID",
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY",
+        "HUBSPOT_MEETINGS_TOKEN",
       ],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
     },

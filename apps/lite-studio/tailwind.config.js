@@ -10,5 +10,4 @@ export default config({
   theme: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/container-queries')],
 })
