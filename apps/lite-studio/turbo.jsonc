@@ -6,7 +6,7 @@
       "dependsOn": ["^build"],
       "env": [],
       "passThroughEnv": [],
-      "inputs": ["app/**"],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": ["build/**"],
     },
   },
