@@ -7,7 +7,7 @@
 #
 # Usage:
 #   cd docker/
-#   bash tests/test-pg17-upgrade.sh
+#   sudo bash tests/test-pg17-upgrade.sh
 #
 # Prerequisites:
 #   - Running self-hosted Supabase instance with Postgres 15:
@@ -233,5 +233,5 @@ fi
 echo "=== Upgrade test passed ==="
 echo ""
 echo "To reclaim disk space:"
-echo "  rm -rf ./volumes/db/data.bak.pg15 ./volumes/db/data_migration ./volumes/db/pg17_upgrade_bin_*.tar.gz"
+echo "  rm -rf ./volumes/db/data.bak.pg15 ./volumes/db/pg17_upgrade_bin_*.tar.gz"
 echo ""
