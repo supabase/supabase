@@ -45,29 +45,26 @@ import RealtimeChat from '@/components/realtime-chat.vue'
 <script setup lang="ts">
 import { computed } from 'vue'
 import RealtimeChat from '@/components/realtime-chat.vue'
-import { useMessagesQuery } from '@/hooks/use-messages-query'
+import { useMessagesQuery } from '@/composables/use-messages-query'
 
 const { data } = useMessagesQuery()
-
-// Ensure fallback to empty array
-const messages = computed(() => data.value ?? [])
 </script>
 
 <template>
   <RealtimeChat
     roomName="my-chat-room"
     username="john_doe"
-    :messages="messages"
+    :messages="data ?? []"
   />
 </template>
 ```
 
 ### Storing messages
 
-```tsx
+```html
 <script setup lang="ts">
 import RealtimeChat from '@/components/realtime-chat.vue'
-import { useMessagesQuery } from '@/hooks/use-messages-query'
+import { useMessagesQuery } from '@/composables/use-messages-query'
 import { storeMessages } from '@/lib/store-messages'
 import type { ChatMessage } from '@/types'
 
