@@ -1,6 +1,6 @@
-import { useFlag } from 'common'
+import { FeatureFlagContext, useFlag } from 'common'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
@@ -15,10 +15,14 @@ import {
 } from '@/components/layouts/Scaffold'
 import AlertError from '@/components/ui/AlertError'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
 const RedeemCreditsContent = () => {
   const redeemCodeEnabled = useFlag('redeemCodeEnabled')
+  const { isLoading: isLoadingProfile } = useProfile()
+  const { hasLoaded } = useContext(FeatureFlagContext)
+
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null)
 
   const {
@@ -27,18 +31,6 @@ const RedeemCreditsContent = () => {
     isLoading: isLoadingOrganizations,
     isError: isErrorOrganizations,
   } = useOrganizationsQuery()
-
-  if (isLoadingOrganizations) {
-    return (
-      <div className="grid md:grid-cols-2 pt-10 gap-8">
-        <ShimmeringLoader className="w-full" />
-        <div className="space-y-4">
-          <ShimmeringLoader className="w-full h-14" />
-          <ShimmeringLoader className="w-full h-14" />
-        </div>
-      </div>
-    )
-  }
 
   if (isErrorOrganizations) {
     return (
@@ -74,7 +66,13 @@ const RedeemCreditsContent = () => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        {redeemCodeEnabled ? (
+        {/* [Joshen] Checking for profile as well as organizations query internally waits for profile to be loaded */}
+        {isLoadingProfile || isLoadingOrganizations || !hasLoaded ? (
+          <>
+            <ShimmeringLoader className="w-full h-[70px]" />
+            <ShimmeringLoader className="w-full h-[70px]" />
+          </>
+        ) : redeemCodeEnabled ? (
           organizations?.map((org) => (
             <OrganizationCard
               key={org.id}

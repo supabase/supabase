@@ -1,21 +1,9 @@
+import { useParams } from 'common'
 import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-
-import { useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -24,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
   cn,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -34,7 +21,20 @@ import {
   DialogTrigger,
   Separator,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
@@ -321,7 +321,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
         <ScaffoldSectionTitle className="text-xl mt-12">Explore our templates</ScaffoldSectionTitle>
         <ResourceList>
           {templates.map((template) => (
-            <Dialog>
+            <Dialog key={template.name}>
               <DialogTrigger asChild>
                 <ResourceItem
                   key={template.name}

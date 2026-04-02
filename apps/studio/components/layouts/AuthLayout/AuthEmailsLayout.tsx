@@ -1,10 +1,10 @@
+import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import AuthLayout from './AuthLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -23,7 +23,7 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   ]
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Email">
       {showEmails ? (
         <PageLayout
           title="Emails"

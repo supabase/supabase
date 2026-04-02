@@ -4,29 +4,19 @@ import type {
   OAuthClient,
   UpdateOAuthClientParams,
 } from '@supabase/supabase-js'
-import { Plus, Trash2, Upload, X } from 'lucide-react'
-import { type ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import * as z from 'zod'
-
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
-import { useOAuthServerAppCreateMutation } from 'data/oauth-server-apps/oauth-server-app-create-mutation'
-import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
-import { useOAuthServerAppUpdateMutation } from 'data/oauth-server-apps/oauth-server-app-update-mutation'
-import { DOCS_URL } from 'lib/constants'
+import { Trash2, Upload, X } from 'lucide-react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
-  FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Separator,
   Sheet,
@@ -37,11 +27,20 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  cn,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+import * as z from 'zod'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthServerAppCreateMutation } from '@/data/oauth-server-apps/oauth-server-app-create-mutation'
+import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
+import { useOAuthServerAppUpdateMutation } from '@/data/oauth-server-apps/oauth-server-app-update-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 interface CreateOrUpdateOAuthAppSheetProps {
   visible: boolean
@@ -87,12 +86,14 @@ export const CreateOrUpdateOAuthAppSheet = ({
   onCancel,
 }: CreateOrUpdateOAuthAppSheetProps) => {
   const { ref: projectRef } = useParams()
-  const isEditMode = !!appToEdit
-  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const uploadButtonRef = useRef<HTMLInputElement>(null)
+
+  const [showRegenerateDialog, setShowRegenerateDialog] = useState(false)
   const [logoFile, setLogoFile] = useState<File>()
   const [logoUrl, setLogoUrl] = useState<string>()
   const [logoRemoved, setLogoRemoved] = useState(false)
+
+  const isEditMode = !!appToEdit
   const hasLogo = logoUrl !== undefined
   const isPublicClient = appToEdit?.client_type === 'public'
 
@@ -101,16 +102,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
     defaultValues: initialValues,
   })
 
-  const {
-    fields: redirectUriFields,
-    append: appendRedirectUri,
-    remove: removeRedirectUri,
-  } = useFieldArray({
-    name: 'redirect_uris',
-    control: form.control,
-  })
-
-  const { data: endpointData } = useProjectEndpointQuery({ projectRef })
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
 
   const { mutate: createOAuthApp, isPending: isCreating } = useOAuthServerAppCreateMutation({
     onSuccess: (data) => {
@@ -200,8 +192,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       updateOAuthApp({
         projectRef,
+        clientEndpoint,
         clientId: appToEdit.client_id,
-        clientEndpoint: endpointData?.endpoint,
         ...payload,
       })
     } else {
@@ -215,7 +207,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
       createOAuthApp({
         projectRef,
-        clientEndpoint: endpointData?.endpoint,
+        clientEndpoint,
         ...payload,
       })
     }
@@ -233,8 +225,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
   const handleConfirmRegenerate = () => {
     regenerateSecret({
       projectRef,
+      clientEndpoint,
       clientId: appToEdit?.client_id,
-      clientEndpoint: endpointData?.endpoint,
     })
   }
 
@@ -391,10 +383,10 @@ export const CreateOrUpdateOAuthAppSheet = ({
                               <Button
                                 type="default"
                                 onClick={handleRegenerateSecret}
-                                className="w-full"
+                                className="w-min"
                                 disabled={isRegenerating}
                               >
-                                Regenerate Client Secret
+                                Regenerate client secret
                               </Button>
                             </>
                           )}
@@ -406,50 +398,17 @@ export const CreateOrUpdateOAuthAppSheet = ({
 
                 <div className="px-5 gap-2 flex flex-col">
                   <FormLabel_Shadcn_ className="text-foreground">Redirect URIs</FormLabel_Shadcn_>
-
-                  <div className="space-y-2">
-                    {redirectUriFields.map((fieldItem, index) => (
-                      <FormField_Shadcn_
-                        control={form.control}
-                        key={fieldItem.id}
-                        name={`redirect_uris.${index}.value`}
-                        render={({ field: inputField }) => (
-                          <FormItem_Shadcn_>
-                            <div className="flex flex-row gap-2">
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  {...inputField}
-                                  placeholder={'https://example.com/callback'}
-                                  onChange={(e) => {
-                                    inputField.onChange(e)
-                                  }}
-                                />
-                              </FormControl_Shadcn_>
-                              {redirectUriFields.length > 1 && (
-                                <Button
-                                  type="default"
-                                  size="tiny"
-                                  className="h-[34px]"
-                                  icon={<Trash2 size={12} />}
-                                  onClick={() => removeRedirectUri(index)}
-                                />
-                              )}
-                            </div>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <div>
-                    <Button
-                      type="default"
-                      icon={<Plus strokeWidth={1.5} />}
-                      onClick={() => appendRedirectUri({ value: '' })}
-                    >
-                      Add redirect URI
-                    </Button>
-                  </div>
+                  <SingleValueFieldArray
+                    control={form.control}
+                    name="redirect_uris"
+                    valueFieldName="value"
+                    createEmptyRow={() => ({ value: '' })}
+                    placeholder="https://example.com/callback"
+                    addLabel="Add redirect URI"
+                    removeLabel="Remove redirect URI"
+                    minimumRows={1}
+                    rowsClassName="space-y-2"
+                  />
                   <FormDescription_Shadcn_ className="text-foreground-lighter">
                     URLs where users will be redirected after authentication.
                   </FormDescription_Shadcn_>

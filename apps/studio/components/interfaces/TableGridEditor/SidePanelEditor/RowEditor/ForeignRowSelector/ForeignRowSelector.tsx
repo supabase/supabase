@@ -1,33 +1,33 @@
+import { keepPreviousData } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { Loader2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { Button, SidePanel } from 'ui'
 
-import { keepPreviousData } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { convertByteaToHex } from '../RowEditor.utils'
+import Pagination from './Pagination'
+import SelectorGrid from './SelectorGrid'
+import { FilterPopoverPrimitive } from '@/components/grid/components/header/filter/FilterPopoverPrimitive'
+import { RefreshButton } from '@/components/grid/components/header/RefreshButton'
+import { SortPopoverPrimitive } from '@/components/grid/components/header/sort/SortPopoverPrimitive'
 import {
   formatSortURLParams,
   loadTableEditorStateFromLocalStorage,
   saveTableEditorStateToLocalStorage,
   sortsToUrlParams,
-} from 'components/grid/SupabaseGrid.utils'
-import { RefreshButton } from 'components/grid/components/header/RefreshButton'
-import { FilterPopoverPrimitive } from 'components/grid/components/header/filter/FilterPopoverPrimitive'
-import { SortPopoverPrimitive } from 'components/grid/components/header/sort/SortPopoverPrimitive'
-import type { Filter, Sort } from 'components/grid/types'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+} from '@/components/grid/SupabaseGrid.utils'
+import type { Filter, Sort } from '@/components/grid/types'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import {
   RoleImpersonationState,
   useRoleImpersonationStateSnapshot,
-} from 'state/role-impersonation-state'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import { Button, SidePanel } from 'ui'
-import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { convertByteaToHex } from '../RowEditor.utils'
-import Pagination from './Pagination'
-import SelectorGrid from './SelectorGrid'
+} from '@/state/role-impersonation-state'
+import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
 const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
 
@@ -110,7 +110,6 @@ export const ForeignRowSelector = ({
   } = useTableRowsQuery(
     {
       projectRef: project?.ref,
-      connectionString: project?.connectionString,
       tableId: table?.id,
       sorts,
       filters,

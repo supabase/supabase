@@ -48,7 +48,7 @@ const DatabaseRoles: NextPageWithLayout = () => {
 
 DatabaseRoles.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Roles">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

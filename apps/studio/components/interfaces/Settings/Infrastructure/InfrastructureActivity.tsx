@@ -1,43 +1,44 @@
 import { useParams } from 'common'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { CPUWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/CPUWarnings'
-import { DiskIOBandwidthWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/DiskIOBandwidthWarnings'
-import { RAMWarnings } from 'components/interfaces/Billing/Usage/UsageWarningAlerts/RAMWarnings'
-import UsageBarChart from 'components/interfaces/Organization/Usage/UsageBarChart'
+import dayjs from 'dayjs'
+import { capitalize } from 'lodash'
+import { BarChart2, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { Fragment, useMemo, useState } from 'react'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { CPUWarnings } from '@/components/interfaces/Billing/Usage/UsageWarningAlerts/CPUWarnings'
+import { DiskIOBandwidthWarnings } from '@/components/interfaces/Billing/Usage/UsageWarningAlerts/DiskIOBandwidthWarnings'
+import { RAMWarnings } from '@/components/interfaces/Billing/Usage/UsageWarningAlerts/RAMWarnings'
+import UsageBarChart from '@/components/interfaces/Organization/Usage/UsageBarChart'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
-import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
-import { DataPoint } from 'data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+} from '@/components/layouts/Scaffold'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { DocsButton } from '@/components/ui/DocsButton'
+import Panel from '@/components/ui/Panel'
+import { DataPoint } from '@/data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
-} from 'data/analytics/infra-monitoring-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import dayjs from 'dayjs'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from 'lib/constants'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { capitalize } from 'lodash'
-import { BarChart2, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { Fragment, useMemo, useState } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { Admonition } from 'ui-patterns/admonition'
-
-import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+} from '@/data/analytics/infra-monitoring-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, InstanceSpecs } from '@/lib/constants'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const NON_DEDICATED_IO_RESOURCES = [
   'ci_micro',
@@ -64,7 +65,9 @@ export const InfrastructureActivity = () => {
   const { data: subscription, isPending: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
   })
-  const isFreePlan = organization?.plan?.id === 'free'
+  const { hasAccess: hasAccessToComputeSizes } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
 
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: projectRef })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
@@ -105,7 +108,7 @@ export const InfrastructureActivity = () => {
   const upgradeUrl =
     organization === undefined
       ? `/`
-      : organization.plan.id === 'free'
+      : hasAccessToComputeSizes
         ? `/org/${organization?.slug ?? '[slug]'}/billing#subscription`
         : `/project/${projectRef}/settings/addons`
 
@@ -269,7 +272,7 @@ export const InfrastructureActivity = () => {
                     <>
                       <DiskIOBandwidthWarnings
                         upgradeUrl={upgradeUrl}
-                        isFreePlan={isFreePlan}
+                        hasAccessToComputeSizes={hasAccessToComputeSizes}
                         hasLatest={hasLatest}
                         currentBillingCycleSelected={currentBillingCycleSelected}
                         latestIoBudgetConsumption={latestIoBudgetConsumption}
@@ -329,15 +332,15 @@ export const InfrastructureActivity = () => {
                   )}
                   {attribute.key === 'max_cpu_usage' && (
                     <CPUWarnings
-                      isFreePlan={isFreePlan}
                       upgradeUrl={upgradeUrl}
+                      hasAccessToComputeSizes={hasAccessToComputeSizes}
                       severity={projectResourceWarnings?.cpu_exhaustion}
                     />
                   )}
                   {attribute.key === 'ram_usage' && (
                     <RAMWarnings
-                      isFreePlan={isFreePlan}
                       upgradeUrl={upgradeUrl}
+                      hasAccessToComputeSizes={hasAccessToComputeSizes}
                       severity={projectResourceWarnings?.memory_and_swap_exhaustion}
                     />
                   )}

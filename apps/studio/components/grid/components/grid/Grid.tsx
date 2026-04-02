@@ -1,19 +1,6 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
-import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
-import { useIsTableFilterBarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
@@ -23,7 +10,20 @@ import type { GridProps, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import RowRenderer from './RowRenderer'
+import { RowRenderer } from './RowRenderer'
+import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
+import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useCsvFileDrop } from '@/hooks/ui/useCsvFileDrop'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -97,12 +97,7 @@ export const Grid = memo(
 
       const { mutate: sendEvent } = useSendEventMutation()
 
-      const {
-        isValidFile: isValidFileDraggedOver,
-        isDraggedOver,
-        onDragOver,
-        onFileDrop,
-      } = useCsvFileDrop({
+      const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
         enabled: isTableEmpty && !isForeignTable,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
         onTelemetryEvent: (eventName) => {
@@ -118,7 +113,6 @@ export const Grid = memo(
 
       const { data } = useForeignKeyConstraintsQuery({
         projectRef: project?.ref,
-        connectionString: project?.connectionString,
         schema: table?.schema ?? undefined,
       })
 
@@ -208,7 +202,7 @@ export const Grid = memo(
       // Compute rowClass function to style pending add/delete rows
       const computedRowClass = useMemo(() => {
         return (row: SupaRow) => {
-          const classes: string[] = []
+          const classes: string[] = ['[&>.rdg-cell]:flex', '[&>.rdg-cell]:items-center']
 
           // Call the original rowClass if provided
           if (rowClass) {
@@ -230,26 +224,29 @@ export const Grid = memo(
 
       return (
         <div
+          data-testid="table-editor-grid-container"
           className={cn('flex flex-col relative transition-colors', containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
+          onDragOver={onDragOver}
+          onDragLeave={onDragOver}
+          onDrop={onFileDrop}
         >
           {/* Render no rows fallback outside of the DataGrid */}
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none',
-                isTableEmpty && isDraggedOver && 'border-2 border-dashed',
-                isValidFileDraggedOver ? 'border-brand-600' : 'border-destructive-600'
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none'
               )}
-              onDragOver={onDragOver}
-              onDragLeave={onDragOver}
-              onDrop={onFileDrop}
             >
               {isLoading && !isDisabled && (
                 <GenericSkeletonLoader className="w-full top-9 absolute p-2" />
               )}
 
-              {isError && <GridError error={error} />}
+              {isError && (
+                <div className="w-full top-9 absolute p-2 pointer-events-auto">
+                  <GridError error={error} />
+                </div>
+              )}
 
               {isSuccess && (
                 <>
@@ -267,18 +264,13 @@ export const Grid = memo(
                       </div>
                     </div>
                   ) : (filters ?? []).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center">
-                      <p className="text-sm text-light pointer-events-auto">
-                        {isDraggedOver ? (
-                          isValidFileDraggedOver ? (
-                            'Drop your CSV file here'
-                          ) : (
-                            <span className="text-destructive">Only CSV files are accepted</span>
-                          )
-                        ) : (
-                          'This table is empty'
-                        )}
-                      </p>
+                    <div
+                      className={cn(
+                        'flex flex-col items-center justify-center w-full h-full mt-9 transition',
+                        isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand'
+                      )}
+                    >
+                      <p className="text-sm text-light pointer-events-auto">This table is empty</p>
                       {tableEntityType === ENTITY_TYPE.FOREIGN_TABLE ? (
                         <div className="flex items-center space-x-2 mt-4">
                           <p className="text-sm text-light pointer-events-auto">
@@ -287,30 +279,28 @@ export const Grid = memo(
                           </p>
                         </div>
                       ) : (
-                        !isDraggedOver && (
-                          <div className="flex flex-col items-center gap-4 mt-4">
-                            <Button
-                              type="default"
-                              className="pointer-events-auto"
-                              onClick={() => {
-                                tableEditorSnap.onImportData()
-                                sendEvent({
-                                  action: 'import_data_button_clicked',
-                                  properties: { tableType: 'Existing Table' },
-                                  groups: {
-                                    project: project?.ref ?? 'Unknown',
-                                    organization: org?.slug ?? 'Unknown',
-                                  },
-                                })
-                              }}
-                            >
-                              Import data from CSV
-                            </Button>
-                            <p className="text-xs text-foreground-light pointer-events-auto">
-                              or drag and drop a CSV file here
-                            </p>
-                          </div>
-                        )
+                        <div className="flex flex-col items-center gap-4 mt-4">
+                          <Button
+                            type="default"
+                            className="pointer-events-auto"
+                            onClick={() => {
+                              tableEditorSnap.onImportData()
+                              sendEvent({
+                                action: 'import_data_button_clicked',
+                                properties: { tableType: 'Existing Table' },
+                                groups: {
+                                  project: project?.ref ?? 'Unknown',
+                                  organization: org?.slug ?? 'Unknown',
+                                },
+                              })
+                            }}
+                          >
+                            Import data from CSV
+                          </Button>
+                          <p className="text-xs text-foreground-light pointer-events-auto">
+                            or drag and drop a CSV file here
+                          </p>
+                        </div>
                       )}
                     </div>
                   ) : (

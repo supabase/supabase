@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Badge, Button, Menu } from 'ui'
+
 import { ProductMenuGroupItem } from './ProductMenu.types'
 
 interface ProductMenuItemProps {
@@ -57,7 +58,7 @@ export const ProductMenuItem = ({
     }
 
     return (
-      <Link href={url} className="block" target={target}>
+      <Link href={url} className="block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )

@@ -1,15 +1,15 @@
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { EmptyRealtime } from './EmptyRealtime'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /**
  * Acts as a container component for the entire log display

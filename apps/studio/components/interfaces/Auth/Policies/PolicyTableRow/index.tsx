@@ -1,12 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import { noop } from 'lodash'
 import { memo, useMemo } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useTablesRolesAccessQuery } from 'data/tables/tables-roles-access-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Card,
   CardContent,
@@ -20,10 +15,15 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { usePoliciesData } from '../PoliciesDataContext'
 import { PolicyRow } from './PolicyRow'
 import type { PolicyTable } from './PolicyTableRow.types'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useTablesRolesAccessQuery } from '@/data/tables/tables-roles-access-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface PolicyTableRowProps {
   table: PolicyTable
@@ -66,11 +66,12 @@ const PolicyTableRowComponent = ({
     [exposedSchemas, table.schema]
   )
 
-  const { data: tablesWithAnonAuthAccess = new Set() } = useTablesRolesAccessQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: table.schema,
-  })
+  const { data: tablesWithAnonAuthAccess = new Set(), isLoading: isLoadingRolesAccess } =
+    useTablesRolesAccessQuery({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: table.schema,
+    })
 
   const hasAnonAuthenticatedRolesAccess = tablesWithAnonAuthAccess.has(table.name)
   const hasApiAccess = isTableExposedThroughAPI && hasAnonAuthenticatedRolesAccess
@@ -81,7 +82,7 @@ const PolicyTableRowComponent = ({
   const isRealtimeMessagesTable = isRealtimeSchema && table.name === 'messages'
   const isTableLocked = isRealtimeSchema ? !isRealtimeMessagesTable : isLocked
 
-  const showPolicies = !isPoliciesLoading && !isPoliciesError
+  const showPolicies = !isPoliciesLoading && !isPoliciesError && !isLoadingRolesAccess
 
   const shouldHideHeaderBorder =
     isPubliclyReadableWritable ||
@@ -106,12 +107,13 @@ const PolicyTableRowComponent = ({
           table={table}
           isLocked={isLocked}
           hasApiAccess={hasApiAccess}
+          isLoadingApiAccess={isLoadingRolesAccess}
           onSelectToggleRLS={onSelectToggleRLS}
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
       </CardHeader>
 
-      {!isTableExposedThroughAPI && (
+      {!isLoadingRolesAccess && !isTableExposedThroughAPI && (
         <Admonition
           showIcon={false}
           type="warning"
@@ -120,12 +122,16 @@ const PolicyTableRowComponent = ({
           <p className="text-foreground-light">
             No data will be selectable via Supabase APIs as this schema is not exposed. You may
             configure this in your project’s{' '}
-            <InlineLink href={`/project/${ref}/settings/api`}>API settings</InlineLink>.
+            <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
+              API settings
+            </InlineLink>
+            .
           </p>
         </Admonition>
       )}
 
-      {(isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
+      {!isLoadingRolesAccess &&
+        (isPubliclyReadableWritable || rlsEnabledNoPolicies || isApiDisabledDueToRoles) &&
         isTableExposedThroughAPI && (
           <Admonition
             showIcon={false}
@@ -136,7 +142,7 @@ const PolicyTableRowComponent = ({
           </Admonition>
         )}
 
-      {isPoliciesLoading && (
+      {(isPoliciesLoading || isLoadingRolesAccess) && (
         <CardContent>
           <ShimmeringLoader />
         </CardContent>

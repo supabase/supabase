@@ -1,12 +1,10 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
-export const generateAdvisorsMenu = (
-  project?: Project,
-  features?: { advisorRules: boolean }
-): ProductMenuGroup[] => {
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from '@/data/projects/project-detail-query'
+import { IS_PLATFORM } from '@/lib/constants'
+
+export const generateAdvisorsMenu = (project?: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
 
   return [
@@ -34,7 +32,7 @@ export const generateAdvisorsMenu = (
         },
       ],
     },
-    ...(IS_PLATFORM && features?.advisorRules
+    ...(IS_PLATFORM
       ? [
           {
             title: 'Configuration',

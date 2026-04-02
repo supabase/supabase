@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM, useParams } from 'common'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
-import { IS_PLATFORM, useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { getTemporaryAPIKey } from 'data/api-keys/temp-api-keys-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
 import { RealtimeTokensPopover } from './RealtimeTokensPopover'
 import { RealtimeConfig } from './useRealtimeMessages'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface HeaderProps {
   config: RealtimeConfig
@@ -29,7 +29,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
   )
 
   return (
-    <div className="flex flex-row h-14 gap-2.5 items-center px-4">
+    <div className="flex flex-row min-h-14 md:min-h-[var(--header-height)] gap-2.5 items-center px-4 border-b ">
       <div className="flex flex-row">
         <ChooseChannelPopover config={config} onChangeConfig={onChangeConfig} />
         <RealtimeTokensPopover config={config} onChangeConfig={onChangeConfig} />

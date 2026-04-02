@@ -1,9 +1,10 @@
-import { BookOpenText } from 'lucide-react'
 import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useAppStateSnapshot } from 'state/app-state'
+import { BookOpenText } from 'lucide-react'
+
 import { ButtonTooltip } from './ButtonTooltip'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface APIDocsButtonProps {
   section?: string[]
@@ -36,7 +37,7 @@ export const APIDocsButton = ({ section, source }: APIDocsButtonProps) => {
         })
       }}
       icon={<BookOpenText />}
-      className="h-7 w-7"
+      className="w-7"
       tooltip={{
         content: {
           side: 'bottom',

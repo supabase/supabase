@@ -1,22 +1,22 @@
 import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
-
-import { useProjectCreationPostgresVersionsQuery } from 'data/config/project-creation-postgres-versions-query'
-import { useProjectUnpausePostgresVersionsQuery } from 'data/config/project-unpause-postgres-versions-query'
-import { PostgresEngine, ReleaseChannel } from 'data/projects/new-project.constants'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { smartRegionToExactRegion } from './ProjectCreation.utils'
+import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
+import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
+import { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PostgresVersionDetails {
   postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
@@ -88,8 +88,8 @@ export const PostgresVersionSelector = ({
 
   const versions =
     type === 'create'
-      ? createVersions?.available_versions ?? []
-      : unpauseVersions?.available_versions ?? []
+      ? (createVersions?.available_versions ?? [])
+      : (unpauseVersions?.available_versions ?? [])
   const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
   const { postgresVersionSelection } = form.watch()
 

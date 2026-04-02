@@ -2,22 +2,22 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { useAwsManagedOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '../../../layouts/Scaffold'
+
 import AwsMarketplaceAutoRenewalWarning from './AwsMarketplaceAutoRenewalWarning'
+import AwsMarketplaceOnboardingPlaceholder from './AwsMarketplaceOnboardingPlaceholder'
 import { useCloudMarketplaceOnboardingInfoQuery } from './cloud-marketplace-query'
 import NewAwsMarketplaceOrgForm, {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
   NewMarketplaceOrgForm,
 } from './NewAwsMarketplaceOrgForm'
-import AwsMarketplaceOnboardingPlaceholder from './AwsMarketplaceOnboardingPlaceholder'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import { useAwsManagedOrganizationCreateMutation } from '@/data/organizations/organization-create-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 const AwsMarketplaceCreateNewOrg = () => {
   const router = useRouter()

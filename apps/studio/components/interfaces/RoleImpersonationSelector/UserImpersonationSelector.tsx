@@ -1,19 +1,9 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ChevronDown, User as IconUser, Loader2, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { keepPreviousData } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import type { ResponseError } from 'types'
 import {
   Button,
   cn,
@@ -30,7 +20,17 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
@@ -96,10 +96,10 @@ const UserImpersonationSelector = () => {
     setPreviousSearches((prev) => {
       // Remove if already present
       const filtered = prev.filter((u) => u.id !== user.id)
-      // Add new user to the end
-      const updated = [...filtered, user]
+      // Add new user to the start of the list (last used first)
+      const updated = [user, ...filtered]
       // Keep only the last 6
-      return updated.slice(-6)
+      return updated.slice(0, 5)
     })
 
     if (customAccessTokenHookDetails?.type === 'https') {

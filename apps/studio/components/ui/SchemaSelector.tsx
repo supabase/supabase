@@ -1,37 +1,39 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
-
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
   Skeleton,
 } from 'ui'
+
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SchemaSelectorProps {
   className?: string
   disabled?: boolean
   size?: 'tiny' | 'small'
   showError?: boolean
-  selectedSchemaName: string
+  selectedSchemaName?: string
+  placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
+  stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
   align?: 'start' | 'end'
@@ -43,8 +45,10 @@ export const SchemaSelector = ({
   size = 'tiny',
   showError = true,
   selectedSchemaName,
+  placeholderLabel = 'Choose a schema...',
   supportSelectAll = false,
   excludedSchemas = [],
+  stopScrollPropagation = false,
   onSelectSchema,
   onSelectCreateSchema,
   align = 'start',
@@ -122,7 +126,7 @@ export const SchemaSelector = ({
                 </div>
               ) : (
                 <div className="w-full flex gap-1">
-                  <p className="text-foreground-lighter">Choose a schema...</p>
+                  <p className="text-foreground-lighter">{placeholderLabel}</p>
                 </div>
               )}
             </Button>
@@ -135,7 +139,9 @@ export const SchemaSelector = ({
           >
             <Command_Shadcn_>
               <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
-              <CommandList_Shadcn_>
+              <CommandList_Shadcn_
+                onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
+              >
                 <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                 <CommandGroup_Shadcn_>
                   <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
@@ -158,7 +164,7 @@ export const SchemaSelector = ({
                         )}
                       </CommandItem_Shadcn_>
                     )}
-                    {schemas?.map((schema) => (
+                    {schemas.map((schema) => (
                       <CommandItem_Shadcn_
                         key={schema.id}
                         className="cursor-pointer flex items-center justify-between space-x-2 w-full"

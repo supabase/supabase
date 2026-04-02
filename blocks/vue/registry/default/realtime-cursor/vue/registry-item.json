@@ -3,7 +3,7 @@
   "type": "registry:component",
   "title": "Realtime Cursor for Vue and Supabase",
   "description": "Component which renders realtime cursors from other users in a room.",
-    "files": [
+  "files": [
     {
       "path": "registry/default/realtime-cursor/vue/components/cursor.vue",
       "type": "registry:component",

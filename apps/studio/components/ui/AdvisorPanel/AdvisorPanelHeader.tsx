@@ -1,7 +1,6 @@
 import { ChevronLeft, X } from 'lucide-react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Badge } from 'ui'
+
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
   formatItemDate,
@@ -9,6 +8,7 @@ import {
   severityBadgeVariants,
   severityLabels,
 } from './AdvisorPanel.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface AdvisorPanelHeaderProps {
   selectedItem: AdvisorItem | undefined

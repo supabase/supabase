@@ -11,16 +11,11 @@ import {
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
+import { Form } from '@ui/components/shadcn/ui/form'
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { Form } from '@ui/components/shadcn/ui/form'
-import { TAX_IDS } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
-import { getURL } from 'lib/helpers'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -41,6 +36,15 @@ import {
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
+import {
+  getEffectiveTaxCountry,
+  resolveStoredTaxId,
+} from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { getURL } from '@/lib/helpers'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
@@ -97,10 +101,8 @@ export const NewPaymentMethodElement = forwardRef(
       resolver: zodResolver(BillingCustomerDataSchema),
       defaultValues: {
         tax_id_name: currentTaxId
-          ? TAX_IDS.find(
-              (option) =>
-                option.type === currentTaxId.type && option.countryIso2 === currentTaxId.country
-            )?.name || ''
+          ? (resolveStoredTaxId(currentTaxId.type, currentTaxId.country, currentAddress?.country)
+              ?.name ?? '')
           : '',
         tax_id_type: currentTaxId ? currentTaxId.type : '',
         tax_id_value: currentTaxId ? currentTaxId.value : '',
@@ -111,6 +113,7 @@ export const NewPaymentMethodElement = forwardRef(
     const [fullyLoaded, setFullyLoaded] = useState(false)
 
     const [showTaxIDsPopover, setShowTaxIDsPopover] = useState(false)
+    const taxIdListboxId = useId()
 
     const onSelectTaxIdType = (name: string) => {
       const selectedTaxIdOption = TAX_IDS.find((option) => option.name === name)
@@ -172,7 +175,7 @@ export const NewPaymentMethodElement = forwardRef(
     function getConfiguredTaxId(): CustomerTaxId | null {
       return purchasingAsBusiness && selectedTaxId
         ? {
-            country: selectedTaxId.countryIso2,
+            country: getEffectiveTaxCountry(selectedTaxId),
             type: selectedTaxId.type,
             value: form.getValues('tax_id_value'),
           }
@@ -288,6 +291,8 @@ export const NewPaymentMethodElement = forwardRef(
                             type="default"
                             role="combobox"
                             size="medium"
+                            aria-expanded={showTaxIDsPopover}
+                            aria-controls={taxIdListboxId}
                             className={cn(
                               'w-full justify-between h-[34px]',
                               !selectedTaxId && 'text-muted'
@@ -305,7 +310,12 @@ export const NewPaymentMethodElement = forwardRef(
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+                      <PopoverContent
+                        id={taxIdListboxId}
+                        sameWidthAsTrigger
+                        className="p-0"
+                        align="start"
+                      >
                         <Command>
                           <CommandInput placeholder="Search tax ID..." />
                           <CommandList>

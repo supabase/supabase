@@ -19,13 +19,15 @@ export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] &
 
 export async function getProjectSettings(
   { projectRef }: ProjectSettingsVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: Record<string, string>
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/projects/{ref}/settings', {
     params: { path: { ref: projectRef } },
     signal,
+    headers,
   })
 
   if (error) handleError(error)

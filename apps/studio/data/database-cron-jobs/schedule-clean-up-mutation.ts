@@ -1,12 +1,10 @@
+import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
 import { useMutation } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
 import type { ResponseError, UseCustomMutationOptions } from 'types'
 
-import {
-  getScheduleDeleteCronJobRunDetailsKey,
-  getScheduleDeleteCronJobRunDetailsSql,
-} from '../sql/queries/delete-cron-job-run-details'
+import { getScheduleDeleteCronJobRunDetailsKey } from './keys'
 
 export type ScheduleCronJobRunDetailsCleanupVariables = {
   projectRef: string

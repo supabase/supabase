@@ -1,16 +1,9 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop } from 'lodash'
+import { useParams } from 'common'
+import { includes } from 'lodash'
 import { Edit3, MoreVertical, Trash } from 'lucide-react'
 import Image from 'next/legacy/image'
-
-import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
+import { parseAsString, useQueryState } from 'nuqs'
 import {
   Badge,
   Button,
@@ -21,25 +14,28 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import Table from '@/components/to-be-cleaned/Table'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+
 export interface HookListProps {
   schema: string
   filterString: string
-  editHook: (hook: PostgresTrigger) => void
-  deleteHook: (hook: PostgresTrigger) => void
 }
 
-export const HookList = ({
-  schema,
-  filterString,
-  editHook = noop,
-  deleteHook = noop,
-}: HookListProps) => {
+export const HookList = ({ schema, filterString }: HookListProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: hooks } = useDatabaseHooksQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const [, setSelectedHookIdToEdit] = useQueryState('edit', parseAsString.withDefault(''))
+  const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
 
   const restUrl = project?.restUrl
   const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
@@ -109,12 +105,18 @@ export const HookList = ({
 
                     <DropdownMenuContent side="left">
                       <>
-                        <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => setSelectedHookIdToEdit(x.id.toString())}
+                        >
                           <Edit3 size="14" />
                           <p>Edit hook</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => setSelectedHookIdToDelete(x.id.toString())}
+                        >
                           <Trash stroke="red" size="14" />
                           <p>Delete hook</p>
                         </DropdownMenuItem>

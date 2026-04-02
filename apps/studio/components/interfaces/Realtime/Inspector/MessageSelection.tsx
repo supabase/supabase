@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Button, cn } from 'ui'
+
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
+import CopyButton from '@/components/ui/CopyButton'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -25,9 +25,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
 
   return (
     <div
-      className={cn(
-        'relative flex h-full flex-grow flex-col border-l border-t-2 overflow-y-scroll bg-200'
-      )}
+      className={cn('relative flex h-full flex-grow flex-col border-l overflow-y-scroll bg-200')}
     >
       <div
         className={cn(

@@ -1,16 +1,40 @@
-import Link from 'next/link'
-import { useState } from 'react'
-
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { ProjectDetail } from 'data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
-import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+export const ChevronsUpAnimated = () => (
+  <svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline
+      points="17 18 12 13 7 18"
+      className="animate-chevron-up"
+      style={{ animationDelay: '0s' }}
+    />
+    <polyline
+      points="17 11 12 6 7 11"
+      className="animate-chevron-up"
+      style={{ animationDelay: '0.3s' }}
+    />
+  </svg>
+)
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -26,6 +50,8 @@ interface ComputeBadgeWrapperProps {
   projectRef?: string
   cloudProvider?: string
   computeSize?: ProjectDetail['infra_compute_size']
+  resourceWarnings?: ResourceWarning
+  badgeClassName?: string
 }
 
 export const ComputeBadgeWrapper = ({
@@ -33,6 +59,8 @@ export const ComputeBadgeWrapper = ({
   projectRef,
   cloudProvider,
   computeSize,
+  resourceWarnings,
+  badgeClassName,
 }: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
   // once open it will fetch the addons
@@ -71,6 +99,12 @@ export const ComputeBadgeWrapper = ({
   )
 
   const isEligibleForFreeUpgrade = data?.plan.id !== 'free' && computeSize === 'nano'
+  const isComputeNearExhaustion =
+    !!resourceWarnings?.cpu_exhaustion ||
+    !!resourceWarnings?.memory_and_swap_exhaustion ||
+    !!resourceWarnings?.disk_space_exhaustion ||
+    !!resourceWarnings?.disk_io_exhaustion
+  const showUpgradeGlow = isEligibleForFreeUpgrade && isComputeNearExhaustion
 
   const isLoading = isLoadingAddons || isLoadingSubscriptions
 
@@ -79,8 +113,25 @@ export const ComputeBadgeWrapper = ({
   return (
     <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
       <HoverCardTrigger asChild className="group" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center">
-          <ComputeBadge infraComputeSize={computeSize} />
+        <div className={cn('flex items-center', showUpgradeGlow && 'animate-badge-pulse')}>
+          <div
+            className={cn(
+              'flex',
+              showUpgradeGlow && 'relative inline-flex overflow-hidden rounded'
+            )}
+          >
+            <ComputeBadge
+              infraComputeSize={computeSize}
+              icon={showUpgradeGlow && <ChevronsUpAnimated />}
+              className={cn(
+                showUpgradeGlow && 'text-brand-600 border-brand-500 bg-brand/10 gap-1',
+                badgeClassName
+              )}
+            />
+            {showUpgradeGlow && (
+              <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-brand/20 to-transparent blur-md" />
+            )}
+          </div>
         </div>
       </HoverCardTrigger>
       <HoverCardContent

@@ -1,8 +1,9 @@
-import { TextFormatter } from 'components/interfaces/Settings/Logs/LogsFormatters'
-import Table from 'components/to-be-cleaned/Table'
-import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { Fragment } from 'react'
+
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { TextFormatter } from '@/components/interfaces/Settings/Logs/LogsFormatters'
+import Table from '@/components/to-be-cleaned/Table'
+import StackedBarChart from '@/components/ui/Charts/StackedBarChart'
 
 export const CacheHitRateChartRenderer = (
   props: ReportWidgetProps<{

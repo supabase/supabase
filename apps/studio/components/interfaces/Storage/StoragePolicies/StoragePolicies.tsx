@@ -4,17 +4,8 @@ import { isEmpty } from 'lodash'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
-import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
-import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -24,10 +15,19 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.utils'
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
-import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
+import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal'
+import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useDatabasePolicyCreateMutation } from '@/data/database-policies/database-policy-create-mutation'
+import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
+import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
+import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const StoragePolicies = () => {
   const { ref: projectRef } = useParams()

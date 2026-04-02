@@ -934,7 +934,8 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    get?: never
+    /** Get database disk attributes */
+    get: operations['v1-get-database-disk']
     put?: never
     /** Modify database disk */
     post: operations['v1-modify-database-disk']
@@ -994,6 +995,23 @@ export interface paths {
     head?: never
     /** Updates realtime configuration */
     patch: operations['v1-update-realtime-config']
+    trace?: never
+  }
+  '/v1/projects/{ref}/config/realtime/shutdown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Shutdowns realtime connections for a project */
+    post: operations['v1-shutdown-realtime']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/v1/projects/{ref}/config/storage': {
@@ -1249,22 +1267,22 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] List applied migration versions
+     * List applied migration versions
      * @description Only available to selected partner OAuth apps
      */
     get: operations['v1-list-migration-history']
     /**
-     * [Beta] Upsert a database migration without applying
+     * Upsert a database migration without applying
      * @description Only available to selected partner OAuth apps
      */
     put: operations['v1-upsert-a-migration']
     /**
-     * [Beta] Apply a database migration
+     * Apply a database migration
      * @description Only available to selected partner OAuth apps
      */
     post: operations['v1-apply-a-migration']
     /**
-     * [Beta] Rollback database migrations and remove them from history table
+     * Rollback database migrations and remove them from history table
      * @description Only available to selected partner OAuth apps
      */
     delete: operations['v1-rollback-migrations']
@@ -1281,7 +1299,7 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] Fetch an existing entry from migration history
+     * Fetch an existing entry from migration history
      * @description Only available to selected partner OAuth apps
      */
     get: operations['v1-get-a-migration']
@@ -1291,10 +1309,30 @@ export interface paths {
     options?: never
     head?: never
     /**
-     * [Beta] Patch an existing entry in migration history
+     * Patch an existing entry in migration history
      * @description Only available to selected partner OAuth apps
      */
     patch: operations['v1-patch-a-migration']
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/openapi': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get PostgREST OpenAPI spec
+     * @description Returns the PostgREST OpenAPI specification for the project. This is the replacement for querying `/rest/v1/` directly with the anon key.
+     */
+    get: operations['v1-get-database-openapi']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/v1/projects/{ref}/database/password': {
@@ -2074,6 +2112,8 @@ export interface components {
     }
     AuthConfigResponse: {
       api_max_request_duration: number | null
+      custom_oauth_enabled: boolean
+      custom_oauth_max_providers: number
       db_max_pool_size: number | null
       /** @enum {string|null} */
       db_max_pool_size_unit: 'connections' | 'percent' | null
@@ -2275,6 +2315,7 @@ export interface components {
       security_captcha_secret: string | null
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
+      security_sb_forwarded_for_enabled: boolean | null
       security_update_password_require_reauthentication: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
@@ -2787,6 +2828,23 @@ export interface components {
             /** @enum {string} */
             type: 'io2'
           }
+    }
+    DiskResponse: {
+      attributes:
+        | {
+            iops: number
+            size_gb: number
+            throughput_mibps?: number
+            /** @enum {string} */
+            type: 'gp3'
+          }
+        | {
+            iops: number
+            size_gb: number
+            /** @enum {string} */
+            type: 'io2'
+          }
+      last_modified_at?: string
     }
     DiskUtilMetricsResponse: {
       metrics: {
@@ -3497,9 +3555,11 @@ export interface components {
       max_payload_size_in_kb: number | null
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second: number | null
+      /** @description Whether to enable presence */
+      presence_enabled: boolean
       /** @description Whether to only allow private channels */
       private_only: boolean | null
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
     RegionsInfo: {
@@ -3512,7 +3572,26 @@ export interface components {
           type: 'smartGroup'
         }[]
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -3531,7 +3610,26 @@ export interface components {
           type: 'smartGroup'
         }
         specific: {
-          code: string
+          /** @enum {string} */
+          code:
+            | 'us-east-1'
+            | 'us-east-2'
+            | 'us-west-1'
+            | 'us-west-2'
+            | 'ap-southeast-1'
+            | 'ap-northeast-1'
+            | 'ap-northeast-2'
+            | 'ap-east-1'
+            | 'ap-southeast-2'
+            | 'eu-west-1'
+            | 'eu-west-2'
+            | 'eu-west-3'
+            | 'eu-north-1'
+            | 'eu-central-1'
+            | 'eu-central-2'
+            | 'ca-central-1'
+            | 'ap-south-1'
+            | 'sa-east-1'
           name: string
           /** @enum {string} */
           provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
@@ -3763,6 +3861,7 @@ export interface components {
     }
     UpdateAuthConfigBody: {
       api_max_request_duration?: number | null
+      custom_oauth_enabled?: boolean
       db_max_pool_size?: number | null
       /** @enum {string|null} */
       db_max_pool_size_unit?: 'connections' | 'percent' | null
@@ -3962,6 +4061,7 @@ export interface components {
       security_captcha_secret?: string | null
       security_manual_linking_enabled?: boolean | null
       security_refresh_token_reuse_interval?: number | null
+      security_sb_forwarded_for_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
       sessions_inactivity_timeout?: number | null
       sessions_single_per_user?: boolean | null
@@ -4188,9 +4288,11 @@ export interface components {
       max_payload_size_in_kb?: number
       /** @description Sets maximum number of presence events per second rate limit */
       max_presence_events_per_second?: number
+      /** @description Whether to enable presence */
+      presence_enabled?: boolean
       /** @description Whether to only allow private channels */
       private_only?: boolean
-      /** @description Whether to suspend realtime */
+      /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean
     }
     UpdateRunStatusBody: {
@@ -4290,9 +4392,12 @@ export interface components {
     V1CreateProjectBody: {
       /** @description Database password */
       db_pass: string
-      /** @enum {string} */
+      /**
+       * @description Desired instance size. Omit this field to always default to the smallest possible size.
+       * @example nano
+       * @enum {string}
+       */
       desired_instance_size?:
-        | 'pico'
         | 'nano'
         | 'micro'
         | 'small'
@@ -4334,13 +4439,8 @@ export interface components {
       plan?: 'free' | 'pro'
       /**
        * @deprecated
-       * @description Postgres engine version. If not provided, the latest version will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17' | '17-oriole'
-      /**
-       * @deprecated
        * @description Region you want your server to reside in. Use region_selection instead.
+       * @example us-east-1
        * @enum {string}
        */
       region?:
@@ -4404,12 +4504,6 @@ export interface components {
             /** @enum {string} */
             type: 'smartGroup'
           }
-      /**
-       * @deprecated
-       * @description Release channel. If not provided, GA will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -4733,6 +4827,8 @@ export interface components {
       name: string
     }
     V1RestorePointResponse: {
+      /** Format: date-time */
+      completed_on: string | null
       name: string
       /** @enum {string} */
       status: 'AVAILABLE' | 'PENDING' | 'REMOVED' | 'FAILED'
@@ -4764,6 +4860,7 @@ export interface components {
              * @description Deprecated. Use `status` instead.
              */
             healthy: boolean
+            replication_connected: boolean
           }
         | {
             db_schema: string
@@ -4932,6 +5029,8 @@ export interface operations {
     parameters: {
       query?: {
         included_schemas?: string
+        /** @description Use pg-delta instead of Migra for diffing when true */
+        pgdelta?: boolean
       }
       header?: never
       path: {
@@ -8234,6 +8333,56 @@ export interface operations {
       }
     }
   }
+  'v1-get-database-disk': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get database disk attributes */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-modify-database-disk': {
     parameters: {
       query?: never
@@ -8461,6 +8610,55 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-shutdown-realtime': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Realtime connections shutdown successfully */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Tenant not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -9675,6 +9873,59 @@ export interface operations {
         content?: never
       }
       /** @description Failed to patch database migration */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-database-openapi': {
+    parameters: {
+      query?: {
+        /** @description The database schema to generate the OpenAPI spec for */
+        schema?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch PostgREST OpenAPI spec */
       500: {
         headers: {
           [name: string]: unknown
@@ -12137,9 +12388,8 @@ export interface operations {
       query: {
         /** @description Continent code to determine regional recommendations: NA (North America), SA (South America), EU (Europe), AF (Africa), AS (Asia), OC (Oceania), AN (Antarctica) */
         continent?: 'NA' | 'SA' | 'EU' | 'AF' | 'AS' | 'OC' | 'AN'
-        /** @description Desired instance size */
+        /** @description Desired instance size. Omit this field to always default to the smallest possible size. */
         desired_instance_size?:
-          | 'pico'
           | 'nano'
           | 'micro'
           | 'small'

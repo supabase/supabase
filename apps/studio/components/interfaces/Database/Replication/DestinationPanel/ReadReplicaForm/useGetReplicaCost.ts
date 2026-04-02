@@ -1,15 +1,16 @@
 import { useParams } from 'common'
+
 import {
   calculateIOPSPrice,
   calculateThroughputPrice,
-} from 'components/interfaces/DiskManagement/DiskManagement.utils'
+} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import {
   DISK_PRICING,
   DiskType,
-} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { formatCurrency } from 'lib/helpers'
+} from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { formatCurrency } from '@/lib/helpers'
 
 export const useGetReplicaCost = () => {
   const { ref: projectRef } = useParams()

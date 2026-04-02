@@ -1,8 +1,8 @@
 import type { Row } from '@tanstack/react-table'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
+
 import { LogsList } from './LogsList'
 
 export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
@@ -14,10 +14,9 @@ export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<any> }) => {
       <>
         <ResizableHandle withHandle disabled={!open} />
         <ResizablePanel
-          order={2}
-          defaultSize={1}
-          maxSize={50}
-          minSize={open ? 16 : 12}
+          defaultSize="1"
+          maxSize="50"
+          minSize={open ? '16' : '12'}
           className={cn(!open ? '!h-12 max-h-12' : 'h-min-16 h-max-32')}
         >
           <div className="h-full flex flex-col overflow-hidden">

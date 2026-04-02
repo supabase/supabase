@@ -1,10 +1,4 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -25,6 +19,12 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import AlertError from '@/components/ui/AlertError'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
@@ -165,6 +165,7 @@ export const HooksListing = () => {
           variant="destructive"
           loading={isDeletingAuthHook}
           title={`Confirm to delete ${selectedHookForDeletion?.title}`}
+          className={cn('md:px-0', selectedHookForDeletion?.method.type === 'postgres' && 'pb-0')}
           confirmLabel="Delete"
           confirmLabelLoading="Deleting"
           onCancel={() => setSelectedHookForDeletion(null)}
@@ -181,20 +182,20 @@ export const HooksListing = () => {
           }}
         >
           <div>
-            <p className="text-sm text-foreground-light">
+            <p className="md:px-5 text-sm text-foreground-light">
               Are you sure you want to delete the {selectedHookForDeletion?.title}?
             </p>
             {selectedHookForDeletion?.method.type === 'postgres' && (
               <>
-                <p className="text-sm text-foreground-light">
+                <p className="md:px-5 text-sm text-foreground-light">
                   The following statements will be executed on the{' '}
                   {selectedHookForDeletion?.method.schema}.
                   {selectedHookForDeletion?.method.functionName} function:
                 </p>
-                <div className={cn('mt-4', 'h-72')}>
+                <div className="mt-4 h-72">
                   <CodeEditor
+                    isReadOnly
                     id="deletion-hook-editor"
-                    isReadOnly={true}
                     language="pgsql"
                     value={getRevokePermissionStatements(
                       selectedHookForDeletion?.method.schema,

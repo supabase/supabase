@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { ComponentProps, ReactNode } from 'react'
-
-import { useParams } from 'common'
-import { useTabsStateSnapshot } from 'state/tabs'
 import { cn } from 'ui'
+
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { CollapseButton } from '../Tabs/CollapseButton'
 import { EditorTabs } from '../Tabs/Tabs'
 import { useEditorType } from './EditorsLayout.hooks'
+import { useTabsStateSnapshot } from '@/state/tabs'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -22,6 +22,7 @@ export const EditorBaseLayout = ({
   product,
   productMenuClassName,
   productMenu,
+  browserTitle,
 }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
@@ -33,18 +34,41 @@ export const EditorBaseLayout = ({
   const hideTabs =
     pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
 
+  const activeEditorTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
+  // Prefer the live tab label so browser titles update immediately after a rename,
+  // even when persisted tab metadata is still catching up.
+  const activeEditorTabLabel = activeEditorTab?.label ?? activeEditorTab?.metadata?.name
+  const activeEditorTabEntity =
+    activeEditorTab === undefined
+      ? undefined
+      : editor === 'sql'
+        ? activeEditorTab.type === 'sql'
+          ? activeEditorTabLabel
+          : undefined
+        : editor === 'table'
+          ? activeEditorTab.type !== 'sql'
+            ? activeEditorTabLabel
+            : undefined
+          : undefined
+
+  const mergedBrowserTitle = {
+    ...browserTitle,
+    section: title ?? browserTitle?.section,
+    entity: browserTitle?.entity ?? activeEditorTabEntity,
+  }
+
   return (
     <ProjectLayoutWithAuth
       resizableSidebar
-      title={title}
       product={product}
+      browserTitle={mergedBrowserTitle}
       productMenuClassName={productMenuClassName}
       productMenu={productMenu}
     >
       <div className="flex flex-col h-full">
         <div
           className={cn(
-            'h-10 flex items-center',
+            'h-10 md:min-h-[var(--header-height)] flex items-center',
             !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
           )}
         >

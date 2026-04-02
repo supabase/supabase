@@ -1,10 +1,10 @@
+import { getTableIndexAdvisorSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-
+import { filterProtectedSchemaIndexStatements } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { databaseKeys } from './keys'
 
-import { filterProtectedSchemaIndexStatements } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { databaseKeys } from './keys'
 
 export type TableIndexAdvisorVariables = {
   projectRef?: string
@@ -31,53 +31,15 @@ export type TableIndexAdvisorResponse = {
   columnsWithSuggestions: string[]
 }
 
-//Generates SQL to find top 5 SELECT queries involving a table and run them through index_advisor
-export function getTableIndexAdvisorSql(schema: string, table: string): string {
-  const escapedSchema = schema.replace(/'/g, "''")
-  const escapedTable = table.replace(/'/g, "''")
-
-  return /* SQL */ `
--- Get top 5 SELECT queries involving this table and run through index_advisor
-set search_path to public, extensions;
-
-with top_queries as (
-  select
-    statements.query,
-    statements.calls,
-    statements.total_exec_time + statements.total_plan_time as total_time,
-    statements.mean_exec_time + statements.mean_plan_time as mean_time
-  from pg_stat_statements as statements
-    inner join pg_authid as auth on statements.userid = auth.oid
-  where 
-    -- Filter for SELECT queries only (index_advisor only works with SELECT)
-    (lower(statements.query) like 'select%' or lower(statements.query) like 'with pgrst%')
-    -- Filter for queries involving our table (handles schema.table and just table references)
-    and (
-      lower(statements.query) like '%${escapedSchema.toLowerCase()}.${escapedTable.toLowerCase()}%'
-      or lower(statements.query) like '%from ${escapedTable.toLowerCase()}%'
-      or lower(statements.query) like '%join ${escapedTable.toLowerCase()}%'
-    )
-    -- Exclude system queries
-    and statements.query not like '%pg_catalog%'
-    and statements.query not like '%information_schema%'
-  order by statements.calls desc
-  limit 5
-)
-select
-  tq.query,
-  tq.calls,
-  tq.total_time,
-  tq.mean_time,
-  coalesce(ia.index_statements, '{}') as index_statements,
-  coalesce((ia.startup_cost_before)::numeric, 0) as startup_cost_before,
-  coalesce((ia.startup_cost_after)::numeric, 0) as startup_cost_after,
-  coalesce((ia.total_cost_before)::numeric, 0) as total_cost_before,
-  coalesce((ia.total_cost_after)::numeric, 0) as total_cost_after
-from top_queries tq
-left join lateral (
-  select * from index_advisor(tq.query)
-) ia on true;
-`.trim()
+// Strips ordering modifiers and outer quotes from a raw column token from an index statement.
+// e.g. '"created_at" DESC NULLS LAST' -> 'created_at'
+export function cleanIndexColumnName(raw: string): string {
+  return raw
+    .trim()
+    .replace(/\s+(asc|desc)(\s+nulls\s+(first|last))?$/i, '')
+    .replace(/\s+nulls\s+(first|last)$/i, '')
+    .trim()
+    .replace(/^"(.+)"$/, '$1')
 }
 
 //Extracts column names from index statements
@@ -92,8 +54,9 @@ function extractColumnsFromIndexStatements(indexStatements: string[]): string[] 
       const columnPart = match[1]
       // Split by comma and clean up each column name
       columnPart.split(',').forEach((col) => {
-        const cleanedCol = col.trim().replace(/^"(.+)"$/, '$1') // Remove quotes if present
-        if (cleanedCol) {
+        const cleanedCol = cleanIndexColumnName(col)
+        // Only add simple identifiers — skip expressions like lower(col)
+        if (cleanedCol && /^[a-z_][a-z0-9_$]*$/i.test(cleanedCol)) {
           columns.add(cleanedCol)
         }
       })

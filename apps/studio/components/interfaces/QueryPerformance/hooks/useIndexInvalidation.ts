@@ -4,19 +4,16 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback } from 'react'
 
 import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databaseKeys } from 'data/database/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
+import { type QueryPerformanceSort } from '../QueryPerformance.types'
+import { useQueryPerformanceQuery } from '../useQueryPerformanceQuery'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useIndexInvalidation() {
   const router = useRouter()
