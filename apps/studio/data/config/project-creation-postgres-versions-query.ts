@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { handleError, post } from 'data/fetchers'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { configKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider

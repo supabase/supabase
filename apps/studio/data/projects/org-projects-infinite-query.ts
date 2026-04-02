@@ -1,11 +1,11 @@
 import { InfiniteData, useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { useCallback } from 'react'
 
-import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { useProfile } from 'lib/profile'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useProfile } from '@/lib/profile'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 // [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view
 // So that the last row will always be a full row of cards while there's a next page

@@ -1,8 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
-import { handleError } from 'data/fetchers'
 
 import { marketplaceIntegrationsKeys } from './keys'
 import { createMarketplaceClient } from './marketplace-client'
+import { handleError } from '@/data/fetchers'
 
 async function getMarketplaceCategories() {
   const client = createMarketplaceClient()
