@@ -1,6 +1,6 @@
 'use client'
 
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 const data = [
   { month: '2020-03', newDevelopers: 11, cumulativeDevelopers: 11 },
@@ -85,46 +85,6 @@ const formatYAxis = (value: number): string => {
   return String(value)
 }
 
-const formatTooltipValue = (value: number): string => {
-  return value.toLocaleString()
-}
-
-const formatMonth = (month: string): string => {
-  const [year, m] = month.split('-')
-  const monthNames = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ]
-  return `${monthNames[parseInt(m, 10) - 1]} ${year}`
-}
-
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null
-
-  const entry = payload[0].payload
-  return (
-    <div className="rounded-lg border bg-surface-100 px-3 py-2 shadow-md">
-      <p className="text-sm font-medium text-foreground">{formatMonth(label)}</p>
-      <p className="text-sm text-foreground-light">
-        Total: {formatTooltipValue(entry.cumulativeDevelopers)}
-      </p>
-      <p className="text-sm text-foreground-lighter">
-        New: +{formatTooltipValue(entry.newDevelopers)}
-      </p>
-    </div>
-  )
-}
-
 const isYearBoundary = (month: string, index: number): boolean => {
   return index === 0 || month.endsWith('-01')
 }
@@ -155,7 +115,6 @@ const DeveloperGrowthChart = () => {
             tickFormatter={formatYAxis}
             width={40}
           />
-          <Tooltip content={<CustomTooltip />} />
           <Area
             type="monotone"
             dataKey="cumulativeDevelopers"
