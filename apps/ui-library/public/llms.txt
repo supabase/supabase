@@ -1,5 +1,5 @@
 # Supabase UI Library
-Last updated: 2026-02-20T06:55:48.569Z
+Last updated: 2026-04-02T09:43:09.760Z
 
 ## Overview
 Library of components for your project. The components integrate with Supabase and are shadcn compatible.
@@ -13,8 +13,6 @@ Library of components for your project. The components integrate with Supabase a
     - A flexible, open-source, React-based UI component library built on shadcn/ui, designed to simplify Supabase-powered projects with pre-built Auth, Storage, and Realtime features.
 - [Quick Start](https://supabase.com/ui/docs/getting-started/quickstart)
     - Install shadcn/ui and use the components in your project
-- [Infinite Query Hook](https://supabase.com/ui/docs/infinite-query-hook)
-    - React hook for infinite lists, fetching data from Supabase.
 - [Supabase Client Libraries](https://supabase.com/ui/docs/nextjs/client)
     - Supabase client for Next.js
 - [Current User Avatar](https://supabase.com/ui/docs/nextjs/current-user-avatar)
@@ -33,6 +31,8 @@ Library of components for your project. The components integrate with Supabase a
     - Real-time Monaco editor for collaborative applications
 - [Social Authentication](https://supabase.com/ui/docs/nextjs/social-auth)
     - Social authentication block for Next.js
+- [TanStack DB](https://supabase.com/ui/docs/nextjs/tanstack-db)
+    - Local-first, reactive collections backed by Supabase
 - [Supabase Client Libraries](https://supabase.com/ui/docs/nuxtjs/client)
     - Supabase client for Nuxt.js
 - [Current User Avatar](https://supabase.com/ui/docs/nuxtjs/current-user-avatar)
@@ -75,6 +75,8 @@ Library of components for your project. The components integrate with Supabase a
     - Supabase Auth-aware avatar
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/react/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
+- [Infinite Query Hook](https://supabase.com/ui/docs/react/infinite-query)
+    - React hook for infinite lists, fetching data from Supabase.
 - [Password-based Authentication](https://supabase.com/ui/docs/react/password-based-auth)
     - Password-based authentication block for React Single Page Applications
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/react/realtime-avatar-stack)
@@ -111,6 +113,8 @@ Library of components for your project. The components integrate with Supabase a
     - Supabase Auth-aware avatar
 - [Dropzone (File Upload)](https://supabase.com/ui/docs/vue/dropzone)
     - Displays a control for easier uploading of files directly to Supabase Storage
+- [Infinite Query Composable](https://supabase.com/ui/docs/vue/infinite-query)
+    - Vue Composable for infinite lists, fetching data from Supabase.
 - [Password-based Authentication](https://supabase.com/ui/docs/vue/password-based-auth)
     - Password-based authentication block for Vue Single Page Applications
 - [Realtime Avatar Stack](https://supabase.com/ui/docs/vue/realtime-avatar-stack)

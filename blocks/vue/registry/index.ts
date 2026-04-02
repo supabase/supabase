@@ -6,6 +6,7 @@ import { socialAuth } from './social-auth'
 import { currentUserAvatar } from './current-user-avatar'
 import { realtimeAvatarStack } from './realtime-avatar-stack'
 import { realtimeChat } from './realtime-chat'
+import { infiniteQuery } from './infinite-query'
 
 const blocks = [
   ...clients,
@@ -15,7 +16,8 @@ const blocks = [
   ...realtimeCursor,
   ...currentUserAvatar,
   ...realtimeAvatarStack,
-  ...realtimeChat
+  ...realtimeChat,
+  ...infiniteQuery
 ]
 
 export { blocks }

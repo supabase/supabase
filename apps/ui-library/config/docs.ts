@@ -117,12 +117,12 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Realtime Chat',
     },
     {
-      title: 'Infinite Query Hook',
-      supportedFrameworks: [],
-      href: '/docs/infinite-query-hook',
+      title: 'Infinite Query',
+      supportedFrameworks: ['react', 'vue'],
+      href: '/docs/react/infinite-query',
       new: true,
       items: [],
-      commandItemLabel: 'Infinite Query Hook',
+      commandItemLabel: 'Infinite Query',
     },
   ],
 }
