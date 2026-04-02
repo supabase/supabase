@@ -30,6 +30,10 @@ vi.mock('data/entitlements/entitlements-query', () => ({
   checkEntitlement: vi.fn(),
 }))
 
+vi.mock('data/fetchers', () => ({
+  get: vi.fn(),
+}))
+
 describe('ai/org-ai-details', () => {
   let mockGetOrganizations: ReturnType<typeof vi.fn>
   let mockGetProjectDetail: ReturnType<typeof vi.fn>
@@ -38,6 +42,7 @@ describe('ai/org-ai-details', () => {
   let mockGetAiOptInLevel: ReturnType<typeof vi.fn>
   let mockSubscriptionHasHipaaAddon: ReturnType<typeof vi.fn>
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
+  let mockGet: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     vi.clearAllMocks()
@@ -50,6 +55,7 @@ describe('ai/org-ai-details', () => {
     const subscriptionUtils =
       await import('components/interfaces/Billing/Subscription/Subscription.utils')
     const entitlementsQuery = await import('data/entitlements/entitlements-query')
+    const fetchers = await import('data/fetchers')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
     mockGetProjectDetail = vi.mocked(projectQuery.getProjectDetail)
@@ -58,12 +64,14 @@ describe('ai/org-ai-details', () => {
     mockGetAiOptInLevel = vi.mocked(aiHook.getAiOptInLevel)
     mockSubscriptionHasHipaaAddon = vi.mocked(subscriptionUtils.subscriptionHasHipaaAddon)
     mockCheckEntitlement = vi.mocked(entitlementsQuery.checkEntitlement)
+    mockGet = vi.mocked(fetchers.get)
 
     // Default mocks for subscription/settings (no HIPAA)
     mockGetOrgSubscription.mockResolvedValue({ addons: [] })
     mockGetProjectSettings.mockResolvedValue({ is_sensitive: false })
     mockSubscriptionHasHipaaAddon.mockReturnValue(false)
     mockCheckEntitlement.mockResolvedValue({ hasAccess: false })
+    mockGet.mockResolvedValue({ data: { signed: false, checked_at: '2026-01-01T00:00:00.000Z' } })
   })
 
   describe('getOrgAIDetails', () => {
@@ -128,6 +136,8 @@ describe('ai/org-ai-details', () => {
         aiOptInLevel: 'schema_only',
         hasAccessToAdvanceModel: false,
         isHipaaEnabled: false,
+        isDpaSigned: false,
+        isEuRegion: false,
         orgId: 1,
         planId: 'free',
       })
@@ -350,6 +360,94 @@ describe('ai/org-ai-details', () => {
       })
 
       expect(result.isHipaaEnabled).toBe(false)
+    })
+
+    it('should return isDpaSigned true when the DPA signed endpoint returns signed: true', async () => {
+      const mockOrg = { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] }
+      const mockProject = { organization_id: 1, region: 'us-east-1' }
+
+      mockGetOrganizations.mockResolvedValue([mockOrg])
+      mockGetProjectDetail.mockResolvedValue(mockProject)
+      mockGetAiOptInLevel.mockReturnValue('schema')
+      mockGet.mockResolvedValue({ data: { signed: true, checked_at: '2026-01-01T00:00:00.000Z' } })
+
+      const result = await getOrgAIDetails({
+        orgSlug: 'test-org',
+        authorization: 'Bearer token',
+        projectRef: 'test-project',
+      })
+
+      expect(result.isDpaSigned).toBe(true)
+    })
+
+    it('should return isDpaSigned false when the DPA signed endpoint returns signed: false', async () => {
+      const mockOrg = { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] }
+      const mockProject = { organization_id: 1, region: 'us-east-1' }
+
+      mockGetOrganizations.mockResolvedValue([mockOrg])
+      mockGetProjectDetail.mockResolvedValue(mockProject)
+      mockGetAiOptInLevel.mockReturnValue('schema')
+      mockGet.mockResolvedValue({ data: { signed: false, checked_at: '2026-01-01T00:00:00.000Z' } })
+
+      const result = await getOrgAIDetails({
+        orgSlug: 'test-org',
+        authorization: 'Bearer token',
+        projectRef: 'test-project',
+      })
+
+      expect(result.isDpaSigned).toBe(false)
+    })
+
+    it('should return isDpaSigned false when the DPA signed endpoint fails', async () => {
+      const mockOrg = { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] }
+      const mockProject = { organization_id: 1, region: 'us-east-1' }
+
+      mockGetOrganizations.mockResolvedValue([mockOrg])
+      mockGetProjectDetail.mockResolvedValue(mockProject)
+      mockGetAiOptInLevel.mockReturnValue('schema')
+      mockGet.mockResolvedValue({ data: null, error: { message: 'Unauthorized' } })
+
+      const result = await getOrgAIDetails({
+        orgSlug: 'test-org',
+        authorization: 'Bearer token',
+        projectRef: 'test-project',
+      })
+
+      expect(result.isDpaSigned).toBe(false)
+    })
+
+    it('should return isEuRegion true for EU database regions', async () => {
+      const mockOrg = { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] }
+      const mockProject = { organization_id: 1, region: 'eu-west-2' }
+
+      mockGetOrganizations.mockResolvedValue([mockOrg])
+      mockGetProjectDetail.mockResolvedValue(mockProject)
+      mockGetAiOptInLevel.mockReturnValue('schema')
+
+      const result = await getOrgAIDetails({
+        orgSlug: 'test-org',
+        authorization: 'Bearer token',
+        projectRef: 'test-project',
+      })
+
+      expect(result.isEuRegion).toBe(true)
+    })
+
+    it('should return isEuRegion false for non-EU database regions', async () => {
+      const mockOrg = { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] }
+      const mockProject = { organization_id: 1, region: 'ap-southeast-1' }
+
+      mockGetOrganizations.mockResolvedValue([mockOrg])
+      mockGetProjectDetail.mockResolvedValue(mockProject)
+      mockGetAiOptInLevel.mockReturnValue('schema')
+
+      const result = await getOrgAIDetails({
+        orgSlug: 'test-org',
+        authorization: 'Bearer token',
+        projectRef: 'test-project',
+      })
+
+      expect(result.isEuRegion).toBe(false)
     })
 
     it('should fetch subscription and project settings with authorization headers', async () => {

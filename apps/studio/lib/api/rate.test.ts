@@ -1,4 +1,5 @@
 import { expect, test, vi } from 'vitest'
+
 // End of third-party imports
 
 import rate from '../../pages/api/ai/feedback/rate'
@@ -46,6 +47,8 @@ test('rate calls the tool sanitizer', async () => {
     getOrgAIDetails: vi.fn().mockResolvedValue({
       aiOptInLevel: 'schema_and_log_and_data',
       hasAccessToAdvanceModel: true,
+      isDpaSigned: false,
+      isEuRegion: false,
     }),
   }))
 
