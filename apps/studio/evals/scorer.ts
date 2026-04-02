@@ -105,7 +105,13 @@ export const knowledgeUsageScorer: EvalScorer<
     .filter((call) => call.toolName === 'load_knowledge')
     .flatMap((call) => {
       const input = call.input
-      if (typeof input !== 'object' || input === null || !('name' in input) || typeof input.name !== 'string') return []
+      if (
+        typeof input !== 'object' ||
+        input === null ||
+        !('name' in input) ||
+        typeof input.name !== 'string'
+      )
+        return []
       return [input.name]
     })
 
