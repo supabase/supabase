@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { customRender } from '@/tests/lib/custom-render'
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointSheet, toEndpointPayload } from './PlatformWebhooksEndpointSheet'
+import { customRender } from '@/tests/lib/custom-render'
 
 const { generateWebhookEndpointNameMock } = vi.hoisted(() => ({
   generateWebhookEndpointNameMock: vi.fn(() => 'winged-envelope'),
