@@ -5,10 +5,36 @@
     "allowJs": false,
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
-      // @deprecated: Don't import directly without suffix. Use @/ always.
-      "*": ["./*"],
       "@/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
+      "@ui/*": ["./../../packages/ui/src/*"], // handle ui package paths
+      // @deprecated: use @/ prefix instead
+      "components/*": ["./components/*"],
+      // @deprecated: use @/ prefix instead
+      "data/*": ["./data/*"],
+      // @deprecated: use @/ prefix instead
+      "evals/*": ["./evals/*"],
+      // @deprecated: use @/ prefix instead
+      "fonts/*": ["./fonts/*"],
+      // @deprecated: use @/ prefix instead
+      "hooks/*": ["./hooks/*"],
+      // @deprecated: use @/ prefix instead
+      "lib/*": ["./lib/*"],
+      // @deprecated: use @/ prefix instead
+      "pages/*": ["./pages/*"],
+      // @deprecated: use @/ prefix instead
+      "public/*": ["./public/*"],
+      // @deprecated: use @/ prefix instead
+      "state/*": ["./state/*"],
+      // @deprecated: use @/ prefix instead
+      "static-data/*": ["./static-data/*"],
+      // @deprecated: use @/ prefix instead
+      "styles/*": ["./styles/*"],
+      // @deprecated: use @/ prefix instead
+      "tests/*": ["./tests/*"],
+      // @deprecated: use @/ prefix instead
+      "types": ["./types"],
+      // @deprecated: use @/ prefix instead
+      "types/*": ["./types/*"]
     },
     "plugins": [{ "name": "next" }]
   },
