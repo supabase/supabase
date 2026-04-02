@@ -73,8 +73,7 @@ describe('useGenerateSettingsMenu', () => {
     const { result } = renderHook(() => useGenerateSettingsMenu())
     const configurationGroup = result.current.find((group) => group.title === 'Configuration')
     const hasDashboardPreferences = configurationGroup?.items.some(
-      (item) =>
-        item.name === 'Dashboard' && item.url === '/project/project-ref/settings/dashboard'
+      (item) => item.name === 'Dashboard' && item.url === '/project/project-ref/settings/dashboard'
     )
 
     expect(hasDashboardPreferences).toBe(true)
