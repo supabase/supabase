@@ -3022,6 +3022,36 @@ export interface PricingPageExperimentExposedEvent {
 }
 
 /**
+ * User was exposed to the header upgrade CTA experiment in studio.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaExperimentExposedEvent {
+  action: 'header_upgrade_cta_experiment_exposed'
+  properties: {
+    experiment_id: 'headerUpgradeCta'
+    variant: 'control' | 'test'
+  }
+}
+
+/**
+ * User clicked the "Upgrade to Pro" CTA in the dashboard header.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaClickedEvent {
+  action: 'header_upgrade_cta_clicked'
+  properties: {
+    currentPlan: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3190,3 +3220,5 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | PricingPageExperimentExposedEvent
+  | HeaderUpgradeCtaExperimentExposedEvent
+  | HeaderUpgradeCtaClickedEvent
