@@ -266,10 +266,6 @@ function DirectConnectionContent({ state }: StepContentProps) {
       >
         {connectionString}
       </CodeBlock>
-      <ConnectionParameters
-        parameters={buildConnectionParameters(connectionParams)}
-        onCopy={trackCopy}
-      />
       {projectRef && (
         <div className="mt-2">
           <IPv4StatusPanel
@@ -279,6 +275,10 @@ function DirectConnectionContent({ state }: StepContentProps) {
           />
         </div>
       )}
+      <ConnectionParameters
+        parameters={buildConnectionParameters(connectionParams)}
+        onCopy={trackCopy}
+      />
     </div>
   )
 }
