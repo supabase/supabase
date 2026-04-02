@@ -108,6 +108,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
   let isHipaaEnabled = false
+  let isDpaSigned = false
+  let isEuRegion = false
   let orgId: number | undefined
   let planId: string | undefined
 
@@ -123,6 +125,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         aiOptInLevel: orgAIOptInLevel,
         hasAccessToAdvanceModel: orgHasAccessToAdvanceModel,
         isHipaaEnabled: orgIsHipaaEnabled,
+        isDpaSigned: orgIsDpaSigned,
+        isEuRegion: orgIsEuRegion,
         orgId: fetchedOrgId,
         planId: fetchedPlanId,
       } = await getOrgAIDetails({
@@ -134,6 +138,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       aiOptInLevel = orgAIOptInLevel
       hasAccessToAdvanceModel = orgHasAccessToAdvanceModel
       isHipaaEnabled = orgIsHipaaEnabled
+      isDpaSigned = orgIsDpaSigned
+      isEuRegion = orgIsEuRegion
       orgId = fetchedOrgId
       planId = fetchedPlanId
     } catch (error) {
@@ -211,6 +217,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       chatId,
       chatName,
       isHipaaEnabled,
+      isDpaSigned,
+      isEuRegion,
       userId,
       orgId,
       planId,
