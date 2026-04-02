@@ -45,7 +45,7 @@ const page: GoPageInput = {
             </li>
             <li>
               Create a{' '}
-              <Link href="https://dreambase.io" className="underline">
+              <Link href="https://dreambase.ai" className="underline">
                 Dreambase
               </Link>{' '}
               account using the same email
