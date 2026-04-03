@@ -124,6 +124,7 @@ const WrapperDynamicColumns = ({
                 label="Name"
                 value={column.name}
                 onChange={(e) => onUpdateValue(column.id, 'name', e.target.value)}
+                aria-label="Column name"
               />
 
               <div className="flex-1">
