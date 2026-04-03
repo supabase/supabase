@@ -28,6 +28,7 @@ export type AssistantEvalOutput = {
 
 export type Expected = {
   requiredTools?: string[]
+  requiredKnowledge?: string[]
   correctAnswer?: string
 }
 
@@ -88,6 +89,40 @@ export const toolUsageScorer: EvalScorer<
 
   return {
     name: 'Tool Usage',
+    score: ratio,
+  }
+}
+
+export const knowledgeUsageScorer: EvalScorer<
+  AssistantEvalInput,
+  AssistantEvalOutput,
+  Expected
+> = async ({ output, expected }) => {
+  if (!expected.requiredKnowledge) return null
+
+  const loadedKnowledge = output.steps
+    .flatMap((step) => step.toolCalls)
+    .filter((call) => call.toolName === 'load_knowledge')
+    .flatMap((call) => {
+      const input = call.input
+      if (
+        typeof input !== 'object' ||
+        input === null ||
+        !('name' in input) ||
+        typeof input.name !== 'string'
+      )
+        return []
+      return [input.name]
+    })
+
+  const presentCount = expected.requiredKnowledge.filter((knowledge) =>
+    loadedKnowledge.includes(knowledge)
+  ).length
+  const totalCount = expected.requiredKnowledge.length
+  const ratio = totalCount === 0 ? 1 : presentCount / totalCount
+
+  return {
+    name: 'Knowledge Usage',
     score: ratio,
   }
 }

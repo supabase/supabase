@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import type { IncidentInfo } from 'lib/api/incident-status'
-import { BASE_PATH, IS_PLATFORM, IS_TEST_ENV } from 'lib/constants'
 import { partition } from 'lodash'
-import { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { platformKeys } from './keys'
+import type { IncidentInfo } from '@/lib/api/incident-status'
+import { BASE_PATH, IS_PLATFORM, IS_TEST_ENV } from '@/lib/constants'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getIncidentStatus(
   signal?: AbortSignal

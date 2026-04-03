@@ -1,49 +1,50 @@
 import { describe, expect, it } from 'vitest'
 
-import { getRenderingTools } from './rendering-tools'
+import { getStudioTools } from './studio-tools'
 
-describe('ai/tools/rendering-tools', () => {
-  describe('getRenderingTools', () => {
+describe('ai/tools/studio-tools', () => {
+  describe('getStudioTools', () => {
     it('should return an object with tool definitions', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
 
       expect(tools).toBeDefined()
       expect(typeof tools).toBe('object')
     })
 
     it('should include execute_sql tool', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
 
       expect(tools.execute_sql).toBeDefined()
       expect(tools.execute_sql.description).toContain('execute a SQL statement')
     })
 
     it('should include deploy_edge_function tool', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
 
       expect(tools.deploy_edge_function).toBeDefined()
       expect(tools.deploy_edge_function.description).toContain('deploy a Supabase Edge Function')
     })
 
     it('should include rename_chat tool', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
 
       expect(tools.rename_chat).toBeDefined()
       expect(tools.rename_chat.description).toContain('Rename the current chat session')
     })
 
-    it('should have exactly 3 tools', () => {
-      const tools = getRenderingTools()
+    it('should have exactly 4 tools', () => {
+      const tools = getStudioTools()
       const toolNames = Object.keys(tools)
 
-      expect(toolNames).toHaveLength(3)
+      expect(toolNames).toHaveLength(4)
+      expect(toolNames).toContain('load_knowledge')
       expect(toolNames).toContain('execute_sql')
       expect(toolNames).toContain('deploy_edge_function')
       expect(toolNames).toContain('rename_chat')
     })
 
     it('should have execute_sql with correct input schema fields', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
       const executeSqlTool = tools.execute_sql
 
       // Check that the tool has an input schema
@@ -56,7 +57,7 @@ describe('ai/tools/rendering-tools', () => {
     })
 
     it('should have deploy_edge_function with input schema', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
       const deployTool = tools.deploy_edge_function
 
       expect(deployTool.inputSchema).toBeDefined()
@@ -67,7 +68,7 @@ describe('ai/tools/rendering-tools', () => {
     })
 
     it('should have rename_chat with execute function', async () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
       const renameTool = tools.rename_chat
 
       expect(renameTool.execute).toBeDefined()
@@ -83,7 +84,7 @@ describe('ai/tools/rendering-tools', () => {
     })
 
     it('should validate execute_sql input schema correctly', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
       const schema = tools.execute_sql.inputSchema
 
       // Check if schema is a Zod schema with safeParse
@@ -119,7 +120,7 @@ describe('ai/tools/rendering-tools', () => {
     })
 
     it('should validate rename_chat input schema correctly', () => {
-      const tools = getRenderingTools()
+      const tools = getStudioTools()
       const schema = tools.rename_chat.inputSchema
 
       // Check if schema is a Zod schema with safeParse

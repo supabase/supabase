@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesMetricsVariables = {
   projectRef?: string
