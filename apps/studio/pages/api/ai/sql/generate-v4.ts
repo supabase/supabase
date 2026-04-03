@@ -4,6 +4,7 @@ import { safeValidateUIMessages } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { isTracingAllowed } from 'lib/ai/braintrust-logger'
 import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
 import { getModel } from 'lib/ai/model'
 import {
@@ -107,9 +108,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
-  let isHipaaEnabled = false
-  let isDpaSigned = false
-  let isEuRegion = false
+  let isHipaaEnabled: boolean | undefined
+  let isDpaSigned: boolean | undefined
+  let isEuRegion: boolean | undefined
   let orgId: number | undefined
   let planId: string | undefined
 
@@ -216,9 +217,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRef,
       chatId,
       chatName,
-      isHipaaEnabled,
-      isDpaSigned,
-      isEuRegion,
+      allowTracing: isTracingAllowed({ isHipaaEnabled, isDpaSigned, isEuRegion }),
       userId,
       orgId,
       planId,

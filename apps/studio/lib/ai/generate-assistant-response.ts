@@ -28,9 +28,7 @@ export async function generateAssistantResponse({
   projectRef,
   chatId,
   chatName,
-  isHipaaEnabled,
-  isDpaSigned,
-  isEuRegion,
+  allowTracing,
   userId,
   orgId,
   planId,
@@ -48,9 +46,7 @@ export async function generateAssistantResponse({
   projectRef?: string
   chatId?: string
   chatName?: string
-  isHipaaEnabled?: boolean
-  isDpaSigned?: boolean
-  isEuRegion?: boolean
+  allowTracing?: boolean
   userId?: string
   orgId?: number
   planId?: string
@@ -60,7 +56,7 @@ export async function generateAssistantResponse({
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
 }) {
-  const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled && !isDpaSigned && !isEuRegion
+  const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   const run = async (span?: Span) => {
     // Only returns last 7 messages

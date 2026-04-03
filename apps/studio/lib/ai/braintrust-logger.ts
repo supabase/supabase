@@ -15,3 +15,17 @@ if (IS_TRACING_ENABLED) {
     projectId: BRAINTRUST_PROJECT_ID,
   })
 }
+
+// Returns true only when all compliance flags are explicitly confirmed off.
+// Treats undefined as restricted — unknown state is not safe to trace.
+export function isTracingAllowed({
+  isHipaaEnabled,
+  isDpaSigned,
+  isEuRegion,
+}: {
+  isHipaaEnabled: boolean | undefined
+  isDpaSigned: boolean | undefined
+  isEuRegion: boolean | undefined
+}) {
+  return isHipaaEnabled === false && isDpaSigned === false && isEuRegion === false
+}

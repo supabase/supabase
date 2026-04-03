@@ -3,7 +3,7 @@ import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
 import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
+import { IS_TRACING_ENABLED, isTracingAllowed } from 'lib/ai/braintrust-logger'
 import { getModel } from 'lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
@@ -54,9 +54,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isHipaaEnabled = false
-  let isDpaSigned = false
-  let isEuRegion = false
+  let isHipaaEnabled: boolean | undefined
+  let isDpaSigned: boolean | undefined
+  let isEuRegion: boolean | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -140,7 +140,11 @@ Instructions:
     })
 
     // Log feedback to Braintrust if tracing is enabled and span ID is available
-    if (IS_TRACING_ENABLED && !isHipaaEnabled && !isDpaSigned && !isEuRegion && spanId) {
+    if (
+      IS_TRACING_ENABLED &&
+      isTracingAllowed({ isHipaaEnabled, isDpaSigned, isEuRegion }) &&
+      spanId
+    ) {
       try {
         const logger = currentLogger()
         logger?.logFeedback({
