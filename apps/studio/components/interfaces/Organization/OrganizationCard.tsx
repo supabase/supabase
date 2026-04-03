@@ -5,6 +5,7 @@ import { Fragment } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ActionCard } from '@/components/ui/ActionCard'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import type { Organization } from '@/types'
 
@@ -49,16 +50,19 @@ export const OrganizationCard = ({
               </>
             )}
           </div>
-          {isMfaRequired && (
-            <Tooltip>
-              <TooltipTrigger className="cursor-default">
-                <Lock size={12} />
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className={!isUserMFAEnabled ? 'w-80' : ''}>
-                MFA enforced
-              </TooltipContent>
-            </Tooltip>
-          )}
+          <div className="flex items-center gap-x-2">
+            <PartnerIcon organization={organization} />
+            {isMfaRequired && (
+              <Tooltip>
+                <TooltipTrigger className="cursor-default">
+                  <Lock size={12} />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className={!isUserMFAEnabled ? 'w-80' : ''}>
+                  MFA enforced
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </div>
       }
     />

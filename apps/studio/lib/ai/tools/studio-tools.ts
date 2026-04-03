@@ -1,8 +1,23 @@
 import { tool } from 'ai'
+import {
+  EDGE_FUNCTION_PROMPT,
+  PG_BEST_PRACTICES,
+  REALTIME_PROMPT,
+  RLS_PROMPT,
+} from 'lib/ai/prompts'
 import { fixSqlBackslashEscapes } from 'lib/ai/util'
 import { z } from 'zod'
 
-export const getRenderingTools = () => ({
+const KNOWLEDGE = {
+  pg_best_practices: PG_BEST_PRACTICES,
+  rls: RLS_PROMPT,
+  edge_functions: EDGE_FUNCTION_PROMPT,
+  realtime: REALTIME_PROMPT,
+} as const
+
+type KnowledgeName = keyof typeof KNOWLEDGE
+
+export const getStudioTools = () => ({
   execute_sql: tool({
     description: 'Asks the user to execute a SQL statement and return the results',
     inputSchema: z.object({
@@ -40,5 +55,15 @@ export const getRenderingTools = () => ({
     execute: async () => {
       return { status: 'Chat request sent to client' }
     },
+  }),
+  load_knowledge: tool({
+    description:
+      'Load detailed knowledge about a Supabase topic before answering questions about it.',
+    inputSchema: z.object({
+      name: z
+        .enum(Object.keys(KNOWLEDGE) as [KnowledgeName, ...KnowledgeName[]])
+        .describe('The knowledge to load'),
+    }),
+    execute: ({ name }) => KNOWLEDGE[name],
   }),
 })
