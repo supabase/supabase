@@ -230,7 +230,7 @@ export const CreateIcebergWrapperSheet = ({
     .map((option) => {
       return {
         ...option,
-        required: !!targetFields[target].find((field) => field.name)?.required,
+        required: !!targetFields[target].find((field) => field.name === option.name)?.required,
       }
     })
   return (
