@@ -109,6 +109,18 @@ const targetFields: Record<Target, { name: string; required: boolean }[]> = {
 
 type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
+const INITIAL_VALUES = {
+  wrapper_name: '',
+  server_name: '',
+  source_schema: '',
+  target_schema: '',
+  target: 'S3Tables',
+  vault_aws_access_key_id: '',
+  vault_aws_s3table_bucket_arn: '',
+  vault_aws_secret_access_key: '',
+  region_name: '',
+}
+
 export const CreateIcebergWrapperSheet = ({
   wrapperMeta,
   onDirty,
@@ -131,39 +143,24 @@ export const CreateIcebergWrapperSheet = ({
     connectionString: project?.connectionString,
   })
 
-  const initialValues = useMemo<FormSchema>(
-    () => ({
-      wrapper_name: '',
-      server_name: '',
-      source_schema: '',
-      target_schema: '',
-      target: 'S3Tables',
-      vault_aws_access_key_id: '',
-      vault_aws_s3table_bucket_arn: '',
-      vault_aws_secret_access_key: '',
-      region_name: '',
-    }),
-    []
-  )
-
   const { mutateAsync: createSchema } = useSchemaCreateMutation()
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialValues,
+    defaultValues: INITIAL_VALUES,
   })
   const { reset, resetField, formState, setError, watch } = form
   const { isDirty, isSubmitting } = formState
 
   useEffect(() => {
-    reset(initialValues)
-  }, [initialValues, reset])
+    reset(INITIAL_VALUES)
+  }, [INITIAL_VALUES, reset])
 
   useEffect(() => {
     onDirty(isDirty)
   }, [onDirty, isDirty])
 
-  const currentTarget = useRef(initialValues.target)
+  const currentTarget = useRef(INITIAL_VALUES.target)
   useEffect(() => {
     const subscription = watch((values) => {
       if (!values.target || values.target === currentTarget.current) return
