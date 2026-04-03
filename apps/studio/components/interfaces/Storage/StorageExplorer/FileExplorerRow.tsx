@@ -17,10 +17,17 @@ import {
   Trash2,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
-import { useContextMenu } from 'react-contexify'
 import {
   Checkbox,
   cn,
+  ContextMenu_Shadcn_,
+  ContextMenuContent_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuSeparator_Shadcn_,
+  ContextMenuSub_Shadcn_,
+  ContextMenuSubContent_Shadcn_,
+  ContextMenuSubTrigger_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -36,7 +43,6 @@ import {
 } from 'ui'
 
 import {
-  CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
@@ -127,7 +133,6 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
-  const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
 
   const isPublic = selectedBucket.public
@@ -272,18 +277,6 @@ export const FileExplorerRow = ({
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
 
-  const displayMenu = (event: any, rowType: STORAGE_ROW_TYPES) => {
-    show(event, {
-      id:
-        rowType === STORAGE_ROW_TYPES.FILE
-          ? CONTEXT_MENU_KEYS.STORAGE_ITEM
-          : CONTEXT_MENU_KEYS.STORAGE_FOLDER,
-      props: {
-        item: itemWithColumnIndex,
-      },
-    })
-  }
-
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
       ? `calc(100% - 60px)`
@@ -298,159 +291,188 @@ export const FileExplorerRow = ({
   }
 
   return (
-    <div
-      style={style}
-      className="h-full border-b border-default"
-      onContextMenu={(event) => {
-        event.stopPropagation()
-        item.type === STORAGE_ROW_TYPES.FILE
-          ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
-          : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
-      }}
-    >
-      <div
-        className={cn(
-          'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-selection' : ''}`,
-          `${isSelected ? 'bg-selection' : ''}`,
-          `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
-        )}
-        onClick={(event) => {
-          event.stopPropagation()
-          event.preventDefault()
-          if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            item.type === STORAGE_ROW_TYPES.FOLDER
-              ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex)
-          }
-        }}
-      >
-        <div
-          className={cn(
-            'flex items-center',
-            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
-          )}
-        >
-          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
-            {!isSelected && (
-              <div
-                className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                }`}
-                style={{ top: '2px' }}
-              >
-                <RowIcon
-                  view={view}
-                  status={item.status}
-                  fileType={item.type}
-                  isOpened={isOpened}
-                  mimeType={item.metadata?.mimetype}
+    <ContextMenu_Shadcn_ modal={false}>
+      <ContextMenuTrigger_Shadcn_ asChild>
+        <div style={style} className="h-full border-b border-default">
+          <div
+            className={cn(
+              'storage-row group flex h-full items-center px-2.5',
+              'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
+              `${isOpened ? 'bg-selection' : ''}`,
+              `${isSelected ? 'bg-selection' : ''}`,
+              `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
+              `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+            )}
+            onClick={(event) => {
+              event.stopPropagation()
+              event.preventDefault()
+              if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
+                item.type === STORAGE_ROW_TYPES.FOLDER
+                  ? openFolder(columnIndex, item)
+                  : onSelectFile(columnIndex)
+              }
+            }}
+          >
+            <div
+              className={cn(
+                'flex items-center',
+                view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
+              )}
+            >
+              <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
+                {!isSelected && (
+                  <div
+                    className={`absolute ${
+                      item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
+                    }`}
+                    style={{ top: '2px' }}
+                  >
+                    <RowIcon
+                      view={view}
+                      status={item.status}
+                      fileType={item.type}
+                      isOpened={isOpened}
+                      mimeType={item.metadata?.mimetype}
+                    />
+                  </div>
+                )}
+                <Checkbox
+                  label={''}
+                  className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
+                    isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                  checked={isSelected}
+                  onChange={(event) => {
+                    event.stopPropagation()
+                    onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
+                  }}
                 />
               </div>
+              <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
+                {item.name}
+              </p>
+              {item.isCorrupted && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    File is corrupted, please delete and reupload again.
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+
+            {view === STORAGE_VIEWS.LIST && (
+              <>
+                <p className="w-[11%] min-w-[100px] truncate text-sm">{size}</p>
+                <p className="w-[14%] min-w-[100px] truncate text-sm">{mimeType}</p>
+                <p className="w-[15%] min-w-[160px] truncate text-sm">{createdAt}</p>
+                <p className="w-[15%] min-w-[160px] truncate text-sm">{updatedAt}</p>
+              </>
             )}
-            <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+
+            <div
+              className={`flex items-center justify-end ${
+                view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
               }`}
-              checked={isSelected}
-              onChange={(event) => {
+              onClick={(event) =>
+                // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
                 event.stopPropagation()
-                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
-              }}
-            />
+              }
+            >
+              {item.status === STORAGE_ROW_STATUS.LOADING ? (
+                <LoaderCircle
+                  className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
+                  size={14}
+                  strokeWidth={2}
+                />
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <div className="storage-row-menu opacity-0">
+                      <MoreVertical size={16} strokeWidth={2} />
+                      <span className="sr-only">{item.name} actions</span>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="end">
+                    {rowOptions.map((option) => {
+                      if ((option?.children ?? []).length > 0) {
+                        return (
+                          <DropdownMenuSub key={option.name}>
+                            <DropdownMenuSubTrigger className="space-x-2">
+                              {option.icon || <></>}
+                              <p>{option.name}</p>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                {(option?.children ?? [])?.map((child) => {
+                                  return (
+                                    <DropdownMenuItem key={child.name} onClick={child.onClick}>
+                                      <p>{child.name}</p>
+                                    </DropdownMenuItem>
+                                  )
+                                })}
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                        )
+                      } else if (option.name === 'Separator') {
+                        return <DropdownMenuSeparator key={option.name} />
+                      } else {
+                        return (
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            key={option.name}
+                            onClick={option.onClick}
+                          >
+                            {option.icon || <></>}
+                            <p>{option.name}</p>
+                          </DropdownMenuItem>
+                        )
+                      }
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
-          <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
-            {item.name}
-          </p>
-          {item.isCorrupted && (
-            <Tooltip>
-              <TooltipTrigger>
-                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                File is corrupted, please delete and reupload again.
-              </TooltipContent>
-            </Tooltip>
-          )}
         </div>
-
-        {view === STORAGE_VIEWS.LIST && (
-          <>
-            <p className="w-[11%] min-w-[100px] truncate text-sm">{size}</p>
-            <p className="w-[14%] min-w-[100px] truncate text-sm">{mimeType}</p>
-            <p className="w-[15%] min-w-[160px] truncate text-sm">{createdAt}</p>
-            <p className="w-[15%] min-w-[160px] truncate text-sm">{updatedAt}</p>
-          </>
-        )}
-
-        <div
-          className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
-          }`}
-          onClick={(event) =>
-            // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
-            event.stopPropagation()
+      </ContextMenuTrigger_Shadcn_>
+      <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+        {rowOptions.map((option) => {
+          if ((option?.children ?? []).length > 0) {
+            return (
+              <ContextMenuSub_Shadcn_ key={option.name}>
+                <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+                  {option.icon || <></>}
+                  <span className="text-xs">{option.name}</span>
+                </ContextMenuSubTrigger_Shadcn_>
+                <ContextMenuSubContent_Shadcn_>
+                  {(option?.children ?? [])?.map((child) => (
+                    <ContextMenuItem_Shadcn_ key={child.name} onSelect={child.onClick}>
+                      <span className="text-xs">{child.name}</span>
+                    </ContextMenuItem_Shadcn_>
+                  ))}
+                </ContextMenuSubContent_Shadcn_>
+              </ContextMenuSub_Shadcn_>
+            )
+          } else if (option.name === 'Separator') {
+            return <ContextMenuSeparator_Shadcn_ key={option.name} />
+          } else {
+            return (
+              <ContextMenuItem_Shadcn_
+                className="gap-x-2"
+                key={option.name}
+                onSelect={option.onClick}
+              >
+                {option.icon || <></>}
+                <span className="text-xs">{option.name}</span>
+              </ContextMenuItem_Shadcn_>
+            )
           }
-        >
-          {item.status === STORAGE_ROW_STATUS.LOADING ? (
-            <LoaderCircle
-              className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
-              size={14}
-              strokeWidth={2}
-            />
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="storage-row-menu opacity-0">
-                  <MoreVertical size={16} strokeWidth={2} />
-                  <span className="sr-only">{item.name} actions</span>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="end">
-                {rowOptions.map((option) => {
-                  if ((option?.children ?? []).length > 0) {
-                    return (
-                      <DropdownMenuSub key={option.name}>
-                        <DropdownMenuSubTrigger className="space-x-2">
-                          {option.icon || <></>}
-                          <p>{option.name}</p>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuSubContent>
-                            {(option?.children ?? [])?.map((child) => {
-                              return (
-                                <DropdownMenuItem key={child.name} onClick={child.onClick}>
-                                  <p>{child.name}</p>
-                                </DropdownMenuItem>
-                              )
-                            })}
-                          </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenuSub>
-                    )
-                  } else if (option.name === 'Separator') {
-                    return <DropdownMenuSeparator key={option.name} />
-                  } else {
-                    return (
-                      <DropdownMenuItem
-                        className="space-x-2"
-                        key={option.name}
-                        onClick={option.onClick}
-                      >
-                        {option.icon || <></>}
-                        <p>{option.name}</p>
-                      </DropdownMenuItem>
-                    )
-                  }
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
-      </div>
-    </div>
+        })}
+      </ContextMenuContent_Shadcn_>
+    </ContextMenu_Shadcn_>
   )
 }
