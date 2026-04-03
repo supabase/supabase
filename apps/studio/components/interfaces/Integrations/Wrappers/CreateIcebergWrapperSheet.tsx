@@ -180,6 +180,7 @@ export const CreateIcebergWrapperSheet = ({
         type: 'validate',
         message: 'This schema already exists. Please specify a unique schema name.',
       })
+      return
     }
 
     try {
