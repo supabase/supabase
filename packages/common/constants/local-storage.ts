@@ -5,6 +5,7 @@ export const LOCAL_STORAGE_KEYS = {
   AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
     `supabase-ai-assistant-state-${projectRef}`,
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
+  DASHBOARD_SIDEBAR_STATE: 'dashboard-sidebar-state',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
   PROJECTS_FILTER: 'projects-filter',
@@ -24,6 +25,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
+  UI_PREVIEW_NAVIGATION_V2: 'supabase-ui-navigation-v2',
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
   UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
@@ -168,6 +170,8 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+  LOCAL_STORAGE_KEYS.DASHBOARD_SIDEBAR_STATE,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_V2,
 ]
 
 export function clearLocalStorage() {

@@ -56,11 +56,11 @@ function useSupportFormTelemetry() {
   )
 }
 
-export function SupportFormPage() {
-  return <SupportFormPageContent />
+export function SupportFormPage({ variant }: { variant?: 'inline' }) {
+  return <SupportFormPageContent variant={variant} />
 }
 
-function SupportFormPageContent() {
+function SupportFormPageContent({ variant }: { variant?: 'inline' }) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
 
@@ -91,14 +91,16 @@ function SupportFormPageContent() {
 
   const isSuccess = state.type === 'success'
 
+  const isInline = variant === 'inline'
+
   return (
-    <SupportFormWrapper>
+    <SupportFormWrapper variant={variant}>
       <SupportFormHeader />
 
       <IncidentAdmonition isActive={hasActiveIncidents} />
 
       {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
-      {!isSuccess && !hasActiveIncidents && (
+      {!isSuccess && !hasActiveIncidents && !isInline && (
         <div className="flex flex-col gap-y-4">
           <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
           <DiscordCTACard organizationSlug={orgSlug} />
@@ -111,16 +113,22 @@ function SupportFormPageContent() {
         dispatch={dispatch}
         initialError={initialError}
         selectedProjectRef={projectRef}
+        variant={variant}
       />
       {!isSuccess && <SupportFormDirectEmailInfo projectRef={projectRef} />}
     </SupportFormWrapper>
   )
 }
 
-function SupportFormWrapper({ children }: PropsWithChildren) {
+function SupportFormWrapper({ children, variant }: PropsWithChildren<{ variant?: 'inline' }>) {
   return (
     <div className="relative overflow-y-auto overflow-x-hidden">
-      <div className="mx-auto my-16 max-w-2xl w-full px-4 lg:px-6">
+      <div
+        className={cn(
+          'mx-auto my-16 max-w-2xl w-full px-4 lg:px-6',
+          variant === 'inline' ? 'max-w-full mt-8' : ''
+        )}
+      >
         <div className="flex flex-col gap-y-8">{children}</div>
       </div>
     </div>
@@ -137,7 +145,7 @@ function SupportFormHeader() {
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
       <div className="flex items-center space-x-3">
         <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
-        <h3 className="m-0 text-lg">Supabase support</h3>
+        <h3 className="m-0 text-lg">Support</h3>
       </div>
 
       <div className="flex items-center gap-x-3">
@@ -248,6 +256,7 @@ interface SupportFromBodyProps {
   dispatch: Dispatch<SupportFormActions>
   initialError: string | null
   selectedProjectRef: string | null
+  variant?: 'inline'
 }
 
 function SupportFormBody({
@@ -256,15 +265,17 @@ function SupportFormBody({
   dispatch,
   initialError,
   selectedProjectRef,
+  variant,
 }: SupportFromBodyProps) {
   const isSuccess = state.type === 'success'
 
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
+        'min-w-full space-y-12',
         `${isSuccess ? 'pt-8' : 'py-8'}`,
-        'border-default'
+        'border-default',
+        variant === 'inline' ? '-mx-6 p-0' : 'rounded border bg-panel-body-light shadow-md'
       )}
     >
       {isSuccess ? (

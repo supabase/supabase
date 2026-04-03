@@ -7,17 +7,21 @@ import type { AdvisorItem } from './AdvisorPanel.types'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
+import { useProjectLintsQuery, type Lint } from '@/data/lint/lint-query'
 import {
-  Notification,
-  NotificationData,
   useNotificationsV2Query,
+  type Notification,
+  type NotificationData,
 } from '@/data/notifications/notifications-v2-query'
 import { useNotificationsV2UpdateMutation } from '@/data/notifications/notifications-v2-update-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
-import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from '@/state/advisor-state'
+import {
+  useAdvisorStateSnapshot,
+  type AdvisorSeverity,
+  type AdvisorTab,
+} from '@/state/advisor-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const severityOrder: Record<AdvisorSeverity, number> = {

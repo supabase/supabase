@@ -122,5 +122,14 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: false,
       isDefaultOptIn: true,
     },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_V2,
+      name: 'New navigation layout',
+      discussionsUrl: undefined,
+      enabled: true,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
+    },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

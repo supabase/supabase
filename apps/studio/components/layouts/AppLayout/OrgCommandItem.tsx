@@ -12,6 +12,7 @@ export interface OrgCommandItemProps {
   hasRouteSlug: boolean
   onClose: () => void
   compactPadding?: boolean
+  onSelectOrganization?: (org: Organization) => void
 }
 
 export function OrgCommandItem({
@@ -21,6 +22,7 @@ export function OrgCommandItem({
   hasRouteSlug,
   onClose,
   compactPadding = false,
+  onSelectOrganization,
 }: OrgCommandItemProps) {
   const href = hasRouteSlug ? routePathname.replace('[slug]', org.slug) : `/org/${org.slug}`
 
@@ -29,21 +31,42 @@ export function OrgCommandItem({
       key={org.slug}
       value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
       className="cursor-pointer w-full"
-      onSelect={() => onClose()}
+      onSelect={() => {
+        if (onSelectOrganization) {
+          onSelectOrganization(org)
+          return
+        }
+        onClose()
+      }}
     >
-      <Link
-        href={href}
-        className={cn(
-          'w-full flex items-center justify-between text-sm md:text-xs',
-          !compactPadding && 'p-0.5'
-        )}
-      >
-        <div className="flex items-center gap-2">
-          <span>{org.name}</span>
-          <PartnerIcon organization={org} />
+      {onSelectOrganization ? (
+        <div
+          className={cn(
+            'w-full flex items-center justify-between text-sm md:text-xs',
+            !compactPadding && 'p-0.5'
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <span>{org.name}</span>
+            <PartnerIcon organization={org} />
+          </div>
+          {org.slug === selectedSlug && <Check size={16} />}
         </div>
-        {org.slug === selectedSlug && <Check size={16} />}
-      </Link>
+      ) : (
+        <Link
+          href={href}
+          className={cn(
+            'w-full flex items-center justify-between text-sm md:text-xs',
+            !compactPadding && 'p-0.5'
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <span>{org.name}</span>
+            <PartnerIcon organization={org} />
+          </div>
+          {org.slug === selectedSlug && <Check size={16} />}
+        </Link>
+      )}
     </CommandItem_Shadcn_>
   )
 }

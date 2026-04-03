@@ -190,3 +190,5 @@ export const RestoringState = () => {
     </div>
   )
 }
+
+export default RestoringState

@@ -318,7 +318,7 @@ const MenuBarWrapper = ({
   return !isLoading && productMenu && showMenuBar ? children : null
 }
 
-interface ContentWrapperProps {
+export interface ContentWrapperProps {
   isLoading: boolean
   isBlocking?: boolean
   children: ReactNode
@@ -336,7 +336,7 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
+export const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()

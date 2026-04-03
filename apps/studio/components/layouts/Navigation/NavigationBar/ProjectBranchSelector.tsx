@@ -44,12 +44,11 @@ export function ProjectBranchSelector() {
   )
 
   const selectedBranch = branches?.find((b) => b.project_ref === ref)
-  const { isMainBranch, branchDisplayName, selectedOrgInitial, organizationHref } =
-    getProjectBranchSelectorState({
-      selectedBranch,
-      isBranchingEnabled,
-      selectedOrganization: selectedOrganization ?? undefined,
-    })
+  const { isMainBranch, branchDisplayName, organizationHref } = getProjectBranchSelectorState({
+    selectedBranch,
+    isBranchingEnabled,
+    selectedOrganization: selectedOrganization ?? undefined,
+  })
 
   const goToOrganization = () => {
     setOpen(false)
@@ -75,7 +74,7 @@ export function ProjectBranchSelector() {
 
   const triggerProps = {
     displayProjectName: displayProject.name,
-    selectedOrgInitial,
+    selectedOrg: selectedOrganization,
     isBranch,
     isProductionBranch,
     branchDisplayName,

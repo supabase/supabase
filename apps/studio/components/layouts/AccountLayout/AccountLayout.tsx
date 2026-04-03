@@ -116,7 +116,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
+      <div className={cn('flex flex-col w-screen h-full')}>
         <WithSidebar
           title=""
           breadcrumbs={[]}

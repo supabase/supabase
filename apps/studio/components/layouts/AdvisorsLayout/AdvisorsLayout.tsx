@@ -1,6 +1,8 @@
+import { useIsNavigationV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { ProjectLayoutV2 } from '../NavigationV2/ProjectLayout'
 import { ProjectLayout } from '../ProjectLayout'
 import { AdvisorsSidebarMenu } from './AdvisorsSidebarMenu'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -12,6 +14,15 @@ export interface AdvisorsLayoutProps {
 const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const isNavigationV2 = useIsNavigationV2Enabled()
+
+  if (isNavigationV2) {
+    return (
+      <ProjectLayoutV2 isLoading={false} product="Advisors">
+        {children}
+      </ProjectLayoutV2>
+    )
+  }
 
   return (
     <ProjectLayout
