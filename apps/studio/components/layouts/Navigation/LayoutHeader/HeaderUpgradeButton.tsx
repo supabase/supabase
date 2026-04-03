@@ -28,12 +28,8 @@ export const HeaderUpgradeButton = ({ className }: HeaderUpgradeButtonProps) => 
   if (!showButton) return null
 
   const handleClick = () => {
-    track('header_upgrade_cta_clicked', { currentPlan: organization?.plan?.id ?? 'free' })
+    track('header_upgrade_cta_clicked')
   }
 
-  return (
-    <div onClick={handleClick} className={className}>
-      <UpgradePlanButton source={EXPERIMENT_ID} />
-    </div>
-  )
+  return <UpgradePlanButton source={EXPERIMENT_ID} className={className} onClick={handleClick} />
 }

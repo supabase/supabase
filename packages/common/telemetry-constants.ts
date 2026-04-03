@@ -3030,9 +3030,6 @@ export interface PricingPageExperimentExposedEvent {
  */
 export interface HeaderUpgradeCtaClickedEvent {
   action: 'header_upgrade_cta_clicked'
-  properties: {
-    currentPlan: string
-  }
   groups: Omit<TelemetryGroups, 'project'>
 }
 
