@@ -113,7 +113,6 @@ export const EditWrapperSheet = ({
     undefined
   )
   const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
-  const hasChangesRef = useRef(false)
 
   const onUpdateTable = (values: FormattedWrapperTable) => {
     if (values.index !== undefined) {
@@ -136,22 +135,20 @@ export const EditWrapperSheet = ({
     setIsUpdateConfirmationOpen(true)
   }
 
-  const checkIsDirty = useCallback(() => hasChangesRef.current, [])
-
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty,
+    checkIsDirty: () => isDirty,
     onClose,
   })
 
   useEffect(() => {
     if (!isClosing) return
-    if (checkIsDirty()) {
+    if (isDirty) {
       confirmOnClose()
     } else {
       onClose()
     }
     setIsClosing(false)
-  }, [checkIsDirty, confirmOnClose, isClosing, onClose, setIsClosing])
+  }, [isDirty, confirmOnClose, isClosing, onClose, setIsClosing])
 
   const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
 
