@@ -36,9 +36,8 @@ const PROVIDER_EMAIL = {
     SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: {
       title: 'Require the current password updating password',
       description:
-        'Requires that the user supplies their current password when changing their password.',
+        'Requires that the user supplies their current password when changing their password. [Learn more](${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing).',
       type: 'boolean',
-      link: `${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing`,
       isPaid: false,
     },
     PASSWORD_HIBP_ENABLED: {
