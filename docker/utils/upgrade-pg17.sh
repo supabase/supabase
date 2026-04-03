@@ -349,7 +349,7 @@ build_tarball() {
             cp "$SHAREDIR"/extension/*.control /export/17/lib/ 2>/dev/null || true
             cp "$SHAREDIR"/extension/*.sql /export/17/lib/ 2>/dev/null || true
 
-            echo "  Creating tarball..."
+            echo "  Creating tarball (this may take several minutes)..."
             cd /export && tar czf pg_upgrade_bin.tar.gz 17/
 
             echo "  Tarball: $(du -sh /export/pg_upgrade_bin.tar.gz | cut -f1)"
