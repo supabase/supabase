@@ -1,8 +1,8 @@
-import dynamic from 'next/dynamic'
-import getContent from '~/data/home/content'
-import Layout from '~/components/Layouts/Default'
 import Hero from '~/components/Hero/Hero'
+import Layout from '~/components/Layouts/Default'
 import Logos from '~/components/logos'
+import getContent from '~/data/home/content'
+import dynamic from 'next/dynamic'
 
 const Products = dynamic(() => import('~/components/Products/index'))
 const HeroFrameworks = dynamic(() => import('~/components/Hero/HeroFrameworks'))
@@ -19,7 +19,7 @@ const Index = () => {
   return (
     <Layout>
       <Hero />
-      <Logos />
+      {/*<Logos />*/}
       <Products {...content.productsSection} />
       <HeroFrameworks />
       <CustomerStories />
