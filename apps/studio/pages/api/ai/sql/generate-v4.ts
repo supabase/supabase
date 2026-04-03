@@ -108,10 +108,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
-  let hasHipaaAddon: boolean | undefined
-  let isSensitive: boolean | undefined
-  let isDpaSigned: boolean | undefined
-  let region: string | undefined
+  let orgHasHipaaAddon: boolean | undefined
+  let projectIsSensitive: boolean | undefined
+  let orgIsDpaSigned: boolean | undefined
+  let projectRegion: string | undefined
   let orgId: number | undefined
   let planId: string | undefined
 
@@ -129,12 +129,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
       aiOptInLevel = orgDetails.aiOptInLevel
       hasAccessToAdvanceModel = orgDetails.hasAccessToAdvanceModel
-      hasHipaaAddon = orgDetails.hasHipaaAddon
-      isDpaSigned = orgDetails.isDpaSigned
+      orgHasHipaaAddon = orgDetails.hasHipaaAddon
+      orgIsDpaSigned = orgDetails.isDpaSigned
       orgId = orgDetails.orgId
       planId = orgDetails.planId
-      isSensitive = projectDetails.isSensitive
-      region = projectDetails.region
+      projectIsSensitive = projectDetails.isSensitive
+      projectRegion = projectDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -210,10 +210,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       chatId,
       chatName,
       allowTracing: isTracingAllowed({
-        orgHasHipaaAddon: hasHipaaAddon,
-        projectIsSensitive: isSensitive,
-        orgIsDpaSigned: isDpaSigned,
-        projectRegion: region,
+        orgHasHipaaAddon,
+        projectIsSensitive,
+        orgIsDpaSigned,
+        projectRegion,
       }),
       userId,
       orgId,

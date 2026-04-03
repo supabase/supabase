@@ -54,10 +54,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let hasHipaaAddon: boolean | undefined
-  let isSensitive: boolean | undefined
-  let isDpaSigned: boolean | undefined
-  let region: string | undefined
+  let orgHasHipaaAddon: boolean | undefined
+  let projectIsSensitive: boolean | undefined
+  let orgIsDpaSigned: boolean | undefined
+  let projectRegion: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -71,10 +71,10 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       ])
 
       aiOptInLevel = orgDetails.aiOptInLevel
-      hasHipaaAddon = orgDetails.hasHipaaAddon
-      isDpaSigned = orgDetails.isDpaSigned
-      isSensitive = projectDetails.isSensitive
-      region = projectDetails.region
+      orgHasHipaaAddon = orgDetails.hasHipaaAddon
+      orgIsDpaSigned = orgDetails.isDpaSigned
+      projectIsSensitive = projectDetails.isSensitive
+      projectRegion = projectDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -137,12 +137,7 @@ Instructions:
     // Log feedback to Braintrust if tracing is enabled and span ID is available
     if (
       IS_TRACING_ENABLED &&
-      isTracingAllowed({
-        orgHasHipaaAddon: hasHipaaAddon,
-        projectIsSensitive: isSensitive,
-        orgIsDpaSigned: isDpaSigned,
-        projectRegion: region,
-      }) &&
+      isTracingAllowed({ orgHasHipaaAddon, projectIsSensitive, orgIsDpaSigned, projectRegion }) &&
       spanId
     ) {
       try {
