@@ -183,7 +183,7 @@ Restart to apply (`max_connections` requires a full restart):
 docker compose -f docker-compose.yml -f docker-compose.pg17.yml restart db
 ```
 
-## Upgrade process details
+### Upgrade process details
 
 The upgrade script delegates the core migration work to two scripts from the [supabase/postgres](https://github.com/supabase/postgres) repository (`ansible/files/admin_api_scripts/pg_upgrade_scripts/`).
 
