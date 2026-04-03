@@ -2,7 +2,6 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExposure'
 import { usePHFlag } from '@/hooks/ui/useFlag'
-import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const EXPERIMENT_ID = 'headerUpgradeCta'
@@ -25,7 +24,6 @@ export const HeaderUpgradeButton = ({ className }: HeaderUpgradeButtonProps) => 
   const variant = isFreePlan && isInExperiment ? (flagValue as string) : undefined
   useTrackExperimentExposure(EXPERIMENT_ID, variant)
 
-  if (!IS_PLATFORM) return null
   if (!isFreePlan) return null
   if (!showButton) return null
 
