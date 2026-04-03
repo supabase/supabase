@@ -1,22 +1,17 @@
 import type { Key } from 'react'
-import { TriggerEvent, useContextMenu } from 'react-contexify'
 import { RenderRowProps, Row } from 'react-data-grid'
+import { ContextMenu_Shadcn_, ContextMenuTrigger_Shadcn_ } from 'ui'
 
-import { ROW_CONTEXT_MENU_ID } from '@/components/grid/constants'
+import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { SupaRow } from '@/components/grid/types'
 
-/**
- * TODO: Refactor to use CellContextMenuWrapper instead of react-contexify
- */
 export function RowRenderer(key: Key, props: RenderRowProps<SupaRow>) {
-  const { show: showContextMenu } = useContextMenu()
-
-  function displayMenu(e: TriggerEvent) {
-    showContextMenu(e, {
-      id: ROW_CONTEXT_MENU_ID,
-      props: { rowIdx: props.rowIdx },
-    })
-  }
-
-  return <Row key={key} {...props} onContextMenu={displayMenu} />
+  return (
+    <ContextMenu_Shadcn_ modal={false} key={key}>
+      <ContextMenuTrigger_Shadcn_ asChild>
+        <Row {...props} />
+      </ContextMenuTrigger_Shadcn_>
+      <RowContextMenuContent row={props.row} />
+    </ContextMenu_Shadcn_>
+  )
 }
