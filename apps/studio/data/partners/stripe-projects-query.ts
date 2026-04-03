@@ -1,8 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
-import { get, handleError } from '../fetchers'
 import { stripeProjectsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
 
 type GetAccountRequestVariables = {
   arId?: string

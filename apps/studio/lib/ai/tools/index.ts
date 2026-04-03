@@ -6,7 +6,7 @@ import { IS_PLATFORM } from 'common'
 import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
 import { getSchemaTools } from './schema-tools'
-import { getRenderingTools } from './rendering-tools'
+import { getStudioTools } from './studio-tools'
 
 export const getTools = async ({
   projectRef,
@@ -23,8 +23,8 @@ export const getTools = async ({
   accessToken?: string
   baseUrl?: string
 }) => {
-  // Always include rendering tools
-  let tools: ToolSet = getRenderingTools()
+  // Always include studio tools
+  let tools: ToolSet = getStudioTools()
 
   // If self-hosted, only add fallback tools
   if (!IS_PLATFORM) {

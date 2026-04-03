@@ -1,9 +1,9 @@
 import { getCronJobsSql } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import { COST_THRESHOLD_ERROR, executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 
 import { databaseCronJobsKeys } from './keys'
+import { COST_THRESHOLD_ERROR, executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export const CRON_JOBS_PAGE_LIMIT = 20
 

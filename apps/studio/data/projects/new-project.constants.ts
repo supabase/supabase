@@ -1,5 +1,6 @@
 import { components } from 'api-types'
-import { PROVIDERS } from 'lib/constants'
+
+import { PROVIDERS } from '@/lib/constants'
 
 export type DesiredInstanceSize = Exclude<
   components['schemas']['CreateProjectBody']['desired_instance_size'],

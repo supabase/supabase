@@ -124,15 +124,15 @@ vi.mock('./BuildingState', () => ({ default: () => null }))
 vi.mock('./ConnectingState', () => ({ default: () => null }))
 vi.mock('./LoadingState', () => ({ LoadingState: () => null }))
 vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => null }))
-vi.mock('./PauseFailedState', () => ({ default: () => null }))
-vi.mock('./PausingState', () => ({ default: () => null }))
+vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
+vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
-vi.mock('./ResizingState', () => ({ default: () => null }))
+vi.mock('./ResizingState', () => ({ ResizingState: () => null }))
 vi.mock('./RestartingState', () => ({ default: () => null }))
-vi.mock('./RestoreFailedState', () => ({ default: () => null }))
-vi.mock('./RestoringState', () => ({ default: () => null }))
+vi.mock('./RestoreFailedState', () => ({ RestoreFailedState: () => null }))
+vi.mock('./RestoringState', () => ({ RestoringState: () => null }))
 vi.mock('./UpgradingState', () => ({ UpgradingState: () => null }))
 
 vi.mock('@/components/interfaces/BranchManagement/CreateBranchModal', () => ({

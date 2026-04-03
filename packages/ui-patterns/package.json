@@ -730,6 +730,10 @@
       "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
       "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
     },
+    "./form/KeyValueFieldArray/validation": {
+      "import": "./src/form/KeyValueFieldArray/validation.ts",
+      "types": "./src/form/KeyValueFieldArray/validation.ts"
+    },
     "./form/SingleValueFieldArray/SingleValueFieldArray.test": {
       "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx",
       "types": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx"

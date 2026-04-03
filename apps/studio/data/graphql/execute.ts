@@ -1,5 +1,5 @@
-import { handleError } from 'data/fetchers'
 import type { TypedDocumentString } from './graphql'
+import { handleError } from '@/data/fetchers'
 
 export async function executeGraphQL<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
