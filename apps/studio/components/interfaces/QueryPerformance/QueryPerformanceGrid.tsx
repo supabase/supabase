@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
 import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -40,6 +38,8 @@ import {
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]

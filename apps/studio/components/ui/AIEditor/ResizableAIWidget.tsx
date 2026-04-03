@@ -1,8 +1,8 @@
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { AskAIWidget } from 'components/interfaces/SQLEditor/AskAIWidget'
-import InlineWidget from 'components/interfaces/SQLEditor/InlineWidget'
+import { AskAIWidget } from '@/components/interfaces/SQLEditor/AskAIWidget'
+import InlineWidget from '@/components/interfaces/SQLEditor/InlineWidget'
 
 interface ResizableAIWidgetProps {
   editor: monacoEditor.IStandaloneCodeEditor | monacoEditor.IStandaloneDiffEditor

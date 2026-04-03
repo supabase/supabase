@@ -1,5 +1,6 @@
 import { getDeleteBucketPrefixSQL } from '@supabase/pg-meta'
-import { executeSql } from 'data/sql/execute-sql-query'
+
+import { executeSql } from '@/data/sql/execute-sql-query'
 
 /**
  * [Joshen] JFYI this is solely being used in storage-explorer.tsx and hence doesn't have a useMutation hook

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Accordion_Shadcn_,
@@ -36,7 +36,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { IntegrationDefinition } from '../../Landing/Integrations.constants'
-import { getEnableExtensionsSQL } from './IntegrationOverviewTabV2.utils'
+import { getEnableExtensionsSQL, getExtensionDefaultSchema } from './IntegrationOverviewTabV2.utils'
 import { extensionsWithRecommendedSchemas } from '@/components/interfaces/Database/Extensions/Extensions.constants'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
@@ -76,30 +76,35 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   } = integration
 
   const allowExtensionCustomSchema = !installationSql
-
-  const defaultExtensionsSchema = Object.fromEntries(
-    requiredExtensionNames.map((extName) => [extName, { schema: 'extensions', value: undefined }])
-  )
-  const [extensionsSchema, setExtensionsSchema] = useState<{
-    [key: string]: { schema: string; value: string | undefined }
-  }>(defaultExtensionsSchema)
-
   const involvesExtensions = requiredExtensionNames.length > 0
   // [Joshen] Will hook these up in the future, applicable for stripe sync engine
   const involvesEdgeFunctions = false
 
-  const { data: extensions = [] } = useDatabaseExtensionsQuery(
+  const { data: extensions = [], isSuccess: isSuccessExtensions } = useDatabaseExtensionsQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
-  const requiredExtensions = extensions.filter((ext) => requiredExtensionNames.includes(ext.name))
-  // [Joshen] Integration requires extensions that are not available to install on the current database image
-  const hasMissingExtensions = requiredExtensionNames.length !== requiredExtensions.length
 
   const { data: schemas = [] } = useSchemasQuery(
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
+
+  const defaultExtensionsSchema = Object.fromEntries(
+    requiredExtensionNames.map((extName) => {
+      const ext = extensions.find((x) => x.name === extName)
+      const defaultSchema = getExtensionDefaultSchema(ext)
+      return [extName, { schema: defaultSchema ?? 'extensions', value: undefined }]
+    })
+  )
+  const [extensionsSchema, setExtensionsSchema] = useState<{
+    [key: string]: { schema: string; value: string | undefined }
+  }>(defaultExtensionsSchema)
+
+  const requiredExtensions = extensions.filter((ext) => requiredExtensionNames.includes(ext.name))
+  // [Joshen] Integration requires extensions that are not available to install on the current database image
+  const hasMissingExtensions = requiredExtensionNames.length !== requiredExtensions.length
+
   const availableSchemas = schemas.filter(
     (schema) => !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
   )
@@ -108,7 +113,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
 
   const enableExtensionsSQL = getEnableExtensionsSQL({
-    extensions: requiredExtensions,
+    extensions: requiredExtensions.filter((ext) => !ext.installed_version),
     extensionsSchema,
   })
   const installationSQLContent = installationSql ?? enableExtensionsSQL
@@ -120,9 +125,9 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     const toastId = toast.loading(`Installing ${name}`)
 
     try {
-      if (!!installationCommand) {
+      if (installationCommand) {
         await installationCommand({ ref: project.ref })
-      } else if (!!installationSql) {
+      } else if (installationSql) {
         await installIntegrationViaSQL()
       } else {
         await installIntegrationExtensions()
@@ -144,11 +149,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     if (!installationSql) return console.error('Installation SQL is required')
 
     const { ref: projectRef, connectionString } = project
-    try {
-      await executeSql({ projectRef, connectionString, sql: installationSql })
-    } catch (error) {
-      throw error
-    }
+    await executeSql({ projectRef, connectionString, sql: installationSql })
   }
 
   const installIntegrationExtensions = async () => {
@@ -156,31 +157,39 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
 
     const { ref: projectRef, connectionString } = project
     const results = await Promise.allSettled(
-      requiredExtensions.map((ext) => {
-        const { name, default_version: version } = ext
-        const createSchema = extensionsSchema[name].schema === 'custom'
-        const schema =
-          name === 'pg_cron'
-            ? 'pg_catalog'
-            : createSchema
-              ? (extensionsSchema[name].value as string)
-              : extensionsSchema[name].schema
+      requiredExtensions
+        .filter((ext) => !ext.installed_version)
+        .map((ext) => {
+          const { name, default_version: version } = ext
+          const createSchema = extensionsSchema[name].schema === 'custom'
 
-        return enableExtension({
-          projectRef,
-          connectionString,
-          schema,
-          name,
-          version,
-          cascade: true,
-          createSchema,
+          const defaultSchema = getExtensionDefaultSchema(ext)
+          const schema =
+            defaultSchema ||
+            (createSchema
+              ? (extensionsSchema[name].value as string)
+              : extensionsSchema[name].schema)
+
+          return enableExtension({
+            projectRef,
+            connectionString,
+            schema,
+            name,
+            version,
+            cascade: true,
+            createSchema,
+          })
         })
-      })
     )
 
     const failure = results.find((r) => r.status === 'rejected')
-    if (!!failure) throw new Error(failure.reason.message)
+    if (failure) throw new Error(failure.reason.message)
   }
+
+  useEffect(() => {
+    if (isSuccessExtensions) return
+    setExtensionsSchema(defaultExtensionsSchema)
+  }, [isSuccessExtensions, defaultExtensionsSchema])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -240,11 +249,11 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
                     )}
                   </TabsList_Shadcn_>
 
-                  <TabsContent_Shadcn_ value="extensions" className="mt-0 px-4">
+                  <TabsContent_Shadcn_ value="extensions" className="mt-0 divide-y">
                     {requiredExtensionNames.map((extName) => {
                       const ext = extensions.find((x) => x.name === extName)
                       return (
-                        <div key={extName} className="py-3 flex items-center justify-between">
+                        <div key={extName} className="py-3 px-4 flex items-center justify-between">
                           <code className="text-xs">{extName}</code>
                           {!ext ? (
                             <Badge>Unavailable</Badge>
@@ -290,9 +299,11 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
                         Select which schemas to install the database extensions under
                       </p>
                       {requiredExtensionNames.map((extName) => {
-                        const extMeta = extensionsSchema[extName as keyof typeof extensionsSchema]
+                        const ext = extensions.find((x) => x.name === extName)
+                        const extMeta = extensionsSchema[extName]
                         const { schema, value } = extMeta
                         const recommendedSchema = extensionsWithRecommendedSchemas[extName]
+                        const defaultSchema = getExtensionDefaultSchema(ext)
 
                         return (
                           <FormItemLayout
@@ -300,8 +311,28 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
                             isReactForm={false}
                             layout="horizontal"
                             label={extName}
+                            description={
+                              ext?.installed_version ? (
+                                <>
+                                  Installed in{' '}
+                                  <code className="text-code-inline">{ext.schema}</code> schema
+                                </>
+                              ) : defaultSchema ? (
+                                <>
+                                  Must be installed in the{' '}
+                                  <code className="text-code-inline">{defaultSchema}</code> schema
+                                </>
+                              ) : recommendedSchema ? (
+                                <>
+                                  Use the{' '}
+                                  <code className="text-code-inline">{recommendedSchema}</code>{' '}
+                                  schema for full compatibility with related features
+                                </>
+                              ) : undefined
+                            }
                           >
                             <Select_Shadcn_
+                              disabled={!!defaultSchema || !!ext?.installed_version}
                               value={schema}
                               onValueChange={(schema) =>
                                 setExtensionsSchema((prev) => ({
@@ -335,6 +366,15 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
                                     </SelectItem_Shadcn_>
                                   )
                                 })}
+                                {defaultSchema &&
+                                !availableSchemas.some(
+                                  (schema) => schema.name === defaultSchema
+                                ) ? (
+                                  <SelectItem_Shadcn_ key={defaultSchema} value={defaultSchema}>
+                                    {defaultSchema}
+                                    <Badge className="ml-2">Default</Badge>
+                                  </SelectItem_Shadcn_>
+                                ) : null}
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
 

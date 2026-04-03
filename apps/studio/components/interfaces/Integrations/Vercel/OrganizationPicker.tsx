@@ -1,26 +1,26 @@
-import { useMemo, useRef, useState } from 'react'
-
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import type { IntegrationName } from 'data/integrations/integrations.types'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { ChevronDown } from 'lucide-react'
-import type { Organization } from 'types'
+import { useMemo, useRef, useState } from 'react'
 import {
   Badge,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
 } from 'ui'
+
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import type { IntegrationName } from '@/data/integrations/integrations.types'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import type { Organization } from '@/types'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName

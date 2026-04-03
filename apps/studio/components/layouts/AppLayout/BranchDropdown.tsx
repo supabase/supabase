@@ -1,15 +1,15 @@
 import { useParams } from 'common'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import type { Branch } from 'data/branches/branches-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { BranchBadge } from './BranchBadge'
 import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import type { Branch } from '@/data/branches/branches-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface BranchDropdownProps {
   embedded?: boolean

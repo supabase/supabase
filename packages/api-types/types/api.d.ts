@@ -1267,22 +1267,22 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] List applied migration versions
+     * List applied migration versions
      * @description Only available to selected partner OAuth apps
      */
     get: operations['v1-list-migration-history']
     /**
-     * [Beta] Upsert a database migration without applying
+     * Upsert a database migration without applying
      * @description Only available to selected partner OAuth apps
      */
     put: operations['v1-upsert-a-migration']
     /**
-     * [Beta] Apply a database migration
+     * Apply a database migration
      * @description Only available to selected partner OAuth apps
      */
     post: operations['v1-apply-a-migration']
     /**
-     * [Beta] Rollback database migrations and remove them from history table
+     * Rollback database migrations and remove them from history table
      * @description Only available to selected partner OAuth apps
      */
     delete: operations['v1-rollback-migrations']
@@ -1299,7 +1299,7 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] Fetch an existing entry from migration history
+     * Fetch an existing entry from migration history
      * @description Only available to selected partner OAuth apps
      */
     get: operations['v1-get-a-migration']
@@ -1309,7 +1309,7 @@ export interface paths {
     options?: never
     head?: never
     /**
-     * [Beta] Patch an existing entry in migration history
+     * Patch an existing entry in migration history
      * @description Only available to selected partner OAuth apps
      */
     patch: operations['v1-patch-a-migration']
@@ -2317,6 +2317,7 @@ export interface components {
       security_refresh_token_reuse_interval: number | null
       security_sb_forwarded_for_enabled: boolean | null
       security_update_password_require_reauthentication: boolean | null
+      security_update_password_require_current_password: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
       sessions_tags: string | null
@@ -4063,6 +4064,7 @@ export interface components {
       security_refresh_token_reuse_interval?: number | null
       security_sb_forwarded_for_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
+      security_update_password_require_current_password?: boolean | null
       sessions_inactivity_timeout?: number | null
       sessions_single_per_user?: boolean | null
       sessions_tags?: string | null

@@ -1,8 +1,9 @@
 import type { AuthMFAEnrollResponse, MFAEnrollParams } from '@supabase/supabase-js'
 import { useMutation } from '@tanstack/react-query'
-import { auth } from 'lib/gotrue'
 import { toast } from 'sonner'
-import { UseCustomMutationOptions } from 'types'
+
+import { auth } from '@/lib/gotrue'
+import { UseCustomMutationOptions } from '@/types'
 
 const mfaEnroll = async (params: MFAEnrollParams) => {
   const { error, data } = await auth.mfa.enroll(params)

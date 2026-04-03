@@ -1,9 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ActionBar } from 'components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Check, ChevronsUpDown, Database, Plus, XIcon } from 'lucide-react'
-import { FormItemLayout } from 'node_modules/ui-patterns/src/form/FormItemLayout/FormItemLayout'
+import { Check, ChevronsUpDown, XIcon } from 'lucide-react'
 import { useEffect, useId, useMemo, useState } from 'react'
 import {
   Control,
@@ -39,6 +35,7 @@ import {
   SelectValue_Shadcn_,
   SidePanel,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -52,6 +49,9 @@ import * as z from 'zod'
 import { ColumnType } from './ColumnType'
 import type { AvailableColumn, Table, TableOption } from './Wrappers.types'
 import { getTableFormSchema } from './Wrappers.utils'
+import { ActionBar } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
   visible: boolean

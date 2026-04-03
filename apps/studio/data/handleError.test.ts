@@ -1,6 +1,7 @@
-import { ConnectionTimeoutError, UnknownAPIResponseError } from 'types/api-errors'
-import { ResponseError } from 'types/base'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
+import { ResponseError } from '@/types/base'
 
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))

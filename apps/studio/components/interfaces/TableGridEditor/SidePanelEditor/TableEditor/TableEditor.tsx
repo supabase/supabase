@@ -1,23 +1,7 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useChanged } from 'hooks/misc/useChanged'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import { type PlainObject } from 'lib/type-helpers'
 import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -41,7 +25,24 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useChanged } from '@/hooks/misc/useChanged'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { type PlainObject } from '@/lib/type-helpers'
+import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
 
 type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
   SaveTableParams,
@@ -94,6 +95,7 @@ export const TableEditor = ({
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const spreadsheetImportKey = useVisibleKey(isImportingSpreadsheet)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
 
   const { data: types } = useEnumeratedTypesQuery({
@@ -487,9 +489,8 @@ export const TableEditor = ({
         )}
 
         <SpreadsheetImport
+          key={spreadsheetImportKey}
           visible={isImportingSpreadsheet}
-          headers={importContent?.headers}
-          rows={importContent?.rows}
           saveContent={(prefillData: ImportContent) => {
             setImportContent(prefillData)
             setIsImportingSpreadsheet(false)

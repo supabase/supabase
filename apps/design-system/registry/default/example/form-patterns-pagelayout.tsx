@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Plus, Trash, Upload } from 'lucide-react'
+import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import {
   Button,
   Calendar,
@@ -35,6 +35,8 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import {
   MultiSelector,
   MultiSelectorContent,
@@ -51,24 +53,40 @@ import {
 } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
-const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().optional(),
-  maxConnections: z.number().min(1).max(1000),
-  enableFeature: z.boolean(),
-  enableRls: z.boolean(),
-  enableNotifications: z.boolean(),
-  enableAnalytics: z.boolean(),
-  region: z.string().min(1, 'Region is required'),
-  schemas: z.array(z.string()).min(1, 'At least one schema is required'),
-  queueType: z.enum(['basic', 'partitioned']),
-  expiryDate: z.date().optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  duration: z.number().min(5).max(30),
-  redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
-  httpHeaders: z.array(z.object({ key: z.string(), value: z.string() })),
-  apiKey: z.string().optional(),
-})
+const formSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    description: z.string().optional(),
+    maxConnections: z.number().min(1).max(1000),
+    enableFeature: z.boolean(),
+    enableRls: z.boolean(),
+    enableNotifications: z.boolean(),
+    enableAnalytics: z.boolean(),
+    region: z.string().min(1, 'Region is required'),
+    schemas: z.array(z.string()).min(1, 'At least one schema is required'),
+    queueType: z.enum(['basic', 'partitioned']),
+    expiryDate: z.date().optional(),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    duration: z.number().min(5).max(30),
+    redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
+    httpHeaders: z.array(z.object({ key: z.string().trim(), value: z.string().trim() })),
+    apiKey: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    getKeyValueFieldArrayValidationIssues({
+      rows: data.httpHeaders,
+      keyFieldName: 'key',
+      valueFieldName: 'value',
+      keyRequiredMessage: 'Header name is required',
+      valueRequiredMessage: 'Header value is required',
+    }).forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: issue.message,
+        path: ['httpHeaders', ...issue.path],
+      })
+    })
+  })
 
 const fakeApiKey = 'sk_live_51H3x4mpl3_4nd_53cur3_k3y_1234567890'
 
@@ -100,11 +118,6 @@ export default function FormPatternsPageLayout() {
       httpHeaders: [{ key: '', value: '' }],
       apiKey: fakeApiKey,
     },
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'redirectUris',
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -690,42 +703,15 @@ export default function FormPatternsPageLayout() {
                         label="Field Array"
                         description="Dynamic list for adding/removing items"
                       >
-                        <div className="space-y-2 w-full">
-                          {fields.map((field, index) => (
-                            <FormField_Shadcn_
-                              key={field.id}
-                              control={form.control}
-                              name={`redirectUris.${index}.value`}
-                              render={({ field: inputField }) => (
-                                <div className="flex gap-2">
-                                  <FormControl_Shadcn_>
-                                    <Input_Shadcn_
-                                      {...inputField}
-                                      placeholder="https://example.com/callback"
-                                    />
-                                  </FormControl_Shadcn_>
-                                  {fields.length > 1 && (
-                                    <Button
-                                      type="default"
-                                      size="tiny"
-                                      htmlType="button"
-                                      icon={<Trash size={12} />}
-                                      onClick={() => remove(index)}
-                                    />
-                                  )}
-                                </div>
-                              )}
-                            />
-                          ))}
-                          <Button
-                            type="default"
-                            htmlType="button"
-                            icon={<Plus />}
-                            onClick={() => append({ value: '' })}
-                          >
-                            Add redirect URI
-                          </Button>
-                        </div>
+                        <SingleValueFieldArray
+                          control={form.control}
+                          name="redirectUris"
+                          valueFieldName="value"
+                          createEmptyRow={() => ({ value: '' })}
+                          placeholder="https://example.com/callback"
+                          addLabel="Add redirect URI"
+                          removeLabel="Remove redirect URI"
+                        />
                       </FormItemLayout>
                     )}
                   />

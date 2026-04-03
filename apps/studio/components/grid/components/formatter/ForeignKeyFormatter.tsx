@@ -1,10 +1,4 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { convertByteaToHex } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useTableQuery } from 'data/tables/table-retrieve-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
@@ -14,6 +8,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { SupaRow } from '../../types'
 import { NullValue } from '../common/NullValue'
 import { ReferenceRecordPeek } from './ReferenceRecordPeek'
+import { convertByteaToHex } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useTableQuery } from '@/data/tables/table-retrieve-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
   tableId?: number

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { accessTokenKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getAccessTokens(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/access-tokens', { signal })

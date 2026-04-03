@@ -1,8 +1,8 @@
-import { FDW, FDWTable } from 'data/fdw/fdws-query'
 import * as z from 'zod'
 
 import { WRAPPER_HANDLERS, WRAPPERS } from './Wrappers.constants'
 import type { Table, WrapperMeta } from './Wrappers.types'
+import { FDW, FDWTable } from '@/data/fdw/fdws-query'
 
 const tableSchema = z
   .object({

@@ -1,10 +1,10 @@
 import { getEntityTypesSQL } from '@supabase/pg-meta'
 import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
+import { executeSql, ExecuteSqlVariables } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type EntityTypesVariables = {
   projectRef?: string

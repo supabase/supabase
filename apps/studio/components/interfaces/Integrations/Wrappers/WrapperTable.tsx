@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +21,8 @@ import { DeleteWrapperModal } from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'
 import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -94,7 +94,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               wrappers.length === 0 ? 'border-t-0' : ''
             )}
           >
-            <TableRow>
+            <TableRow className="border-b-0">
               <TableCell colSpan={4}>
                 {wrappers.length} {integration?.name}
                 {wrappers.length === 0 || wrappers.length > 1 ? 's' : ''} created

@@ -1,6 +1,5 @@
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { useParams } from 'common'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -22,6 +21,7 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
 import { DiskType, RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from '../ui/DiskManagement.constants'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 
 type IOPSFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

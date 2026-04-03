@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { constructHeaders, fetchHandler, handleError } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
-import { UseCustomQueryOptions } from 'types'
+
+import { constructHeaders, fetchHandler, handleError } from '@/data/fetchers'
+import { BASE_PATH } from '@/lib/constants'
+import { UseCustomQueryOptions } from '@/types'
 
 export type FeedbackCategoryVariables = {
   prompt: string

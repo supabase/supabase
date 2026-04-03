@@ -1,15 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { invalidateSchemasQuery } from 'data/database/schemas-query'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { FDW } from 'data/fdw/fdws-query'
-import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { compact } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
-import { FormItemLayout } from 'node_modules/ui-patterns/src/form/FormItemLayout/FormItemLayout'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,6 +19,7 @@ import {
   SheetTitle,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
@@ -47,6 +40,13 @@ import {
   NewTable,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { FDW } from '@/data/fdw/fdws-query'
+import { getDecryptedValues } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { UUID_REGEX } from '@/lib/constants'
 
 export interface EditWrapperSheetProps {

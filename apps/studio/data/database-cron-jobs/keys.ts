@@ -1,4 +1,4 @@
-import { sqlKeys } from '../sql/keys'
+import { sqlKeys } from '@/data/sql/keys'
 
 export const databaseCronJobsKeys = {
   create: () => ['cron-jobs', 'create'] as const,

@@ -1,10 +1,10 @@
 import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { FormItemLayout } from 'node_modules/ui-patterns/src/form/FormItemLayout/FormItemLayout'
 import type { Control } from 'react-hook-form'
 import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Textarea } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { ServerOption } from './Wrappers.types'
 

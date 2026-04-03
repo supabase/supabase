@@ -1,6 +1,7 @@
 import { useParams } from 'common'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { PROJECT_STATUS, PROVIDERS } from 'lib/constants'
+
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { PROJECT_STATUS, PROVIDERS } from '@/lib/constants'
 
 export function useSelectedProjectQuery({ enabled = true } = {}) {
   const { ref } = useParams()

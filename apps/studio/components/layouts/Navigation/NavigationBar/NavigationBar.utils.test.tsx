@@ -1,4 +1,3 @@
-import type { Project } from 'data/projects/project-detail-query'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -7,6 +6,7 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from './NavigationBar.utils'
+import type { Project } from '@/data/projects/project-detail-query'
 
 const REF = 'test-project-ref'
 
