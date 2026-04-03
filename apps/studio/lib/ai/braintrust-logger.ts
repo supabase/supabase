@@ -19,13 +19,18 @@ if (IS_TRACING_ENABLED) {
 // Returns true only when all compliance flags are explicitly confirmed off.
 // Treats undefined as restricted — unknown state is not safe to trace.
 export function isTracingAllowed({
-  isHipaaEnabled,
+  hasHipaaAddon,
+  isSensitive,
   isDpaSigned,
-  isEuRegion,
+  region,
 }: {
-  isHipaaEnabled: boolean | undefined
+  hasHipaaAddon: boolean | undefined
+  isSensitive: boolean | null | undefined
   isDpaSigned: boolean | undefined
-  isEuRegion: boolean | undefined
+  region: string | undefined
 }) {
+  const isHipaaEnabled =
+    hasHipaaAddon == null || isSensitive == null ? undefined : hasHipaaAddon && isSensitive
+  const isEuRegion = region === undefined ? undefined : region.startsWith('eu-')
   return isHipaaEnabled === false && isDpaSigned === false && isEuRegion === false
 }

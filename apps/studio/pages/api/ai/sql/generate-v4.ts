@@ -108,9 +108,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
-  let isHipaaEnabled: boolean | undefined
+  let hasHipaaAddon: boolean | undefined
+  let isSensitive: boolean | undefined
   let isDpaSigned: boolean | undefined
-  let isEuRegion: boolean | undefined
+  let region: string | undefined
   let orgId: number | undefined
   let planId: string | undefined
 
@@ -125,9 +126,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       const {
         aiOptInLevel: orgAIOptInLevel,
         hasAccessToAdvanceModel: orgHasAccessToAdvanceModel,
-        isHipaaEnabled: orgIsHipaaEnabled,
+        hasHipaaAddon: orgHasHipaaAddon,
+        isSensitive: projectIsSensitive,
         isDpaSigned: orgIsDpaSigned,
-        isEuRegion: orgIsEuRegion,
+        region: orgRegion,
         orgId: fetchedOrgId,
         planId: fetchedPlanId,
       } = await getOrgAIDetails({
@@ -138,9 +140,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
       aiOptInLevel = orgAIOptInLevel
       hasAccessToAdvanceModel = orgHasAccessToAdvanceModel
-      isHipaaEnabled = orgIsHipaaEnabled
+      hasHipaaAddon = orgHasHipaaAddon
+      isSensitive = projectIsSensitive
       isDpaSigned = orgIsDpaSigned
-      isEuRegion = orgIsEuRegion
+      region = orgRegion
       orgId = fetchedOrgId
       planId = fetchedPlanId
     } catch (error) {
@@ -217,7 +220,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRef,
       chatId,
       chatName,
-      allowTracing: isTracingAllowed({ isHipaaEnabled, isDpaSigned, isEuRegion }),
+      allowTracing: isTracingAllowed({ hasHipaaAddon, isSensitive, isDpaSigned, region }),
       userId,
       orgId,
       planId,

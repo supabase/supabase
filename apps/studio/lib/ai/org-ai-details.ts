@@ -49,16 +49,17 @@ export const getOrgAIDetails = async ({
 
   const aiOptInLevel = getAiOptInLevel(selectedOrg?.opt_in_tags)
   const hasAccessToAdvanceModel = advanceModelAccess.hasAccess
-  const isHipaaEnabled = subscriptionHasHipaaAddon(subscription) && !!projectSettings?.is_sensitive
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const isSensitive = projectSettings?.is_sensitive
   const isDpaSigned = dpaSignedStatus.data?.signed ?? false
-  const isEuRegion = selectedProject?.region?.startsWith('eu-') ?? false
 
   return {
     aiOptInLevel,
     hasAccessToAdvanceModel,
-    isHipaaEnabled,
+    hasHipaaAddon,
+    isSensitive,
     isDpaSigned,
-    isEuRegion,
+    region: selectedProject?.region,
     orgId: selectedOrg?.id,
     planId: selectedOrg?.plan.id,
   }
