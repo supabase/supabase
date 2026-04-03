@@ -111,7 +111,6 @@ type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
 const INITIAL_VALUES = {
   wrapper_name: '',
-  server_name: '',
   source_schema: '',
   target_schema: '',
   target: 'S3Tables',
@@ -119,7 +118,7 @@ const INITIAL_VALUES = {
   vault_aws_s3table_bucket_arn: '',
   vault_aws_secret_access_key: '',
   region_name: '',
-}
+} satisfies FormSchema
 
 export const CreateIcebergWrapperSheet = ({
   wrapperMeta,
@@ -149,18 +148,14 @@ export const CreateIcebergWrapperSheet = ({
     resolver: zodResolver(formSchema),
     defaultValues: INITIAL_VALUES,
   })
-  const { reset, resetField, formState, setError, watch } = form
+  const { resetField, formState, setError, watch } = form
   const { isDirty, isSubmitting } = formState
-
-  useEffect(() => {
-    reset(INITIAL_VALUES)
-  }, [INITIAL_VALUES, reset])
 
   useEffect(() => {
     onDirty(isDirty)
   }, [onDirty, isDirty])
 
-  const currentTarget = useRef(INITIAL_VALUES.target)
+  const currentTarget = useRef<FormSchema['target']>(INITIAL_VALUES.target)
   useEffect(() => {
     const subscription = watch((values) => {
       if (!values.target || values.target === currentTarget.current) return
