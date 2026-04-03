@@ -10,7 +10,7 @@
 #   sudo bash tests/test-pg17-upgrade.sh
 #
 # Prerequisites:
-#   - Running self-hosted Supabase instance with Postgres 15:
+#   - Running self-hosted Supabase with a clean, tests-only Postgres 15:
 #       docker compose up -d
 #   - .env file with POSTGRES_PASSWORD, ANON_KEY
 #
@@ -53,6 +53,8 @@ case "$current_version" in
 esac
 
 # --- Seed test data --------------------------------------------------------
+# Note: this script is designed to run against a fresh docker-compose stack,
+# not an existing database with user data.
 
 echo ""
 echo "Seeding test data on Postgres 15..."
