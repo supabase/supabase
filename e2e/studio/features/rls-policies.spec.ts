@@ -65,7 +65,7 @@ test.describe('RLS Policies', () => {
       // Check page elements
       await expect(page.getByRole('heading', { name: 'Policies' })).toBeVisible()
       await expect(
-        page.getByText('Manage Row Level Security policies for your tables')
+        page.getByText('Manage and test Row Level Security policies for your tables')
       ).toBeVisible()
 
       // Check schema selector is present

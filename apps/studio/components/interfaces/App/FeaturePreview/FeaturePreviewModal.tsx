@@ -34,6 +34,7 @@ import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { QueueOperationsPreview } from './QueueOperationsPreview'
+import { RLSPolicyTestingPreview } from './RLSPolicyTestingPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
@@ -52,6 +53,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]: <FloatingMobileToolbarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTING]: <RLSPolicyTestingPreview />,
 }
 
 export const FeaturePreviewModal = () => {
