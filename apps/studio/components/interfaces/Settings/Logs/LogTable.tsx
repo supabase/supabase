@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
 import { isEqual } from 'lodash'
-import { Copy, Eye, EyeOff, Play, X as XIcon } from 'lucide-react'
+import { Copy, Eye, EyeOff, Play } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -96,7 +96,6 @@ export const LogTable = ({
   const [selectedLogId] = useSelectedLog()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [anchorRowId, setAnchorRowId] = useState<string | null>(null)
   const [copiedFormat, setCopiedFormat] = useState<'json' | 'markdown' | null>(null)
 
   const { can: canCreateLogQuery } = useAsyncCheckPermissions(
@@ -174,7 +173,6 @@ export const LogTable = ({
           next.add(key)
         }
         setSelectedRows(next)
-        setAnchorRowId(key)
         if (next.size > 0) {
           setSelectedRow(null)
           onSelectedLogChange?.(null)
@@ -264,7 +262,7 @@ export const LogTable = ({
       }
       return (
         <ContextMenu_Shadcn_ key={key} modal={false}>
-          <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenuTrigger_Shadcn_ style={{ display: 'contents' }}>
             <Row
               {...props}
               isRowSelected={false}
@@ -302,22 +300,18 @@ export const LogTable = ({
 
   const onRowClick = useCallback(
     (row: LogData) => {
-      const key = getRowKey(row)
-
       // Regular single click — clear multi-select, open side panel
       setSelectedRows(new Set())
-      setAnchorRowId(key)
       setSelectedRow(row)
       onSelectedLogChange?.(row)
     },
-    [getRowKey, onSelectedLogChange]
+    [onSelectedLogChange]
   )
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setSelectedRows(new Set())
-        setAnchorRowId(null)
         return
       }
 
@@ -362,7 +356,6 @@ export const LogTable = ({
   useEffect(() => {
     if (isLoading) {
       setSelectedRows(new Set())
-      setAnchorRowId(null)
     }
   }, [isLoading])
 
@@ -501,7 +494,6 @@ export const LogTable = ({
                 sqlQuery={sqlQuery}
                 onClear={() => {
                   setSelectedRows(new Set())
-                  setAnchorRowId(null)
                 }}
               />
             </div>
