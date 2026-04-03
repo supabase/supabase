@@ -268,12 +268,12 @@ const TableForm = ({
       const existingSchema = schemas?.find((s) => s.name === schema)
 
       return {
-        ...initialData,
         schema_name: existingSchema ? '' : schema,
         schema: existingSchema ? existingSchema.name : 'custom',
         ...Object.fromEntries(
           table.options.map((option) => [option.name, option.defaultValue ?? ''])
         ),
+        ...initialData,
       }
     }
     return {
