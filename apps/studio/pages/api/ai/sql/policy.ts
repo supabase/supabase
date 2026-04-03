@@ -2,9 +2,9 @@ import { generateText, Output, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { getOrgAIDetails } from 'lib/ai/ai-details'
 import { getModel } from 'lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import { RLS_PROMPT } from 'lib/ai/prompts'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
@@ -79,7 +79,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
         orgSlug,
         authorization,
-        projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel

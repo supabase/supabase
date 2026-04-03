@@ -4,9 +4,9 @@ import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { getOrgAIDetails } from 'lib/ai/ai-details'
 import { getModel } from 'lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
 import {
   EDGE_FUNCTION_PROMPT,
   GENERAL_PROMPT,
@@ -58,7 +58,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
         orgSlug,
         authorization,
-        projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel
