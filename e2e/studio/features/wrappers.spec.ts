@@ -132,6 +132,7 @@ testRunner('S3 Wrapper', () => {
     await page.getByRole('textbox', { name: 'Table name' }).fill(tableName)
     await page.getByRole('textbox', { name: 'URI' }).fill('s3://bucket/s3_table.csv')
     await page.getByRole('button', { name: 'Add column' }).click()
+    // FIXME: Necessary because this component is somehow remounted
     await page.waitForTimeout(500)
     await page.getByRole('textbox', { name: 'Name', exact: true }).fill('s3_column')
     await page.getByRole('button', { name: 'Save' }).click()
