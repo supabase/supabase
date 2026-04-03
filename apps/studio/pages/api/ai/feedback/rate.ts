@@ -7,6 +7,7 @@ import { IS_TRACING_ENABLED, isTracingAllowed } from 'lib/ai/braintrust-logger'
 import { getModel } from 'lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { getProjectAIDetails } from 'lib/ai/project-ai-details'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -65,24 +66,16 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      // Get organizations and compute opt in level server-side
-      const {
-        aiOptInLevel: orgAIOptInLevel,
-        hasHipaaAddon: orgHasHipaaAddon,
-        isSensitive: projectIsSensitive,
-        isDpaSigned: orgIsDpaSigned,
-        region: orgRegion,
-      } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-        projectRef,
-      })
+      const [orgDetails, projectDetails] = await Promise.all([
+        getOrgAIDetails({ orgSlug, authorization }),
+        getProjectAIDetails({ projectRef, authorization }),
+      ])
 
-      aiOptInLevel = orgAIOptInLevel
-      hasHipaaAddon = orgHasHipaaAddon
-      isSensitive = projectIsSensitive
-      isDpaSigned = orgIsDpaSigned
-      region = orgRegion
+      aiOptInLevel = orgDetails.aiOptInLevel
+      hasHipaaAddon = orgDetails.hasHipaaAddon
+      isDpaSigned = orgDetails.isDpaSigned
+      isSensitive = projectDetails.isSensitive
+      region = projectDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',

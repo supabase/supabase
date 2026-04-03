@@ -16,6 +16,7 @@ import {
   type AssistantModelId,
 } from 'lib/ai/model.utils'
 import { getOrgAIDetails } from 'lib/ai/org-ai-details'
+import { getProjectAIDetails } from 'lib/ai/project-ai-details'
 import { getTools } from 'lib/ai/tools'
 import apiWrapper from 'lib/api/apiWrapper'
 import { executeQuery } from 'lib/api/self-hosted/query'
@@ -122,30 +123,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      // Get organizations and compute opt in level server-side
-      const {
-        aiOptInLevel: orgAIOptInLevel,
-        hasAccessToAdvanceModel: orgHasAccessToAdvanceModel,
-        hasHipaaAddon: orgHasHipaaAddon,
-        isSensitive: projectIsSensitive,
-        isDpaSigned: orgIsDpaSigned,
-        region: orgRegion,
-        orgId: fetchedOrgId,
-        planId: fetchedPlanId,
-      } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-        projectRef,
-      })
+      const [orgDetails, projectDetails] = await Promise.all([
+        getOrgAIDetails({ orgSlug, authorization }),
+        getProjectAIDetails({ projectRef, authorization }),
+      ])
 
-      aiOptInLevel = orgAIOptInLevel
-      hasAccessToAdvanceModel = orgHasAccessToAdvanceModel
-      hasHipaaAddon = orgHasHipaaAddon
-      isSensitive = projectIsSensitive
-      isDpaSigned = orgIsDpaSigned
-      region = orgRegion
-      orgId = fetchedOrgId
-      planId = fetchedPlanId
+      aiOptInLevel = orgDetails.aiOptInLevel
+      hasAccessToAdvanceModel = orgDetails.hasAccessToAdvanceModel
+      hasHipaaAddon = orgDetails.hasHipaaAddon
+      isDpaSigned = orgDetails.isDpaSigned
+      orgId = orgDetails.orgId
+      planId = orgDetails.planId
+      isSensitive = projectDetails.isSensitive
+      region = projectDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
