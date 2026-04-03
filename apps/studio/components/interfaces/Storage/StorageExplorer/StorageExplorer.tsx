@@ -17,13 +17,13 @@ import type { Bucket } from '@/data/storage/buckets-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { useStoragePreference } from './useStoragePreference'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
   const storageExplorerRef = useRef(null)
   const {
     projectRef,
-    view,
     columns,
     selectedItems,
     openedFolders,
@@ -41,6 +41,7 @@ export const StorageExplorer = () => {
     setSelectedFilePreview,
     setSelectedItemsToMove,
   } = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
