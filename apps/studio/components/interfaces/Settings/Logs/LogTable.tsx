@@ -1,16 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play, X as XIcon } from 'lucide-react'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Item, Menu, useContextMenu } from 'react-contexify'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
-import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import {
   Button,
   Checkbox_Shadcn_,
   cn,
+  ContextMenu_Shadcn_,
+  ContextMenuItem_Shadcn_,
+  ContextMenuTrigger_Shadcn_,
   copyToClipboard,
   ResizableHandle,
   ResizablePanel,
@@ -92,9 +94,6 @@ export const LogTable = ({
   const { ref } = useParams()
   const { profile } = useProfile()
   const [selectedLogId] = useSelectedLog()
-  const { show: showContextMenu } = useContextMenu()
-
-  const [cellPosition, setCellPosition] = useState<any>()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [anchorRowId, setAnchorRowId] = useState<string | null>(null)
@@ -124,8 +123,6 @@ export const LogTable = ({
 
   const panelContentMinSize = 40
   const panelContentMaxSize = 60
-
-  const LOGS_EXPLORER_CONTEXT_MENU_ID = 'logs-explorer-context-menu'
 
   const getRowKey = useCallback(
     (row: LogData): string => {
@@ -209,17 +206,7 @@ export const LogTable = ({
       name: v as string,
       resizable: true,
       renderCell: ({ row }) => {
-        return (
-          <span
-            onContextMenu={(e) => {
-              e.preventDefault()
-              setCellPosition({ row, column: { name: v } })
-              showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })
-            }}
-          >
-            {formatCellValue(row?.[v])}
-          </span>
-        )
+        return <span>{formatCellValue(row?.[v])}</span>
       },
       renderHeaderCell: () => {
         return <div className="flex items-center">{v}</div>
@@ -269,13 +256,6 @@ export const LogTable = ({
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
-      const handleContextMenu = (e: React.MouseEvent) => {
-        const firstDataColumn = columns.find((c) => c.key !== 'multi-select')
-        if (firstDataColumn) {
-          setCellPosition({ row: props.row, column: firstDataColumn })
-        }
-        showContextMenu(e, { id: LOGS_EXPLORER_CONTEXT_MENU_ID })
-      }
       const handleClick = (e: React.MouseEvent) => {
         // Check if clicking on the checkbox column - let that handler handle it
         const target = e.target as HTMLElement
@@ -283,17 +263,33 @@ export const LogTable = ({
         onRowClick(props.row)
       }
       return (
-        <Row
-          key={key}
-          {...props}
-          isRowSelected={false}
-          selectedCellIdx={undefined}
-          onContextMenu={handleContextMenu}
-          onClick={handleClick}
-        />
+        <ContextMenu_Shadcn_ key={key} modal={false}>
+          <ContextMenuTrigger_Shadcn_ asChild>
+            <Row
+              {...props}
+              isRowSelected={false}
+              selectedCellIdx={undefined}
+              onClick={handleClick}
+            />
+          </ContextMenuTrigger_Shadcn_>
+          <ContextMenuContent>
+            <ContextMenuItem_Shadcn_
+              className="gap-x-2"
+              onSelect={() => {
+                const eventMessage = props.row.event_message
+                copyToClipboard(eventMessage, () => {
+                  toast.success('Copied to clipboard')
+                })
+              }}
+            >
+              <Copy size={14} />
+              <span className="text-xs">Copy event message</span>
+            </ContextMenuItem_Shadcn_>
+          </ContextMenuContent>
+        </ContextMenu_Shadcn_>
       )
     },
-    [columns, showContextMenu]
+    [columns]
   )
 
   const formatCellValue = (value: any) => {
@@ -304,23 +300,18 @@ export const LogTable = ({
         : String(value)
   }
 
-  const onCopyCell = () => {
-    if (!cellPosition) return
-    const eventMessage = cellPosition.row.event_message
-    copyToClipboard(eventMessage, () => {
-      toast.success('Copied to clipboard')
-    })
-  }
+  const onRowClick = useCallback(
+    (row: LogData) => {
+      const key = getRowKey(row)
 
-  function onRowClick(row: LogData) {
-    const key = getRowKey(row)
-
-    // Regular single click — clear multi-select, open side panel
-    setSelectedRows(new Set())
-    setAnchorRowId(key)
-    setSelectedRow(row)
-    onSelectedLogChange?.(row)
-  }
+      // Regular single click — clear multi-select, open side panel
+      setSelectedRows(new Set())
+      setAnchorRowId(key)
+      setSelectedRow(row)
+      onSelectedLogChange?.(row)
+    },
+    [getRowKey, onSelectedLogChange]
+  )
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -523,9 +514,6 @@ export const LogTable = ({
               })}
               rowHeight={40}
               headerRowHeight={queryType ? 0 : 28}
-              onSelectedCellChange={(row) => {
-                setCellPosition(row)
-              }}
               columns={columns}
               rowClass={(row: LogData) => {
                 const key = getRowKey(row)
@@ -557,16 +545,6 @@ export const LogTable = ({
               }}
             />
           </div>
-          {typeof window !== 'undefined' &&
-            createPortal(
-              <Menu id={LOGS_EXPLORER_CONTEXT_MENU_ID} animation={false}>
-                <Item onClick={onCopyCell}>
-                  <Copy size={14} />
-                  <span className="ml-2 text-xs">Copy event message</span>
-                </Item>
-              </Menu>,
-              document.body
-            )}
         </ResizablePanel>
 
         {selectionOpen && (
