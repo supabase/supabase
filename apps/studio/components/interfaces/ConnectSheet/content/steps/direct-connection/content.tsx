@@ -127,8 +127,6 @@ function DirectConnectionContent({ state }: StepContentProps) {
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
-  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
   const connectionSource = state.connectionSource
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
@@ -138,6 +136,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
   const connectionStrings = useConnectionStringDatabases()
   const connectionStringPooler =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
+  const hasIPv4Addon = connectionStringPooler.ipv4SupportedForDedicatedPooler
 
   // Determine which connection string to use
   const resolvedConnectionString = useMemo(
@@ -206,17 +205,17 @@ function DirectConnectionContent({ state }: StepContentProps) {
     text: 'Pooler settings',
     url: `/project/${projectRef}/database/settings#connection-pooling`,
   }
-  const buttonLinks = !ipv4Addon
+  const buttonLinks = !hasIPv4Addon
     ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
     : [ipv4SettingsUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
 
   let ipv4Status: IPv4Status
   if (connectionMethod === 'direct') {
     ipv4Status = {
-      type: !ipv4Addon ? 'error' : 'success',
-      title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+      type: !hasIPv4Addon ? 'error' : 'success',
+      title: !hasIPv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
       description:
-        !sharedPoolerPreferred && !ipv4Addon
+        !sharedPoolerPreferred && !hasIPv4Addon
           ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
           : sharedPoolerPreferred
             ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
@@ -226,10 +225,10 @@ function DirectConnectionContent({ state }: StepContentProps) {
   } else if (connectionMethod === 'transaction') {
     const isUsingSharedPooler = useSharedPooler || !hasDedicatedPooler
     ipv4Status = {
-      type: !isUsingSharedPooler && !ipv4Addon ? 'error' : 'success',
-      title: !isUsingSharedPooler && !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+      type: !isUsingSharedPooler && !hasIPv4Addon ? 'error' : 'success',
+      title: !isUsingSharedPooler && !hasIPv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
       description:
-        !isUsingSharedPooler && !ipv4Addon
+        !isUsingSharedPooler && !hasIPv4Addon
           ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
           : isUsingSharedPooler
             ? 'Transaction pooler connections are IPv4 proxied for free.'
