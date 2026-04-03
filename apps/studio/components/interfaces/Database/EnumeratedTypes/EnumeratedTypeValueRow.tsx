@@ -58,7 +58,6 @@ const EnumeratedTypeValueRow = ({
                 }`}
                 type="button"
                 disabled={isDisabled}
-                onClick={(e) => e.stopPropagation()}
               >
                 <GripVertical size={16} strokeWidth={1.5} />
               </button>
