@@ -24,6 +24,7 @@ services:
       timeout: 10s
       interval: 5s
       retries: 3
+      start_period: 30s
     depends_on:
       analytics:
         condition: service_healthy
@@ -81,6 +82,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 20s
     depends_on:
       studio:
         condition: service_healthy
@@ -132,6 +134,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 20s
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -219,6 +222,14 @@ services:
       # GOTRUE_MFA_PHONE_ENROLL_ENABLED: ${MFA_PHONE_ENROLL_ENABLED}
       # GOTRUE_MFA_PHONE_VERIFY_ENABLED: ${MFA_PHONE_VERIFY_ENABLED}
       # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
+
+      # SAML SSO
+      # GOTRUE_SAML_ENABLED: ${SAML_ENABLED}
+      # GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
+      # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
+      # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
+      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
+      # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
 
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
@@ -390,6 +401,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 10s
     environment:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
@@ -467,6 +479,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+      start_period: 30s
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -528,6 +541,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+      start_period: 20s
     environment:
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
@@ -567,6 +581,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 10s
     environment:
       LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
     command:
