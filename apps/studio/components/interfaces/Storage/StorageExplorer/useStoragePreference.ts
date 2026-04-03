@@ -7,7 +7,7 @@ import {
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from '../Storage.constants'
-import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 interface StoragePreference {
   view: STORAGE_VIEWS
@@ -39,7 +39,7 @@ export function getStoragePreference(projectRef: string): StoragePreference {
 }
 
 export function useStoragePreference(projectRef: string) {
-  const [preference, setPreference] = useLocalStorage<StoragePreference>(
+  const [preference, setPreference] = useLocalStorageQuery<StoragePreference>(
     LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef),
     DEFAULT_PREFERENCES
   )
