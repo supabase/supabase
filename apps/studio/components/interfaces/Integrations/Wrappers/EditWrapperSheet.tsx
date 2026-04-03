@@ -364,7 +364,6 @@ export const EditWrapperSheet = ({
         loading={isSaving}
         onCancel={() => {
           setIsUpdateConfirmationOpen(false)
-          reset()
           onClose()
         }}
         onConfirm={() => {
