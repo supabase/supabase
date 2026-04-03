@@ -22,6 +22,7 @@ import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
+import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -30,7 +31,6 @@ import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
-import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 
 export const FilesBuckets = () => {
   const { ref } = useParams()
@@ -126,9 +126,7 @@ export const FilesBuckets = () => {
                           <DropdownMenuContent align="start" className="w-40">
                             <DropdownMenuRadioGroup
                               value={sortBucket}
-                              onValueChange={(value) =>
-                                setSortBucket(value as STORAGE_BUCKET_SORT)
-                              }
+                              onValueChange={(value) => setSortBucket(value as STORAGE_BUCKET_SORT)}
                             >
                               <DropdownMenuRadioItem value="alphabetical">
                                 Sort by name

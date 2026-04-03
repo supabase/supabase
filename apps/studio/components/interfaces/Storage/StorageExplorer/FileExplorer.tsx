@@ -8,8 +8,8 @@ import { ColumnContextMenu } from './ColumnContextMenu'
 import { FileExplorerColumn } from './FileExplorerColumn'
 import { FolderContextMenu } from './FolderContextMenu'
 import { ItemContextMenu } from './ItemContextMenu'
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 import { useStoragePreference } from './useStoragePreference'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
   columns: StorageColumn[]

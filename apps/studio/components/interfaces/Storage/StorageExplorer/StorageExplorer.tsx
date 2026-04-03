@@ -12,12 +12,12 @@ import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
+import { useStoragePreference } from './useStoragePreference'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
-import { useStoragePreference } from './useStoragePreference'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
