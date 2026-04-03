@@ -88,7 +88,7 @@ const CreateEnumeratedTypeSidePanel = ({
     reset(initialValues)
   }, [reset, visible])
 
-  const { fields, append, remove, swap } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     name: 'values',
     control: form.control,
   })
@@ -100,7 +100,7 @@ const CreateEnumeratedTypeSidePanel = ({
     const activeIndex = fields.findIndex((item) => item.id === event.active.id)
     if (activeIndex < 0) return
 
-    swap(activeIndex, overIndex)
+    move(activeIndex, overIndex)
   }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {

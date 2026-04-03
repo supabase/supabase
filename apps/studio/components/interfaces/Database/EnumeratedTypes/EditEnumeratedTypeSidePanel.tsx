@@ -84,7 +84,7 @@ const EditEnumeratedTypeSidePanel = ({
   })
   const { reset } = form
 
-  const { fields, append, remove, swap } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     name: 'values',
     control: form.control,
   })
@@ -96,7 +96,7 @@ const EditEnumeratedTypeSidePanel = ({
     const activeIndex = fields.findIndex((item) => item.id === event.active.id)
     if (activeIndex < 0) return
 
-    swap(activeIndex, overIndex)
+    move(activeIndex, overIndex)
   }
 
   const originalEnumeratedTypes = useMemo(
