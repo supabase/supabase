@@ -133,7 +133,7 @@ testRunner('S3 Wrapper', () => {
     await page.getByRole('textbox', { name: 'URI' }).fill('s3://bucket/s3_table.csv')
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.waitForTimeout(500)
-    await page.getByRole('textbox', { name: 'Column name', exact: true }).fill('s3_column')
+    await page.getByRole('textbox', { name: 'Name', exact: true }).fill('s3_column')
     await page.getByRole('button', { name: 'Save' }).click()
     await page.getByRole('button', { name: 'Create wrapper' }).click()
     await expect(page.getByText('Successfully created S3 foreign data wrapper')).toBeVisible()
