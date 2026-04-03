@@ -50,7 +50,7 @@ export const OrganizationCard = ({
               </>
             )}
           </div>
-          <div className="flex items-center gap-x-1">
+          <div className="flex items-center gap-x-2">
             <PartnerIcon organization={organization} />
             {isMfaRequired && (
               <Tooltip>
