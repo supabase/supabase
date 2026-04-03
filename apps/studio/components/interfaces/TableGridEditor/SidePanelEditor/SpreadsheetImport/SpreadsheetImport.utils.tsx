@@ -19,10 +19,10 @@ const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export function parseSpreadsheetText({
   text,
-  treatEmptyAsNull = false,
+  emptyStringAsNullHeaders = [],
 }: {
   text: string
-  treatEmptyAsNull?: boolean
+  emptyStringAsNullHeaders?: string[]
 }): Promise<{
   headers: Array<string>
   rows: Array<unknown>
@@ -37,7 +37,13 @@ export function parseSpreadsheetText({
       header: true,
       dynamicTyping: false,
       skipEmptyLines: true,
-      transform: treatEmptyAsNull ? (value: string) => (value === '' ? null : value) : undefined,
+      transform:
+        emptyStringAsNullHeaders.length > 0
+          ? (value: string, field: string | number) =>
+              value === '' && typeof field === 'string' && emptyStringAsNullHeaders.includes(field)
+                ? null
+                : value
+          : undefined,
       complete: (results) => {
         const headers = results.meta.fields || []
         const rows = results.data
@@ -67,7 +73,7 @@ export function parseSpreadsheetText({
 export const parseSpreadsheet = (
   file: File,
   onProgressUpdate: (progress: number) => void,
-  treatEmptyAsNull = false
+  emptyStringAsNullHeaders: string[] = []
 ): Promise<
   Omit<SpreadsheetData, 'rows'> & {
     previewRows: Array<unknown>
@@ -95,14 +101,18 @@ export const parseSpreadsheet = (
 
         // transform option is silently ignored when worker: true, so we apply
         // the empty → null conversion manually here instead
-        const data = treatEmptyAsNull
-          ? results.data.map((row) => {
-              const rowAsObject = isObject(row) ? row : {}
-              return Object.fromEntries(
-                Object.entries(rowAsObject).map(([k, v]) => [k, v === '' ? null : v])
-              )
-            })
-          : results.data
+        const data =
+          emptyStringAsNullHeaders.length > 0
+            ? results.data.map((row) => {
+                const rowAsObject = isObject(row) ? row : {}
+                return Object.fromEntries(
+                  Object.entries(rowAsObject).map(([k, v]) => [
+                    k,
+                    v === '' && emptyStringAsNullHeaders.includes(k) ? null : v,
+                  ])
+                )
+              })
+            : results.data
 
         headers.forEach((header) => {
           const type = inferColumnType(header, data)

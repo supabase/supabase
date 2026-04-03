@@ -842,7 +842,7 @@ export const SidePanelEditor = ({
       return console.error('no project or table selected')
     }
 
-    const { file, rowCount, selectedHeaders, resolve } = importContent
+    const { file, rowCount, selectedHeaders, emptyStringAsNullHeaders, resolve } = importContent
     const toastId = toast.loading(
       `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
     )
@@ -854,6 +854,7 @@ export const SidePanelEditor = ({
         file,
         table: selectedTable,
         selectedHeaders,
+        emptyStringAsNullHeaders,
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
@@ -863,7 +864,6 @@ export const SidePanelEditor = ({
             { id: toastId }
           )
         },
-        treatEmptyAsNull: importContent.treatEmptyAsNull,
       })
       if (res.error) {
         const message = isObjectContainingKeys(res.error, ['message'])
@@ -879,6 +879,7 @@ export const SidePanelEditor = ({
         table: selectedTable,
         rows: importContent.rows,
         selectedHeaders,
+        emptyStringAsNullHeaders,
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
@@ -890,7 +891,6 @@ export const SidePanelEditor = ({
             { id: toastId }
           )
         },
-        treatEmptyAsNull: importContent.treatEmptyAsNull,
       })
       if (res.error) {
         const message = isObjectContainingKeys(res.error, ['message'])

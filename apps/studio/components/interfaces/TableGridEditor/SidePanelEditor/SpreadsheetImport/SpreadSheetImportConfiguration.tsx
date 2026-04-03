@@ -1,6 +1,7 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Checkbox_Shadcn_, cn, Collapsible, Label_Shadcn_, SidePanel } from 'ui'
+import { Button, cn, Collapsible, SidePanel } from 'ui'
+import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 
@@ -8,18 +9,21 @@ interface SpreadSheetImportConfigurationProps {
   spreadsheetData: SpreadsheetData
   selectedHeaders: string[]
   onToggleHeader: (header: string) => void
-  treatEmptyAsNull: boolean
-  onToggleTreatEmptyAsNull: () => void
+  emptyStringAsNullHeaders: string[]
+  onEmptyStringAsNullHeadersChange: (headers: string[]) => void
 }
 
 const SpreadsheetImportConfiguration = ({
   spreadsheetData,
   selectedHeaders,
   onToggleHeader,
-  treatEmptyAsNull,
-  onToggleTreatEmptyAsNull,
+  emptyStringAsNullHeaders,
+  onEmptyStringAsNullHeadersChange,
 }: SpreadSheetImportConfigurationProps) => {
   const [expandConfiguration, setExpandConfiguration] = useState(false)
+  const importableHeaders = spreadsheetData.headers.filter((header) =>
+    selectedHeaders.includes(header)
+  )
 
   return (
     <Collapsible open={expandConfiguration} onOpenChange={setExpandConfiguration} className={''}>
@@ -52,19 +56,6 @@ const SpreadsheetImportConfiguration = ({
                 By default, all columns are selected to be imported from your CSV
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Checkbox_Shadcn_
-                id="treat-empty-as-null"
-                checked={treatEmptyAsNull}
-                onCheckedChange={onToggleTreatEmptyAsNull}
-              />
-              <Label_Shadcn_
-                htmlFor="treat-empty-as-null"
-                className="text-sm text-foreground-light cursor-pointer"
-              >
-                Treat empty cells as <code className="text-xs">NULL</code>
-              </Label_Shadcn_>
-            </div>
             <div className="flex items-center flex-wrap gap-2 pl-0.5 pb-0.5">
               {spreadsheetData.headers.map((header) => {
                 const isSelected = selectedHeaders.includes(header)
@@ -81,6 +72,38 @@ const SpreadsheetImportConfiguration = ({
                   </Button>
                 )
               })}
+            </div>
+            <div className="space-y-2">
+              <div>
+                <p className="text-sm text-foreground-light">Set empty cells as NULL</p>
+                <p className="text-sm text-foreground-light">
+                  Empty cells will only be converted to NULL for the selected imported columns
+                </p>
+              </div>
+              <MultiSelector
+                values={emptyStringAsNullHeaders}
+                onValuesChange={onEmptyStringAsNullHeadersChange}
+                disabled={importableHeaders.length === 0}
+              >
+                <MultiSelector.Trigger
+                  badgeLimit="wrap"
+                  label={
+                    importableHeaders.length === 0
+                      ? 'No imported columns selected'
+                      : 'Select columns...'
+                  }
+                  mode="inline-combobox"
+                />
+                <MultiSelector.Content>
+                  <MultiSelector.List>
+                    {importableHeaders.map((header) => (
+                      <MultiSelector.Item key={header} value={header}>
+                        {header}
+                      </MultiSelector.Item>
+                    ))}
+                  </MultiSelector.List>
+                </MultiSelector.Content>
+              </MultiSelector>
             </div>
           </div>
         </SidePanel.Content>

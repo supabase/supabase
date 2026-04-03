@@ -19,6 +19,6 @@ export interface ImportContent {
   rows: unknown[]
   columnTypeMap: Dictionary<InferredColumnType>
   selectedHeaders: string[]
-  treatEmptyAsNull: boolean
+  emptyStringAsNullHeaders?: string[]
   resolve: () => void
 }
