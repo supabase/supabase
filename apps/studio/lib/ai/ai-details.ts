@@ -35,7 +35,7 @@ export const getOrgAIDetails = async ({
     aiOptInLevel: getAiOptInLevel(selectedOrg?.opt_in_tags),
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
     hasHipaaAddon: subscriptionHasHipaaAddon(subscription),
-    isDpaSigned: dpaSignedStatus.data?.signed ?? false,
+    isDpaSigned: dpaSignedStatus.data?.signed,
     orgId: selectedOrg?.id,
     planId: selectedOrg?.plan.id,
   }

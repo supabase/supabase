@@ -123,7 +123,7 @@ describe('getOrgAIDetails', () => {
     expect(result.isDpaSigned).toBe(true)
   })
 
-  it('returns isDpaSigned false when endpoint fails', async () => {
+  it('returns isDpaSigned undefined when endpoint fails', async () => {
     mockGetOrganizations.mockResolvedValue([
       { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] },
     ])
@@ -132,7 +132,7 @@ describe('getOrgAIDetails', () => {
 
     const result = await getOrgAIDetails({ orgSlug: 'test-org', authorization: AUTH })
 
-    expect(result.isDpaSigned).toBe(false)
+    expect(result.isDpaSigned).toBeUndefined()
   })
 
   it('calls getAiOptInLevel with the matched org opt_in_tags', async () => {
