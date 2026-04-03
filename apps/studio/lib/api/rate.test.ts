@@ -48,7 +48,10 @@ test('rate calls the tool sanitizer', async () => {
       aiOptInLevel: 'schema_and_log_and_data',
       hasAccessToAdvanceModel: true,
       isDpaSigned: false,
-      isEuRegion: false,
+    }),
+    getProjectAIDetails: vi.fn().mockResolvedValue({
+      region: 'us-east-1',
+      isSensitive: false,
     }),
   }))
 
