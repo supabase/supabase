@@ -137,7 +137,12 @@ Instructions:
     // Log feedback to Braintrust if tracing is enabled and span ID is available
     if (
       IS_TRACING_ENABLED &&
-      isTracingAllowed({ hasHipaaAddon, isSensitive, isDpaSigned, region }) &&
+      isTracingAllowed({
+        orgHasHipaaAddon: hasHipaaAddon,
+        projectIsSensitive: isSensitive,
+        orgIsDpaSigned: isDpaSigned,
+        projectRegion: region,
+      }) &&
       spanId
     ) {
       try {

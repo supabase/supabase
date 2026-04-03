@@ -209,7 +209,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRef,
       chatId,
       chatName,
-      allowTracing: isTracingAllowed({ hasHipaaAddon, isSensitive, isDpaSigned, region }),
+      allowTracing: isTracingAllowed({
+        orgHasHipaaAddon: hasHipaaAddon,
+        projectIsSensitive: isSensitive,
+        orgIsDpaSigned: isDpaSigned,
+        projectRegion: region,
+      }),
       userId,
       orgId,
       planId,
