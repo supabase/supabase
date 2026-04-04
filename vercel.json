@@ -1,5 +1,30 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm install --no-frozen-lockfile --ignore-scripts",
+  "buildCommand": "cd apps/studio && npx next build",
+  "outputDirectory": "apps/studio/.next",
+  "framework": "nextjs",
+  "ignoreCommand": "",
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+  ],
+  "env": {
+    "SKIP_ASSET_UPLOAD": "1",
+    "NEXT_PUBLIC_IS_PLATFORM": "false"
+  }
 }
