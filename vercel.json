@@ -1,5 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd marceau-app && npm install",
+  "buildCommand": "cd marceau-app && npm run build",
+  "outputDirectory": "marceau-app/.next",
   "framework": "nextjs",
   "ignoreCommand": ""
 }
