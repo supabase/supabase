@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm install --no-frozen-lockfile --ignore-scripts",
+  "installCommand": "echo 'public-hoist-pattern[]=*' >> .npmrc && pnpm install --no-frozen-lockfile --ignore-scripts",
   "buildCommand": "SKIP_ASSET_UPLOAD=1 NEXT_PUBLIC_IS_PLATFORM=false turbo run build --filter=studio",
   "outputDirectory": "apps/studio/.next",
   "framework": "nextjs",
