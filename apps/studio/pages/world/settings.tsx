@@ -41,6 +41,84 @@ const SettingsPage: NextPageWithLayout = () => {
     transition: 'left 0.2s, background 0.2s',
   })
 
+  // Raccoon SVG mascot with deal-with-it sunglasses
+  const RaccoonMascot = () => (
+    <motion.div
+      className="fixed top-20 right-4 z-40"
+      initial={{ opacity: 0, x: 100, rotate: 10 }}
+      animate={{ opacity: 1, x: 0, rotate: 0 }}
+      transition={{ delay: 0.5, type: 'spring', stiffness: 120 }}
+      style={{ width: 180, height: 220 }}
+    >
+      <svg viewBox="0 0 200 250" width="180" height="220">
+        {/* Body */}
+        <ellipse cx="100" cy="180" rx="55" ry="60" fill="#8B7355" />
+        <ellipse cx="100" cy="185" rx="40" ry="45" fill="#C4B49A" />
+        {/* Head */}
+        <ellipse cx="100" cy="100" rx="50" ry="45" fill="#8B7355" />
+        {/* Face mask */}
+        <ellipse cx="100" cy="105" rx="35" ry="30" fill="#C4B49A" />
+        {/* Dark eye patches */}
+        <ellipse cx="78" cy="95" rx="18" ry="14" fill="#2C2C2C" />
+        <ellipse cx="122" cy="95" rx="18" ry="14" fill="#2C2C2C" />
+        {/* Eyes */}
+        <circle cx="78" cy="95" r="6" fill="white" />
+        <circle cx="122" cy="95" r="6" fill="white" />
+        <circle cx="80" cy="94" r="3" fill="black" />
+        <circle cx="124" cy="94" r="3" fill="black" />
+        {/* Nose */}
+        <ellipse cx="100" cy="110" rx="6" ry="4" fill="#2C2C2C" />
+        {/* Mouth - grin */}
+        <path d="M 88 118 Q 100 128 112 118" stroke="#2C2C2C" strokeWidth="2" fill="none" />
+        {/* Ears */}
+        <ellipse cx="65" cy="65" rx="15" ry="18" fill="#8B7355" />
+        <ellipse cx="135" cy="65" rx="15" ry="18" fill="#8B7355" />
+        <ellipse cx="65" cy="65" rx="10" ry="12" fill="#C4B49A" />
+        <ellipse cx="135" cy="65" rx="10" ry="12" fill="#C4B49A" />
+        {/* Arms raised up - rock on! */}
+        <path d="M 50 160 Q 20 100 15 70" stroke="#8B7355" strokeWidth="16" fill="none" strokeLinecap="round" />
+        <path d="M 150 160 Q 180 100 185 70" stroke="#8B7355" strokeWidth="16" fill="none" strokeLinecap="round" />
+        {/* Hands */}
+        <circle cx="15" cy="68" r="10" fill="#8B7355" />
+        <circle cx="185" cy="68" r="10" fill="#8B7355" />
+        {/* Rock fingers - left hand */}
+        <line x1="8" y1="62" x2="3" y2="45" stroke="#8B7355" strokeWidth="4" strokeLinecap="round" />
+        <line x1="20" y1="60" x2="22" y2="43" stroke="#8B7355" strokeWidth="4" strokeLinecap="round" />
+        {/* Rock fingers - right hand */}
+        <line x1="178" y1="60" x2="176" y2="43" stroke="#8B7355" strokeWidth="4" strokeLinecap="round" />
+        <line x1="192" y1="62" x2="197" y2="45" stroke="#8B7355" strokeWidth="4" strokeLinecap="round" />
+        {/* Deal-with-it sunglasses */}
+        <rect x="60" y="86" width="80" height="16" rx="2" fill="black" />
+        <rect x="62" y="88" width="25" height="12" rx="1" fill="#111" />
+        <rect x="113" y="88" width="25" height="12" rx="1" fill="#111" />
+        {/* Pixel shine on glasses */}
+        <rect x="65" y="90" width="4" height="3" fill="rgba(255,255,255,0.3)" />
+        <rect x="71" y="90" width="4" height="3" fill="rgba(255,255,255,0.3)" />
+        <rect x="116" y="90" width="4" height="3" fill="rgba(255,255,255,0.3)" />
+        <rect x="122" y="90" width="4" height="3" fill="rgba(255,255,255,0.3)" />
+        {/* Tail */}
+        <path d="M 145 200 Q 175 180 170 150 Q 165 130 175 120" stroke="#8B7355" strokeWidth="12" fill="none" strokeLinecap="round" />
+        <path d="M 170 150 Q 165 130 175 120" stroke="#2C2C2C" strokeWidth="12" fill="none" strokeLinecap="round" opacity="0.5" />
+      </svg>
+      {/* Glow effect */}
+      <motion.div
+        className="absolute -inset-2 rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(255,100,0,0.15) 0%, transparent 70%)' }}
+        animate={{ opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      {/* Label */}
+      <motion.p
+        className="text-center text-xs font-bold mt-1"
+        style={{ color: '#ff8c00', textShadow: '0 0 8px #ff6600' }}
+        animate={{ opacity: [0.6, 1, 0.6] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
+        DEAL WITH IT
+      </motion.p>
+    </motion.div>
+  )
+
   return (
     <>
       <Head>
@@ -51,6 +129,9 @@ const SettingsPage: NextPageWithLayout = () => {
         className="fixed inset-0 bg-black overflow-y-auto"
         style={{ fontFamily: "'Courier New', monospace" }}
       >
+        {/* Raccoon mascot - fixed top right */}
+        <RaccoonMascot />
+
         {/* Header */}
         <div
           className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b"
@@ -71,13 +152,14 @@ const SettingsPage: NextPageWithLayout = () => {
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto p-6 space-y-6">
+        {/* Settings menu aligned to the left */}
+        <div className="max-w-md p-6 space-y-6 ml-4">
           {/* Language */}
           <motion.div
             className="p-5 rounded-xl border"
             style={{ borderColor: '#ff660033', background: 'rgba(255,100,0,0.03)' }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
             <h3 className="text-sm font-bold mb-4" style={{ color: '#ff8c00' }}>
@@ -108,8 +190,8 @@ const SettingsPage: NextPageWithLayout = () => {
           <motion.div
             className="p-5 rounded-xl border"
             style={{ borderColor: '#ff660033', background: 'rgba(255,100,0,0.03)' }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
             <h3 className="text-sm font-bold mb-4" style={{ color: '#ff8c00' }}>
@@ -142,8 +224,8 @@ const SettingsPage: NextPageWithLayout = () => {
           <motion.div
             className="p-5 rounded-xl border space-y-4"
             style={{ borderColor: '#ff660033', background: 'rgba(255,100,0,0.03)' }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
           >
             <h3 className="text-sm font-bold mb-4" style={{ color: '#ff8c00' }}>
@@ -170,8 +252,8 @@ const SettingsPage: NextPageWithLayout = () => {
           <motion.div
             className="p-5 rounded-xl border"
             style={{ borderColor: '#ff660033', background: 'rgba(255,100,0,0.03)' }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
             <h3 className="text-sm font-bold mb-3" style={{ color: '#ff8c00' }}>
