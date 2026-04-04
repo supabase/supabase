@@ -38,6 +38,115 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
   )
 }
 
+// ─── TI-LEX CLOCK ────────────────────────────────────────
+function TiLexClock() {
+  const [time, setTime] = useState(new Date())
+
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const hours = time.getHours().toString().padStart(2, '0')
+  const minutes = time.getMinutes().toString().padStart(2, '0')
+  const seconds = time.getSeconds().toString().padStart(2, '0')
+  const date = time.toLocaleDateString('fr-CA', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
+  return (
+    <motion.div
+      className="absolute top-4 left-4 z-30 rounded-xl border overflow-hidden"
+      style={{
+        background: '#000',
+        borderColor: '#ff660055',
+        boxShadow: '0 0 20px rgba(255,100,0,0.15)',
+        padding: '12px 20px',
+      }}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+    >
+      {/* Ti-Lex-Al label */}
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-xs" style={{ color: '#ff8c00' }}>🪶</span>
+        <span
+          className="text-[10px] font-bold tracking-widest"
+          style={{ color: '#ff8c00', textShadow: '0 0 8px #ff6600' }}
+        >
+          TI-LEX-AL CLOCK
+        </span>
+      </div>
+      {/* Time */}
+      <div className="flex items-baseline gap-1">
+        <span
+          className="text-4xl font-black tracking-wider"
+          style={{
+            color: '#ffffff',
+            textShadow: '0 0 10px rgba(255,255,255,0.3)',
+            fontFamily: "'Courier New', monospace",
+          }}
+        >
+          {hours}
+        </span>
+        <motion.span
+          className="text-4xl font-black"
+          style={{ color: '#ff8c00' }}
+          animate={{ opacity: [1, 0.2, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          :
+        </motion.span>
+        <span
+          className="text-4xl font-black tracking-wider"
+          style={{
+            color: '#ffffff',
+            textShadow: '0 0 10px rgba(255,255,255,0.3)',
+            fontFamily: "'Courier New', monospace",
+          }}
+        >
+          {minutes}
+        </span>
+        <motion.span
+          className="text-4xl font-black"
+          style={{ color: '#ff8c00' }}
+          animate={{ opacity: [1, 0.2, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          :
+        </motion.span>
+        <span
+          className="text-2xl font-bold tracking-wider"
+          style={{
+            color: '#ff8c00',
+            textShadow: '0 0 8px #ff6600',
+            fontFamily: "'Courier New', monospace",
+          }}
+        >
+          {seconds}
+        </span>
+      </div>
+      {/* Date */}
+      <p
+        className="text-[10px] mt-1 tracking-wide"
+        style={{ color: '#ffffff88', fontFamily: "'Courier New', monospace" }}
+      >
+        {date}
+      </p>
+      {/* Bottom glow line */}
+      <motion.div
+        className="mt-2 h-[2px] rounded-full"
+        style={{ background: 'linear-gradient(90deg, transparent, #ff8c00, transparent)' }}
+        animate={{ opacity: [0.3, 0.8, 0.3] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </motion.div>
+  )
+}
+
 const MENU_ITEMS = [
   { key: 'gpsMap' as const, href: '/world/gps-map', icon: '🗺️', color: '#00ff88', label: '' },
   { key: 'agentAlex' as const, href: '/world/agent-alex', icon: '🕶️', color: '#ff0000', label: '' },
@@ -76,6 +185,9 @@ const WorldDashboard = () => {
       <div className="fixed inset-0 bg-black overflow-hidden" style={{ fontFamily: "'Courier New', monospace" }}>
         {/* Matrix rain background */}
         <div className="absolute inset-0 overflow-hidden">{matrixColumns}</div>
+
+        {/* Ti-Lex Clock */}
+        <TiLexClock />
 
         {/* Language selector - top right */}
         <div className="absolute top-4 right-4 z-30">
