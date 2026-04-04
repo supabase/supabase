@@ -43,8 +43,8 @@ const MENU_ITEMS = [
   { key: 'agentAlex' as const, href: '/world/agent-alex', icon: '🕶️', color: '#ff0000', label: '' },
   { key: 'tilexal' as const, href: '/world/tilexal', icon: '🪶', color: '#ff8c00', label: '' },
   { key: 'security' as const, href: '/world/security', icon: '🔐', color: '#00ffcc', label: '' },
-  { key: 'gpsMap' as const, href: '/world/world-map', icon: '🌍', color: '#4488ff', label: 'World Map FREE' },
-  { key: 'settings' as const, href: '#', icon: '⚙️', color: '#888888', label: '' },
+  { key: 'dashboard' as const, href: '/world/world-map', icon: '🌍', color: '#4488ff', label: 'World Map FREE' },
+  { key: 'settings' as const, href: '/world/settings', icon: '⚙️', color: '#888888', label: '' },
 ]
 
 const WorldDashboard: NextPageWithLayout = () => {
