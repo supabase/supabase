@@ -64,7 +64,7 @@ function TiLexClock() {
 
   return (
     <motion.div
-      className="absolute top-4 left-4 z-30 rounded-xl border overflow-hidden"
+      className="absolute top-4 right-4 z-30 rounded-xl border overflow-hidden"
       style={{
         background: '#000',
         borderColor: '#ff660055',
@@ -195,8 +195,8 @@ const WorldDashboard = () => {
         {/* Ti-Lex Clock */}
         <TiLexClock />
 
-        {/* Language selector - top right */}
-        <div className="absolute top-4 right-4 z-30">
+        {/* Language selector - below clock */}
+        <div className="absolute top-[140px] right-4 z-30">
           <button
             onClick={() => setShowLangMenu(!showLangMenu)}
             className="px-4 py-2 border rounded-lg font-bold text-sm"
