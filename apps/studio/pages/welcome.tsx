@@ -39,17 +39,20 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
   const [text, setText] = useState('')
 
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null
     const timeout = setTimeout(() => {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setText((prev) => {
           const next = prev + chars[Math.floor(Math.random() * chars.length)] + '\n'
           if (next.length > 600) return ''
           return next
         })
       }, speed)
-      return () => clearInterval(interval)
     }, delay)
-    return () => clearTimeout(timeout)
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
   }, [delay, speed])
 
   return (

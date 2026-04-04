@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { type LangCode, LANGUAGES, t } from 'lib/i18n/translations'
 import type { NextPageWithLayout } from 'types'
 
@@ -10,19 +11,22 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
   const chars = 'アカサタナハマヤラワ0123456789MARCEAU'.split('')
   const [text, setText] = useState('')
 
-  if (typeof window !== 'undefined') {
-    setTimeout(() => {
-      const interval = setInterval(() => {
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
         setText((prev) => {
           const next = prev + chars[Math.floor(Math.random() * chars.length)] + '\n'
           if (next.length > 400) return ''
           return next
         })
       }, speed)
-      // cleanup after 60s to save memory
-      setTimeout(() => clearInterval(interval), 60000)
     }, delay)
-  }
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
+  }, [delay, speed])
 
   return (
     <div
@@ -44,8 +48,15 @@ const MENU_ITEMS = [
 ]
 
 const WorldDashboard: NextPageWithLayout = () => {
-  const [lang, setLang] = useState<LangCode>('fr')
+  const router = useRouter()
+  const [lang, setLang] = useState<LangCode>((router.query.lang as LangCode) || 'fr')
   const [showLangMenu, setShowLangMenu] = useState(false)
+
+  useEffect(() => {
+    if (router.query.lang && router.query.lang !== lang) {
+      setLang(router.query.lang as LangCode)
+    }
+  }, [router.query.lang])
 
   const matrixColumns = Array.from({ length: 25 }, (_, i) => (
     <MatrixColumn

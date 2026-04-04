@@ -110,6 +110,7 @@ const AgentAlexPage: NextPageWithLayout = () => {
   const [showProfile, setShowProfile] = useState(false)
   const terminalRef = useRef<HTMLDivElement>(null)
   const bootRef = useRef<HTMLDivElement>(null)
+  const toolIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Boot sequence
   useEffect(() => {
@@ -160,9 +161,22 @@ const AgentAlexPage: NextPageWithLayout = () => {
     }
   }, [commandInput, currentLang])
 
+  // Cleanup tool interval on unmount
+  useEffect(() => {
+    return () => {
+      if (toolIntervalRef.current) clearInterval(toolIntervalRef.current)
+    }
+  }, [])
+
   // Run tool
   const runTool = useCallback(
     (tool: string) => {
+      // Cancel any previous tool animation
+      if (toolIntervalRef.current) {
+        clearInterval(toolIntervalRef.current)
+        toolIntervalRef.current = null
+      }
+
       setActiveTool(tool)
       setToolRunning(true)
       setToolOutput('')
@@ -203,12 +217,15 @@ const AgentAlexPage: NextPageWithLayout = () => {
 
       const lines = outputs[tool] || ['Running...', 'Complete.']
       let i = 0
-      const interval = setInterval(() => {
+      toolIntervalRef.current = setInterval(() => {
         if (i < lines.length) {
           setToolOutput((prev) => (prev ? prev + '\n' : '') + '> ' + lines[i])
           i++
         } else {
-          clearInterval(interval)
+          if (toolIntervalRef.current) {
+            clearInterval(toolIntervalRef.current)
+            toolIntervalRef.current = null
+          }
           setToolRunning(false)
         }
       }, 400)

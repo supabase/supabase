@@ -196,7 +196,7 @@ const TiLexAlPage: NextPageWithLayout = () => {
   const [showLangMenu, setShowLangMenu] = useState(false)
   const chatRef = useRef<HTMLDivElement>(null)
 
-  // Add greeting after quill animation
+  // Add greeting after quill animation (only once)
   useEffect(() => {
     if (!showQuill) {
       const greeting: ChatMessage = {
@@ -205,9 +205,9 @@ const TiLexAlPage: NextPageWithLayout = () => {
         text: t(currentLang, 'tilexalGreeting'),
         timestamp: new Date(),
       }
-      setMessages([greeting])
+      setMessages((prev) => (prev.length === 0 ? [greeting] : prev))
     }
-  }, [showQuill, currentLang])
+  }, [showQuill])
 
   // Auto-scroll chat
   useEffect(() => {
