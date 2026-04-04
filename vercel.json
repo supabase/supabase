@@ -3,7 +3,7 @@
   "installCommand": "pnpm install --no-frozen-lockfile --ignore-scripts",
   "buildCommand": "SKIP_ASSET_UPLOAD=1 NEXT_PUBLIC_IS_PLATFORM=false turbo run build --filter=studio",
   "outputDirectory": "apps/studio/.next",
-  "framework": null,
+  "framework": "nextjs",
   "ignoreCommand": "",
   "headers": [
     {
@@ -19,8 +19,5 @@
         { "key": "Cache-Control", "value": "no-cache" }
       ]
     }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
   ]
 }
