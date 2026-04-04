@@ -72,6 +72,28 @@ type TranslationKeys = {
   askTilexal: string
   thinking: string
   typeMessage: string
+  // Agent Alex
+  agentAlex: string
+  agentAlexGreeting: string
+  agentAlexStatus: string
+  missionLog: string
+  activeMissions: string
+  completedMissions: string
+  newMission: string
+  missionBriefing: string
+  agentTools: string
+  codeBreaker: string
+  networkScan: string
+  dataExtract: string
+  encryptMsg: string
+  agentProfile: string
+  agentRank: string
+  agentClearance: string
+  agentSpecialty: string
+  executeCommand: string
+  commandPrompt: string
+  systemOnline: string
+  accessGranted: string
 }
 
 export const translations: Record<LangCode, TranslationKeys> = {
@@ -107,6 +129,27 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Demander a Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al reflechit...',
     typeMessage: 'Ecris ton message...',
+    agentAlex: 'Agent Alex',
+    agentAlexGreeting: 'Agent Alex en ligne. Systeme MARCEAU actif. Pret pour la mission.',
+    agentAlexStatus: 'En service',
+    missionLog: 'Journal de missions',
+    activeMissions: 'Missions actives',
+    completedMissions: 'Missions completees',
+    newMission: 'Nouvelle mission',
+    missionBriefing: 'Briefing de mission',
+    agentTools: 'Outils d\'agent',
+    codeBreaker: 'Briseur de code',
+    networkScan: 'Scan reseau',
+    dataExtract: 'Extraction donnees',
+    encryptMsg: 'Message crypte',
+    agentProfile: 'Profil agent',
+    agentRank: 'Rang',
+    agentClearance: 'Niveau d\'acces',
+    agentSpecialty: 'Specialite',
+    executeCommand: 'Executer commande',
+    commandPrompt: 'Entrez une commande agent...',
+    systemOnline: 'Systeme en ligne',
+    accessGranted: 'Acces autorise',
   },
   en: {
     welcome: 'Welcome to my mind',
@@ -140,6 +183,27 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al is thinking...',
     typeMessage: 'Type your message...',
+    agentAlex: 'Agent Alex',
+    agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.',
+    agentAlexStatus: 'On duty',
+    missionLog: 'Mission log',
+    activeMissions: 'Active missions',
+    completedMissions: 'Completed missions',
+    newMission: 'New mission',
+    missionBriefing: 'Mission briefing',
+    agentTools: 'Agent tools',
+    codeBreaker: 'Code breaker',
+    networkScan: 'Network scan',
+    dataExtract: 'Data extraction',
+    encryptMsg: 'Encrypt message',
+    agentProfile: 'Agent profile',
+    agentRank: 'Rank',
+    agentClearance: 'Clearance level',
+    agentSpecialty: 'Specialty',
+    executeCommand: 'Execute command',
+    commandPrompt: 'Enter an agent command...',
+    systemOnline: 'System online',
+    accessGranted: 'Access granted',
   },
   it: {
     welcome: 'Benvenuto nella mia mente',
@@ -173,6 +237,27 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Chiedi a Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al sta pensando...',
     typeMessage: 'Scrivi il tuo messaggio...',
+    agentAlex: 'Agente Alex',
+    agentAlexGreeting: 'Agente Alex online. Sistema MARCEAU attivo. Pronto per la missione.',
+    agentAlexStatus: 'In servizio',
+    missionLog: 'Registro missioni',
+    activeMissions: 'Missioni attive',
+    completedMissions: 'Missioni completate',
+    newMission: 'Nuova missione',
+    missionBriefing: 'Briefing missione',
+    agentTools: 'Strumenti agente',
+    codeBreaker: 'Decodificatore',
+    networkScan: 'Scansione rete',
+    dataExtract: 'Estrazione dati',
+    encryptMsg: 'Messaggio criptato',
+    agentProfile: 'Profilo agente',
+    agentRank: 'Grado',
+    agentClearance: 'Livello accesso',
+    agentSpecialty: 'Specialita',
+    executeCommand: 'Esegui comando',
+    commandPrompt: 'Inserisci un comando...',
+    systemOnline: 'Sistema online',
+    accessGranted: 'Accesso autorizzato',
   },
   es: {
     welcome: 'Bienvenido a mi mente',
@@ -206,6 +291,27 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Pregunta a Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al esta pensando...',
     typeMessage: 'Escribe tu mensaje...',
+    agentAlex: 'Agente Alex',
+    agentAlexGreeting: 'Agente Alex en linea. Sistema MARCEAU activo. Listo para la mision.',
+    agentAlexStatus: 'En servicio',
+    missionLog: 'Registro de misiones',
+    activeMissions: 'Misiones activas',
+    completedMissions: 'Misiones completadas',
+    newMission: 'Nueva mision',
+    missionBriefing: 'Informe de mision',
+    agentTools: 'Herramientas de agente',
+    codeBreaker: 'Descifrador',
+    networkScan: 'Escaneo de red',
+    dataExtract: 'Extraccion de datos',
+    encryptMsg: 'Mensaje cifrado',
+    agentProfile: 'Perfil de agente',
+    agentRank: 'Rango',
+    agentClearance: 'Nivel de acceso',
+    agentSpecialty: 'Especialidad',
+    executeCommand: 'Ejecutar comando',
+    commandPrompt: 'Ingresa un comando...',
+    systemOnline: 'Sistema en linea',
+    accessGranted: 'Acceso autorizado',
   },
   pt: {
     welcome: 'Bem-vindo a minha mente',
@@ -239,6 +345,27 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Pergunte ao Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al esta pensando...',
     typeMessage: 'Digite sua mensagem...',
+    agentAlex: 'Agente Alex',
+    agentAlexGreeting: 'Agente Alex online. Sistema MARCEAU ativo. Pronto para a missao.',
+    agentAlexStatus: 'Em servico',
+    missionLog: 'Registro de missoes',
+    activeMissions: 'Missoes ativas',
+    completedMissions: 'Missoes completadas',
+    newMission: 'Nova missao',
+    missionBriefing: 'Briefing da missao',
+    agentTools: 'Ferramentas do agente',
+    codeBreaker: 'Quebra-codigo',
+    networkScan: 'Varredura de rede',
+    dataExtract: 'Extracao de dados',
+    encryptMsg: 'Mensagem criptografada',
+    agentProfile: 'Perfil do agente',
+    agentRank: 'Posto',
+    agentClearance: 'Nivel de acesso',
+    agentSpecialty: 'Especialidade',
+    executeCommand: 'Executar comando',
+    commandPrompt: 'Digite um comando...',
+    systemOnline: 'Sistema online',
+    accessGranted: 'Acesso autorizado',
   },
   de: {
     welcome: 'Willkommen in meinem Kopf',
@@ -272,6 +399,27 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Frag Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al denkt nach...',
     typeMessage: 'Nachricht eingeben...',
+    agentAlex: 'Agent Alex',
+    agentAlexGreeting: 'Agent Alex online. MARCEAU-System aktiv. Bereit fur die Mission.',
+    agentAlexStatus: 'Im Dienst',
+    missionLog: 'Missionsprotokoll',
+    activeMissions: 'Aktive Missionen',
+    completedMissions: 'Abgeschlossene Missionen',
+    newMission: 'Neue Mission',
+    missionBriefing: 'Missionsbriefing',
+    agentTools: 'Agenten-Werkzeuge',
+    codeBreaker: 'Code-Knacker',
+    networkScan: 'Netzwerk-Scan',
+    dataExtract: 'Datenextraktion',
+    encryptMsg: 'Verschlusselte Nachricht',
+    agentProfile: 'Agentenprofil',
+    agentRank: 'Rang',
+    agentClearance: 'Freigabestufe',
+    agentSpecialty: 'Spezialgebiet',
+    executeCommand: 'Befehl ausfuhren',
+    commandPrompt: 'Befehl eingeben...',
+    systemOnline: 'System online',
+    accessGranted: 'Zugriff gewahrt',
   },
   ja: {
     welcome: 'Welcome to my mind',
@@ -305,6 +453,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
   },
   zh: {
     welcome: 'Welcome to my mind',
@@ -338,6 +487,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
   },
   ko: {
     welcome: 'Welcome to my mind',
@@ -371,6 +521,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
   },
   ar: {
     welcome: 'Welcome to my mind',
@@ -404,6 +555,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
   },
   ru: {
     welcome: 'Welcome to my mind',
@@ -470,6 +622,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
   },
   nl: {
     welcome: 'Welkom in mijn hoofd',
@@ -503,6 +656,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Vraag Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al denkt na...',
     typeMessage: 'Typ je bericht...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU systeem actief. Klaar voor de missie.', agentAlexStatus: 'In dienst', missionLog: 'Missie logboek', activeMissions: 'Actieve missies', completedMissions: 'Voltooide missies', newMission: 'Nieuwe missie', missionBriefing: 'Missie briefing', agentTools: 'Agent gereedschap', codeBreaker: 'Code kraker', networkScan: 'Netwerk scan', dataExtract: 'Data extractie', encryptMsg: 'Versleuteld bericht', agentProfile: 'Agent profiel', agentRank: 'Rang', agentClearance: 'Toegangsniveau', agentSpecialty: 'Specialiteit', executeCommand: 'Opdracht uitvoeren', commandPrompt: 'Voer een commando in...', systemOnline: 'Systeem online', accessGranted: 'Toegang verleend',
   },
   pl: {
     welcome: 'Witaj w moim umysle',
@@ -536,6 +690,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Zapytaj Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al mysli...',
     typeMessage: 'Wpisz wiadomosc...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. System MARCEAU aktywny. Gotowy do misji.', agentAlexStatus: 'Na slubie', missionLog: 'Dziennik misji', activeMissions: 'Aktywne misje', completedMissions: 'Ukonczone misje', newMission: 'Nowa misja', missionBriefing: 'Odprawia misji', agentTools: 'Narzedzia agenta', codeBreaker: 'Lamacz kodow', networkScan: 'Skanowanie sieci', dataExtract: 'Ekstrakcja danych', encryptMsg: 'Zaszyfrowana wiadomosc', agentProfile: 'Profil agenta', agentRank: 'Ranga', agentClearance: 'Poziom dostepu', agentSpecialty: 'Specjalnosc', executeCommand: 'Wykonaj komende', commandPrompt: 'Wprowadz komende...', systemOnline: 'System online', accessGranted: 'Dostep przyznany',
   },
   sv: {
     welcome: 'Valkommen till mitt sinne',
@@ -569,6 +724,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Fraga Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al tanker...',
     typeMessage: 'Skriv ditt meddelande...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU-system aktivt. Redo for uppdraget.', agentAlexStatus: 'I tjanst', missionLog: 'Uppdragslogg', activeMissions: 'Aktiva uppdrag', completedMissions: 'Slutforda uppdrag', newMission: 'Nytt uppdrag', missionBriefing: 'Uppdragsbriefing', agentTools: 'Agentverktyg', codeBreaker: 'Kodknackare', networkScan: 'Natverksskanning', dataExtract: 'Dataextraktion', encryptMsg: 'Krypterat meddelande', agentProfile: 'Agentprofil', agentRank: 'Rang', agentClearance: 'Sakerhetsniva', agentSpecialty: 'Specialitet', executeCommand: 'Utfor kommando', commandPrompt: 'Ange ett kommando...', systemOnline: 'System online', accessGranted: 'Atkomst beviljad',
   },
 }
 

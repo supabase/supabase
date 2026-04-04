@@ -1,10 +1,268 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { type LangCode, LANGUAGES, t } from 'lib/i18n/translations'
 import type { NextPageWithLayout } from 'types'
+
+// ─── MUSIC PLAYLIST ───────────────────────────────────────
+interface Track {
+  title: string
+  artist: string
+  duration: string
+  genre: string
+}
+
+const PLAYLIST: Track[] = [
+  { title: 'Night Drive', artist: 'MARCEAU Beats', duration: '3:42', genre: 'Synthwave' },
+  { title: 'Highway Phantom', artist: 'Agent Alex', duration: '4:15', genre: 'Dark Electro' },
+  { title: 'Neon City Lights', artist: 'Ti-Lex-Al', duration: '3:58', genre: 'Cyberpunk' },
+  { title: 'Code Runner', artist: 'MARCEAU Beats', duration: '5:01', genre: 'Drum & Bass' },
+  { title: 'Midnight Protocol', artist: 'Agent Alex', duration: '4:33', genre: 'Dark Ambient' },
+  { title: 'Digital Horizon', artist: 'MARCEAU Beats', duration: '3:27', genre: 'Synthwave' },
+  { title: 'Route 666', artist: 'Ti-Lex-Al', duration: '4:45', genre: 'Industrial' },
+  { title: 'Firewall Breaker', artist: 'Agent Alex', duration: '3:12', genre: 'Techno' },
+  { title: 'Northern Lights', artist: 'MARCEAU Beats', duration: '6:10', genre: 'Ambient' },
+  { title: 'Turbo Boost', artist: 'Ti-Lex-Al', duration: '2:58', genre: 'EDM' },
+]
+
+// ─── MINI MUSIC PLAYER ───────────────────────────────────
+function MiniMusicPlayer() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTrack, setCurrentTrack] = useState(0)
+  const [showPlaylist, setShowPlaylist] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [shuffle, setShuffle] = useState(false)
+
+  const track = PLAYLIST[currentTrack]
+
+  // Simulate progress
+  useEffect(() => {
+    if (!isPlaying) return
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) {
+          // Auto next track
+          setCurrentTrack((c) => (c + 1) % PLAYLIST.length)
+          return 0
+        }
+        return p + 0.5
+      })
+    }, 100)
+    return () => clearInterval(interval)
+  }, [isPlaying])
+
+  const nextTrack = useCallback(() => {
+    if (shuffle) {
+      setCurrentTrack(Math.floor(Math.random() * PLAYLIST.length))
+    } else {
+      setCurrentTrack((c) => (c + 1) % PLAYLIST.length)
+    }
+    setProgress(0)
+  }, [shuffle])
+
+  const prevTrack = useCallback(() => {
+    setCurrentTrack((c) => (c - 1 + PLAYLIST.length) % PLAYLIST.length)
+    setProgress(0)
+  }, [])
+
+  const selectTrack = useCallback((index: number) => {
+    setCurrentTrack(index)
+    setProgress(0)
+    setIsPlaying(true)
+    setShowPlaylist(false)
+  }, [])
+
+  // Collapsed: just a small button
+  if (!isOpen) {
+    return (
+      <motion.button
+        className="absolute top-4 left-4 w-12 h-12 rounded-full border-2 flex items-center justify-center z-10"
+        style={{
+          borderColor: '#ff0000',
+          background: 'rgba(0,0,0,0.9)',
+          boxShadow: '0 0 15px rgba(255,0,0,0.3)',
+        }}
+        whileHover={{ scale: 1.1, boxShadow: '0 0 25px rgba(255,0,0,0.5)' }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsOpen(true)}
+        title="YouTube Music"
+      >
+        <span className="text-lg">🎵</span>
+      </motion.button>
+    )
+  }
+
+  return (
+    <motion.div
+      className="absolute top-4 left-4 z-10 rounded-xl border overflow-hidden"
+      style={{
+        width: showPlaylist ? 320 : 280,
+        borderColor: '#ff660066',
+        background: 'rgba(0,0,0,0.95)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 0 30px rgba(255,100,0,0.15)',
+      }}
+      initial={{ opacity: 0, scale: 0.8, y: -20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Header */}
+      <div
+        className="flex items-center justify-between px-3 py-2 border-b"
+        style={{ borderColor: '#ff660033', background: 'rgba(255,0,0,0.08)' }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm">🎵</span>
+          <span className="text-xs font-bold" style={{ color: '#ff0000' }}>YouTube Music</span>
+        </div>
+        <button
+          onClick={() => setIsOpen(false)}
+          className="text-xs px-1.5 py-0.5 rounded"
+          style={{ color: '#ff660088' }}
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Now playing */}
+      <div className="px-3 py-2">
+        <div className="flex items-center gap-3">
+          {/* Album art placeholder */}
+          <motion.div
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-lg flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, #ff4500, #ff8c00)',
+              boxShadow: isPlaying ? '0 0 15px rgba(255,100,0,0.4)' : 'none',
+            }}
+            animate={isPlaying ? { rotate: [0, 360] } : { rotate: 0 }}
+            transition={isPlaying ? { duration: 4, repeat: Infinity, ease: 'linear' } : {}}
+          >
+            🎶
+          </motion.div>
+          <div className="min-w-0 flex-1">
+            <p
+              className="text-xs font-bold truncate"
+              style={{ color: '#ff8c00' }}
+            >
+              {track.title}
+            </p>
+            <p className="text-[10px] truncate" style={{ color: '#ff660077' }}>
+              {track.artist} • {track.genre}
+            </p>
+          </div>
+          <span className="text-[10px] flex-shrink-0" style={{ color: '#ff660044' }}>
+            {track.duration}
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: '#ff660022' }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: 'linear-gradient(90deg, #ff4500, #ff8c00)', width: `${progress}%` }}
+          />
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-4 mt-2">
+          <button
+            onClick={() => setShuffle(!shuffle)}
+            className="text-xs"
+            style={{ color: shuffle ? '#ff8c00' : '#ff660044' }}
+            title="Shuffle"
+          >
+            🔀
+          </button>
+          <button
+            onClick={prevTrack}
+            className="text-sm"
+            style={{ color: '#ff8c00' }}
+          >
+            ⏮
+          </button>
+          <motion.button
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{
+              background: isPlaying
+                ? 'linear-gradient(135deg, #ff4500, #ff8c00)'
+                : 'rgba(255,100,0,0.2)',
+              border: '1px solid #ff6600',
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsPlaying(!isPlaying)}
+          >
+            <span className="text-sm" style={{ color: isPlaying ? '#000' : '#ff8c00' }}>
+              {isPlaying ? '⏸' : '▶'}
+            </span>
+          </motion.button>
+          <button
+            onClick={nextTrack}
+            className="text-sm"
+            style={{ color: '#ff8c00' }}
+          >
+            ⏭
+          </button>
+          <button
+            onClick={() => setShowPlaylist(!showPlaylist)}
+            className="text-xs"
+            style={{ color: showPlaylist ? '#ff8c00' : '#ff660044' }}
+            title="Playlist"
+          >
+            📋
+          </button>
+        </div>
+      </div>
+
+      {/* Playlist dropdown */}
+      <AnimatePresence>
+        {showPlaylist && (
+          <motion.div
+            className="border-t max-h-48 overflow-y-auto"
+            style={{ borderColor: '#ff660033' }}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {PLAYLIST.map((trk, i) => (
+              <button
+                key={i}
+                className="w-full flex items-center gap-2 px-3 py-1.5 text-left"
+                style={{
+                  background: i === currentTrack ? 'rgba(255,100,0,0.15)' : 'transparent',
+                  borderBottom: '1px solid #ff660011',
+                }}
+                onClick={() => selectTrack(i)}
+              >
+                <span className="text-[10px] w-4" style={{ color: i === currentTrack ? '#ff8c00' : '#ff660044' }}>
+                  {i === currentTrack && isPlaying ? '▶' : `${i + 1}`}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-[11px] truncate"
+                    style={{ color: i === currentTrack ? '#ff8c00' : '#ff660088' }}
+                  >
+                    {trk.title}
+                  </p>
+                  <p className="text-[9px] truncate" style={{ color: '#ff660044' }}>
+                    {trk.artist}
+                  </p>
+                </div>
+                <span className="text-[9px] flex-shrink-0" style={{ color: '#ff660033' }}>
+                  {trk.duration}
+                </span>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
 
 // ─── CITIES DATABASE (Canada + USA) ───────────────────────
 interface City {
@@ -517,6 +775,9 @@ const GpsMapPage: NextPageWithLayout = () => {
             onSelectCity={setSelectedCity}
             mapMode={mapMode}
           />
+
+          {/* Mini Music Player */}
+          <MiniMusicPlayer />
 
           {/* Compass */}
           <div

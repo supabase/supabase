@@ -36,6 +36,7 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
 
 const MENU_ITEMS = [
   { key: 'gpsMap' as const, href: '/world/gps-map', icon: '🗺️', color: '#00ff88' },
+  { key: 'agentAlex' as const, href: '/world/agent-alex', icon: '🕶️', color: '#ff0000' },
   { key: 'tilexal' as const, href: '/world/tilexal', icon: '🪶', color: '#ff8c00' },
   { key: 'settings' as const, href: '#', icon: '⚙️', color: '#888888' },
 ]
@@ -145,7 +146,7 @@ const WorldDashboard: NextPageWithLayout = () => {
           </motion.div>
 
           {/* App grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl px-8">
             {MENU_ITEMS.map((item, i) => (
               <motion.div
                 key={item.key}
