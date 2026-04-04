@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import type { NextPageWithLayout } from 'types'
 
 // ─── PHASES ────────────────────────────────────────────────
@@ -69,6 +70,7 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
 
 // ─── MAIN PAGE ─────────────────────────────────────────────
 const WelcomePage: NextPageWithLayout = () => {
+  const router = useRouter()
   const [phase, setPhase] = useState(0)
   const [visibleLetters, setVisibleLetters] = useState(0)
   const [eyesRed, setEyesRed] = useState(false)
@@ -123,12 +125,16 @@ const WelcomePage: NextPageWithLayout = () => {
     return () => clearInterval(interval)
   }, [phase])
 
-  // Phase 4: HAHA
+  // Phase 4: HAHA → then navigate to world
   useEffect(() => {
     if (phase !== 4) return
-    const t = setTimeout(() => setShowHaha(true), 300)
-    return () => clearTimeout(t)
-  }, [phase])
+    const t1 = setTimeout(() => setShowHaha(true), 300)
+    const t2 = setTimeout(() => router.push('/world'), 4000)
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
+  }, [phase, router])
 
   const handleMenu = useCallback((action: string) => {
     if (action === 'entrer') {
