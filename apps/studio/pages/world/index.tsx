@@ -7,8 +7,8 @@ import { type LangCode, LANGUAGES, t } from 'lib/i18n/translations'
 
 
 // ─── MATRIX RAIN COLUMN (orange) ──────────────────────────
-function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; left: string }) {
-  const chars = 'アカサタナハマヤラワ0123456789MARCEAU'.split('')
+function MatrixColumn({ delay, speed, left, bright }: { delay: number; speed: number; left: string; bright?: boolean }) {
+  const chars = 'アカサタナハマヤラワガザダバパ0123456789ABCDEFMARCEAU@#$%&'.split('')
   const [text, setText] = useState('')
 
   useEffect(() => {
@@ -17,7 +17,7 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
       interval = setInterval(() => {
         setText((prev) => {
           const next = prev + chars[Math.floor(Math.random() * chars.length)] + '\n'
-          if (next.length > 400) return ''
+          if (next.length > 600) return ''
           return next
         })
       }, speed)
@@ -31,7 +31,12 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
   return (
     <div
       className="absolute top-0 font-mono text-[10px] leading-tight whitespace-pre pointer-events-none"
-      style={{ left, color: '#ff8c00', opacity: 0.15, textShadow: '0 0 4px #ff6600' }}
+      style={{
+        left,
+        color: bright ? '#ff8c00' : '#ff6600',
+        opacity: bright ? 0.4 : 0.15,
+        textShadow: bright ? '0 0 8px #ff6600, 0 0 15px #ff4500' : '0 0 4px #ff6600',
+      }}
     >
       {text}
     </div>
@@ -167,12 +172,13 @@ const WorldDashboard = () => {
     }
   }, [router.query.lang])
 
-  const matrixColumns = Array.from({ length: 25 }, (_, i) => (
+  const matrixColumns = Array.from({ length: 50 }, (_, i) => (
     <MatrixColumn
       key={i}
-      delay={Math.random() * 3000}
-      speed={60 + Math.random() * 100}
-      left={`${(i / 25) * 100}%`}
+      delay={Math.random() * 2000}
+      speed={30 + Math.random() * 80}
+      left={`${(i / 50) * 100}%`}
+      bright={i % 5 === 0}
     />
   ))
 
