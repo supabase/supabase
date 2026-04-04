@@ -35,10 +35,12 @@ function MatrixColumn({ delay, speed, left }: { delay: number; speed: number; le
 }
 
 const MENU_ITEMS = [
-  { key: 'gpsMap' as const, href: '/world/gps-map', icon: '🗺️', color: '#00ff88' },
-  { key: 'agentAlex' as const, href: '/world/agent-alex', icon: '🕶️', color: '#ff0000' },
-  { key: 'tilexal' as const, href: '/world/tilexal', icon: '🪶', color: '#ff8c00' },
-  { key: 'settings' as const, href: '#', icon: '⚙️', color: '#888888' },
+  { key: 'gpsMap' as const, href: '/world/gps-map', icon: '🗺️', color: '#00ff88', label: '' },
+  { key: 'agentAlex' as const, href: '/world/agent-alex', icon: '🕶️', color: '#ff0000', label: '' },
+  { key: 'tilexal' as const, href: '/world/tilexal', icon: '🪶', color: '#ff8c00', label: '' },
+  { key: 'security' as const, href: '/world/security', icon: '🔐', color: '#00ffcc', label: '' },
+  { key: 'gpsMap' as const, href: '/world/world-map', icon: '🌍', color: '#4488ff', label: 'World Map FREE' },
+  { key: 'settings' as const, href: '#', icon: '⚙️', color: '#888888', label: '' },
 ]
 
 const WorldDashboard: NextPageWithLayout = () => {
@@ -146,17 +148,17 @@ const WorldDashboard: NextPageWithLayout = () => {
           </motion.div>
 
           {/* App grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl px-8">
             {MENU_ITEMS.map((item, i) => (
               <motion.div
-                key={item.key}
+                key={item.href}
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.2, duration: 0.6 }}
+                transition={{ delay: 0.3 + i * 0.15, duration: 0.6 }}
               >
                 <Link href={`${item.href}?lang=${lang}`} passHref legacyBehavior>
                   <motion.a
-                    className="block p-8 border-2 rounded-xl text-center cursor-pointer"
+                    className="block p-6 border-2 rounded-xl text-center cursor-pointer"
                     style={{
                       borderColor: '#ff6600',
                       background: 'rgba(255, 100, 0, 0.05)',
@@ -168,15 +170,15 @@ const WorldDashboard: NextPageWithLayout = () => {
                     }}
                     whileTap={{ scale: 0.97 }}
                   >
-                    <div className="text-5xl mb-4">{item.icon}</div>
+                    <div className="text-4xl mb-3">{item.icon}</div>
                     <div
-                      className="text-xl font-bold"
+                      className="text-lg font-bold"
                       style={{
                         color: '#ff8c00',
                         textShadow: '0 0 10px #ff6600',
                       }}
                     >
-                      {t(lang, item.key)}
+                      {item.label || t(lang, item.key)}
                     </div>
                   </motion.a>
                 </Link>

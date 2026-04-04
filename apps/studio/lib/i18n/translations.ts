@@ -94,6 +94,34 @@ type TranslationKeys = {
   commandPrompt: string
   systemOnline: string
   accessGranted: string
+  // Security & Subscription
+  security: string
+  subscription: string
+  apiKeys: string
+  yourApiKey: string
+  generateKey: string
+  revokeKey: string
+  copyKey: string
+  keyCopied: string
+  pricing: string
+  freeplan: string
+  proplan: string
+  perMonth: string
+  subscribe: string
+  currentPlan: string
+  features: string
+  legalProtection: string
+  termsOfService: string
+  privacyPolicy: string
+  compliance: string
+  securityStandards: string
+  dataProtection: string
+  antifraud: string
+  rateLimiting: string
+  banPolicy: string
+  keyProtection: string
+  neverShareKey: string
+  reportAbuse: string
 }
 
 export const translations: Record<LangCode, TranslationKeys> = {
@@ -150,6 +178,33 @@ export const translations: Record<LangCode, TranslationKeys> = {
     commandPrompt: 'Entrez une commande agent...',
     systemOnline: 'Systeme en ligne',
     accessGranted: 'Acces autorise',
+    security: 'Securite',
+    subscription: 'Abonnement',
+    apiKeys: 'Cles API',
+    yourApiKey: 'Ta cle API',
+    generateKey: 'Generer une cle',
+    revokeKey: 'Revoquer la cle',
+    copyKey: 'Copier la cle',
+    keyCopied: 'Cle copiee!',
+    pricing: 'Tarification',
+    freeplan: 'Gratuit',
+    proplan: 'Pro - 5$/mois',
+    perMonth: '/mois',
+    subscribe: 'S\'abonner',
+    currentPlan: 'Plan actuel',
+    features: 'Fonctionnalites',
+    legalProtection: 'Protection legale',
+    termsOfService: 'Conditions d\'utilisation',
+    privacyPolicy: 'Politique de confidentialite',
+    compliance: 'Conformite',
+    securityStandards: 'Normes de securite',
+    dataProtection: 'Protection des donnees',
+    antifraud: 'Anti-fraude',
+    rateLimiting: 'Limitation de requetes',
+    banPolicy: 'Politique de bannissement',
+    keyProtection: 'Protection des cles',
+    neverShareKey: 'Ne jamais partager ta cle API',
+    reportAbuse: 'Signaler un abus',
   },
   en: {
     welcome: 'Welcome to my mind',
@@ -204,6 +259,33 @@ export const translations: Record<LangCode, TranslationKeys> = {
     commandPrompt: 'Enter an agent command...',
     systemOnline: 'System online',
     accessGranted: 'Access granted',
+    security: 'Security',
+    subscription: 'Subscription',
+    apiKeys: 'API Keys',
+    yourApiKey: 'Your API Key',
+    generateKey: 'Generate Key',
+    revokeKey: 'Revoke Key',
+    copyKey: 'Copy Key',
+    keyCopied: 'Key copied!',
+    pricing: 'Pricing',
+    freeplan: 'Free',
+    proplan: 'Pro - $5/month',
+    perMonth: '/month',
+    subscribe: 'Subscribe',
+    currentPlan: 'Current plan',
+    features: 'Features',
+    legalProtection: 'Legal Protection',
+    termsOfService: 'Terms of Service',
+    privacyPolicy: 'Privacy Policy',
+    compliance: 'Compliance',
+    securityStandards: 'Security Standards',
+    dataProtection: 'Data Protection',
+    antifraud: 'Anti-fraud',
+    rateLimiting: 'Rate Limiting',
+    banPolicy: 'Ban Policy',
+    keyProtection: 'Key Protection',
+    neverShareKey: 'Never share your API key',
+    reportAbuse: 'Report abuse',
   },
   it: {
     welcome: 'Benvenuto nella mia mente',
@@ -258,6 +340,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     commandPrompt: 'Inserisci un comando...',
     systemOnline: 'Sistema online',
     accessGranted: 'Accesso autorizzato',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   es: {
     welcome: 'Bienvenido a mi mente',
@@ -312,6 +395,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     commandPrompt: 'Ingresa un comando...',
     systemOnline: 'Sistema en linea',
     accessGranted: 'Acceso autorizado',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   pt: {
     welcome: 'Bem-vindo a minha mente',
@@ -366,6 +450,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     commandPrompt: 'Digite um comando...',
     systemOnline: 'Sistema online',
     accessGranted: 'Acesso autorizado',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   de: {
     welcome: 'Willkommen in meinem Kopf',
@@ -420,6 +505,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     commandPrompt: 'Befehl eingeben...',
     systemOnline: 'System online',
     accessGranted: 'Zugriff gewahrt',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   ja: {
     welcome: 'Welcome to my mind',
@@ -454,6 +540,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   zh: {
     welcome: 'Welcome to my mind',
@@ -488,6 +575,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   ko: {
     welcome: 'Welcome to my mind',
@@ -522,6 +610,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   ar: {
     welcome: 'Welcome to my mind',
@@ -556,6 +645,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   ru: {
     welcome: 'Welcome to my mind',
@@ -589,6 +679,8 @@ export const translations: Record<LangCode, TranslationKeys> = {
     askTilexal: 'Ask Ti-Lex-Al...',
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
+    agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   hi: {
     welcome: 'Welcome to my mind',
@@ -623,6 +715,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al thinking...',
     typeMessage: 'Type message...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU system active. Ready for mission.', agentAlexStatus: 'On duty', missionLog: 'Mission log', activeMissions: 'Active missions', completedMissions: 'Completed missions', newMission: 'New mission', missionBriefing: 'Mission briefing', agentTools: 'Agent tools', codeBreaker: 'Code breaker', networkScan: 'Network scan', dataExtract: 'Data extraction', encryptMsg: 'Encrypt message', agentProfile: 'Agent profile', agentRank: 'Rank', agentClearance: 'Clearance level', agentSpecialty: 'Specialty', executeCommand: 'Execute command', commandPrompt: 'Enter an agent command...', systemOnline: 'System online', accessGranted: 'Access granted',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   nl: {
     welcome: 'Welkom in mijn hoofd',
@@ -657,6 +750,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al denkt na...',
     typeMessage: 'Typ je bericht...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU systeem actief. Klaar voor de missie.', agentAlexStatus: 'In dienst', missionLog: 'Missie logboek', activeMissions: 'Actieve missies', completedMissions: 'Voltooide missies', newMission: 'Nieuwe missie', missionBriefing: 'Missie briefing', agentTools: 'Agent gereedschap', codeBreaker: 'Code kraker', networkScan: 'Netwerk scan', dataExtract: 'Data extractie', encryptMsg: 'Versleuteld bericht', agentProfile: 'Agent profiel', agentRank: 'Rang', agentClearance: 'Toegangsniveau', agentSpecialty: 'Specialiteit', executeCommand: 'Opdracht uitvoeren', commandPrompt: 'Voer een commando in...', systemOnline: 'Systeem online', accessGranted: 'Toegang verleend',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   pl: {
     welcome: 'Witaj w moim umysle',
@@ -691,6 +785,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al mysli...',
     typeMessage: 'Wpisz wiadomosc...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. System MARCEAU aktywny. Gotowy do misji.', agentAlexStatus: 'Na slubie', missionLog: 'Dziennik misji', activeMissions: 'Aktywne misje', completedMissions: 'Ukonczone misje', newMission: 'Nowa misja', missionBriefing: 'Odprawia misji', agentTools: 'Narzedzia agenta', codeBreaker: 'Lamacz kodow', networkScan: 'Skanowanie sieci', dataExtract: 'Ekstrakcja danych', encryptMsg: 'Zaszyfrowana wiadomosc', agentProfile: 'Profil agenta', agentRank: 'Ranga', agentClearance: 'Poziom dostepu', agentSpecialty: 'Specjalnosc', executeCommand: 'Wykonaj komende', commandPrompt: 'Wprowadz komende...', systemOnline: 'System online', accessGranted: 'Dostep przyznany',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
   sv: {
     welcome: 'Valkommen till mitt sinne',
@@ -725,6 +820,7 @@ export const translations: Record<LangCode, TranslationKeys> = {
     thinking: 'Ti-Lex-Al tanker...',
     typeMessage: 'Skriv ditt meddelande...',
     agentAlex: 'Agent Alex', agentAlexGreeting: 'Agent Alex online. MARCEAU-system aktivt. Redo for uppdraget.', agentAlexStatus: 'I tjanst', missionLog: 'Uppdragslogg', activeMissions: 'Aktiva uppdrag', completedMissions: 'Slutforda uppdrag', newMission: 'Nytt uppdrag', missionBriefing: 'Uppdragsbriefing', agentTools: 'Agentverktyg', codeBreaker: 'Kodknackare', networkScan: 'Natverksskanning', dataExtract: 'Dataextraktion', encryptMsg: 'Krypterat meddelande', agentProfile: 'Agentprofil', agentRank: 'Rang', agentClearance: 'Sakerhetsniva', agentSpecialty: 'Specialitet', executeCommand: 'Utfor kommando', commandPrompt: 'Ange ett kommando...', systemOnline: 'System online', accessGranted: 'Atkomst beviljad',
+    security: 'Security', subscription: 'Subscription', apiKeys: 'API Keys', yourApiKey: 'Your API Key', generateKey: 'Generate Key', revokeKey: 'Revoke Key', copyKey: 'Copy Key', keyCopied: 'Key copied!', pricing: 'Pricing', freeplan: 'Free', proplan: 'Pro - $5/month', perMonth: '/month', subscribe: 'Subscribe', currentPlan: 'Current plan', features: 'Features', legalProtection: 'Legal Protection', termsOfService: 'Terms of Service', privacyPolicy: 'Privacy Policy', compliance: 'Compliance', securityStandards: 'Security Standards', dataProtection: 'Data Protection', antifraud: 'Anti-fraud', rateLimiting: 'Rate Limiting', banPolicy: 'Ban Policy', keyProtection: 'Key Protection', neverShareKey: 'Never share your API key', reportAbuse: 'Report abuse',
   },
 }
 
