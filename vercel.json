@@ -1,8 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --no-frozen-lockfile --ignore-scripts",
-  "buildCommand": "cd apps/studio && npx next build",
-  "framework": "nextjs",
+  "buildCommand": "SKIP_ASSET_UPLOAD=1 NEXT_PUBLIC_IS_PLATFORM=false turbo run build --filter=studio",
+  "outputDirectory": "apps/studio/.next",
+  "framework": null,
   "ignoreCommand": "",
   "headers": [
     {
@@ -20,12 +21,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ],
-  "build": {
-    "env": {
-      "SKIP_ASSET_UPLOAD": "1",
-      "NEXT_PUBLIC_IS_PLATFORM": "false"
-    }
-  }
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
