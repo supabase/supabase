@@ -7,13 +7,12 @@ import { type LangCode, LANGUAGES, t } from 'lib/i18n/translations'
 import type { NextPageWithLayout } from 'types'
 
 // ─── AGENT COMMANDS & RESPONSES ───────────────────────────
-interface MissionEntry {
-  id: number
-  title: string
-  status: 'active' | 'completed' | 'failed'
-  priority: 'high' | 'medium' | 'low'
-  timestamp: Date
-}
+import {
+  type MissionEntry,
+  getToolOutput,
+  shouldCreateMission,
+  createMissionFromCommand,
+} from './agent-alex.utils'
 
 const INITIAL_MISSIONS: MissionEntry[] = [
   { id: 1, title: 'Surveillance reseau MARCEAU', status: 'active', priority: 'high', timestamp: new Date() },
@@ -147,17 +146,8 @@ const AgentAlexPage: NextPageWithLayout = () => {
     setCommandLog((prev) => [...prev, { cmd, response }])
 
     // Special commands
-    if (cmd.toLowerCase().includes('mission')) {
-      setMissions((prev) => [
-        {
-          id: Date.now(),
-          title: cmd,
-          status: 'active',
-          priority: 'high',
-          timestamp: new Date(),
-        },
-        ...prev,
-      ])
+    if (shouldCreateMission(cmd)) {
+      setMissions((prev) => [createMissionFromCommand(cmd), ...prev])
     }
   }, [commandInput, currentLang])
 
@@ -181,41 +171,7 @@ const AgentAlexPage: NextPageWithLayout = () => {
       setToolRunning(true)
       setToolOutput('')
 
-      const outputs: Record<string, string[]> = {
-        codeBreaker: [
-          'Decrypting...',
-          'Key found: 0xMARCEAU_ALEX_2024',
-          'Cipher: AES-512-OMEGA',
-          'Decrypted payload: [CLASSIFIED]',
-          'Status: SUCCESS',
-        ],
-        networkScan: [
-          'Scanning ports 1-65535...',
-          'Host 192.168.1.1: OPEN [22,80,443]',
-          'Host 10.0.0.1: OPEN [8080,3306]',
-          'Host 172.16.0.1: FILTERED',
-          'Vulnerabilities found: 0',
-          'Network: SECURE',
-        ],
-        dataExtract: [
-          'Connecting to target database...',
-          'Authentication: BYPASSED',
-          'Tables found: 147',
-          'Extracting records...',
-          '████████████████ 100%',
-          'Data saved to /vault/extract_001.enc',
-        ],
-        encryptMsg: [
-          'Encryption mode: MARCEAU-OMEGA',
-          'Generating key pair...',
-          'RSA-4096 + AES-512',
-          'Message encrypted successfully',
-          'Signature: AGENT_ALEX_VERIFIED',
-          'Expiry: 24h auto-destruct',
-        ],
-      }
-
-      const lines = outputs[tool] || ['Running...', 'Complete.']
+      const lines = getToolOutput(tool)
       let i = 0
       toolIntervalRef.current = setInterval(() => {
         if (i < lines.length) {

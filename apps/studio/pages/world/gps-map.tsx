@@ -265,15 +265,13 @@ function MiniMusicPlayer() {
 }
 
 // ─── CITIES DATABASE (Canada + USA) ───────────────────────
-interface City {
-  name: string
-  lat: number
-  lng: number
-  country: 'CA' | 'US'
-  province?: string
-  state?: string
-  population: number
-}
+import {
+  type City,
+  latLngToSvgCoords,
+  calculateDistance,
+  searchCities,
+  calculateCityDotSize,
+} from './gps-map.utils'
 
 const CITIES: City[] = [
   // Canada
@@ -346,11 +344,7 @@ function MapView({
   onSelectCity: (city: City) => void
   mapMode: 'map' | 'satellite' | 'traffic'
 }) {
-  // Convert lat/lng to SVG coordinates (simplified projection)
-  const toSvg = (lat: number, lng: number) => ({
-    x: ((lng + 170) / 130) * 900,
-    y: ((75 - lat) / 55) * 600,
-  })
+  const toSvg = latLngToSvgCoords
 
   return (
     <svg viewBox="0 0 900 600" className="w-full h-full">
@@ -432,7 +426,7 @@ function MapView({
       {CITIES.map((city) => {
         const pos = toSvg(city.lat, city.lng)
         const isSelected = selectedCity?.name === city.name
-        const dotSize = Math.max(2, Math.min(6, city.population / 500000))
+        const dotSize = calculateCityDotSize(city.population)
 
         return (
           <g
@@ -506,14 +500,7 @@ const GpsMapPage: NextPageWithLayout = () => {
       setSearchResults([])
       return
     }
-    const q = searchQuery.toLowerCase()
-    const results = CITIES.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.province?.toLowerCase().includes(q) ||
-        c.state?.toLowerCase().includes(q)
-    ).slice(0, 8)
-    setSearchResults(results)
+    setSearchResults(searchCities(searchQuery, CITIES))
   }, [searchQuery])
 
   // AI suggestion
@@ -535,18 +522,7 @@ const GpsMapPage: NextPageWithLayout = () => {
     }, 30)
   }, [currentLang])
 
-  // Calculate fake distance
-  const getDistance = (a: City, b: City) => {
-    const R = 6371
-    const dLat = ((b.lat - a.lat) * Math.PI) / 180
-    const dLng = ((b.lng - a.lng) * Math.PI) / 180
-    const x =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((a.lat * Math.PI) / 180) *
-        Math.cos((b.lat * Math.PI) / 180) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2)
-    return Math.round(R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x)))
+  const getDistance = calculateDistance
   }
 
   return (

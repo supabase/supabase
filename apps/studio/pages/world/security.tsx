@@ -6,16 +6,7 @@ import { useRouter } from 'next/router'
 import { type LangCode, LANGUAGES, t } from 'lib/i18n/translations'
 import type { NextPageWithLayout } from 'types'
 
-// --- GENERATE FAKE API KEY ---
-function generateApiKey(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  const prefix = 'mrcx_live_'
-  let key = prefix
-  for (let i = 0; i < 48; i++) {
-    key += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return key
-}
+import { generateApiKey } from './security.utils'
 
 // --- COMPLIANCE STANDARDS ---
 const COMPLIANCE_STANDARDS = [
