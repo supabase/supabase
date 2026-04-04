@@ -1,23 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "echo 'public-hoist-pattern[]=*' >> .npmrc && pnpm install --no-frozen-lockfile --ignore-scripts",
-  "buildCommand": "SKIP_ASSET_UPLOAD=1 NEXT_PUBLIC_IS_PLATFORM=false turbo run build --filter=studio",
+  "buildCommand": "pnpm vercel-build",
   "outputDirectory": "apps/studio/.next",
   "framework": "nextjs",
-  "ignoreCommand": "",
-  "headers": [
-    {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
-      ]
-    },
-    {
-      "source": "/manifest.json",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache" }
-      ]
-    }
-  ]
+  "ignoreCommand": ""
 }

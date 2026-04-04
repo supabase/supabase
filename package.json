@@ -39,10 +39,12 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
     "knip": "pnpx knip@~5.50.0",
-    "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
+    "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts",
+    "vercel-build": "SKIP_ASSET_UPLOAD=1 NEXT_PUBLIC_IS_PLATFORM=false turbo run build --filter=studio"
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.823.0",
+    "next": "~16.1.6",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
