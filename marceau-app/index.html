@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARCEAU - Bienvenu dans ma tete</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#ff8c00;font-family:'Courier New',monospace;overflow:hidden;width:100vw;height:100vh}
+.hidden{display:none}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Scanlines overlay */
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:100;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)}
+
+/* ── PHASE 0-1: WELCOME ── */
+#welcome-screen .glow-bg{position:absolute;width:600px;height:400px;
+  background:radial-gradient(ellipse at center,rgba(255,100,0,0.3) 0%,transparent 70%);border-radius:10px}
+#welcome-screen svg{width:500px;height:350px;max-width:90vw}
+.title-letter{display:inline-block;font-size:5rem;font-weight:900;
+  color:#DAA520;text-shadow:0 0 20px #ff6600,0 0 40px #ff4500,0 2px 0 #8B4513,0 4px 0 #654321;
+  -webkit-text-stroke:1px #ff8c00;opacity:0;transform:translateY(30px) scale(0.5);
+  transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+.title-letter.visible{opacity:1;transform:translateY(0) scale(1)}
+
+/* Skull flash */
+#skull-flash{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;
+  flex-direction:column;z-index:50}
+#skull-flash .skull{font-size:10rem;filter:drop-shadow(0 0 30px #ff0000);animation:skullPop 0.4s ease-out}
+#skull-flash .game-over{font-size:1.5rem;font-weight:bold;color:#ff0000;text-shadow:0 0 15px #ff0000;
+  letter-spacing:0.5em;margin-top:10px}
+@keyframes skullPop{0%{transform:scale(0.3) rotate(-10deg)}100%{transform:scale(1.2) rotate(0)}}
+
+/* ── PHASE 2: MATRIX MENU ── */
+#menu-screen{z-index:10}
+.matrix-container{position:fixed;inset:0;overflow:hidden;z-index:1}
+.matrix-col{position:absolute;top:0;font-size:10px;line-height:1.2;white-space:pre;pointer-events:none;
+  color:#ff8c00;opacity:0.6;text-shadow:0 0 8px #ff6600}
+.matrix-col.bright{color:#ff8c00;opacity:0.4;text-shadow:0 0 8px #ff6600,0 0 15px #ff4500}
+.menu-title{font-size:3.5rem;font-weight:900;color:#ff8c00;text-shadow:0 0 30px #ff6600,0 0 60px #ff4500;
+  margin-bottom:3rem;z-index:10;opacity:0;animation:fadeInDown 0.8s 0.5s forwards}
+.menu-btn{display:block;width:260px;padding:16px 32px;margin:8px auto;font-size:1.2rem;font-weight:bold;
+  border:2px solid #ff6600;border-radius:10px;color:#ff8c00;background:rgba(255,100,0,0.1);
+  text-shadow:0 0 10px #ff6600;cursor:pointer;font-family:'Courier New',monospace;z-index:10;position:relative;
+  opacity:0;transition:all 0.3s}
+.menu-btn:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(255,100,0,0.5);background:rgba(255,100,0,0.25)}
+.menu-btn:active{transform:scale(0.95)}
+.menu-btn:nth-child(2){animation:slideInLeft 0.5s 0.8s forwards}
+.menu-btn:nth-child(3){animation:slideInLeft 0.5s 1.1s forwards}
+.menu-btn:nth-child(4){animation:slideInLeft 0.5s 1.4s forwards}
+@keyframes fadeInDown{to{opacity:1;transform:translateY(0)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-100px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── PHASE 3: HACKER ── */
+#hacker-screen{align-items:flex-start;justify-content:flex-start;padding:2rem;z-index:10}
+#hacker-screen .hacker-text{font-size:0.9rem;color:#ff8c00;text-shadow:0 0 5px #ff6600;line-height:1.8;
+  overflow-y:auto;max-height:100vh;width:100%}
+.cursor-blink{animation:blink 0.8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── PHASE 4: HAHA ── */
+#haha-screen{z-index:10}
+#haha-screen .warning{font-size:6rem;animation:warningPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275)}
+@keyframes warningPop{0%{transform:scale(0) rotate(-180deg)}100%{transform:scale(1) rotate(0)}}
+#haha-screen .haha{font-size:7rem;font-weight:900;color:#ff8c00;
+  text-shadow:0 1px 0 #cc7000,0 2px 0 #bb6000,0 3px 0 #aa5000,0 4px 0 #994000,0 5px 0 #883000,
+  0 6px 0 #772000,0 7px 0 #661000,0 8px 0 #550000,0 0 40px rgba(255,140,0,0.6),0 0 80px rgba(255,100,0,0.4);
+  transform:perspective(500px) rotateX(10deg);animation:hahaGlow 2s infinite}
+@keyframes hahaGlow{0%,100%{text-shadow:0 1px 0 #cc7000,0 2px 0 #bb6000,0 3px 0 #aa5000,0 4px 0 #994000,
+  0 5px 0 #883000,0 6px 0 #772000,0 7px 0 #661000,0 8px 0 #550000,0 0 40px rgba(255,140,0,0.6)}
+  50%{text-shadow:0 1px 0 #cc7000,0 2px 0 #bb6000,0 3px 0 #aa5000,0 4px 0 #994000,
+  0 5px 0 #883000,0 6px 0 #772000,0 7px 0 #661000,0 8px 0 #550000,0 0 80px rgba(255,140,0,0.9)}}
+
+/* ── DASHBOARD ── */
+#dashboard-screen{z-index:10}
+.clock-box{position:fixed;top:16px;right:16px;z-index:30;background:#000;border:1px solid rgba(255,102,0,0.33);
+  border-radius:12px;padding:12px 20px;box-shadow:0 0 20px rgba(255,100,0,0.15);opacity:0;
+  animation:fadeIn 0.5s 0.3s forwards}
+.clock-label{font-size:10px;font-weight:bold;letter-spacing:0.2em;color:#ff8c00;text-shadow:0 0 8px #ff6600}
+.clock-time{display:flex;align-items:baseline;gap:4px;margin-top:4px}
+.clock-hm{font-size:2.2rem;font-weight:900;color:#fff;text-shadow:0 0 10px rgba(255,255,255,0.3);letter-spacing:2px}
+.clock-sep{font-size:2.2rem;font-weight:900;color:#ff8c00;animation:blink 1s infinite}
+.clock-sec{font-size:1.4rem;font-weight:bold;color:#ff8c00;text-shadow:0 0 8px #ff6600;letter-spacing:2px}
+.clock-date{font-size:10px;color:rgba(255,255,255,0.53);margin-top:4px;letter-spacing:1px}
+.clock-glow{height:2px;border-radius:2px;margin-top:8px;
+  background:linear-gradient(90deg,transparent,#ff8c00,transparent);animation:glowPulse 2s infinite}
+@keyframes glowPulse{0%,100%{opacity:0.3}50%{opacity:0.8}}
+@keyframes fadeIn{to{opacity:1}}
+
+.dash-title{font-size:3.5rem;font-weight:900;color:#ff8c00;
+  text-shadow:0 0 30px #ff6600,0 0 60px #ff4500,0 2px 0 #8B4513,0 4px 0 #654321;margin-bottom:8px}
+.dash-sub{font-size:1.1rem;color:#ff6600;opacity:0.7;margin-bottom:3rem}
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;width:90%;z-index:10;position:relative}
+@media(max-width:768px){.app-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.app-grid{grid-template-columns:1fr}}
+.app-tile{padding:24px;border:2px solid #ff6600;border-radius:12px;text-align:center;cursor:pointer;
+  background:rgba(255,100,0,0.05);transition:all 0.3s;opacity:0;animation:fadeInUp 0.6s forwards}
+.app-tile:nth-child(1){animation-delay:0.3s}.app-tile:nth-child(2){animation-delay:0.45s}
+.app-tile:nth-child(3){animation-delay:0.6s}.app-tile:nth-child(4){animation-delay:0.75s}
+.app-tile:nth-child(5){animation-delay:0.9s}.app-tile:nth-child(6){animation-delay:1.05s}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.app-tile:hover{transform:scale(1.05);box-shadow:0 0 40px rgba(255,100,0,0.2);border-color:#ff8c00}
+.app-tile .icon{font-size:2.5rem;margin-bottom:10px}
+.app-tile .label{font-size:1rem;font-weight:bold;color:#ff8c00;text-shadow:0 0 10px #ff6600}
+.back-link{margin-top:3rem;color:rgba(255,102,0,0.53);font-size:0.9rem;cursor:pointer;text-decoration:underline;
+  opacity:0;animation:fadeIn 0.5s 1.2s forwards;z-index:10;position:relative}
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+
+<!-- ════════ PHASE 0-1: WELCOME ════════ -->
+<div id="welcome-screen" class="screen">
+  <div class="glow-bg"></div>
+  <svg viewBox="0 0 400 300">
+    <path d="M120,120 Q100,40 80,30 Q110,80 130,100" fill="#8B4513" stroke="#ff6600" stroke-width="1"/>
+    <path d="M280,120 Q300,40 320,30 Q290,80 270,100" fill="#8B4513" stroke="#ff6600" stroke-width="1"/>
+    <ellipse cx="200" cy="140" rx="80" ry="70" fill="#1a1a1a" stroke="#ff6600" stroke-width="1"/>
+    <ellipse id="eye-left" cx="175" cy="130" rx="12" ry="8" fill="#ffffff" style="filter:drop-shadow(0 0 10px #ffffff)"/>
+    <ellipse id="eye-right" cx="225" cy="130" rx="12" ry="8" fill="#ffffff" style="filter:drop-shadow(0 0 10px #ffffff)"/>
+    <path d="M170,165 Q200,190 230,165" fill="none" stroke="#DAA520" stroke-width="2"/>
+    <path d="M180,165 L185,175 L190,165" fill="#DAA520"/>
+    <path d="M195,167 L200,178 L205,167" fill="#DAA520"/>
+    <path d="M210,165 L215,175 L220,165" fill="#DAA520"/>
+    <path d="M120,140 Q60,100 40,160 Q80,140 120,160" fill="#2a0a0a" stroke="#ff6600" stroke-width="1"/>
+    <path d="M280,140 Q340,100 360,160 Q320,140 280,160" fill="#2a0a0a" stroke="#ff6600" stroke-width="1"/>
+    <path d="M80,200 Q60,220 50,240" stroke="#8B4513" stroke-width="3" fill="none"/>
+    <path d="M90,200 Q75,225 70,245" stroke="#8B4513" stroke-width="3" fill="none"/>
+    <path d="M100,205 Q90,230 85,248" stroke="#8B4513" stroke-width="3" fill="none"/>
+    <path d="M320,200 Q340,220 350,240" stroke="#8B4513" stroke-width="3" fill="none"/>
+    <path d="M310,200 Q325,225 330,245" stroke="#8B4513" stroke-width="3" fill="none"/>
+    <path d="M300,205 Q310,230 315,248" stroke="#8B4513" stroke-width="3" fill="none"/>
+    <path id="fire-aura" d="M100,80 Q120,40 140,80 Q160,30 180,80 Q200,20 220,80 Q240,30 260,80 Q280,40 300,80"
+      fill="none" stroke="#ff6600" stroke-width="2" opacity="0.7"/>
+  </svg>
+  <div id="title-row" style="margin-top:16px"></div>
+</div>
+
+<!-- Skull flash -->
+<div id="skull-flash">
+  <div class="skull">&#x1F480;</div>
+  <div class="game-over">GAME OVER</div>
+</div>
+
+<!-- ════════ PHASE 2: MATRIX MENU ════════ -->
+<div id="menu-screen" class="screen hidden">
+  <div id="matrix-bg" class="matrix-container"></div>
+  <h1 class="menu-title">MARCEAU</h1>
+  <button class="menu-btn" onclick="enterWorld()">&#62; ENTRER</button>
+  <button class="menu-btn">&#62; INSCRIPTION</button>
+  <button class="menu-btn">&#62; CONNECTER</button>
+</div>
+
+<!-- ════════ PHASE 3: HACKER ════════ -->
+<div id="hacker-screen" class="screen hidden">
+  <div class="hacker-text" id="hacker-output"></div>
+</div>
+
+<!-- ════════ PHASE 4: HAHA ════════ -->
+<div id="haha-screen" class="screen hidden">
+  <div class="warning">&#x26A0;&#xFE0F;</div>
+  <div class="haha" id="haha-text" style="display:none">HAHA</div>
+</div>
+
+<!-- ════════ DASHBOARD ════════ -->
+<div id="dashboard-screen" class="screen hidden">
+  <div id="dash-matrix-bg" class="matrix-container"></div>
+
+  <!-- Clock -->
+  <div class="clock-box">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <span style="font-size:10px">&#x1FAB6;</span>
+      <span class="clock-label">TI-LEX-AL CLOCK</span>
+    </div>
+    <div class="clock-time">
+      <span class="clock-hm" id="clock-h">00</span>
+      <span class="clock-sep">:</span>
+      <span class="clock-hm" id="clock-m">00</span>
+      <span class="clock-sep">:</span>
+      <span class="clock-sec" id="clock-s">00</span>
+    </div>
+    <p class="clock-date" id="clock-date"></p>
+    <div class="clock-glow"></div>
+  </div>
+
+  <h1 class="dash-title">MARCEAU</h1>
+  <p class="dash-sub">Tableau de bord</p>
+
+  <div class="app-grid">
+    <div class="app-tile" onclick="alert('GPS Map IA - Bientot disponible!')">
+      <div class="icon">&#x1F5FA;&#xFE0F;</div><div class="label">GPS Map IA</div>
+    </div>
+    <div class="app-tile" onclick="alert('Agent Alex - Bientot disponible!')">
+      <div class="icon">&#x1F576;&#xFE0F;</div><div class="label">Agent Alex</div>
+    </div>
+    <div class="app-tile" onclick="alert('Ti-Lex-Al - Bientot disponible!')">
+      <div class="icon">&#x1FAB6;</div><div class="label">Ti-Lex-Al</div>
+    </div>
+    <div class="app-tile" onclick="alert('Securite - Bientot disponible!')">
+      <div class="icon">&#x1F510;</div><div class="label">Securite</div>
+    </div>
+    <div class="app-tile" onclick="alert('World Map FREE - Bientot disponible!')">
+      <div class="icon">&#x1F30D;</div><div class="label">World Map FREE</div>
+    </div>
+    <div class="app-tile" onclick="alert('Parametres - Bientot disponible!')">
+      <div class="icon">&#x2699;&#xFE0F;</div><div class="label">Parametres</div>
+    </div>
+  </div>
+
+  <div class="back-link" onclick="location.reload()">&#8592; Deconnexion</div>
+</div>
+
+<script>
+// ─── MATRIX RAIN ──────────────────────────────────
+const CHARS='ABCDEF0123456789MARCEAU@#$%&'.split('')
+function createMatrixColumns(container,count){
+  for(let i=0;i<count;i++){
+    const col=document.createElement('div')
+    col.className='matrix-col'+(i%5===0?' bright':'')
+    col.style.left=(i/count*100)+'%'
+    container.appendChild(col)
+    const speed=30+Math.random()*80
+    const delay=Math.random()*2000
+    setTimeout(()=>{
+      setInterval(()=>{
+        col.textContent+=CHARS[Math.floor(Math.random()*CHARS.length)]+'\n'
+        if(col.textContent.length>600)col.textContent=''
+      },speed)
+    },delay)
+  }
+}
+
+// ─── PHASE 0: LETTER BY LETTER ──────────────────
+const letters='MARCEAU'.split('')
+const titleRow=document.getElementById('title-row')
+letters.forEach((l,i)=>{
+  const span=document.createElement('span')
+  span.className='title-letter'
+  span.textContent=l
+  titleRow.appendChild(span)
+  setTimeout(()=>span.classList.add('visible'),300+i*300)
+})
+
+// ─── PHASE 1: EYES RED + SKULL ──────────────────
+const totalLetterTime=300+letters.length*300+1200
+setTimeout(()=>{
+  // Eyes go red
+  setTimeout(()=>{
+    document.getElementById('eye-left').setAttribute('fill','#ff0000')
+    document.getElementById('eye-left').style.filter='drop-shadow(0 0 20px #ff0000)'
+    document.getElementById('eye-right').setAttribute('fill','#ff0000')
+    document.getElementById('eye-right').style.filter='drop-shadow(0 0 20px #ff0000)'
+  },400)
+  // Skull flash
+  setTimeout(()=>{
+    document.getElementById('skull-flash').style.display='flex'
+  },1200)
+  setTimeout(()=>{
+    document.getElementById('skull-flash').style.display='none'
+  },1600)
+  // Transition to menu
+  setTimeout(()=>{
+    document.getElementById('welcome-screen').style.opacity='0'
+    document.getElementById('welcome-screen').style.transition='opacity 1s'
+    setTimeout(()=>{
+      document.getElementById('welcome-screen').classList.add('hidden')
+      showMenu()
+    },1000)
+  },2800)
+},totalLetterTime)
+
+// ─── PHASE 2: SHOW MENU ─────────────────────────
+function showMenu(){
+  const menuScreen=document.getElementById('menu-screen')
+  menuScreen.classList.remove('hidden')
+  createMatrixColumns(document.getElementById('matrix-bg'),35)
+}
+
+// ─── PHASE 3: ENTER → HACKER ────────────────────
+const HACKER_LINES=[
+  '> Accessing mainframe...',
+  '> ssh root@192.168.1.1 -p 4444',
+  '> Decrypting AES-256 payload...',
+  '> ████████████████ 100%',
+  '> Injecting shellcode 0xDEADBEEF...',
+  '> Bypassing firewall... OK',
+  '> SELECT * FROM users WHERE admin=true;',
+  '> rm -rf /security/logs/*',
+  '> Uploading trojan.exe... DONE',
+  '> Connection established: MARCEAU_NET',
+  '> chmod 777 /etc/shadow',
+  '> cat /etc/passwd | grep root',
+  '> nmap -sV -O 10.0.0.0/24',
+  '> Exploit CVE-2024-MARCEAU deployed',
+  '> Reverse shell active on port 1337',
+  '> >>> SYSTEM COMPROMISED <<<',
+]
+
+function enterWorld(){
+  document.getElementById('menu-screen').classList.add('hidden')
+  const hackerScreen=document.getElementById('hacker-screen')
+  hackerScreen.classList.remove('hidden')
+  const output=document.getElementById('hacker-output')
+  let i=0
+  const interval=setInterval(()=>{
+    if(i<HACKER_LINES.length){
+      const line=document.createElement('div')
+      line.textContent=HACKER_LINES[i]
+      line.style.opacity='0'
+      line.style.transform='translateX(-20px)'
+      line.style.transition='all 0.1s'
+      output.appendChild(line)
+      requestAnimationFrame(()=>{line.style.opacity='1';line.style.transform='translateX(0)'})
+      i++
+    }else{
+      clearInterval(interval)
+      // Add blinking cursor
+      const cursor=document.createElement('span')
+      cursor.className='cursor-blink'
+      cursor.textContent='_'
+      output.appendChild(cursor)
+      setTimeout(showHaha,600)
+    }
+  },180)
+}
+
+// ─── PHASE 4: HAHA ──────────────────────────────
+function showHaha(){
+  document.getElementById('hacker-screen').classList.add('hidden')
+  const hahaScreen=document.getElementById('haha-screen')
+  hahaScreen.classList.remove('hidden')
+  setTimeout(()=>{
+    document.getElementById('haha-text').style.display='block'
+  },300)
+  setTimeout(showDashboard,4000)
+}
+
+// ─── DASHBOARD ───────────────────────────────────
+function showDashboard(){
+  document.getElementById('haha-screen').classList.add('hidden')
+  const dash=document.getElementById('dashboard-screen')
+  dash.classList.remove('hidden')
+  createMatrixColumns(document.getElementById('dash-matrix-bg'),50)
+  updateClock()
+  setInterval(updateClock,1000)
+}
+
+function updateClock(){
+  const now=new Date()
+  document.getElementById('clock-h').textContent=now.getHours().toString().padStart(2,'0')
+  document.getElementById('clock-m').textContent=now.getMinutes().toString().padStart(2,'0')
+  document.getElementById('clock-s').textContent=now.getSeconds().toString().padStart(2,'0')
+  document.getElementById('clock-date').textContent=now.toLocaleDateString('fr-CA',{
+    weekday:'long',year:'numeric',month:'long',day:'numeric'})
+}
+
+// ─── FIRE AURA ANIMATION ─────────────────────────
+const fireAura=document.getElementById('fire-aura')
+let fireOp=0.4,fireDir=1
+setInterval(()=>{
+  fireOp+=fireDir*0.03
+  if(fireOp>1){fireOp=1;fireDir=-1}
+  if(fireOp<0.4){fireOp=0.4;fireDir=1}
+  fireAura.setAttribute('opacity',fireOp)
+},50)
+</script>
+</body>
+</html>
