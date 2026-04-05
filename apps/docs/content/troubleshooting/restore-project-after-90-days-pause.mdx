@@ -1,0 +1,72 @@
+---
+title = "How To Restore Project After 90-Day Pause"
+topics = [ "platform" ]
+keywords = [ "pause", "restore", "90 days", "project", "backup", "migration", "storage" ]
+---
+
+Projects that have been paused for more than 90 days can no longer be restored through Supabase Studio. You can still recover your data by downloading the available backups and migrating them to a new project.
+
+Both the database backup and Storage objects can be downloaded from the [Project Overview](https://supabase.com/dashboard/project/_) section in Supabase Studio before the project is deleted.
+
+<Image
+  alt="Restore project after 90-day pause"
+  src={{
+    dark: '/docs/img/restore-after-90-day-dark.png',
+    light: '/docs/img/restore-after-90-day-light.png',
+  }}
+  width={1600}
+  height={900}
+/>
+
+Here is a [short video walkthrough](https://youtu.be/ktsgm8HxWqo?si=5_8IVzL1rp8MWv7m) of the full migration process.
+
+## Step 1: Download your backups
+
+In the [Project Overview](https://supabase.com/dashboard/project/_) of your paused project, download:
+
+- **Database backup** — the `.backup` file from the Backups section
+- **Storage objects** — all files from your Storage buckets
+
+> **Warning:** Once a project is deleted, all associated data including backups is permanently removed and cannot be recovered.
+
+## Step 2: Create a new Supabase project
+
+Create a new project at [database.new](https://database.new) and configure it to match your previous setup (extensions, webhooks, Realtime publications, etc.).
+
+## Step 3: Restore the database
+
+Get the **Session pooler** connection string for your new project from the [Connect dialog](https://supabase.com/dashboard/project/_?showConnect=true).
+
+Unzip the downloaded backup file if it has a `.gz` extension, then run:
+
+```bash
+psql -d [CONNECTION_STRING] -f /path/to/backup_file.backup
+```
+
+Some errors like `object already exists` are expected and can be safely ignored — they occur because the new project already has the default Supabase schemas applied.
+
+See the [Restore Dashboard backup guide](https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore) for detailed instructions and troubleshooting.
+
+## Step 4: Restore Storage objects
+
+Use the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction) to copy your downloaded storage files to the new project's buckets:
+
+```bash
+supabase storage cp /path/to/downloaded/files ss:///bucket_name -r --experimental
+```
+
+Repeat for each bucket. See the [`supabase storage cp`](https://supabase.com/docs/reference/cli/supabase-storage-cp) reference for all available flags.
+
+## Step 5: Copy project configurations
+
+Use the [Management API](https://api.supabase.com/api/v1) to copy configurations (Auth, Realtime, Storage, etc.) from the paused project to the new one. You need Owner or Admin permissions on both projects.
+
+You can use [this bash script](https://gist.github.com/Ellba/a18781733e483e6bb15e89199198d1db) that accepts an access token, source project reference, and destination project reference to automate the process.
+
+Get your access token from the [Account Tokens page](https://supabase.com/dashboard/account/tokens).
+
+## Related guides
+
+- [Migrating within Supabase](https://supabase.com/docs/guides/platform/migrating-within-supabase)
+- [Restore Dashboard backup](https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore)
+- [Backup and Restore using the CLI](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore)
