@@ -6,7 +6,7 @@ keywords = [ "pause", "restore", "90 days", "project", "backup", "migration", "s
 
 Projects that have been paused for more than 90 days can no longer be restored through Supabase Studio. You can still recover your data by downloading the available backups and migrating them to a new project.
 
-Both the database backup and Storage objects can be downloaded from the [Project Overview](https://supabase.com/dashboard/project/_) section in Supabase Studio before the project is deleted.
+Both the database backup and Storage objects can be downloaded from the [Project Overview](/dashboard/project/_) section in Supabase Studio before the project is deleted.
 
 <Image
   alt="Restore project after 90-day pause"
@@ -22,7 +22,7 @@ Here is a [short video walkthrough](https://youtu.be/ktsgm8HxWqo?si=5_8IVzL1rp8M
 
 ## Step 1: Download your backups
 
-In the [Project Overview](https://supabase.com/dashboard/project/_) of your paused project, download:
+In the [Project Overview](/dashboard/project/_) of your paused project, download:
 
 - **Database backup** — the `.backup` file from the Backups section
 - **Storage objects** — all files from your Storage buckets
@@ -35,7 +35,7 @@ Create a new project at [database.new](https://database.new) and configure it to
 
 ## Step 3: Restore the database
 
-Get the **Session pooler** connection string for your new project from the [Connect dialog](https://supabase.com/dashboard/project/_?showConnect=true).
+Get the **Session pooler** connection string for your new project from the [Connect dialog](/dashboard/project/_?showConnect=true).
 
 Unzip the downloaded backup file if it has a `.gz` extension, then run:
 
@@ -45,17 +45,17 @@ psql -d [CONNECTION_STRING] -f /path/to/backup_file.backup
 
 Some errors like `object already exists` are expected and can be safely ignored — they occur because the new project already has the default Supabase schemas applied.
 
-See the [Restore Dashboard backup guide](https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore) for detailed instructions and troubleshooting.
+See the [Restore Dashboard backup guide](/guides/platform/migrating-within-supabase/dashboard-restore) for detailed instructions and troubleshooting.
 
 ## Step 4: Restore Storage objects
 
-Use the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction) to copy your downloaded storage files to the new project's buckets:
+Use the [Supabase CLI](/docs/reference/cli/introduction) to copy your downloaded storage files to the new project's buckets:
 
 ```bash
 supabase storage cp /path/to/downloaded/files ss:///bucket_name -r --experimental
 ```
 
-Repeat for each bucket. See the [`supabase storage cp`](https://supabase.com/docs/reference/cli/supabase-storage-cp) reference for all available flags.
+Repeat for each bucket. See the [`supabase storage cp`](/docs/reference/cli/supabase-storage-cp) reference for all available flags.
 
 ## Step 5: Copy project configurations
 
@@ -63,10 +63,10 @@ Use the [Management API](https://api.supabase.com/api/v1) to copy configurations
 
 You can use [this bash script](https://gist.github.com/Ellba/a18781733e483e6bb15e89199198d1db) that accepts an access token, source project reference, and destination project reference to automate the process.
 
-Get your access token from the [Account Tokens page](https://supabase.com/dashboard/account/tokens).
+Get your access token from the [Account Tokens page](/dashboard/account/tokens).
 
 ## Related guides
 
-- [Migrating within Supabase](https://supabase.com/docs/guides/platform/migrating-within-supabase)
-- [Restore Dashboard backup](https://supabase.com/docs/guides/platform/migrating-within-supabase/dashboard-restore)
-- [Backup and Restore using the CLI](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore)
+- [Migrating within Supabase](/guides/platform/migrating-within-supabase)
+- [Restore Dashboard backup](/guides/platform/migrating-within-supabase/dashboard-restore)
+- [Backup and Restore using the CLI](/guides/platform/migrating-within-supabase/backup-restore)
