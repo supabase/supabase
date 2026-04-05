@@ -2,7 +2,7 @@
 // - `generated-images` bucket already created.
 // - `OPENAI_API_KEY` environment variable set.
 
-import { createClient } from 'npm:supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js'
 import OpenAI, { toFile } from 'jsr:@openai/openai@4.96.2'
 
 // Configure COS headers for the function
