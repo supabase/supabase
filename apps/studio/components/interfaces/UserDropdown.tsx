@@ -14,11 +14,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  singleThemes,
+  Theme,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  singleThemes,
-  Theme,
 } from 'ui'
 
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
@@ -47,7 +47,10 @@ export function UserDropdown({
     <DropdownMenu>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+          <DropdownMenuTrigger
+            asChild
+            className={cn('border flex-shrink-0 px-3', triggerClassName)}
+          >
             <Button
               type="default"
               aria-label="Open account menu"

@@ -12,11 +12,11 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  singleThemes,
+  Theme,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  singleThemes,
-  Theme,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
 
@@ -38,7 +38,10 @@ export const LocalDropdown = ({
     <DropdownMenu>
       <Tooltip>
         <TooltipTrigger asChild>
-          <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
+          <DropdownMenuTrigger
+            className={cn('border flex-shrink-0 px-3', triggerClassName)}
+            asChild
+          >
             <Button
               type="default"
               aria-label="Open account menu"
