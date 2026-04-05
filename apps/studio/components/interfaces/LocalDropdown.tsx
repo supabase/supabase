@@ -12,6 +12,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   singleThemes,
   Theme,
 } from 'ui'
@@ -33,14 +36,22 @@ export const LocalDropdown = ({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
-        <Button
-          type="default"
-          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
-        >
-          <ProfileImage className="w-8 h-8 rounded-md" />
-        </Button>
-      </DropdownMenuTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
+            <Button
+              type="default"
+              aria-label="Open account menu"
+              className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+            >
+              <ProfileImage className="w-8 h-8 rounded-md" />
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Settings</p>
+        </TooltipContent>
+      </Tooltip>
       <DropdownMenuContent side="bottom" align="end" className={cn('w-44', contentClassName)}>
         <DropdownMenuItem
           className="flex gap-2 cursor-pointer"

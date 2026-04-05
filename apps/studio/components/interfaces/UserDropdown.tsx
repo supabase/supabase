@@ -14,6 +14,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   singleThemes,
   Theme,
 } from 'ui'
@@ -42,20 +45,28 @@ export function UserDropdown({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
-        <Button
-          type="default"
-          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
-        >
-          {isLoading ? (
-            <div className="w-full h-full flex items-center justify-center">
-              <Loader2 className="animate-spin text-foreground-lighter" size={16} />
-            </div>
-          ) : (
-            <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+            <Button
+              type="default"
+              aria-label="Open account menu"
+              className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+            >
+              {isLoading ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Loader2 className="animate-spin text-foreground-lighter" size={16} />
+                </div>
+              ) : (
+                <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Account</p>
+        </TooltipContent>
+      </Tooltip>
 
       <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
