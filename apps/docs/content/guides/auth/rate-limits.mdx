@@ -77,13 +77,13 @@ Once IP address forwarding is enabled, you can either pass the `Sb-Forwarded-For
 ```typescript
 import { createServerClient } from '@supabase/ssr'
 
-const supabase = createClient(
+const supabase = createServerClient(
   "https://<your-project-id>.supabase.co",
   "<your-secret-key>", // Key should start with sb_secret
   {
-    "global": {
-      "headers": {
-        "sb-forwarded-for": request.headers.get('x-forwarded-for'),
+    global: {
+      headers: {
+        "sb-forwarded-for": request.headers.get("x-forwarded-for"),
       },
     },
   },
