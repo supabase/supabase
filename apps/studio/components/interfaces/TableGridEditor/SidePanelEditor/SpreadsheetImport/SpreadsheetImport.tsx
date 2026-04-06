@@ -188,7 +188,7 @@ function SpreadsheetFileDropZone({
 }: SpreadsheetFileDropZoneProps) {
   const handleUploadFile = useCallback(
     async function uploadFile(event: DragEvent<HTMLDivElement> | ChangeEvent<HTMLInputElement>) {
-      const [file] = isDragEvent(event) ? event.dataTransfer.files : event.target.files ?? []
+      const [file] = isDragEvent(event) ? event.dataTransfer.files : (event.target.files ?? [])
       if (!file) {
         return
       }
