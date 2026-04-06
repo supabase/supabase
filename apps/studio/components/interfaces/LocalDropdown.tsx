@@ -17,9 +17,9 @@ import {
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns'
 
+import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
-import { ButtonTooltip } from '../ui/ButtonTooltip'
 
 export const LocalDropdown = ({
   triggerClassName,
@@ -37,8 +37,8 @@ export const LocalDropdown = ({
       <DropdownMenuTrigger className={cn('border flex-shrink-0 px-3', triggerClassName)} asChild>
         <ButtonTooltip
           type="default"
-          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8" 
-          tooltip={{ content: { text: 'Settings' } }}            
+          className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          tooltip={{ content: { text: 'Settings' } }}
         >
           <ProfileImage className="w-8 h-8 rounded-md" />
         </ButtonTooltip>

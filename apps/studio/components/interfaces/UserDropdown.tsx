@@ -18,13 +18,13 @@ import {
   Theme,
 } from 'ui'
 
+import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useAppStateSnapshot } from '@/state/app-state'
-import { ButtonTooltip } from '../ui/ButtonTooltip'
 
 export function UserDropdown({
   triggerClassName,
@@ -47,7 +47,7 @@ export function UserDropdown({
         <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
-          tooltip={{ content: { text: 'Account settings' } }}    
+          tooltip={{ content: { text: 'Account settings' } }}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
