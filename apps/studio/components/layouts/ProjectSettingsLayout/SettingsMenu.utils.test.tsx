@@ -67,26 +67,25 @@ describe('useGenerateSettingsMenu', () => {
     expect(hasMembers).toBe(false)
   })
 
-  it('includes dashboard preferences when flag is enabled', () => {
+  it('includes dashboard in configuration when flag is enabled', () => {
     vi.mocked(useFlag).mockReturnValue(true)
 
     const { result } = renderHook(() => useGenerateSettingsMenu())
-    const preferencesGroup = result.current.find((group) => group.title === 'Preferences')
-    const hasDashboardPreferences = preferencesGroup?.items.some(
-      (item) =>
-        item.name === 'Dashboard preferences' &&
-        item.url === '/project/project-ref/settings/preferences'
+    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
+    const hasDashboardPreferences = configurationGroup?.items.some(
+      (item) => item.name === 'Dashboard' && item.url === '/project/project-ref/settings/dashboard'
     )
 
     expect(hasDashboardPreferences).toBe(true)
+    expect(result.current.find((group) => group.title === 'Preferences')).toBeUndefined()
   })
 
-  it('hides dashboard preferences when flag is disabled', () => {
+  it('hides dashboard in configuration when flag is disabled', () => {
     vi.mocked(useFlag).mockReturnValue(false)
 
     const { result } = renderHook(() => useGenerateSettingsMenu())
-    const preferencesGroup = result.current.find((group) => group.title === 'Preferences')
+    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
 
-    expect(preferencesGroup).toBeUndefined()
+    expect(configurationGroup?.items.some((item) => item.name === 'Dashboard')).toBe(false)
   })
 })

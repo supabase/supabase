@@ -11,7 +11,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
-import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/InlineEditorSettings'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
 import {
