@@ -1,8 +1,4 @@
 import { UseFormReturn } from 'react-hook-form'
-
-import Panel from 'components/ui/Panel'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { PROVIDERS } from 'lib/constants'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -12,9 +8,16 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  useWatch_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
+import Panel from '@/components/ui/Panel'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { PROVIDERS } from '@/lib/constants'
+
+const HA_SUPPORTED_PROVIDERS = ['AWS_K8S']
 
 interface CloudProviderSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -22,6 +25,7 @@ interface CloudProviderSelectorProps {
 
 export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+  const highAvailability = useWatch_Shadcn_({ control: form.control, name: 'highAvailability' })
 
   return (
     <Panel.Content>
@@ -29,10 +33,21 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
         control={form.control}
         name="cloudProvider"
         render={({ field }) => (
-          <FormItemLayout label="Cloud provider" layout="horizontal">
+          <FormItemLayout
+            label="Cloud provider"
+            layout="horizontal"
+            description={
+              highAvailability ? (
+                <p className="text-warning">
+                  High availability is only supported on AWS (Revamped)
+                </p>
+              ) : undefined
+            }
+          >
             <Select_Shadcn_
               onValueChange={(value) => field.onChange(value)}
               defaultValue={field.value}
+              value={field.value}
             >
               <FormControl_Shadcn_>
                 <SelectTrigger_Shadcn_>
@@ -46,8 +61,9 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
                     .map((providerObj) => {
                       const label = providerObj['name']
                       const value = providerObj['id']
+                      const isDisabled = highAvailability && !HA_SUPPORTED_PROVIDERS.includes(value)
                       return (
-                        <SelectItem_Shadcn_ key={value} value={value}>
+                        <SelectItem_Shadcn_ key={value} value={value} disabled={isDisabled}>
                           {label}
                         </SelectItem_Shadcn_>
                       )

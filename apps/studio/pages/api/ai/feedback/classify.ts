@@ -1,5 +1,6 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { getModel } from 'lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -28,24 +29,21 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const {
-      model,
-      error: modelError,
-      providerOptions,
-    } = await getModel({
+    const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      routingKey: 'feedback',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const { object } = await generateObject({
-      model,
-      providerOptions,
-      schema: z.object({
-        feedback_category: z.enum(['support', 'feedback', 'unknown']),
+    const { output } = await generateText({
+      ...modelParams,
+      output: Output.object({
+        schema: z.object({
+          feedback_category: z.enum(['support', 'feedback', 'unknown']),
+        }),
       }),
       temperature: 0,
       prompt: `
@@ -97,7 +95,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   `,
     })
 
-    return res.json({ feedback_category: object.feedback_category })
+    return res.json({ feedback_category: output.feedback_category })
   } catch (error) {
     if (error instanceof Error) {
       console.error(`Classifying this feedback failed`)

@@ -1,4 +1,4 @@
-import { DOCS_URL } from 'lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 // Original storage constants
 export enum URL_EXPIRY_DURATION {
@@ -88,3 +88,5 @@ export const BUCKET_TYPES = {
 }
 export const BUCKET_TYPE_KEYS = Object.keys(BUCKET_TYPES) as Array<keyof typeof BUCKET_TYPES>
 export const DEFAULT_BUCKET_TYPE: keyof typeof BUCKET_TYPES = 'files'
+
+export const PUBLIC_BUCKET_TOOLTIP = 'Objects in this bucket are readable by anyone with the URL.'

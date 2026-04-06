@@ -1,14 +1,9 @@
 import { noop, pull } from 'lodash'
+import { ChevronLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
-import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
-import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import { ChevronLeft } from 'lucide-react'
 import { Modal } from 'ui'
+
 import {
   applyBucketIdToTemplateDefinition,
   createPayloadsForAddPolicy,
@@ -17,6 +12,11 @@ import {
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
+import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Auth/Policies/Policies.constants'
+import PolicySelection from '@/components/interfaces/Auth/Policies/PolicySelection'
+import PolicyTemplates from '@/components/interfaces/Auth/Policies/PolicyTemplates'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 const newPolicyTemplate: any = {
   name: '',
@@ -26,7 +26,7 @@ const newPolicyTemplate: any = {
   allowedOperations: [],
 }
 
-const StoragePoliciesEditPolicyModal = ({
+export const StoragePoliciesEditPolicyModal = ({
   visible = false,
   bucketName = '',
   onSelectCancel = () => {},
@@ -260,5 +260,3 @@ const StoragePoliciesEditPolicyModal = ({
     </Modal>
   )
 }
-
-export default StoragePoliciesEditPolicyModal

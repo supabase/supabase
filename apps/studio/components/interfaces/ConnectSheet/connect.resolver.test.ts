@@ -471,7 +471,7 @@ describe('connect.resolver:getDefaultState', () => {
       steps: [],
     }
 
-    const state = getDefaultState(schema)
+    const state = getDefaultState({ schema })
     expect(state.mode).toBe('framework')
   })
 
@@ -501,7 +501,7 @@ describe('connect.resolver:getDefaultState', () => {
       steps: [],
     }
 
-    const state = getDefaultState(schema)
+    const state = getDefaultState({ schema })
     expect(state.framework).toBe('nextjs')
     expect(state.library).toBe('supabasejs')
     expect(state.mcpReadonly).toBe(false)
@@ -514,7 +514,7 @@ describe('connect.resolver:getDefaultState', () => {
       steps: [],
     }
 
-    const state = getDefaultState(schema)
+    const state = getDefaultState({ schema })
     expect(state.mode).toBe('direct')
   })
 })

@@ -1,5 +1,6 @@
 import type { VirtualItem, Virtualizer } from '@tanstack/react-virtual'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { mergeRefs } from 'common'
 import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react'
 import {
   cloneElement,
@@ -11,8 +12,6 @@ import {
   useMemo,
   useRef,
 } from 'react'
-
-import { mergeRefs } from 'common'
 import {
   cn,
   Table,
@@ -139,8 +138,10 @@ export const VirtualizedTable = <TItem,>({
   )
 }
 
-interface VirtualizedTableBodyProps<TItem>
-  extends Omit<React.ComponentProps<typeof TableBody>, 'children'> {
+interface VirtualizedTableBodyProps<TItem> extends Omit<
+  React.ComponentProps<typeof TableBody>,
+  'children'
+> {
   emptyContent?: ReactNode
   leadingContent?: ReactNode
   trailingContent?: ReactNode
@@ -167,7 +168,7 @@ export const VirtualizedTableBody = <TItem,>({
     <TableBody {...props}>
       {leadingContent}
       {data.length === 0 ? (
-        emptyContent ?? null
+        (emptyContent ?? null)
       ) : (
         <>
           {paddingTop > 0 && (

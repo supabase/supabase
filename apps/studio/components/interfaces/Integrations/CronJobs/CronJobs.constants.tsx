@@ -1,8 +1,11 @@
 import { EdgeFunctions, RESTApi, SqlEditor } from 'icons'
 import { ScrollText } from 'lucide-react'
 
-export const cronPattern =
-  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
+const cronField = /(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)/
+const cronDayOfMonth = /(\*|\$|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)/
+export const cronPattern = new RegExp(
+  `^${cronField.source}\\s+${cronField.source}\\s+${cronDayOfMonth.source}\\s+${cronField.source}\\s+${cronField.source}$`
+)
 
 // detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
 export const secondsPattern = /^\d+\s+seconds*$/
@@ -46,12 +49,21 @@ export type HTTPHeader = { name: string; value: string }
 
 export type HTTPParameter = { name: string; value: string }
 
-export const CRON_TABLE_COLUMNS = [
-  { id: 'jobname', name: 'Name', minWidth: 0, width: 200 },
-  { id: 'schedule', name: 'Schedule', width: 100 },
-  { id: 'latest_run', name: 'Last run', width: 265 },
-  { id: 'next_run', name: 'Next run', minWidth: 180 },
-  { id: 'command', name: 'Command', minWidth: 320 },
-  { id: 'active', name: 'Active', width: 70, minWidth: 70, maxWidth: 70 },
-  { id: 'actions', name: '', minWidth: 75, width: 75 },
+type CronTableColumn = {
+  id: string
+  name: string
+  width?: number
+  minWidth?: number
+  maxWidth?: number
+  resizable?: boolean
+}
+
+export const CRON_TABLE_COLUMNS: CronTableColumn[] = [
+  { id: 'jobname', name: 'Name', minWidth: 160, width: 200, resizable: true },
+  { id: 'schedule', name: 'Schedule', width: 100, resizable: true },
+  { id: 'latest_run', name: 'Last run', width: 265, resizable: true },
+  { id: 'next_run', name: 'Next run', minWidth: 180, resizable: true },
+  { id: 'command', name: 'Command', minWidth: 320, resizable: true },
+  { id: 'active', name: 'Active', width: 70, minWidth: 70, maxWidth: 70, resizable: false },
+  { id: 'actions', name: '', minWidth: 75, width: 75, resizable: false },
 ]

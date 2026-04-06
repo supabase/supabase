@@ -1,11 +1,6 @@
-import {
-  CodeBlock,
-  CodeBlockLang,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-} from 'ui'
+import { useEffect, useState } from 'react'
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 interface MultipleCodeBlockFile {
   name: string
@@ -102,17 +97,37 @@ export const MultipleCodeBlock = ({ files, value, onValueChange }: MultipleCodeB
   }
 
   const defaultValue = files[0]?.name ?? ''
+  const isControlled = value !== undefined
+  const [internalValue, setInternalValue] = useState(defaultValue)
 
   const trimmedFiles = files.map((file) => ({
     ...file,
     code: typeof file.code === 'string' ? file.code.trim() : file.code,
   }))
 
+  useEffect(() => {
+    if (isControlled) return
+
+    setInternalValue((currentValue) => {
+      const currentValueExists = files.some((file) => file.name === currentValue)
+      return currentValueExists ? currentValue : defaultValue
+    })
+  }, [defaultValue, files, isControlled])
+
+  const activeValue = isControlled ? value : internalValue
+
+  const handleValueChange = (nextValue: string) => {
+    if (!isControlled) {
+      setInternalValue(nextValue)
+    }
+
+    onValueChange?.(nextValue)
+  }
+
   return (
     <Tabs_Shadcn_
-      defaultValue={defaultValue}
-      value={value}
-      onValueChange={onValueChange}
+      value={activeValue}
+      onValueChange={handleValueChange}
       className="border rounded-lg gap-0 space-y-0 overflow-hidden"
     >
       <TabsList_Shadcn_ className="bg-surface-75 px-5 gap-5 overflow-x-auto border-0 border-b">

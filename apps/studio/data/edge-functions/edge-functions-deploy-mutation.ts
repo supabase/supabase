@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
+import { edgeFunctionsKeys } from './keys'
 import {
   getFallbackEntrypointPath,
   getFallbackImportMapPath,
   getStaticPatterns,
-} from 'components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { edgeFunctionsKeys } from './keys'
+} from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type EdgeFunctionsDeployBodyMetadata = components['schemas']['FunctionDeployBody']['metadata']
 type EdgeFunctionsDeployVariables = {

@@ -1,31 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { QUEUES_SCHEMA } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import {
-  FormPanelContainer,
-  FormPanelContent,
-  FormPanelFooter,
-} from 'components/ui/Forms/FormPanel'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import {
-  QUEUES_SCHEMA,
-  useDatabaseQueueToggleExposeMutation,
-} from 'data/database-queues/database-queues-toggle-postgrest-mutation'
-import { useDatabaseQueuesVersionQuery } from 'data/database-queues/database-queues-version-query'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Form_Shadcn_,
@@ -37,8 +15,26 @@ import {
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
-// [Joshen] Not convinced with the UI and layout but getting the functionality out first
+import { DocsButton } from '@/components/ui/DocsButton'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import {
+  FormPanelContainer,
+  FormPanelContent,
+  FormPanelFooter,
+} from '@/components/ui/Forms/FormPanel'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
+import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()

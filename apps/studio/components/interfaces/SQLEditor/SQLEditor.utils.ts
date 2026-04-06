@@ -1,12 +1,14 @@
-import { generateUuid } from 'lib/api/snippets.browser'
-import { removeCommentsFromSql } from 'lib/helpers'
-import type { SnippetWithContent } from 'state/sql-editor-v2'
 import {
-  NEW_SQL_SNIPPET_SKELETON,
+  alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
+  NEW_SQL_SNIPPET_SKELETON,
   sqlAiDisclaimerComment,
+  updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff } from './SQLEditor.types'
+import { generateUuid } from '@/lib/api/snippets.browser'
+import { removeCommentsFromSql } from '@/lib/helpers'
+import type { SnippetWithContent } from '@/state/sql-editor-v2'
 
 export const createSqlSnippetSkeletonV2 = ({
   name,
@@ -55,13 +57,21 @@ export function checkDestructiveQuery(sql: string) {
 
 // Function to check for UPDATE queries without WHERE clause
 export function isUpdateWithoutWhere(sql: string): boolean {
-  const updateWithoutWhereRegex =
-    /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
   const updateStatements = sql
     .split(';')
     .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
   return updateStatements.some(
     (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
+  )
+}
+
+export function checkAlterDatabaseConnection(sql: string): boolean {
+  const cleanedSql = removeCommentsFromSql(sql)
+  const statements = cleanedSql
+    .split(';')
+    .filter((statement) => statement.trim().toLowerCase().startsWith('alter database'))
+  return statements.some((statement) =>
+    alterDatabasePreventConnectionStatements.some((x) => statement.toLowerCase().includes(x))
   )
 }
 

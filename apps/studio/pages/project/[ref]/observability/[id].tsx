@@ -14,7 +14,7 @@ const PageLayout: NextPageWithLayout = () => (
 
 PageLayout.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout>{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Report">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

@@ -15,11 +15,13 @@ Wrappers introduce some new terminology and different workflows.
 
 <Image
   alt="Foreign Data Wrappers (FDW)"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/foreign-data-wrappers/extracting-data.png',
     light: '/docs/img/database/foreign-data-wrappers/extracting-data--light.png',
   }}
+width={1600}
+height={929}
 />
 
 ### Remote servers
@@ -114,11 +116,13 @@ select cron.schedule(
 
 <Image
   alt="FDW with pg_cron"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/foreign-data-wrappers/extracting-data-pgcron.png',
     light: '/docs/img/database/foreign-data-wrappers/extracting-data-pgcron--light.png',
   }}
+width={1600}
+height={929}
 />
 
 This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).

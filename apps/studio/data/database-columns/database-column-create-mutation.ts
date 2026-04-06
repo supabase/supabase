@@ -2,8 +2,8 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateColumnBody = {
   schema: string

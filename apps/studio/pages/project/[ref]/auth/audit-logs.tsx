@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { AuditLogsForm } from 'components/interfaces/Auth/AuditLogsForm'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
@@ -62,7 +61,7 @@ const AuditLogsPage: NextPageWithLayout = () => {
 
 AuditLogsPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Audit Logs">{page}</AuthLayout>
   </DefaultLayout>
 )
 

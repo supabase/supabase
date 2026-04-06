@@ -1,39 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useFlag, useParams } from 'common'
-import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
-import { UpdateCustomReportModal } from 'components/interfaces/Reports/UpdateModal'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { Content, useContentQuery } from 'data/content/content-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProfile } from 'lib/profile'
-import { Menu, cn } from 'ui'
+import { cn, Menu } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ReportMenuItem } from './ReportMenuItem'
-import { useQueryState, parseAsBoolean } from 'nuqs'
+import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
+import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { Content, useContentQuery } from '@/data/content/content-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useProfile } from '@/lib/profile'
 
 const ReportsMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4]) as string
-  const authEnabled = useFlag('authreportv2')
-  const edgeFnEnabled = useFlag('edgefunctionreport')
-  const realtimeEnabled = useFlag('realtimeReport')
-  const storageReportEnabled = useFlag('storagereport')
-  const postgrestReportEnabled = useFlag('postgrestreport')
 
-  // b/c fly doesn't support storage
   const storageSupported = useIsFeatureEnabled('project_storage:all')
-  const storageEnabled = storageReportEnabled && storageSupported
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -127,54 +120,37 @@ const ReportsMenu = () => {
           key: 'api-overview',
           url: `/project/${ref}/reports/api-overview${preservedQueryParams}`,
         },
-        ...(authEnabled
-          ? [
-              {
-                name: 'Auth',
-                key: 'auth',
-                url: `/project/${ref}/reports/auth${preservedQueryParams}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Auth',
+          key: 'auth',
+          url: `/project/${ref}/reports/auth${preservedQueryParams}`,
+        },
         {
           name: 'Database',
           key: 'database',
           url: `/project/${ref}/reports/database${preservedQueryParams}`,
         },
-        ...(edgeFnEnabled
-          ? [
-              {
-                name: 'Edge Functions',
-                key: 'edge-functions',
-                url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
-              },
-            ]
-          : []),
+        {
+          name: 'Edge Functions',
+          key: 'edge-functions',
+          url: `/project/${ref}/reports/edge-functions${preservedQueryParams}`,
+        },
         {
           name: 'Query Performance',
           key: 'query-performance',
           url: `/project/${ref}/reports/query-performance${preservedQueryParams}`,
         },
-        ...(postgrestReportEnabled
-          ? [
-              {
-                name: 'PostgREST',
-                key: 'postgrest',
-                url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
-              },
-            ]
-          : []),
-        ...(realtimeEnabled
-          ? [
-              {
-                name: 'Realtime',
-                key: 'realtime',
-                url: `/project/${ref}/reports/realtime${preservedQueryParams}`,
-              },
-            ]
-          : []),
-
-        ...(storageEnabled
+        {
+          name: 'PostgREST',
+          key: 'postgrest',
+          url: `/project/${ref}/reports/postgrest${preservedQueryParams}`,
+        },
+        {
+          name: 'Realtime',
+          key: 'realtime',
+          url: `/project/${ref}/reports/realtime${preservedQueryParams}`,
+        },
+        ...(storageSupported
           ? [
               {
                 name: 'Storage',

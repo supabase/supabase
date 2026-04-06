@@ -1,13 +1,14 @@
+import { useCallback, useMemo } from 'react'
+
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
   FeatureKey,
-} from 'data/entitlements/entitlements-query'
-import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { useMemo } from 'react'
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
+} from '@/data/entitlements/entitlements-query'
+import { useEntitlementsQuery } from '@/data/entitlements/entitlements-query'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function isNumericConfig(
   config: EntitlementConfig,
@@ -61,6 +62,26 @@ function getEntitlementMax(entitlement: Entitlement | null): number | undefined 
     : getEntitlementNumericValue(entitlement)
 }
 
+export function useHasEntitlementAccess(organizationSlug?: string) {
+  const shouldGetSelectedOrg = !organizationSlug
+  const { data: selectedOrg } = useSelectedOrganizationQuery({
+    enabled: shouldGetSelectedOrg,
+  })
+
+  const finalOrgSlug = organizationSlug || selectedOrg?.slug
+  const enabled = IS_PLATFORM && !!finalOrgSlug
+
+  const { data: entitlementsData } = useEntitlementsQuery({ slug: finalOrgSlug! }, { enabled })
+
+  return useCallback(
+    (key: string) =>
+      IS_PLATFORM
+        ? (entitlementsData?.entitlements.find((e) => e.feature.key === key)?.hasAccess ?? false)
+        : true,
+    [entitlementsData]
+  )
+}
+
 export function useCheckEntitlements(
   featureKey: FeatureKey,
   organizationSlug?: string,
@@ -110,7 +131,7 @@ export function useCheckEntitlements(
     : isSuccessEntitlements
 
   return {
-    hasAccess: IS_PLATFORM ? entitlement?.hasAccess ?? false : true,
+    hasAccess: IS_PLATFORM ? (entitlement?.hasAccess ?? false) : true,
     isLoading: IS_PLATFORM ? isLoading : false,
     isSuccess: IS_PLATFORM ? isSuccess : true,
     getEntitlementNumericValue: () => getEntitlementNumericValue(entitlement),

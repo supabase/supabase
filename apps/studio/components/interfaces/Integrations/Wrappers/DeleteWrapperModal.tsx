@@ -1,7 +1,4 @@
 import { useParams } from 'common'
-import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -9,6 +6,9 @@ import { Modal } from 'ui'
 
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { getWrapperMetaForWrapper, wrapperMetaComparator } from './Wrappers.utils'
+import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DeleteWrapperModal = () => {
   const { id, ref } = useParams()

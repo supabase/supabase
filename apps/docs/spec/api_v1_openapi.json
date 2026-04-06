@@ -383,6 +383,13 @@
             "required": false,
             "in": "query",
             "schema": { "type": "string" }
+          },
+          {
+            "name": "pgdelta",
+            "required": false,
+            "in": "query",
+            "description": "Use pg-delta instead of Migra for diffing when true",
+            "schema": { "type": "boolean" }
           }
         ],
         "responses": {
@@ -480,12 +487,11 @@
             "name": "desired_instance_size",
             "required": false,
             "in": "query",
-            "description": "Desired instance size",
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "schema": {
               "example": "nano",
               "type": "string",
               "enum": [
-                "pico",
                 "nano",
                 "micro",
                 "small",
@@ -4007,7 +4013,7 @@
           "500": { "description": "Failed to list database migrations" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
-        "summary": "[Beta] List applied migration versions",
+        "summary": "List applied migration versions",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4048,7 +4054,7 @@
           "500": { "description": "Failed to apply database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Apply a database migration",
+        "summary": "Apply a database migration",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4089,7 +4095,7 @@
           "500": { "description": "Failed to upsert database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Upsert a database migration without applying",
+        "summary": "Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4122,7 +4128,7 @@
           "500": { "description": "Failed to rollback database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "summary": "Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4163,7 +4169,7 @@
           "500": { "description": "Failed to get database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_read"] }],
-        "summary": "[Beta] Fetch an existing entry from migration history",
+        "summary": "Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4203,7 +4209,7 @@
           "500": { "description": "Failed to patch database migration" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_migrations_write"] }],
-        "summary": "[Beta] Patch an existing entry in migration history",
+        "summary": "Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
         "x-endpoint-owners": ["infra"],
@@ -4377,7 +4383,7 @@
           "429": { "description": "Rate limit exceeded" },
           "500": { "description": "Failed to update database password" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["database_write"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_config_write"] }],
         "summary": "Updates the database password",
         "tags": ["Database"],
         "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
@@ -4557,6 +4563,44 @@
         "summary": "Delete JIT access by user-id",
         "tags": ["Database"],
         "x-endpoint-owners": ["security"]
+      }
+    },
+    "/v1/projects/{ref}/database/openapi": {
+      "get": {
+        "description": "Returns the PostgREST OpenAPI specification for the project. This is the replacement for querying `/rest/v1/` directly with the anon key.",
+        "operationId": "v1-get-database-openapi",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          },
+          {
+            "name": "schema",
+            "required": false,
+            "in": "query",
+            "description": "The database schema to generate the OpenAPI spec for",
+            "schema": { "default": "public", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to fetch PostgREST OpenAPI spec" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_read"] }],
+        "summary": "Get PostgREST OpenAPI spec",
+        "tags": ["Database"],
+        "x-badges": [{ "name": "OAuth scope: database:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "database:read"
       }
     },
     "/v1/projects/{ref}/functions": {
@@ -5019,6 +5063,65 @@
         "x-oauth-scope": "storage:read"
       }
     },
+    "/v1/projects/{ref}/config/disk": {
+      "get": {
+        "operationId": "v1-get-database-disk",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/DiskResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to get database disk attributes" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_read"] }],
+        "summary": "Get database disk attributes",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      },
+      "post": {
+        "operationId": "v1-modify-database-disk",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DiskRequestBody" } }
+          }
+        },
+        "responses": {
+          "201": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to modify database disk" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_write"] }],
+        "summary": "Modify database disk",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
     "/v1/projects/{ref}/config/disk/util": {
       "get": {
         "operationId": "v1-get-disk-utilization",
@@ -5047,37 +5150,6 @@
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_read"] }],
         "summary": "Get disk utilization",
-        "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api", "infra"]
-      }
-    },
-    "/v1/projects/{ref}/config/disk": {
-      "post": {
-        "operationId": "v1-modify-database-disk",
-        "parameters": [
-          {
-            "name": "ref",
-            "required": true,
-            "in": "path",
-            "description": "Project ref",
-            "schema": { "minLength": 20, "maxLength": 20, "pattern": "^[a-z]+$", "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/DiskRequestBody" } }
-          }
-        },
-        "responses": {
-          "201": { "description": "" },
-          "401": { "description": "Unauthorized" },
-          "403": { "description": "Forbidden action" },
-          "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to modify database disk" }
-        },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["infra_disk_config_write"] }],
-        "summary": "Modify database disk",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
       }
@@ -5387,7 +5459,7 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["realtime_config_read"] }],
         "summary": "Gets realtime configuration",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
@@ -5417,7 +5489,7 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["realtime_config_write"] }],
         "summary": "Updates realtime configuration",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
@@ -5442,7 +5514,7 @@
           "404": { "description": "Tenant not found" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["realtime_config_write"] }],
         "summary": "Shutdowns realtime connections for a project",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
@@ -6399,6 +6471,7 @@
           "region": {
             "type": "string",
             "description": "Region you want your server to reside in. Use region_selection instead.",
+            "example": "us-east-1",
             "deprecated": true,
             "enum": [
               "us-east-1",
@@ -6479,9 +6552,10 @@
             "description": "This field is deprecated and is ignored in this request"
           },
           "desired_instance_size": {
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
+            "example": "nano",
             "type": "string",
             "enum": [
-              "pico",
               "nano",
               "micro",
               "small",
@@ -6508,18 +6582,6 @@
             "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          },
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-            "description": "Release channel. If not provided, GA will be used.",
-            "deprecated": true
-          },
-          "postgres_engine": {
-            "type": "string",
-            "enum": ["15", "17", "17-oriole"],
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "deprecated": true
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
@@ -7832,9 +7894,15 @@
                     "description": "Deprecated. Use `status` instead."
                   },
                   "db_connected": { "type": "boolean" },
+                  "replication_connected": { "type": "boolean" },
                   "connected_cluster": { "type": "integer" }
                 },
-                "required": ["healthy", "db_connected", "connected_cluster"]
+                "required": [
+                  "healthy",
+                  "db_connected",
+                  "replication_connected",
+                  "connected_cluster"
+                ]
               },
               {
                 "type": "object",
@@ -8251,10 +8319,10 @@
             "type": "boolean",
             "nullable": true
           },
-          "sessions_inactivity_timeout": { "type": "integer", "nullable": true },
+          "sessions_inactivity_timeout": { "type": "number", "nullable": true },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "integer", "nullable": true },
+          "sessions_timebox": { "type": "number", "nullable": true },
           "site_url": { "type": "string", "nullable": true },
           "sms_autoconfirm": { "type": "boolean", "nullable": true },
           "sms_max_frequency": { "type": "integer", "nullable": true },
@@ -8292,7 +8360,9 @@
           "uri_allow_list": { "type": "string", "nullable": true },
           "oauth_server_enabled": { "type": "boolean" },
           "oauth_server_allow_dynamic_registration": { "type": "boolean" },
-          "oauth_server_authorization_path": { "type": "string", "nullable": true }
+          "oauth_server_authorization_path": { "type": "string", "nullable": true },
+          "custom_oauth_enabled": { "type": "boolean" },
+          "custom_oauth_max_providers": { "type": "integer" }
         },
         "required": [
           "api_max_request_duration",
@@ -8525,7 +8595,9 @@
           "uri_allow_list",
           "oauth_server_enabled",
           "oauth_server_allow_dynamic_registration",
-          "oauth_server_authorization_path"
+          "oauth_server_authorization_path",
+          "custom_oauth_enabled",
+          "custom_oauth_max_providers"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -8634,8 +8706,8 @@
             "nullable": true
           },
           "security_captcha_secret": { "type": "string", "nullable": true },
-          "sessions_timebox": { "type": "integer", "minimum": 0, "nullable": true },
-          "sessions_inactivity_timeout": { "type": "integer", "minimum": 0, "nullable": true },
+          "sessions_timebox": { "type": "number", "minimum": 0, "nullable": true },
+          "sessions_inactivity_timeout": { "type": "number", "minimum": 0, "nullable": true },
           "sessions_single_per_user": { "type": "boolean", "nullable": true },
           "sessions_tags": {
             "type": "string",
@@ -8899,7 +8971,8 @@
           "nimbus_oauth_client_secret": { "type": "string", "nullable": true },
           "oauth_server_enabled": { "type": "boolean", "nullable": true },
           "oauth_server_allow_dynamic_registration": { "type": "boolean", "nullable": true },
-          "oauth_server_authorization_path": { "type": "string", "nullable": true }
+          "oauth_server_authorization_path": { "type": "string", "nullable": true },
+          "custom_oauth_enabled": { "type": "boolean" }
         }
       },
       "CreateThirdPartyAuthBody": {
@@ -9782,21 +9855,35 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskUtilMetricsResponse": {
+      "DiskResponse": {
         "type": "object",
         "properties": {
-          "timestamp": { "type": "string" },
-          "metrics": {
-            "type": "object",
-            "properties": {
-              "fs_size_bytes": { "type": "number" },
-              "fs_avail_bytes": { "type": "number" },
-              "fs_used_bytes": { "type": "number" }
-            },
-            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
-          }
+          "attributes": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "throughput_mibps": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["gp3"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "iops": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "size_gb": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+                  "type": { "type": "string", "enum": ["io2"] }
+                },
+                "required": ["iops", "size_gb", "type"]
+              }
+            ]
+          },
+          "last_modified_at": { "type": "string" }
         },
-        "required": ["timestamp", "metrics"]
+        "required": ["attributes"]
       },
       "DiskRequestBody": {
         "type": "object",
@@ -9827,6 +9914,22 @@
           }
         },
         "required": ["attributes"]
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": { "type": "string" },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": { "type": "number" },
+              "fs_avail_bytes": { "type": "number" },
+              "fs_used_bytes": { "type": "number" }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
       },
       "DiskAutoscaleConfig": {
         "type": "object",
@@ -10192,8 +10295,9 @@
           "suspend": {
             "type": "boolean",
             "nullable": true,
-            "description": "Whether to suspend realtime"
-          }
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": { "type": "boolean", "description": "Whether to enable presence" }
         },
         "required": [
           "private_only",
@@ -10205,7 +10309,8 @@
           "max_joins_per_second",
           "max_presence_events_per_second",
           "max_payload_size_in_kb",
-          "suspend"
+          "suspend",
+          "presence_enabled"
         ]
       },
       "UpdateRealtimeConfigBody": {
@@ -10263,7 +10368,11 @@
             "maximum": 10000,
             "description": "Sets maximum number of payload size in KB rate limit"
           },
-          "suspend": { "type": "boolean", "description": "Whether to suspend realtime" }
+          "suspend": {
+            "type": "boolean",
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": { "type": "boolean", "description": "Whether to enable presence" }
         },
         "additionalProperties": false
       },
@@ -10743,9 +10852,10 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "status": { "type": "string", "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"] }
+          "status": { "type": "string", "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"] },
+          "completed_on": { "type": "string", "format": "date-time", "nullable": true }
         },
-        "required": ["name", "status"]
+        "required": ["name", "status", "completed_on"]
       },
       "V1UndoBody": {
         "type": "object",

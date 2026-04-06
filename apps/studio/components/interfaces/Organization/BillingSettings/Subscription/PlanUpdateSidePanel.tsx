@@ -1,38 +1,38 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { isArray } from 'lodash'
 import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
-
-import { useParams } from 'common'
-import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
-import { useOrganizationQuery } from 'data/organizations/organization-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import type { OrgPlan } from 'data/subscriptions/types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { formatCurrency } from 'lib/helpers'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Organization } from 'types/base'
-import { Button, SidePanel, cn } from 'ui'
+import { Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import DowngradeModal from './DowngradeModal'
 import { EnterpriseCard } from './EnterpriseCard'
 import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import type { OrgPlan } from '@/data/subscriptions/types'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { formatCurrency } from '@/lib/helpers'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
+import { Organization } from '@/types/base'
 
 const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
@@ -67,7 +67,10 @@ export const PlanUpdateSidePanel = () => {
     'stripe.subscriptions'
   )
 
-  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const snap = useOrgSettingsPageStateSnapshot()
+  const visible = snap.panelKey === 'subscriptionPlan'
+
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
     useMemo(
       () => orgProjectsData?.pages.flatMap((page) => page.projects),
@@ -77,8 +80,6 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
   const onClose = () => {
     const { panel, ...queryWithoutPanel } = router.query
     router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
@@ -90,8 +91,14 @@ export const PlanUpdateSidePanel = () => {
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
-  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
+  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery(
+    { orgSlug: slug },
+    { enabled: visible }
+  )
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: visible }
+  )
 
   const {
     data: subscriptionPreview,
@@ -187,7 +194,8 @@ export const PlanUpdateSidePanel = () => {
               const source = Array.isArray(router.query.source)
                 ? router.query.source[0]
                 : router.query.source
-              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_team'
+              // TODO this panel should allow direct configuration of the highlighting rather than indirectly via the source param
+              const shouldHighlight = source === 'log-drains-empty-state' && plan.id === 'tier_pro'
 
               if (plan.id === 'tier_enterprise') {
                 return <EnterpriseCard key={plan.id} plan={plan} isCurrentPlan={isCurrentPlan} />

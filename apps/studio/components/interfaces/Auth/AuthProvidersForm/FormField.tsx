@@ -1,52 +1,88 @@
-import { Markdown } from 'components/interfaces/Markdown'
-import { DatePicker } from 'components/ui/DatePicker'
-import dayjs from 'dayjs'
-import { BASE_PATH } from 'lib/constants'
-import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { format } from 'date-fns'
+import { CalendarIcon, ExternalLink } from 'lucide-react'
+import { type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
-import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import {
+  Button,
+  Calendar,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Separator,
+  SheetSection,
+  Switch,
+  Textarea,
+  useWatch_Shadcn_,
+} from 'ui'
+import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { Enum } from './AuthProvidersForm.types'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { BASE_PATH } from '@/lib/constants'
 
 interface FormFieldProps {
+  projectRef: string | undefined
+  organizationSlug: string | undefined
   name: string
   properties: any
-  formValues: any
-  setFieldValue: (field: string, v: any) => any
+  control: Control
+  hasAccess: boolean
   disabled?: boolean
 }
 
-function formatDate(date: Date): string {
-  return dayjs(date).format('dddd, MMMM D, YYYY HH:mm:ss Z')
-}
-
 const FormField = ({
+  projectRef,
   name,
   properties,
-  formValues,
-  disabled = false,
-  setFieldValue,
+  organizationSlug,
+  control,
+  hasAccess,
+  disabled: disabledProp,
 }: FormFieldProps) => {
-  const [hidden, setHidden] = useState(!!properties.isSecret)
-  const [dateAsText, setDateAsText] = useState(
-    formValues[name] ? formatDate(new Date(formValues[name])) : ''
-  )
+  const { description: originalDescription } = properties
+  let description = originalDescription
 
-  useEffect(() => {
-    if (properties.show && properties.show.key && !formValues[properties.show.key]) {
-      setFieldValue(name, '')
-      setDateAsText('')
-    }
-  }, [properties.show && properties.show.key && !formValues[properties.show.key]])
+  if (originalDescription && projectRef) {
+    description = originalDescription.replace(
+      /\(\.\.\/auth\/(.*?)\)/g,
+      `(/project/${projectRef}/auth/$1)`
+    )
+  }
+
+  const fieldValue = useWatch_Shadcn_({ control, name })
+  if (!hasAccess) {
+    const planMessage = organizationSlug
+      ? `Only available on [Pro plan](/org/${organizationSlug}/billing?panel=subscriptionPlan) and above.`
+      : ''
+    description = originalDescription ? `${originalDescription} ${planMessage}` : planMessage
+  }
+  const disabled =
+    disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
+
+  const showValue = useWatch_Shadcn_({
+    control,
+    name: properties.show?.key,
+    disabled: properties.show == null,
+  })
 
   if (properties.show) {
     if (properties.show.matches) {
-      if (!properties.show.matches.includes(formValues[properties.show.key])) {
+      if (!properties.show.matches.includes(showValue)) {
         return null
       }
-    } else if (!formValues[properties.show.key]) {
+    } else if (!showValue) {
       return null
     }
   }
@@ -54,241 +90,279 @@ const FormField = ({
   switch (properties.type) {
     case 'datetime':
       return (
-        <Input
-          size="small"
-          layout="vertical"
-          id={name}
-          name={name}
-          type="text"
-          value={dateAsText}
-          readOnly
-          label={properties.title}
-          labelOptional={
-            properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
-            ) : null
-          }
-          descriptionText={
-            properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
-            ) : null
-          }
-          actions={
-            <DatePicker
-              selectsRange={false}
-              minDate={new Date()}
-              from={formValues[name]}
-              to={formValues[name]}
-              onChange={(date) => {
-                if (date && date.to) {
-                  setFieldValue(name, date.to)
-                  setDateAsText(formatDate(new Date(date.to)))
-                } else {
-                  setDateAsText('')
-                  setFieldValue(name, '')
-                }
-              }}
-            >
-              <span>Pick</span>
-            </DatePicker>
-          }
-        />
+        <>
+          <SheetSection>
+            <FormField_Shadcn_
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                        {description}
+                      </ReactMarkdown>
+                    ) : null
+                  }
+                >
+                  <FormControl_Shadcn_>
+                    <Popover_Shadcn_>
+                      <PopoverTrigger_Shadcn_ asChild>
+                        <Button
+                          type="outline"
+                          className="w-full justify-start text-left font-normal px-3 py-4"
+                          icon={<CalendarIcon className="h-4 w-4" />}
+                          size="small"
+                        >
+                          {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
+                        </Button>
+                      </PopoverTrigger_Shadcn_>
+                      <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            field.onChange(date?.toISOString())
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent_Shadcn_>
+                    </Popover_Shadcn_>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'string':
       return (
-        <Input
-          size="small"
-          layout="vertical"
-          id={name}
-          name={name}
-          disabled={disabled}
-          type={hidden ? 'password' : 'text'}
-          label={properties.title}
-          labelOptional={
-            properties.descriptionOptional ? (
-              <Markdown
-                content={properties.descriptionOptional}
-                className="text-foreground-lighter"
-              />
-            ) : null
-          }
-          descriptionText={
-            properties.description ? (
-              <Markdown content={properties.description} className="text-foreground-lighter" />
-            ) : null
-          }
-          actions={
-            !!properties.isSecret ? (
-              <Button
-                icon={hidden ? <Eye /> : <EyeOff />}
-                type="default"
-                onClick={() => setHidden(!hidden)}
-              />
-            ) : (
-              <span className="mr-3 text-foreground-lighter">
-                {properties.units ? (
-                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                    {properties.units}
-                  </ReactMarkdown>
-                ) : null}
-              </span>
-            )
-          }
-        />
+        <>
+          <SheetSection>
+            <FormField_Shadcn_
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <FormControl_Shadcn_ className="col-span-6">
+                    {properties.isSecret ? (
+                      <DataInput {...field} id={name} size="small" copy reveal />
+                    ) : (
+                      <Input_Shadcn_ {...field} id={name} />
+                    )}
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'multiline-string':
       return (
-        <Input.TextArea
-          size="small"
-          layout="vertical"
-          id={name}
-          name={name}
-          disabled={disabled}
-          type={hidden ? 'password' : 'text'}
-          label={properties.title}
-          labelOptional={
-            properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
-            ) : undefined
-          }
-          descriptionText={
-            properties.description ? (
-              <Markdown content={properties.description} className="text-foreground-lighter" />
-            ) : null
-          }
-          actions={
-            !!properties.isSecret ? (
-              <Button
-                icon={hidden ? <Eye /> : <EyeOff />}
-                type="default"
-                onClick={() => setHidden(!hidden)}
-              />
-            ) : (
-              <span className="mr-3 text-scale-900">
-                {properties.units ? (
-                  <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                    {properties.units}
-                  </ReactMarkdown>
-                ) : null}
-              </span>
-            )
-          }
-        />
+        <>
+          <SheetSection>
+            <FormField_Shadcn_
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <FormControl_Shadcn_ className="col-span-6">
+                    <Textarea
+                      {...field}
+                      id={name}
+                      rows={4}
+                      placeholder="Enter multi-line text"
+                      className="resize-none"
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'number':
       return (
-        <InputNumber
-          size="small"
-          layout="vertical"
-          id={name}
-          name={name}
-          disabled={disabled}
-          label={properties.title}
-          labelOptional={
-            properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
-            ) : null
-          }
-          descriptionText={
-            properties.description ? (
-              <Markdown content={properties.description} className="text-foreground-lighter" />
-            ) : null
-          }
-          actions={
-            <span className="mr-3 text-foreground-lighter">
-              {properties.units ? (
-                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                  {properties.units}
-                </ReactMarkdown>
-              ) : null}
-            </span>
-          }
-        />
+        <>
+          <SheetSection>
+            <FormField_Shadcn_
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <FormControl_Shadcn_ className="col-span-6">
+                    {properties.units ? (
+                      <InputGroup>
+                        <InputGroupAddon align="inline-end">
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {properties.units}
+                          </ReactMarkdown>
+                        </InputGroupAddon>
+                        <InputGroupInput
+                          {...field}
+                          id={name}
+                          type="number"
+                          onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                      </InputGroup>
+                    ) : (
+                      <Input_Shadcn_
+                        {...field}
+                        id={name}
+                        type="number"
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    )}
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'boolean':
       return (
-        <Toggle
-          size="small"
-          id={name}
-          name={name}
-          disabled={disabled}
-          label={
-            <div className="flex items-center gap-x-2">
-              <span>{properties.title}</span>
-              {properties.link && (
-                <a href={properties.link} target="_blank" rel="noreferrer noopener">
-                  <InfoTooltip side="bottom">Documentation</InfoTooltip>
-                </a>
+        <>
+          <SheetSection>
+            <FormField_Shadcn_
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    <div className="flex flex-col gap-1">
+                      {description ? <Markdown content={description} /> : null}
+                      {properties.link && (
+                        <span>
+                          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+                            <a href={properties.link} target="_blank" rel="noreferrer noopener">
+                              Documentation
+                            </a>
+                          </Button>
+                        </span>
+                      )}
+                    </div>
+                  }
+                >
+                  <FormControl_Shadcn_ className="col-span-6">
+                    <Switch
+                      id={name}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      size="small"
+                    />
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
               )}
-            </div>
-          }
-          descriptionText={
-            properties.description ? <Markdown content={properties.description} /> : null
-          }
-        />
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'select':
       return (
-        <Listbox
-          size="small"
-          name={name}
-          disabled={disabled}
-          label={properties.title}
-          descriptionText={
-            properties.description ? (
-              <ReactMarkdown
-                unwrapDisallowed
-                disallowedElements={['p']}
-                className="form-field-markdown"
-              >
-                {properties.description}
-              </ReactMarkdown>
-            ) : null
-          }
-          defaultValue={properties.enum[0]}
-        >
-          {properties.enum.map((option: Enum) => {
-            return (
-              <Listbox.Option
-                id={option.value}
-                key={option.value}
-                label={option.label}
-                value={option.value}
-                addOnBefore={() => {
-                  return option.icon ? (
-                    <img
-                      alt={`${option.label} icon`}
-                      className="h-6 w-6"
-                      src={`${BASE_PATH}/img/icons/${option.icon}`}
-                    />
-                  ) : null
-                }}
-              >
-                {option.label}
-              </Listbox.Option>
-            )
-          })}
-        </Listbox>
+        <>
+          <SheetSection>
+            <FormField_Shadcn_
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <ReactMarkdown
+                        unwrapDisallowed
+                        disallowedElements={['p']}
+                        className="form-field-markdown"
+                      >
+                        {description}
+                      </ReactMarkdown>
+                    ) : null
+                  }
+                >
+                  <FormControl_Shadcn_ className="col-span-6">
+                    <Select_Shadcn_
+                      defaultValue={properties.enum[0]}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger_Shadcn_>
+                        <SelectValue_Shadcn_ placeholder="Select an option" />
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
+                        {properties.enum.map((option: Enum) => (
+                          <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                            <span className="flex gap-2 items-center">
+                              {option.icon ? (
+                                <img
+                                  alt={`${option.label} icon`}
+                                  className="h-6 w-6"
+                                  src={`${BASE_PATH}/img/icons/${option.icon}`}
+                                />
+                              ) : null}
+                              {option.label}
+                            </span>
+                          </SelectItem_Shadcn_>
+                        ))}
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
+                  </FormControl_Shadcn_>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     default:
-      break
+      return null
   }
-
-  return null
 }
 
 export default FormField

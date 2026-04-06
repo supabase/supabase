@@ -1,5 +1,5 @@
 import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
-import { DropdownMenuItem, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import { cn, DropdownMenuItem, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 export const DropdownMenuItemTooltip = forwardRef<
   ElementRef<typeof DropdownMenuItem>,

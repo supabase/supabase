@@ -1,17 +1,16 @@
-import type { AnalyticsInterval } from 'data/analytics/constants'
-
-import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
-import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { fetchLogs } from 'data/reports/report.utils'
+import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
 import z from 'zod'
+
+import { ReportConfig, ReportDataProviderAttribute } from './reports.types'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformCategoricalCountData,
   transformStatusCodeData,
-} from 'components/interfaces/Reports/Reports.utils'
-import { AUTH_ERROR_CODES } from 'common/constants/auth-error-codes'
+} from '@/components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import type { AnalyticsInterval } from '@/data/analytics/constants'
+import { analyticsIntervalToGranularity, fetchLogs } from '@/data/reports/report.utils'
 
 const AUTH_ERROR_CODE_LIST = Object.entries(AUTH_ERROR_CODES).map(([key, value]) => ({
   key,
@@ -523,7 +522,6 @@ export const createUsageReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip:
         "Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid.",
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       dataProvider: async () => {
         const attributes = [
           { attribute: 'ActiveUsers', provider: 'logs', label: 'Auth Activity', enabled: true },
@@ -553,7 +551,6 @@ export const createUsageReportConfig = ({
       hideChartType: false,
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of sign in attempts by type.',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       dataProvider: async () => {
         const attributes = [
           {
@@ -608,7 +605,6 @@ export const createUsageReportConfig = ({
       hideChartType: false,
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of sign ups.',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       dataProvider: async () => {
         const attributes = [
           {
@@ -641,7 +637,6 @@ export const createUsageReportConfig = ({
       hideChartType: false,
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of password reset requests.',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       dataProvider: async () => {
         const attributes = [
           {
@@ -690,7 +685,6 @@ export const createErrorsReportConfig = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of auth errors by status code from the API Gateway.',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = AUTH_REPORT_SQL.ErrorsByStatus(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -716,7 +710,6 @@ export const createErrorsReportConfig = ({
     defaultChartStyle: 'line',
     titleTooltip:
       'The total number of auth errors by Supabase Auth error code from the API Gateway.',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = AUTH_REPORT_SQL.ErrorsByAuthCode(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -775,7 +768,6 @@ export const createLatencyReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip:
         'Basic processing time metrics for sign in operations within the auth server (excludes network latency).',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       dataProvider: async () => {
         const attributes = [
           {
@@ -816,7 +808,8 @@ export const createLatencyReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip:
         'Percentile processing time metrics for sign in operations within the auth server (excludes network latency).',
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
+      entitlement: 'auth',
+      requiredPlan: 'Pro',
       dataProvider: async () => {
         const attributes = [
           {
@@ -857,7 +850,6 @@ export const createLatencyReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip:
         'Basic processing time metrics for sign up operations within the auth server (excludes network latency).',
-      availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
       dataProvider: async () => {
         const attributes = [
           {
@@ -898,7 +890,8 @@ export const createLatencyReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip:
         'Percentile processing time metrics for sign up operations within the auth server (excludes network latency).',
-      availableIn: ['pro', 'team', 'enterprise', 'platform'],
+      entitlement: 'auth',
+      requiredPlan: 'Pro',
       dataProvider: async () => {
         const attributes = [
           {

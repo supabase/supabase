@@ -1,24 +1,22 @@
+import dayjs from 'dayjs'
 import { List, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { Card, cn, WarningIcon } from 'ui'
 
-import Panel from 'components/ui/Panel'
 import type { ChartHighlightAction } from './ChartHighlightActions'
-import { ComposedChart } from './ComposedChart'
-
-import { AnalyticsInterval, DataPoint } from 'data/analytics/constants'
-import { useInfraMonitoringQueries } from 'data/analytics/infra-monitoring-queries'
-import { InfraMonitoringAttribute } from 'data/analytics/infra-monitoring-query'
-import { useProjectDailyStatsQueries } from 'data/analytics/project-daily-stats-queries'
-import { ProjectDailyStatsAttribute } from 'data/analytics/project-daily-stats-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useChartHighlight } from './useChartHighlight'
-
-import dayjs from 'dayjs'
-import type { UpdateDateRange } from 'pages/project/[ref]/observability/database'
 import type { ChartData } from './Charts.types'
+import { ComposedChart } from './ComposedChart'
 import { MultiAttribute } from './ComposedChart.utils'
+import { useChartHighlight } from './useChartHighlight'
+import Panel from '@/components/ui/Panel'
+import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
+import { useInfraMonitoringQueries } from '@/data/analytics/infra-monitoring-queries'
+import { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
+import { useProjectDailyStatsQueries } from '@/data/analytics/project-daily-stats-queries'
+import { ProjectDailyStatsAttribute } from '@/data/analytics/project-daily-stats-query'
+import type { UpdateDateRange } from '@/pages/project/[ref]/observability/database'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export interface ComposedChartHandlerProps {
   id?: string
@@ -30,7 +28,7 @@ export interface ComposedChartHandlerProps {
   customDateFormat?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hideChartType?: boolean
-  data?: ChartData
+  data?: ChartData | DataPoint[]
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
@@ -39,6 +37,7 @@ export interface ComposedChartHandlerProps {
   showLegend?: boolean
   showTotal?: boolean
   showMaxValue?: boolean
+  normalizeVisibleStackToPercent?: boolean
   updateDateRange?: UpdateDateRange
   valuePrecision?: number
   isVisible?: boolean
@@ -134,12 +133,12 @@ const ComposedChartHandler = ({
     endDate,
     interval as AnalyticsInterval,
     databaseIdentifier,
-    data,
+    Array.isArray(data) ? undefined : data,
     isVisible
   )
 
   const combinedData = useMemo(() => {
-    if (data) return data
+    if (data) return Array.isArray(data) ? data : data.data
 
     const isLoading = attributeQueries.some((query: any) => query.isLoading)
     if (isLoading) return undefined

@@ -1,21 +1,20 @@
 import dayjs from 'dayjs'
 
-import {
-  isUnixMicro,
-  unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { AnalyticsInterval } from 'data/analytics/constants'
-import { get } from 'data/fetchers'
-import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig } from './reports.types'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { fetchLogs } from 'data/reports/report.utils'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformStatusCodeData,
-} from 'components/interfaces/Reports/Reports.utils'
+} from '@/components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { SelectFilters } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { AnalyticsInterval } from '@/data/analytics/constants'
+import { get } from '@/data/fetchers'
+import { analyticsIntervalToGranularity, fetchLogs } from '@/data/reports/report.utils'
 
 type EdgeFunctionReportFilters = {
   status_code: NumericFilter | null
@@ -213,7 +212,6 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations over time.',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.TotalInvocations(interval, filters)
       const response = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -245,7 +243,6 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function executions by status code.',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionStatusCodes(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
@@ -277,7 +274,6 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
-    availableIn: ['free', 'pro', 'team', 'enterprise', 'platform'],
     YAxisProps: {
       width: 50,
       tickFormatter: (value: number) => `${value}ms`,
@@ -339,7 +335,8 @@ export const edgeFunctionReports = ({
     hideChartType: false,
     defaultChartStyle: 'line',
     titleTooltip: 'The total number of edge function invocations by region.',
-    availableIn: ['pro', 'team', 'enterprise', 'platform'],
+    entitlement: 'edge_functions',
+    requiredPlan: 'Pro',
     dataProvider: async () => {
       const sql = METRIC_SQL.InvocationsByRegion(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)

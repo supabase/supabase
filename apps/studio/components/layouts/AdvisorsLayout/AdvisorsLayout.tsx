@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { withAuth } from 'hooks/misc/withAuth'
 import { ProjectLayout } from '../ProjectLayout'
 import { AdvisorsSidebarMenu } from './AdvisorsSidebarMenu'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 export interface AdvisorsLayoutProps {
   title?: string

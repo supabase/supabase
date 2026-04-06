@@ -5,7 +5,7 @@ import yaml from 'js-yaml'
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Button, cn } from 'ui'
-import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
@@ -15,7 +15,6 @@ interface McpConfigurationDisplayProps {
   clientConfig: McpClientConfig
   className?: string
   theme?: 'light' | 'dark'
-  basePath: string
   onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
   isPlatform?: boolean
@@ -28,13 +27,11 @@ export function McpConfigurationDisplay({
   clientConfig,
   className,
   theme = 'dark',
-  basePath,
   onCopyCallback,
   onInstallCallback,
   isPlatform,
 }: McpConfigurationDisplayProps) {
   const mcpButtonData = getMcpButtonData({
-    basePath,
     theme,
     client: selectedClient,
     clientConfig,
@@ -86,7 +83,7 @@ export function McpConfigurationDisplay({
             >
               <Image
                 src={mcpButtonData.imageSrc}
-                alt=""
+                alt={`${selectedClient.label} icon`}
                 width={16}
                 height={16}
                 className="shrink-0"

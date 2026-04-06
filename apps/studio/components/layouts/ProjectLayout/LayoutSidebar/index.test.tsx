@@ -1,12 +1,13 @@
 import { act, screen, waitFor } from '@testing-library/react'
+import { ResizablePanel, ResizablePanelGroup } from 'ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { sidebarManagerState } from 'state/sidebar-manager-state'
-import { render } from 'tests/helpers'
-import { routerMock } from 'tests/lib/route-mock'
-import { ResizablePanel, ResizablePanelGroup } from 'ui'
 import { LayoutSidebar } from './index'
 import { LayoutSidebarProvider, SIDEBAR_KEYS } from './LayoutSidebarProvider'
+import { MobileSheetProvider } from '@/components/layouts/Navigation/NavigationBar/MobileSheetContext'
+import { sidebarManagerState } from '@/state/sidebar-manager-state'
+import { render } from '@/tests/helpers'
+import { routerMock } from '@/tests/lib/route-mock'
 
 vi.mock('components/ui/AIAssistantPanel/AIAssistant', () => ({
   AIAssistant: () => <div data-testid="ai-assistant-sidebar">AI Assistant</div>,
@@ -104,12 +105,14 @@ describe('LayoutSidebar', () => {
 
   const renderSidebar = () =>
     render(
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel>
           <div />
         </ResizablePanel>
         <LayoutSidebarProvider>
-          <LayoutSidebar />
+          <MobileSheetProvider>
+            <LayoutSidebar />
+          </MobileSheetProvider>
         </LayoutSidebarProvider>
       </ResizablePanelGroup>
     )

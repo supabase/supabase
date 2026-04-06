@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { getPublicUrlForBucketObject } from 'data/storage/bucket-object-get-public-url-mutation'
-import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
-import { Bucket } from 'data/storage/buckets-query'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { StorageItem } from '../Storage.types'
+import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
+import { getPublicUrlForBucketObject } from '@/data/storage/bucket-object-get-public-url-mutation'
+import { signBucketObject } from '@/data/storage/bucket-object-sign-mutation'
+import { Bucket } from '@/data/storage/buckets-query'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 const DEFAULT_EXPIRY = 7 * 24 * 60 * 60 // in seconds, default to 1 week
 
@@ -43,8 +45,8 @@ export const useFetchFileUrlQuery = (
   { file, projectRef, bucket }: UseFileUrlQueryVariables,
   { ...options }: UseCustomQueryOptions<string, ResponseError> = {}
 ) => {
-  const { getPathAlongOpenedFolders } = useStorageExplorerStateSnapshot()
-  const pathToFile = getPathAlongOpenedFolders(false)
+  const { openedFolders, selectedBucket } = useStorageExplorerStateSnapshot()
+  const pathToFile = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
   const formattedPathToFile = [pathToFile, file?.name].join('/')
 
   return useQuery<string, ResponseError, string>({

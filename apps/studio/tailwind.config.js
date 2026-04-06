@@ -80,6 +80,9 @@ module.exports = config({
 
       animation: {
         shimmer: 'shimmer 2s infinite linear',
+        'badge-shimmer': 'badge-shimmer 3s ease-in-out infinite',
+        'badge-pulse': 'badge-pulse 3s ease-in-out infinite',
+        'chevron-up': 'chevron-up 2s ease-in-out infinite',
         sway: 'sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
@@ -91,6 +94,21 @@ module.exports = config({
             'background-position': '1000px 0',
           },
         },
+        'badge-shimmer': {
+          '0%': { transform: 'rotate(-45deg) translateX(-100%)', opacity: '0' },
+          '10%': { opacity: '1' },
+          '40%': { opacity: '1' },
+          '50%': { transform: 'rotate(-45deg) translateX(100%)', opacity: '0' },
+          '100%': { transform: 'rotate(-45deg) translateX(100%)', opacity: '0' },
+        },
+        'badge-pulse': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.8' },
+        },
+        'chevron-up': {
+          '0%, 100%': { opacity: '0.2' },
+          '50%': { opacity: '1' },
+        },
         sway: {
           '0%, 100%': {
             transform: 'rotate(-10deg) scale(1.5) translateY(4rem)',
@@ -98,12 +116,6 @@ module.exports = config({
           '50%': {
             transform: 'rotate(10deg) scale(1.5) translateY(2rem)',
           },
-        },
-        typewriter: {
-          from: { width: '0' },
-        },
-        'blink-caret': {
-          '50%': { borderColor: 'transparent' },
         },
       },
     },

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { cn, CodeBlock, Separator } from 'ui'
+import { cn, Separator } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { InfoTooltip } from '../info-tooltip'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
@@ -12,7 +13,6 @@ import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
 
 export interface McpConfigPanelProps {
-  basePath: string
   baseUrl?: string
   projectRef?: string
   initialSelectedClient?: McpClient
@@ -26,7 +26,6 @@ export interface McpConfigPanelProps {
 }
 
 export function McpConfigPanel({
-  basePath,
   projectRef,
   initialSelectedClient,
   onClientSelect,
@@ -109,7 +108,6 @@ export function McpConfigPanel({
           clients={MCP_CLIENTS}
           selectedClient={selectedClient}
           onClientChange={handleClientChange}
-          basePath={basePath}
           theme={theme}
         />
         <p className="text-xs text-foreground-lighter">
@@ -124,7 +122,6 @@ export function McpConfigPanel({
         <McpConfigurationDisplay
           className={innerPanelSpacing}
           theme={theme}
-          basePath={basePath}
           selectedClient={selectedClient}
           clientConfig={clientConfig}
           onCopyCallback={onCopyCallback}

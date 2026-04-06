@@ -1,29 +1,8 @@
-import pgMeta from '@supabase/pg-meta'
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { USER_SEARCH_INDEXES } from '@supabase/pg-meta'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from 'components/ui/AlertError'
-import { APIDocsButton } from 'components/ui/APIDocsButton'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useIndexWorkerStatusQuery } from 'data/auth/index-worker-status-query'
-import { authKeys } from 'data/auth/keys'
-import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
-import { useUserIndexStatusesQuery } from 'data/auth/user-search-indexes-query'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
 import {
   ExternalLinkIcon,
   InfoIcon,
@@ -75,7 +54,28 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { AlertError } from '@/components/ui/AlertError'
+import { APIDocsButton } from '@/components/ui/APIDocsButton'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useIndexWorkerStatusQuery } from '@/data/auth/index-worker-status-query'
+import { authKeys } from '@/data/auth/keys'
+import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
+import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
+import { useUsersCountQuery } from '@/data/auth/users-count-query'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
+import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
@@ -246,7 +246,7 @@ export const UsersV2 = () => {
   const userSearchIndexesAreValidAndReady =
     !isUserSearchIndexesError &&
     !isUserSearchIndexesLoading &&
-    userSearchIndexes?.length === pgMeta.USER_SEARCH_INDEXES.length &&
+    userSearchIndexes?.length === USER_SEARCH_INDEXES.length &&
     userSearchIndexes?.every((index) => index.is_valid && index.is_ready)
 
   /**
@@ -751,11 +751,11 @@ export const UsersV2 = () => {
         </div>
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizablePanelGroup
-          direction="horizontal"
+          orientation="horizontal"
           className="relative flex flex-grow bg-alternative min-h-0"
           autoSaveId="query-performance-layout-v1"
         >
-          <ResizablePanel defaultSize={1}>
+          <ResizablePanel>
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}

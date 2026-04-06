@@ -2,16 +2,17 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import { Button } from 'ui'
 
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ColumnForeignKeyProps {
+  tableId?: number
   column: ColumnField
   relations: ForeignKey[]
   closePanel: () => void
@@ -20,6 +21,7 @@ interface ColumnForeignKeyProps {
 }
 
 const ColumnForeignKey = ({
+  tableId,
   column,
   relations,
   closePanel,
@@ -29,7 +31,6 @@ const ColumnForeignKey = ({
   const { id: _id } = useParams()
   const [open, setOpen] = useState(false)
   const [selectedFk, setSelectedFk] = useState<ForeignKey>()
-
   const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -41,7 +42,7 @@ const ColumnForeignKey = ({
   const { data: table } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    id,
+    id: tableId ?? id,
   })
   const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
     return {

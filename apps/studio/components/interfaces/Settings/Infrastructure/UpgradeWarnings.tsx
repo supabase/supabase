@@ -1,15 +1,14 @@
+import { useParams } from 'common'
 import Link from 'next/link'
-
-import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
-import { useFlag, useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import { ProjectUpgradeEligibilityValidationError } from '@/data/config/project-upgrade-eligibility-query'
+import { DOCS_URL } from '@/lib/constants'
+
 export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: string }) => {
   const { ref } = useParams()
-  const unifiedReplication = useFlag('unifiedReplication')
 
   return (
     <Admonition
@@ -18,11 +17,9 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        unifiedReplication ? (
-          <Button asChild type="default">
-            <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
-          </Button>
-        ) : undefined
+        <Button asChild type="default">
+          <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
+        </Button>
       }
     />
   )
@@ -31,7 +28,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
 const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError): string => {
   switch (error.type) {
     case 'objects_depending_on_pg_cron':
-      return error.dependents.join(', ')
+      return (error.dependents ?? []).join(', ') || 'Objects depending on pg_cron'
     case 'indexes_referencing_ll_to_earth':
       return `${error.schema_name}.${error.index_name}`
     case 'function_using_obsolete_lang':

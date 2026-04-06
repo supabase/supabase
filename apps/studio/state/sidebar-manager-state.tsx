@@ -1,8 +1,9 @@
 import { LOCAL_STORAGE_KEYS } from 'common/constants'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { ReactNode, useEffect } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
+
+import useLatest from '@/hooks/misc/useLatest'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type SidebarHandlers = {
   onOpen?: () => void
@@ -32,6 +33,7 @@ type SidebarManagerState = SidebarManagerData & {
   closeSidebar: (id: string) => void
   isSidebarOpen: (id: string) => boolean
   closeActive: () => void
+  clearActiveSidebar: () => void
 }
 
 const INITIAL_SIDEBAR_MANAGER_DATA: SidebarManagerData = {
@@ -143,6 +145,10 @@ const createSidebarManagerState = () => {
     closeActive() {
       if (!state.activeSidebar) return
       state.activeSidebar?.onClose?.()
+      state.activeSidebar = undefined
+    },
+
+    clearActiveSidebar() {
       state.activeSidebar = undefined
     },
   })

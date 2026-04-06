@@ -1,11 +1,9 @@
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import dayjs from 'dayjs'
 import { Code, Play } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
-import { Badge, Button, ChartContainer, ChartTooltipContent, cn, CodeBlock } from 'ui'
+import { Badge, Button, ChartContainer, ChartTooltipContent, cn } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from '../ButtonTooltip'
@@ -14,6 +12,9 @@ import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
+import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -146,59 +147,62 @@ export const QueryBlock = ({
       label={label}
       badge={isWriteQuery && <Badge variant="warning">Write</Badge>}
       actions={
-        disabled ? null : (
-          <>
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<Code size={14} strokeWidth={1.5} />}
-              onClick={() => setShowSql(!showSql)}
-              tooltip={{
-                content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
-              }}
-            />
-            {hasResults && (
-              <BlockViewConfiguration
-                view={view}
-                isChart={view === 'chart'}
-                lockColumns={false}
-                chartConfig={chartSettings}
-                columns={Object.keys(results?.[0] ?? {})}
-                changeView={(nextView) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: { view: nextView } })
-                  setChartSettings({ ...chartSettings, view: nextView })
-                }}
-                updateChartConfig={(config) => {
-                  if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
-                  setChartSettings(config)
+        <>
+          {!disabled && (
+            <>
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Code size={14} strokeWidth={1.5} />}
+                onClick={() => setShowSql(!showSql)}
+                tooltip={{
+                  content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
                 }}
               />
-            )}
+              {hasResults && (
+                <BlockViewConfiguration
+                  view={view}
+                  isChart={view === 'chart'}
+                  lockColumns={false}
+                  chartConfig={chartSettings}
+                  columns={Object.keys(results?.[0] ?? {})}
+                  changeView={(nextView) => {
+                    if (onUpdateChartConfig)
+                      onUpdateChartConfig({ chartConfig: { view: nextView } })
+                    setChartSettings({ ...chartSettings, view: nextView })
+                  }}
+                  updateChartConfig={(config) => {
+                    if (onUpdateChartConfig) onUpdateChartConfig({ chartConfig: config })
+                    setChartSettings(config)
+                  }}
+                />
+              )}
 
-            <EditQueryButton id={id} title={label} sql={sql} />
-            <ButtonTooltip
-              type="text"
-              size="tiny"
-              className="w-7 h-7"
-              icon={<Play size={14} strokeWidth={1.5} />}
-              loading={isExecuting}
-              disabled={isExecuting || disabled || !sql}
-              onClick={runSelect}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  className: 'max-w-56 text-center',
-                  text: isExecuting
-                    ? 'Query is running. Check the SQL Editor to manage running queries.'
-                    : 'Run query',
-                },
-              }}
-            />
+              <EditQueryButton id={id} title={label} sql={sql} />
+              <ButtonTooltip
+                type="text"
+                size="tiny"
+                className="w-7 h-7"
+                icon={<Play size={14} strokeWidth={1.5} />}
+                loading={isExecuting}
+                disabled={isExecuting || disabled || !sql}
+                onClick={runSelect}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    className: 'max-w-56 text-center',
+                    text: isExecuting
+                      ? 'Query is running. Check the SQL Editor to manage running queries.'
+                      : 'Run query',
+                  },
+                }}
+              />
+            </>
+          )}
 
-            {actions}
-          </>
-        )
+          {actions}
+        </>
       }
     >
       {!!showWarning && !blockWriteQueries && (

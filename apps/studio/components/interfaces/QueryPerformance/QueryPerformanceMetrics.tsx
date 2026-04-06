@@ -1,15 +1,13 @@
-import React, { useMemo } from 'react'
-import { parseAsJson, useQueryStates } from 'nuqs'
 import { Info } from 'lucide-react'
+import { parseAsJson, useQueryStates } from 'nuqs'
+import React, { useMemo } from 'react'
+import { cn, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { Skeleton, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { useQueryPerformanceQuery } from './useQueryPerformanceQuery'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 
 export const QueryPerformanceMetrics = () => {
-  const { data: queryMetrics, isLoading } = useQueryPerformanceQuery({
-    preset: 'queryMetrics',
-  })
+  const { data: queryMetrics, isLoading } = useQueryPerformanceQuery({ preset: 'queryMetrics' })
 
   const [, setSearchParams] = useQueryStates({
     totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>

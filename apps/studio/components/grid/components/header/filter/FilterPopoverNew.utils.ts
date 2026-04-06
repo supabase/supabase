@@ -1,13 +1,14 @@
-import type { SupaColumn } from 'components/grid/types'
+import { format } from 'date-fns'
+import type { FilterProperty, OperatorDefinition } from 'ui-patterns'
+
+import type { Filter, SupaColumn } from '@/components/grid/types'
 import {
   isBoolColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
   isTimeColumn,
-} from 'components/grid/utils/types'
-import { format } from 'date-fns'
-import type { FilterProperty, OperatorDefinition } from 'ui-patterns'
+} from '@/components/grid/utils/types'
 
 // Check if column is a date/datetime/time type
 function isDateLikeColumn(column: SupaColumn): boolean {
@@ -50,12 +51,27 @@ const DATE_OPERATORS: OperatorDefinition[] = [
   { value: '<=', label: 'Less or equal', group: 'comparison' },
   { value: '=', label: 'Equals', group: 'comparison' },
   { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: 'is', label: 'Is', group: 'setNull' },
 ]
 
 const BOOLEAN_OPERATORS: OperatorDefinition[] = [
   { value: '=', label: 'Equals', group: 'comparison' },
   { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: 'is', label: 'Is', group: 'setNull' },
 ]
+
+export function isComplexValue(value: unknown): boolean {
+  return value !== null && value !== undefined && typeof value === 'object'
+}
+
+export function buildFilterFromCellValue(columnKey: string, value: unknown): Filter {
+  const isNullish = value === null || value === undefined
+  return {
+    column: columnKey,
+    operator: isNullish ? 'is' : '=',
+    value: isNullish ? 'null' : String(value),
+  }
+}
 
 export function columnToFilterProperty(column: SupaColumn): FilterProperty {
   // For enum columns, use the enum values as options

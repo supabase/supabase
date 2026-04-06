@@ -1,17 +1,20 @@
 import { compact, uniqBy } from 'lodash'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
+
 import 'react-contexify/dist/ReactContexify.css'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ChevronRight, ChevronsDown, ChevronsUp, Copy, Eye, FolderPlus } from 'lucide-react'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
+
 import {
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from '../Storage.constants'
+import { useStoragePreference } from './useStoragePreference'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface ColumnContextMenuProps {
   id: string
@@ -19,14 +22,31 @@ interface ColumnContextMenuProps {
 
 export const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
   const {
+    projectRef,
     columns,
     selectedItems,
     setSelectedItems,
-    setView,
-    setSortBy,
-    setSortByOrder,
+    setSelectedFilePreview,
+    refetchAllOpenedFolders,
     addNewFolderPlaceholder,
   } = useStorageExplorerStateSnapshot()
+  const {
+    setView,
+    setSortBy: setPreferenceSortBy,
+    setSortByOrder: setPreferenceSortByOrder,
+  } = useStoragePreference(projectRef)
+
+  const setSortBy = async (value: STORAGE_SORT_BY) => {
+    setPreferenceSortBy(value)
+    setSelectedFilePreview(undefined)
+    await refetchAllOpenedFolders()
+  }
+
+  const setSortByOrder = async (value: STORAGE_SORT_BY_ORDER) => {
+    setPreferenceSortByOrder(value)
+    setSelectedFilePreview(undefined)
+    await refetchAllOpenedFolders()
+  }
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 

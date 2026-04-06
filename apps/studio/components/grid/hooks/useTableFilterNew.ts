@@ -1,5 +1,5 @@
-import { Filter } from 'components/grid/types'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { Filter } from '@/components/grid/types'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 /**
  * Hook for managing table filters via the table editor state (snap).

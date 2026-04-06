@@ -5,12 +5,12 @@ import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { constructHeaders } from 'data/fetchers'
-import { detectOS } from 'lib/helpers'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { constructHeaders } from '@/data/fetchers'
+import { detectOS } from '@/lib/helpers'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
   id?: string
@@ -33,6 +33,7 @@ interface AIEditorProps {
   closeShortcutEnabled?: boolean
   openAIAssistantShortcutEnabled?: boolean
   executeQuery?: () => void
+  onMount?: (editor: monacoEditor.IStandaloneCodeEditor, monaco: Monaco) => void
 }
 
 // [Joshen] This has overlap with components/interfaces/SQLEditor/MonacoEditor
@@ -55,6 +56,7 @@ export const AIEditor = ({
   closeShortcutEnabled = true,
   openAIAssistantShortcutEnabled = true,
   executeQuery,
+  onMount,
 }: AIEditorProps) => {
   const os = detectOS()
   const { toggleSidebar } = useSidebarManagerSnapshot()
@@ -179,6 +181,7 @@ export const AIEditor = ({
   ) => {
     editorRef.current = editor
     monacoRef.current = monaco
+    onMount?.(editor, monaco)
     // Set prompt state to open if promptInput exists
     if (promptInput) {
       const model = editor.getModel()

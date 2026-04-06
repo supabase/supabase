@@ -1,18 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { FormSchema } from 'types'
 import {
   Button,
   CardContent,
@@ -28,7 +20,16 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { SpamValidation } from './SpamValidation'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { FormSchema } from '@/types'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -203,21 +204,6 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }, [authConfig, properties, messageSlug, form])
 
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [hasUnsavedChanges])
-
-  useEffect(() => {
     if (projectRef && id && !!authConfig) {
       const [subjectKey] = Object.keys(properties)
 
@@ -376,6 +362,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
           </>
         )}
       </form>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasChanges} />
     </Form_Shadcn_>
   )
 }

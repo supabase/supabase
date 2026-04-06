@@ -1,17 +1,41 @@
 import { toString as CronToString } from 'cronstrue'
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
 import z from 'zod'
 
-import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { cronPattern, secondsPattern } from '../CronJobs.constants'
+import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const convertCronToString = (schedule: string) => {
   // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
+  // original schedule when cronstrue throws.
+  // pg_cron uses '$' for "last day of month"; cronstrue uses 'L' — normalize before parsing.
   try {
-    return CronToString(schedule)
+    return CronToString(schedule.replace(/\$/g, 'L'))
   } catch (error) {
     return schedule
   }
+}
+
+const httpHeadersSchema = z.array(z.object({ name: z.string().trim(), value: z.string().trim() }))
+
+const addHttpHeaderIssues = (
+  rows: z.infer<typeof httpHeadersSchema>,
+  ctx: z.RefinementCtx,
+  pathPrefix: string[]
+) => {
+  getKeyValueFieldArrayValidationIssues({
+    rows,
+    keyFieldName: 'name',
+    valueFieldName: 'value',
+    keyRequiredMessage: 'Header name is required',
+    valueRequiredMessage: 'Header value is required',
+  }).forEach((issue) => {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: issue.message,
+      path: [...pathPrefix, ...issue.path],
+    })
+  })
 }
 
 const edgeFunctionSchema = z.object({
@@ -19,7 +43,7 @@ const edgeFunctionSchema = z.object({
   method: z.enum(['GET', 'POST']),
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
-  httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpHeaders: httpHeadersSchema,
   httpBody: z
     .string()
     .trim()
@@ -40,14 +64,13 @@ const edgeFunctionSchema = z.object({
 const httpRequestSchema = z.object({
   type: z.literal('http_request'),
   method: z.enum(['GET', 'POST']),
-  endpoint: z
-    .string()
-    .trim()
-    .min(1, 'Please provide a URL')
-    .regex(urlRegex(), 'Please provide a valid URL')
-    .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
+  endpoint: httpEndpointUrlSchema({
+    requiredMessage: 'Please provide a URL',
+    invalidMessage: 'Please provide a valid URL',
+    prefixMessage: 'Please prefix your URL with http:// or https://',
+  }),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
-  httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpHeaders: httpHeadersSchema,
   httpBody: z
     .string()
     .trim()
@@ -115,6 +138,10 @@ export const FormSchema = z
           path: ['schedule'],
         })
       }
+    }
+
+    if (data.values.type === 'edge_function' || data.values.type === 'http_request') {
+      addHttpHeaderIssues(data.values.httpHeaders, ctx, ['values', 'httpHeaders'])
     }
   })
 

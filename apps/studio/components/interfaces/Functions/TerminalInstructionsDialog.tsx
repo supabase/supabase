@@ -1,6 +1,6 @@
 import { parseAsString, useQueryState } from 'nuqs'
-
 import { Dialog, DialogContent, DialogSection, DialogTitle } from 'ui'
+
 import { TerminalInstructions } from './TerminalInstructions'
 
 export const TerminalInstructionsDialog = () => {
