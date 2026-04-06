@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import PreferencesPage from 'pages/account/me'
+import PreferencesPage from '@/pages/account/me'
 
 const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -10,8 +10,8 @@ const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile } = vi.hoisted((
   mockUseProfile: vi.fn(),
 }))
 
-vi.mock('lib/constants', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('lib/constants')
+vi.mock('@/lib/constants', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
   return {
     ...actual,
     get IS_PLATFORM() {
@@ -20,60 +20,60 @@ vi.mock('lib/constants', async () => {
   }
 })
 
-vi.mock('hooks/misc/useIsFeatureEnabled', () => ({
+vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))
 
-vi.mock('lib/profile', () => ({
+vi.mock('@/lib/profile', () => ({
   useProfile: mockUseProfile,
 }))
 
-vi.mock('components/layouts/AccountLayout/AccountLayout', () => ({
+vi.mock('@/components/layouts/AccountLayout/AccountLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
-vi.mock('components/layouts/AppLayout/AppLayout', () => ({
+vi.mock('@/components/layouts/AppLayout/AppLayout', () => ({
   AppLayout: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
-vi.mock('components/layouts/DefaultLayout', () => ({
+vi.mock('@/components/layouts/DefaultLayout', () => ({
   DefaultLayout: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/ProfileInformation', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/ProfileInformation', () => ({
   ProfileInformation: () => <div>ProfileInformation</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/AccountIdentities', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/AccountIdentities', () => ({
   AccountIdentities: () => <div>AccountIdentities</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/AccountConnections', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/AccountConnections', () => ({
   AccountConnections: () => <div>AccountConnections</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/ThemeSettings', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/ThemeSettings', () => ({
   ThemeSettings: () => <div>ThemeSettings</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/HotkeySettings', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/HotkeySettings', () => ({
   HotkeySettings: () => <div>HotkeySettings</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/DashboardSettings', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/DashboardSettings', () => ({
   DashboardSettings: () => <div>DashboardSettings</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/AnalyticsSettings', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/AnalyticsSettings', () => ({
   AnalyticsSettings: () => <div>AnalyticsSettings</div>,
 }))
 
-vi.mock('components/interfaces/Account/Preferences/AccountDeletion', () => ({
+vi.mock('@/components/interfaces/Account/Preferences/AccountDeletion', () => ({
   AccountDeletion: () => <div>AccountDeletion</div>,
 }))
 
-vi.mock('components/ui/AlertError', () => ({
+vi.mock('@/components/ui/AlertError', () => ({
   AlertError: () => <div>AlertError</div>,
 }))
 

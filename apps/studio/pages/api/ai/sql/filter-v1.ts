@@ -1,16 +1,17 @@
 import { generateText, Output } from 'ai'
 import { source } from 'common-tags'
-import { getModel } from 'lib/ai/model'
-import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
-import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
+
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import apiWrapper from '@/lib/api/apiWrapper'
 import {
   filterGroupSchemaForAI,
   requestSchema,
   serializeOperators,
   serializeOptions,
   validateFilterGroup,
-} from 'lib/api/filterHelpers'
-import { NextApiRequest, NextApiResponse } from 'next'
+} from '@/lib/api/filterHelpers'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

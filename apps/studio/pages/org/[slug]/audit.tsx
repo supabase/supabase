@@ -1,10 +1,3 @@
-import { AuditLogs } from 'components/interfaces/Organization/AuditLogs/AuditLogs'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { OrganizationSettingsLayout } from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
 import {
   PageHeader,
@@ -13,6 +6,14 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
+import { AuditLogs } from '@/components/interfaces/Organization/AuditLogs/AuditLogs'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgAuditLogs: NextPageWithLayout = () => {
   const { isPending: isLoadingPermissions } = usePermissionsQuery()

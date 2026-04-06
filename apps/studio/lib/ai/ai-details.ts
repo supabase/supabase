@@ -1,11 +1,11 @@
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { getProjectSettings } from 'data/config/project-settings-v2-query'
-import { checkEntitlement } from 'data/entitlements/entitlements-query'
-import { get } from 'data/fetchers'
-import { getOrganizations } from 'data/organizations/organizations-query'
-import { getProjectDetail } from 'data/projects/project-detail-query'
-import { getOrgSubscription } from 'data/subscriptions/org-subscription-query'
-import { getAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { getProjectSettings } from '@/data/config/project-settings-v2-query'
+import { checkEntitlement } from '@/data/entitlements/entitlements-query'
+import { get } from '@/data/fetchers'
+import { getOrganizations } from '@/data/organizations/organizations-query'
+import { getProjectDetail } from '@/data/projects/project-detail-query'
+import { getOrgSubscription } from '@/data/subscriptions/org-subscription-query'
+import { getAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export const getOrgAIDetails = async ({
   orgSlug,

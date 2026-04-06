@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
-import { ForgotPasswordWizard } from 'components/interfaces/SignIn/ForgotPasswordWizard'
-import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
-import type { NextPageWithLayout } from 'types'
+import { ForgotPasswordWizard } from '@/components/interfaces/SignIn/ForgotPasswordWizard'
+import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const ForgotPasswordPage: NextPageWithLayout = () => {
   return (

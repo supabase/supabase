@@ -1,16 +1,17 @@
 import { generateText, Output } from 'ai'
 import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
-import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails, getProjectAIDetails } from 'lib/ai/ai-details'
-import { IS_TRACING_ENABLED, isTracingAllowed } from 'lib/ai/braintrust-logger'
-import { getModel } from 'lib/ai/model'
-import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+
+import { rateMessageResponseSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
+import { IS_TRACING_ENABLED, isTracingAllowed } from '@/lib/ai/braintrust-logger'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
+import apiWrapper from '@/lib/api/apiWrapper'
 
 export const maxDuration = 30
 

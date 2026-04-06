@@ -2,35 +2,35 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getOrgAIDetails, getProjectAIDetails } from './ai-details'
 
-vi.mock('data/organizations/organizations-query', () => ({
+vi.mock('@/data/organizations/organizations-query', () => ({
   getOrganizations: vi.fn(),
 }))
 
-vi.mock('data/projects/project-detail-query', () => ({
+vi.mock('@/data/projects/project-detail-query', () => ({
   getProjectDetail: vi.fn(),
 }))
 
-vi.mock('data/subscriptions/org-subscription-query', () => ({
+vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   getOrgSubscription: vi.fn(),
 }))
 
-vi.mock('data/config/project-settings-v2-query', () => ({
+vi.mock('@/data/config/project-settings-v2-query', () => ({
   getProjectSettings: vi.fn(),
 }))
 
-vi.mock('hooks/misc/useOrgOptedIntoAi', () => ({
+vi.mock('@/hooks/misc/useOrgOptedIntoAi', () => ({
   getAiOptInLevel: vi.fn(),
 }))
 
-vi.mock('components/interfaces/Billing/Subscription/Subscription.utils', () => ({
+vi.mock('@/components/interfaces/Billing/Subscription/Subscription.utils', () => ({
   subscriptionHasHipaaAddon: vi.fn(),
 }))
 
-vi.mock('data/entitlements/entitlements-query', () => ({
+vi.mock('@/data/entitlements/entitlements-query', () => ({
   checkEntitlement: vi.fn(),
 }))
 
-vi.mock('data/fetchers', () => ({
+vi.mock('@/data/fetchers', () => ({
   get: vi.fn(),
 }))
 
@@ -48,13 +48,13 @@ describe('getOrgAIDetails', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    const orgsQuery = await import('data/organizations/organizations-query')
-    const subscriptionQuery = await import('data/subscriptions/org-subscription-query')
-    const aiHook = await import('hooks/misc/useOrgOptedIntoAi')
+    const orgsQuery = await import('@/data/organizations/organizations-query')
+    const subscriptionQuery = await import('@/data/subscriptions/org-subscription-query')
+    const aiHook = await import('@/hooks/misc/useOrgOptedIntoAi')
     const subscriptionUtils =
-      await import('components/interfaces/Billing/Subscription/Subscription.utils')
-    const entitlementsQuery = await import('data/entitlements/entitlements-query')
-    const fetchers = await import('data/fetchers')
+      await import('@/components/interfaces/Billing/Subscription/Subscription.utils')
+    const entitlementsQuery = await import('@/data/entitlements/entitlements-query')
+    const fetchers = await import('@/data/fetchers')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
     mockGetOrgSubscription = vi.mocked(subscriptionQuery.getOrgSubscription)
@@ -180,8 +180,8 @@ describe('getProjectAIDetails', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    const projectQuery = await import('data/projects/project-detail-query')
-    const settingsQuery = await import('data/config/project-settings-v2-query')
+    const projectQuery = await import('@/data/projects/project-detail-query')
+    const settingsQuery = await import('@/data/config/project-settings-v2-query')
 
     mockGetProjectDetail = vi.mocked(projectQuery.getProjectDetail)
     mockGetProjectSettings = vi.mocked(settingsQuery.getProjectSettings)

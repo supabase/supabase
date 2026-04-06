@@ -6,11 +6,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
 
-vi.mock('components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
+vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
 }))
 
-vi.mock('components/ui/ButtonTooltip', () => ({
+vi.mock('@/components/ui/ButtonTooltip', () => ({
   ButtonTooltip: ({
     icon,
     children,

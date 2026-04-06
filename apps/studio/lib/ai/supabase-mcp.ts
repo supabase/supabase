@@ -1,9 +1,9 @@
+import { createMCPClient } from '@ai-sdk/mcp'
 import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createSupabaseApiPlatform } from '@supabase/mcp-server-supabase/platform/api'
 import { StreamTransport } from '@supabase/mcp-utils'
-import { createMCPClient } from '@ai-sdk/mcp'
 
-import { API_URL } from 'lib/constants'
+import { API_URL } from '@/lib/constants'
 
 export async function createSupabaseMCPClient({
   accessToken,

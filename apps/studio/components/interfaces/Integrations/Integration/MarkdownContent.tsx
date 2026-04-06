@@ -17,7 +17,7 @@ export const MarkdownContent = ({
   const [isExpanded, setIsExpanded] = useState(initiallyExpanded ?? false)
 
   useEffect(() => {
-    import(`static-data/integrations/${integrationId}/overview.md`)
+    import(`@/static-data/integrations/${integrationId}/overview.md`)
       .then((module) => setContent(String(module.default)))
       .catch((error) => console.error('Error loading markdown:', error))
   }, [integrationId])

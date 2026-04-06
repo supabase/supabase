@@ -16,26 +16,26 @@ const mockToastError = vi.fn()
 const mockFetchQuery = vi.fn()
 
 // Setup mocks before imports
-vi.mock('data/query-client', () => ({
+vi.mock('@/data/query-client', () => ({
   getQueryClient: () => ({
     fetchQuery: mockFetchQuery,
   }),
 }))
 
-vi.mock('data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-query', () => ({
   executeSql: (...args: unknown[]) => mockExecuteSql(...args),
 }))
 
-vi.mock('data/tables/table-retrieve-query', () => ({
+vi.mock('@/data/tables/table-retrieve-query', () => ({
   getTable: (...args: unknown[]) => mockGetTable(...args),
   getTableQuery: (...args: unknown[]) => mockGetTable(...args),
 }))
 
-vi.mock('data/telemetry/send-event-mutation', () => ({
+vi.mock('@/data/telemetry/send-event-mutation', () => ({
   sendEvent: (...args: unknown[]) => mockSendEvent(...args),
 }))
 
-vi.mock('data/prefetchers/project.$ref.editor.$id', () => ({
+vi.mock('@/data/prefetchers/project.$ref.editor.$id', () => ({
   prefetchEditorTablePage: (...args: unknown[]) => mockPrefetchEditorTablePage(...args),
 }))
 
@@ -48,7 +48,7 @@ vi.mock('sonner', () => ({
 }))
 
 // Mock SparkBar component used in toast
-vi.mock('components/ui/SparkBar', () => ({
+vi.mock('@/components/ui/SparkBar', () => ({
   default: () => null,
 }))
 

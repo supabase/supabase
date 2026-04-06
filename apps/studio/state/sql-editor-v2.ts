@@ -1,7 +1,6 @@
 import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import type { SqlSnippets } from 'types'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
@@ -13,6 +12,7 @@ import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutatio
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
 import { getQueryClient } from '@/data/query-client'
+import type { SqlSnippets } from '@/types'
 
 type StateSnippetFolder = {
   projectRef: string
