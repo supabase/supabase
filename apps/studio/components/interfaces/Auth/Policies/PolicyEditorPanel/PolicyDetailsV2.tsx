@@ -170,7 +170,7 @@ export const PolicyDetailsV2 = ({
                       >
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Find a table..." />
-                          <CommandList_Shadcn_>
+                          <CommandList_Shadcn_ onWheel={(event) => event.stopPropagation()}>
                             <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
                             <CommandGroup_Shadcn_>
                               <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
