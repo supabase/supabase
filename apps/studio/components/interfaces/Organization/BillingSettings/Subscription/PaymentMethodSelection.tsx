@@ -26,6 +26,7 @@ import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organi
 import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
@@ -37,6 +38,9 @@ export interface PaymentMethodSelectionProps {
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
   readOnly: boolean
+  onAddressChange?: (address: CustomerAddress) => void
+  onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  onUseAsDefaultBillingAddressChange?: (useAsDefault: boolean) => void
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -45,6 +49,9 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     onSelectPaymentMethod,
     layout = 'vertical',
     readOnly,
+    onAddressChange,
+    onTaxIdChange,
+    onUseAsDefaultBillingAddressChange,
   }: PaymentMethodSelectionProps,
   ref
 ) {
@@ -281,6 +288,8 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 customerName={customerProfile?.billing_name}
                 currentAddress={customerProfile?.address}
                 currentTaxId={taxId}
+                onAddressChange={onAddressChange}
+                onTaxIdChange={onTaxIdChange}
               />
             </Elements>
 
@@ -290,7 +299,11 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 <Checkbox_Shadcn_
                   id="defaultBillingAddress"
                   checked={useAsDefaultBillingAddress}
-                  onCheckedChange={() => setUseAsDefaultBillingAddress(!useAsDefaultBillingAddress)}
+                  onCheckedChange={() => {
+                    const next = !useAsDefaultBillingAddress
+                    setUseAsDefaultBillingAddress(next)
+                    onUseAsDefaultBillingAddressChange?.(next)
+                  }}
                 />
                 <label
                   htmlFor="defaultBillingAddress"
