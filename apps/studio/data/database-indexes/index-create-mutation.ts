@@ -17,12 +17,18 @@ export type DatabaseIndexCreateVariables = {
   }
 }
 
+const VALID_INDEX_TYPES = ['btree', 'hash', 'gist', 'spgist', 'gin', 'brin']
+
 export async function createDatabaseIndex({
   projectRef,
   connectionString,
   payload,
 }: DatabaseIndexCreateVariables) {
   const { schema, entity, type, columns } = payload
+
+  if (!VALID_INDEX_TYPES.includes(type)) {
+    throw new Error(`Invalid index type: ${type}`)
+  }
 
   const sql = `
   CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${type} (${columns
