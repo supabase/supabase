@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { getOrRefreshTemporaryApiKey } from 'data/api-keys/temp-api-keys-utils'
+
+import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
 
 /**
  * Creates a Supabase client bound to a specific project. It uses temporary API key.

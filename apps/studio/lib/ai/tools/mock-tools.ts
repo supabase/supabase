@@ -1,8 +1,9 @@
-import { tool, type ToolSet } from 'ai'
-import { getStudioTools } from '../tools/studio-tools'
-import { z } from 'zod'
-import { getMcpTools } from 'lib/ai/tools/mcp-tools'
 import assert from 'node:assert'
+import { tool, type ToolSet } from 'ai'
+import { z } from 'zod'
+
+import { getStudioTools } from '../tools/studio-tools'
+import { getMcpTools } from '@/lib/ai/tools/mcp-tools'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),

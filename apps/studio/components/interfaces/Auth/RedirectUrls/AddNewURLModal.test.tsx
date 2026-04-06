@@ -1,10 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
-import { render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AddNewURLModal } from './AddNewURLModal'
+import { render } from '@/tests/helpers'
 
 const { mutateMock, useAuthConfigUpdateMutationMock } = vi.hoisted(() => ({
   mutateMock: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock(import('common'), async (importOriginal) => {
   }
 })
 
-vi.mock('data/auth/auth-config-update-mutation', () => ({
+vi.mock('@/data/auth/auth-config-update-mutation', () => ({
   useAuthConfigUpdateMutation: useAuthConfigUpdateMutationMock,
 }))
 

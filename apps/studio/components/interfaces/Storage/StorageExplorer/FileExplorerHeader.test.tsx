@@ -20,17 +20,17 @@ const {
   mockUseStoragePreference: vi.fn(),
 }))
 
-vi.mock('lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
-vi.mock('state/storage-explorer', () => ({
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
+vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => mockUseStorageExplorerStateSnapshot(),
 }))
-vi.mock('hooks/misc/useCheckPermissions', () => ({
+vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
 }))
-vi.mock('components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useIsAPIDocsSidePanelEnabled: () => mockIsAPIDocsSidePanelEnabled(),
 }))
-vi.mock('components/ui/APIDocsButton', () => ({
+vi.mock('@/components/ui/APIDocsButton', () => ({
   APIDocsButton: () => null,
 }))
 vi.mock('./useStoragePreference', () => ({

@@ -32,7 +32,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/project/default/editor/1',
 }))
 
-vi.mock('state/tabs', () => ({
+vi.mock('@/state/tabs', () => ({
   useTabsStateSnapshot: () => mockTabsState,
 }))
 

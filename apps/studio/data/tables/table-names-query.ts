@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import type { UseCustomQueryOptions } from 'types'
 
 import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableKeys } from './keys'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type TableName = {
   id: number

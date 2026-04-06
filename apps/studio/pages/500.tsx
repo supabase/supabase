@@ -1,14 +1,14 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { NextPage } from 'next'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSignOut } from 'lib/auth'
 import { Button } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSignOut } from '@/lib/auth'
 
 const Error500: NextPage = () => {
   const router = useRouter()

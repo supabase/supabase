@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/nextjs'
-import { ResponseError } from 'types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { captureCriticalError } from './error-reporting'
+import { ResponseError } from '@/types'
 
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
