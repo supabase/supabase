@@ -9,17 +9,17 @@ interface NoProjectsOnPaidOrgInfoProps {
 }
 
 export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
-  const { data } = useOrgProjectsInfiniteQuery({ slug: organization?.slug })
+  const { data } = useOrgProjectsInfiniteQuery(
+    { slug: organization?.slug },
+    {
+      enabled:
+        organization != null &&
+        !['free', 'platform', 'enterprise'].includes(organization.plan.id ?? ''),
+    }
+  )
   const projectCount = data?.pages[0].pagination.count ?? 0
 
-  if (
-    projectCount > 0 ||
-    organization?.plan === undefined ||
-    organization.plan.id === 'free' ||
-    organization.plan.id === 'enterprise' ||
-    organization.plan.id === 'platform'
-  )
-    return null
+  if (projectCount > 0 || !organization) return null
 
   return (
     <Admonition
