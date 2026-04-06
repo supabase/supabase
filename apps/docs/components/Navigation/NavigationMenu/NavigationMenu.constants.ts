@@ -270,6 +270,14 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             community: true,
             enabled: sdkKotlinEnabled,
           },
+          {
+            label: 'Elixir',
+            icon: 'reference-elixir',
+            href: '/reference/elixir' as `/${string}`,
+            level: 'reference_elixir',
+            community: true,
+            enabled: sdkElixirEnabled,
+          },
         ],
         [
           {

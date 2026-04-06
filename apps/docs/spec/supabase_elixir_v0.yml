@@ -1450,7 +1450,7 @@ functions:
   - id: get-user
     title: "Retrieve a user"
     description: |
-      Gets the current user details from the session or by access token.
+      Gets the current user details using a session.
     notes: |
       - Returns `{:ok, %Supabase.Auth.User{}}` on success or `{:error, reason}` on failure.
     params:
@@ -1458,33 +1458,35 @@ functions:
         isOptional: false
         type: Supabase.Client.t()
         description: The Supabase client instance
-      - name: jwt
-        isOptional: true
-        type: String.t()
-        description: An optional JWT access token (uses session token if not provided)
+      - name: session
+        isOptional: false
+        type: Supabase.Auth.Session.t()
+        description: The user's current session
     examples:
       - id: get-current-user
         name: Get current user
         code: |
           ```elixir
-          {:ok, user} = Supabase.Auth.get_user(client)
+          {:ok, user} = Supabase.Auth.get_user(client, session)
           ```
 
   - id: update-user
     title: "Update a user"
     description: |
       Updates the current user's attributes (email, password, metadata, etc.).
+      Accepts either a `Plug.Conn` or `Phoenix.LiveView.Socket` as the connection parameter.
     notes: |
-      - Returns `{:ok, %Supabase.Auth.User{}}` on success or `{:error, reason}` on failure.
+      - Returns `{:ok, conn}` on success (with updated session) or `{:error, reason}` on failure.
+      - The `conn` parameter can be a `Plug.Conn.t()` or `Phoenix.LiveView.Socket.t()`.
     params:
       - name: client
         isOptional: false
         type: Supabase.Client.t()
         description: The Supabase client instance
-      - name: access_token
+      - name: conn
         isOptional: false
-        type: String.t()
-        description: The user's access token
+        type: Plug.Conn.t() | Phoenix.LiveView.Socket.t()
+        description: The current connection (Plug conn or LiveView socket)
       - name: attrs
         isOptional: false
         type: map()
@@ -1507,7 +1509,7 @@ functions:
         name: Update user email
         code: |
           ```elixir
-          {:ok, user} = Supabase.Auth.update_user(client, access_token, %{
+          {:ok, conn} = Supabase.Auth.update_user(client, conn, %{
             email: "newemail@example.com"
           })
           ```
@@ -1574,37 +1576,32 @@ functions:
     description: |
       Resends an OTP email or SMS to the user.
     notes: |
-      - Returns `{:ok, map()}` on success or `{:error, reason}` on failure.
+      - Returns `:ok` on success or `{:error, reason}` on failure.
     params:
       - name: client
         isOptional: false
         type: Supabase.Client.t()
         description: The Supabase client instance
-      - name: credentials
+      - name: email
         isOptional: false
-        type: map()
+        type: String.t()
+        description: The user's email address
+      - name: resend_params
+        isOptional: false
+        type: Supabase.Auth.Schemas.ResendParams.t()
         description: The resend parameters
         subContent:
           - name: type
             isOptional: false
             type: atom()
-            description: "The type of OTP to resend (e.g., `:signup`, `:sms`)"
-          - name: email
-            isOptional: true
-            type: String.t()
-            description: The user's email
-          - name: phone
-            isOptional: true
-            type: String.t()
-            description: The user's phone number
+            description: "The type of OTP to resend (e.g., `:signup`, `:sms`, `:email_change`)"
     examples:
       - id: resend-otp
         name: Resend signup confirmation
         code: |
           ```elixir
-          {:ok, _} = Supabase.Auth.resend(client, %{
-            type: :signup,
-            email: "user@example.com"
+          :ok = Supabase.Auth.resend(client, "user@example.com", %ResendParams{
+            type: :signup
           })
           ```
 
@@ -2587,32 +2584,33 @@ functions:
   - id: from-upload
     title: "Upload a file"
     description: |
-      Uploads a file to a storage bucket.
+      Uploads a file to a storage bucket. First create a bucket-scoped storage reference with `Storage.from/2`, then call `upload/4` on it.
     notes: |
       - Returns `{:ok, map()}` on success (includes the file key) or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
+      - name: file_path
         isOptional: false
-        type: String.t()
-        description: The bucket ID
-      - name: path
+        type: Path.t()
+        description: The local file path on disk
+      - name: object_path
         isOptional: false
-        type: String.t()
-        description: The file path within the bucket
-      - name: file
-        isOptional: false
-        type: String.t() | binary()
-        description: The file path on disk or binary content
+        type: Path.t()
+        description: The destination path within the bucket
+      - name: options
+        isOptional: true
+        type: Enumerable.t()
+        description: Upload options (e.g., content type, cache control)
     examples:
       - id: upload-file
         name: Upload a file
         code: |
           ```elixir
-          {:ok, result} = Supabase.Storage.File.upload(client, "avatars", "public/avatar.png", "/path/to/avatar.png")
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, result} = Supabase.Storage.File.upload(storage, "/path/to/avatar.png", "public/avatar.png")
           ```
 
   - id: from-download
@@ -2622,24 +2620,30 @@ functions:
     notes: |
       - Returns `{:ok, binary()}` on success (the file contents) or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
-        isOptional: false
-        type: String.t()
-        description: The bucket ID
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
       - name: path
         isOptional: false
-        type: String.t()
+        type: Path.t()
         description: The file path within the bucket
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Download options
+        subContent:
+          - name: transform
+            isOptional: true
+            type: Enumerable.t() | nil
+            description: Image transformation options
     examples:
       - id: download-file
         name: Download a file
         code: |
           ```elixir
-          {:ok, binary} = Supabase.Storage.File.download(client, "avatars", "public/avatar.png")
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, binary} = Supabase.Storage.File.download(storage, "public/avatar.png")
           ```
 
   - id: from-list
@@ -2649,23 +2653,19 @@ functions:
     notes: |
       - Returns `{:ok, [map()]}` on success (list of file metadata) or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
-        isOptional: false
-        type: String.t()
-        description: The bucket ID
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
+      - name: prefix
+        isOptional: true
+        type: Path.t() | nil
+        description: Filter by path prefix
       - name: options
         isOptional: true
-        type: keyword()
+        type: Enumerable.t()
         description: List options
         subContent:
-          - name: prefix
-            isOptional: true
-            type: String.t()
-            description: Filter by path prefix
           - name: limit
             isOptional: true
             type: integer()
@@ -2679,7 +2679,8 @@ functions:
         name: List files in a bucket
         code: |
           ```elixir
-          {:ok, files} = Supabase.Storage.File.list(client, "avatars", prefix: "public/")
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, files} = Supabase.Storage.File.list(storage, "public/")
           ```
 
   - id: from-update
@@ -2689,80 +2690,103 @@ functions:
     notes: |
       - Returns `{:ok, map()}` on success (includes the file key) or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
+      - name: file_path
         isOptional: false
-        type: String.t()
-        description: The bucket ID
-      - name: path
+        type: Path.t()
+        description: The new local file path on disk
+      - name: object_path
         isOptional: false
-        type: String.t()
-        description: The file path within the bucket
-      - name: file
-        isOptional: false
-        type: String.t() | binary()
-        description: The new file path on disk or binary content
+        type: Path.t()
+        description: The destination path within the bucket
+      - name: options
+        isOptional: true
+        type: Enumerable.t()
+        description: Upload options (e.g., content type, cache control)
     examples:
       - id: update-file
         name: Replace a file
         code: |
           ```elixir
-          {:ok, result} = Supabase.Storage.File.update(client, "avatars", "public/avatar.png", "/path/to/new-avatar.png")
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, result} = Supabase.Storage.File.update(storage, "/path/to/new-avatar.png", "public/avatar.png")
           ```
 
   - id: from-move
     title: "Move an existing file"
     description: |
-      Moves a file from one path to another within the same bucket.
+      Moves a file from one path to another within the same bucket or to a different bucket.
     notes: |
-      - Returns `{:ok, map()}` on success or `{:error, reason}` on failure.
+      - Returns `{:ok, :moved}` on success or `{:error, reason}` on failure.
     params:
-      - name: source
+      - name: storage
         isOptional: false
-        type: map()
-        description: Source file reference (bucket + path)
-      - name: destination
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
+      - name: options
         isOptional: false
-        type: map()
-        description: Destination file reference (bucket + path)
+        type: keyword()
+        description: Move options
+        subContent:
+          - name: from
+            isOptional: false
+            type: Path.t()
+            description: Source file path
+          - name: to
+            isOptional: false
+            type: Path.t()
+            description: Destination file path
+          - name: destination_bucket
+            isOptional: true
+            type: String.t() | nil
+            description: Target bucket (defaults to the same bucket)
     examples:
       - id: move-file
         name: Move a file
         code: |
           ```elixir
-          {:ok, _} = Supabase.Storage.File.move(
-            %{bucket: "avatars", path: "old/avatar.png"},
-            %{bucket: "avatars", path: "new/avatar.png"}
-          )
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, :moved} = Supabase.Storage.File.move(storage, from: "old/avatar.png", to: "new/avatar.png")
           ```
 
   - id: from-copy
     title: "Copy an existing file"
     description: |
-      Copies a file from one path to another.
+      Copies a file from one path to another within the same bucket or to a different bucket.
     notes: |
-      - Returns `{:ok, map()}` on success or `{:error, reason}` on failure.
+      - Returns `{:ok, :moved}` on success or `{:error, reason}` on failure.
     params:
-      - name: source
+      - name: storage
         isOptional: false
-        type: map()
-        description: Source file reference (bucket + path)
-      - name: destination
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
+      - name: options
         isOptional: false
-        type: map()
-        description: Destination file reference (bucket + path)
+        type: keyword()
+        description: Copy options
+        subContent:
+          - name: from
+            isOptional: false
+            type: Path.t()
+            description: Source file path
+          - name: to
+            isOptional: false
+            type: Path.t()
+            description: Destination file path
+          - name: destination_bucket
+            isOptional: true
+            type: String.t() | nil
+            description: Target bucket (defaults to the same bucket)
     examples:
       - id: copy-file
         name: Copy a file
         code: |
           ```elixir
-          {:ok, _} = Supabase.Storage.File.copy(
-            %{bucket: "avatars", path: "original.png"},
-            %{bucket: "avatars", path: "backup/original.png"}
-          )
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, :moved} = Supabase.Storage.File.copy(storage, from: "original.png", to: "backup/original.png")
           ```
 
   - id: from-remove
@@ -2772,20 +2796,21 @@ functions:
     notes: |
       - Returns `{:ok, [map()]}` on success or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
       - name: paths
         isOptional: false
-        type: "[String.t()]"
-        description: List of file paths to delete
+        type: "[Path.t()]"
+        description: List of file paths to delete (or a single path string)
     examples:
       - id: remove-files
         name: Delete files
         code: |
           ```elixir
-          {:ok, _} = Supabase.Storage.File.remove(client, ["public/avatar.png", "public/old.png"])
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, _} = Supabase.Storage.File.remove(storage, ["public/avatar.png", "public/old.png"])
           ```
 
   - id: from-create-signed-url
@@ -2795,28 +2820,38 @@ functions:
     notes: |
       - Returns `{:ok, String.t()}` on success (the signed URL) or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
-        isOptional: false
-        type: String.t()
-        description: The bucket ID
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
       - name: path
         isOptional: false
-        type: String.t()
+        type: Path.t()
         description: The file path
-      - name: expires_in
-        isOptional: false
-        type: integer()
-        description: Expiration time in seconds
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Signed URL options
+        subContent:
+          - name: expires_in
+            isOptional: false
+            type: integer()
+            description: Expiration time in seconds
+          - name: download
+            isOptional: true
+            type: boolean() | String.t() | nil
+            description: Set to trigger a download or provide a custom filename
+          - name: transform
+            isOptional: true
+            type: Enumerable.t() | nil
+            description: Image transformation options
     examples:
       - id: create-signed-url
         name: Create a signed URL
         code: |
           ```elixir
-          {:ok, url} = Supabase.Storage.File.create_signed_url(client, "avatars", "private/avatar.png", 3600)
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, url} = Supabase.Storage.File.create_signed_url(storage, "private/avatar.png", expires_in: 3600)
           ```
 
   - id: from-create-signed-urls
@@ -2824,30 +2859,36 @@ functions:
     description: |
       Creates signed URLs for multiple files in a single request.
     notes: |
-      - Returns `{:ok, [String.t()]}` on success (list of signed URLs) or `{:error, reason}` on failure.
+      - Returns `{:ok, [%{path: String.t(), signed_url: String.t(), error: term() | nil}]}` on success or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
-        isOptional: false
-        type: String.t()
-        description: The bucket ID
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
       - name: paths
         isOptional: false
-        type: "[String.t()]"
+        type: "[Path.t()]"
         description: List of file paths
-      - name: expires_in
-        isOptional: false
-        type: integer()
-        description: Expiration time in seconds
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: Signed URL options
+        subContent:
+          - name: expires_in
+            isOptional: false
+            type: integer()
+            description: Expiration time in seconds
+          - name: download
+            isOptional: true
+            type: boolean() | String.t() | nil
+            description: Set to trigger a download or provide a custom filename
     examples:
       - id: create-signed-urls
         name: Create multiple signed URLs
         code: |
           ```elixir
-          {:ok, urls} = Supabase.Storage.File.create_signed_urls(client, "avatars", ["a.png", "b.png"], 3600)
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, urls} = Supabase.Storage.File.create_signed_urls(storage, ["a.png", "b.png"], expires_in: 3600)
           ```
 
   - id: from-get-public-url
@@ -2855,26 +2896,36 @@ functions:
     description: |
       Returns the public URL of a file in a public bucket.
     notes: |
-      - Returns `String.t()` — the public URL. This is a pure function and does not make a network request.
+      - Returns `{:ok, String.t()}` on success (the public URL) or `{:error, reason}` on failure.
     params:
-      - name: client
+      - name: storage
         isOptional: false
-        type: Supabase.Client.t()
-        description: The Supabase client instance
-      - name: bucket_id
-        isOptional: false
-        type: String.t()
-        description: The bucket ID
+        type: Supabase.Storage.t()
+        description: A bucket-scoped storage reference created via `Supabase.Storage.from(client, bucket_id)`
       - name: path
         isOptional: false
-        type: String.t()
+        type: Path.t()
         description: The file path
+      - name: options
+        isOptional: true
+        type: keyword()
+        description: URL options
+        subContent:
+          - name: download
+            isOptional: true
+            type: boolean() | String.t() | nil
+            description: Set to trigger a download or provide a custom filename
+          - name: transform
+            isOptional: true
+            type: Enumerable.t() | nil
+            description: Image transformation options
     examples:
       - id: get-public-url
         name: Get public URL
         code: |
           ```elixir
-          url = Supabase.Storage.File.get_public_url(client, "avatars", "public/avatar.png")
+          storage = Supabase.Storage.from(client, "avatars")
+          {:ok, url} = Supabase.Storage.File.get_public_url(storage, "public/avatar.png")
           ```
 
   # ──────────────────────────────────────────────────
