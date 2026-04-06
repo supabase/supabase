@@ -2,15 +2,12 @@ import Link from 'next/link'
 import { Admonition } from 'ui-patterns'
 
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import type { Organization } from '@/types'
-
-interface NoProjectsOnPaidOrgInfoProps {
-  organization?: Organization
-}
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const EXCLUDED_PLANS = ['free', 'platform', 'enterprise']
 
-export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
+export const NoProjectsOnPaidOrgInfo = () => {
+  const { data: organization } = useSelectedOrganizationQuery()
   const isEligible = organization != null && !EXCLUDED_PLANS.includes(organization.plan.id ?? '')
 
   const { data } = useOrgProjectsInfiniteQuery(
