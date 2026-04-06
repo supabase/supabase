@@ -147,10 +147,10 @@ Do not delete `data.bak.pg15` until you have verified the upgrade. Rollback is o
 
 ### Rollback
 
-If you need to revert to Postgres 15:
+If you need to revert to Postgres 15 (run the following commands as root):
 
 ```sh
-docker compose down && \
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml down && \
 rm -rf ./volumes/db/data && \
 mv ./volumes/db/data.bak.pg15 ./volumes/db/data && \
 docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/ && \
@@ -181,6 +181,12 @@ Restart to apply (`max_connections` requires a full restart):
 
 ```sh
 docker compose -f docker-compose.yml -f docker-compose.pg17.yml restart db
+```
+
+Verify the new settings:
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml exec db psql -U postgres -c "SHOW max_connections;"
 ```
 
 ### Upgrade process details
@@ -291,7 +297,7 @@ If the upgrade fails and the script's built-in rollback isn't sufficient, restor
 Restore the data:
 
 ```sh
-docker compose down && \
+docker compose -f docker-compose.yml -f docker-compose.pg17.yml down && \
 rm -rf ./volumes/db/data && \
 cp -a ./volumes/db/data-manual-backup ./volumes/db/data
 ```
