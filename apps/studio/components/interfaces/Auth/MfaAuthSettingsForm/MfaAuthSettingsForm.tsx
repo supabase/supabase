@@ -14,7 +14,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -25,6 +24,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -506,12 +506,14 @@ export const MfaAuthSettingsForm = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Phone verification message"
-                        description="To format the OTP code use `{{ .Code }}`"
+                        description="To format the OTP code use `{{ .Code }}`. Newlines are supported for WebOTP API compatibility."
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="text"
+                          <Textarea
                             {...field}
+                            rows={4}
+                            placeholder="Your code is {{ .Code }}"
+                            className="resize-none"
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                           />
                         </FormControl_Shadcn_>
