@@ -58,7 +58,7 @@ jobs:
             -H "Authorization: Bearer $BEARER_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{"issue_id": $NUMBER}')
-          echo "spam_response=$RESPONSE" >> $GITHUB_OUTPUT
+          echo "SPAM_RESPONSE=$RESPONSE" >> $GITHUB_ENV
       - name: Use spam detector output to label issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
