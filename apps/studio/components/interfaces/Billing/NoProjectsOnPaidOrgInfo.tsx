@@ -8,18 +8,18 @@ interface NoProjectsOnPaidOrgInfoProps {
   organization?: Organization
 }
 
+const EXCLUDED_PLANS = ['free', 'platform', 'enterprise']
+
 export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInfoProps) => {
+  const isEligible = organization != null && !EXCLUDED_PLANS.includes(organization.plan.id ?? '')
+
   const { data } = useOrgProjectsInfiniteQuery(
     { slug: organization?.slug },
-    {
-      enabled:
-        organization != null &&
-        !['free', 'platform', 'enterprise'].includes(organization.plan.id ?? ''),
-    }
+    { enabled: isEligible }
   )
   const projectCount = data?.pages[0].pagination.count ?? 0
 
-  if (projectCount > 0 || !organization) return null
+  if (!isEligible || projectCount > 0) return null
 
   return (
     <Admonition
