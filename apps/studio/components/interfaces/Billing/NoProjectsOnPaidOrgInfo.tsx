@@ -19,14 +19,7 @@ export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInf
   )
   const projectCount = data?.pages[0].pagination.count ?? 0
 
-  if (
-    projectCount > 0 ||
-    organization?.plan === undefined ||
-    organization.plan.id === 'free' ||
-    organization.plan.id === 'enterprise' ||
-    organization.plan.id === 'platform'
-  )
-    return null
+  if (projectCount > 0 || !organization) return null
 
   return (
     <Admonition
