@@ -124,6 +124,9 @@ vi.mock('ui', async () => {
       children: ReactNode
       onClick?: () => void
     }) => <button onClick={onClick}>{children}</button>,
+    Tooltip: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    TooltipContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+    TooltipTrigger: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     singleThemes: [
       { value: 'dark', name: 'Dark' },
       { value: 'light', name: 'Light' },
