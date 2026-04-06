@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
@@ -57,6 +57,8 @@ export const DefaultLayout = ({
 
   useCheckLatestDeploy()
 
+  const isMobile = useBreakpoint('md')
+
   const contentMinSizePercentage = 50
   const contentMaxSizePercentage = 70
 
@@ -82,10 +84,12 @@ export const DefaultLayout = ({
                 {/* Top Banner */}
                 <AppBannerWrapper />
                 <div className="flex-shrink-0">
-                  <MobileNavigationBar
-                    hideMobileMenu={hideMobileMenu}
-                    backToDashboardURL={backToDashboardURL}
-                  />
+                  {isMobile && (
+                    <MobileNavigationBar
+                      hideMobileMenu={hideMobileMenu}
+                      backToDashboardURL={backToDashboardURL}
+                    />
+                  )}
                   <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
                 </div>
                 {/* Main Content Area */}
