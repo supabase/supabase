@@ -1,4 +1,4 @@
-import { UseFormReturn, useWatch as useWatch_Shadcn_ } from 'react-hook-form'
+import { UseFormReturn } from 'react-hook-form'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -8,6 +8,7 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  useWatch_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
