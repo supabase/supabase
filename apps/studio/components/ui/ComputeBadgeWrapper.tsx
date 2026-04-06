@@ -206,7 +206,9 @@ export const ComputeBadgeWrapper = ({
                     track('compute_badge_upgrade_clicked', {
                       computeSize: computeSize ?? 'unknown',
                       planId: data?.plan.id ?? 'unknown',
-                      upgradeType: isEligibleForFreeUpgrade ? 'free_micro_upgrade' : 'compute_upgrade',
+                      upgradeType: isEligibleForFreeUpgrade
+                        ? 'free_micro_upgrade'
+                        : 'compute_upgrade',
                     })
                   }}
                 >
