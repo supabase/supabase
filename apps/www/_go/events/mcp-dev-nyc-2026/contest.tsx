@@ -59,7 +59,7 @@ const page: GoPageInput = {
           </div>
           <Button asChild type="default" size="medium">
             <Link
-              href="https://supabase.link/mcpdev-nyc-slides"
+              href="https://mcp-dev-summit-presentation.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
             >

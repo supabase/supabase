@@ -1,8 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import DashboardPage from 'pages/project/[ref]/settings/dashboard'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import DashboardPage from 'pages/project/[ref]/settings/dashboard'
 
 const { mockIsPlatform, mockRouter, mockUseFlag } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -40,8 +39,8 @@ vi.mock('components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
-vi.mock('@/components/interfaces/Settings/General/QueryPreferences', () => ({
-  QueryPreferences: () => <div>QueryPreferences</div>,
+vi.mock('@/components/interfaces/Settings/General/DashboardPreferences', () => ({
+  DashboardPreferences: () => <div>DashboardPreferences</div>,
 }))
 
 describe('/project/[ref]/settings/dashboard', () => {
@@ -55,7 +54,7 @@ describe('/project/[ref]/settings/dashboard', () => {
     render(<DashboardPage dehydratedState={{}} />)
 
     expect(screen.getByText('Dashboard')).toBeInTheDocument()
-    expect(screen.getByText('QueryPreferences')).toBeInTheDocument()
+    expect(screen.getByText('DashboardPreferences')).toBeInTheDocument()
     expect(screen.queryByText('Edits')).not.toBeInTheDocument()
   })
 
@@ -68,6 +67,6 @@ describe('/project/[ref]/settings/dashboard', () => {
       expect(mockRouter.replace).toHaveBeenCalledWith('/account/me#dashboard')
     })
 
-    expect(screen.queryByText('QueryPreferences')).not.toBeInTheDocument()
+    expect(screen.queryByText('DashboardPreferences')).not.toBeInTheDocument()
   })
 })

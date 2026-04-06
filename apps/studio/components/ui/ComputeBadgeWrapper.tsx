@@ -6,6 +6,7 @@ import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
+import { useTrack } from 'lib/telemetry/track'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
@@ -106,6 +107,8 @@ export const ComputeBadgeWrapper = ({
     !!resourceWarnings?.disk_io_exhaustion
   const showUpgradeGlow = isEligibleForFreeUpgrade && isComputeNearExhaustion
 
+  const track = useTrack()
+
   const isLoading = isLoadingAddons || isLoadingSubscriptions
 
   if (!computeSize) return null
@@ -194,7 +197,21 @@ export const ComputeBadgeWrapper = ({
                 </p>
               </div>
               <div>
-                <Button asChild type="default" htmlType="button" role="button">
+                <Button
+                  asChild
+                  type="default"
+                  htmlType="button"
+                  role="button"
+                  onClick={() => {
+                    track('compute_badge_upgrade_clicked', {
+                      computeSize: computeSize ?? 'unknown',
+                      planId: data?.plan.id ?? 'unknown',
+                      upgradeType: isEligibleForFreeUpgrade
+                        ? 'free_micro_upgrade'
+                        : 'compute_upgrade',
+                    })
+                  }}
+                >
                   <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
                     Upgrade compute
                   </Link>

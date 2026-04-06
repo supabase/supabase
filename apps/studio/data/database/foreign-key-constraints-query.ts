@@ -1,11 +1,11 @@
 import { getForeignKeyConstraintsSql } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
-import { UseCustomQueryOptions } from 'types'
 
-import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string

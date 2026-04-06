@@ -1,7 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag } from 'common'
 import { Calendar, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -53,7 +52,6 @@ export const CreditCodeRedemption = ({
   onClose?: () => void
 }) => {
   const router = useRouter()
-  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
   )
@@ -146,8 +144,6 @@ export const CreditCodeRedemption = ({
       initHcaptchaRef.current()
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
-
-  if (!redeemCodeEnabled) return null
 
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>

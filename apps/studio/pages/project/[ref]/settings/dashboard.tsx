@@ -14,7 +14,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-import { QueryPreferences } from '@/components/interfaces/Settings/General/QueryPreferences'
+import { DashboardPreferences } from '@/components/interfaces/Settings/General/DashboardPreferences'
 
 const Preferences: NextPageWithLayout = () => {
   const router = useRouter()
@@ -41,7 +41,7 @@ const Preferences: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="small">{showQueryPreferences && <QueryPreferences />}</PageContainer>
+      <PageContainer size="small">{showQueryPreferences && <DashboardPreferences />}</PageContainer>
     </>
   )
 }

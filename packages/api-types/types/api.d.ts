@@ -2317,6 +2317,7 @@ export interface components {
       security_refresh_token_reuse_interval: number | null
       security_sb_forwarded_for_enabled: boolean | null
       security_update_password_require_reauthentication: boolean | null
+      security_update_password_require_current_password: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
       sessions_tags: string | null
@@ -4063,6 +4064,7 @@ export interface components {
       security_refresh_token_reuse_interval?: number | null
       security_sb_forwarded_for_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
+      security_update_password_require_current_password?: boolean | null
       sessions_inactivity_timeout?: number | null
       sessions_single_per_user?: boolean | null
       sessions_tags?: string | null

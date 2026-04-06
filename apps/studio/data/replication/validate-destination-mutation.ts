@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { DestinationConfig } from './create-destination-pipeline-mutation'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type ValidateDestinationParams = {
   projectRef: string

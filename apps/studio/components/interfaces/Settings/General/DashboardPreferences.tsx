@@ -58,7 +58,7 @@ const DEFAULT_PREFERENCE: DashboardPreference = {
  * - Also, current database logic only applies to Table Editor atm, will need to extend it further to other pages
  */
 
-export const QueryPreferences = () => {
+export const DashboardPreferences = () => {
   const { ref: projectRef } = useParams()
 
   const [dashboardPreferences, setDashboardPreferences, { isLoading }] =
