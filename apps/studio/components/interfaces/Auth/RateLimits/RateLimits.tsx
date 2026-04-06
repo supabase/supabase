@@ -17,12 +17,13 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
+  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { PageSection, PageSectionContent, PageSectionDescription, PageSectionMeta, PageSectionSummary, PageSectionTitle } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
@@ -65,7 +66,31 @@ export const RateLimits = () => {
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
   const canUpdateWeb3RateLimit = authConfig?.EXTERNAL_WEB3_SOLANA_ENABLED
 
-  const FormSchema = z.object({
+  const IPForwardingFormSchema = z.object({
+    SECURITY_SB_FORWARDED_FOR_ENABLED: z.coerce
+      .boolean()
+  })
+
+  const ipForwardingForm = useForm<z.infer<typeof IPForwardingFormSchema>>({
+    resolver: zodResolver(IPForwardingFormSchema),
+    defaultValues: {
+      SECURITY_SB_FORWARDED_FOR_ENABLED: false,
+    },
+  })
+
+  const onSubmitIPForwardingForm = (data: z.infer<typeof IPForwardingFormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    const payload: Partial<z.infer<typeof IPForwardingFormSchema>> = {}
+
+    if (data.SECURITY_SB_FORWARDED_FOR_ENABLED !== authConfig?.SECURITY_SB_FORWARDED_FOR_ENABLED) {
+      payload.SECURITY_SB_FORWARDED_FOR_ENABLED = data.SECURITY_SB_FORWARDED_FOR_ENABLED
+    }
+
+    updateAuthConfig({ projectRef, config: payload }, { onSuccess: () => ipForwardingForm.reset(data) })
+  }
+  
+  const RateLimitFormSchema = z.object({
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
@@ -96,8 +121,8 @@ export const RateLimits = () => {
       .max(32767, 'Must not be more than 32,767 an hour'),
   })
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
+    resolver: zodResolver(RateLimitFormSchema),
     defaultValues: {
       RATE_LIMIT_TOKEN_REFRESH: 0,
       RATE_LIMIT_VERIFY: 0,
@@ -109,10 +134,10 @@ export const RateLimits = () => {
     },
   })
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
 
-    const payload: Partial<z.infer<typeof FormSchema>> = {}
+    const payload: Partial<z.infer<typeof RateLimitFormSchema>> = {}
     const params = [
       'RATE_LIMIT_TOKEN_REFRESH',
       'RATE_LIMIT_VERIFY',
@@ -126,12 +151,12 @@ export const RateLimits = () => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
     })
 
-    updateAuthConfig({ projectRef, config: payload }, { onSuccess: () => form.reset(data) })
+    updateAuthConfig({ projectRef, config: payload }, { onSuccess: () => rateLimitForm.reset(data) })
   }
 
   useEffect(() => {
     if (isSuccess) {
-      form.reset({
+      rateLimitForm.reset({
         RATE_LIMIT_TOKEN_REFRESH: authConfig.RATE_LIMIT_TOKEN_REFRESH,
         RATE_LIMIT_VERIFY: authConfig.RATE_LIMIT_VERIFY,
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
@@ -139,6 +164,10 @@ export const RateLimits = () => {
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
         RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
         RATE_LIMIT_WEB3: authConfig.RATE_LIMIT_WEB3 ?? 0,
+      })
+
+      ipForwardingForm.reset({
+        SECURITY_SB_FORWARDED_FOR_ENABLED: authConfig.SECURITY_SB_FORWARDED_FOR_ENABLED,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -175,14 +204,15 @@ export const RateLimits = () => {
   }
 
   return (
+    <>
     <PageSection>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Form_Shadcn_ {...rateLimitForm}>
+          <form onSubmit={rateLimitForm.handleSubmit(onSubmitRateLimitForm)}>
             <Card>
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_EMAIL_SENT"
                   render={({ field }) => (
                     <FormItemLayout
@@ -253,7 +283,7 @@ export const RateLimits = () => {
 
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_SMS_SENT"
                   render={({ field }) => (
                     <FormItemLayout
@@ -302,7 +332,7 @@ export const RateLimits = () => {
 
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_TOKEN_REFRESH"
                   render={({ field }) => (
                     <FormItemLayout
@@ -337,9 +367,9 @@ export const RateLimits = () => {
                           </TooltipContent>
                         )}
                       </Tooltip>
-                      {form.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
+                      {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
                         <p className="text-foreground-lighter text-sm mt-2">
-                          {form.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
+                          {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
                         </p>
                       )}
                     </FormItemLayout>
@@ -349,7 +379,7 @@ export const RateLimits = () => {
 
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_VERIFY"
                   render={({ field }) => (
                     <FormItemLayout
@@ -384,9 +414,9 @@ export const RateLimits = () => {
                           </TooltipContent>
                         )}
                       </Tooltip>
-                      {form.watch('RATE_LIMIT_VERIFY') > 0 && (
+                      {rateLimitForm.watch('RATE_LIMIT_VERIFY') > 0 && (
                         <p className="text-foreground-lighter text-sm mt-2">
-                          {form.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
+                          {rateLimitForm.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
                         </p>
                       )}
                     </FormItemLayout>
@@ -396,7 +426,7 @@ export const RateLimits = () => {
 
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_ANONYMOUS_USERS"
                   render={({ field }) => (
                     <FormItemLayout
@@ -443,7 +473,7 @@ export const RateLimits = () => {
 
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_OTP"
                   render={({ field }) => (
                     <FormItemLayout
@@ -478,9 +508,9 @@ export const RateLimits = () => {
                           </TooltipContent>
                         )}
                       </Tooltip>
-                      {form.watch('RATE_LIMIT_OTP') > 0 && (
+                      {rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
                         <p className="text-foreground-lighter text-sm mt-2">
-                          {form.watch('RATE_LIMIT_OTP') * 12} requests per hour
+                          {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
                         </p>
                       )}
                     </FormItemLayout>
@@ -490,7 +520,7 @@ export const RateLimits = () => {
 
               <CardContent>
                 <FormField_Shadcn_
-                  control={form.control}
+                  control={rateLimitForm.control}
                   name="RATE_LIMIT_WEB3"
                   render={({ field }) => (
                     <FormItemLayout
@@ -536,15 +566,15 @@ export const RateLimits = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
+                {rateLimitForm.formState.isDirty && (
+                  <Button type="default" onClick={() => rateLimitForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                  disabled={!canUpdateConfig || isUpdatingConfig || !rateLimitForm.formState.isDirty}
                   loading={isUpdatingConfig}
                 >
                   Save changes
@@ -555,5 +585,61 @@ export const RateLimits = () => {
         </Form_Shadcn_>
       </PageSectionContent>
     </PageSection>
+
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>IP Address Forwarding</PageSectionTitle>
+            <PageSectionDescription>Control how Auth determines source IP address for rate limiting.</PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...ipForwardingForm}>
+            <form onSubmit={ipForwardingForm.handleSubmit(onSubmitIPForwardingForm)}>
+              <Card>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={ipForwardingForm.control}
+                    name="SECURITY_SB_FORWARDED_FOR_ENABLED"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enable IP address forwarding"
+                        description="Clients can forward end-user IP addresses to Auth for rate limiting when using secret API keys"
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={(value) => field.onChange(value)}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  {ipForwardingForm.formState.isDirty && (
+                    <Button type="default" onClick={() => ipForwardingForm.reset()}>
+                                                                                  Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig || isUpdatingConfig || !ipForwardingForm.formState.isDirty
+                    }
+                    loading={isUpdatingConfig}
+                  >
+                     Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
+    </>
   )
 }
