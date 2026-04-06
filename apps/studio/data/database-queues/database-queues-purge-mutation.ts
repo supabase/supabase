@@ -1,3 +1,4 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -26,7 +27,7 @@ export async function purgeDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.purge_queue('${queueName}');`,
+    sql: `select * from pgmq.purge_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.purge(queueName),
   })
 

@@ -1,3 +1,4 @@
+import { literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -30,7 +31,7 @@ export async function readDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.set_vt('${queueName}', ${messageId}, ${duration})`,
+    sql: `select * from pgmq.set_vt(${literal(queueName)}, ${literal(messageId)}, ${literal(duration)})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
