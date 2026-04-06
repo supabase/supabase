@@ -439,7 +439,11 @@ export const FileExplorerRow = ({
           </div>
         </div>
       </ContextMenuTrigger_Shadcn_>
-      <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+      <ContextMenuContent_Shadcn_
+        onCloseAutoFocus={(e) => e.stopPropagation()}
+        // don't propagate the click event to avoid unexpected column click which will deselect the folders
+        onClick={(e) => e.stopPropagation()}
+      >
         {rowOptions.map((option) => {
           if ((option?.children ?? []).length > 0) {
             return (
