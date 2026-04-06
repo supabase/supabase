@@ -40,7 +40,7 @@ We recommend using the In-place upgrade method, as it is faster, and more reliab
 When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
 
 1. On the [General Settings](/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
-1. After your project is paused, click **Restore project**. When a project is unpaused, it is restored from the [physical backup](https://supabase.com/docs/guides/platform/backups) that was taken at the time the project was paused. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
+1. After your project is paused, click **Restore project**. When a project is unpaused, it is restored from the [physical backup](/guides/platform/backups) that was taken at the time the project was paused. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
 
 Note that a pause + restore upgrade involves tearing down your project's resources before bringing them back up again. If the restore process should fail, manual intervention from Supabase support will be required to bring your project back online.
 
