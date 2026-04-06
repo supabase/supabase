@@ -2,7 +2,7 @@ import type { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Checkbox_Shadcn_,
@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { useTableNamesQuery } from '@/data/tables/table-names-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
@@ -66,15 +66,10 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   const httpUrl = useWatch_Shadcn_({ control: form.control, name: 'http_url' })
   const httpHeaders = useWatch_Shadcn_({ control: form.control, name: 'httpHeaders' })
 
-  const { data } = useTablesQuery({
+  const { data: tables = [] } = useTableNamesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const tables = useMemo(
-    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
-    [data]
-  )
 
   // Handle auth header auto-add for edge functions
   useEffect(() => {

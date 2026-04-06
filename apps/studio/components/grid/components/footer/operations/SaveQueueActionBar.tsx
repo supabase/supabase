@@ -13,7 +13,7 @@ import {
 
 import { useOperationQueueActions } from '@/components/grid/hooks/useOperationQueueActions'
 import { useOperationQueueShortcuts } from '@/components/grid/hooks/useOperationQueueShortcuts'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { getModKeyLabel } from '@/lib/helpers'
