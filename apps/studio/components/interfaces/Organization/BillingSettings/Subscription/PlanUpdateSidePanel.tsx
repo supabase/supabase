@@ -67,7 +67,10 @@ export const PlanUpdateSidePanel = () => {
     'stripe.subscriptions'
   )
 
-  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const snap = useOrgSettingsPageStateSnapshot()
+  const visible = snap.panelKey === 'subscriptionPlan'
+
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
     useMemo(
       () => orgProjectsData?.pages.flatMap((page) => page.projects),
@@ -77,8 +80,6 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
   const onClose = () => {
     const { panel, ...queryWithoutPanel } = router.query
     router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
@@ -90,8 +91,14 @@ export const PlanUpdateSidePanel = () => {
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
-  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
+  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery(
+    { orgSlug: slug },
+    { enabled: visible }
+  )
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: visible }
+  )
 
   const {
     data: subscriptionPreview,

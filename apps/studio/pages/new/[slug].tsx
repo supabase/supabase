@@ -403,6 +403,12 @@ const Wizard: NextPageWithLayout = () => {
   }, [recommendedSmartRegion])
 
   useEffect(() => {
+    if (highAvailability && cloudProvider !== 'AWS_K8S') {
+      form.setValue('cloudProvider', 'AWS_K8S')
+    }
+  }, [highAvailability, cloudProvider, form])
+
+  useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
       form.setValue('instanceSize', instanceSize, {
         shouldDirty: false,
