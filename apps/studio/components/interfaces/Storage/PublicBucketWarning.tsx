@@ -132,10 +132,9 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
           <div className="-mx-4 md:-mx-5 -mb-4 border-t">
             <CodeBlock
               hideLineNumbers
-              wrapLines
               language="sql"
               value={generatePolicyRemovalSql(policyName)}
-              wrapperClassName="[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0"
+              wrapperClassName="[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0 [&_pre>*]:!whitespace-pre-wrap"
               className="[&_code]:text-foreground"
             />
           </div>
