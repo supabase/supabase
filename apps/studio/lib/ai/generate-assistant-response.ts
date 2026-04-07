@@ -87,7 +87,9 @@ export async function generateAssistantResponse({
 
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
-        ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+        ? shouldTrace
+          ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+          : await getSchemas()
         : "You don't have access to any schemas."
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
