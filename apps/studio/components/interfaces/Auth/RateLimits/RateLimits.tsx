@@ -36,10 +36,12 @@ import * as z from 'zod'
 
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import NoPermission from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 export const RateLimits = () => {
   const { ref: projectRef } = useParams()
@@ -624,7 +626,13 @@ export const RateLimits = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Enable IP address forwarding"
-                        description="Clients can forward end-user IP addresses to Auth for rate limiting when using secret API keys"
+                        description=<>
+                          Clients can forward end-user IP addresses to Auth for rate limiting when
+                          using secret API keys.{' '}
+                          <InlineLink href={`${DOCS_URL}/guides/auth/rate-limits`}>
+                            Learn more
+                          </InlineLink>
+                        </>
                       >
                         <FormControl_Shadcn_>
                           <Switch
