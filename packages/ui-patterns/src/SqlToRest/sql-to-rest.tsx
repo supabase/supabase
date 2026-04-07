@@ -315,7 +315,7 @@ export default function SqlToRest({
             </div>
             <div className="prose text-sm mt-2">
               PostgREST doesn't support this query. If you're sure the syntax is correct and are
-              unable to modify it, wrap it in a stored procedure and call it using the{' '}
+              unable to modify it, wrap it in a database function and call it using the{' '}
               <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
                 RPC
               </a>{' '}
