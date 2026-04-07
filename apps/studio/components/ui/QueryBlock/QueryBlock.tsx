@@ -11,7 +11,12 @@ import { CHART_COLORS } from '../Charts/Charts.constants'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
+import {
+  checkHasNonPositiveValues,
+  formatLogTick,
+  formatYAxisTick,
+  getCumulativeResults,
+} from './QueryBlock.utils'
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
@@ -112,6 +117,12 @@ export const QueryBlock = ({
   }, [logScale, yKey, chartData])
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
+
+  const maxYValue =
+    chartData && yKey ? Math.max(...chartData.map((d: any) => Number(d[yKey]) || 0)) : 0
+  const yAxisWidth = effectiveLogScale
+    ? 52
+    : Math.max(36, (formatYAxisTick(maxYValue).length + 1) * 8)
 
   const getDateFormat = (key: any) => {
     const value = chartData?.[0]?.[key] || ''
@@ -275,7 +286,7 @@ export const QueryBlock = ({
               >
                 <BarChart
                   accessibilityLayer
-                  margin={{ left: -20, right: 0, top: 10 }}
+                  margin={{ left: 0, right: 0, top: 10 }}
                   data={chartData}
                   onMouseMove={(e: any) => {
                     if (e.activeTooltipIndex !== focusDataIndex) {
@@ -303,10 +314,21 @@ export const QueryBlock = ({
                     scale={effectiveLogScale ? 'log' : 'auto'}
                     domain={effectiveLogScale ? [1, 'auto'] : undefined}
                     allowDataOverflow={effectiveLogScale}
-                    width={effectiveLogScale ? 52 : undefined}
-                    tickFormatter={effectiveLogScale ? formatLogTick : undefined}
+                    width={yAxisWidth}
+                    tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                   />
-                  <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
+                  <Tooltip
+                    content={
+                      <ChartTooltipContent
+                        className="min-w-[200px]"
+                        labelFormatter={(value) =>
+                          xKeyDateFormat === 'date'
+                            ? dayjs(value).format('MMM D YYYY HH:mm')
+                            : String(value)
+                        }
+                      />
+                    }
+                  />
                   <Bar radius={1} dataKey={yKey}>
                     {chartData?.map((_: any, index: number) => (
                       <Cell
