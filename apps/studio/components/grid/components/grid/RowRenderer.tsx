@@ -1,39 +1,64 @@
-import type { Key } from 'react'
-import { useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import type { Key, ReactNode } from 'react'
 import { RenderRowProps, Row } from 'react-data-grid'
+import { flushSync } from 'react-dom'
 import { ContextMenu_Shadcn_, ContextMenuTrigger_Shadcn_ } from 'ui'
 
 import { RowContextMenuContent } from '../menu/RowContextMenu'
 import { SupaRow } from '@/components/grid/types'
 
-function RowWithContextMenu({ row, ...props }: RenderRowProps<SupaRow>) {
-  const triggerRef = useRef<HTMLSpanElement>(null)
-  const [menuKey, setMenuKey] = useState(0)
+type RowContextMenuContextValue = {
+  onRowContextMenu: (e: React.MouseEvent, row: SupaRow) => void
+}
 
-  // Hack to make ContextMenu work with react-data-grid, which doesn't support portals in rows. The original bug
-  // was that the ContextMenu didn't move when right-clicking two cells in the same row
-  function handleContextMenu(e: React.MouseEvent) {
+const RowContextMenuContext = createContext<RowContextMenuContextValue | null>(null)
+
+export function RowContextMenuProvider({ children }: { children: ReactNode }) {
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const [menuKey, setMenuKey] = useState(0)
+  const [activeRow, setActiveRow] = useState<SupaRow | null>(null)
+
+  const onRowContextMenu = useCallback((e: React.MouseEvent, row: SupaRow) => {
     e.preventDefault()
+    flushSync(() => setActiveRow(row))
+    setMenuKey((prev) => prev + 1)
     const trigger = triggerRef.current
     if (!trigger) return
-    setMenuKey((k) => k + 1)
+    trigger.style.left = `${e.clientX}px`
+    trigger.style.top = `${e.clientY}px`
     trigger.dispatchEvent(
       new MouseEvent('contextmenu', {
         bubbles: true,
-        cancelable: true,
         clientX: e.clientX,
         clientY: e.clientY,
       })
     )
-  }
+  }, [])
 
   return (
-    <ContextMenu_Shadcn_ modal={false}>
-      <ContextMenuTrigger_Shadcn_ ref={triggerRef} />
-      <RowContextMenuContent key={menuKey} row={row} />
-      <Row row={row} {...props} onContextMenu={handleContextMenu} />
-    </ContextMenu_Shadcn_>
+    <RowContextMenuContext.Provider value={{ onRowContextMenu }}>
+      <ContextMenu_Shadcn_ modal={false}>
+        <ContextMenuTrigger_Shadcn_ asChild>
+          <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
+        </ContextMenuTrigger_Shadcn_>
+        {activeRow && <RowContextMenuContent key={menuKey} row={activeRow} />}
+      </ContextMenu_Shadcn_>
+      {children}
+    </RowContextMenuContext.Provider>
   )
+}
+
+function RowWithContextMenu({ row, ...props }: RenderRowProps<SupaRow>) {
+  const ctx = useContext(RowContextMenuContext)
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      ctx?.onRowContextMenu(e, row)
+    },
+    [ctx, row]
+  )
+
+  return <Row row={row} {...props} onContextMenu={handleContextMenu} />
 }
 
 export function RowRenderer(key: Key, props: RenderRowProps<SupaRow>) {

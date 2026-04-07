@@ -27,6 +27,7 @@ import {
 } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerRow } from './FileExplorerRow'
+import { FileExplorerRowContextMenuProvider } from './FileExplorerRowContextMenu'
 import { useStoragePreference } from './useStoragePreference'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -257,18 +258,20 @@ export const FileExplorerColumn = ({
 
           {/* Column Interface */}
           {columnItems.length > 0 && (
-            <InfiniteListDefault
-              className="h-full"
-              items={columnItems}
-              itemProps={itemProps}
-              getItemKey={getItemKey}
-              getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
-              ItemComponent={FileExplorerRow}
-              LoaderComponent={LoaderForIconMenuItems}
-              hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
-              isLoadingNextPage={column.isLoadingMoreItems}
-              onLoadNextPage={() => onColumnLoadMore(index, column)}
-            />
+            <FileExplorerRowContextMenuProvider>
+              <InfiniteListDefault
+                className="h-full"
+                items={columnItems}
+                itemProps={itemProps}
+                getItemKey={getItemKey}
+                getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
+                ItemComponent={FileExplorerRow}
+                LoaderComponent={LoaderForIconMenuItems}
+                hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
+                isLoadingNextPage={column.isLoadingMoreItems}
+                onLoadNextPage={() => onColumnLoadMore(index, column)}
+              />
+            </FileExplorerRowContextMenuProvider>
           )}
 
           {/* Drag drop upload CTA for when column is empty */}

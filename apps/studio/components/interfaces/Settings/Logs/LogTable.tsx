@@ -3,7 +3,7 @@ import { ContextMenuContent } from '@ui/components/shadcn/ui/context-menu'
 import { IS_PLATFORM, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { Copy, Eye, EyeOff, Play } from 'lucide-react'
-import { Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 import {
@@ -97,6 +97,27 @@ export const LogTable = ({
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [copiedFormat, setCopiedFormat] = useState<'json' | 'markdown' | null>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const [activeRow, setActiveRow] = useState<LogData | null>(null)
+  const [contextMenuKey, setContextMenuKey] = useState(0)
+
+  const handleRowContextMenu = useCallback((e: React.MouseEvent, row: LogData) => {
+    e.preventDefault()
+    setActiveRow(row)
+    // Force re-render of ContextMenuContent to update the current position.
+    setContextMenuKey((prev) => prev + 1)
+    const trigger = triggerRef.current
+    if (!trigger) return
+    trigger.style.left = `${e.clientX}px`
+    trigger.style.top = `${e.clientY}px`
+    trigger.dispatchEvent(
+      new MouseEvent('contextmenu', {
+        bubbles: true,
+        clientX: e.clientX,
+        clientY: e.clientY,
+      })
+    )
+  }, [])
 
   const { can: canCreateLogQuery } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -252,52 +273,6 @@ export const LogTable = ({
     columns = [checkboxColumn, ...columns]
   }
 
-  const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
-    (key, props) => {
-      const handleClick = (e: React.MouseEvent) => {
-        // Check if clicking on the checkbox column - let that handler handle it
-        const target = e.target as HTMLElement
-        if (target.closest('[data-column-key="multi-select"]')) return
-        onRowClick(props.row)
-      }
-      return (
-        <ContextMenu_Shadcn_ key={key} modal={false}>
-          <ContextMenuTrigger_Shadcn_ style={{ display: 'contents' }}>
-            <Row
-              {...props}
-              isRowSelected={false}
-              selectedCellIdx={undefined}
-              onClick={handleClick}
-            />
-          </ContextMenuTrigger_Shadcn_>
-          <ContextMenuContent>
-            <ContextMenuItem_Shadcn_
-              className="gap-x-2"
-              onSelect={() => {
-                const eventMessage = props.row.event_message
-                copyToClipboard(eventMessage, () => {
-                  toast.success('Copied to clipboard')
-                })
-              }}
-            >
-              <Copy size={14} />
-              <span className="text-xs">Copy event message</span>
-            </ContextMenuItem_Shadcn_>
-          </ContextMenuContent>
-        </ContextMenu_Shadcn_>
-      )
-    },
-    [columns]
-  )
-
-  const formatCellValue = (value: any) => {
-    return value && typeof value === 'object'
-      ? JSON.stringify(value)
-      : value === null
-        ? 'NULL'
-        : String(value)
-  }
-
   const onRowClick = useCallback(
     (row: LogData) => {
       // Regular single click — clear multi-select, open side panel
@@ -307,6 +282,36 @@ export const LogTable = ({
     },
     [onSelectedLogChange]
   )
+
+  const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
+    (key, props) => {
+      const handleClick = (e: React.MouseEvent) => {
+        // Check if clicking on the checkbox column - let that handler handle it
+        const target = e.target as HTMLElement
+        if (target.closest('[data-column-key="multi-select"]')) return
+        onRowClick(props.row)
+      }
+      return (
+        <Row
+          key={key}
+          {...props}
+          isRowSelected={false}
+          selectedCellIdx={undefined}
+          onClick={handleClick}
+          onContextMenu={(e) => handleRowContextMenu(e, props.row)}
+        />
+      )
+    },
+    [handleRowContextMenu, onRowClick]
+  )
+
+  const formatCellValue = (value: any) => {
+    return value && typeof value === 'object'
+      ? JSON.stringify(value)
+      : value === null
+        ? 'NULL'
+        : String(value)
+  }
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -497,6 +502,27 @@ export const LogTable = ({
                 }}
               />
             </div>
+            <ContextMenu_Shadcn_ modal={false}>
+              <ContextMenuTrigger_Shadcn_ asChild>
+                <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
+              </ContextMenuTrigger_Shadcn_>
+              <ContextMenuContent key={contextMenuKey}>
+                <ContextMenuItem_Shadcn_
+                  className="gap-x-2"
+                  onSelect={() => {
+                    const eventMessage = activeRow?.event_message
+                    if (eventMessage) {
+                      copyToClipboard(eventMessage, () => {
+                        toast.success('Copied to clipboard')
+                      })
+                    }
+                  }}
+                >
+                  <Copy size={14} />
+                  <span className="text-xs">Copy event message</span>
+                </ContextMenuItem_Shadcn_>
+              </ContextMenuContent>
+            </ContextMenu_Shadcn_>
             <DataGrid
               role="table"
               style={{ flex: '1 1 0%', minHeight: 0 }}
