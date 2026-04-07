@@ -329,7 +329,7 @@ export const QueryBlock = ({
                       />
                     }
                   />
-                  <Bar radius={1} dataKey={yKey}>
+                  <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">
                     {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
