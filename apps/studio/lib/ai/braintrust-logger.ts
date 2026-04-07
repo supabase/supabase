@@ -16,8 +16,8 @@ if (IS_TRACING_ENABLED) {
   })
 }
 
-// Returns true only when all compliance flags are explicitly confirmed off.
-// Treats undefined as restricted — unknown state is not safe to trace.
+// Checks compliance flags for tracing and returns true only when all checks pass.
+// Defaults to disabling tracing when states are unknown.
 export function isTracingAllowed({
   orgHasHipaaAddon,
   projectIsSensitive,
@@ -29,10 +29,17 @@ export function isTracingAllowed({
   orgIsDpaSigned: boolean | undefined
   projectRegion: string | undefined
 }) {
-  const isHipaaEnabled =
-    orgHasHipaaAddon == null || projectIsSensitive == null
-      ? undefined
-      : orgHasHipaaAddon && projectIsSensitive
-  const isEuRegion = projectRegion === undefined ? undefined : projectRegion.startsWith('eu-')
-  return isHipaaEnabled === false && orgIsDpaSigned === false && isEuRegion === false
+  // Disable tracing for orgs with a signed (or unknown) DPA status
+  if (orgIsDpaSigned !== false) return false
+
+  // Disable tracing for EU (or unknown) regions
+  if (projectRegion === undefined || projectRegion.startsWith('eu-')) return false
+
+  // Disable tracing for orgs with an unknown HIPAA addon state
+  if (orgHasHipaaAddon === undefined) return false
+
+  // Disable tracing for projects within a HIPAA-enabled org that are sensitive (or unknown sensitivity)
+  if (orgHasHipaaAddon && projectIsSensitive !== false) return false
+
+  return true
 }

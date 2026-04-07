@@ -45,6 +45,16 @@ describe('isTracingAllowed', () => {
     expect(isTracingAllowed({ ...baseAllowed, projectRegion: 'ap-southeast-1' })).toBe(true)
   })
 
+  it('allows tracing when HIPAA addon is false and is_sensitive is null (DB default)', () => {
+    expect(isTracingAllowed({ ...baseAllowed, projectIsSensitive: null })).toBe(true)
+  })
+
+  it('disallows tracing when HIPAA addon is unknown and is_sensitive is null', () => {
+    expect(
+      isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: undefined, projectIsSensitive: null })
+    ).toBe(false)
+  })
+
   it('disallows tracing when flags are undefined (unknown = restricted)', () => {
     expect(
       isTracingAllowed({
@@ -57,6 +67,13 @@ describe('isTracingAllowed', () => {
     expect(isTracingAllowed({ ...baseAllowed, orgIsDpaSigned: undefined })).toBe(false)
     expect(isTracingAllowed({ ...baseAllowed, projectRegion: undefined })).toBe(false)
     expect(isTracingAllowed({ ...baseAllowed, orgHasHipaaAddon: undefined })).toBe(false)
-    expect(isTracingAllowed({ ...baseAllowed, projectIsSensitive: undefined })).toBe(false)
+    // projectIsSensitive unknown only matters when orgHasHipaaAddon is also unknown
+    expect(
+      isTracingAllowed({
+        ...baseAllowed,
+        orgHasHipaaAddon: undefined,
+        projectIsSensitive: undefined,
+      })
+    ).toBe(false)
   })
 })
