@@ -241,6 +241,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/organizations/{slug}/entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get entitlements for an organization
+     * @description Returns the entitlements available to the organization based on their plan and any overrides.
+     */
+    get: operations['v1-get-organization-entitlements']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/organizations/{slug}/members': {
     parameters: {
       query?: never
@@ -290,6 +310,23 @@ export interface paths {
      *     This endpoint uses offset-based pagination. Use the `offset` parameter to skip a number of projects and the `limit` parameter to control the number of projects returned per page.
      */
     get: operations['v1-get-all-projects-for-organization']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/profile': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the user's profile */
+    get: operations['v1-get-profile']
     put?: never
     post?: never
     delete?: never
@@ -2293,6 +2330,7 @@ export interface components {
       oauth_server_allow_dynamic_registration: boolean
       oauth_server_authorization_path: string | null
       oauth_server_enabled: boolean
+      passkey_enabled: boolean
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       /** @enum {string|null} */
@@ -2359,6 +2397,9 @@ export interface components {
       smtp_sender_name: string | null
       smtp_user: string | null
       uri_allow_list: string | null
+      webauthn_rp_display_name: string | null
+      webauthn_rp_id: string | null
+      webauthn_rp_origins: string | null
     }
     /** @example {
      *       "role": "postgres",
@@ -4207,6 +4248,7 @@ export interface components {
       oauth_server_allow_dynamic_registration?: boolean | null
       oauth_server_authorization_path?: string | null
       oauth_server_enabled?: boolean | null
+      passkey_enabled?: boolean
       password_hibp_enabled?: boolean | null
       password_min_length?: number | null
       /** @enum {string|null} */
@@ -4272,6 +4314,9 @@ export interface components {
       smtp_sender_name?: string | null
       smtp_user?: string | null
       uri_allow_list?: string | null
+      webauthn_rp_display_name?: string | null
+      webauthn_rp_id?: string | null
+      webauthn_rp_origins?: string | null
     }
     /** @example {
      *       "branch_name": "preview-login-page",
@@ -4818,6 +4863,89 @@ export interface components {
         count: number
       }[]
     }
+    V1ListEntitlementsResponse: {
+      entitlements: {
+        config:
+          | {
+              enabled: boolean
+            }
+          | {
+              enabled: boolean
+              unit: string
+              unlimited: boolean
+              value: number
+            }
+          | {
+              enabled: boolean
+              set: string[]
+            }
+        feature: {
+          /** @enum {string} */
+          key:
+            | 'instances.compute_update_available_sizes'
+            | 'instances.read_replicas'
+            | 'instances.disk_modifications'
+            | 'instances.high_availability'
+            | 'instances.orioledb'
+            | 'replication.etl'
+            | 'storage.max_file_size'
+            | 'storage.max_file_size.configurable'
+            | 'storage.image_transformations'
+            | 'storage.vector_buckets'
+            | 'storage.iceberg_catalog'
+            | 'security.audit_logs_days'
+            | 'security.questionnaire'
+            | 'security.soc2_report'
+            | 'security.private_link'
+            | 'security.enforce_mfa'
+            | 'log.retention_days'
+            | 'custom_domain'
+            | 'vanity_subdomain'
+            | 'ipv4'
+            | 'pitr.available_variants'
+            | 'log_drains'
+            | 'branching_limit'
+            | 'branching_persistent'
+            | 'auth.mfa_phone'
+            | 'auth.mfa_web_authn'
+            | 'auth.mfa_enhanced_security'
+            | 'auth.hooks'
+            | 'auth.platform.sso'
+            | 'auth.custom_jwt_template'
+            | 'auth.saml_2'
+            | 'auth.user_sessions'
+            | 'auth.leaked_password_protection'
+            | 'auth.advanced_auth_settings'
+            | 'auth.performance_settings'
+            | 'auth.password_hibp'
+            | 'backup.retention_days'
+            | 'backup.restore_to_new_project'
+            | 'function.max_count'
+            | 'function.size_limit_mb'
+            | 'realtime.max_concurrent_users'
+            | 'realtime.max_events_per_second'
+            | 'realtime.max_joins_per_second'
+            | 'realtime.max_channels_per_client'
+            | 'realtime.max_bytes_per_second'
+            | 'realtime.max_presence_events_per_second'
+            | 'realtime.max_payload_size_in_kb'
+            | 'project_scoped_roles'
+            | 'security.member_roles'
+            | 'project_pausing'
+            | 'project_cloning'
+            | 'project_restore_after_expiry'
+            | 'assistant.advance_model'
+            | 'integrations.github_connections'
+            | 'dedicated_pooler'
+            | 'observability.dashboard_advanced_metrics'
+          /** @enum {string} */
+          type: 'boolean' | 'numeric' | 'set'
+        }
+        hasAccess: boolean
+        /** @enum {string} */
+        type: 'boolean' | 'numeric' | 'set'
+      }[]
+    }
     V1ListMigrationsResponse: {
       name?: string
       version: string
@@ -4915,6 +5043,11 @@ export interface components {
       db_pool: number | null
       db_schema: string
       max_rows: number
+    }
+    V1ProfileResponse: {
+      gotrue_id: string
+      primary_email: string
+      username: string
     }
     V1ProjectAdvisorsResponse: {
       lints: {
@@ -5686,6 +5819,49 @@ export interface operations {
       }
     }
   }
+  'v1-get-organization-entitlements': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ListEntitlementsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   'v1-list-organization-members': {
     parameters: {
       query?: never
@@ -5833,6 +6009,25 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  'v1-get-profile': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V1ProfileResponse']
+        }
       }
     }
   }
