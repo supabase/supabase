@@ -391,14 +391,13 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 {hasMaxSizeChanges && (
                   <BreakdownRow label="Max disk size">
                     <ValueChange
-                      from={String(
-                        form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
-                          DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                      )}
-                      to={String(
-                        form.getValues('maxSizeGb')?.toLocaleString() ??
-                          DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                      )}
+                      from={(
+                        form.formState.defaultValues?.maxSizeGb ??
+                        DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                      ).toLocaleString()}
+                      to={(
+                        form.getValues('maxSizeGb') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                      ).toLocaleString()}
                     />
                   </BreakdownRow>
                 )}
