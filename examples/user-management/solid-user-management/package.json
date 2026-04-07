@@ -13,7 +13,7 @@
   "devDependencies": {
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
+    "vite": "^7.3.2",
     "vite-plugin-solid": "^2.11.10"
   },
   "dependencies": {
