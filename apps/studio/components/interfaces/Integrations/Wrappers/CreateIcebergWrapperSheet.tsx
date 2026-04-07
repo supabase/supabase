@@ -39,43 +39,52 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const FORM_ID = 'create-wrapper-form'
 
+const S3TableSchema = z.object({
+  target: z.literal('S3Tables'),
+  source_schema: z.string().min(1, 'Please provide a namespace name'),
+  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  target_schema: z.string().min(1, 'Please provide an unique target schema'),
+  vault_aws_access_key_id: z.string().min(1, 'Required'),
+  vault_aws_secret_access_key: z.string().min(1, 'Required'),
+  region_name: z.string().min(1, 'Required'),
+  vault_aws_s3table_bucket_arn: z.string().min(1, 'Required'),
+})
+type S3TableSchemaType = z.infer<typeof S3TableSchema>
+
+const R2CatalogSchema = z.object({
+  target: z.literal('R2Catalog'),
+  source_schema: z.string().min(1, 'Please provide a namespace name'),
+  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  target_schema: z.string().min(1, 'Please provide an unique target schema'),
+  vault_aws_access_key_id: z.string().min(1, 'Required'),
+  vault_aws_secret_access_key: z.string().min(1, 'Required'),
+  vault_token: z.string().min(1, 'Required'),
+  warehouse: z.string().min(1, 'Required'),
+  s3: z.object({ endpoint: z.string().min(1, 'Required') }),
+  catalog_uri: z.string().min(1, 'Required'),
+})
+type R2CatalogSchemaType = z.infer<typeof R2CatalogSchema>
+
+const IcebergRestCatalogSchema = z.object({
+  target: z.literal('IcebergRestCatalog'),
+  source_schema: z.string().min(1, 'Please provide a namespace name'),
+  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  target_schema: z.string().min(1, 'Please provide an unique target schema'),
+  vault_aws_access_key_id: z.string().optional(),
+  vault_aws_secret_access_key: z.string().optional(),
+  region_name: z.string().optional(),
+  vault_aws_s3table_bucket_arn: z.string().optional(),
+  vault_token: z.string().optional(),
+  warehouse: z.string().optional(),
+  s3: z.object({ endpoint: z.string().min(1, 'Required') }),
+  catalog_uri: z.string().optional(),
+})
+type IcebergRestCatalogSchemaType = z.infer<typeof IcebergRestCatalogSchema>
+
 const formSchema = z.discriminatedUnion('target', [
-  z.object({
-    target: z.literal('S3Tables'),
-    source_schema: z.string().min(1, 'Please provide a namespace name'),
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
-    target_schema: z.string().min(1, 'Please provide an unique target schema'),
-    vault_aws_access_key_id: z.string().min(1, 'Required'),
-    vault_aws_secret_access_key: z.string().min(1, 'Required'),
-    region_name: z.string().min(1, 'Required'),
-    vault_aws_s3table_bucket_arn: z.string().min(1, 'Required'),
-  }),
-  z.object({
-    target: z.literal('R2Catalog'),
-    source_schema: z.string().min(1, 'Please provide a namespace name'),
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
-    target_schema: z.string().min(1, 'Please provide an unique target schema'),
-    vault_aws_access_key_id: z.string().min(1, 'Required'),
-    vault_aws_secret_access_key: z.string().min(1, 'Required'),
-    vault_token: z.string().min(1, 'Required'),
-    warehouse: z.string().min(1, 'Required'),
-    's3.endpoint': z.string().min(1, 'Required'),
-    catalog_uri: z.string().min(1, 'Required'),
-  }),
-  z.object({
-    target: z.literal('IcebergRestCatalog'),
-    source_schema: z.string().min(1, 'Please provide a namespace name'),
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
-    target_schema: z.string().min(1, 'Please provide an unique target schema'),
-    vault_aws_access_key_id: z.string().optional(),
-    vault_aws_secret_access_key: z.string().optional(),
-    region_name: z.string().optional(),
-    vault_aws_s3table_bucket_arn: z.string().optional(),
-    vault_token: z.string().optional(),
-    warehouse: z.string().optional(),
-    's3.endpoint': z.string().optional(),
-    catalog_uri: z.string().optional(),
-  }),
+  S3TableSchema,
+  R2CatalogSchema,
+  IcebergRestCatalogSchema,
 ])
 
 type FormSchema = z.infer<typeof formSchema>
@@ -183,6 +192,15 @@ export const CreateIcebergWrapperSheet = ({
       return
     }
 
+    let formValues: Record<string, string> = {}
+    if (values.target === 'R2Catalog' || values.target === 'IcebergRestCatalog') {
+      const { s3, ...otherFormValues } = values
+      formValues = otherFormValues
+      formValues['s3.endpoint'] = s3.endpoint
+    } else {
+      formValues = values
+    }
+
     try {
       await createSchema({
         projectRef: project?.ref,
@@ -195,7 +213,7 @@ export const CreateIcebergWrapperSheet = ({
         connectionString: project?.connectionString,
         wrapperMeta,
         formState: {
-          ...values,
+          ...formValues,
           server_name: `${values.wrapper_name}_server`,
           supabase_target_schema: values.target_schema,
         },
