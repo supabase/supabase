@@ -2472,6 +2472,24 @@ export interface InlineEditorSettingClickedEvent {
 }
 
 /**
+ * User toggled the queue table operations setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface QueueOperationsSettingClickedEvent {
+  action: 'queue_operations_setting_clicked'
+  properties: {
+    /**
+     * Whether the queue operations was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -3022,6 +3040,18 @@ export interface PricingPageExperimentExposedEvent {
 }
 
 /**
+ * User clicked the "Upgrade to Pro" CTA in the dashboard header.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaClickedEvent {
+  action: 'header_upgrade_cta_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3162,6 +3192,7 @@ export type TelemetryEvent =
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
+  | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
@@ -3190,3 +3221,4 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | PricingPageExperimentExposedEvent
+  | HeaderUpgradeCtaClickedEvent

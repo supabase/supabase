@@ -30,12 +30,10 @@ import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
-import { QueueOperationsPreview } from './QueueOperationsPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -47,7 +45,6 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]: <QueueOperationsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]: <TableFilterBarPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
@@ -67,12 +64,6 @@ export const FeaturePreviewModal = () => {
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const [isDismissedTableQueueOperations, setIsDismissedTableQueueOperations] =
-    useLocalStorageQuery(
-      LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
-      false
-    )
-
   const { flags, onUpdateFlag } = featurePreviewContext
   const allFeaturePreviews = (
     IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
@@ -91,13 +82,6 @@ export const FeaturePreviewModal = () => {
       properties: { feature: selectedFeature.key },
       groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
     })
-
-    if (
-      selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS &&
-      !isDismissedTableQueueOperations
-    ) {
-      setIsDismissedTableQueueOperations(true)
-    }
   }
 
   return (

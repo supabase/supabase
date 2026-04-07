@@ -22,6 +22,7 @@ import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
+import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
 import AlertError from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -34,13 +35,14 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 export const FilesBuckets = () => {
   const { ref } = useParams()
   const snap = useStorageExplorerStateSnapshot()
+  const { sortBucket, setSortBucket } = useStoragePreference(snap.projectRef)
 
   const [filterString, setFilterString] = useState('')
   const debouncedFilterString = useDebounce(filterString, 250)
   const normalizedSearch = debouncedFilterString.trim()
 
-  const sortColumn = snap.sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'name' : 'created_at'
-  const sortOrder = snap.sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'asc' : 'desc'
+  const sortColumn = sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'name' : 'created_at'
+  const sortOrder = sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'asc' : 'desc'
 
   const [visible, setVisible] = useQueryState(
     'new',
@@ -118,15 +120,13 @@ export const FilesBuckets = () => {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button type="default" icon={<ArrowDownNarrowWide />}>
-                              Sorted by {snap.sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                              Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-40">
                             <DropdownMenuRadioGroup
-                              value={snap.sortBucket}
-                              onValueChange={(value) =>
-                                snap.setSortBucket(value as STORAGE_BUCKET_SORT)
-                              }
+                              value={sortBucket}
+                              onValueChange={(value) => setSortBucket(value as STORAGE_BUCKET_SORT)}
                             >
                               <DropdownMenuRadioItem value="alphabetical">
                                 Sort by name
