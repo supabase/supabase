@@ -14,7 +14,10 @@ import {
   type ConnectionStringMethod,
   type DatabaseConnectionType,
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
-import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type {
+  ConnectionStringPooler,
+  StepContentProps,
+} from '@/components/interfaces/ConnectSheet/Connect.types'
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
 import {
   buildConnectionParameters,
@@ -134,9 +137,9 @@ function DirectConnectionContent({ state }: StepContentProps) {
   const useSharedPooler = Boolean(state.useSharedPooler)
 
   const connectionStrings = useConnectionStringDatabases()
-  const connectionStringPooler =
+  const connectionStringPooler: ConnectionStringPooler | undefined =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
-  const hasIPv4Addon = connectionStringPooler.ipv4SupportedForDedicatedPooler
+  const hasIPv4Addon = connectionStringPooler?.ipv4SupportedForDedicatedPooler ?? false
 
   // Determine which connection string to use
   const resolvedConnectionString = useMemo(
