@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
@@ -12,7 +13,7 @@ import {
   WarningIcon,
 } from 'ui'
 
-import APIAuthorizationLayout from '@/components/layouts/APIAuthorizationLayout'
+import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
 import { OrganizationSelector } from '@/components/ui/org-selector'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-projects-confirm-mutation'
@@ -94,7 +95,7 @@ const StripeProjectsLoginPage = () => {
       : 'Your Supabase organization has been linked to your Stripe account.'
 
   return (
-    <APIAuthorizationLayout>
+    <APIAuthorizationLayout HeadProvider={Head}>
       <div className="flex flex-col items-center min-h-[500px]">
         {isConfirming ? (
           <>

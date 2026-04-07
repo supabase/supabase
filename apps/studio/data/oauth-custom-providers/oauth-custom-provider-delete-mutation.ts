@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useAuthConfigQuery } from '../auth/auth-config-query'
-import { useProjectApiUrl } from '../config/project-endpoint-query'
 import { oAuthCustomProvidersKeys } from './keys'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'

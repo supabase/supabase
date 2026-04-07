@@ -1,7 +1,7 @@
-import type { Entity } from 'data/table-editor/table-editor-types'
 import type { Dictionary } from 'types'
 
 import { PendingAddRow, SupaRow } from '@/components/grid/types'
+import type { Entity } from '@/data/table-editor/table-editor-types'
 
 export enum QueuedOperationType {
   EDIT_CELL_CONTENT = 'edit_cell_content',

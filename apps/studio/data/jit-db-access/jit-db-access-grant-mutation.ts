@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { handleError, put } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
 
 import { jitDbAccessKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 type JitDbAccessGrantVariables = {
   projectRef: string

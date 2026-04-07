@@ -1,21 +1,20 @@
 import dayjs from 'dayjs'
 
-import {
-  isUnixMicro,
-  unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { AnalyticsInterval } from 'data/analytics/constants'
-import { get } from 'data/fetchers'
-import { analyticsIntervalToGranularity } from 'data/reports/report.utils'
 import { ReportConfig } from './reports.types'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-import { SelectFilters } from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { fetchLogs } from 'data/reports/report.utils'
 import {
   extractStatusCodesFromData,
   generateStatusCodeAttributes,
   transformStatusCodeData,
-} from 'components/interfaces/Reports/Reports.utils'
+} from '@/components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { SelectFilters } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import {
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { AnalyticsInterval } from '@/data/analytics/constants'
+import { get } from '@/data/fetchers'
+import { analyticsIntervalToGranularity, fetchLogs } from '@/data/reports/report.utils'
 
 type EdgeFunctionReportFilters = {
   status_code: NumericFilter | null

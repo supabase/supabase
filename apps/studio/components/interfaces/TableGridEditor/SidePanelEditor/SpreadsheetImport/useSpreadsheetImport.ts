@@ -31,6 +31,7 @@ interface FileParsedState {
   _tag: 'file_parsed'
   file: File
   selectedHeaders: Array<string>
+  emptyStringAsNullHeaders: Array<string>
   data: SpreadsheetData
   errors: Array<Papa.ParseError & { data: unknown }>
 }
@@ -39,6 +40,7 @@ interface TextParsedState {
   _tag: 'text_parsed'
   text: string
   selectedHeaders: Array<string>
+  emptyStringAsNullHeaders: Array<string>
   data: SpreadsheetData
   errors: Array<Papa.ParseError & { data: unknown }>
 }
@@ -123,8 +125,6 @@ export function useSpreadsheetImport({
     }
   })
 
-  const [treatEmptyAsNull, setTreatEmptyAsNull] = useState(false)
-
   const handleSwitchTab = useCallback(
     function switchTab() {
       if (isFileTab(state)) {
@@ -147,14 +147,20 @@ export function useSpreadsheetImport({
   }, [])
 
   const processFile = useCallback(
-    async function processFile(file: File, { treatEmptyAsNull }: { treatEmptyAsNull: boolean }) {
+    async function processFile(
+      file: File,
+      { emptyStringAsNullHeaders }: { emptyStringAsNullHeaders?: Array<string> }
+    ) {
       const currentSignal = resetAbortController()
 
-      const { headers, rowCount, columnTypeMap, errors, previewRows } = await parseSpreadsheet(
-        file,
-        setParseProgress,
-        treatEmptyAsNull
-      )
+      const {
+        headers,
+        emptyStringAsNullHeaders: resolvedEmptyStringAsNullHeaders,
+        rowCount,
+        columnTypeMap,
+        errors,
+        previewRows,
+      } = await parseSpreadsheet(file, setParseProgress, emptyStringAsNullHeaders)
       if (currentSignal.aborted) return
 
       if (errors.length > 0) {
@@ -165,6 +171,7 @@ export function useSpreadsheetImport({
         _tag: 'file_parsed',
         file,
         selectedHeaders: headers,
+        emptyStringAsNullHeaders: resolvedEmptyStringAsNullHeaders,
         data: { headers, rows: previewRows, rowCount, columnTypeMap },
         errors,
       })
@@ -173,11 +180,20 @@ export function useSpreadsheetImport({
   )
 
   const processText = useCallback(
-    async function processText(text: string, { treatEmptyAsNull }: { treatEmptyAsNull: boolean }) {
+    async function processText(
+      text: string,
+      { emptyStringAsNullHeaders }: { emptyStringAsNullHeaders: Array<string> | undefined }
+    ) {
       const currentSignal = resetAbortController()
-      const { headers, rows, columnTypeMap, errors } = await parseSpreadsheetText({
+      const {
+        headers,
+        emptyStringAsNullHeaders: resolvedEmptyStringAsNullHeaders,
+        rows,
+        columnTypeMap,
+        errors,
+      } = await parseSpreadsheetText({
         text,
-        treatEmptyAsNull,
+        emptyStringAsNullHeaders,
       })
       if (currentSignal.aborted) return
 
@@ -189,6 +205,7 @@ export function useSpreadsheetImport({
         _tag: 'text_parsed',
         text,
         selectedHeaders: headers,
+        emptyStringAsNullHeaders: resolvedEmptyStringAsNullHeaders,
         data: { headers, rows, rowCount: rows.length, columnTypeMap },
         errors,
       })
@@ -215,7 +232,7 @@ export function useSpreadsheetImport({
   // latest state/treatEmptyAsNull without re-triggering the effect.
   const processOnMount = useStaticEffectEvent(async function processOnMount() {
     if (state._tag === 'parsing_file') {
-      await processFile(state.file, { treatEmptyAsNull })
+      await processFile(state.file, { emptyStringAsNullHeaders: undefined })
     }
   })
   useEffect(() => {
@@ -223,32 +240,27 @@ export function useSpreadsheetImport({
   }, [processOnMount])
 
   const processSpreadsheet = useCallback(
-    async function processSpreadsheet({ treatEmptyAsNull }: { treatEmptyAsNull: boolean }) {
+    async function processSpreadsheet({
+      emptyStringAsNullHeaders,
+    }: {
+      emptyStringAsNullHeaders: Array<string> | undefined
+    }) {
       if (hasAttachedFile(state)) {
-        return processFile(state.file, { treatEmptyAsNull })
+        return processFile(state.file, { emptyStringAsNullHeaders })
       } else if (hasAttachedText(state)) {
-        return processText(state.text, { treatEmptyAsNull })
+        return processText(state.text, { emptyStringAsNullHeaders })
       }
     },
     [state, processFile, processText]
-  )
-
-  const handleToggleTreatEmptyAsNull = useCallback(
-    function toggleTreatEmptyAsNull() {
-      const next = !treatEmptyAsNull
-      setTreatEmptyAsNull(next)
-      processSpreadsheet({ treatEmptyAsNull: next })
-    },
-    [treatEmptyAsNull, processSpreadsheet]
   )
 
   const handleUploadFile = useCallback(
     async function uploadFile(file: File) {
       markDirty(true)
       setState({ _tag: 'parsing_file', file, progress: 0 })
-      await processFile(file, { treatEmptyAsNull })
+      await processFile(file, { emptyStringAsNullHeaders: undefined })
     },
-    [treatEmptyAsNull, markDirty, processFile]
+    [markDirty, processFile]
   )
 
   const handleInputText = useCallback(
@@ -260,10 +272,13 @@ export function useSpreadsheetImport({
       } else {
         markDirty(true)
         setState({ _tag: 'parsing_text', text, progress: 0 })
-        await processTextDebounced(text, { treatEmptyAsNull })
+        await processTextDebounced(text, {
+          emptyStringAsNullHeaders:
+            state._tag === 'text_parsed' ? state.emptyStringAsNullHeaders : undefined,
+        })
       }
     },
-    [treatEmptyAsNull, resetAbortController, markDirty, processTextDebounced]
+    [state, resetAbortController, markDirty, processTextDebounced]
   )
 
   const handleRemoveFile = useCallback(
@@ -283,18 +298,31 @@ export function useSpreadsheetImport({
         const selectedHeaders = state.selectedHeaders.includes(header)
           ? state.selectedHeaders.filter((h) => h !== header)
           : [...state.selectedHeaders, header]
-        setState({ ...state, selectedHeaders })
+        const emptyStringAsNullHeaders = state.emptyStringAsNullHeaders.filter((h) =>
+          selectedHeaders.includes(h)
+        )
+        setState({ ...state, selectedHeaders, emptyStringAsNullHeaders })
       }
     },
     [state]
   )
 
+  const handleSetEmptyStringAsNullHeaders = useCallback(
+    function setEmptyStringAsNullHeaders(headers: string[]) {
+      if (state._tag === 'file_parsed' || state._tag === 'text_parsed') {
+        const nextHeaders = headers.filter((header) => state.selectedHeaders.includes(header))
+        processSpreadsheet({ emptyStringAsNullHeaders: nextHeaders })
+        setState({ ...state, emptyStringAsNullHeaders: nextHeaders })
+      }
+    },
+    [processSpreadsheet, state]
+  )
+
   return {
     state,
-    treatEmptyAsNull,
     handleSwitchTab,
-    handleToggleTreatEmptyAsNull,
     handleToggleSelectedHeader,
+    handleSetEmptyStringAsNullHeaders,
     handleUploadFile,
     handleInputText,
     handleRemoveFile,

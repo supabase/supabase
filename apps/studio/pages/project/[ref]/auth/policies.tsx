@@ -1,7 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
+import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 import { Policies } from 'components/interfaces/Auth/Policies/Policies'
 import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
 import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
