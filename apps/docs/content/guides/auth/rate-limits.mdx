@@ -57,11 +57,6 @@ You can also enable IP address forwarding using the management API:
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 export PROJECT_REF="your-project-ref"
 
-# Get IP address forwarding settings
-curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
-     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-    | jq '.security_sb_forwarded_for_enabled'
-
 # Update IP address forwarding settings
 curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
      -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
