@@ -10,42 +10,6 @@ export type OrganizationBillingSubscriptionPreviewVariables = {
   tier?: SubscriptionTier
 }
 
-export type OrganizationBillingSubscriptionPreviewResponse = {
-  breakdown: {
-    description: string
-    unit_price: number
-    unit_price_desc?: string
-    quantity?: number
-    total_price: number
-    breakdown?: {
-      project_name: string
-      project_ref: string
-      usage: number
-    }[]
-  }[]
-  number_of_projects?: number
-  plan_change_type?: 'downgrade' | 'none' | 'upgrade'
-  active_projects?: {
-    status:
-      | 'INACTIVE'
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'UNKNOWN'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'RESTARTING'
-      | 'RESIZING'
-      | 'UPGRADING'
-    instance_size: string
-    name: string
-    ref: string
-  }[]
-  billed_via_partner?: boolean
-}
-
 export async function previewOrganizationBillingSubscription({
   organizationSlug,
   tier,
@@ -68,7 +32,7 @@ export async function previewOrganizationBillingSubscription({
 
   if (error) handleError(error)
 
-  return data as OrganizationBillingSubscriptionPreviewResponse
+  return data
 }
 
 export type OrganizationBillingSubscriptionPreviewData = Awaited<

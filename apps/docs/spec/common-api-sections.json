@@ -683,6 +683,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-organization-entitlements",
+        "title": "Get organization entitlements",
+        "slug": "v1-get-organization-entitlements",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-organizations",
         "title": "List all organizations",
         "slug": "v1-list-all-organizations",
@@ -692,6 +698,18 @@
         "id": "v1-list-organization-members",
         "title": "List organization members",
         "slug": "v1-list-organization-members",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Profile",
+    "items": [
+      {
+        "id": "v1-get-profile",
+        "title": "Get profile",
+        "slug": "v1-get-profile",
         "type": "operation"
       }
     ]

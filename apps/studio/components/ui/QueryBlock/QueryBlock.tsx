@@ -11,7 +11,13 @@ import { CHART_COLORS } from '../Charts/Charts.constants'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
-import { checkHasNonPositiveValues, formatLogTick, getCumulativeResults } from './QueryBlock.utils'
+import {
+  checkHasNonPositiveValues,
+  computeYAxisWidth,
+  formatLogTick,
+  formatYAxisTick,
+  getCumulativeResults,
+} from './QueryBlock.utils'
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
@@ -112,6 +118,10 @@ export const QueryBlock = ({
   }, [logScale, yKey, chartData])
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
+
+  const yAxisWidth = computeYAxisWidth(chartData ?? [], yKey ?? '', {
+    isLogScale: effectiveLogScale,
+  })
 
   const getDateFormat = (key: any) => {
     const value = chartData?.[0]?.[key] || ''
@@ -226,9 +236,12 @@ export const QueryBlock = ({
 
       {showSql && (
         <div
-          className={cn('shrink-0 grow-1 w-full h-full overflow-y-auto max-h-[min(300px, 100%)]', {
-            'border-b': results !== undefined,
-          })}
+          className={cn(
+            'shrink-0 grow-1 w-full h-full overflow-y-auto overscroll-contain max-h-[min(300px, 100%)]',
+            {
+              'border-b': results !== undefined,
+            }
+          )}
         >
           <CodeBlock
             hideLineNumbers
@@ -272,7 +285,7 @@ export const QueryBlock = ({
               >
                 <BarChart
                   accessibilityLayer
-                  margin={{ left: -20, right: 0, top: 10 }}
+                  margin={{ left: 0, right: 0, top: 10 }}
                   data={chartData}
                   onMouseMove={(e: any) => {
                     if (e.activeTooltipIndex !== focusDataIndex) {
@@ -300,11 +313,22 @@ export const QueryBlock = ({
                     scale={effectiveLogScale ? 'log' : 'auto'}
                     domain={effectiveLogScale ? [1, 'auto'] : undefined}
                     allowDataOverflow={effectiveLogScale}
-                    width={effectiveLogScale ? 52 : undefined}
-                    tickFormatter={effectiveLogScale ? formatLogTick : undefined}
+                    width={yAxisWidth}
+                    tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                   />
-                  <Tooltip content={<ChartTooltipContent className="w-[150px]" />} />
-                  <Bar radius={1} dataKey={yKey}>
+                  <Tooltip
+                    content={
+                      <ChartTooltipContent
+                        className="min-w-[200px]"
+                        labelFormatter={(value) =>
+                          xKeyDateFormat === 'date'
+                            ? dayjs(value).format('MMM D YYYY HH:mm')
+                            : String(value)
+                        }
+                      />
+                    }
+                  />
+                  <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">
                     {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
@@ -342,7 +366,11 @@ export const QueryBlock = ({
             </div>
           ) : (
             results && (
-              <div className={cn('flex-1 w-full overflow-auto relative max-h-64')}>
+              <div
+                className={cn(
+                  'flex flex-col flex-1 w-full overflow-auto overscroll-contain relative max-h-64'
+                )}
+              >
                 <Results rows={results} />
               </div>
             )
