@@ -40,6 +40,39 @@ describe('parseParameters', () => {
     const userIdParam = result.find((p) => p.name === 'userId')
     expect(userIdParam?.occurrences).toBe(2)
   })
+
+  it('ignores casts and placeholders inside quoted/commented SQL', () => {
+    const result = parseParameters(`
+      -- :ignored_comment
+      SELECT
+        metadata::jsonb AS payload,
+        ':ignored_string' AS literal
+      FROM logs
+      WHERE user_id = :userId
+      /* :ignored_block_comment */
+    `)
+
+    expect(result).toEqual([
+      {
+        name: 'userId',
+        value: '',
+        defaultValue: undefined,
+        type: undefined,
+        possibleValues: undefined,
+        occurrences: 1,
+      },
+    ])
+  })
+
+  it('ignores placeholders inside dollar-quoted strings', () => {
+    const result = parseParameters(`
+      SELECT $$:ignored$$ AS body, :userId AS user_id
+    `)
+
+    const userIdParam = result.find((p) => p.name === 'userId')
+    expect(userIdParam?.occurrences).toBe(1)
+    expect(result.map((p) => p.name)).not.toContain('ignored')
+  })
 })
 
 describe('processParameterizedSql', () => {
@@ -73,5 +106,32 @@ describe('processParameterizedSql', () => {
     const result = processParameterizedSql(sql, {})
     expect(result).toBe('SELECT * FROM items WHERE status = open')
     expect(result).not.toContain('@set')
+  })
+
+  it('does not treat postgres casts or quoted/commented values as parameters', () => {
+    const sql = `
+      @set userId:int = 123
+      SELECT
+        metadata::jsonb AS payload,
+        ':ignored_string' AS literal
+      FROM logs
+      WHERE user_id = :userId
+      -- :ignored_comment
+      /* :ignored_block_comment */
+    `
+
+    const result = processParameterizedSql(sql, {})
+
+    expect(result).toContain('metadata::jsonb')
+    expect(result).toContain("':ignored_string' AS literal")
+    expect(result).toContain('WHERE user_id = 123')
+    expect(result).not.toContain('@set')
+  })
+
+  it('throws only for true missing placeholders when casts are present', () => {
+    const sql = 'SELECT 1::int, :userId'
+    expect(() => processParameterizedSql(sql, {})).toThrowError(
+      'Missing value for parameter: userId'
+    )
   })
 })
