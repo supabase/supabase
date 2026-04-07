@@ -330,6 +330,7 @@ export const ChartBlock = ({
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
+                      className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />
