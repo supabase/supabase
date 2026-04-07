@@ -1,13 +1,13 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import { PROVIDERS } from 'lib/constants'
-import { captureCriticalError } from 'lib/error-reporting'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
+import type { components } from '@/data/api'
+import { handleError, post } from '@/data/fetchers'
+import { PROVIDERS } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CloudProvider = CreateProjectBody['cloud_provider']

@@ -14,16 +14,7 @@ import { buildAssistantEvalOutput } from 'evals/output'
 import type { AssistantEvalInput, AssistantEvalOutput } from 'evals/scorer'
 import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
-import {
-  CHAT_PROMPT,
-  EDGE_FUNCTION_PROMPT,
-  GENERAL_PROMPT,
-  LIMITATIONS_PROMPT,
-  PG_BEST_PRACTICES,
-  REALTIME_PROMPT,
-  RLS_PROMPT,
-  SECURITY_PROMPT,
-} from 'lib/ai/prompts'
+import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from 'lib/ai/prompts'
 import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
@@ -70,7 +61,7 @@ export async function generateAssistantResponse({
   const run = async (span?: Span) => {
     // Only returns last 7 messages
     // Filters out tools with invalid states
-    // Filters out tool outputs based on opt-in level using renderingToolOutputParser
+    // Filters out tool outputs based on opt-in level
     const messages = (rawMessages || []).slice(-7).map((msg) => {
       if (msg && msg.role === 'assistant' && 'results' in msg) {
         const cleanedMsg = { ...msg }
@@ -103,12 +94,16 @@ export async function generateAssistantResponse({
     const system = source`
       ${GENERAL_PROMPT}
       ${CHAT_PROMPT}
-      ${PG_BEST_PRACTICES}
-      ${RLS_PROMPT}
-      ${EDGE_FUNCTION_PROMPT}
-      ${REALTIME_PROMPT}
       ${SECURITY_PROMPT}
       ${LIMITATIONS_PROMPT}
+
+      ## Available Knowledge
+
+      Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
+      - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
+      - \`rls\` — Row Level Security policies
+      - \`edge_functions\` — Supabase Edge Functions
+      - \`realtime\` — Supabase Realtime
     `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`

@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { formatRelative } from 'date-fns'
 import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -15,18 +16,14 @@ import {
 
 import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const StripeSyncSettingsPage = () => {
-  const { data: project } = useSelectedProjectQuery()
+  const { ref } = useParams()
 
   const {
     schemaComment: { status: installationStatus },
     syncState,
-  } = useStripeSyncStatus({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useStripeSyncStatus()
   const installed = isInstalled(installationStatus)
   const isSyncing = isSyncRunning(syncState)
   const uninstalling = isUninstalling(installationStatus)
@@ -117,9 +114,7 @@ export const StripeSyncSettingsPage = () => {
                 </div>
 
                 <Button asChild type="default" className="ml-8 @md:ml-0">
-                  <Link href={`/project/${project?.ref}/editor?schema=stripe`}>
-                    Open Table Editor
-                  </Link>
+                  <Link href={`/project/${ref}/editor?schema=stripe`}>Open Table Editor</Link>
                 </Button>
               </div>
             </CardContent>

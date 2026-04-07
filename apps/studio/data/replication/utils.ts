@@ -1,5 +1,5 @@
-import { MAX_RETRY_FAILURE_COUNT } from 'data/query-client'
-import { ResponseError } from 'types'
+import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
+import { ResponseError } from '@/types'
 
 export const checkReplicationFeatureFlagRetry = (
   failureCount: number,

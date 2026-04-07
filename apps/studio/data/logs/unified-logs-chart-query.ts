@@ -1,11 +1,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
-import { getLogsChartQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { handleError, post } from 'data/fetchers'
-import { ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 import { logsKeys } from './keys'
 import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { handleError, post } from '@/data/fetchers'
+import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
   { projectRef, search }: UnifiedLogsVariables,

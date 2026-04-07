@@ -1,17 +1,17 @@
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { PendingAddRow } from 'components/grid/types'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { toast } from 'sonner'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { QueuedOperation, QueuedOperationType } from 'state/table-editor-operation-queue.types'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { tableRowKeys } from './keys'
 import { getTableRowCreateSql } from './table-row-create-mutation'
 import { getTableRowDeleteSql } from './table-row-delete-mutation'
 import { getTableRowUpdateSql } from './table-row-update-mutation'
+import type { PendingAddRow } from '@/components/grid/types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import { QueuedOperation, QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OperationQueueSaveVariables = {
   projectRef: string

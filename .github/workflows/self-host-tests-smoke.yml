@@ -24,5 +24,11 @@ jobs:
           sparse-checkout: |
             docker/
       - name: Run docker-compose up
+        shell: bash
         # Ensure all services can be started and healthy with default config
-        run: cd docker && cp .env.example .env && docker compose up --wait --wait-timeout 180
+        run: |
+          set -euo pipefail
+          cd docker
+          cp .env.example .env
+          yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
+          docker compose up --wait --wait-timeout 180
