@@ -22,7 +22,7 @@ import {
 import { ComputeBadge } from 'ui-patterns'
 
 import { DiskStorageSchemaType } from './DiskManagement.schema'
-import { DiskManagementMessage } from './DiskManagement.types'
+import { DiskManagementMessage, InfraInstanceSize } from './DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -262,7 +262,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <span className="text-3xl text-foreground" translate="no">
                   {formatCurrency(totalBeforePrice)}
                 </span>
-                <ComputeBadge infraComputeSize={oldComputeLabel} />
+                <ComputeBadge infraComputeSize={oldComputeLabel as InfraInstanceSize} />
               </div>
 
               {/* Arrow */}
@@ -279,7 +279,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <span className="text-3xl text-foreground" translate="no">
                   {formatCurrency(totalAfterPrice)}
                 </span>
-                <ComputeBadge infraComputeSize={newComputeLabel} />
+                <ComputeBadge infraComputeSize={newComputeLabel as InfraInstanceSize} />
               </div>
             </div>
           </>
