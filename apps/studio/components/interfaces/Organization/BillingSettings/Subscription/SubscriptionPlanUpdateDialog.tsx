@@ -73,7 +73,8 @@ interface Props {
   projects: OrgProject[]
   onAddressChange?: (address: CustomerAddress) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
-  onUseAsDefaultBillingAddressChange?: (useAsDefault: boolean) => void
+  useAsDefaultBillingAddress: boolean
+  onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
 
 export const SubscriptionPlanUpdateDialog = ({
@@ -90,6 +91,7 @@ export const SubscriptionPlanUpdateDialog = ({
   projects,
   onAddressChange,
   onTaxIdChange,
+  useAsDefaultBillingAddress,
   onUseAsDefaultBillingAddressChange,
 }: Props) => {
   const { resolvedTheme } = useTheme()
@@ -345,6 +347,7 @@ export const SubscriptionPlanUpdateDialog = ({
                         readOnly={paymentConfirmationLoading || isConfirming || isUpdating}
                         onAddressChange={onAddressChange}
                         onTaxIdChange={onTaxIdChange}
+                        useAsDefaultBillingAddress={useAsDefaultBillingAddress}
                         onUseAsDefaultBillingAddressChange={onUseAsDefaultBillingAddressChange}
                       />
                     </div>

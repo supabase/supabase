@@ -386,6 +386,7 @@ export const PlanUpdateSidePanel = () => {
         }}
         onAddressChange={handleAddressChange}
         onTaxIdChange={handleTaxIdChange}
+        useAsDefaultBillingAddress={useAsDefaultBillingAddress}
         onUseAsDefaultBillingAddressChange={handleUseAsDefaultBillingAddressChange}
       />
 

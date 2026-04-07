@@ -40,7 +40,8 @@ export interface PaymentMethodSelectionProps {
   readOnly: boolean
   onAddressChange?: (address: CustomerAddress) => void
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
-  onUseAsDefaultBillingAddressChange?: (useAsDefault: boolean) => void
+  useAsDefaultBillingAddress: boolean
+  onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -51,6 +52,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     readOnly,
     onAddressChange,
     onTaxIdChange,
+    useAsDefaultBillingAddress,
     onUseAsDefaultBillingAddressChange,
   }: PaymentMethodSelectionProps,
   ref
@@ -60,7 +62,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
-  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
@@ -300,9 +301,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                   id="defaultBillingAddress"
                   checked={useAsDefaultBillingAddress}
                   onCheckedChange={() => {
-                    const next = !useAsDefaultBillingAddress
-                    setUseAsDefaultBillingAddress(next)
-                    onUseAsDefaultBillingAddressChange?.(next)
+                    onUseAsDefaultBillingAddressChange(!useAsDefaultBillingAddress)
                   }}
                 />
                 <label
