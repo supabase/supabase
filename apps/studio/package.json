@@ -115,8 +115,6 @@
     "pg-minify": "^1.6.3",
     "randombytes": "^2.1.0",
     "react": "catalog:",
-    "react-beautiful-dnd": "^13.1.0",
-    "react-contexify": "^5.0.0",
     "react-data-grid": "7.0.0-beta.47",
     "react-day-picker": "^9.11.1",
     "react-dnd": "^16.0.1",

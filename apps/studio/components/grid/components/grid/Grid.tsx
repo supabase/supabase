@@ -10,7 +10,7 @@ import type { GridProps, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import { RowRenderer } from './RowRenderer'
+import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
 import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
 import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
 import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -324,26 +324,28 @@ export const Grid = memo(
             </div>
           )}
 
-          <DataGrid
-            ref={ref}
-            className={`${gridClass} flex-grow`}
-            rowClass={computedRowClass}
-            columns={columnsWithDirtyCellClass}
-            rows={rows ?? []}
-            renderers={{ renderRow: RowRenderer }}
-            rowKeyGetter={rowKeyGetter}
-            selectedRows={snap.selectedRows}
-            onColumnResize={snap.updateColumnSize}
-            onRowsChange={onRowsChange}
-            onSelectedCellChange={onSelectedCellChange}
-            onSelectedRowsChange={onSelectedRowsChange}
-            onCellDoubleClick={(props) => {
-              if (typeof props.column.name === 'string') {
-                onRowDoubleClick(props.row, { name: props.column.name })
-              }
-            }}
-            onCellKeyDown={handleCopyCell}
-          />
+          <RowContextMenuProvider>
+            <DataGrid
+              ref={ref}
+              className={`${gridClass} flex-grow`}
+              rowClass={computedRowClass}
+              columns={columnsWithDirtyCellClass}
+              rows={rows ?? []}
+              renderers={{ renderRow: RowRenderer }}
+              rowKeyGetter={rowKeyGetter}
+              selectedRows={snap.selectedRows}
+              onColumnResize={snap.updateColumnSize}
+              onRowsChange={onRowsChange}
+              onSelectedCellChange={onSelectedCellChange}
+              onSelectedRowsChange={onSelectedRowsChange}
+              onCellDoubleClick={(props) => {
+                if (typeof props.column.name === 'string') {
+                  onRowDoubleClick(props.row, { name: props.column.name })
+                }
+              }}
+              onCellKeyDown={handleCopyCell}
+            />
+          </RowContextMenuProvider>
         </div>
       )
     }

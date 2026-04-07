@@ -1,10 +1,9 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useRef } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { createPortal } from 'react-dom'
 
 import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
@@ -12,7 +11,6 @@ import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
-import { RowContextMenu } from './components/menu/RowContextMenu'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
@@ -46,7 +44,6 @@ export const SupabaseGrid = ({
   const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
-  const [mounted, setMounted] = useState(false)
 
   const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
@@ -89,10 +86,6 @@ export const SupabaseGrid = ({
     }
   )
 
-  useEffect(() => {
-    if (!mounted) setMounted(true)
-  }, [])
-
   const operations = (tableEditorSnap.operationQueue.operations as QueuedOperation[]).filter(
     (op) => op.tableId === tableId
   )
@@ -128,8 +121,6 @@ export const SupabaseGrid = ({
             <Shortcuts gridRef={gridRef} rows={rows} />
           </>
         )}
-
-        {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
       </div>
     </DndProvider>
   )

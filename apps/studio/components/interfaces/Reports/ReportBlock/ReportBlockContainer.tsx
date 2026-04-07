@@ -56,7 +56,7 @@ export const ReportBlockContainer = ({
               <h3 className="heading-meta truncate">{label}</h3>
               {badge && <div className="flex items-center shrink-0">{badge}</div>}
             </div>
-            <div className="flex items-center">{actions}</div>
+            <div className="flex items-center shrink-0">{actions}</div>
           </div>
         </TooltipTrigger>
         {tooltip && (
