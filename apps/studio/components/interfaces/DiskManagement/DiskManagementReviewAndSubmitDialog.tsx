@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
-import { useMemo } from 'react'
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Alert_Shadcn_,
   AlertTitle_Shadcn_,
-  Badge,
   Button,
   ButtonProps,
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -17,14 +17,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
   WarningIcon,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 
 import { DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
@@ -36,8 +31,6 @@ import {
   getAvailableComputeOptions,
   mapAddOnVariantIdToComputeSize,
 } from './DiskManagement.utils'
-import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
-import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -50,81 +43,30 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { formatCurrency } from '@/lib/helpers'
 
-const TableHeaderRow = () => (
-  <TableRow>
-    <TableHead className="w-[140px] pl-5">Disk attribute</TableHead>
-    <TableHead className="text-right">-</TableHead>
-    <TableHead className="w-[100px]">Unit</TableHead>
-    <TableHead className="text-right pr-5">Price Change</TableHead>
-  </TableRow>
-)
-
-interface TableDataRowProps {
-  attribute: string
-  defaultValue: string | number
-  newValue: string | number
-  unit: string
-  beforePrice: number
-  afterPrice: number
-  hidePrice?: boolean
-  priceTooltip?: string
-  upgradeIncluded?: boolean
+interface BreakdownRowProps {
+  label: string
+  children: React.ReactNode
 }
 
-const TableDataRow = ({
-  attribute,
-  defaultValue,
-  newValue,
-  unit,
-  beforePrice,
-  afterPrice,
-  hidePrice = false,
-  priceTooltip,
-  upgradeIncluded = false,
-}: TableDataRowProps) => (
-  <TableRow>
-    <TableCell className="pl-5">
-      <div className="flex flex-row gap-2 items-center">
-        <span>{attribute}</span>
-      </div>
-    </TableCell>
-    <TableCell className="text-right font-mono">
-      {defaultValue !== newValue ? (
-        <Badge variant="default" className="bg-alternative bg-opacity-100">
-          <div className="flex items-center gap-1">
-            <span className="text-xs font-mono text-foreground-muted">
-              {defaultValue.toString()}
-            </span>
-            <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
-            <span className="text-xs font-mono text-foreground">{newValue.toString()}</span>
-          </div>
-        </Badge>
-      ) : (
-        <span className="text-xs font-mono">
-          <span className="text-foreground-muted"></span>
-          {defaultValue}
-        </span>
-      )}
-    </TableCell>
-    <TableCell className="text-xs font-mono">{unit}</TableCell>
-    <TableCell className="text-right pr-5">
-      {!upgradeIncluded && hidePrice ? (
-        <span className="text-xs font-mono">-</span>
-      ) : beforePrice !== afterPrice || upgradeIncluded ? (
-        <BillingChangeBadge
-          show={true}
-          beforePrice={beforePrice}
-          afterPrice={afterPrice}
-          tooltip={priceTooltip}
-          free={upgradeIncluded}
-        />
-      ) : (
-        <span className="text-xs font-mono" translate="no">
-          {formatCurrency(beforePrice)}
-        </span>
-      )}
-    </TableCell>
-  </TableRow>
+const BreakdownRow = ({ label, children }: BreakdownRowProps) => (
+  <div className="flex items-center justify-between py-3 px-5 border-b border-dashed last:border-b-0">
+    <span className="text-sm text-foreground-light">{label}</span>
+    {children}
+  </div>
+)
+
+const ValueChange = ({ from, to }: { from: string; to: string }) => (
+  <span className="text-xs font-mono uppercase">
+    <span className="text-foreground-lighter">{from}</span>
+    <span className="text-foreground-lighter mx-2">&rarr;</span>
+    <span className="text-foreground">{to}</span>
+  </span>
+)
+
+const PriceDelta = ({ delta }: { delta: number }) => (
+  <span className={cn('text-sm font-mono', delta >= 0 ? 'text-brand' : 'text-destructive')}>
+    {delta >= 0 ? `+ ${formatCurrency(delta)}` : `- ${formatCurrency(Math.abs(delta))}`} per month
+  </span>
 )
 
 interface DiskSizeMeterProps {
@@ -159,6 +101,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
 
   const { formState, getValues } = form
 
+  const [showBreakdown, setShowBreakdown] = useState(true)
+
   const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -169,17 +113,10 @@ export const DiskManagementReviewAndSubmitDialog = ({
     }
   )
 
-  /**
-   * Queries
-   * */
-  const {
-    data: addons,
-    // request deps in Form handle errors and loading
-  } = useProjectAddonsQuery({ projectRef: project?.ref })
+  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
   const planId = org?.plan.id ?? 'free'
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
-  const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
 
   const availableAddons = useMemo(() => {
     return addons?.available_addons ?? []
@@ -253,6 +190,33 @@ export const DiskManagementReviewAndSubmitDialog = ({
     (hasThroughputChanges && form.getValues('storageType') === 'gp3') ||
     hasTotalSizeChanges
 
+  const totalBeforePrice =
+    Number(computeSizePrice.oldPrice) +
+    Number(diskSizePrice.oldPrice) +
+    Number(iopsPrice.oldPrice) +
+    Number(throughputPrice.oldPrice)
+
+  const totalAfterPrice =
+    Number(computeSizePrice.newPrice) +
+    Number(diskSizePrice.newPrice) +
+    Number(iopsPrice.newPrice) +
+    Number(throughputPrice.newPrice)
+
+  const oldComputeLabel = mapAddOnVariantIdToComputeSize(
+    form.formState.defaultValues?.computeSize ?? 'ci_nano'
+  )
+  const newComputeLabel = mapAddOnVariantIdToComputeSize(form.getValues('computeSize'))
+
+  const hasAnyBreakdownRows =
+    hasComputeChanges ||
+    hasStorageTypeChanges ||
+    hasIOPSChanges ||
+    (form.getValues('storageType') === 'gp3' && hasThroughputChanges) ||
+    hasTotalSizeChanges ||
+    hasGrowthPercentChanges ||
+    hasMinIncrementChanges ||
+    hasMaxSizeChanges
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
@@ -280,154 +244,175 @@ export const DiskManagementReviewAndSubmitDialog = ({
           Review changes
         </ButtonTooltip>
       </DialogTrigger>
-      <DialogContent className="min-w-[620px]">
-        <DialogHeader>
+      <DialogContent className="min-w-[560px] p-0 gap-0 overflow-hidden">
+        <DialogHeader className="px-5 py-4">
           <DialogTitle>Review changes</DialogTitle>
-          <DialogDescription>Changes will be applied shortly once confirmed.</DialogDescription>
+          <DialogDescription>Changes will be applied shortly after confirmation.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-        {(hasComputeChanges || hasDiskConfigChanges) && (
+
+        {hasComputeChanges && (
           <>
-            <div className="flex flex-col gap-2 p-5">
-              <DiskMangementRestartRequiredSection
-                visible={hasComputeChanges}
-                title="Resizing your Compute will trigger a project restart"
-                description="Project will restart automatically on confirmation."
-              />
-              <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
+            <div className="relative flex border-b">
+              {/* BEFORE */}
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r">
+                <span className="text-xs uppercase tracking-widest font-mono text-foreground-muted">
+                  Before
+                </span>
+                <span className="text-3xl text-foreground" translate="no">
+                  {formatCurrency(totalBeforePrice)}
+                </span>
+                <ComputeBadge infraComputeSize={oldComputeLabel} />
+              </div>
+
+              {/* Arrow */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-dash-sidebar border border-brand-500 flex items-center justify-center z-10 overflow-hidden">
+                <span className="absolute inset-0 bg-brand bg-opacity-10 rounded-full" />
+                <ArrowRight size={16} className="text-brand-600 relative z-10" strokeWidth={2.5} />
+              </div>
+
+              {/* AFTER */}
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4">
+                <span className="text-xs uppercase tracking-widest font-mono text-foreground-muted">
+                  After
+                </span>
+                <span className="text-3xl text-foreground" translate="no">
+                  {formatCurrency(totalAfterPrice)}
+                </span>
+                <ComputeBadge infraComputeSize={newComputeLabel} />
+              </div>
             </div>
-            <DialogSectionSeparator />
           </>
         )}
-        <Table>
-          <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
-            <TableHeaderRow />
-          </TableHeader>
-          <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
-            {hasComputeChanges && (
-              <TableDataRow
-                attribute="Compute size"
-                defaultValue={mapAddOnVariantIdToComputeSize(
-                  form.formState.defaultValues?.computeSize ?? 'ci_nano'
-                )}
-                newValue={mapAddOnVariantIdToComputeSize(form.getValues('computeSize'))}
-                unit="-"
-                beforePrice={Number(computeSizePrice.oldPrice)}
-                afterPrice={Number(computeSizePrice.newPrice)}
-                upgradeIncluded={
-                  org?.plan.id !== 'free' &&
-                  project?.infra_compute_size === 'nano' &&
-                  form.getValues('computeSize') === 'ci_micro'
-                }
-              />
-            )}
-            {hasStorageTypeChanges && (
-              <TableDataRow
-                hidePrice
-                attribute="Storage Type"
-                defaultValue={form.formState.defaultValues?.storageType ?? ''}
-                newValue={form.getValues('storageType')}
-                unit="-"
-                beforePrice={0}
-                afterPrice={0}
-              />
-            )}
-            {(hasIOPSChanges || hasStorageTypeChanges) && (
-              <TableDataRow
-                attribute="IOPS"
-                defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
-                newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
-                unit="IOPS"
-                beforePrice={Number(iopsPrice.oldPrice)}
-                afterPrice={Number(iopsPrice.newPrice)}
-                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-              />
-            )}
-            {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
-              <TableDataRow
-                attribute="Throughput"
-                defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
-                newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
-                unit="MB/s"
-                beforePrice={Number(throughputPrice.oldPrice)}
-                afterPrice={Number(throughputPrice.newPrice)}
-                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-              />
-            )}
-            {(hasTotalSizeChanges || hasStorageTypeChanges) && (
-              <TableDataRow
-                attribute="Disk size"
-                defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
-                newValue={form.getValues('totalSize')?.toLocaleString()}
-                unit="GB"
-                beforePrice={Number(diskSizePrice.oldPrice)}
-                afterPrice={Number(diskSizePrice.newPrice)}
-                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-              />
-            )}
-            {hasGrowthPercentChanges && (
-              <TableDataRow
-                attribute="Growth percent"
-                defaultValue={
-                  form.formState.defaultValues?.growthPercent ??
-                  DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                }
-                newValue={
-                  form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                }
-                unit="%"
-                beforePrice={0}
-                afterPrice={0}
-              />
-            )}
-            {hasMinIncrementChanges && (
-              <TableDataRow
-                attribute="Min increment"
-                defaultValue={
-                  form.formState.defaultValues?.minIncrementGb ??
-                  DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                }
-                newValue={
-                  form.getValues('minIncrementGb') ??
-                  DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                }
-                unit="GB"
-                beforePrice={0}
-                afterPrice={0}
-              />
-            )}
-            {hasMaxSizeChanges && (
-              <TableDataRow
-                attribute="Max disk size"
-                defaultValue={
-                  form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
-                  DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                }
-                newValue={
-                  form.getValues('maxSizeGb')?.toLocaleString() ??
-                  DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                }
-                unit="GB"
-                beforePrice={0}
-                afterPrice={0}
-              />
-            )}
-          </TableBody>
-        </Table>
 
-        {numReplicas > 0 && (
-          <div className="border-t px-4 py-2 text-sm text-foreground-lighter">
-            {replicaTooltipText}
+        {!hasComputeChanges && hasDiskConfigChanges && (
+          <div className="px-5 py-3">
+            <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
           </div>
         )}
 
-        <DialogFooter>
+        {(hasComputeChanges || hasDiskConfigChanges || hasAnyBreakdownRows) && (
+          <div
+            className={cn(
+              'flex items-center justify-between px-5 py-3',
+              showBreakdown && hasAnyBreakdownRows ? 'border-b' : ''
+            )}
+          >
+            <div className="flex items-center gap-2">
+              {hasComputeChanges && <WarningIcon />}
+              <span className="text-sm text-foreground">
+                {hasComputeChanges
+                  ? 'Resizing your Compute will trigger a project restart.'
+                  : 'Review the changes below before confirming.'}
+              </span>
+            </div>
+            {hasAnyBreakdownRows && (
+              <button
+                onClick={() => setShowBreakdown(!showBreakdown)}
+                className="flex items-center gap-1 text-sm text-foreground-light hover:text-foreground transition-colors shrink-0 ml-4"
+              >
+                View breakdown
+                {showBreakdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            )}
+          </div>
+        )}
+
+        {showBreakdown && hasAnyBreakdownRows && (
+          <div className="py-0.5">
+            {hasComputeChanges && (
+              <BreakdownRow label="Compute size">
+                <ValueChange from={oldComputeLabel} to={newComputeLabel} />
+              </BreakdownRow>
+            )}
+            {hasStorageTypeChanges && (
+              <BreakdownRow label="Storage type">
+                <ValueChange
+                  from={(form.formState.defaultValues?.storageType ?? '').toUpperCase()}
+                  to={form.getValues('storageType').toUpperCase()}
+                />
+              </BreakdownRow>
+            )}
+            {(hasIOPSChanges || hasStorageTypeChanges) && (
+              <BreakdownRow label={`IOPS (${form.getValues('provisionedIOPS')?.toLocaleString()})`}>
+                <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
+              </BreakdownRow>
+            )}
+            {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
+              <BreakdownRow
+                label={`Throughput (${form.getValues('throughput')?.toLocaleString()} MB/s)`}
+              >
+                <PriceDelta
+                  delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
+                />
+              </BreakdownRow>
+            )}
+            {(hasTotalSizeChanges || hasStorageTypeChanges) && (
+              <BreakdownRow
+                label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
+              >
+                <PriceDelta
+                  delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
+                />
+              </BreakdownRow>
+            )}
+            {hasGrowthPercentChanges && (
+              <BreakdownRow label="Growth percent">
+                <ValueChange
+                  from={String(
+                    form.formState.defaultValues?.growthPercent ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                  )}
+                  to={String(
+                    form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                  )}
+                />
+              </BreakdownRow>
+            )}
+            {hasMinIncrementChanges && (
+              <BreakdownRow label="Min increment">
+                <ValueChange
+                  from={String(
+                    form.formState.defaultValues?.minIncrementGb ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                  )}
+                  to={String(
+                    form.getValues('minIncrementGb') ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                  )}
+                />
+              </BreakdownRow>
+            )}
+            {hasMaxSizeChanges && (
+              <BreakdownRow label="Max disk size">
+                <ValueChange
+                  from={String(
+                    form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                  )}
+                  to={String(
+                    form.getValues('maxSizeGb')?.toLocaleString() ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                  )}
+                />
+              </BreakdownRow>
+            )}
+            {numReplicas > 0 && (
+              <div className="px-5 py-2 text-xs text-foreground-muted">
+                Price change includes primary database and {numReplicas} replica
+                {numReplicas > 1 ? 's' : ''}
+              </div>
+            )}
+          </div>
+        )}
+
+        <DialogFooter className="px-5 py-4">
           <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
           <Button
             block
-            type={'warning'}
+            type="primary"
             size="large"
             htmlType="submit"
             loading={loading}
