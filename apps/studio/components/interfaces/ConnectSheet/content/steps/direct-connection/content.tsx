@@ -1,16 +1,23 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
+import { Badge } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '../../../DatabaseSettings.utils'
+import { IPv4StatusPanel, type IPv4Status } from './IPv4StatusPanel'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   DATABASE_CONNECTION_TYPES,
+  IPV4_ADDON_TEXT,
+  PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
   type ConnectionStringMethod,
   type DatabaseConnectionType,
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
-import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import type {
+  ConnectionStringPooler,
+  StepContentProps,
+} from '@/components/interfaces/ConnectSheet/Connect.types'
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
 import {
   buildConnectionParameters,
@@ -121,14 +128,18 @@ const CONNECTION_METHOD_TO_TELEMETRY: Record<
  */
 function DirectConnectionContent({ state }: StepContentProps) {
   const track = useTrack()
+  const { ref: projectRef } = useParams()
+  const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+
   const connectionSource = state.connectionSource
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
   const connectionMethod = (state.connectionMethod as ConnectionStringMethod) ?? 'direct'
   const useSharedPooler = Boolean(state.useSharedPooler)
 
   const connectionStrings = useConnectionStringDatabases()
-  const connectionStringPooler =
+  const connectionStringPooler: ConnectionStringPooler | undefined =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
+  const hasIPv4Addon = connectionStringPooler?.ipv4SupportedForDedicatedPooler ?? false
 
   // Determine which connection string to use
   const resolvedConnectionString = useMemo(
@@ -184,8 +195,69 @@ function DirectConnectionContent({ state }: StepContentProps) {
     )
   }
 
+  const sharedPoolerPreferred = !hasDedicatedPooler
+  const ipv4AddOnUrl = {
+    text: 'IPv4 add-on',
+    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+  }
+  const ipv4SettingsUrl = {
+    text: 'IPv4 settings',
+    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+  }
+  const poolerSettingsUrl = {
+    text: 'Pooler settings',
+    url: `/project/${projectRef}/database/settings#connection-pooling`,
+  }
+  const buttonLinks = !hasIPv4Addon
+    ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
+    : [ipv4SettingsUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
+
+  let ipv4Status: IPv4Status
+  if (connectionMethod === 'direct') {
+    ipv4Status = {
+      type: !hasIPv4Addon ? 'error' : 'success',
+      title: !hasIPv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+      description:
+        !sharedPoolerPreferred && !hasIPv4Addon
+          ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+          : sharedPoolerPreferred
+            ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
+            : IPV4_ADDON_TEXT,
+      links: buttonLinks,
+    }
+  } else if (connectionMethod === 'transaction') {
+    const isUsingSharedPooler = useSharedPooler || !hasDedicatedPooler
+    ipv4Status = {
+      type: !isUsingSharedPooler && !hasIPv4Addon ? 'error' : 'success',
+      title: !isUsingSharedPooler && !hasIPv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+      description:
+        !isUsingSharedPooler && !hasIPv4Addon
+          ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
+          : isUsingSharedPooler
+            ? 'Transaction pooler connections are IPv4 proxied for free.'
+            : IPV4_ADDON_TEXT,
+      links: !isUsingSharedPooler ? buttonLinks : undefined,
+    }
+  } else {
+    ipv4Status = {
+      type: 'success',
+      title: 'IPv4 compatible',
+      description: 'Session pooler connections are IPv4 proxied for free',
+    }
+  }
+
+  const poolerBadge =
+    connectionMethod === 'transaction'
+      ? useSharedPooler || !hasDedicatedPooler
+        ? 'Shared Pooler'
+        : 'Dedicated Pooler'
+      : connectionMethod === 'session'
+        ? 'Shared Pooler'
+        : null
+
   return (
     <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-x-2">{poolerBadge && <Badge>{poolerBadge}</Badge>}</div>
       <CodeBlock
         className="[&_code]:text-foreground"
         wrapperClassName="lg:col-span-2"
@@ -196,6 +268,15 @@ function DirectConnectionContent({ state }: StepContentProps) {
       >
         {connectionString}
       </CodeBlock>
+      {projectRef && (
+        <div className="mt-2">
+          <IPv4StatusPanel
+            method={connectionMethod}
+            ipv4Status={ipv4Status}
+            projectRef={projectRef}
+          />
+        </div>
+      )}
       <ConnectionParameters
         parameters={buildConnectionParameters(connectionParams)}
         onCopy={trackCopy}

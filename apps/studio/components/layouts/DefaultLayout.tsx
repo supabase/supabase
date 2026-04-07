@@ -16,6 +16,7 @@ import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export interface DefaultLayoutProps {
@@ -50,9 +51,11 @@ export const DefaultLayout = ({
   const backToDashboardURL = router.pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
-      : !!lastVisitedOrganization
+      : IS_PLATFORM && !!lastVisitedOrganization
         ? `/org/${lastVisitedOrganization}`
-        : '/organizations'
+        : IS_PLATFORM
+          ? '/organizations'
+          : '/project/default'
     : undefined
 
   useCheckLatestDeploy()

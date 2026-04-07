@@ -342,7 +342,7 @@ export const QueryBlock = ({
             </div>
           ) : (
             results && (
-              <div className={cn('flex-1 w-full overflow-auto relative max-h-64')}>
+              <div className={cn('flex flex-col flex-1 w-full relative max-h-64')}>
                 <Results rows={results} />
               </div>
             )

@@ -19,25 +19,25 @@ const CHUNK_SIZE = 1024 * 1024 * 0.25 // 0.25MB
 
 export function parseSpreadsheetText({
   text,
-  treatEmptyAsNull = false,
+  emptyStringAsNullHeaders,
 }: {
   text: string
-  treatEmptyAsNull?: boolean
+  emptyStringAsNullHeaders: Array<string> | undefined
 }): Promise<{
   headers: Array<string>
+  emptyStringAsNullHeaders: Array<string>
   rows: Array<unknown>
   previewRows: Array<unknown>
   columnTypeMap: Record<string, InferredColumnType>
   errors: Array<Papa.ParseError & { data: unknown }>
 }> {
   const columnTypeMap: Record<string, InferredColumnType> = {}
-  let previewRows: unknown[] = []
+  let previewRows: Array<unknown> = []
   return new Promise((resolve) => {
     Papa.parse(text, {
       header: true,
       dynamicTyping: false,
       skipEmptyLines: true,
-      transform: treatEmptyAsNull ? (value: string) => (value === '' ? null : value) : undefined,
       complete: (results) => {
         const headers = results.meta.fields || []
         const rows = results.data
@@ -52,8 +52,32 @@ export function parseSpreadsheetText({
           }
         })
 
-        previewRows = results.data.slice(0, 20)
-        resolve({ headers, rows, previewRows, columnTypeMap, errors })
+        const resolvedEmptyStringAsNullHeaders = emptyStringAsNullHeaders
+          ? emptyStringAsNullHeaders.filter((header) => headers.includes(header))
+          : headers
+
+        const transformedRows =
+          resolvedEmptyStringAsNullHeaders.length > 0
+            ? rows.map((row) => {
+                const rowAsObject = isObject(row) ? row : {}
+                return Object.fromEntries(
+                  Object.entries(rowAsObject).map(([k, v]) => [
+                    k,
+                    v === '' && resolvedEmptyStringAsNullHeaders!.includes(k) ? null : v,
+                  ])
+                )
+              })
+            : rows
+
+        previewRows = transformedRows.slice(0, 20)
+        resolve({
+          headers,
+          emptyStringAsNullHeaders: resolvedEmptyStringAsNullHeaders,
+          rows: transformedRows,
+          previewRows,
+          columnTypeMap,
+          errors,
+        })
       },
     })
   })
@@ -67,17 +91,19 @@ export function parseSpreadsheetText({
 export const parseSpreadsheet = (
   file: File,
   onProgressUpdate: (progress: number) => void,
-  treatEmptyAsNull = false
+  emptyStringAsNullHeaders: Array<string> | undefined
 ): Promise<
   Omit<SpreadsheetData, 'rows'> & {
     previewRows: Array<unknown>
+    emptyStringAsNullHeaders: Array<string>
     errors: Array<Papa.ParseError & { data: unknown }>
   }
 > => {
-  let headers: string[] = []
+  let headers: Array<string> = []
+  let resolvedEmptyStringAsNullHeaders: Array<string> | undefined = emptyStringAsNullHeaders
   let chunkNumber = 0
   let rowCount = 0
-  let previewRows: unknown[] = []
+  let previewRows: Array<unknown> = []
 
   const columnTypeMap: Record<string, InferredColumnType> = {}
   const errors: (Papa.ParseError & { data: unknown })[] = []
@@ -92,17 +118,27 @@ export const parseSpreadsheet = (
       chunkSize: CHUNK_SIZE,
       chunk: (results) => {
         headers = results.meta.fields ?? []
+        // Default to all headers selected for empty string → null
+        // transformation if no specific headers were provided, otherwise
+        // filter down to only the allowed headers
+        resolvedEmptyStringAsNullHeaders = resolvedEmptyStringAsNullHeaders
+          ? resolvedEmptyStringAsNullHeaders.filter((header) => headers.includes(header))
+          : headers
 
         // transform option is silently ignored when worker: true, so we apply
         // the empty → null conversion manually here instead
-        const data = treatEmptyAsNull
-          ? results.data.map((row) => {
-              const rowAsObject = isObject(row) ? row : {}
-              return Object.fromEntries(
-                Object.entries(rowAsObject).map(([k, v]) => [k, v === '' ? null : v])
-              )
-            })
-          : results.data
+        const data =
+          resolvedEmptyStringAsNullHeaders.length > 0
+            ? results.data.map((row) => {
+                const rowAsObject = isObject(row) ? row : {}
+                return Object.fromEntries(
+                  Object.entries(rowAsObject).map(([k, v]) => [
+                    k,
+                    v === '' && resolvedEmptyStringAsNullHeaders!.includes(k) ? null : v,
+                  ])
+                )
+              })
+            : results.data
 
         headers.forEach((header) => {
           const type = inferColumnType(header, data)
@@ -131,7 +167,15 @@ export const parseSpreadsheet = (
         onProgressUpdate(progress > 1 ? 100 : Number((progress * 100).toFixed(2)))
       },
       complete: () => {
-        const data = { headers, rowCount, previewRows, columnTypeMap, errors }
+        const data = {
+          headers,
+          emptyStringAsNullHeaders:
+            emptyStringAsNullHeaders?.filter((header) => headers.includes(header)) ?? headers,
+          rowCount,
+          previewRows,
+          columnTypeMap,
+          errors,
+        }
         resolve(data)
       },
     })

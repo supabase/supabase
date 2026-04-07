@@ -1,0 +1,34 @@
+@keyframes terminalLine {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  20% {
+    clip-path: inset(0 80% 0 0);
+  }
+  50% {
+    clip-path: inset(0 40% 0 0);
+  }
+  70% {
+    clip-path: inset(0 20% 0 0);
+  }
+  80% {
+    clip-path: inset(0 0% 0 0);
+  }
+  90% {
+    clip-path: inset(0 0 0 50%);
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
