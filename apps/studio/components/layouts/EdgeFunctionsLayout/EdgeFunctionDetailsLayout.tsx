@@ -338,6 +338,7 @@ const EdgeFunctionDetailsLayout = ({
                   }
                   source="edge-functions"
                   label="API Docs"
+                  tooltip="View API docs for this edge function"
                 />
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
                 <Popover_Shadcn_>
