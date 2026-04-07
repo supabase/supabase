@@ -83,6 +83,7 @@ const CreateEnumeratedTypeSidePanel = ({
     defaultValues: initialValues,
   })
   const { reset } = form
+  const { isDirty } = form.formState
 
   useEffect(() => {
     reset(initialValues)
@@ -133,6 +134,7 @@ const CreateEnumeratedTypeSidePanel = ({
   return (
     <SidePanel
       loading={isCreating}
+      disabled={!isDirty}
       visible={visible}
       onCancel={closePanel}
       header="Create a new enumerated type"

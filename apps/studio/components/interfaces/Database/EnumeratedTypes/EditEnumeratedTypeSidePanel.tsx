@@ -15,7 +15,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -79,11 +79,15 @@ const EditEnumeratedTypeSidePanel = ({
     defaultValues: {
       name: '',
       description: '',
-      values: [{ isNew: true, originalValue: '', updatedValue: '' }],
+      values: (selectedEnumeratedType?.enums ?? []).map((x) => ({
+        isNew: false,
+        originalValue: x,
+        updatedValue: x,
+      })),
     },
   })
   const { reset } = form
-
+  const { isDirty } = form.formState
   const { fields, append, remove, move } = useFieldArray({
     name: 'values',
     control: form.control,
@@ -98,16 +102,6 @@ const EditEnumeratedTypeSidePanel = ({
 
     move(activeIndex, overIndex)
   }
-
-  const originalEnumeratedTypes = useMemo(
-    () =>
-      (selectedEnumeratedType?.enums ?? []).map((x) => ({
-        isNew: false,
-        originalValue: x,
-        updatedValue: x,
-      })),
-    [selectedEnumeratedType]
-  )
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (project?.ref === undefined) return console.error('Project ref required')
@@ -144,6 +138,12 @@ const EditEnumeratedTypeSidePanel = ({
   }
 
   useEffect(() => {
+    const originalEnumeratedTypes = (selectedEnumeratedType?.enums ?? []).map((x) => ({
+      isNew: false,
+      originalValue: x,
+      updatedValue: x,
+    }))
+
     if (selectedEnumeratedType !== undefined) {
       reset({
         name: selectedEnumeratedType.name,
@@ -157,7 +157,7 @@ const EditEnumeratedTypeSidePanel = ({
         values: originalEnumeratedTypes,
       })
     }
-  }, [reset, originalEnumeratedTypes, selectedEnumeratedType])
+  }, [reset, selectedEnumeratedType, visible])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -169,6 +169,7 @@ const EditEnumeratedTypeSidePanel = ({
   return (
     <SidePanel
       loading={isCreating}
+      disabled={!isDirty}
       visible={visible}
       onCancel={onClose}
       header={`Update type "${selectedEnumeratedType?.name}"`}
