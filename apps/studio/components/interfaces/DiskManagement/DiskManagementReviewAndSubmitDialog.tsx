@@ -281,7 +281,10 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <span className="text-3xl text-foreground tabular-nums" translate="no">
                   {formatCurrency(totalAfterPrice)}
                 </span>
-                <ComputeBadge infraComputeSize={newComputeLabel as InfraInstanceSize} />
+                <div className="relative inline-flex overflow-hidden rounded">
+                  <ComputeBadge infraComputeSize={newComputeLabel as InfraInstanceSize} />
+                  <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-brand/20 to-transparent blur-md" />
+                </div>
               </div>
             </div>
           </>
