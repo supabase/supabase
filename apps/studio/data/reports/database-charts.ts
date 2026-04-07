@@ -202,8 +202,6 @@ export const getReportAttributesV2: (
       label: 'Disk throughput',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      entitlement: 'disk_throughput',
-      requiredPlan: 'Team',
       hide: false,
       showTooltip: true,
       format: 'bytes-per-second',
