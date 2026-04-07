@@ -337,6 +337,7 @@ const EdgeFunctionDetailsLayout = ({
                       : ['edge-functions']
                   }
                   source="edge-functions"
+                  label="API Docs"
                 />
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
                 <Popover_Shadcn_>
