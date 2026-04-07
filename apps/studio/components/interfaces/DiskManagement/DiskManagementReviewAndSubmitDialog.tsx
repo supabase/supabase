@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -49,12 +50,10 @@ interface BreakdownRowProps {
 }
 
 const BreakdownRow = ({ label, description, children }: BreakdownRowProps) => (
-  <div className="flex items-start justify-between py-3 px-0 border-b border-dashed last:border-b-0">
+  <div className="flex items-center justify-between py-3 px-0 border-b border-dashed last:border-b-0">
     <div className="flex flex-col gap-0.5">
       <span className="text-sm text-foreground-light">{label}</span>
-      {description && (
-        <span className="text-xs text-foreground-lighter max-w-72">{description}</span>
-      )}
+      {description && <span className="text-xs text-warning-600 max-w-72">{description}</span>}
     </div>
     {children}
   </div>
@@ -69,8 +68,8 @@ const ValueChange = ({ from, to }: { from: string; to: string }) => (
 )
 
 const PriceDelta = ({ delta }: { delta: number }) => (
-  <span className={cn('text-sm font-mono', delta >= 0 ? 'text-brand' : 'text-destructive')}>
-    {delta >= 0 ? `+ ${formatCurrency(delta)}` : `- ${formatCurrency(Math.abs(delta))}`}{' '}
+  <span className={cn('text-sm', delta >= 0 ? 'text-brand' : 'text-destructive')}>
+    {delta >= 0 ? `+${formatCurrency(delta)}` : `-${formatCurrency(Math.abs(delta))}`}{' '}
     <span className="text-foreground-lighter">per month</span>
   </span>
 )
@@ -260,29 +259,26 @@ export const DiskManagementReviewAndSubmitDialog = ({
         {hasComputeChanges && (
           <>
             <div className="relative flex border-b">
-              {/* BEFORE */}
               <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r">
-                <span className="text-xs uppercase tracking-widest font-mono text-foreground-muted">
+                <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   Before
                 </span>
-                <span className="text-3xl text-foreground" translate="no">
+                <span className="text-3xl text-foreground tabular-nums" translate="no">
                   {formatCurrency(totalBeforePrice)}
                 </span>
                 <ComputeBadge infraComputeSize={oldComputeLabel as InfraInstanceSize} />
               </div>
 
-              {/* Arrow */}
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-dash-sidebar border border-brand-500 flex items-center justify-center z-10 overflow-hidden">
                 <span className="absolute inset-0 bg-brand bg-opacity-10 rounded-full" />
                 <ArrowRight size={16} className="text-brand-600 relative z-10" strokeWidth={2.5} />
               </div>
 
-              {/* AFTER */}
               <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4">
-                <span className="text-xs uppercase tracking-widest font-mono text-foreground-muted">
+                <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   After
                 </span>
-                <span className="text-3xl text-foreground" translate="no">
+                <span className="text-3xl text-foreground tabular-nums" translate="no">
                   {formatCurrency(totalAfterPrice)}
                 </span>
                 <ComputeBadge infraComputeSize={newComputeLabel as InfraInstanceSize} />
@@ -300,7 +296,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
           >
             <button
               onClick={() => setShowBreakdown(!showBreakdown)}
-              className="flex items-center gap-1 text-sm text-foreground-light hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-sm text-foreground-lighter hover:text-foreground transition-colors"
             >
               View breakdown
               {showBreakdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -308,97 +304,111 @@ export const DiskManagementReviewAndSubmitDialog = ({
           </div>
         )}
 
-        {showBreakdown && hasAnyBreakdownRows && (
-          <div className="py-0.5 px-5">
-            {hasComputeChanges && (
-              <BreakdownRow
-                label="Compute size"
-                description="Project will restart automatically on confirmation."
-              >
-                <ValueChange from={oldComputeLabel} to={newComputeLabel} />
-              </BreakdownRow>
-            )}
-            {hasStorageTypeChanges && (
-              <BreakdownRow label="Storage type">
-                <ValueChange
-                  from={(form.formState.defaultValues?.storageType ?? '').toUpperCase()}
-                  to={form.getValues('storageType').toUpperCase()}
-                />
-              </BreakdownRow>
-            )}
-            {(hasIOPSChanges || hasStorageTypeChanges) && (
-              <BreakdownRow label={`IOPS (${form.getValues('provisionedIOPS')?.toLocaleString()})`}>
-                <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
-              </BreakdownRow>
-            )}
-            {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
-              <BreakdownRow
-                label={`Throughput (${form.getValues('throughput')?.toLocaleString()} MB/s)`}
-              >
-                <PriceDelta
-                  delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
-                />
-              </BreakdownRow>
-            )}
-            {(hasTotalSizeChanges || hasStorageTypeChanges) && (
-              <BreakdownRow
-                label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
-                description="For 4 hours after changes you will not be able to modify disk attributes."
-              >
-                <PriceDelta
-                  delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
-                />
-              </BreakdownRow>
-            )}
-            {hasGrowthPercentChanges && (
-              <BreakdownRow label="Growth percent">
-                <ValueChange
-                  from={String(
-                    form.formState.defaultValues?.growthPercent ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                  )}
-                  to={String(
-                    form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                  )}
-                />
-              </BreakdownRow>
-            )}
-            {hasMinIncrementChanges && (
-              <BreakdownRow label="Min increment">
-                <ValueChange
-                  from={String(
-                    form.formState.defaultValues?.minIncrementGb ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                  )}
-                  to={String(
-                    form.getValues('minIncrementGb') ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                  )}
-                />
-              </BreakdownRow>
-            )}
-            {hasMaxSizeChanges && (
-              <BreakdownRow label="Max disk size">
-                <ValueChange
-                  from={String(
-                    form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                  )}
-                  to={String(
-                    form.getValues('maxSizeGb')?.toLocaleString() ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                  )}
-                />
-              </BreakdownRow>
-            )}
-            {numReplicas > 0 && (
-              <div className="px-5 py-2 text-xs text-foreground-muted">
-                Price change includes primary database and {numReplicas} replica
-                {numReplicas > 1 ? 's' : ''}
+        <AnimatePresence initial={false}>
+          {showBreakdown && hasAnyBreakdownRows && (
+            <motion.div
+              key="breakdown"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              className="overflow-hidden"
+            >
+              <div className="py-0.5 px-5">
+                {hasComputeChanges && (
+                  <BreakdownRow
+                    label="Compute size"
+                    description="Project will restart automatically on confirmation."
+                  >
+                    <ValueChange from={oldComputeLabel} to={newComputeLabel} />
+                  </BreakdownRow>
+                )}
+                {hasStorageTypeChanges && (
+                  <BreakdownRow label="Storage type">
+                    <ValueChange
+                      from={(form.formState.defaultValues?.storageType ?? '').toUpperCase()}
+                      to={form.getValues('storageType').toUpperCase()}
+                    />
+                  </BreakdownRow>
+                )}
+                {(hasIOPSChanges || hasStorageTypeChanges) && (
+                  <BreakdownRow
+                    label={`IOPS (${form.getValues('provisionedIOPS')?.toLocaleString()})`}
+                  >
+                    <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
+                  </BreakdownRow>
+                )}
+                {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
+                  <BreakdownRow
+                    label={`Throughput (${form.getValues('throughput')?.toLocaleString()} MB/s)`}
+                  >
+                    <PriceDelta
+                      delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
+                    />
+                  </BreakdownRow>
+                )}
+                {(hasTotalSizeChanges || hasStorageTypeChanges) && (
+                  <BreakdownRow
+                    label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
+                    description="For 4 hours after changes you will not be able to modify disk attributes."
+                  >
+                    <PriceDelta
+                      delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
+                    />
+                  </BreakdownRow>
+                )}
+                {hasGrowthPercentChanges && (
+                  <BreakdownRow label="Growth percent">
+                    <ValueChange
+                      from={String(
+                        form.formState.defaultValues?.growthPercent ??
+                          DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                      )}
+                      to={String(
+                        form.getValues('growthPercent') ??
+                          DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                      )}
+                    />
+                  </BreakdownRow>
+                )}
+                {hasMinIncrementChanges && (
+                  <BreakdownRow label="Min increment">
+                    <ValueChange
+                      from={String(
+                        form.formState.defaultValues?.minIncrementGb ??
+                          DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                      )}
+                      to={String(
+                        form.getValues('minIncrementGb') ??
+                          DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                      )}
+                    />
+                  </BreakdownRow>
+                )}
+                {hasMaxSizeChanges && (
+                  <BreakdownRow label="Max disk size">
+                    <ValueChange
+                      from={String(
+                        form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
+                          DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                      )}
+                      to={String(
+                        form.getValues('maxSizeGb')?.toLocaleString() ??
+                          DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                      )}
+                    />
+                  </BreakdownRow>
+                )}
+                {numReplicas > 0 && (
+                  <div className="py-2 text-xs text-foreground-muted">
+                    Price change includes primary database and {numReplicas} replica
+                    {numReplicas > 1 ? 's' : ''}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <DialogFooter className="px-5 py-4">
           <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
