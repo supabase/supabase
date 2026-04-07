@@ -131,6 +131,7 @@ export const ColumnManagement = ({
     if (type === 'pks') {
       const activeIndex = primaryKeyColumns.findIndex((item) => item.id === result.active.id)
       const overIndex = primaryKeyColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
       const updatedPrimaryKeyColumns = arrayMove(primaryKeyColumns, activeIndex, overIndex)
       const updatedColumns = updatedPrimaryKeyColumns.concat(otherColumns)
       return onColumnsUpdated(updatedColumns)
@@ -139,6 +140,7 @@ export const ColumnManagement = ({
     if (type === 'others') {
       const activeIndex = otherColumns.findIndex((item) => item.id === result.active.id)
       const overIndex = otherColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
       const updatedOtherColumns = arrayMove(otherColumns, activeIndex, overIndex)
       const updatedColumns = primaryKeyColumns.concat(updatedOtherColumns)
       return onColumnsUpdated(updatedColumns)
