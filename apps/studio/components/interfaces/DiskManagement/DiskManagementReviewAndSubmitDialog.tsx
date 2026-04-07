@@ -301,7 +301,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
               onClick={() => setShowBreakdown(!showBreakdown)}
               className="flex items-center gap-1 text-sm text-foreground-lighter hover:text-foreground transition-colors"
             >
-              View breakdown
+              {showBreakdown ? 'Hide breakdown' : 'View breakdown'}
               {showBreakdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button>
           </div>
