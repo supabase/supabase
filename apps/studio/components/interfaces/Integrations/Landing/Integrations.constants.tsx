@@ -1,4 +1,8 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
+import { stripeSyncKeys } from 'data/database-integrations/stripe/keys'
+import { installStripeSync } from 'data/database-integrations/stripe/stripe-sync-install-mutation'
+import { databaseKeys } from 'data/database/keys'
+import { useTrack } from 'lib/telemetry/track'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -7,10 +11,11 @@ import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
+import { getStripeSyncSchemaComment } from '../templates/StripeSyncEngine/useStripeSyncStatus'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
 import { enableDatabaseWebhooks } from '@/data/database/hooks-enable-mutation'
-import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { getSchemas, invalidateSchemasQuery } from '@/data/database/schemas-query'
 import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
@@ -22,12 +27,29 @@ export type Navigation = {
   children?: Navigation[]
 }
 
-export const Loading = () => (
-  <div className="p-10">
-    <GenericSkeletonLoader />
-  </div>
-)
+// [Joshen] Basing this on template.json for now
+export type IntegrationInputs = {
+  [key: string]: {
+    label: string
+    type: 'text' | 'number' | 'password'
+    description?: string
+    required: boolean
+    actions: {
+      label: string
+      href: string
+    }[]
+  }
+}
 
+type IntegrationStep = {
+  label: string
+  description?: string
+}
+
+/**
+ * [Joshen] For marketplace, we probably need to revisit this definition
+ * What properties are obsolete, what properties we need from remote source
+ */
 export type IntegrationDefinition = {
   id: string
   name: string
@@ -52,10 +74,29 @@ export type IntegrationDefinition = {
     pageId: string | undefined
     childId: string | undefined
   }) => ComponentType<{}> | null
-  /** SQL query for installing the entire integration */
+
+  /** For showing the SQL query in the installation sheet */
   installationSql?: string
-  /** Custom command to install the integration */
-  installationCommand?: (props: { ref: string }) => Promise<void>
+  /** Custom command to install the integration (if any - none atm) */
+  installationCommand?: (props: {
+    ref: string
+    track?: ReturnType<typeof useTrack>
+    [key: string]: unknown
+  }) => Promise<void>
+  /**
+   * Used for long polling to track the progress of the integration installation if async
+   * The component calling this handles the polling logic, and should terminate the poll depending on the returned value
+   * Depending on how we want this to work, this method will thereafter also call any RQ invalidation if required
+   * */
+  checkInstallationStatus?: (props: {
+    ref?: string
+    connectionString?: string | null
+    [key: string]: unknown
+  }) => Promise<'installed' | 'installing'>
+  /** User inputs for template integrations */
+  inputs?: IntegrationInputs
+  /** Purely visual, just to show what are the changes on the project from installing the integration */
+  steps?: IntegrationStep[]
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -451,7 +492,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
 const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'stripe_sync_engine',
-    type: 'custom' as const,
+    type: 'template' as const,
     requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
@@ -487,8 +528,8 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
-                (mod) => mod.StripeSyncInstallationPage
+              import('components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
+                (mod) => mod.StripeSyncEngineOverviewTab
               ),
             { loading: Loading }
           )
@@ -503,6 +544,62 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       }
       return null
     },
+    inputs: {
+      stripe_api_key: {
+        type: 'password',
+        required: true,
+        label: 'Stripe API secret key',
+        description:
+          'Requires write access to Webhook Endpoints and read-only access to all other categories.',
+        actions: [
+          {
+            label: 'Get API key',
+            href: 'https://dashboard.stripe.com/apikeys',
+          },
+          {
+            label: 'What are Stripe API keys?',
+            href: 'https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them',
+          },
+        ],
+      },
+    },
+    steps: [
+      { label: 'Creates a new database schema named `stripe`' },
+      { label: 'Creates tables and views in the `stripe` schema for synced Stripe data' },
+      { label: 'Deploys Edge Functions to handle incoming webhooks from Stripe' },
+      { label: 'Schedules automatic Stripe data syncs using Supabase Queues' },
+    ],
+    installationCommand: async ({ ref: projectRef, track, stripe_api_key }) => {
+      const startTime = Date.now()
+      await installStripeSync({ projectRef, startTime, stripeSecretKey: stripe_api_key as string })
+
+      if (track) track('integration_install_submitted', { integrationName: 'stripe_sync_engine' })
+
+      const queryClient = getQueryClient()
+      await queryClient.invalidateQueries({ queryKey: stripeSyncKeys.all })
+    },
+    checkInstallationStatus: async (props) => {
+      const queryClient = getQueryClient()
+      const { projectRef, connectionString } = props || {}
+
+      const schemas = await getSchemas({
+        projectRef: projectRef as string,
+        connectionString: connectionString as string,
+      })
+
+      const { status, errorMessage } = getStripeSyncSchemaComment(schemas)
+
+      if (status === 'install error') {
+        throw new Error(errorMessage ?? 'Stripe Sync installation failed')
+      }
+
+      if (status === 'installed') {
+        await queryClient.invalidateQueries({
+          queryKey: databaseKeys.schemas(projectRef as string),
+        })
+      }
+      return status === 'installed' ? 'installed' : 'installing'
+    },
   },
 ]
 
@@ -511,3 +608,9 @@ export const INTEGRATIONS: Array<IntegrationDefinition> = [
   ...SUPABASE_INTEGRATIONS,
   ...TEMPLATE_INTEGRATIONS,
 ]
+
+export const Loading = () => (
+  <div className="p-10">
+    <GenericSkeletonLoader />
+  </div>
+)

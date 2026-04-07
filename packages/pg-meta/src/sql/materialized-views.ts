@@ -1,4 +1,6 @@
-export const MATERIALIZED_VIEWS_SQL = /* SQL */ `
+import { safeSql } from '../pg-format'
+
+export const MATERIALIZED_VIEWS_SQL = /* SQL */ safeSql`
 select
   c.oid::int8 as id,
   n.nspname as schema,

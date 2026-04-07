@@ -1,15 +1,4 @@
 import { useParams } from 'common'
-import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
-import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
-import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
-import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
-import { PUBLIC_BUCKET_TOOLTIP } from 'components/interfaces/Storage/Storage.constants'
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -30,6 +19,18 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { DeleteBucketModal } from '@/components/interfaces/Storage/DeleteBucketModal'
+import { EditBucketModal } from '@/components/interfaces/Storage/EditBucketModal'
+import { EmptyBucketModal } from '@/components/interfaces/Storage/EmptyBucketModal'
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
+import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucketWarning'
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
+import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
+import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 
 const BucketPage: NextPageWithLayout = () => {
@@ -150,8 +151,11 @@ const BucketPage: NextPageWithLayout = () => {
           </>
         }
       >
-        <div className="flex-1 min-h-0 px-6 pb-6">
-          <StorageExplorer />
+        <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col gap-4">
+          {ref && bucketId && <PublicBucketWarning projectRef={ref} bucketId={bucketId} />}
+          <div className="flex-1 min-h-0">
+            <StorageExplorer />
+          </div>
         </div>
       </PageLayout>
 
