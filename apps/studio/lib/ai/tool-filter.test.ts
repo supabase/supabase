@@ -3,10 +3,10 @@ import { describe, expect, it, vitest } from 'vitest'
 import { z } from 'zod'
 
 import {
+  createPrivacyMessageTool,
+  filterToolsByOptInLevel,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
-  filterToolsByOptInLevel,
-  createPrivacyMessageTool,
   toolSetValidationSchema,
 } from './tool-filter'
 

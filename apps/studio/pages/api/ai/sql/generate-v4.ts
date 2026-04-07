@@ -2,10 +2,13 @@ import pgMeta from '@supabase/pg-meta'
 import type { JwtPayload } from '@supabase/supabase-js'
 import { safeValidateUIMessages } from 'ai'
 import { IS_PLATFORM } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
-import { getModel } from 'lib/ai/model'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import z from 'zod'
+
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { getModel } from '@/lib/ai/model'
 import {
   DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
@@ -13,14 +16,12 @@ import {
   isAssistantBaseModelId,
   isKnownAssistantModelId,
   type AssistantModelId,
-} from 'lib/ai/model.utils'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { getTools } from 'lib/ai/tools'
-import apiWrapper from 'lib/api/apiWrapper'
-import { executeQuery } from 'lib/api/self-hosted/query'
-import { getURL } from 'lib/helpers'
-import type { NextApiRequest, NextApiResponse } from 'next'
-import z from 'zod'
+} from '@/lib/ai/model.utils'
+import { getOrgAIDetails } from '@/lib/ai/org-ai-details'
+import { getTools } from '@/lib/ai/tools'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { executeQuery } from '@/lib/api/self-hosted/query'
+import { getURL } from '@/lib/helpers'
 
 export const maxDuration = 120
 

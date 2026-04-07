@@ -1,9 +1,8 @@
 import type { ToolSet } from 'ai'
-// End of third-party imports
 
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 const UI_EXECUTED_TOOLS = ['execute_sql', 'deploy_edge_function']
 

@@ -10,12 +10,13 @@ import {
 } from 'ai'
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
-import { buildAssistantEvalOutput } from 'evals/output'
-import type { AssistantEvalInput, AssistantEvalOutput } from 'evals/scorer'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
-import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from 'lib/ai/prompts'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+
+import { buildAssistantEvalOutput } from '@/evals/output'
+import type { AssistantEvalInput, AssistantEvalOutput } from '@/evals/scorer'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
+import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 

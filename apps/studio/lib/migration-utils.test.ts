@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import { parseMigrationVersion } from './migration-utils'
 import dayjs from 'dayjs'
+import { describe, expect, it } from 'vitest'
+
+import { parseMigrationVersion } from './migration-utils'
 
 describe('parseMigrationVersion', () => {
   it('should parse valid migration version in YYYYMMDDHHmmss format', () => {

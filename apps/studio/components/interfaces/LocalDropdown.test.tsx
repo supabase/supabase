@@ -44,13 +44,13 @@ vi.mock('next-themes', () => ({
   }),
 }))
 
-vi.mock('state/app-state', () => ({
+vi.mock('@/state/app-state', () => ({
   useAppStateSnapshot: () => ({
     setLastRouteBeforeVisitingAccountPage: mockSetLastRoute,
   }),
 }))
 
-vi.mock('components/ui/ProfileImage', () => ({
+vi.mock('@/components/ui/ProfileImage', () => ({
   ProfileImage: () => <div>Avatar</div>,
 }))
 

@@ -5,8 +5,9 @@
 import * as Sentry from '@sentry/nextjs'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
-import { MIRRORED_BREADCRUMBS } from 'lib/breadcrumbs'
-import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from 'lib/sanitize'
+
+import { MIRRORED_BREADCRUMBS } from '@/lib/breadcrumbs'
+import { sanitizeArrayOfObjects, sanitizeUrlHashParams } from '@/lib/sanitize'
 
 const DEFAULT_ERROR_SAMPLE_RATE = 1.0
 const LOW_PRIORITY_ERROR_SAMPLE_RATE = 0.01

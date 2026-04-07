@@ -1,5 +1,6 @@
 import { openai } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import * as bedrockModule from './bedrock'
 import { getModel } from './model'
 import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
