@@ -18,7 +18,7 @@ Check updates for each service to learn more.
 ## [2026-04-08]
 
 ### Documentation
-- Added new how-to guides explaining [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates) and [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso) configuration - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386)
+- Added new how-to guides for configuring [custom email templates](https://supabase.com/docs/guides/self-hosting/custom-email-templates), setting up [SAML SSO](https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso), and [using Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) - PR [#42832](https://github.com/supabase/supabase/pull/42832), PR [#43386](https://github.com/supabase/supabase/pull/43386), PR [#44147](https://github.com/supabase/supabase/pull/44147)
 
 ### Utils
 - Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147)
@@ -27,8 +27,7 @@ Check updates for each service to learn more.
 - Updated to `supabase/studio:2026.04.08-sha-xxxxx`
 
 ### API gateway
-- ⚠️ Added configuration to support SAML SSO (requires `.env`, `docker-compose.yml` and `volumes/api/kong.yml` update) - PR [#43385](https://github.com/supabase/supabase/pull/43385), 
-- ⚠️ Updated Kong to `3.9.1` - PR [#43554](https://github.com/supabase/supabase/pull/43554)
+- ⚠️ Added configuration for SAML SSO (requires `.env`, `docker-compose.yml` and `volumes/api/kong.yml` update) - PR [#43385](https://github.com/supabase/supabase/pull/43385)
 
 ### PostgREST
 - Updated to `v14.8` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.8)
@@ -37,13 +36,17 @@ Check updates for each service to learn more.
 - Updated to `v1.48.26` - [Release](https://github.com/supabase/storage/releases/tag/v1.48.26)
 
 ### imgproxy
-- Changed `IMGPROXY_ENABLE_WEBP_DETECTION` environment variable to `IMGPROXY_AUTO_WEBP` (requires `.env` and `docker-compose.yml` update) - PR [#](https://github.com/supabase/supabase/pull/43919)
+- Changed `IMGPROXY_ENABLE_WEBP_DETECTION` environment variable to `IMGPROXY_AUTO_WEBP` (requires `.env` and `docker-compose.yml` update) - PR [#43919](https://github.com/supabase/supabase/pull/43919)
 
 ### Postgres Meta
 - Updated to `v0.96.3` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.96.3)
 
 ### Analytics (Logflare)
 - Updated to `v1.36.1` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.36.1)
+
+### Postgres
+- Added `docker-compose.pg17.yml` overlay configuration - PR [#44147](https://github.com/supabase/supabase/pull/44147)
+- Added [documentation](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) explaning the upgrade to Postgres 17
 
 ---
 
