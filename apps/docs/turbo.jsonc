@@ -1,14 +1,14 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
     "codegen:examples": {
       "inputs": ["../../examples/**"],
-      "outputs": ["examples/**"]
+      "outputs": ["examples/**"],
     },
     "codegen:references": {
       "inputs": ["spec/**"],
-      "outputs": ["features/docs/generated/**"]
+      "outputs": ["features/docs/generated/**"],
     },
     "build": {
       "dependsOn": ["^build", "codegen:examples", "codegen:references"],
@@ -57,10 +57,10 @@
         "LOGFLARE_SOURCE_TOKEN",
         "OPENAI_API_KEY",
         "SITE_NAME",
-        "SUPABASE_SECRET_KEY"
+        "SUPABASE_SECRET_KEY",
       ],
       "inputs": ["$TURBO_DEFAULT$"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    }
-  }
+      "outputs": [".next/**", "!.next/cache/**"],
+    },
+  },
 }

@@ -20,6 +20,7 @@ import {
 } from 'ui'
 
 import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { Bucket } from '@/data/storage/buckets-query'
 
 interface StoragePoliciesBucketRowProps {
@@ -61,10 +62,7 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
                       Public
                     </Badge>
                   </TooltipTrigger>
-                  <TooltipContent side="top">
-                    This bucket is publicly readable. Anyone can list and access all objects stored
-                    in it.
-                  </TooltipContent>
+                  <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
                 </Tooltip>
               )}
             </div>

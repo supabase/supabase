@@ -11,7 +11,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
-import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/InlineEditorSettings'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
 import {
   ReportsSelectFilter,

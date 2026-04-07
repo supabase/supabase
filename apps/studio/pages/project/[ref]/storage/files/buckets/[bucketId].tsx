@@ -3,6 +3,7 @@ import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketMod
 import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
 import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
 import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
+import { PUBLIC_BUCKET_TOOLTIP } from 'components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
@@ -80,10 +81,7 @@ const BucketPage: NextPageWithLayout = () => {
                     Public
                   </Badge>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  This bucket is publicly readable. Anyone can list and access all objects stored in
-                  it.
-                </TooltipContent>
+                <TooltipContent side="bottom">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
               </Tooltip>
             )}
           </div>

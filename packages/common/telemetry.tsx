@@ -15,6 +15,7 @@ import { post } from './fetchWrappers'
 import type { FirstReferrerData, MwDiagData } from './first-referrer-cookie'
 import {
   isExternalReferrer,
+  isOAuthRedirectReferrer,
   parseFirstReferrerCookie,
   parseMwDiagCookie,
 } from './first-referrer-cookie'
@@ -123,7 +124,10 @@ function handlePageTelemetry({
     const storedReferrer = telemetryDataOverride?.ph?.referrer
 
     const shouldUseStoredReferrer = Boolean(
-      storedReferrer && isExternalReferrer(storedReferrer) && !isExternalReferrer(liveReferrer)
+      storedReferrer &&
+      isExternalReferrer(storedReferrer) &&
+      !isOAuthRedirectReferrer(storedReferrer) &&
+      (!isExternalReferrer(liveReferrer) || isOAuthRedirectReferrer(liveReferrer))
     )
 
     const pageData = telemetryDataOverride
@@ -145,7 +149,8 @@ function handlePageTelemetry({
     if (
       firstReferrerData &&
       isExternalReferrer(firstReferrerData.referrer) &&
-      !isExternalReferrer(pageData.ph.referrer)
+      !isOAuthRedirectReferrer(firstReferrerData.referrer) &&
+      (!isExternalReferrer(pageData.ph.referrer) || isOAuthRedirectReferrer(pageData.ph.referrer))
     ) {
       pageData.ph.referrer = firstReferrerData.referrer
       firstReferrerCookieConsumed = true

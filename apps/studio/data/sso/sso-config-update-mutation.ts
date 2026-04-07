@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, put } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { orgSSOKeys } from './keys'
+import type { components } from '@/data/api'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SSOConfigUpdateVariables = {
   slug: string

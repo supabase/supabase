@@ -76,28 +76,28 @@ interface SampleRow {
 }
 
 describe('SpreadsheetImport.utils: parseSpreadsheetText', () => {
-  test('should keep empty cells as empty strings by default', async () => {
+  test('should keep empty cells as empty strings if no headers given', async () => {
     const csv = `name,age\nJohn,25\nJane,`
-    const { rows } = await parseSpreadsheetText({ text: csv })
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: [] })
     expect((rows[1] as SampleRow).age).toBe('')
   })
 
   test('should convert empty cells to null when treatEmptyAsNull is true', async () => {
     const csv = `name,age\nJohn,25\nJane,`
-    const { rows } = await parseSpreadsheetText({ text: csv, treatEmptyAsNull: true })
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: undefined })
     expect((rows[1] as SampleRow).age).toBeNull()
   })
 
   test('should not affect non-empty values when treatEmptyAsNull is true', async () => {
     const csv = `name,age\nJohn,25\nJane,`
-    const { rows } = await parseSpreadsheetText({ text: csv, treatEmptyAsNull: true })
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: undefined })
     expect((rows[0] as SampleRow).name).toBe('John')
     expect((rows[0] as SampleRow).age).toBe('25')
   })
 
   test('should handle multiple empty cells across columns when treatEmptyAsNull is true', async () => {
     const csv = `name,age,city\nJohn,,\nJane,30,`
-    const { rows } = await parseSpreadsheetText({ text: csv, treatEmptyAsNull: true })
+    const { rows } = await parseSpreadsheetText({ text: csv, emptyStringAsNullHeaders: undefined })
     expect((rows[0] as SampleRow).age).toBeNull()
     expect((rows[0] as SampleRow).city).toBeNull()
     expect((rows[1] as SampleRow).age).toBe('30')
@@ -106,7 +106,10 @@ describe('SpreadsheetImport.utils: parseSpreadsheetText', () => {
 
   test('should return correct headers regardless of treatEmptyAsNull', async () => {
     const csv = `name,age\nJohn,25`
-    const { headers } = await parseSpreadsheetText({ text: csv, treatEmptyAsNull: true })
+    const { headers } = await parseSpreadsheetText({
+      text: csv,
+      emptyStringAsNullHeaders: undefined,
+    })
     expect(headers).toEqual(['name', 'age'])
   })
 })

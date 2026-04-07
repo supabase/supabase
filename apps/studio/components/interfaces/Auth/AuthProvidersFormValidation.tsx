@@ -33,6 +33,12 @@ const PROVIDER_EMAIL = {
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: {
+      title: 'Require current password when updating',
+      description: `Requires that the user supplies their current password when changing their password. [Learn more](${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing).`,
+      type: 'boolean',
+      isPaid: false,
+    },
     PASSWORD_HIBP_ENABLED: {
       title: 'Prevent use of leaked passwords',
       description: `Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API. [Learn more](${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection)`,
@@ -70,7 +76,6 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
-
     MAILER_OTP_EXP: {
       title: 'Email OTP expiration',
       type: 'number',
@@ -472,69 +477,56 @@ const EXTERNAL_PROVIDER_APPLE = {
   },
   validationSchema: object().shape({
     EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_SECRET: string()
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !!EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
-            .test({
-              message: 'Secret key is not a correctly generated JWT.',
-              test: (value?: string): boolean => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const header = JSON.parse(parts[0])
-                  const body = JSON.parse(parts[1])
-                  return (
-                    typeof header === 'object' &&
-                    typeof body === 'object' &&
-                    header &&
-                    body &&
-                    header.alg === 'ES256' &&
-                    body.aud === 'https://appleid.apple.com'
-                  )
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
-
+    EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema
+          .matches(/^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i, 'Secret key should be a JWT.')
+          .test({
+            message: 'Secret key is not a correctly generated JWT.',
+            test: (value?: string): boolean => {
+              if (!value) {
                 return true
-              },
-            })
-            .test({
-              message: 'Secret key expires in less than 7 days!',
-              test: (value?: string) => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const body = JSON.parse(parts[1])
-                  return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
+              }
+              try {
+                const parts = value.split('.').map((value) => parseBase64URL(value))
+                const header = JSON.parse(parts[0])
+                const body = JSON.parse(parts[1])
+                return (
+                  typeof header === 'object' &&
+                  typeof body === 'object' &&
+                  header &&
+                  body &&
+                  header.alg === 'ES256' &&
+                  body.aud === 'https://appleid.apple.com'
+                )
+              } catch (e: any) {
+                console.log(e)
+                return false
+              }
 
+              return true
+            },
+          })
+          .test({
+            message: 'Secret key expires in less than 7 days!',
+            test: (value?: string) => {
+              if (!value) {
                 return true
-              },
-            }),
-      })
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema.matches(
-            /^$/,
-            'Secret Key should only be set if Service ID for OAuth is provided.'
-          ),
-      }),
+              }
+              try {
+                const parts = value.split('.').map((value) => parseBase64URL(value))
+                const body = JSON.parse(parts[1])
+                return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
+              } catch (e: any) {
+                console.log(e)
+                return false
+              }
+
+              return true
+            },
+          }),
+    }),
     EXTERNAL_APPLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(

@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
-import { filterProtectedSchemaIndexAdvisorResult } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetIndexAdvisorResultVariables = {
   projectRef?: string

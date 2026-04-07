@@ -1,0 +1,287 @@
+---
+title = "Edge Function 500 error response"
+topics = [ "functions" ]
+keywords = [ "500", "Internal Server Error" ]
+
+[[errors]]
+http_status_code = 500
+message = "Internal Server Error"
+---
+
+A 500 from an Edge Function means one of two things.
+
+- The function encountered an unhandled [JavaScript error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects#error_objects)
+- Your code deliberately returned a 500 response
+
+## Quick triage
+
+If you received back the below message, then go to the [JavaScript failure](#javascript-failure) section:
+
+```js
+Internal Server Error
+```
+
+If the body contained a custom message, or nothing at all, run the below query in [Log Explorer](</dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message,%0A++content.timestamp,%0A++fel.function_name,%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST(fl.metadata)+AS+content+ON+TRUE%0ALEFT+JOIN+(%0A++SELECT%0A++++em.execution_id,%0A++++res.status_code,%0A++++req.pathname+AS+function_name%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST(metadata)+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.request)+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.response)+AS+res+ON+TRUE%0A)+fel+ON+content.execution_id+=+fel.execution_id%0AWHERE+%0A++fel.status_code+=+500%0A++++AND+%0A++content.level+=+%27error%27%0A++++AND%0A++++(%0A++++++content.event_type+=+%27Log%27%0A++++++++OR%0A++++++content.event_type+=+%27UncaughtException%27%0A++++)%0A++++AND%0A++fl.event_message+LIKE+%27%25Error:%25file:///%25%27%0AORDER+BY+function_name,+timestamp%0ALIMIT+50;&its=&ite=>) after setting the time range:
+
+```sql
+select
+  console_logs.event_message,
+  cast(invocation_events.timestamp as datetime) as timestamp,
+  invocation_events.function_name
+from
+  function_logs as console_logs
+  left join UNNEST(console_logs.metadata) as metadata on true
+  left join (
+    select
+      timestamp,
+      em.execution_id,
+      res.status_code,
+      req.pathname as function_name
+    from
+      function_edge_logs
+      left join UNNEST(metadata) as em on true
+      left join UNNEST(em.request) as req on true
+      left join UNNEST(em.response) as res on true
+  ) as invocation_events
+    on metadata.execution_id = invocation_events.execution_id
+where
+  invocation_events.status_code = 500
+  and metadata.level = 'error'
+  and metadata.event_type in ('Log', 'UncaughtException')
+  and console_logs.event_message like '%Error:%file:///%'
+order by invocation_events.function_name, invocation_events.timestamp
+limit 50;
+```
+
+Based on the output, go to the relevant section:
+
+- **Query returns no results:** [Custom 500 response](#your-custom-response-returned-a-500)
+- **Query returns results:** [JavaScript failure](#javascript-failure)
+
+## Your custom response returned a 500
+
+Somewhere in your function logic, you are returning a 500 response yourself:
+
+### Example:
+
+```js
+return new Response(JSON.stringify(data), {
+  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  status: 500, // <-- you set this
+})
+```
+
+### Fix:
+
+1. Search your function code for status: 500 (or status: "500")
+2. Trace back the condition that triggered it. Check any third-party API responses that might be feeding a 500 response back to the function.
+3. Add a [try/catch](/docs/guides/functions/error-handling) block with a custom `console.error()` message before the code returns, so future occurrences leave a better trace.
+
+See: [Error handling in Edge Functions](/docs/guides/functions/error-handling)
+
+## JavaScript failure
+
+An unhandled [JavaScript Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects#error_objects) emerged during execution.
+
+The function's log will produce an `event_message` with the error type. It may look like:
+
+```sh
+TypeError: Cannot read properties of undefined (reading 'some_func')
+    at Object.handler (file:///var/tmp/sb-compile-edge-runtime/source/index.ts:15:26)
+    at eventLoopTick (ext:core/01_core.js:175:7)
+    at async mapped (ext:runtime/http.js:246:20)
+```
+
+The first line tells you the error type and message. The [stack trace](https://www.sentinelone.com/blog/javascript-stack-trace-understanding-it-and-using-it-to-debug/) points to the file and line number.
+
+The Mozilla Foundation documents all error objects and what they mean:
+
+- [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error)
+- [`AggregateError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AggregateError)
+- [`EvalError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError)
+- [`RangeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError)
+- [`ReferenceError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError)
+- [`SuppressedError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SuppressedError)
+- [`SyntaxError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError)
+- [`TypeError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError)
+- [`URIError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError)
+- [`InternalError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError)
+
+However, you can also review the below **example cases** for an idea of possible causes.
+
+### Example cases
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+### TypeError: Undefined variables
+
+A `TypeError` occurs when any JavaScript datatype is misused. For instance, trying to execute a number as if it were a function would cause the error:
+
+```js
+const some_num = 5
+
+some_num() // TypeError: some_num is not a function
+```
+
+This issue often appears when working with returned objects from external APIs. One may assume a response has a certain shape, but if the value is actually `null` or `undefined`, using it without checking can lead to a `TypeError`.
+
+```js
+const data = await req.json() // returns undefined if request body is empty
+data.some_obj.some_val // TypeError: Cannot read properties of undefined
+```
+
+#### Fix 1: Type-check before using potentially unknown values:
+
+```js
+const { user_submission } = await req.json()
+
+// checking value for appropriate datatype
+if (typeof user_submission === 'undefined') {
+  return new Response(JSON.stringify({ message: 'Submission is empty. Please try again.' }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status: 400,
+  })
+}
+
+// rest of code ...
+```
+
+#### Fix 2: Wrap problematic code in try/catch:
+
+One could use a [try/catch/finally](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch) block to handle these errors:
+
+```js
+try {
+  some_obj.some_func(); // TypeError: Cannot read properties of undefined
+  ...
+}
+catch(err) {
+  // customize the error message
+  console.error('return object was misformatted:', err)
+}
+finally {
+  // add a custom error response for easier debugging
+  return new Response(JSON.stringify(
+    { message: 'Could not parse return object' }),
+    {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500 // opt to customize the status code to better fit the situation
+    }
+  )
+}
+```
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+### ReferenceError: Var is not defined
+
+A `ReferenceError` occurs when one tries to reference a variable that does not exist in the code's scope. Often times caused by a typo or missing import.
+
+For instance, if one tries to access a variable before it is defined, they will encounter the error:
+
+```js
+let a = some_uninitialized_var // ReferenceError: some_uninitialized_var is not defined...
+```
+
+### Fix:
+
+- Check the variable name in the error message against your code to ensure there are no typos
+- Make sure the variable is declared before it's used
+- If it's from a package, confirm the import exists and the export name is correct
+- If the error references a JavaScript internal, make sure it is compatible with the Supabase Runtime. If not, consider refactoring or updating the library's version
+
+### Custom errors
+
+You explicitly threw an [error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Error) somewhere in your code, or a third-party package did:
+
+```js
+throw new Error('custom, unhandled error')
+```
+
+Alternatively, in a [try/catch blocks](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch), you may have augmented the standard error message:
+
+```js
+try {
+  // induce reference error
+  const a = unitialized_var // ReferenceError...
+} catch (error) {
+  console.error('custom error message...', error) // modifying the original error message
+}
+```
+
+When you customize the error response, it's important to define an appropriate new message. It may also be worthwhile changing the default `500` code returned during errors to a value more reflective of the situation for easier debugging in the future:
+
+```js
+...
+catch (error) {
+  console.error('custom error message...', error) // modifying the original error message
+  return new Response(JSON.stringify(
+    { message: 'Permissions error, please sign in' }),
+    {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 401 // customizing the status code
+    }
+  )
+}
+```
+
+{/* supa-mdx-lint-disable Rule003Spelling */}
+
+### SyntaxError: Special case - CORS violation
+
+A `SyntaxError` error occurs when Deno's grammatical rules are violated, such as failing to close a parenthesis:
+
+```js
+console.log('unclosed' ; // Uncaught SyntaxError: missing ) after argument list
+```
+
+In most cases, syntax violations can be fixed by removing a typo. There is a special case that is common enough that it is worth providing an example over: [CORS](https://developer.mozilla.org/en-US/docs/Glossary/Preflight_request) violations.
+
+When making calls from a browser, such as FireFox or Chrome, the site will make an [OPTIONS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS) request before sending over the actual payload. This is a security mechanism done to prevent [Cross-Site-Request-Forgery attacks](https://support.apollographql.com/space/ETKB/779452417/Understanding+CORS+and+CSRF). To satisfy the request, you need to have a [CORS handler](/docs/guides/functions/cors) in place:
+
+```js
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+Deno.serve(async (req) => {
+  // CORS handler: manages OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+})
+```
+
+Without the `OPTIONS` handler, requests from the browser will be misinterpreted, resulting in an `Unexpected end of JSON input` error log.
+
+```sh
+SyntaxError: Unexpected end of JSON input
+    at parse (<anonymous>)
+    at packageData (ext:deno_fetch/22_body.js:408:14)
+    at consumeBody (ext:deno_fetch/22_body.js:261:12)
+    at eventLoopTick (ext:core/01_core.js:175:7)
+    at async Object.handler (file:///var/tmp/sb-compile-edge-runtime/source/index.ts:5:20)at async mapped (ext:runtime/http.js:246:20)
+```
+
+The solution is to follow our guide on adding [CORS support](/docs/guides/functions/cors).
+
+It is also important to note that if any error occurs before the CORS check can be satisfied, the browser may falsely report CORS as the reason a request failed:
+
+```js
+// returns before the CORS check can be satisfied
+return
+
+if (req.method === 'OPTIONS') {
+  return new Response('ok', { headers: corsHeaders })
+}
+```
+
+So, when encountering these errors, it is still important to check the logs or run the request outside the browser to make sure it is actually the primary factor and not a side-effect of a larger issue.
+
+## Still stuck?
+
+- Read the [Function Error Handling guide](/docs/guides/functions/error-handling) for best practices on structuring error responses
+- Review our [guide](/docs/guides/functions/debugging-tools) on local debugging with Chrome Dev Tools
+- Check the [Supabase GitHub Discussions](https://github.com/orgs/supabase/discussions), [Discord](https://discord.com/channels/839993398554656828/1006358244786196510), and [Reddit page](https://www.reddit.com/r/Supabase/) for similar reports that can help with debugging
+- Open a [support ticket](/dashboard/support/new) from your Dashboard if the issue persists and you believe it is a platform limitation

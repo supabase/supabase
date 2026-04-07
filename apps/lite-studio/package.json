@@ -1,0 +1,36 @@
+{
+  "name": "lite-studio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc",
+    "clean": "rimraf node_modules tsconfig.tsbuildinfo build .react-router .turbo"
+  },
+  "dependencies": {
+    "@react-router/node": "7.13.2",
+    "@react-router/serve": "7.13.2",
+    "isbot": "^5.1.36",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-router": "7.13.2",
+    "@react-router/fs-routes": "^7.4.0",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*"
+  },
+  "devDependencies": {
+    "@react-router/dev": "7.13.2",
+    "@types/node": "^22",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "autoprefixer": "^10.4.27",
+    "config": "workspace:*",
+    "postcss": "^8.5.8",
+    "tailwindcss": "catalog:",
+    "tsconfig": "workspace:*",
+    "vite": "catalog:",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}

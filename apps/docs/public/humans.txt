@@ -51,6 +51,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Murray
 Colum Ferry
 Craig Cannon
 Cuong Do
@@ -66,6 +67,7 @@ David Weitzman
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dimitrios Liappis
 Div Arora
 Divit D
 Douglas Hunley

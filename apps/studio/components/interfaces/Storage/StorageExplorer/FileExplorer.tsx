@@ -8,6 +8,7 @@ import { ColumnContextMenu } from './ColumnContextMenu'
 import { FileExplorerColumn } from './FileExplorerColumn'
 import { FolderContextMenu } from './FolderContextMenu'
 import { ItemContextMenu } from './ItemContextMenu'
+import { useStoragePreference } from './useStoragePreference'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
@@ -33,6 +34,7 @@ export const FileExplorer = ({
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(snap.projectRef)
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -48,7 +50,7 @@ export const FileExplorer = ({
       ref={fileExplorerRef}
       className={cn(
         'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
-        snap.view === STORAGE_VIEWS.LIST && 'flex-col'
+        view === STORAGE_VIEWS.LIST && 'flex-col'
       )}
     >
       <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
@@ -59,7 +61,7 @@ export const FileExplorer = ({
         <FileExplorerColumn
           column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
         />
-      ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
+      ) : view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
           {columns.map((column, index) => (
             <FileExplorerColumn
@@ -75,7 +77,7 @@ export const FileExplorer = ({
             />
           ))}
         </div>
-      ) : snap.view === STORAGE_VIEWS.LIST ? (
+      ) : view === STORAGE_VIEWS.LIST ? (
         <>
           {columns.length > 0 && (
             <FileExplorerColumn
@@ -92,7 +94,7 @@ export const FileExplorer = ({
           )}
         </>
       ) : (
-        <div>Unknown view: {snap.view}</div>
+        <div>Unknown view: {view}</div>
       )}
     </div>
   )

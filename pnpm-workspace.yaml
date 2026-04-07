@@ -15,7 +15,7 @@ catalog:
   '@types/react-dom': ^18.3.0
   lodash: ^4.17.23
   lodash-es: ^4.17.23
-  next: ^15.5.13
+  next: ~16.1.7
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -46,12 +46,12 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
-  - undici
-  - next
-  - '@next/*'
-  - h3
-  - typescript
-  - stripe-experiment-sync
+  - '@react-router/*'
+  - react-router
+  - path-to-regexp
+  - brace-expansion
+  - serialize-javascript
+  - turbo
 
 onlyBuiltDependencies:
   - node-pty
@@ -59,11 +59,12 @@ onlyBuiltDependencies:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
-  '@aws-sdk/core>fast-xml-parser': ^4.5.4
+  '@aws-sdk/core>fast-xml-parser': ^4.5.5
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
-  '@rollup/plugin-terser>serialize-javascript': ^7.0.3
+  '@rollup/plugin-terser>serialize-javascript': ^7.0.5
+  '@tanstack/start-server-core': ^1.159.0
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   esbuild: ^0.25.2
@@ -75,7 +76,7 @@ overrides:
   'pgsql-parser>libpg-query': ^15.2.0
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
-  'terser-webpack-plugin>serialize-javascript': ^7.0.3
+  'terser-webpack-plugin>serialize-javascript': ^7.0.5
   tmp: ^0.2.4
   webpack: ^5.104.1
 

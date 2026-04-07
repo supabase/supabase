@@ -2472,6 +2472,24 @@ export interface InlineEditorSettingClickedEvent {
 }
 
 /**
+ * User toggled the queue table operations setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface QueueOperationsSettingClickedEvent {
+  action: 'queue_operations_setting_clicked'
+  properties: {
+    /**
+     * Whether the queue operations was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -2931,6 +2949,44 @@ export interface LogExplorerQueryRunButtonClickedEvent {
 }
 
 /**
+ * User clicked an upgrade CTA inside the compute badge hover card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ComputeBadgeUpgradeClickedEvent {
+  action: 'compute_badge_upgrade_clicked'
+  properties: {
+    computeSize: string
+    planId: string
+    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerDismissedEvent {
+  action: 'free_micro_upgrade_banner_dismissed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA on the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerCtaClickedEvent {
+  action: 'free_micro_upgrade_banner_cta_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -2952,6 +3008,47 @@ export interface StorageExplorerNavigateClickedEvent {
 export interface StorageExplorerNavigateSubmittedEvent {
   action: 'storage_explorer_navigate_submitted'
   groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the pricing value/flexibility experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingPageExperimentExposedEvent {
+  action: 'pricing_page_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingPageExperiment'
+    /**
+     * Experiment variant.
+     * GROWTH-694: flexibility (section), flexibility_card (on card), hourly_rate (on card)
+     * GROWTH-697: multi_project (on card), estimate_cta (on card)
+     */
+    variant:
+      | 'control'
+      | 'flexibility'
+      | 'flexibility_card'
+      | 'hourly_rate'
+      | 'multi_project'
+      | 'estimate_cta'
+  }
+}
+
+/**
+ * User clicked the "Upgrade to Pro" CTA in the dashboard header.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaClickedEvent {
+  action: 'header_upgrade_cta_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -3095,6 +3192,7 @@ export type TelemetryEvent =
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
+  | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
@@ -3119,3 +3217,8 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
+  | ComputeBadgeUpgradeClickedEvent
+  | FreeMicroUpgradeBannerDismissedEvent
+  | FreeMicroUpgradeBannerCtaClickedEvent
+  | PricingPageExperimentExposedEvent
+  | HeaderUpgradeCtaClickedEvent
