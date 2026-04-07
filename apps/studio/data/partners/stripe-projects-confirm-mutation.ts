@@ -6,22 +6,16 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type ConfirmAccountRequestVariables = {
   arId: string
-  organizationId?: number
-  organizationName?: string
 }
 
-async function confirmAccountRequest({
-  arId,
-  organizationId,
-  organizationName,
-}: ConfirmAccountRequestVariables) {
+async function confirmAccountRequest({ arId }: ConfirmAccountRequestVariables) {
   if (!arId) throw new Error('Account request ID is required')
 
   const { data, error } = await post(
     '/platform/stripe/projects/provisioning/account_requests/{id}/confirm',
     {
       params: { path: { id: arId } },
-      body: { organization_id: organizationId, organization_name: organizationName },
+      body: {},
     }
   )
 

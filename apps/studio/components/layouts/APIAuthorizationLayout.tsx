@@ -1,5 +1,6 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
+import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
 import { Separator } from 'ui'
 
@@ -29,17 +30,19 @@ export const APIAuthorizationLayout = ({
           <div className="mx-auto px-4 sm:px-6">
             <div className="max-w-xl flex justify-between items-center mx-auto py-4">
               <div className="flex justify-start lg:w-0 lg:flex-1 items-center">
-                <span className="sr-only">Supabase</span>
-                <Image
-                  src={
-                    resolvedTheme?.includes('dark')
-                      ? `${BASE_PATH}/img/supabase-dark.svg`
-                      : `${BASE_PATH}/img/supabase-light.svg`
-                  }
-                  alt="Supabase Logo"
-                  height={20}
-                  width={105}
-                />
+                <Link href="/">
+                  <span className="sr-only">Supabase</span>
+                  <Image
+                    src={
+                      resolvedTheme?.includes('dark')
+                        ? `${BASE_PATH}/img/supabase-dark.svg`
+                        : `${BASE_PATH}/img/supabase-light.svg`
+                    }
+                    alt="Supabase Logo"
+                    height={20}
+                    width={105}
+                  />
+                </Link>
               </div>
             </div>
           </div>
