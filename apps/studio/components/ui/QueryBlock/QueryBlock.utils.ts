@@ -21,6 +21,21 @@ export const formatYAxisTick = (value: number): string => {
   return String(value)
 }
 
+export const computeYAxisWidth = (
+  data: Record<string, unknown>[],
+  key: string,
+  {
+    isLogScale = false,
+    isPercentage = false,
+  }: { isLogScale?: boolean; isPercentage?: boolean } = {}
+): number => {
+  if (isLogScale) return 52
+  if (isPercentage) return Math.max(36, (3 + 1) * 8) // max tick is "100"
+  const maxMagnitude =
+    data.length > 0 ? Math.max(...data.map((d) => Math.abs(Number(d[key]) || 0))) : 0
+  return Math.max(36, (formatYAxisTick(maxMagnitude).length + 1) * 8)
+}
+
 export const formatLogTick = (value: number): string => {
   if (value >= 1_000_000)
     return `${(value / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 1 })}M`

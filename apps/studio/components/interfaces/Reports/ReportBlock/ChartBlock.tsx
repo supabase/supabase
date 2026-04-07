@@ -12,6 +12,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import {
   checkHasNonPositiveValues,
+  computeYAxisWidth,
   formatLogTick,
   formatYAxisTick,
 } from '@/components/ui/QueryBlock/QueryBlock.utils'
@@ -177,11 +178,10 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  // Use max absolute magnitude so the width accommodates negative tick labels too
-  const maxMagnitude =
-    data.length > 0 ? Math.max(...data.map((d: any) => Math.abs(Number(d[metricLabel]) || 0))) : 0
-  const maxFormattedLength = isPercentage ? 3 : formatYAxisTick(maxMagnitude).length
-  const yAxisWidth = effectiveLogScale ? 52 : Math.max(36, (maxFormattedLength + 1) * 8)
+  const yAxisWidth = computeYAxisWidth(data, metricLabel, {
+    isLogScale: effectiveLogScale,
+    isPercentage,
+  })
 
   const getInitialHighlightedValue = useCallback(() => {
     if (!chartData?.data?.length) return undefined

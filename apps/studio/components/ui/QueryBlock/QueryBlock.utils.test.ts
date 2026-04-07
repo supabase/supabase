@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatYAxisTick } from './QueryBlock.utils'
+import { computeYAxisWidth, formatYAxisTick } from './QueryBlock.utils'
 
 describe('formatYAxisTick', () => {
   it('returns integers as-is when below 1000', () => {
@@ -52,5 +52,41 @@ describe('formatYAxisTick', () => {
     expect(formatYAxisTick(1.25)).toBe('1.3')
     expect(formatYAxisTick(99.9)).toBe('99.9')
     expect(formatYAxisTick(5.0)).toBe('5')
+  })
+})
+
+describe('computeYAxisWidth', () => {
+  const row = (v: number) => ({ val: v })
+
+  it('returns 52 for log scale regardless of data', () => {
+    expect(computeYAxisWidth([row(1_000_000)], 'val', { isLogScale: true })).toBe(52)
+  })
+
+  it('returns a fixed width for percentage data', () => {
+    const width = computeYAxisWidth([row(99)], 'val', { isPercentage: true })
+    // "100" is the longest tick → (3+1)*8 = 32, floor at 36
+    expect(width).toBe(36)
+  })
+
+  it('returns minimum 36 for small values', () => {
+    expect(computeYAxisWidth([row(5)], 'val')).toBe(36)
+    expect(computeYAxisWidth([], 'val')).toBe(36)
+  })
+
+  it('widens for large values', () => {
+    // formatYAxisTick(55_300) = "55.3K" (5 chars) → (5+1)*8 = 48
+    expect(computeYAxisWidth([row(55_300)], 'val')).toBe(48)
+  })
+
+  it('uses absolute magnitude so negative data is handled correctly', () => {
+    const negWidth = computeYAxisWidth([row(-55_300)], 'val')
+    const posWidth = computeYAxisWidth([row(55_300)], 'val')
+    expect(negWidth).toBe(posWidth)
+  })
+
+  it('picks the largest magnitude across all rows', () => {
+    const data = [row(100), row(5_000), row(200)]
+    // max is 5000 → "5K" (2 chars) → (2+1)*8 = 24, floor at 36
+    expect(computeYAxisWidth(data, 'val')).toBe(36)
   })
 })

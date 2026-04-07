@@ -13,6 +13,7 @@ import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
 import {
   checkHasNonPositiveValues,
+  computeYAxisWidth,
   formatLogTick,
   formatYAxisTick,
   getCumulativeResults,
@@ -118,12 +119,9 @@ export const QueryBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  // Use max absolute magnitude so the width accommodates negative tick labels too
-  const maxYMagnitude =
-    chartData && yKey ? Math.max(...chartData.map((d: any) => Math.abs(Number(d[yKey]) || 0))) : 0
-  const yAxisWidth = effectiveLogScale
-    ? 52
-    : Math.max(36, (formatYAxisTick(maxYMagnitude).length + 1) * 8)
+  const yAxisWidth = computeYAxisWidth(chartData ?? [], yKey ?? '', {
+    isLogScale: effectiveLogScale,
+  })
 
   const getDateFormat = (key: any) => {
     const value = chartData?.[0]?.[key] || ''
