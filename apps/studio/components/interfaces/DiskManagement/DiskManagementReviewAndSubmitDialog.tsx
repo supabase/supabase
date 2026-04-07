@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
+import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Alert_Shadcn_,
@@ -105,8 +104,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
   const isAwsK8sProject = project?.cloud_provider === 'AWS_K8S'
 
   const { formState, getValues } = form
-
-  const [showBreakdown, setShowBreakdown] = useState(true)
 
   const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -291,126 +288,95 @@ export const DiskManagementReviewAndSubmitDialog = ({
         )}
 
         {hasAnyBreakdownRows && (
-          <div
-            className={cn(
-              'flex items-center justify-end px-5 py-3',
-              showBreakdown ? 'border-b' : ''
+          <div className="py-0.5 px-5">
+            {hasComputeChanges && (
+              <BreakdownRow
+                label="Compute size"
+                description="Project will restart automatically on confirmation."
+              >
+                <ValueChange from={oldComputeLabel} to={newComputeLabel} />
+              </BreakdownRow>
             )}
-          >
-            <button
-              onClick={() => setShowBreakdown(!showBreakdown)}
-              className="flex items-center gap-1 text-sm text-foreground-lighter hover:text-foreground transition-colors"
-            >
-              {showBreakdown ? 'Hide breakdown' : 'View breakdown'}
-              {showBreakdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
+            {hasStorageTypeChanges && (
+              <BreakdownRow label="Storage type">
+                <ValueChange
+                  from={(form.formState.defaultValues?.storageType ?? '').toUpperCase()}
+                  to={form.getValues('storageType').toUpperCase()}
+                />
+              </BreakdownRow>
+            )}
+            {(hasIOPSChanges || hasStorageTypeChanges) && (
+              <BreakdownRow label={`IOPS (${form.getValues('provisionedIOPS')?.toLocaleString()})`}>
+                <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
+              </BreakdownRow>
+            )}
+            {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
+              <BreakdownRow
+                label={`Throughput (${form.getValues('throughput')?.toLocaleString()} MB/s)`}
+              >
+                <PriceDelta
+                  delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
+                />
+              </BreakdownRow>
+            )}
+            {(hasTotalSizeChanges || hasStorageTypeChanges) && (
+              <BreakdownRow
+                label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
+                description="For 4 hours after changes you will not be able to modify disk attributes."
+              >
+                <PriceDelta
+                  delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
+                />
+              </BreakdownRow>
+            )}
+            {hasGrowthPercentChanges && (
+              <BreakdownRow label="Growth percent">
+                <ValueChange
+                  from={String(
+                    form.formState.defaultValues?.growthPercent ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                  )}
+                  to={String(
+                    form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                  )}
+                />
+              </BreakdownRow>
+            )}
+            {hasMinIncrementChanges && (
+              <BreakdownRow label="Min increment">
+                <ValueChange
+                  from={String(
+                    form.formState.defaultValues?.minIncrementGb ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                  )}
+                  to={String(
+                    form.getValues('minIncrementGb') ??
+                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                  )}
+                />
+              </BreakdownRow>
+            )}
+            {hasMaxSizeChanges && (
+              <BreakdownRow label="Max disk size">
+                <ValueChange
+                  from={(
+                    form.formState.defaultValues?.maxSizeGb ??
+                    DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                  ).toLocaleString()}
+                  to={(
+                    form.getValues('maxSizeGb') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                  ).toLocaleString()}
+                />
+              </BreakdownRow>
+            )}
+            {numReplicas > 0 && (
+              <div className="py-2 text-xs text-foreground-muted">
+                Price change includes primary database and {numReplicas} replica
+                {numReplicas > 1 ? 's' : ''}
+              </div>
+            )}
           </div>
         )}
-
-        <AnimatePresence initial={false}>
-          {showBreakdown && hasAnyBreakdownRows && (
-            <motion.div
-              key="breakdown"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="overflow-hidden"
-            >
-              <div className="py-0.5 px-5">
-                {hasComputeChanges && (
-                  <BreakdownRow
-                    label="Compute size"
-                    description="Project will restart automatically on confirmation."
-                  >
-                    <ValueChange from={oldComputeLabel} to={newComputeLabel} />
-                  </BreakdownRow>
-                )}
-                {hasStorageTypeChanges && (
-                  <BreakdownRow label="Storage type">
-                    <ValueChange
-                      from={(form.formState.defaultValues?.storageType ?? '').toUpperCase()}
-                      to={form.getValues('storageType').toUpperCase()}
-                    />
-                  </BreakdownRow>
-                )}
-                {(hasIOPSChanges || hasStorageTypeChanges) && (
-                  <BreakdownRow
-                    label={`IOPS (${form.getValues('provisionedIOPS')?.toLocaleString()})`}
-                  >
-                    <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
-                  </BreakdownRow>
-                )}
-                {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
-                  <BreakdownRow
-                    label={`Throughput (${form.getValues('throughput')?.toLocaleString()} MB/s)`}
-                  >
-                    <PriceDelta
-                      delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
-                    />
-                  </BreakdownRow>
-                )}
-                {(hasTotalSizeChanges || hasStorageTypeChanges) && (
-                  <BreakdownRow
-                    label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
-                    description="For 4 hours after changes you will not be able to modify disk attributes."
-                  >
-                    <PriceDelta
-                      delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
-                    />
-                  </BreakdownRow>
-                )}
-                {hasGrowthPercentChanges && (
-                  <BreakdownRow label="Growth percent">
-                    <ValueChange
-                      from={String(
-                        form.formState.defaultValues?.growthPercent ??
-                          DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                      )}
-                      to={String(
-                        form.getValues('growthPercent') ??
-                          DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                      )}
-                    />
-                  </BreakdownRow>
-                )}
-                {hasMinIncrementChanges && (
-                  <BreakdownRow label="Min increment">
-                    <ValueChange
-                      from={String(
-                        form.formState.defaultValues?.minIncrementGb ??
-                          DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                      )}
-                      to={String(
-                        form.getValues('minIncrementGb') ??
-                          DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                      )}
-                    />
-                  </BreakdownRow>
-                )}
-                {hasMaxSizeChanges && (
-                  <BreakdownRow label="Max disk size">
-                    <ValueChange
-                      from={(
-                        form.formState.defaultValues?.maxSizeGb ??
-                        DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                      ).toLocaleString()}
-                      to={(
-                        form.getValues('maxSizeGb') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
-                      ).toLocaleString()}
-                    />
-                  </BreakdownRow>
-                )}
-                {numReplicas > 0 && (
-                  <div className="py-2 text-xs text-foreground-muted">
-                    Price change includes primary database and {numReplicas} replica
-                    {numReplicas > 1 ? 's' : ''}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <DialogFooter className="px-5 py-4">
           <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
