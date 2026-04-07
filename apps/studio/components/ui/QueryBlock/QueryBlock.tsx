@@ -118,11 +118,12 @@ export const QueryBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  const maxYValue =
-    chartData && yKey ? Math.max(...chartData.map((d: any) => Number(d[yKey]) || 0)) : 0
+  // Use max absolute magnitude so the width accommodates negative tick labels too
+  const maxYMagnitude =
+    chartData && yKey ? Math.max(...chartData.map((d: any) => Math.abs(Number(d[yKey]) || 0))) : 0
   const yAxisWidth = effectiveLogScale
     ? 52
-    : Math.max(36, (formatYAxisTick(maxYValue).length + 1) * 8)
+    : Math.max(36, (formatYAxisTick(maxYMagnitude).length + 1) * 8)
 
   const getDateFormat = (key: any) => {
     const value = chartData?.[0]?.[key] || ''

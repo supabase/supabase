@@ -177,9 +177,10 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
-  const maxDataValue =
-    data.length > 0 ? Math.max(...data.map((d: any) => Number(d[metricLabel]) || 0)) : 0
-  const maxFormattedLength = isPercentage ? 3 : formatYAxisTick(maxDataValue).length
+  // Use max absolute magnitude so the width accommodates negative tick labels too
+  const maxMagnitude =
+    data.length > 0 ? Math.max(...data.map((d: any) => Math.abs(Number(d[metricLabel]) || 0))) : 0
+  const maxFormattedLength = isPercentage ? 3 : formatYAxisTick(maxMagnitude).length
   const yAxisWidth = effectiveLogScale ? 52 : Math.max(36, (maxFormattedLength + 1) * 8)
 
   const getInitialHighlightedValue = useCallback(() => {

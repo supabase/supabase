@@ -29,7 +29,6 @@ export const formatLogTick = (value: number): string => {
   return value.toLocaleString()
 }
 
-// Add helper function for cumulative results
 export const getCumulativeResults = (results: { rows: any[] }, config: ChartConfig) => {
   if (!results?.rows?.length) {
     return []
