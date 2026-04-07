@@ -4673,13 +4673,6 @@ export interface components {
         state?: string | null
       }
       billing_name?: string
-      /** @enum {boolean} */
-      clear_tax_id?: true
-      tax_id?: {
-        country?: string
-        type: string
-        value: string
-      }
     }
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse: {
@@ -6996,7 +6989,6 @@ export interface components {
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
       OAUTH_SERVER_AUTHORIZATION_PATH: string | null
       OAUTH_SERVER_ENABLED: boolean
-      PASSKEY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -7017,9 +7009,7 @@ export interface components {
       SECURITY_MANUAL_LINKING_ENABLED: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       SECURITY_SB_FORWARDED_FOR_ENABLED: boolean
-      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
-      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: boolean
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
       SESSIONS_TAGS: string
@@ -7056,9 +7046,6 @@ export interface components {
       SMTP_SENDER_NAME: string
       SMTP_USER: string
       URI_ALLOW_LIST: string
-      WEBAUTHN_RP_DISPLAY_NAME: string | null
-      WEBAUTHN_RP_ID: string | null
-      WEBAUTHN_RP_ORIGINS: string | null
     }
     InstallPlatformAppBody: {
       /** Format: uuid */
@@ -8323,8 +8310,6 @@ export interface components {
         unit_price?: number
         unit_price_desc?: string
       }[]
-      /** @enum {string} */
-      monthly_invoice_tax_status: 'calculated' | 'not_applicable' | 'failed'
       number_of_projects: number
       /** @enum {boolean} */
       pending_subscription_flow: true
@@ -8334,15 +8319,7 @@ export interface components {
       upfront_charge: {
         customer_balance: number
         prorated_credit: number
-        tax: {
-          currency: string
-          tax_amount: number
-          tax_rate_percentage: number
-          total_amount_excluding_tax: number
-          total_amount_including_tax: number
-        } | null
-        /** @enum {string} */
-        tax_status: 'calculated' | 'not_applicable' | 'failed'
+        tax: number
         taxable_amount: number
         total: number
       } | null
@@ -10295,7 +10272,6 @@ export interface components {
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
       OAUTH_SERVER_AUTHORIZATION_PATH?: string | null
       OAUTH_SERVER_ENABLED?: boolean | null
-      PASSKEY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean | null
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
@@ -10323,9 +10299,7 @@ export interface components {
       SECURITY_MANUAL_LINKING_ENABLED?: boolean | null
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number | null
       SECURITY_SB_FORWARDED_FOR_ENABLED?: boolean | null
-      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD?: boolean | null
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean | null
-      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD?: boolean | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
       SESSIONS_SINGLE_PER_USER?: boolean | null
       SESSIONS_TAGS?: string | null
@@ -10364,9 +10338,6 @@ export interface components {
       SMTP_SENDER_NAME?: string | null
       SMTP_USER?: string | null
       URI_ALLOW_LIST?: string | null
-      WEBAUTHN_RP_DISPLAY_NAME?: string | null
-      WEBAUTHN_RP_ID?: string | null
-      WEBAUTHN_RP_ORIGINS?: string | null
     }
     UpdateGoTrueConfigHooksBody: {
       HOOK_AFTER_USER_CREATED_ENABLED?: boolean | null
