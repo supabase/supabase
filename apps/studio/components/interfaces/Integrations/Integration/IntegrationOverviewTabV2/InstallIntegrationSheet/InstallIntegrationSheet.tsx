@@ -1,8 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  IntegrationInputs,
-  type IntegrationDefinition,
-} from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { type IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useTrack } from 'lib/telemetry/track'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -31,7 +28,6 @@ import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
 } from '@/data/database-extensions/database-extensions-query'
-import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { ResponseError } from '@/types'
 
@@ -105,12 +101,16 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
     { enabled: involvesExtensions }
   )
 
-  const defaultExtensionsSchema = Object.fromEntries(
-    requiredExtensionNames.map((extName) => {
-      const ext = extensions.find((x) => x.name === extName)
-      const defaultSchema = getExtensionDefaultSchema(ext)
-      return [extName, { schema: defaultSchema ?? 'extensions', value: undefined }]
-    })
+  const defaultExtensionsSchema = useMemo(
+    () =>
+      Object.fromEntries(
+        requiredExtensionNames.map((extName) => {
+          const ext = extensions.find((x) => x.name === extName)
+          const defaultSchema = getExtensionDefaultSchema(ext)
+          return [extName, { schema: defaultSchema ?? 'extensions', value: undefined }]
+        })
+      ),
+    [requiredExtensionNames, extensions]
   )
   const [extensionsSchema, setExtensionsSchema] =
     useState<ExtensionsSchema>(defaultExtensionsSchema)
@@ -145,14 +145,21 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
 
       if (!!checkInstallationStatus) {
         const pollInstallationStatus = async () => {
-          const { ref: projectRef, connectionString } = project || {}
-          const status = await checkInstallationStatus({ projectRef, connectionString })
-          if (status === 'installed') {
-            toast.success(`Successfully installed ${name}`, { id: toastId })
-            setOpen(false)
+          try {
+            const { ref: projectRef, connectionString } = project || {}
+            const status = await checkInstallationStatus({ projectRef, connectionString })
+            if (status === 'installed') {
+              toast.success(`Successfully installed ${name}`, { id: toastId })
+              setOpen(false)
+              setIsInstalling(false)
+            } else {
+              setTimeout(() => pollInstallationStatus(), 5000)
+            }
+          } catch (error) {
+            toast.error(`Failed to install ${name}: ${(error as ResponseError).message}`, {
+              id: toastId,
+            })
             setIsInstalling(false)
-          } else {
-            setTimeout(() => pollInstallationStatus(), 5000)
           }
         }
         pollInstallationStatus()
@@ -200,7 +207,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   }
 
   useEffect(() => {
-    if (isSuccessExtensions) return
+    if (!isSuccessExtensions) return
     setExtensionsSchema(defaultExtensionsSchema)
   }, [isSuccessExtensions, defaultExtensionsSchema])
 

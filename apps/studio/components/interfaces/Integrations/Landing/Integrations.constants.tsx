@@ -6,7 +6,6 @@ import { useTrack } from 'lib/telemetry/track'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { snakeCase } from 'node_modules/@types/lodash'
 import { ComponentType, ReactNode } from 'react'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -588,7 +587,11 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         connectionString: connectionString as string,
       })
 
-      const { status } = getStripeSyncSchemaComment(schemas)
+      const { status, errorMessage } = getStripeSyncSchemaComment(schemas)
+
+      if (status === 'install error') {
+        throw new Error(errorMessage ?? 'Stripe Sync installation failed')
+      }
 
       if (status === 'installed') {
         await queryClient.invalidateQueries({

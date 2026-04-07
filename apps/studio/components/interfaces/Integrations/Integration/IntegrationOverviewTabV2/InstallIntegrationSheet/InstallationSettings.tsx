@@ -26,7 +26,7 @@ export const InstallationSettings = ({
         <CardContent className="divide-y p-0">
           {Object.entries(inputs).map((entry) => {
             const [key, input] = entry
-            const { type, label, description, required, actions } = input
+            const { type, label, description, required, actions = [] } = input
 
             return (
               <div key={key} className="flex flex-col gap-y-2 p-4">
