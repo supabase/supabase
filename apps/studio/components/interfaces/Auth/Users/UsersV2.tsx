@@ -54,7 +54,6 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -99,7 +98,6 @@ export const UsersV2 = () => {
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const gridRef = useRef<DataGridHandle>(null)
   const xScroll = useRef<number>(0)
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { mutate: sendEvent } = useSendEventMutation()
 
   const {
@@ -722,9 +720,7 @@ export const UsersV2 = () => {
               </div>
 
               <div className="flex items-center gap-x-2">
-                {isNewAPIDocsEnabled && (
-                  <APIDocsButton section={['user-management']} source="auth-users" />
-                )}
+                <APIDocsButton section={['user-management']} source="auth-users" />
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}

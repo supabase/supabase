@@ -11,7 +11,6 @@ import {
   PopoverTrigger_Shadcn_,
 } from 'ui'
 
-import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -90,8 +89,6 @@ type NavTitleProps = {
 }
 
 const NavTitle = ({ title, category }: NavTitleProps) => {
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-
   const snap = useAppStateSnapshot()
   const handleBack = () => {
     snap.setActiveDocsSection([category])
@@ -99,9 +96,7 @@ const NavTitle = ({ title, category }: NavTitleProps) => {
 
   return (
     <div className="flex items-center space-x-2 mb-2">
-      {isNewAPIDocsEnabled && (
-        <Button type="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
-      )}
+      <Button type="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
       <p className="text-sm text-foreground-light capitalize">{title}</p>
     </div>
   )

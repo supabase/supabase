@@ -1,5 +1,5 @@
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, FileText, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
@@ -26,7 +26,6 @@ interface OtherFeatures {
   isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
-  apiDocsSidePanel?: boolean
 }
 
 interface SettingsFeatures {
@@ -154,8 +153,6 @@ export const generateOtherRoutes = (
   const isPlatform = features?.isPlatform ?? IS_PLATFORM
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
-  const apiDocsSidePanelEnabled = features?.apiDocsSidePanel ?? false
-
   return [
     {
       key: 'advisors',
@@ -183,19 +180,6 @@ export const generateOtherRoutes = (
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
     },
-    ...(apiDocsSidePanelEnabled
-      ? [
-          {
-            key: 'api',
-            label: 'API Docs',
-            disabled: !isProjectActive,
-            icon: <FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link:
-              ref &&
-              (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/data_api/docs`),
-          },
-        ]
-      : []),
     {
       key: 'integrations',
       label: 'Integrations',

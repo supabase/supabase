@@ -70,11 +70,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 
 // Helpers
 
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
-
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]

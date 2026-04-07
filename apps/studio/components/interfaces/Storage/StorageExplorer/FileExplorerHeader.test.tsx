@@ -10,13 +10,11 @@ const {
   mockTrack,
   mockUseStorageExplorerStateSnapshot,
   mockUseAsyncCheckPermissions,
-  mockIsAPIDocsSidePanelEnabled,
   mockUseStoragePreference,
 } = vi.hoisted(() => ({
   mockTrack: vi.fn(),
   mockUseStorageExplorerStateSnapshot: vi.fn(),
   mockUseAsyncCheckPermissions: vi.fn(),
-  mockIsAPIDocsSidePanelEnabled: vi.fn(),
   mockUseStoragePreference: vi.fn(),
 }))
 
@@ -26,9 +24,6 @@ vi.mock('state/storage-explorer', () => ({
 }))
 vi.mock('hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
-}))
-vi.mock('components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  useIsAPIDocsSidePanelEnabled: () => mockIsAPIDocsSidePanelEnabled(),
 }))
 vi.mock('components/ui/APIDocsButton', () => ({
   APIDocsButton: () => null,
@@ -83,13 +78,11 @@ describe('FileExplorerHeader', () => {
     mockTrack.mockReset()
     mockUseStorageExplorerStateSnapshot.mockReset()
     mockUseAsyncCheckPermissions.mockReset()
-    mockIsAPIDocsSidePanelEnabled.mockReset()
     mockUseStoragePreference.mockReset()
 
     mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot())
     mockUseStoragePreference.mockReturnValue(createPreference())
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
-    mockIsAPIDocsSidePanelEnabled.mockReturnValue(false)
   })
 
   it('renders full breadcrumbs in column view and places Navigate before Reload', () => {

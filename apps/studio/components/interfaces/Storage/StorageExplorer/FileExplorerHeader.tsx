@@ -47,7 +47,6 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 import { useStoragePreference } from './useStoragePreference'
-import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -208,7 +207,6 @@ export const FileExplorerHeader = ({
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
   const snap = useStorageExplorerStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const track = useTrack()
 
   const [pathString, setPathString] = useState('')
@@ -546,14 +544,12 @@ export const FileExplorerHeader = ({
               )}
             </div>
 
-            {isNewAPIDocsEnabled && (
-              <>
-                <div className="h-6 shrink-0 border-r border-control" />
-                <div className="mx-2 shrink-0">
-                  <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
-                </div>
-              </>
-            )}
+            <>
+              <div className="h-6 shrink-0 border-r border-control" />
+              <div className="mx-2 shrink-0">
+                <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
+              </div>
+            </>
           </div>
         </div>
       </div>
