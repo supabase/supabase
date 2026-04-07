@@ -32,7 +32,6 @@ import {
   mapAddOnVariantIdToComputeSize,
 } from './DiskManagement.utils'
 import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
-import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -45,18 +44,24 @@ import { formatCurrency } from '@/lib/helpers'
 
 interface BreakdownRowProps {
   label: string
+  description?: string
   children: React.ReactNode
 }
 
-const BreakdownRow = ({ label, children }: BreakdownRowProps) => (
-  <div className="flex items-center justify-between py-3 px-5 border-b border-dashed last:border-b-0">
-    <span className="text-sm text-foreground-light">{label}</span>
+const BreakdownRow = ({ label, description, children }: BreakdownRowProps) => (
+  <div className="flex items-start justify-between py-3 px-0 border-b border-dashed last:border-b-0">
+    <div className="flex flex-col gap-0.5">
+      <span className="text-sm text-foreground-light">{label}</span>
+      {description && (
+        <span className="text-xs text-foreground-lighter max-w-72">{description}</span>
+      )}
+    </div>
     {children}
   </div>
 )
 
 const ValueChange = ({ from, to }: { from: string; to: string }) => (
-  <span className="text-xs font-mono uppercase">
+  <span className="text-sm font-mono uppercase">
     <span className="text-foreground-lighter">{from}</span>
     <span className="text-foreground-lighter mx-2">&rarr;</span>
     <span className="text-foreground">{to}</span>
@@ -65,7 +70,8 @@ const ValueChange = ({ from, to }: { from: string; to: string }) => (
 
 const PriceDelta = ({ delta }: { delta: number }) => (
   <span className={cn('text-sm font-mono', delta >= 0 ? 'text-brand' : 'text-destructive')}>
-    {delta >= 0 ? `+ ${formatCurrency(delta)}` : `- ${formatCurrency(Math.abs(delta))}`} per month
+    {delta >= 0 ? `+ ${formatCurrency(delta)}` : `- ${formatCurrency(Math.abs(delta))}`}{' '}
+    <span className="text-foreground-lighter">per month</span>
   </span>
 )
 
@@ -285,43 +291,30 @@ export const DiskManagementReviewAndSubmitDialog = ({
           </>
         )}
 
-        {!hasComputeChanges && hasDiskConfigChanges && (
-          <div className="px-5 py-3">
-            <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
-          </div>
-        )}
-
-        {(hasComputeChanges || hasDiskConfigChanges || hasAnyBreakdownRows) && (
+        {hasAnyBreakdownRows && (
           <div
             className={cn(
-              'flex items-center justify-between px-5 py-3',
-              showBreakdown && hasAnyBreakdownRows ? 'border-b' : ''
+              'flex items-center justify-end px-5 py-3',
+              showBreakdown ? 'border-b' : ''
             )}
           >
-            <div className="flex items-center gap-2">
-              {hasComputeChanges && <WarningIcon />}
-              <span className="text-sm text-foreground">
-                {hasComputeChanges
-                  ? 'Resizing your Compute will trigger a project restart.'
-                  : 'Review the changes below before confirming.'}
-              </span>
-            </div>
-            {hasAnyBreakdownRows && (
-              <button
-                onClick={() => setShowBreakdown(!showBreakdown)}
-                className="flex items-center gap-1 text-sm text-foreground-light hover:text-foreground transition-colors shrink-0 ml-4"
-              >
-                View breakdown
-                {showBreakdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              </button>
-            )}
+            <button
+              onClick={() => setShowBreakdown(!showBreakdown)}
+              className="flex items-center gap-1 text-sm text-foreground-light hover:text-foreground transition-colors"
+            >
+              View breakdown
+              {showBreakdown ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button>
           </div>
         )}
 
         {showBreakdown && hasAnyBreakdownRows && (
-          <div className="py-0.5">
+          <div className="py-0.5 px-5">
             {hasComputeChanges && (
-              <BreakdownRow label="Compute size">
+              <BreakdownRow
+                label="Compute size"
+                description="Project will restart automatically on confirmation."
+              >
                 <ValueChange from={oldComputeLabel} to={newComputeLabel} />
               </BreakdownRow>
             )}
@@ -350,6 +343,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {(hasTotalSizeChanges || hasStorageTypeChanges) && (
               <BreakdownRow
                 label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
+                description="For 4 hours after changes you will not be able to modify disk attributes."
               >
                 <PriceDelta
                   delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
