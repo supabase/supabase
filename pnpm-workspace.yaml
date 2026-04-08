@@ -49,6 +49,7 @@ minimumReleaseAgeExclude:
   - defu
   - vite
   - '@hono/node-server'
+  - hono
 
 onlyBuiltDependencies:
   - node-pty
