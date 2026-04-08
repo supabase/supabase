@@ -10,7 +10,7 @@ keywords = []
 
 PostgREST is returning errors by not recognizing the objects(tables/functions/views) in a schema and logging errors similar to:
 
-```console
+```
 Could not find the table 'X' in the schema cache
 ```
 
