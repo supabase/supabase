@@ -1,10 +1,9 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
 import {
   ArrowLeftRight,
   Check,
   ClipboardCheck,
   FolderLock,
-  Globe2,
   HeartPulse,
   InfoIcon,
   Lightbulb,
@@ -17,30 +16,29 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
 
+import { companyStats } from '../company-stats'
 import MainProducts from '../MainProducts'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { TwoColumnsSectionProps } from 'components/Solutions/TwoColumnsSection'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
 import {
   FrameworkLink,
+  getEditors,
   type FeaturesSection,
   type FrameworkLinkProps,
   type HeroSection,
   type Metadata,
   type Quotes,
-  getEditors,
 } from './solutions.utils'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { companyStats } from '../company-stats'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import type { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -143,7 +141,7 @@ const data: {
       },
       {
         icon: '/images/logos/publicity/brthrs.svg',
-        avatar: '/images/avatars/zimo-holdijk.jpeg',
+        avatar: '/images/avatars/zimo-holdijk.png',
         author: 'Zimo Holdijk',
         authorTitle: 'Lead Product Manager, Brthrs',
         quote: (

@@ -1,7 +1,5 @@
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import {
   Activity,
   BarChartIcon,
@@ -11,12 +9,13 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
   title?: string

@@ -55,10 +55,9 @@ export interface ModalProps extends React.ComponentProps<typeof DialogContent> {
   closable?: boolean
 }
 
-interface ModalType
-  extends React.ForwardRefExoticComponent<
-    React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps
-  > {
+interface ModalType extends React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof DialogContent> & ModalProps
+> {
   Content: React.ComponentType<{ children: React.ReactNode; className?: string }>
   Separator: React.ComponentType
 }

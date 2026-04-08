@@ -1,24 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
-import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Modal } from 'ui'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
-  PageSectionDescription,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useDatabasePasswordResetMutation } from '@/data/database/database-password-reset-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()

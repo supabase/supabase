@@ -34,7 +34,15 @@ Replication is currently in private alpha. Access is limited and features may ch
 
 </Admonition>
 
-Replication powered by [Supabase ETL](https://github.com/supabase/etl) automatically replicates data to supported systems.
+Replication powered by [Supabase ETL](https://github.com/supabase/etl) automatically replicates data to supported systems. Right now, **BigQuery** is the only supported managed destination.
+
+<Admonition type="note" title="Why Analytics Buckets are no longer listed">
+
+We are currently working on a new Supabase Warehouse product designed to address the limitations of the previous Analytics Buckets. Our goal is to build a solution we can confidently stand behind, rather than continuing to support an approach that does not meet the quality and flexibility we want for our users.
+
+At the moment, BigQuery is the only supported destination, but we are actively working on expanding capabilities.
+
+</Admonition>
 
 - [Set up replication](/docs/guides/database/replication/replication-setup)
 

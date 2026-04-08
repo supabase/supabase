@@ -1,5 +1,4 @@
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { EMPTY_OBJ } from 'lib/void'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -14,6 +13,7 @@ import {
 
 import { useFeaturePreviews } from './useFeaturePreviews'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
   flags: { [key: string]: boolean }
@@ -70,11 +70,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 
 // Helpers
 
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
-
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
@@ -108,20 +103,28 @@ export const useIsAdvisorRulesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
 }
 
-export const useIsQueueOperationsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
-}
-
 export const useIsPlatformWebhooksEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   return platformWebhooksEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]
 }
 
+export const useIsJitDbAccessEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
+  return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
+}
+
 export const useIsTableFilterBarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
+}
+
+export const useIsFloatingMobileToolbarEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
+
+  return showFloatingMobileToolbar && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]
 }
 
 export const useFeaturePreviewModal = () => {

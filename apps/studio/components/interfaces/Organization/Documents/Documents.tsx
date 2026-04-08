@@ -1,19 +1,20 @@
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
 import { Fragment } from 'react'
+
 import { CustomDocument } from './CustomDocument'
 import { DPA } from './DPA'
 import { HIPAA } from './HIPAA'
 import { SecurityQuestionnaire } from './SecurityQuestionnaire'
 import { SOC2 } from './SOC2'
 import { TIA } from './TIA'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import {
+  ScaffoldContainer,
+  ScaffoldDivider,
+  ScaffoldSection,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 
 export const Documents = () => {
   const { organizationLegalDocuments } = useCustomContent(['organization:legal_documents'])
@@ -31,37 +32,37 @@ export const Documents = () => {
 
   return (
     <>
-      <ScaffoldContainer id="dpa">
+      <ScaffoldContainer id="dpa" className="px-6 xl:px-10">
         <DPA />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="tia">
+      <ScaffoldContainer id="tia" className="px-6 xl:px-10">
         <TIA />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="soc2">
+      <ScaffoldContainer id="soc2" className="px-6 xl:px-10">
         <SOC2 />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="hipaa">
+      <ScaffoldContainer id="hipaa" className="px-6 xl:px-10">
         <HIPAA />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="security-questionnaire">
+      <ScaffoldContainer id="security-questionnaire" className="px-6 xl:px-10">
         <SecurityQuestionnaire />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer>
+      <ScaffoldContainer className="px-6 xl:px-10">
         <ScaffoldSection className="py-12">
           <ScaffoldSectionDetail className="col-span-full">
             <p className="text-sm text-foreground-light m-0">

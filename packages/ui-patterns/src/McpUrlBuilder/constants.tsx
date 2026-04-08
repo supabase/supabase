@@ -1,6 +1,7 @@
-import { CodeBlock } from 'ui/src/components/CodeBlock'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type {
+  AntigravityMcpConfig,
   ClaudeCodeMcpConfig,
   CodexMcpConfig,
   FactoryMcpConfig,
@@ -305,6 +306,42 @@ export const MCP_CLIENTS: McpClient[] = [
         </div>
       )
     },
+  },
+  {
+    key: 'antigravity',
+    label: 'Antigravity',
+    icon: 'antigravity',
+    configFile: '~/.gemini/antigravity/mcp_config.json',
+    externalDocsUrl: 'https://antigravity.google/docs/mcp',
+    transformConfig: (config): AntigravityMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            serverUrl: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+    alternateInstructions: (_config, _onCopy) => (
+      <div className="space-y-2">
+        <p className="text-xs text-foreground-light">
+          After saving the config, restart Antigravity. It will prompt you to complete the OAuth
+          flow to authenticate with Supabase.
+        </p>
+        <p className="text-xs text-foreground-light">
+          To edit the config from within Antigravity, click the <strong>···</strong> menu at the top
+          of the Agent pane &gt; <strong>MCP Servers</strong> &gt;{' '}
+          <strong>Manage MCP Servers</strong> &gt; <strong>View raw config</strong>. From the Manage
+          MCP Servers page you can also <strong>Refresh</strong> server configs and enable/disable
+          servers.
+        </p>
+        <p className="text-xs text-foreground-light">
+          If you run into authentication issues, open the command palette and run{' '}
+          <strong>Authentication: Remove Dynamic Authentication Providers</strong> to clear cached
+          OAuth credentials and re-authenticate.
+        </p>
+      </div>
+    ),
   },
   {
     key: 'windsurf',

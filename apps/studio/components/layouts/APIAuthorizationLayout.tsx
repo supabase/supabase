@@ -1,22 +1,29 @@
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
-import Head from 'next/head'
 import Image from 'next/legacy/image'
 import type { PropsWithChildren } from 'react'
 import { Separator } from 'ui'
 
-export interface APIAuthorizationLayoutProps {}
+import { Head, type HeadProvider } from '@/components/ui/Head'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { BASE_PATH } from '@/lib/constants'
 
-const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorizationLayoutProps>) => {
+export interface APIAuthorizationLayoutProps {
+  HeadProvider: HeadProvider
+}
+
+export const APIAuthorizationLayout = ({
+  HeadProvider,
+  children,
+}: PropsWithChildren<APIAuthorizationLayoutProps>) => {
   const { resolvedTheme } = useTheme()
   const { appTitle } = useCustomContent(['app:title'])
 
   return (
     <>
-      <Head>
-        <title>Authorize API access | {appTitle || 'Supabase'}</title>
-      </Head>
+      <Head
+        HeadProvider={HeadProvider}
+        title={`Authorize API access | ${appTitle || 'Supabase'}`}
+      />
       <main className="h-screen flex flex-col w-full h-full overflow-y-auto">
         <div>
           <div className="mx-auto px-4 sm:px-6">
@@ -45,5 +52,3 @@ const APIAuthorizationLayout = ({ children }: PropsWithChildren<APIAuthorization
     </>
   )
 }
-
-export default APIAuthorizationLayout

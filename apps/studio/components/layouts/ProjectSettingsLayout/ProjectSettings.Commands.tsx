@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
@@ -26,6 +26,13 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
     [
+      {
+        id: 'nav-project-settings-add-ons',
+        name: 'Add-ons',
+        value: 'Add-ons addons add ons add on add-on',
+        route: `/project/${ref}/settings/addons`,
+        defaultHidden: true,
+      },
       {
         id: 'nav-project-settings-general',
         name: 'General Settings',

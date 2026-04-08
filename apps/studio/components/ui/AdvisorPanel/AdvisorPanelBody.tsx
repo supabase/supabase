@@ -1,7 +1,4 @@
-import { Lint } from 'data/lint/lint-query'
-import { Notification } from 'data/notifications/notifications-v2-query'
 import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
-import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
@@ -16,6 +13,9 @@ import {
   tabIconMap,
 } from './AdvisorPanel.utils'
 import { EmptyAdvisor } from './EmptyAdvisor'
+import { Lint } from '@/data/lint/lint-query'
+import { Notification } from '@/data/notifications/notifications-v2-query'
+import { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
   return (

@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -29,7 +28,13 @@ import {
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { computeYAxisDomain, formatPercentage, numberFormatter, useChartSize } from './Charts.utils'
+import {
+  computeYAxisDomain,
+  formatPercentage,
+  normalizeStackedSeriesData,
+  numberFormatter,
+  useChartSize,
+} from './Charts.utils'
 import {
   calculateTotalChartAggregate,
   CustomLabel,
@@ -39,6 +44,7 @@ import {
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
@@ -71,6 +77,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   sql?: string
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
+  normalizeVisibleStackToPercent?: boolean
 }
 
 interface CustomizedDotProps {
@@ -130,12 +137,12 @@ export function ComposedChart({
   highlightActions,
   titleTooltip,
   showNewBadge,
+  normalizeVisibleStackToPercent = false,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
   )
-  const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
@@ -173,6 +180,15 @@ export function ComposedChart({
     tick: false,
     width: 0,
   }
+  const yAxisPadding = useMemo(() => {
+    const needsTopPadding = normalizeVisibleStackToPercent && chartStyle !== 'bar'
+    if (!needsTopPadding) return _YAxisProps.padding
+
+    return {
+      ..._YAxisProps.padding,
+      top: Math.max(8, _YAxisProps.padding?.top ?? 0),
+    }
+  }, [_YAxisProps.padding, chartStyle, normalizeVisibleStackToPercent])
 
   function getHeaderLabel() {
     if (!xAxisIsDate) {
@@ -242,8 +258,24 @@ export function ComposedChart({
       : undefined
 
     if (focusDataIndex !== null) {
+      const focusedDataPoint = data[focusDataIndex]
+        ? Object.entries(data[focusDataIndex])
+            .map(([key, value]) => ({
+              dataKey: key,
+              value: value as number,
+            }))
+            .filter(
+              (entry) =>
+                entry.dataKey !== 'timestamp' &&
+                entry.dataKey !== 'period_start' &&
+                attributes.some(
+                  (attr) => attr.attribute === entry.dataKey && attr.enabled !== false
+                )
+            )
+        : undefined
+
       return showTotal
-        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
+        ? calculateTotalChartAggregate(focusedDataPoint ?? [], attributesToIgnoreFromTotal)
         : data[focusDataIndex]?.[yAxisKey]
     }
 
@@ -311,7 +343,20 @@ export function ComposedChart({
     return !attribute?.isMaxValue
   })
 
-  const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
+  const visibleAttributes = useMemo(
+    () => stackedAttributes.filter((att) => !hiddenAttributes.has(att.name)),
+    [stackedAttributes, hiddenAttributes]
+  )
+  const displayData = useMemo(
+    () =>
+      normalizeVisibleStackToPercent
+        ? normalizeStackedSeriesData({
+            data,
+            attributeNames: visibleAttributes.map((attribute) => attribute.name),
+          })
+        : data,
+    [data, normalizeVisibleStackToPercent, visibleAttributes]
+  )
 
   const isPercentage = format === '%'
   const isRamChart =
@@ -327,16 +372,10 @@ export function ComposedChart({
   const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
   const shouldFormatBytes =
     isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
-  //*
-  // Set the y-axis domain
-  // to the highest value in the chart data for percentage charts
-  // to vertically zoom in on the data
-  // */
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
   )
-  const yDomain = [0, yMaxFromVisible]
 
   const yAxisDomain = useMemo(
     () =>
@@ -409,30 +448,31 @@ export function ComposedChart({
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={data}
+          data={displayData}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {
-            if (!activeTooltipIndex) return
+          onMouseMove={({ activeLabel, activeTooltipIndex }) => {
+            if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
 
             setIsActiveHoveredChart(true)
             if (activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(activeTooltipIndex)
-              setActivePayload(activePayload ?? [])
             }
 
             setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[activeTooltipIndex]?.timestamp
+            const activeTimestamp =
+              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
               coordinates: activeLabel,
             })
           }}
           onMouseDown={({ activeLabel, activeTooltipIndex }) => {
-            if (!activeTooltipIndex) return
+            if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
 
-            const activeTimestamp = data[activeTooltipIndex]?.timestamp
+            const activeTimestamp =
+              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
               coordinates: activeLabel,
@@ -442,7 +482,6 @@ export function ComposedChart({
           onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
-            setActivePayload(null)
 
             clearHover()
           }}
@@ -457,7 +496,8 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={yAxisDomain}
+            domain={_YAxisProps.domain ?? yAxisDomain}
+            padding={yAxisPadding}
             key={yAxisKey}
           />
           <XAxis
@@ -571,10 +611,12 @@ export function ComposedChart({
               showTooltip && !showHighlightActions ? (
                 <CustomTooltip
                   {...props}
+                  data={data}
                   format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}
                   attributes={attributes}
+                  xAxisKey={xAxisKey}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
                   isActiveHoveredChart={

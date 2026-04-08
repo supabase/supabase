@@ -3,14 +3,8 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import {
-  useAccessTokenCreateMutation,
-  type NewScopedAccessToken,
-  type ScopedAccessTokenCreateVariables,
-} from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import {
   Button,
   Form_Shadcn_,
@@ -18,23 +12,29 @@ import {
   Separator,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { BasicInfo } from './Form/BasicInfo'
-import { Permissions } from './Form/Permissions/Permissions'
-import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
+
 import {
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   type ScopedAccessTokenPermission,
 } from '../AccessToken.constants'
-import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { mapPermissionToFGA, getExpirationDate } from '../AccessToken.utils'
 import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
+import { getExpirationDate, mapPermissionToFGA } from '../AccessToken.utils'
+import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
+import { BasicInfo } from './Form/BasicInfo'
+import { Permissions } from './Form/Permissions/Permissions'
+import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
+import {
+  useAccessTokenCreateMutation,
+  type NewScopedAccessToken,
+  type ScopedAccessTokenCreateVariables,
+} from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
 
 export interface NewScopedTokenSheetProps {
   visible: boolean

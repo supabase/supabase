@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 import { Gauge, Inbox, Shield } from 'lucide-react'
 
-import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { Lint } from 'data/lint/lint-query'
-import { AdvisorSeverity, AdvisorTab } from 'state/advisor-state'
 import type { AdvisorItem } from './AdvisorPanel.types'
+import { lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
+import { Lint } from '@/data/lint/lint-query'
+import { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
 
 export const formatItemDate = (timestamp: number): string => {
   const daysFromNow = dayjs().diff(dayjs(timestamp), 'day')

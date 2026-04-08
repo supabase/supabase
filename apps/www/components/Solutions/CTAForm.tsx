@@ -1,7 +1,9 @@
 import React, { FC } from 'react'
-import { cn, TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import TalkToPartnershipTeamForm from '~/components/Forms/TalkToPartnershipTeamForm'
+import { cn } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
+
+import TalkToPartnershipTeamForm from '@/components/Forms/TalkToPartnershipTeamForm'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 interface Props {}
 

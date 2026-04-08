@@ -466,7 +466,7 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttribut
             ? 'bottom-[calc(100%+0.25rem)] origin-bottom'
             : 'top-[calc(100%+0.25rem)] origin-top',
           open
-            ? 'opacity-100 translate-y-0 visible duration-150 ease-[.76,0,.23,1]'
+            ? 'opacity-100 translate-y-0 visible duration-150 ease-in-out'
             : cn('opacity-0 invisible duration-0', closedTranslationClass),
           className
         )}

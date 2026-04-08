@@ -1,5 +1,5 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
+import { IS_PLATFORM } from 'common'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
@@ -10,12 +10,8 @@ import { proxy, useSnapshot } from 'valtio'
 
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import {
-  STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
-  STORAGE_SORT_BY,
-  STORAGE_SORT_BY_ORDER,
-  STORAGE_VIEWS,
 } from '@/components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
@@ -33,6 +29,8 @@ import {
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
+import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
@@ -41,13 +39,13 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
+import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { tryParseJson } from '@/lib/helpers'
 import { lookupMime } from '@/lib/mime'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import { ResponseError } from '@/types'
@@ -65,12 +63,6 @@ const OFFSET = 0
 const DEFAULT_RETRY_SECONDS = 5
 const RATE_LIMIT_RETRY_SECONDS = 60
 
-const DEFAULT_PREFERENCES = {
-  view: STORAGE_VIEWS.COLUMNS,
-  sortBy: STORAGE_SORT_BY.NAME,
-  sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
-  sortBucket: STORAGE_BUCKET_SORT.CREATED_AT,
-}
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 let abortController: AbortController
@@ -91,10 +83,10 @@ function createStorageExplorerState({
   resumableUploadUrl: string
   clientEndpoint: string
 }) {
-  const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
-  const { view, sortBy, sortByOrder, sortBucket } =
-    (typeof window !== 'undefined' && tryParseJson(localStorage?.getItem(localStorageKey))) ||
-    DEFAULT_PREFERENCES
+  const getSortOptions = () => {
+    const { sortBy, sortByOrder } = getStoragePreference(projectRef)
+    return { column: sortBy, order: sortByOrder }
+  }
 
   const state = proxy({
     projectRef,
@@ -170,34 +162,6 @@ function createStorageExplorerState({
       })
     },
 
-    view,
-    setView: (value: STORAGE_VIEWS) => {
-      state.view = value
-      state.updateExplorerPreference()
-    },
-
-    sortBucket,
-    setSortBucket: async (value: STORAGE_BUCKET_SORT) => {
-      state.sortBucket = value
-      state.updateExplorerPreference()
-    },
-
-    sortBy,
-    setSortBy: async (value: STORAGE_SORT_BY) => {
-      state.sortBy = value
-      state.updateExplorerPreference()
-      state.setSelectedFilePreview(undefined)
-      await state.refetchAllOpenedFolders()
-    },
-
-    sortByOrder,
-    setSortByOrder: async (value: STORAGE_SORT_BY_ORDER) => {
-      state.sortByOrder = value
-      state.updateExplorerPreference()
-      state.setSelectedFilePreview(undefined)
-      await state.refetchAllOpenedFolders()
-    },
-
     isSearching: false,
     setIsSearching: (value: boolean) => (state.isSearching = value),
 
@@ -206,15 +170,6 @@ function createStorageExplorerState({
 
     selectedFileCustomExpiry: undefined as StorageItem | undefined,
     setSelectedFileCustomExpiry: (item?: StorageItem) => (state.selectedFileCustomExpiry = item),
-
-    updateExplorerPreference: () => {
-      const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
-      const { view, sortBy, sortByOrder, sortBucket } = state
-      localStorage.setItem(
-        localStorageKey,
-        JSON.stringify({ view, sortBy, sortByOrder, sortBucket })
-      )
-    },
 
     // Functions that manage the UI of the Storage Explorer
 
@@ -325,20 +280,26 @@ function createStorageExplorerState({
         status: STORAGE_ROW_STATUS.LOADING,
         columnIndex: index,
       })
-      state.pushColumnAtIndex(
-        { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
-        index
-      )
-
       const prefix = state.openedFolders
         .slice(0, index + 1)
         .map((folder) => folder.name)
         .join('/')
+      state.pushColumnAtIndex(
+        {
+          id: folderId,
+          name: folderName,
+          path: prefix,
+          status: STORAGE_ROW_STATUS.LOADING,
+          items: [],
+        },
+        index
+      )
+
       const options = {
         limit: LIMIT,
         offset: OFFSET,
         search: searchString,
-        sortBy: { column: state.sortBy, order: state.sortByOrder },
+        sortBy: getSortOptions(),
       }
 
       try {
@@ -362,6 +323,7 @@ function createStorageExplorerState({
           {
             id: folderId || folderName,
             name: folderName,
+            path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
             hasMoreItems: formattedItems.length === LIMIT,
@@ -393,12 +355,11 @@ function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
-      const prefix = state.openedFolders.map((folder) => folder.name).join('/')
       const options = {
         limit: LIMIT,
         offset: column.items.length,
         search: searchString,
-        sortBy: { column: state.sortBy, order: state.sortByOrder },
+        sortBy: getSortOptions(),
       }
 
       try {
@@ -406,14 +367,14 @@ function createStorageExplorerState({
           {
             projectRef: state.projectRef,
             bucketId: state.selectedBucket.id,
-            path: prefix,
+            path: column.path,
             options,
           },
           abortController?.signal
         )
 
         // Add items to column
-        const formattedItems = formatFolderItems(data, prefix)
+        const formattedItems = formatFolderItems(data, column.path)
         state.columns = state.columns.map((col, idx) => {
           if (idx === index) {
             return {
@@ -452,7 +413,7 @@ function createStorageExplorerState({
 
       if (showLoading) {
         state.columns = [state.selectedBucket.name].concat(paths).map((path) => {
-          return { id: path, name: path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
+          return { id: path, name: path, path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
         })
       }
 
@@ -463,7 +424,7 @@ function createStorageExplorerState({
             limit: LIMIT,
             offset: OFFSET,
             search: searchString,
-            sortBy: { column: state.sortBy, order: state.sortByOrder },
+            sortBy: getSortOptions(),
           }
 
           try {
@@ -488,6 +449,7 @@ function createStorageExplorerState({
           id: null,
           status: STORAGE_ROW_STATUS.READY,
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
+          path: prefix,
           items: formattedItems,
           hasMoreItems: formattedItems.length === LIMIT,
           isLoadingMoreItems: false,
@@ -531,7 +493,7 @@ function createStorageExplorerState({
           options: {
             limit: LIMIT,
             offset: OFFSET,
-            sortBy: { column: state.sortBy, order: state.sortByOrder },
+            sortBy: getSortOptions(),
           },
         })
 
@@ -795,8 +757,34 @@ function createStorageExplorerState({
           { id: toastId, closeButton: false, position: 'top-right' }
         )
 
+        // Pre-fetch all URLs in a single batch to avoid N management API calls
+        const filePaths = files.map((file) => `${file.prefix}/${file.name}`)
+        const urlByPath = new Map<string, string>()
+
+        if (state.selectedBucket.public) {
+          for (const filePath of filePaths) {
+            urlByPath.set(
+              filePath,
+              `${clientEndpoint}/storage/v1/object/public/${state.selectedBucket.id}/${filePath}`
+            )
+          }
+        } else {
+          const signedUrls = await signBucketObjects({
+            projectRef: state.projectRef,
+            bucketId: state.selectedBucket.id,
+            paths: filePaths,
+            expiresIn: 60 * 60, // 1 hour — enough for large folder downloads
+          })
+          for (const item of signedUrls) {
+            if (item.path && item.signedUrl) {
+              urlByPath.set(item.path, item.signedUrl)
+            }
+          }
+        }
+
         const promises = files.map((file) => {
           const fileMimeType = (file.metadata?.mimetype as string) ?? null
+          const filePath = `${file.prefix}/${file.name}`
           return () => {
             return new Promise<
               | {
@@ -807,26 +795,22 @@ function createStorageExplorerState({
               | boolean
             >(async (resolve) => {
               try {
-                // Get authenticated Supabase client for Storage API access
-                const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+                const url = urlByPath.get(filePath)
+                if (!url) throw new Error(`Failed to retrieve file ${filePath}`)
 
-                // Use Storage API directly instead of Management API to avoid throttling
-                const { data, error } = await client.storage
-                  .from(state.selectedBucket.id)
-                  .download(`${file.prefix}/${file.name}`)
-
-                if (error) throw error
-                if (!data) throw new Error('No data returned from download')
+                const response = await fetch(url)
+                if (!response.ok) throw new Error(`Failed to retrieve file ${filePath}`)
+                const data = await response.blob()
 
                 progress = progress + 1 / files.length
 
                 resolve({
                   name: file.name,
                   prefix: file.prefix,
-                  blob: new Blob([data], { type: fileMimeType }),
+                  blob: new Blob([data], { type: fileMimeType ?? data.type }),
                 })
               } catch (error) {
-                console.error('Failed to download file', `${file.prefix}/${file.name}`)
+                console.error('Failed to download file', filePath)
                 resolve(false)
               }
             })
@@ -929,7 +913,7 @@ function createStorageExplorerState({
       const options = {
         limit: 10000,
         offset: OFFSET,
-        sortBy: { column: state.sortBy, order: state.sortByOrder },
+        sortBy: getSortOptions(),
       }
       let folderContents: StorageObject[] = []
 
@@ -1530,17 +1514,17 @@ function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
+        const url = await fetchFileUrl(
+          file.path,
+          state.projectRef,
+          state.selectedBucket.id,
+          state.selectedBucket.public
+        )
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
+        const data = await response.blob()
 
-        // Use Storage API directly instead of Management API to avoid throttling
-        const { data, error } = await client.storage
-          .from(state.selectedBucket.id)
-          .download(file.path)
-
-        if (error) throw error
-        if (!data) throw new Error('No data returned from download')
-
-        const newBlob = new Blob([data], { type: fileMimeType })
+        const newBlob = new Blob([data], { type: fileMimeType ?? data.type })
         const blobUrl = window.URL.createObjectURL(newBlob)
         const link = document.createElement('a')
         link.href = blobUrl
@@ -1574,17 +1558,18 @@ function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const client = await createProjectSupabaseClient(state.projectRef, clientEndpoint)
-
-        const { data, error } = await client.storage
-          .from(state.selectedBucket.id)
-          .download(file.path)
-
-        if (error) throw error
-        if (!data) throw new Error('No data returned from download')
+        const url = await fetchFileUrl(
+          file.path,
+          state.projectRef,
+          state.selectedBucket.id,
+          state.selectedBucket.public
+        )
+        const response = await fetch(url)
+        if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
+        const data = await response.blob()
 
         const fileMimeType = file?.metadata?.mimetype ?? undefined
-        return { name: file.name, blob: new Blob([data], { type: fileMimeType }) }
+        return { name: file.name, blob: new Blob([data], { type: fileMimeType ?? data.type }) }
       } catch (err) {
         console.error('Failed to download file', file.path)
         return false

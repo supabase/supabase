@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Button } from 'ui'
 
 import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
   '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
@@ -19,12 +19,13 @@ interface UpgradePlanButtonProps {
   source: string
   variant?: 'default' | 'primary'
   plan?: 'Pro' | 'Team' | 'Enterprise'
-  addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+  addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
   /** Used in the default message template for request upgrade dialog, e.g: "Upgrade to ..." */
   featureProposition?: string
   disabled?: boolean
   className?: string
   slug?: string
+  onClick?: () => void
 }
 
 /**
@@ -42,6 +43,7 @@ export const UpgradePlanButton = ({
   children,
   className,
   slug: slugParam,
+  onClick,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -73,7 +75,13 @@ export const UpgradePlanButton = ({
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 
-  const linkChildren = children || (!!addon ? 'Enable add-on' : `Upgrade to ${plan}`)
+  const linkChildren =
+    children ||
+    (isOnPaidPlanAndRequestingToPurchaseAddon
+      ? addon === 'computeSize'
+        ? 'Change compute size'
+        : 'Enable add-on'
+      : `Upgrade to ${plan}`)
   const link = billingAll ? (
     <Link href={href}>{linkChildren}</Link>
   ) : (
@@ -114,7 +122,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={variant} disabled={disabled} className={className}>
+    <Button asChild type={variant} disabled={disabled} className={className} onClick={onClick}>
       {link}
     </Button>
   )

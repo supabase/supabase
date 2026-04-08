@@ -33,7 +33,9 @@ const PlatformSection = ({ title, subheading, features, id, className }: Platfor
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 sm:divide-x divide-y rounded-md border border-default overflow-hidden">
-        {features?.map((feature) => <FeatureCard key={feature.id} feature={feature} />)}
+        {features?.map((feature) => (
+          <FeatureCard key={feature.id} feature={feature} />
+        ))}
       </div>
     </SectionContainer>
   )

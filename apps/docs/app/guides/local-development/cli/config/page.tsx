@@ -1,11 +1,11 @@
-import ReactMarkdown from 'react-markdown'
-import { CodeBlock } from 'ui'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { type TOCHeader } from '~/components/GuidesSidebar'
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
+import ReactMarkdown from 'react-markdown'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 const meta = {
   title: 'Supabase CLI config',

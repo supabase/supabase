@@ -1,45 +1,12 @@
 import type { Monaco } from '@monaco-editor/react'
+import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import {
-  isExplainQuery,
-  isExplainSql,
-  splitSqlStatements,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import ResizableAIWidget from 'components/ui/AIEditor/ResizableAIWidget'
-import { GridFooter } from 'components/ui/GridFooter'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { constructHeaders, isValidConnString } from 'data/fetchers'
-import { lintKeys } from 'data/lint/keys'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { wrapWithRollback } from 'data/sql/utils/transaction'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { isError } from 'data/utils/error-check'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { generateUuid } from 'lib/api/snippets.browser'
-import { BASE_PATH } from 'lib/constants'
-import { formatSql } from 'lib/formatSql'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import {
-  isRoleImpersonationEnabled,
-  useGetImpersonatedRoleState,
-} from 'state/role-impersonation-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
   cn,
@@ -64,8 +31,14 @@ import {
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
-import { DiffType, IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
 import {
+  DiffType,
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+  type PotentialIssues,
+} from './SQLEditor.types'
+import {
+  checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
@@ -74,6 +47,39 @@ import {
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import {
+  isExplainQuery,
+  isExplainSql,
+  splitSqlStatements,
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
+import { GridFooter } from '@/components/ui/GridFooter'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { constructHeaders, isValidConnString } from '@/data/fetchers'
+import { lintKeys } from '@/data/lint/keys'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { isError } from '@/data/utils/error-check'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { generateUuid } from '@/lib/api/snippets.browser'
+import { BASE_PATH } from '@/lib/constants'
+import { formatSql } from '@/lib/formatSql'
+import { detectOS } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import {
+  isRoleImpersonationEnabled,
+  useGetImpersonatedRoleState,
+} from '@/state/role-impersonation-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -123,9 +129,8 @@ export const SQLEditor = () => {
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
-  const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
-  const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
-  const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
+  const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
+
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
@@ -199,7 +204,7 @@ export const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
-          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
+          const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
 
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
@@ -275,7 +280,7 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
       const formattedSql = formatSql(sql)
 
@@ -313,26 +318,23 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
 
-      let queryHasIssues = false
+      const hasDestructiveOperations = checkDestructiveQuery(sql)
+      const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
+      const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
 
-      const destructiveOperations = checkDestructiveQuery(sql)
-      if (!force && destructiveOperations) {
-        setShowPotentialIssuesModal(true)
-        setQueryHasDestructiveOperations(true)
-        queryHasIssues = true
-      }
-
-      const updateWithoutWhereClause = isUpdateWithoutWhere(sql)
-      if (!force && updateWithoutWhereClause) {
-        setShowPotentialIssuesModal(true)
-        setQueryHasUpdateWithoutWhere(true)
-        queryHasIssues = true
-      }
+      const queryHasIssues =
+        !force &&
+        (hasDestructiveOperations || hasUpdateWithoutWhere || hasAlterDatabasePreventConnection)
 
       if (queryHasIssues) {
+        setPotentialIssues({
+          hasDestructiveOperations,
+          hasUpdateWithoutWhere,
+          hasAlterDatabasePreventConnection,
+        })
         return
       }
 
@@ -416,7 +418,7 @@ export const SQLEditor = () => {
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
 
       // Check for multiple statements - EXPLAIN only works on a single statement
@@ -801,21 +803,16 @@ export const SQLEditor = () => {
   return (
     <>
       <RunQueryWarningModal
-        visible={showPotentialIssuesModal}
-        hasDestructiveOperations={queryHasDestructiveOperations}
-        hasUpdateWithoutWhere={queryHasUpdateWithoutWhere}
+        visible={!!potentialIssues}
+        potentialIssues={potentialIssues}
         onCancel={() => {
           clearPendingRunRefocus()
-          setShowPotentialIssuesModal(false)
-          setQueryHasDestructiveOperations(false)
-          setQueryHasUpdateWithoutWhere(false)
+          setPotentialIssues(undefined)
           refocusEditor()
         }}
         onConfirm={() => {
           shouldRefocusAfterRunRef.current = true
-          setShowPotentialIssuesModal(false)
-          setQueryHasDestructiveOperations(false)
-          setQueryHasUpdateWithoutWhere(false)
+          setPotentialIssues(undefined)
           refocusEditor()
           void executeQuery(true)
         }}
@@ -884,7 +881,7 @@ export const SQLEditor = () => {
                       snippetName={
                         urlId === 'new'
                           ? generatedNewSnippetName
-                          : snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName
+                          : (snapV2.snippets[id]?.snippet.name ?? generatedNewSnippetName)
                       }
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}

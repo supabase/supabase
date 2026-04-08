@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React, { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FilterBar } from './FilterBar'
@@ -174,6 +175,53 @@ describe('FilterBar', () => {
 
     const updatedValueInput = await screen.findByLabelText('Value for Status')
     expect((updatedValueInput as HTMLInputElement).value).toBe('active')
+  })
+
+  it('shows an equals fallback and applies it on enter for non-operator input', async () => {
+    const user = userEvent.setup()
+    const onFilterChange = vi.fn()
+
+    function Wrapper() {
+      const [filters, setFilters] = useState(initialFilters)
+
+      return (
+        <FilterBar
+          filterProperties={mockFilterProperties}
+          filters={filters}
+          onFilterChange={(next) => {
+            onFilterChange(next)
+            setFilters(next)
+          }}
+          freeformText=""
+          onFreeformTextChange={mockOnFreeformTextChange}
+        />
+      )
+    }
+
+    render(<Wrapper />)
+
+    await user.click(screen.getByPlaceholderText('Filter by Name, Status, Count'))
+    await user.click(screen.getByText('Name'))
+
+    const operatorInput = await screen.findByLabelText('Operator for Name')
+    await user.click(operatorInput)
+    await user.type(operatorInput, 'abc')
+
+    expect(onFilterChange).toHaveBeenCalledTimes(1)
+    expect(await screen.findByText('Equals: "abc"')).toBeInTheDocument()
+
+    await user.keyboard('{Enter}')
+
+    await waitFor(() => {
+      expect(onFilterChange).toHaveBeenLastCalledWith({
+        logicalOperator: 'AND',
+        conditions: [{ propertyName: 'name', operator: '=', value: 'abc' }],
+      })
+    })
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Add more filters...')).toHaveFocus()
+    })
   })
 
   it('renders and applies custom value component inside popover', async () => {

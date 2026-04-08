@@ -210,7 +210,7 @@ export const FeatureFlagProvider = ({
         flagValues.forEach((item) => {
           flagStore['configcat'][item.settingKey] =
             overridesCookieValue[item.settingKey] ??
-            (item.settingValue === null ? null : item.settingValue ?? false)
+            (item.settingValue === null ? null : (item.settingValue ?? false))
         })
       }
 

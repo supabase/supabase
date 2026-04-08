@@ -1401,6 +1401,157 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-nextjs",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-react",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react/lib/supabase/client.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-react-router",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/react-router/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "realtime-monaco-tanstack",
+      "type": "registry:component",
+      "title": "Realtime Monaco",
+      "description": "Real-time Monaco editor for collaborative applications.",
+      "registryDependencies": [],
+      "dependencies": [
+        "@monaco-editor/react@latest",
+        "y-monaco@latest",
+        "yjs@latest",
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/realtime-monaco/hooks/use-connect-on-mount.ts",
+          "type": "registry:hook"
+        },
+        {
+          "path": "registry/default/blocks/realtime-monaco/components/realtime-monaco.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/tanstack/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "VITE_SUPABASE_URL": "",
+        "VITE_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "infinite-query-hook",
       "type": "registry:block",
       "title": "Infinite Query Hook",
@@ -2115,6 +2266,144 @@
         "@supabase/supabase-js@latest",
         "@vueuse/core",
         "lucide-vue-next"
+      ]
+    },
+    {
+      "name": "current-user-avatar-nuxtjs",
+      "type": "registry:block",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/default/current-user-avatar/nuxtjs/app/components/current-user-avatar.vue",
+          "type": "registry:component",
+          "target": "app/components/current-user-avatar.vue"
+        },
+        {
+          "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/current-user-avatar/nuxtjs/app/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserImage.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "current-user-avatar-vue",
+      "type": "registry:block",
+      "title": "Current User Avatar",
+      "description": "Component which renders the current user's avatar.",
+      "registryDependencies": [
+        "avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/default/current-user-avatar/vue/components/current-user-avatar.vue",
+          "type": "registry:component",
+          "target": "components/current-user-avatar.vue"
+        },
+        {
+          "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/current-user-avatar/vue/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserImage.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-avatar-stack-nuxtjs",
+      "type": "registry:block",
+      "title": "Realtime Avatar Stack",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/components/realtime-avatar-stack.vue",
+          "type": "registry:component",
+          "target": "app/components/realtime-avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/components/avatar-stack.vue",
+          "type": "registry:component",
+          "target": "app/components/avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserImage.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "app/composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/nuxtjs/app/composables/useRealtimePresenceRoom.ts",
+          "type": "registry:component",
+          "target": "app/composables/useRealtimePresenceRoom.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
+      ]
+    },
+    {
+      "name": "realtime-avatar-stack-vue",
+      "type": "registry:block",
+      "title": "Realtime Avatar Stack",
+      "description": "Component which stack of avatars, tracked by realtime presence.",
+      "registryDependencies": [
+        "avatar",
+        "tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/components/realtime-avatar-stack.vue",
+          "type": "registry:component",
+          "target": "components/realtime-avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/components/avatar-stack.vue",
+          "type": "registry:component",
+          "target": "components/avatar-stack.vue"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserImage.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserImage.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useCurrentUserName.ts",
+          "type": "registry:component",
+          "target": "composables/useCurrentUserName.ts"
+        },
+        {
+          "path": "registry/default/realtime-avatar-stack/vue/composables/useRealtimePresenceRoom.ts",
+          "type": "registry:component",
+          "target": "composables/useRealtimePresenceRoom.ts"
+        }
+      ],
+      "dependencies": [
+        "@supabase/supabase-js@latest"
       ]
     },
     {

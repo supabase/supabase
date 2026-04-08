@@ -1,14 +1,10 @@
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfileNameAndPicture } from 'lib/profile'
 import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -22,9 +18,21 @@ import {
   Theme,
 } from 'ui'
 
+import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-export function UserDropdown() {
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
@@ -35,10 +43,11 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="border flex-shrink-0 px-3">
-        <Button
+      <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
+        <ButtonTooltip
           type="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          tooltip={{ content: { text: 'Account settings' } }}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
@@ -47,10 +56,10 @@ export function UserDropdown() {
           ) : (
             <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
           )}
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
@@ -97,7 +106,7 @@ export function UserDropdown() {
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="https://supabase.com/changelog"
                   target="_blank"

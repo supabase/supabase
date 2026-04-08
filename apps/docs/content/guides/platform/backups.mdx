@@ -13,6 +13,18 @@ When you delete a project, we permanently remove all associated data, including 
 
 </Admonition>
 
+## Types of backups
+
+Database backups can be categorized into two types: **logical** and **physical**. You can learn more about them [in this blog post](/blog/postgresql-physical-logical-backups).
+
+<Admonition type="note" label="Physical backups are now enabled by default">
+
+All projects on Postgres `15.8.1.079` and newer use the newer physical backup process.
+
+Projects on older Postgres versions have to upgrade in order to be transitioned to physical backups. Once upgraded to an eligible version, your project is automatically transitioned over to physical backups.
+
+</Admonition>
+  
 <Admonition type="caution">
 
 For security purposes, daily backups do not store passwords for custom roles, and you will not find them in downloadable files. If you restore from a daily backup and use custom roles, you will need to reset their passwords after the restoration completes.

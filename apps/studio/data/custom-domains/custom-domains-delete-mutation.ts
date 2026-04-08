@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import { subscriptionKeys } from 'data/subscriptions/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { customDomainKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import { subscriptionKeys } from '@/data/subscriptions/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainDeleteVariables = {
   projectRef: string

@@ -1,5 +1,6 @@
 import { useFlag } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 /**
  * Organization level opt in for ETL private alpha, there's 2 flags we're using which controls

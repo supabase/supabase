@@ -1,9 +1,4 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useDeleteLogDrainMutation } from 'data/log-drains/delete-log-drain-mutation'
-import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useTrack } from 'lib/telemetry/track'
 import { MoreHorizontal, Pencil, TrashIcon } from 'lucide-react'
 import { cloneElement, useState } from 'react'
 import { toast } from 'sonner'
@@ -29,6 +24,11 @@ import { LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { LogDrainsCard } from './LogDrainsCard'
 import { LogDrainsEmpty } from './LogDrainsEmpty'
 import { VoteLink } from './VoteLink'
+import AlertError from '@/components/ui/AlertError'
+import { useDeleteLogDrainMutation } from '@/data/log-drains/delete-log-drain-mutation'
+import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useTrack } from '@/lib/telemetry/track'
 
 export function LogDrains({
   onNewDrainClick,
@@ -176,6 +176,7 @@ export function LogDrains({
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[140px]" align="end">
+                        {/* Jordi: Updating log drains is disabled temporarily.
                         <DropdownMenuItem
                           onClick={() => {
                             onUpdateDrainClick(drain)
@@ -183,7 +184,7 @@ export function LogDrains({
                         >
                           <Pencil className="h-4 w-4 mr-2" />
                           Update
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedLogDrain(drain)

@@ -1,11 +1,11 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Badge, Button } from 'ui'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 import { generateAdvisorsMenu } from './AdvisorsMenu.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AdvisorsSidebarMenuProps {
   page?: string

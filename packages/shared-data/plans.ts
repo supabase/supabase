@@ -50,7 +50,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
+    warning: 'Includes one project running on Micro compute.',
     priceMonthly: 25,
     description: 'For production applications with the power to scale.',
     features: [
@@ -75,7 +75,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
+    warning: 'Includes one project running on Micro compute.',
     priceMonthly: 599,
     description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [

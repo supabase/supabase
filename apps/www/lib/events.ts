@@ -276,9 +276,7 @@ export const getStaticEvents = async (): Promise<{
     event.end_date ? new Date(event.end_date) >= new Date() : new Date(event.date) >= new Date()
   )
 
-  const onDemandEvents = allEvents.filter(
-    (event: SupabaseEvent) => new Date(event.date) < new Date() && event.onDemand === true
-  )
+  const onDemandEvents = allEvents.filter((event: SupabaseEvent) => event.onDemand === true)
 
   const categories = upcomingEvents.reduce(
     (acc: { [key: string]: number }, event: SupabaseEvent) => {
