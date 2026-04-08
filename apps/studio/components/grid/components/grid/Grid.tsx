@@ -1,5 +1,5 @@
 import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
@@ -351,7 +351,7 @@ export const Grid = memo(
           >
             <SortableContext
               items={columnsWithDirtyCellClass.map((column) => column.key)}
-              strategy={verticalListSortingStrategy}
+              strategy={horizontalListSortingStrategy}
             >
               <RowContextMenuProvider>
                 <DataGrid
