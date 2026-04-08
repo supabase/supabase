@@ -204,7 +204,7 @@ export const OAuthServerSettingsForm = () => {
               <GenericSkeletonLoader />
             </CardContent>
           </Card>
-          {authConfig?.OAUTH_SERVER_ENABLED && <OAuthEndpointsTable isLoading />}
+          <OAuthEndpointsTable isLoading />
         </PageSectionContent>
       </PageSection>
     )
