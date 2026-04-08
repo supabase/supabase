@@ -55,7 +55,6 @@ const formSchema = z.object({
     .min(1, 'Please provide a URL for your site')
     .url('Please provide a URL for your site')
     .refine((value) => isValidHttpUrl(value), 'Please provide a valid URL for your site'),
-  // react-hook-form only handles arrays of objects
   redirect_uris: z
     .array(
       z.object({
