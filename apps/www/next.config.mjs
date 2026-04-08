@@ -3,13 +3,8 @@ import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { dirname, resolve } from 'path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-import { fileURLToPath } from 'url'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
-
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
@@ -74,14 +69,6 @@ const nextConfig = {
       // Static assets
       'public/**/*',
     ],
-  },
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      react: resolve(__dirname, 'node_modules/react'),
-      'react-dom': resolve(__dirname, 'node_modules/react-dom'),
-    }
-    return config
   },
   reactStrictMode: true,
   images: {
