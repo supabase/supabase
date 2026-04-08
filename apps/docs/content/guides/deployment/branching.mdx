@@ -7,10 +7,6 @@ Use branching to safely experiment with changes to your Supabase project.
 
 Supabase branches create separate environments that spin off from your main project. You can use these branching environments to create and test changes like new configurations, database schemas, or features without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
-<Admonition type="note">
-If your organization's plan doesn't include branching, the CLI will display an error with a direct link to your organization's billing page when you run `supabase branches create` or `supabase branches update`.
-</Admonition>
-
 ## How branching works
 
 - **Separate Environments**: Each branch is a separate environment with its own Supabase instance and API credentials.
