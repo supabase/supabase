@@ -19,10 +19,9 @@ import {
   DialogTrigger,
   WarningIcon,
 } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
 
 import { DiskStorageSchemaType } from './DiskManagement.schema'
-import { DiskManagementMessage, InfraInstanceSize } from './DiskManagement.types'
+import { DiskManagementMessage } from './DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -49,7 +48,7 @@ interface BreakdownRowProps {
 }
 
 const BreakdownRow = ({ label, description, children }: BreakdownRowProps) => (
-  <div className="flex items-center justify-between py-3 px-0 border-b border-dashed last:border-b-0">
+  <div className="flex items-start justify-between py-3 px-0 border-b border-dashed last:border-b-0">
     <div className="flex flex-col gap-0.5">
       <span className="text-sm text-foreground-light">{label}</span>
       {description && <span className="text-xs text-warning-600 max-w-72">{description}</span>}
@@ -67,7 +66,7 @@ const ValueChange = ({ from, to }: { from: string; to: string }) => (
 )
 
 const PriceDelta = ({ delta }: { delta: number }) => (
-  <span className={cn('text-sm', delta >= 0 ? 'text-brand' : 'text-destructive')}>
+  <span className={cn('text-xs', delta >= 0 ? 'text-brand' : 'text-destructive')}>
     {delta >= 0 ? `+${formatCurrency(delta)}` : `-${formatCurrency(Math.abs(delta))}`}{' '}
     <span className="text-foreground-lighter">per month</span>
   </span>
@@ -260,10 +259,12 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   Before
                 </span>
-                <span className="text-3xl text-foreground tabular-nums" translate="no">
+                <span className="text-3xl text-foreground-light tabular-nums" translate="no">
                   {formatCurrency(totalBeforePrice)}
                 </span>
-                <ComputeBadge infraComputeSize={oldComputeLabel as InfraInstanceSize} />
+                <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
+                  per month
+                </span>
               </div>
 
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-dash-sidebar border border-brand-500 flex items-center justify-center z-10 overflow-hidden">
@@ -278,10 +279,9 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <span className="text-3xl text-foreground tabular-nums" translate="no">
                   {formatCurrency(totalAfterPrice)}
                 </span>
-                <div className="animate-badge-pulse relative inline-flex overflow-hidden rounded">
-                  <ComputeBadge infraComputeSize={newComputeLabel as InfraInstanceSize} />
-                  <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-brand/20 to-transparent blur-md" />
-                </div>
+                <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
+                  per month
+                </span>
               </div>
             </div>
           </>
@@ -294,7 +294,12 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 label="Compute size"
                 description="Project will restart automatically on confirmation."
               >
-                <ValueChange from={oldComputeLabel} to={newComputeLabel} />
+                <div className="flex flex-col items-end gap-0.5">
+                  <ValueChange from={oldComputeLabel} to={newComputeLabel} />
+                  <PriceDelta
+                    delta={Number(computeSizePrice.newPrice) - Number(computeSizePrice.oldPrice)}
+                  />
+                </div>
               </BreakdownRow>
             )}
             {hasStorageTypeChanges && (
@@ -306,27 +311,43 @@ export const DiskManagementReviewAndSubmitDialog = ({
               </BreakdownRow>
             )}
             {(hasIOPSChanges || hasStorageTypeChanges) && (
-              <BreakdownRow label={`IOPS (${form.getValues('provisionedIOPS')?.toLocaleString()})`}>
-                <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
+              <BreakdownRow label="IOPS">
+                <div className="flex flex-col items-end gap-0.5">
+                  <ValueChange
+                    from={(form.formState.defaultValues?.provisionedIOPS ?? 0).toLocaleString()}
+                    to={(form.getValues('provisionedIOPS') ?? 0).toLocaleString()}
+                  />
+                  <PriceDelta delta={Number(iopsPrice.newPrice) - Number(iopsPrice.oldPrice)} />
+                </div>
               </BreakdownRow>
             )}
             {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
-              <BreakdownRow
-                label={`Throughput (${form.getValues('throughput')?.toLocaleString()} MB/s)`}
-              >
-                <PriceDelta
-                  delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
-                />
+              <BreakdownRow label="Throughput">
+                <div className="flex flex-col items-end gap-0.5">
+                  <ValueChange
+                    from={`${(form.formState.defaultValues?.throughput ?? 0).toLocaleString()} MB/s`}
+                    to={`${(form.getValues('throughput') ?? 0).toLocaleString()} MB/s`}
+                  />
+                  <PriceDelta
+                    delta={Number(throughputPrice.newPrice) - Number(throughputPrice.oldPrice)}
+                  />
+                </div>
               </BreakdownRow>
             )}
             {(hasTotalSizeChanges || hasStorageTypeChanges) && (
               <BreakdownRow
-                label={`Disk size (${form.getValues('totalSize')?.toLocaleString()}GB)`}
+                label="Disk size"
                 description="For 4 hours after changes you will not be able to modify disk attributes."
               >
-                <PriceDelta
-                  delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
-                />
+                <div className="flex flex-col items-end gap-0.5">
+                  <ValueChange
+                    from={`${(form.formState.defaultValues?.totalSize ?? 0).toLocaleString()} GB`}
+                    to={`${(form.getValues('totalSize') ?? 0).toLocaleString()} GB`}
+                  />
+                  <PriceDelta
+                    delta={Number(diskSizePrice.newPrice) - Number(diskSizePrice.oldPrice)}
+                  />
+                </div>
               </BreakdownRow>
             )}
             {hasGrowthPercentChanges && (
