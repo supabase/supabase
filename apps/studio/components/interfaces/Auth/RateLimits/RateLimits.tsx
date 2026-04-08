@@ -629,7 +629,9 @@ export const RateLimits = () => {
                         description=<>
                           Clients can forward end-user IP addresses to Auth for rate limiting when
                           using secret API keys.{' '}
-                          <InlineLink href={`${DOCS_URL}/guides/auth/rate-limits#ip-address-forwarding`}>
+                          <InlineLink
+                            href={`${DOCS_URL}/guides/auth/rate-limits#ip-address-forwarding`}
+                          >
                             Learn more
                           </InlineLink>
                         </>
