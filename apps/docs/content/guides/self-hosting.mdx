@@ -71,7 +71,8 @@ Self-hosted Supabase (Docker) does not phone home or collect any telemetry.
 Note that the **Supabase CLI** is a separate tool from self-hosted Supabase and collects usage telemetry to help improve the developer experience. You can opt out at any time:
 
 - Run `supabase telemetry disable`
-- Or set the `DO_NOT_TRACK=1` environment variable
+- Set `SUPABASE_TELEMETRY_DISABLED=1` to disable Supabase CLI telemetry only
+- Set `DO_NOT_TRACK=1` to disable telemetry across all tools that respect this standard
 
 To check your current telemetry status, run `supabase telemetry status`. To re-enable, run `supabase telemetry enable`.
 
