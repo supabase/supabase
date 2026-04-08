@@ -1,7 +1,7 @@
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { ident } from '@supabase/pg-meta/src/pg-format'
 import { databaseIndexesKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'

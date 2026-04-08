@@ -1,7 +1,7 @@
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { ident } from '@supabase/pg-meta/src/pg-format'
 import { databaseIndexesKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -17,18 +17,12 @@ export type DatabaseIndexCreateVariables = {
   }
 }
 
-const VALID_INDEX_TYPES = ['btree', 'hash', 'gist', 'spgist', 'gin', 'brin']
-
 export async function createDatabaseIndex({
   projectRef,
   connectionString,
   payload,
 }: DatabaseIndexCreateVariables) {
   const { schema, entity, type, columns } = payload
-
-  if (!VALID_INDEX_TYPES.includes(type)) {
-    throw new Error(`Invalid index type: ${type}`)
-  }
 
   const sql = `
   CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${type} (${columns
