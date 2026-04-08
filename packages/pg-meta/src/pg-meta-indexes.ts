@@ -82,7 +82,10 @@ function list({
   }
 }
 
-function retrieve({ id }: { id: number }): { sql: SafeSqlFragment; zod: typeof pgIndexOptionalZod } {
+function retrieve({ id }: { id: number }): {
+  sql: SafeSqlFragment
+  zod: typeof pgIndexOptionalZod
+} {
   const sql = safeSql`
     with indexes as (${INDEXES_SQL})
     select *

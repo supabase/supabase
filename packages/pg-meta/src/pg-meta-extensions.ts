@@ -97,7 +97,10 @@ type ExtensionRemoveParams = {
   cascade?: boolean
 }
 
-function remove(name: string, { cascade = false }: ExtensionRemoveParams = {}): {
+function remove(
+  name: string,
+  { cascade = false }: ExtensionRemoveParams = {}
+): {
   sql: SafeSqlFragment
 } {
   const sql = safeSql`DROP EXTENSION ${ident(name)} ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
