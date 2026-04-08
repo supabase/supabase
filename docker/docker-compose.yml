@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.03.16-sha-5528817
+    image: supabase/studio:2026.04.08-sha-205cbe7
     restart: unless-stopped
     healthcheck:
       test:
@@ -252,7 +252,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v14.6
+    image: postgrest/postgrest:v14.8
     restart: unless-stopped
     depends_on:
       db:
@@ -322,7 +322,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.44.2
+    image: supabase/storage-api:v1.48.26
     restart: unless-stopped
     depends_on:
       db:
@@ -407,7 +407,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.95.2
+    image: supabase/postgres-meta:v0.96.3
     restart: unless-stopped
     depends_on:
       db:
@@ -455,7 +455,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.31.2
+    image: supabase/logflare:1.36.1
     restart: unless-stopped
     # ports:
     #   - 4000:4000
