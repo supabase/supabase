@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PublicationsList } from 'components/interfaces/Database/Publications/PublicationsList'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -13,6 +7,13 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { PublicationsList } from '@/components/interfaces/Database/Publications/PublicationsList'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabasePublications: NextPageWithLayout = () => {
   const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(

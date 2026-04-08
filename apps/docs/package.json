@@ -145,6 +145,7 @@
     "@types/react-dom": "catalog:",
     "@types/unist": "^2.0.6",
     "@types/uuid": "^10.0.0",
+    "@redocly/cli": "^2.25.3",
     "amaro": "^1.1.5",
     "api-types": "workspace:*",
     "cheerio": "^1.0.0-rc.12",

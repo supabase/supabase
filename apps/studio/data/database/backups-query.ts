@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { databaseKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type BackupsVariables = {
   projectRef?: string
@@ -43,7 +43,8 @@ export const useBackupsQuery = <TData = BackupsData>(
       enabled &&
       !isOrioleDbInAws &&
       typeof projectRef !== 'undefined' &&
-      projectStatus !== PROJECT_STATUS.COMING_UP,
+      projectStatus !== PROJECT_STATUS.COMING_UP &&
+      projectStatus !== PROJECT_STATUS.UNKNOWN,
     ...options,
   })
 }

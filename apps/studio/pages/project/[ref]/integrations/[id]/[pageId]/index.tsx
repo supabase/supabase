@@ -1,14 +1,7 @@
 import { useFlag, useParams } from 'common'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
-import type { NextPageWithLayout } from 'types'
 import {
   BreadcrumbItem_Shadcn_ as BreadcrumbItem,
   BreadcrumbLink_Shadcn_ as BreadcrumbLink,
@@ -35,9 +28,16 @@ import {
 } from 'ui-patterns'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet'
+import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { NextPageWithLayout } from '@/types'
 
 type NavigationItem = { label: string; href: string; active?: boolean }
 

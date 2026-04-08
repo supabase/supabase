@@ -12,11 +12,15 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function SpendCapDisabledSection() {
-  const { data: org } = useSelectedOrganizationQuery()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: org, isPending: isOrgPending } = useSelectedOrganizationQuery()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
 
   const isSpendCapEnabled =
-    org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
+    !isOrgPending &&
+    !isProjectPending &&
+    org?.plan.id !== 'free' &&
+    !org?.usage_billing_enabled &&
+    project?.cloud_provider !== 'FLY'
 
   return (
     <AnimatePresence>

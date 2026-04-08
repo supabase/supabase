@@ -1,11 +1,10 @@
-import { compactNumberFormatter } from 'components/ui/Charts/Charts.utils'
-import { ReportAttributes } from 'components/ui/Charts/ComposedChart.utils'
-import { DOCS_URL } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-
-import { DiskAttributesData } from '../config/disk-attributes-query'
-import { MaxConnectionsData } from '../database/max-connections-query'
-import { Project } from '../projects/project-detail-query'
+import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
+import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
+import { DiskAttributesData } from '@/data/config/disk-attributes-query'
+import { MaxConnectionsData } from '@/data/database/max-connections-query'
+import { Project } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -203,8 +202,6 @@ export const getReportAttributesV2: (
       label: 'Disk throughput',
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput`,
       syncId: 'database-reports',
-      entitlement: 'disk_throughput',
-      requiredPlan: 'Team',
       hide: false,
       showTooltip: true,
       format: 'bytes-per-second',
