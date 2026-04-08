@@ -82,8 +82,7 @@ export const useOpenIDConfigurationQuery = <TData = OpenIDConfigurationData>(
   })
 
   // Include loading states from dependencies
-  const isLoading =
-    query.isLoading || isEndpointLoading || isAuthConfigLoading || (!isSuccessConfig && enabled)
+  const isLoading = query.isLoading || isEndpointLoading || isAuthConfigLoading
 
   return {
     ...query,
