@@ -43,3 +43,44 @@ This means a client that has been idle will tolerate a brief spike in traffic, b
 The table below shows the rate limit quotas and additional details for authentication endpoints.
 
 <$Partial path="auth_rate_limits.mdx" />
+
+## IP address forwarding
+
+By default, Supabase Auth uses the IP address of the client for rate limiting. In certain cases, such as when using server-side frameworks or proxies in front of a project, it may be necessary to forward the end-user IP address to avoid being rate limited based on the address of the server-side client. To use a forwarded IP address for rate limiting in Supabase Auth, set the `Sb-Forwarded-For` header to the end-user IP address and make a request with a [secret API key](/docs/guides/api/api-keys). Publishable API keys and legacy `anon`/`service_role` API keys are not supported.
+
+IP address forwarding must be explicitly enabled for new projects. You can enable this feature in your project under the **IP Address Forwarding** section of your project's rate limit settings at [**Authentication** > **Rate Limits**](/dashboard/project/_/auth/rate-limits).
+
+You can also enable IP address forwarding using the management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Update IP address forwarding settings
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{
+      "security_sb_forwarded_for_enabled": true
+        }' \
+    | jq '.security_sb_forwarded_for_enabled'
+```
+
+Once IP address forwarding is enabled, set the `Sb-Forwarded-For` header using the Supabase SDK:
+
+```typescript
+import { createServerClient } from '@supabase/ssr'
+
+const supabase = createServerClient(
+  'https://<your-project-id>.supabase.co',
+  '<your-secret-key>', // Key should start with sb_secret
+  {
+    global: {
+      headers: {
+        'sb-forwarded-for': request.headers.get('x-forwarded-for'),
+      },
+    },
+  }
+)
+```

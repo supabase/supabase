@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.84.2
+  version: 2.88.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -275,6 +275,16 @@ commands:
         name: --local
         description: Runs pgTAP tests on the local database.
         default_value: 'true'
+  - id: supabase-telemetry
+    title: supabase telemetry
+    summary: Manage CLI telemetry settings
+    description: |
+      The Supabase CLI collects telemetry data about general usage. Participating in this program is optional. You can opt out by running `supabase telemetry disable` or setting `SUPABASE_TELEMETRY_DISABLED=1`. Use `supabase telemetry status` to check your current setting and `supabase telemetry enable` to opt back in.
+    tags:
+      - local-dev
+    links: []
+    subcommands: []
+    flags: []
   - id: supabase-storage
     title: supabase storage
     summary: Manage Supabase Storage objects
