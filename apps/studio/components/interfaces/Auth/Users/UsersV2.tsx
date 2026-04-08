@@ -55,7 +55,6 @@ import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
 import { AlertError } from '@/components/ui/AlertError'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -720,7 +719,6 @@ export const UsersV2 = () => {
               </div>
 
               <div className="flex items-center gap-x-2">
-                <APIDocsButton section={['user-management']} source="auth-users" />
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}

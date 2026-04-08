@@ -25,9 +25,7 @@ vi.mock('@/state/storage-explorer', () => ({
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
 }))
-vi.mock('@/components/ui/APIDocsButton', () => ({
-  APIDocsButton: () => null,
-}))
+
 vi.mock('./useStoragePreference', () => ({
   useStoragePreference: (...args: any[]) => mockUseStoragePreference(...args),
 }))

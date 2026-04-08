@@ -40,7 +40,6 @@ import {
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
@@ -330,16 +329,6 @@ const EdgeFunctionDetailsLayout = ({
 
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
-                <APIDocsButton
-                  section={
-                    functionSlug !== undefined
-                      ? ['edge-functions', functionSlug]
-                      : ['edge-functions']
-                  }
-                  source="edge-functions"
-                  label="API Docs"
-                  tooltip="View API docs for this edge function"
-                />
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
                 <Popover_Shadcn_>
                   <PopoverTrigger_Shadcn_ asChild>
