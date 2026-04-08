@@ -370,25 +370,25 @@ export const Grid = memo(
               strategy={verticalListSortingStrategy}
             >
               <RowContextMenuProvider>
-              <DataGrid
-                ref={ref}
-                className={`${gridClass} flex-grow`}
-                rowClass={computedRowClass}
-                columns={columnsWithDirtyCellClass}
-                rows={rows ?? []}
-                renderers={{ renderRow: RowRenderer }}
-                rowKeyGetter={rowKeyGetter}
-                selectedRows={snap.selectedRows}
-                onColumnResize={snap.updateColumnSize}
-                onRowsChange={onRowsChange}
-                onSelectedCellChange={onSelectedCellChange}
-                onSelectedRowsChange={onSelectedRowsChange}
-                onCellDoubleClick={(props) => {
-                  if (typeof props.column.name === 'string') {
-                    onRowDoubleClick(props.row, { name: props.column.name })
-                  }
-                }}
-                onCellKeyDown={handleCopyCell}
+                <DataGrid
+                  ref={ref}
+                  className={`${gridClass} flex-grow`}
+                  rowClass={computedRowClass}
+                  columns={columnsWithDirtyCellClass}
+                  rows={rows ?? []}
+                  renderers={{ renderRow: RowRenderer }}
+                  rowKeyGetter={rowKeyGetter}
+                  selectedRows={snap.selectedRows}
+                  onColumnResize={snap.updateColumnSize}
+                  onRowsChange={onRowsChange}
+                  onSelectedCellChange={onSelectedCellChange}
+                  onSelectedRowsChange={onSelectedRowsChange}
+                  onCellDoubleClick={(props) => {
+                    if (typeof props.column.name === 'string') {
+                      onRowDoubleClick(props.row, { name: props.column.name })
+                    }
+                  }}
+                  onCellKeyDown={handleCopyCell}
                 />
               </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
