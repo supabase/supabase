@@ -10,6 +10,20 @@ You can use the Supabase CLI to run the entire Supabase stack locally on your ma
 
 The Supabase CLI provides tools to develop your project locally, deploy to the Supabase Platform, handle database migrations, and generate types directly from your database schema.
 
+## Telemetry
+
+The Supabase CLI collects anonymous usage telemetry to help improve the developer experience. No personally identifiable information is collected.
+
+You can manage telemetry with the following commands:
+
+| Command                        | Description                    |
+| ------------------------------ | ------------------------------ |
+| `supabase telemetry disable`   | Opt out of telemetry           |
+| `supabase telemetry enable`    | Opt back in to telemetry       |
+| `supabase telemetry status`    | Check current telemetry status |
+
+You can also set the `DO_NOT_TRACK=1` environment variable to disable telemetry.
+
 ## Resources
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
