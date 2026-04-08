@@ -132,7 +132,7 @@ export const AccountIdentities = () => {
                           )}
                         </div>
                         <p className="text-sm text-foreground-lighter">
-                          {!!username ? <span>{username} • </span> : null}
+                          {!!username ? <span>{username} · </span> : null}
                           {identity.email}
                         </p>
                       </div>

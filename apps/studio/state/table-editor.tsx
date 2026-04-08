@@ -1,18 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { useConstant } from 'common'
-import type { SupaRow } from 'components/grid/types'
-import {
-  resolveDeleteRowConflicts,
-  resolveEditCellConflicts,
-  upsertOperation,
-} from 'components/grid/utils/queueConflictResolution'
-import { generateTableChangeKey } from 'components/grid/utils/queueOperationUtils'
-import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
-import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
 import { createContext, PropsWithChildren, useContext } from 'react'
-import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
@@ -21,6 +10,17 @@ import {
   type OperationQueueState,
   type QueueStatus,
 } from './table-editor-operation-queue.types'
+import type { SupaRow } from '@/components/grid/types'
+import {
+  resolveDeleteRowConflicts,
+  resolveEditCellConflicts,
+  upsertOperation,
+} from '@/components/grid/utils/queueConflictResolution'
+import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUtils'
+import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
+import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { Dictionary } from '@/types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
