@@ -21,7 +21,7 @@ export const LogPage: NextPageWithLayout = () => {
         condensedLayout
         projectRef={ref as string}
         queryType="functions"
-        filterOverride={{ 'metadata.function_id': selectedFunction.id }}
+        filterOverride={{ 'metadata.request.pathname': `/functions/v1/${selectedFunction.slug}` }}
       />
     </div>
   )
