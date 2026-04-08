@@ -1,27 +1,28 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { getSupportLinkQueryParams } from 'components/ui/HelpPanel/HelpPanel.utils'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, type PropsWithChildren } from 'react'
-import { useRegisterSidebar, useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+
+import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import useLatest from '@/hooks/misc/useLatest'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useRegisterSidebar, useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const AdvisorPanel = dynamic(() =>
-  import('components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
+  import('@/components/ui/AdvisorPanel/AdvisorPanel').then((m) => m.AdvisorPanel)
 )
 const AIAssistant = dynamic(() =>
-  import('components/ui/AIAssistantPanel/AIAssistant').then((m) => m.AIAssistant)
+  import('@/components/ui/AIAssistantPanel/AIAssistant').then((m) => m.AIAssistant)
 )
 const EditorPanel = dynamic(() =>
-  import('components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
+  import('@/components/ui/EditorPanel/EditorPanel').then((m) => m.EditorPanel)
 )
 const HelpPanel = dynamic(() =>
-  import('components/ui/HelpPanel/HelpPanel').then((m) => m.HelpPanel)
+  import('@/components/ui/HelpPanel/HelpPanel').then((m) => m.HelpPanel)
 )
 
 export const SIDEBAR_KEYS = {

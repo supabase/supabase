@@ -1,7 +1,3 @@
-import { Addons } from 'components/interfaces/Settings/Addons/Addons'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import type { NextPageWithLayout } from 'types'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -9,6 +5,11 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
+import { Addons } from '@/components/interfaces/Settings/Addons/Addons'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const ProjectAddons: NextPageWithLayout = () => {
   return (

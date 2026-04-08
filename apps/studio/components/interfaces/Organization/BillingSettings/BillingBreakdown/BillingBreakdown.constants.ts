@@ -1,5 +1,5 @@
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { DOCS_URL } from 'lib/constants'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const USAGE_APPROACHING_THRESHOLD = 0.8
 

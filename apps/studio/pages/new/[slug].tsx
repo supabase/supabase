@@ -2,58 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
-import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
-import { CloudProviderSelector } from 'components/interfaces/ProjectCreation/CloudProviderSelector'
-import { ComputeSizeSelector } from 'components/interfaces/ProjectCreation/ComputeSizeSelector'
-import { CustomPostgresVersionInput } from 'components/interfaces/ProjectCreation/CustomPostgresVersionInput'
-import { DatabasePasswordInput } from 'components/interfaces/ProjectCreation/DatabasePasswordInput'
-import { DisabledWarningDueToIncident } from 'components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
-import { FreeProjectLimitWarning } from 'components/interfaces/ProjectCreation/FreeProjectLimitWarning'
-import { HighAvailabilityInput } from 'components/interfaces/ProjectCreation/HighAvailabilityInput'
-import { OrganizationSelector } from 'components/interfaces/ProjectCreation/OrganizationSelector'
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
-import { sizes } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
-import { FormSchema } from 'components/interfaces/ProjectCreation/ProjectCreation.schema'
-import {
-  instanceLabel,
-  smartRegionToExactRegion,
-} from 'components/interfaces/ProjectCreation/ProjectCreation.utils'
-import { ProjectCreationFooter } from 'components/interfaces/ProjectCreation/ProjectCreationFooter'
-import { ProjectNameInput } from 'components/interfaces/ProjectCreation/ProjectNameInput'
-import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
-import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
-import Panel from 'components/ui/Panel'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
-import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationAvailableRegionsQuery } from 'data/organizations/organization-available-regions-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { OrgProject, useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import {
-  ProjectCreateVariables,
-  useProjectCreateMutation,
-} from 'data/projects/project-create-mutation'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useDataApiGrantTogglesEnabled } from 'hooks/misc/useDataApiGrantTogglesEnabled'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { withAuth } from 'hooks/misc/withAuth'
-import { usePHFlag } from 'hooks/ui/useFlag'
-import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from 'lib/constants'
-import { buildStudioPageTitle } from 'lib/page-title'
-import { useProfile } from 'lib/profile'
-import { useTrack } from 'lib/telemetry/track'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -61,11 +9,67 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
 import { Button, Form_Shadcn_, FormField_Shadcn_, useWatch_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
+
+import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { AdvancedConfiguration } from '@/components/interfaces/ProjectCreation/AdvancedConfiguration'
+import { CloudProviderSelector } from '@/components/interfaces/ProjectCreation/CloudProviderSelector'
+import { ComputeSizeSelector } from '@/components/interfaces/ProjectCreation/ComputeSizeSelector'
+import { CustomPostgresVersionInput } from '@/components/interfaces/ProjectCreation/CustomPostgresVersionInput'
+import { DatabasePasswordInput } from '@/components/interfaces/ProjectCreation/DatabasePasswordInput'
+import { DisabledWarningDueToIncident } from '@/components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
+import { FreeProjectLimitWarning } from '@/components/interfaces/ProjectCreation/FreeProjectLimitWarning'
+import { HighAvailabilityInput } from '@/components/interfaces/ProjectCreation/HighAvailabilityInput'
+import { OrganizationSelector } from '@/components/interfaces/ProjectCreation/OrganizationSelector'
+import {
+  extractPostgresVersionDetails,
+  PostgresVersionSelector,
+} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { sizes } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { FormSchema } from '@/components/interfaces/ProjectCreation/ProjectCreation.schema'
+import {
+  instanceLabel,
+  smartRegionToExactRegion,
+} from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
+import { ProjectCreationFooter } from '@/components/interfaces/ProjectCreation/ProjectCreationFooter'
+import { ProjectNameInput } from '@/components/interfaces/ProjectCreation/ProjectNameInput'
+import { RegionSelector } from '@/components/interfaces/ProjectCreation/RegionSelector'
+import { SecurityOptions } from '@/components/interfaces/ProjectCreation/SecurityOptions'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { WizardLayoutWithoutAuth } from '@/components/layouts/WizardLayout'
+import Panel from '@/components/ui/Panel'
+import { useAvailableOrioleImageVersion } from '@/data/config/project-creation-postgres-versions-query'
+import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
+import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
+import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import {
+  OrgProject,
+  useOrgProjectsInfiniteQuery,
+} from '@/data/projects/org-projects-infinite-query'
+import {
+  ProjectCreateVariables,
+  useProjectCreateMutation,
+} from '@/data/projects/project-create-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import type { NextPageWithLayout } from '@/types'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
@@ -96,6 +100,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+
   const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
   // Read the raw flag for telemetry — useDataApiGrantTogglesEnabled coerces undefined→false,
   // which would record false for users whose flags haven't loaded yet. The raw value preserves
@@ -400,6 +405,12 @@ const Wizard: NextPageWithLayout = () => {
       form.setValue('dbRegion', recommendedSmartRegion)
     }
   }, [recommendedSmartRegion])
+
+  useEffect(() => {
+    if (highAvailability && cloudProvider !== 'AWS_K8S') {
+      form.setValue('cloudProvider', 'AWS_K8S')
+    }
+  }, [highAvailability, cloudProvider, form])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {

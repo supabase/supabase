@@ -1,13 +1,5 @@
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { SingleStat } from 'components/ui/SingleStat'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
-import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
 import dayjs from 'dayjs'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { cn, InfoIcon, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
@@ -18,6 +10,14 @@ import {
   StatusIcon,
   StatusMessage,
 } from '../Home/ServiceStatus'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { SingleStat } from '@/components/ui/SingleStat'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
+import { useProjectServiceStatusQuery } from '@/data/service-status/service-status-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 

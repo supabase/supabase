@@ -1,7 +1,6 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useEffect, useMemo, useRef, useState } from 'react'
-
-import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
 import {
   cn,
   Command_Shadcn_,
@@ -11,8 +10,9 @@ import {
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
 } from 'ui'
+
 import type { ResourcePickerRenderProps } from './SecondLevelNav.Layout'
-import { keepPreviousData } from '@tanstack/react-query'
+import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 
 type StorageResourceListProps = ResourcePickerRenderProps & {
   projectRef?: string

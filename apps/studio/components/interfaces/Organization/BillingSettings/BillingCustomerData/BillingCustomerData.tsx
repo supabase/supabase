@@ -1,36 +1,43 @@
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe/stripe-js'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
+import { useTheme } from 'next-themes'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { BillingCustomerDataForm } from './BillingCustomerDataForm'
+import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import {
+  getAddressElementAppearanceOptions,
+  STRIPE_ELEMENT_FONTS,
+} from '@/components/interfaces/Billing/Payment/Payment.utils'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { organizationKeys } from 'data/organizations/keys'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button, Card, CardFooter, Form_Shadcn_ as Form } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import {
-  BillingCustomerDataForm,
-  type BillingCustomerDataFormValues,
-} from './BillingCustomerDataForm'
-import { resolveStoredTaxId } from './TaxID.utils'
-import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { organizationKeys } from '@/data/organizations/keys'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from '@/data/organizations/organization-tax-id-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
+
+const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 export const BillingCustomerData = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
+  const { resolvedTheme } = useTheme()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
@@ -54,49 +61,56 @@ export const BillingCustomerData = () => {
     isSuccess: loadedTaxId,
   } = useOrganizationTaxIdQuery({ slug })
 
-  const initialCustomerData = useMemo<Partial<BillingCustomerDataFormValues>>(
-    () => ({
-      city: customerProfile?.address?.city ?? undefined,
-      country: customerProfile?.address?.country,
-      line1: customerProfile?.address?.line1,
-      line2: customerProfile?.address?.line2 ?? undefined,
-      postal_code: customerProfile?.address?.postal_code ?? undefined,
-      state: customerProfile?.address?.state ?? undefined,
-      billing_name: customerProfile?.billing_name,
-      tax_id_type: taxId?.type,
-      tax_id_value: taxId?.value,
-      tax_id_name: taxId
-        ? (resolveStoredTaxId(taxId.type, taxId.country, customerProfile?.address?.country)?.name ??
-          '')
-        : '',
-    }),
-    [customerProfile, taxId]
-  )
-
-  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation()
-  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation()
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
+    onError: () => {},
+  })
+  const { mutateAsync: updateTaxId } = useOrganizationTaxIdUpdateMutation({ onError: () => {} })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const addressElementRef = useRef<StripeAddressElement | null>(null)
 
-  const { form, handleSubmit, handleReset, isDirty } = useBillingCustomerDataForm({
-    initialCustomerData,
+  const {
+    form,
+    handleSubmit,
+    handleReset,
+    isDirty,
+    resetKey,
+    onAddressChange,
+    applyAddressElementValue,
+    markCurrentValuesAsSaved,
+    addressCountry,
+    addressOptions,
+  } = useBillingCustomerDataForm({
+    customerProfile,
+    taxId,
     onCustomerDataChange: async (data) => {
       setIsSubmitting(true)
 
       try {
-        await updateCustomerProfile({
-          slug,
-          address: data.address,
-          billing_name: data.billing_name,
-        })
+        try {
+          await updateCustomerProfile({
+            slug,
+            address: data.address,
+            billing_name: data.billing_name,
+          })
+        } catch (error) {
+          toast.error(
+            `Failed updating billing address: ${error instanceof Error ? error.message : 'Unknown error'}`
+          )
+          throw error
+        }
 
-        await updateTaxId({ slug, taxId: data.tax_id })
+        try {
+          await updateTaxId({ slug, taxId: data.tax_id })
+        } catch (error) {
+          toast.error(
+            `Failed updating tax ID: ${error instanceof Error ? error.message : 'Unknown error'}`
+          )
+          throw error
+        }
 
         toast.success('Successfully updated billing data')
 
-        // Optimistically update organization_missing_tax_id in the cached organizations list
-        // so the TaxIdBanner hides immediately. The server responds 304 Not Modified for a
-        // while after the tax ID is saved, so invalidation/refetch won't work here.
         queryClient.setQueriesData<any[]>(
           { queryKey: organizationKeys.list(), exact: true },
           (prev) => {
@@ -106,18 +120,51 @@ export const BillingCustomerData = () => {
             )
           }
         )
-
-        setIsSubmitting(false)
       } catch (error) {
-        toast.error(
-          `Failed updating billing data: ${error instanceof Error ? error.message : 'Unknown error'}`
-        )
+        throw error
+      } finally {
         setIsSubmitting(false)
       }
     },
   })
 
+  useEffect(() => {
+    addressElementRef.current = null
+  }, [resetKey])
+
+  const onFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      if (addressElementRef.current) {
+        const addressResult = await addressElementRef.current.getValue()
+        applyAddressElementValue(addressResult)
+      }
+      const result = await handleSubmit()
+      if (result.status === 'error') {
+        toast.error(result.message)
+        return
+      }
+      markCurrentValuesAsSaved(
+        result.submittedState.addressValue,
+        result.submittedState.taxIdValues
+      )
+    } catch {
+      // Save failure toasts are handled inside onCustomerDataChange.
+    }
+  }
+
   const isSubmitDisabled = !isDirty || !canUpdateBillingCustomerData || isSubmitting
+
+  const stripeElementsOptions: StripeElementsOptions = useMemo(
+    () =>
+      ({
+        mode: 'setup',
+        currency: 'usd',
+        appearance: getAddressElementAppearanceOptions(resolvedTheme),
+        fonts: STRIPE_ELEMENT_FONTS,
+      }) as any,
+    [resolvedTheme]
+  )
 
   return (
     <ScaffoldSection>
@@ -162,38 +209,47 @@ export const BillingCustomerData = () => {
             )}
 
             {isSuccess && loadedTaxId && (
-              <Card>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleSubmit)}>
-                    <BillingCustomerDataForm
-                      className="p-8"
-                      form={form}
-                      disabled={!canUpdateBillingCustomerData}
-                    />
-                    <CardFooter className="border-t justify-end px-8">
-                      {!canUpdateBillingCustomerData && (
-                        <span className="text-sm text-foreground-lighter mr-auto">
-                          You need additional permissions to manage this organization's billing
-                          address
-                        </span>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <Button type="default" onClick={handleReset} disabled={isSubmitDisabled}>
-                          Cancel
-                        </Button>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          disabled={isSubmitDisabled}
-                          loading={isSubmitting}
-                        >
-                          Save
-                        </Button>
-                      </div>
-                    </CardFooter>
-                  </form>
-                </Form>
-              </Card>
+              <Elements stripe={stripePromise} options={stripeElementsOptions}>
+                <Card>
+                  <Form {...form}>
+                    <form onSubmit={onFormSubmit}>
+                      <BillingCustomerDataForm
+                        className="p-8"
+                        form={form}
+                        disabled={!canUpdateBillingCustomerData}
+                        addressOptions={addressOptions}
+                        resetKey={resetKey}
+                        onAddressChange={onAddressChange}
+                        onAddressReady={(element) => {
+                          addressElementRef.current = element
+                        }}
+                        addressCountry={addressCountry}
+                      />
+                      <CardFooter className="border-t justify-end px-8">
+                        {!canUpdateBillingCustomerData && (
+                          <span className="text-sm text-foreground-lighter mr-auto">
+                            You need additional permissions to manage this organization's billing
+                            address
+                          </span>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <Button type="default" onClick={handleReset} disabled={isSubmitDisabled}>
+                            Cancel
+                          </Button>
+                          <Button
+                            type="primary"
+                            htmlType="submit"
+                            disabled={isSubmitDisabled}
+                            loading={isSubmitting}
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      </CardFooter>
+                    </form>
+                  </Form>
+                </Card>
+              </Elements>
             )}
           </>
         )}

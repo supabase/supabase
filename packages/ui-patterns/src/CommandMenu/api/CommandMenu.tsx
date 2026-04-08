@@ -203,10 +203,12 @@ function CommandMenuTriggerInput({
           <p className="flex text-xs pr-2 text-foreground-muted">{placeholder}</p>
         </div>
         {showShortcut && (
-          <KeyboardShortcut
-            keys={['Meta', 'k']}
-            className="command-shortcut hidden md:inline-flex h-full border border-default bg-surface-300 text-foreground-lighter shadow-xs shadow-background-surface-100"
-          />
+          <span aria-hidden="true">
+            <KeyboardShortcut
+              keys={['Meta', 'k']}
+              className="command-shortcut hidden md:inline-flex h-full border border-default bg-surface-300 text-foreground-lighter shadow-xs shadow-background-surface-100"
+            />
+          </span>
         )}
       </button>
     </CommandMenuTrigger>

@@ -18,10 +18,13 @@ const supabase: Handle = async ({ event, resolve }) => {
        * the cookie options. Setting `path` to `/` replicates previous/
        * standard behavior.
        */
-      setAll: (cookiesToSet) => {
+      setAll: (cookiesToSet, headers) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
         })
+        if (Object.keys(headers).length > 0) {
+          event.setHeaders(headers)
+        }
       },
     },
   })

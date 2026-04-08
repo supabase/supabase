@@ -1,6 +1,6 @@
-import { formatBytes } from 'lib/helpers'
 import { BlockFieldConfig } from '../types'
 import { getStorageMetadata } from '../utils/storageUtils'
+import { formatBytes } from '@/lib/helpers'
 
 // Helper functions that avoid duplication with existing storage utilities
 const getFileName = (path: string): string => {

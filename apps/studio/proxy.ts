@@ -1,5 +1,6 @@
-import { IS_PLATFORM } from 'lib/constants'
 import type { NextRequest } from 'next/server'
+
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const config = {
   matcher: '/api/:function*',

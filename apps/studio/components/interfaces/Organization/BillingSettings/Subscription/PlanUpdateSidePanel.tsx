@@ -1,29 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
-import { getPlanChangeType } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { RequestUpgradeToBillingOwners } from 'components/ui/RequestUpgradeToBillingOwners'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
-import { useOrganizationQuery } from 'data/organizations/organization-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import type { OrgPlan } from 'data/subscriptions/types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { formatCurrency } from 'lib/helpers'
 import { isArray } from 'lodash'
 import { Check, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Organization } from 'types/base'
 import { Button, cn, SidePanel } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -33,6 +16,25 @@ import { ExitSurveyModal } from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
+import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationBillingSubscriptionPreview } from '@/data/organizations/organization-billing-subscription-preview'
+import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import type { OrgPlan } from '@/data/subscriptions/types'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { formatCurrency } from '@/lib/helpers'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
+import { Organization } from '@/types/base'
 
 const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
@@ -61,13 +63,36 @@ export const PlanUpdateSidePanel = () => {
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
+  const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
+  const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
+  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
+
+  const billingAddress = useAsDefaultBillingAddress ? latestAddress : undefined
+  const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
+  const debouncedAddress = useDebounce(billingAddress, 1000)
+  const debouncedTaxId = useDebounce(billingTaxId, 1000)
+
+  const handleAddressChange = useCallback(
+    (address: CustomerAddress) => setLatestAddress(address),
+    []
+  )
+
+  const handleTaxIdChange = useCallback((taxId: CustomerTaxId | null) => setLatestTaxId(taxId), [])
+
+  const handleUseAsDefaultBillingAddressChange = useCallback(
+    (useAsDefault: boolean) => setUseAsDefaultBillingAddress(useAsDefault),
+    []
+  )
 
   const { can: canUpdateSubscription } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
 
-  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const snap = useOrgSettingsPageStateSnapshot()
+  const visible = snap.panelKey === 'subscriptionPlan'
+
+  const { data: orgProjectsData } = useOrgProjectsInfiniteQuery({ slug }, { enabled: visible })
   const orgProjects =
     useMemo(
       () => orgProjectsData?.pages.flatMap((page) => page.projects),
@@ -77,8 +102,6 @@ export const PlanUpdateSidePanel = () => {
   const { data } = useOrganizationQuery({ slug })
   const hasOrioleProjects = !!data?.has_oriole_project
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const visible = snap.panelKey === 'subscriptionPlan'
   const onClose = () => {
     const { panel, ...queryWithoutPanel } = router.query
     router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
@@ -90,15 +113,27 @@ export const PlanUpdateSidePanel = () => {
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
-  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
+  const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery(
+    { orgSlug: slug },
+    { enabled: visible }
+  )
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug },
+    { enabled: visible }
+  )
 
   const {
     data: subscriptionPreview,
     error: subscriptionPreviewError,
     isPending: subscriptionPreviewIsLoading,
+    isFetching: subscriptionPreviewIsFetching,
     isSuccess: subscriptionPreviewInitialized,
-  } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
+  } = useOrganizationBillingSubscriptionPreview({
+    tier: selectedTier,
+    organizationSlug: slug,
+    address: debouncedAddress,
+    taxId: debouncedTaxId ?? undefined,
+  })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
   const hasMembersExceedingFreeTierLimit =
@@ -111,6 +146,9 @@ export const PlanUpdateSidePanel = () => {
   useEffect(() => {
     if (visible) {
       setSelectedTier(undefined)
+      setLatestAddress(undefined)
+      setLatestTaxId(undefined)
+      setUseAsDefaultBillingAddress(true)
       const source = Array.isArray(router.query.source)
         ? router.query.source[0]
         : router.query.source
@@ -335,6 +373,7 @@ export const PlanUpdateSidePanel = () => {
         planMeta={planMeta}
         subscriptionPreviewError={subscriptionPreviewError}
         subscriptionPreviewIsLoading={subscriptionPreviewIsLoading}
+        subscriptionPreviewIsFetching={subscriptionPreviewIsFetching}
         subscriptionPreviewInitialized={subscriptionPreviewInitialized}
         subscriptionPreview={subscriptionPreview}
         subscription={subscription}
@@ -345,6 +384,10 @@ export const PlanUpdateSidePanel = () => {
             subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
               ?.features || [],
         }}
+        onAddressChange={handleAddressChange}
+        onTaxIdChange={handleTaxIdChange}
+        useAsDefaultBillingAddress={useAsDefaultBillingAddress}
+        onUseAsDefaultBillingAddressChange={handleUseAsDefaultBillingAddressChange}
       />
 
       <MembersExceedLimitModal

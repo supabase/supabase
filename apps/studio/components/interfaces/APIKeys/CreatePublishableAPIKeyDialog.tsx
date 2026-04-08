@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import { Plus } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -22,6 +21,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 const FORM_ID = 'create-publishable-api-key'
 const SCHEMA = z.object({

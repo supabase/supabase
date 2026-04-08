@@ -1,12 +1,12 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { Lightbulb } from 'lucide-react'
 import { useMemo } from 'react'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn } from 'ui'
 
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()

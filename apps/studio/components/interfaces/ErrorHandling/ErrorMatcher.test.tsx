@@ -1,18 +1,18 @@
 import { render, screen } from '@testing-library/react'
-import { ConnectionTimeoutError } from 'types/api-errors'
-import { ResponseError } from 'types/base'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
+import { ConnectionTimeoutError } from '@/types/api-errors'
+import { ResponseError } from '@/types/base'
 
-vi.mock('lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
-vi.mock('state/ai-assistant-state', () => ({
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+vi.mock('@/state/ai-assistant-state', () => ({
   useAiAssistantStateSnapshot: () => ({ newChat: vi.fn() }),
 }))
-vi.mock('state/sidebar-manager-state', () => ({
+vi.mock('@/state/sidebar-manager-state', () => ({
   useSidebarManagerSnapshot: () => ({ openSidebar: vi.fn() }),
 }))
-vi.mock('components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider', () => ({
+vi.mock('@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider', () => ({
   SIDEBAR_KEYS: { AI_ASSISTANT: 'ai-assistant' },
 }))
 vi.mock('./RestartProjectDialog', () => ({

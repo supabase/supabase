@@ -18,6 +18,7 @@ import {
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import type { PrivateApp } from '../../PrivateAppsContext'
 import type { AppsSort } from '../Apps.types'
 

@@ -8,9 +8,6 @@ import {
   type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import {
@@ -24,14 +21,17 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableHeadSort,
   TableRow,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TanStackTableHeadSort } from 'ui-patterns/Table'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
+import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface DetailItemProps {
   label: string
@@ -59,39 +59,24 @@ const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
-const getCurrentSort = (sorting: SortingState) => {
-  if (sorting.length === 0) return ''
-
-  const [currentSort] = sorting
-  return `${currentSort.id}:${currentSort.desc ? 'desc' : 'asc'}`
-}
-
-const getAriaSort = (
-  sorting: SortingState,
-  columnId: string
-): 'ascending' | 'descending' | 'none' => {
-  const currentSort = sorting.find((sort) => sort.id === columnId)
-
-  if (!currentSort) return 'none'
-  return currentSort.desc ? 'descending' : 'ascending'
-}
-
 const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Status</TanStackTableHeadSort>,
     cell: ({ row }) => (
       <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
     ),
   },
   {
     accessorKey: 'eventType',
-    header: 'Event type',
+    header: ({ column }) => (
+      <TanStackTableHeadSort column={column}>Event type</TanStackTableHeadSort>
+    ),
     cell: ({ row }) => <code className="text-code-inline">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
-    header: 'Response',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Response</TanStackTableHeadSort>,
     sortingFn: (rowA, rowB, columnId) => {
       const responseA = rowA.getValue<number | undefined>(columnId) ?? -1
       const responseB = rowB.getValue<number | undefined>(columnId) ?? -1
@@ -110,7 +95,9 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   },
   {
     accessorKey: 'attemptAt',
-    header: 'Attempted',
+    header: ({ column }) => (
+      <TanStackTableHeadSort column={column}>Attempted</TanStackTableHeadSort>
+    ),
     cell: ({ row }) => (
       <TimestampInfo
         className="text-sm text-foreground-lighter"
@@ -175,18 +162,6 @@ export const PlatformWebhooksEndpointDetails = ({
     pageIndex: 0,
     pageSize: DELIVERIES_PAGE_SIZE,
   })
-  const currentSort = getCurrentSort(sorting)
-
-  const handleSortChange = (columnId: string) => {
-    const currentColumnSort = sorting.find((sort) => sort.id === columnId)
-
-    if (!currentColumnSort) {
-      setSorting([{ id: columnId, desc: false }])
-      return
-    }
-
-    setSorting([{ id: columnId, desc: !currentColumnSort.desc }])
-  }
 
   const table = useReactTable({
     data: filteredDeliveries,
@@ -290,25 +265,25 @@ export const PlatformWebhooksEndpointDetails = ({
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     const columnId = header.column.id
-                    const canSort = header.column.getCanSort()
+                    const sort = header.column.getIsSorted()
 
                     return (
                       <TableHead
                         key={header.id}
-                        aria-sort={canSort ? getAriaSort(sorting, columnId) : undefined}
+                        aria-sort={
+                          header.column.getCanSort()
+                            ? sort === 'asc'
+                              ? 'ascending'
+                              : sort === 'desc'
+                                ? 'descending'
+                                : 'none'
+                            : undefined
+                        }
                         className={columnId === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
                       >
-                        {header.isPlaceholder ? null : canSort ? (
-                          <TableHeadSort
-                            column={columnId}
-                            currentSort={currentSort}
-                            onSortChange={handleSortChange}
-                          >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHeadSort>
-                        ) : (
-                          flexRender(header.column.columnDef.header, header.getContext())
-                        )}
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
                       </TableHead>
                     )
                   })}

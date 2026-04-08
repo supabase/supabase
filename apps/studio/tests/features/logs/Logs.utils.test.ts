@@ -1,13 +1,14 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { describe, expect, test } from 'vitest'
+
 import {
   checkForILIKEClause,
   checkForWildcard,
   checkForWithClause,
   fillTimeseries,
   unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { describe, test, expect } from 'vitest'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
 
 dayjs.extend(utc)
 

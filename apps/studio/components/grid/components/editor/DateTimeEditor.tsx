@@ -1,9 +1,7 @@
 import dayjs from 'dayjs'
 import { ChevronDown } from 'lucide-react'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useEffect, useRef, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
-
 import {
   Button,
   cn,
@@ -17,7 +15,9 @@ import {
 } from 'ui'
 import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { BlockKeys } from '../common/BlockKeys'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 
 interface BaseEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
   TRow,

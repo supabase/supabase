@@ -1,8 +1,4 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useUnlinkIdentityMutation } from 'data/profile/profile-unlink-identity-mutation'
 import dayjs from 'dayjs'
-import { BASE_PATH } from 'lib/constants'
 import { Edit, Unlink } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -39,6 +35,10 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
+import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
+import { BASE_PATH } from '@/lib/constants'
 
 const getProviderName = (provider: string) =>
   provider === 'github'

@@ -12,12 +12,17 @@ import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-const EXPERIMENT_ID = 'pricingCalculatorExperiment' as const
-type PricingCalculatorVariant = 'control' | 'test'
+const EXPERIMENT_ID = 'pricingPageExperiment' as const
+export type PricingPageExperimentVariant =
+  | 'control'
+  // GROWTH-694: flexibility/hourly billing
+  | 'flexibility' // concrete FAQ example as section between cards and buttons
+  | 'flexibility_card' // "no lock-in" messaging on Pro card warning
+  | 'hourly_rate' // actual hourly compute rate on Pro card warning
+  // GROWTH-697: pro project cost visibility
+  | 'multi_project' // "first project included, additional from $10/mo" on Pro card
+  | 'estimate_cta' // "estimate your cost" link on Pro card scrolling to calculator
 
-const NewPricingComputeSection = dynamic(
-  () => import('~/components/Pricing/NewPricingComputeSection')
-)
 const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
 const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
 const PricingComparisonTable = dynamic(() => import('~/components/Pricing/PricingComparisonTable'))
@@ -52,23 +57,34 @@ export default function PricingContent() {
   const { isLoading, organizations } = useOrganizations()
   const hasExistingOrganizations = !isLoading && organizations.length > 0
 
-  // Pricing calculator A/B experiment
+  // Pricing value/flexibility A/B experiment
   // Uses client-side PostHog directly — server-side evaluation lacks full person context for www pages.
   // DevToolbar overrides (x-ph-flag-overrides cookie) are respected in local dev via posthogClient.getFeatureFlag.
-  const [flagValue, setFlagValue] = useState<PricingCalculatorVariant | false | undefined>(
+  const [flagValue, setFlagValue] = useState<PricingPageExperimentVariant | false | undefined>(
     () =>
-      posthogClient.getFeatureFlag(EXPERIMENT_ID) as PricingCalculatorVariant | false | undefined
+      posthogClient.getFeatureFlag(EXPERIMENT_ID) as
+        | PricingPageExperimentVariant
+        | false
+        | undefined
   )
 
   useEffect(() => {
     return posthogClient.onFeatureFlags(() => {
       const value = posthogClient.getFeatureFlag(EXPERIMENT_ID)
-      setFlagValue(value as PricingCalculatorVariant | false | undefined)
+      setFlagValue(value as PricingPageExperimentVariant | false | undefined)
     })
   }, [])
 
-  const isTestVariant = flagValue === 'test'
-  const isInExperiment = flagValue === 'control' || flagValue === 'test'
+  const validVariants: PricingPageExperimentVariant[] = [
+    'control',
+    'flexibility',
+    'flexibility_card',
+    'hourly_rate',
+    'multi_project',
+    'estimate_cta',
+  ]
+  const isInExperiment = validVariants.includes(flagValue as PricingPageExperimentVariant)
+  const showFlexibilitySection = flagValue === 'flexibility'
 
   useEffect(() => {
     if (!isInExperiment) return
@@ -95,7 +111,19 @@ export default function PricingContent() {
       <PricingPlans
         organizations={organizations}
         hasExistingOrganizations={hasExistingOrganizations}
+        experimentVariant={isInExperiment ? (flagValue as PricingPageExperimentVariant) : undefined}
       />
+
+      {showFlexibilitySection && (
+        <div className="mx-auto max-w-xl px-8 mt-10 xl:mt-16 text-center">
+          <p className="text-foreground text-sm">
+            Need more power for a launch? Scale up instantly.{' '}
+            <span className="text-foreground-light">
+              Scale back down after — you only pay for the hours you use.
+            </span>
+          </p>
+        </div>
+      )}
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
@@ -119,27 +147,25 @@ export default function PricingContent() {
         id="addon-compute"
         className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
-        {isTestVariant && (
-          <div className="text-center mb-8 lg:mb-16">
-            <h2 className="text-foreground text-3xl" id="how-compute-pricing-works">
-              How compute pricing works
-            </h2>
-            <p className="text-foreground-light mt-4 text-lg mb-4">
-              Choose a plan, add projects, and see your total cost
-            </p>
-            <div className="flex items-center justify-center gap-1">
-              <span className="py-1 px-3 bg-surface-100 flex items-center gap-1 border rounded-full text-xs text-foreground-lighter">
-                What is &ldquo;compute&rdquo;?
-                <InfoTooltip side="bottom" className="max-w-[280px]">
-                  Think of compute as the computer your database runs on. As your app grows, you
-                  scale CPU and memory to handle more traffic and data.
-                </InfoTooltip>
-              </span>
-            </div>
+        <div className="text-center mb-8 lg:mb-16">
+          <h2 className="text-foreground text-3xl" id="how-compute-pricing-works">
+            How compute pricing works
+          </h2>
+          <p className="text-foreground-light mt-4 text-lg mb-4">
+            Choose a plan, add projects, and see your total cost
+          </p>
+          <div className="flex items-center justify-center gap-1">
+            <span className="py-1 px-3 bg-surface-100 flex items-center gap-1 border rounded-full text-xs text-foreground-lighter">
+              What is &ldquo;compute&rdquo;?
+              <InfoTooltip side="bottom" className="max-w-[280px]">
+                Think of compute as the computer your database runs on. As your app grows, you scale
+                CPU and memory to handle more traffic and data.
+              </InfoTooltip>
+            </span>
           </div>
-        )}
+        </div>
 
-        {isTestVariant ? <NewPricingComputeSection /> : <PricingComputeSection />}
+        <PricingComputeSection />
       </div>
 
       <div

@@ -1,4 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
+import { useParams } from 'common/hooks/useParams'
 import {
   Copy,
   Download,
@@ -14,29 +17,26 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
-
-import { keepPreviousData } from '@tanstack/react-query'
-import { IS_PLATFORM } from 'common'
-import { useParams } from 'common/hooks/useParams'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { getContentById } from 'data/content/content-id-query'
-import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useLatest from 'hooks/misc/useLatest'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
+  ContextMenu_Shadcn_,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
   ContextMenuTrigger_Shadcn_,
-  ContextMenu_Shadcn_,
   TreeViewItem,
-  cn,
 } from 'ui'
+
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { getContentById } from '@/data/content/content-id-query'
+import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
+import { Snippet } from '@/data/content/sql-folders-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import useLatest from '@/hooks/misc/useLatest'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 interface SQLEditorTreeViewItemProps extends Omit<
   ComponentProps<typeof TreeViewItem>,

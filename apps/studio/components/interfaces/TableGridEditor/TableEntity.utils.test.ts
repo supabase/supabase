@@ -1,7 +1,8 @@
-import type { SupaTable } from 'components/grid/types'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { describe, expect, it } from 'vitest'
+
 import { formatTableRowsToSQL } from './TableEntity.utils'
+import type { SupaTable } from '@/components/grid/types'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
   it('should format rows into a single SQL INSERT statement', () => {

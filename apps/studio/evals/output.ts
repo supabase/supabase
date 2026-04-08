@@ -1,4 +1,5 @@
 import { type ToolSet, type TypedToolCall, type TypedToolResult } from 'ai'
+
 import { type AssistantEvalOutput } from './scorer'
 
 type Step = {
@@ -27,7 +28,16 @@ function parseToolCall(
     case 'search_docs': {
       const content = toolResult.output?.content
       if (!content || !Array.isArray(content)) return {}
-      const docs = content.map((item) => item?.text).filter((text) => typeof text === 'string')
+      const docs = content
+        .map((item) => item?.text)
+        .filter((text) => {
+          if (typeof text !== 'string') return false
+          try {
+            return !JSON.parse(text)?.error
+          } catch {
+            return true
+          }
+        })
       if (docs.length === 0) return {}
       return { docs }
     }

@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Check, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { useClientSecretDeleteMutation } from 'data/oauth-secrets/client-secret-delete-mutation'
-import { Secret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { useClientSecretDeleteMutation } from '@/data/oauth-secrets/client-secret-delete-mutation'
+import { Secret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export interface SecretRowProps {
   secret: Secret

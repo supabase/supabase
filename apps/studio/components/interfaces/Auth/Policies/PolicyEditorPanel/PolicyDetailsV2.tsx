@@ -2,39 +2,39 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
+  RadioGroupLargeItem_Shadcn_,
   ScrollArea,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
-  Select_Shadcn_,
-  cn,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
+
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PolicyDetailsV2Props {
   schema: string
@@ -170,7 +170,7 @@ export const PolicyDetailsV2 = ({
                       >
                         <Command_Shadcn_>
                           <CommandInput_Shadcn_ placeholder="Find a table..." />
-                          <CommandList_Shadcn_>
+                          <CommandList_Shadcn_ onWheel={(event) => event.stopPropagation()}>
                             <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
                             <CommandGroup_Shadcn_>
                               <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>

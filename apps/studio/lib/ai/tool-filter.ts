@@ -1,8 +1,7 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
-// End of third-party imports
 
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
@@ -40,6 +39,8 @@ export const toolSetValidationSchema = z.record(
     'getRlsKnowledge',
     'getFunctions',
     'getEdgeFunctionKnowledge',
+
+    'load_knowledge',
   ]),
   basicToolSchema
 )
@@ -71,6 +72,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   rename_chat: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
   get_active_incidents: TOOL_CATEGORIES.UI,
+  load_knowledge: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,

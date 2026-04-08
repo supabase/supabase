@@ -2,18 +2,6 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { getStripeElementsAppearanceOptions } from 'components/interfaces/Billing/Payment/Payment.utils'
-import {
-  NewPaymentMethodElement,
-  type PaymentMethodElementRef,
-} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { SetupIntentResponse } from 'data/stripe/setup-intent-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { Loader, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
@@ -29,6 +17,20 @@ import { toast } from 'sonner'
 import { Checkbox_Shadcn_, Listbox } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
+import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
+import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 export interface PaymentMethodSelectionProps {
@@ -36,6 +38,10 @@ export interface PaymentMethodSelectionProps {
   onSelectPaymentMethod: (id: string) => void
   layout?: 'vertical' | 'horizontal'
   readOnly: boolean
+  onAddressChange?: (address: CustomerAddress) => void
+  onTaxIdChange?: (taxId: CustomerTaxId | null) => void
+  useAsDefaultBillingAddress: boolean
+  onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -44,6 +50,10 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     onSelectPaymentMethod,
     layout = 'vertical',
     readOnly,
+    onAddressChange,
+    onTaxIdChange,
+    useAsDefaultBillingAddress,
+    onUseAsDefaultBillingAddressChange,
   }: PaymentMethodSelectionProps,
   ref
 ) {
@@ -52,7 +62,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
   const [setupIntent, setSetupIntent] = useState<SetupIntentResponse | undefined>(undefined)
-  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const { resolvedTheme } = useTheme()
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
   const [setupNewPaymentMethod, setSetupNewPaymentMethod] = useState<boolean | null>(null)
@@ -280,6 +289,8 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 customerName={customerProfile?.billing_name}
                 currentAddress={customerProfile?.address}
                 currentTaxId={taxId}
+                onAddressChange={onAddressChange}
+                onTaxIdChange={onTaxIdChange}
               />
             </Elements>
 
@@ -289,7 +300,9 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 <Checkbox_Shadcn_
                   id="defaultBillingAddress"
                   checked={useAsDefaultBillingAddress}
-                  onCheckedChange={() => setUseAsDefaultBillingAddress(!useAsDefaultBillingAddress)}
+                  onCheckedChange={() => {
+                    onUseAsDefaultBillingAddressChange(!useAsDefaultBillingAddress)
+                  }}
                 />
                 <label
                   htmlFor="defaultBillingAddress"

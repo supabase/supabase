@@ -1,7 +1,8 @@
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { noop } from 'lodash'
 import { PropsWithChildren, useCallback, useState } from 'react'
 import { Button, KeyboardShortcut } from 'ui'
+
+import { useHotKey } from '@/hooks/ui/useHotKey'
 
 interface ActionBarProps {
   loading?: boolean

@@ -1,14 +1,14 @@
 import { getImportForeignSchemaSql } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { foreignTableKeys } from 'data/foreign-tables/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { vaultSecretsKeys } from 'data/vault/keys'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { fdwKeys } from './keys'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { foreignTableKeys } from '@/data/foreign-tables/keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { vaultSecretsKeys } from '@/data/vault/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type FDWImportForeignSchemaVariables = {
   projectRef?: string

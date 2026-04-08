@@ -1,19 +1,6 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
-import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
-import { useIsTableFilterBarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
@@ -23,7 +10,20 @@ import type { GridProps, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import { RowRenderer } from './RowRenderer'
+import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
+import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
+import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
+import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useCsvFileDrop } from '@/hooks/ui/useCsvFileDrop'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -324,26 +324,28 @@ export const Grid = memo(
             </div>
           )}
 
-          <DataGrid
-            ref={ref}
-            className={`${gridClass} flex-grow`}
-            rowClass={computedRowClass}
-            columns={columnsWithDirtyCellClass}
-            rows={rows ?? []}
-            renderers={{ renderRow: RowRenderer }}
-            rowKeyGetter={rowKeyGetter}
-            selectedRows={snap.selectedRows}
-            onColumnResize={snap.updateColumnSize}
-            onRowsChange={onRowsChange}
-            onSelectedCellChange={onSelectedCellChange}
-            onSelectedRowsChange={onSelectedRowsChange}
-            onCellDoubleClick={(props) => {
-              if (typeof props.column.name === 'string') {
-                onRowDoubleClick(props.row, { name: props.column.name })
-              }
-            }}
-            onCellKeyDown={handleCopyCell}
-          />
+          <RowContextMenuProvider>
+            <DataGrid
+              ref={ref}
+              className={`${gridClass} flex-grow`}
+              rowClass={computedRowClass}
+              columns={columnsWithDirtyCellClass}
+              rows={rows ?? []}
+              renderers={{ renderRow: RowRenderer }}
+              rowKeyGetter={rowKeyGetter}
+              selectedRows={snap.selectedRows}
+              onColumnResize={snap.updateColumnSize}
+              onRowsChange={onRowsChange}
+              onSelectedCellChange={onSelectedCellChange}
+              onSelectedRowsChange={onSelectedRowsChange}
+              onCellDoubleClick={(props) => {
+                if (typeof props.column.name === 'string') {
+                  onRowDoubleClick(props.row, { name: props.column.name })
+                }
+              }}
+              onCellKeyDown={handleCopyCell}
+            />
+          </RowContextMenuProvider>
         </div>
       )
     }

@@ -1,16 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useToggleLegacyAPIKeysMutation } from 'data/api-keys/legacy-api-key-toggle-mutation'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAuthorizedAppsQuery } from 'data/oauth/authorized-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,7 +12,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
+
 import Panel from '../Panel'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useToggleLegacyAPIKeysMutation } from '@/data/api-keys/legacy-api-key-toggle-mutation'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
@@ -44,13 +44,46 @@ export const ToggleLegacyApiKeysPanel = () => {
     { enabled: canReadAPIKeys }
   )
 
-  const { data: authorizedApps = [], isSuccess: isAuthorizedAppsSuccess } = useAuthorizedAppsQuery({
+  const { data: authorizedApps = [], isError: isAuthorizedAppsError } = useAuthorizedAppsQuery({
     slug: org?.slug,
   })
 
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
 
-  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess && isAuthorizedAppsSuccess)) {
+  const oauthAppsLink = (
+    <a
+      href={`/dashboard/org/${org?.slug}/apps`}
+      target="_blank"
+      rel="noreferrer"
+      className="underline"
+    >
+      OAuth apps
+    </a>
+  )
+
+  const appsWarning = isAuthorizedAppsError
+    ? {
+        title: 'Check your OAuth apps before continuing',
+        description: (
+          <>
+            Disabling legacy API keys can break apps that integrate with Supabase. Before
+            continuing, check your organization's {oauthAppsLink} to ensure none of them depend on
+            the legacy API keys.
+          </>
+        ),
+      }
+    : {
+        title: 'Apps using Supabase may break',
+        description: (
+          <>
+            Your project uses apps that integrate with Supabase. Disabling the legacy API keys is a
+            brand new feature and the apps you're using may not have added support for this yet. It
+            can cause them to stop functioning. Check your {oauthAppsLink} before continuing.
+          </>
+        ),
+      }
+
+  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess)) {
     return null
   }
 
@@ -73,7 +106,7 @@ export const ToggleLegacyApiKeysPanel = () => {
               <ButtonTooltip
                 type="default"
                 onClick={
-                  authorizedApps?.length
+                  isLegacyKeysEnabled && (authorizedApps?.length || isAuthorizedAppsError)
                     ? () => setIsAppsWarningOpen(true)
                     : () => setIsConfirmOpen(true)
                 }
@@ -110,12 +143,8 @@ export const ToggleLegacyApiKeysPanel = () => {
       <AlertDialog open={isAppsWarningOpen} onOpenChange={(value) => setIsAppsWarningOpen(value)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Apps using Supabase may break</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your project uses apps that integrate with Supabase. Disabling the legacy API keys is
-              a brand new feature and the apps you’re using may not have added support for this yet.
-              It can cause them to stop functioning. Check before continuing.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{appsWarning.title}</AlertDialogTitle>
+            <AlertDialogDescription>{appsWarning.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

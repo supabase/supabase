@@ -1,9 +1,9 @@
-import SqlEditor from 'components/ui/SqlEditor'
 import { isEmpty, noop } from 'lodash'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
 
 import type { PolicyForReview } from './Policies.types'
+import SqlEditor from '@/components/ui/SqlEditor'
 
 interface PolicyReviewProps {
   policy: PolicyForReview

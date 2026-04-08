@@ -5,8 +5,9 @@ import type {
   PostgresTable,
   PostgresView,
 } from '@supabase/postgres-meta'
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+
+import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 interface TableRelationship extends PostgresRelationship {
   deletion_action: 'a' | 'r' | 'c' | 'n' | 'd'

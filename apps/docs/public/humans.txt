@@ -51,6 +51,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Murray
 Colum Ferry
 Craig Cannon
 Cuong Do
@@ -66,6 +67,7 @@ David Weitzman
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dimitrios Liappis
 Div Arora
 Divit D
 Douglas Hunley
@@ -106,6 +108,7 @@ Illia Basalaiev
 Inian P
 Ivan Vasilov
 Jamie Boyd
+Jared Patterson
 Jason Farber
 Jean-Paul Argudo
 Jeezy
@@ -173,6 +176,7 @@ Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
@@ -203,6 +207,7 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Samir Ketema
 Sana Cordeaux
 Sara Read
 Sean Oliver
@@ -237,6 +242,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

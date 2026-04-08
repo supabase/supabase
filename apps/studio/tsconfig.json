@@ -5,8 +5,6 @@
     "allowJs": false,
     "lib": ["dom", "dom.iterable", "esnext"],
     "paths": {
-      // @deprecated: Don't import directly without suffix. Use @/ always.
-      "*": ["./*"],
       "@/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
