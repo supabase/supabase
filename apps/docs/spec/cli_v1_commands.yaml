@@ -278,6 +278,8 @@ commands:
   - id: supabase-telemetry
     title: supabase telemetry
     summary: Manage CLI telemetry settings
+    description: |
+      Manage CLI telemetry settings. The Supabase CLI collects usage telemetry to help improve the developer experience. You can opt out at any time by running `supabase telemetry disable` or setting the `DO_NOT_TRACK=1` environment variable.
     tags:
       - local-dev
     links: []

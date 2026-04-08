@@ -344,6 +344,20 @@ When you are finished working on your Supabase project, you can stop the stack (
 supabase stop
 ```
 
+## Telemetry
+
+The Supabase CLI collects usage telemetry to help improve the developer experience.
+
+You can manage telemetry with the following commands:
+
+| Command                      | Description                    |
+| ---------------------------- | ------------------------------ |
+| `supabase telemetry disable` | Opt out of telemetry           |
+| `supabase telemetry enable`  | Opt back in to telemetry       |
+| `supabase telemetry status`  | Check current telemetry status |
+
+You can also set the `DO_NOT_TRACK=1` environment variable to disable telemetry.
+
 ## Learn more
 
 - [CLI configuration](/docs/guides/local-development/cli/config)
