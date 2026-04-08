@@ -164,6 +164,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             onClick={(e) => {
               e.stopPropagation()
             }}
+            aria-label={`Column ${column.name} actions`}
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>
