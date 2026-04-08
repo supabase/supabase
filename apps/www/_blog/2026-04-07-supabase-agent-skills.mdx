@@ -41,7 +41,7 @@ The skill covers three areas: documentation access, security, and tooling workfl
 
 The core principle: verify against current docs before implementing.
 
-Supabase moves fast. Function signatures, CLI flags, config options, and API conventions change between releases. An agent working from training data alone is essentially working from a snapshot — one that could be months or years old.
+Supabase moves fast. Config options, product documentation and API conventions are examples of things that will change over time. An agent working from training data alone is essentially working from a snapshot — one that could be months or years old.
 
 The skill instructs agents to look up documentation before writing any Supabase-specific code, using three methods in priority order:
 
@@ -53,7 +53,7 @@ The skill doesn't tell agents what the current API looks like. It tells them how
 
 ### Security and RLS
 
-Supabase has specific security traps that silently create vulnerabilities. The skill instructs agents to check the docs before implementing anything, but agents are lazy about it: even with `search_docs` available, they can can choose to keep it offline and go with what they already know from training data rather than making an extra round-trip. That means security-sensitive patterns might get missed even when the correct guidance exists in the docs.
+Supabase has specific security configurations that the agent might miss. These instructions are described in detail in our documentation. The skill instructs agents to check the Supabase docs before implementing anything, but agents are lazy about it: even with `search_docs` available, they can can choose to keep it offline and go with what they already know from training data rather than making an extra round-trip. That means security configurations and patterns might get missed even when the correct guidance exists in the docs.
 
 To ensure agents never skip these, the skill includes an inline checklist of security requirements that apply to every Supabase project. These aren't pulled from docs on demand — they're loaded with the skill, so the agent has no excuse to miss them:
 
