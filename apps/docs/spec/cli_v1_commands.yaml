@@ -279,13 +279,7 @@ commands:
     title: supabase telemetry
     summary: Manage CLI telemetry settings
     description: |
-      The Supabase CLI collects usage telemetry to help improve the developer experience. You can opt out at any time by running `supabase telemetry disable` or setting the `DO_NOT_TRACK=1` environment variable.
-
-      | Command | Description |
-      |---|---|
-      | `supabase telemetry enable` | Enable CLI telemetry |
-      | `supabase telemetry disable` | Disable CLI telemetry |
-      | `supabase telemetry status` | Show current telemetry status |
+      The Supabase CLI collects usage telemetry to help improve the developer experience. You can opt out at any time by running `supabase telemetry disable` or setting the `DO_NOT_TRACK=1` environment variable. Use `supabase telemetry status` to check your current setting and `supabase telemetry enable` to opt back in.
     tags:
       - local-dev
     links: []
