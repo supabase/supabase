@@ -353,7 +353,8 @@ export const Grid = memo(
               const column = table.columns.find((col) => col.name === active.id)
               setDraggedColumn(column)
             }}
-            onDragOver={({ active, over }) => {
+            onDragOver={({ active, over, activatorEvent }) => {
+              if (activatorEvent.type === 'keydown') return
               // Dragged column is not over another column
               if (over == null) return
               // Dragged column is over itself
@@ -361,8 +362,18 @@ export const Grid = memo(
               // Our ids are the columns keys (their names) so it's safe to either cast or call toString
               snap.moveColumn(active.id.toString(), over.id.toString())
             }}
-            onDragEnd={() => {
+            onDragCancel={() => {
               setDraggedColumn(undefined)
+            }}
+            onDragEnd={({ active, over, activatorEvent }) => {
+              setDraggedColumn(undefined)
+              if (activatorEvent.type !== 'keydown') return
+              // Dragged column is not over another column
+              if (over == null) return
+              // Dragged column is over itself
+              if (active.id === over.id) return
+              // Our ids are the columns keys (their names) so it's safe to either cast or call toString
+              snap.moveColumn(active.id.toString(), over.id.toString())
             }}
           >
             <SortableContext
