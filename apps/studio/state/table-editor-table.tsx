@@ -137,12 +137,9 @@ export const createTableEditorTableState = ({
         false
 
       // Move the column to just after the remaining frozen columns
-      const lastFrozenIdx = state.gridColumns.reduce(
-        (last, col, i) => (col.frozen && i !== index ? i : last),
-        -1
-      )
       const col = state.gridColumns[index]
       state.gridColumns.splice(index, 1)
+      const lastFrozenIdx = state.gridColumns.reduce((last, col, i) => (col.frozen ? i : last), -1)
       state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
       state.gridColumns.forEach((col, i) => {
         ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
