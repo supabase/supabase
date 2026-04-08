@@ -1,10 +1,6 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { noop } from 'lodash'
-
-import { PolicyRow } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
-import { Bucket } from 'data/storage/buckets-query'
-
 import { FilesBucket as FilesBucketIcon } from 'icons'
+import { noop } from 'lodash'
 import { forwardRef, type CSSProperties } from 'react'
 import {
   Badge,
@@ -18,7 +14,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+
+import { PolicyRow } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyRow'
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { Bucket } from '@/data/storage/buckets-query'
 
 interface StoragePoliciesBucketRowProps {
   table: string
@@ -52,7 +55,16 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
             <FilesBucketIcon className="text-foreground-muted" size={16} strokeWidth={1.5} />
             <div className="flex flex-1 min-w-0 items-center gap-1.5">
               <CardTitle className="truncate">{label}</CardTitle>
-              {bucket?.public && <Badge variant="warning">Public</Badge>}
+              {bucket?.public && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="warning" className="flex">
+                      Public
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </div>
           <Button type="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>

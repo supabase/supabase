@@ -1,9 +1,9 @@
-import { Terminal } from 'lucide-react'
-
 import { useParams } from 'common'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { Terminal } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
+
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
 
 export const MigrationsEmptyState = () => {
   const { ref } = useParams()

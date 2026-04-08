@@ -3,18 +3,9 @@ import { compact, isEmpty, mapValues } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { UUID_REGEX } from '@/lib/constants'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { invalidateSchemasQuery } from 'data/database/schemas-query'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { FDW } from 'data/fdw/fdws-query'
-import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
@@ -24,6 +15,19 @@ import {
   makeValidateRequired,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
+import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { FDW } from '@/data/fdw/fdws-query'
+import { getDecryptedValues } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { UUID_REGEX } from '@/lib/constants'
 
 export interface EditWrapperSheetProps {
   wrapper: FDW

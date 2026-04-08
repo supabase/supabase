@@ -1,11 +1,7 @@
 // End of third-party imports
 
-import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { compact } from 'lodash'
 import { File, FileCode, Plus, X } from 'lucide-react'
-import { InlineLink } from 'components/ui/InlineLink'
 import {
   useCallback,
   useEffect,
@@ -19,6 +15,10 @@ import { toast } from 'sonner'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { createSupportStorageClient } from './support-storage-client'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useGenerateAttachmentURLsMutation } from '@/data/support/generate-attachment-urls-mutation'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
 

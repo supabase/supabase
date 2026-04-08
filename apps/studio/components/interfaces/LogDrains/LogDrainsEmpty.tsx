@@ -1,11 +1,11 @@
 import { IS_PLATFORM } from 'common'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import { Button, Card, cn } from 'ui'
 
 import { AnimatedLogos } from './AnimatedLogos'
 import { VoteLink } from './VoteLink'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { DOCS_URL } from '@/lib/constants'
 
 export const LogDrainsEmpty = () => {
   const items = [

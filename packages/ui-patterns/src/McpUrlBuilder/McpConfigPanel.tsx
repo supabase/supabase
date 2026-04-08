@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { cn, CodeBlock, Separator } from 'ui'
+import { cn, Separator } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { InfoTooltip } from '../info-tooltip'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'

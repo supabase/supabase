@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
 import { groupBy } from 'lodash'
 
-import { DataPoint } from 'data/analytics/constants'
-import type { OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DataPoint } from '@/data/analytics/constants'
+import type { OrgDailyUsageResponse, PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {

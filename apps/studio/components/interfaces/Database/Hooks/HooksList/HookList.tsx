@@ -1,11 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseHooksQuery } from 'data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import { includes } from 'lodash'
 import { Edit3, MoreVertical, Trash } from 'lucide-react'
 import Image from 'next/legacy/image'
@@ -19,6 +13,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
+import Table from '@/components/to-be-cleaned/Table'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 export interface HookListProps {
   schema: string

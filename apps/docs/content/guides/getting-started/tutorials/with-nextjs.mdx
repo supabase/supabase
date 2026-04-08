@@ -44,7 +44,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 
 ### App styling (optional)
 
-An optional step is to update the CSS file `app/globals.css` to make the app look nice.
+An optional step is to update the CSS file `app/globals.css` to make the app look better.
 You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
 ### Supabase Server-Side Auth
@@ -66,7 +66,7 @@ There are two different types of clients in Supabase:
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
 2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
-It is recommended to create the following essential utilities files for creating clients, and organize them within `lib/supabase` at the root of the project.
+We recommend creating the following essential utilities files for creating clients, and organize them within `lib/supabase` at the root of the project.
 
 Create a `client.ts` and a `server.ts` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
 
@@ -88,9 +88,11 @@ meta="name=lib/supabase/server.ts"
 
 ### Next.js proxy
 
-Since Server Components can't write cookies, you need [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them. This is accomplished by:
+Since Server Components can't write cookies, you need [Proxy](https://nextjs.org/docs/app/getting-started/proxy) to refresh expired Auth tokens and store them.
 
-- Refreshing the Auth token with the call to `supabase.auth.getUser`.
+You can accomplish this by:
+
+- Refreshing the Auth token with the call to `supabase.auth.getClaims`.
 - Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
 - Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
 
@@ -100,15 +102,15 @@ You could also add a matcher, so that the Proxy only runs on routes that access 
 
 Be careful when protecting pages. The server gets the user session from the cookies, which anyone can spoof.
 
-Always use `supabase.auth.getUser()` to protect pages and user data.
+Most of the time, use `supabase.auth.getClaims()` to protect pages and user data.
 
 _Never_ trust `supabase.auth.getSession()` inside server code such as proxy. It isn't guaranteed to revalidate the Auth token.
 
-It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
+It's safe to trust `getClaims()` because it validates the token in storage, either directly or by calling `getUser()` solely to check the result. It doesn't use the response from `getUser()` itself, only whether the validation succeeded.
 
 </Admonition>
 
-Create a `proxy.ts` file at the project root and another one within the `lib/supabase` folder. The `lib/supabase` file contains the logic for updating the session. This is used by the `proxy.ts` file, which is a Next.js convention.
+Create a `proxy.ts` file at the project root and another one within the `lib/supabase` folder. The `lib/supabase` file contains the logic for updating the session. The `proxy.ts` file uses this, which is a Next.js convention.
 
 <$CodeTabs>
 
@@ -184,9 +186,9 @@ Before proceeding, change the email template to support support a server-side au
 - Select the **Confirm signup** template.
 - Change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
-<Admonition type="tip">
+<Admonition type="tip" label="Did you know?">
 
-**Did you know?** You can also customize other emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+You can also customize other emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
 </Admonition>
 

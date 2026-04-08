@@ -1,7 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-
 import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -10,8 +9,9 @@ import {
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import type { SupportFormValues } from './SupportForm.schema'
+
 import { DASHBOARD_LOG_CATEGORIES } from './dashboard-logs'
+import type { SupportFormValues } from './SupportForm.schema'
 
 interface DashboardLogsToggleProps {
   form: UseFormReturn<SupportFormValues>

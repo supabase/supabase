@@ -1,4 +1,4 @@
-import { DOCS_URL } from 'lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceWarningMessage {
   // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/api')

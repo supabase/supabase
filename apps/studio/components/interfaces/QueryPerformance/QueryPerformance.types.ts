@@ -1,4 +1,4 @@
-import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
+import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
 
 export interface QueryPerformanceRow {
   query: string
@@ -55,4 +55,6 @@ export type QueryPerformanceSQLParams = {
   minTotalTime?: number
   runIndexAdvisor?: boolean
   filterIndexAdvisor?: boolean
+  page?: number
+  pageSize?: number
 }

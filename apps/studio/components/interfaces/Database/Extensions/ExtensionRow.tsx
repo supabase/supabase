@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { AlertTriangle, Book, Github, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -16,6 +10,12 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'
 import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ExtensionRowProps {
   extension: DatabaseExtension

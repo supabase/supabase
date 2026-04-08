@@ -1,13 +1,14 @@
 import { expect, Page } from '@playwright/test'
+
+import { createTable, dropTable } from '../utils/db/index.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { createTable, dropTable } from '../utils/db/index.js'
 
 const ensureWebhooksEnabled = async (page: Page, ref: string) => {
   await page.goto(toUrl(`/project/${ref}/integrations/webhooks/overview`))
-  await expect(
-    page.getByText('Database Webhooks allow you to send real-time data')
-  ).toBeVisible({ timeout: 30000 })
+  await expect(page.getByText('Database Webhooks allow you to send real-time data')).toBeVisible({
+    timeout: 30000,
+  })
 
   const enableButton = page.getByRole('button', { name: 'Enable webhooks' })
   if ((await enableButton.count()) > 0) {
@@ -37,9 +38,23 @@ const createWebhookViaUI = async (page: Page, hookName: string, tableName: strin
     .fill('http://localhost:3000/test-webhook')
 
   await page.getByRole('button', { name: 'Create webhook' }).click()
-  await expect(
-    page.getByText(`Successfully created new webhook "${hookName}"`)
-  ).toBeVisible({ timeout: 10000 })
+  await expect(page.getByText(`Successfully created new webhook "${hookName}"`)).toBeVisible({
+    timeout: 10000,
+  })
+}
+
+const openWebhookEditor = async (page: Page, hookName: string) => {
+  const webhookText = page.getByText(hookName, { exact: true })
+  const webhookRow = page.locator('tr').filter({ has: webhookText })
+  await webhookRow.getByRole('button').click()
+  await page.getByRole('menuitem', { name: 'Edit hook' }).click()
+  await expect(page.getByText(`Update webhook ${hookName}`)).toBeVisible({ timeout: 10000 })
+}
+
+const addCustomHeader = async (page: Page, name: string, value: string) => {
+  await page.getByRole('button', { name: 'Add a new header' }).click()
+  await page.getByPlaceholder('Header name').last().fill(name)
+  await page.getByPlaceholder('Header value').last().fill(value)
 }
 
 const deleteWebhookViaUI = async (page: Page, name: string) => {
@@ -97,9 +112,9 @@ test.describe('Database Webhooks', () => {
 
       await page.getByRole('button', { name: 'Create webhook' }).click()
 
-      await expect(
-        page.getByText(`Successfully created new webhook "${hook}"`)
-      ).toBeVisible({ timeout: 10000 })
+      await expect(page.getByText(`Successfully created new webhook "${hook}"`)).toBeVisible({
+        timeout: 10000,
+      })
 
       await expect(page.getByText(hook, { exact: true })).toBeVisible({ timeout: 10000 })
     } finally {
@@ -130,11 +145,56 @@ test.describe('Database Webhooks', () => {
 
       await page.getByRole('button', { name: 'Update webhook' }).click()
 
-      await expect(
-        page.getByText(`Successfully updated webhook "${hook}"`)
-      ).toBeVisible({ timeout: 10000 })
+      await expect(page.getByText(`Successfully updated webhook "${hook}"`)).toBeVisible({
+        timeout: 10000,
+      })
 
       await expect(page.getByText('Webhook not found')).not.toBeVisible()
+    } finally {
+      await dropTable(table)
+    }
+  })
+
+  test('preserves webhook URL path and custom headers after editing', async ({ page, ref }) => {
+    const { table, hook } = uniqueNames('edit_persist')
+    const originalUrl = 'http://localhost:3000/test-webhook'
+    const updatedUrl = 'http://localhost:3000/test-webhook-updated/path'
+    const headerName = 'X-API-Key'
+    const headerValue = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12'
+
+    await setupTable(table)
+
+    try {
+      await ensureWebhooksEnabled(page, ref)
+      await navigateToWebhooksList(page, ref)
+      await createWebhookViaUI(page, hook, table)
+
+      await openWebhookEditor(page, hook)
+      await addCustomHeader(page, headerName, headerValue)
+      await page.getByRole('button', { name: 'Update webhook' }).click()
+
+      await expect(page.getByText(`Successfully updated webhook "${hook}"`)).toBeVisible({
+        timeout: 10000,
+      })
+
+      await openWebhookEditor(page, hook)
+      await expect(page.getByPlaceholder('http://api.com/path/resource')).toHaveValue(originalUrl)
+      await expect(page.getByPlaceholder('Header name').last()).toHaveValue(headerName)
+      await expect(page.getByPlaceholder('Header value').last()).toHaveValue(headerValue)
+
+      const urlInput = page.getByPlaceholder('http://api.com/path/resource')
+      await urlInput.clear()
+      await urlInput.fill(updatedUrl)
+      await page.getByRole('button', { name: 'Update webhook' }).click()
+
+      await expect(page.getByText(`Successfully updated webhook "${hook}"`)).toBeVisible({
+        timeout: 10000,
+      })
+
+      await openWebhookEditor(page, hook)
+      await expect(page.getByPlaceholder('http://api.com/path/resource')).toHaveValue(updatedUrl)
+      await expect(page.getByPlaceholder('Header name').last()).toHaveValue(headerName)
+      await expect(page.getByPlaceholder('Header value').last()).toHaveValue(headerValue)
     } finally {
       await dropTable(table)
     }

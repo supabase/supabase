@@ -1,9 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import type { Dictionary } from 'types'
 import { SidePanel, Toggle } from 'ui'
 
 import { ActionBar } from '../ActionBar'
@@ -21,6 +18,10 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
@@ -43,6 +44,10 @@ export const RowEditor = ({
   saveChanges = noop,
   updateEditorDirty = noop,
 }: RowEditorProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save'
+
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [rowFields, setRowFields] = useState<RowField[]>([])
 
@@ -64,7 +69,6 @@ export const RowEditor = ({
     (rowField: any) => !rowField.isNullable
   )
 
-  const { data: project } = useSelectedProjectQuery()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -129,7 +133,7 @@ export const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields(rowFields)
+        ? generateRowObjectFromFields({ fields: rowFields })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
@@ -182,7 +186,7 @@ export const RowEditor = ({
           loading={loading}
           formId={formId}
           backButtonLabel="Cancel"
-          applyButtonLabel="Save"
+          applyButtonLabel={applyChangesLabel}
           closePanel={closePanel}
           hideApply={!editable}
           visible={visible}
@@ -222,6 +226,7 @@ export const RowEditor = ({
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         isEditable={editable}
+                        isNewRow={isNewRecord || '__tempId' in row}
                       />
                     )
                   })}
@@ -250,6 +255,7 @@ export const RowEditor = ({
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           isEditable={editable}
+                          isNewRow={isNewRecord || '__tempId' in row}
                         />
                       )
                     })}

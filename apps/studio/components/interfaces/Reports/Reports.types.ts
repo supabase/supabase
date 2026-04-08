@@ -1,4 +1,4 @@
-import type { ResponseError } from 'types'
+import type { ResponseError } from '@/types'
 
 export enum Presets {
   API = 'api',
@@ -26,7 +26,9 @@ export interface ReportQuery {
     where?: string,
     orderBy?: string,
     runIndexAdvisor?: boolean,
-    filterIndexAdvisor?: boolean
+    filterIndexAdvisor?: boolean,
+    page?: number,
+    pageSize?: number
   ) => string
 }
 

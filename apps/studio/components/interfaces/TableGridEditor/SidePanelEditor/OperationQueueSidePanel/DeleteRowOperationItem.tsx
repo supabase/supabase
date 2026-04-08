@@ -1,12 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Undo2 } from 'lucide-react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { DeleteRowPayload } from '@/state/table-editor-operation-queue.types'
 
 interface DeleteRowOperationItemProps {
@@ -62,7 +62,7 @@ export const DeleteRowOperationItem = ({
         </div>
         <ButtonTooltip
           type="text"
-          aria-label="Revert change"
+          aria-label="Discard change"
           className="w-7"
           icon={<Undo2 />}
           onClick={handleDelete}
@@ -70,7 +70,7 @@ export const DeleteRowOperationItem = ({
             content: {
               side: 'left',
               align: 'end',
-              text: 'Revert change',
+              text: 'Discard change',
             },
           }}
         />

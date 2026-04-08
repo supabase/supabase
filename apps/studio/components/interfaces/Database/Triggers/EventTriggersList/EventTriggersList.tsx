@@ -1,36 +1,36 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { EMPTY_ARR } from '@/lib/void'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DeleteEventTrigger } from 'components/interfaces/Database/Triggers/DeleteEventTrigger'
-import {
-  ReportsSelectFilter,
-  selectFilterSchema,
-} from 'components/interfaces/Reports/v2/ReportsSelectFilter'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabaseEventTriggerDeleteMutation } from 'data/database-event-triggers/database-event-trigger-delete-mutation'
-import {
-  type DatabaseEventTrigger,
-  useDatabaseEventTriggersQuery,
-} from 'data/database-event-triggers/database-event-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { EventTriggerList } from './EventTriggerList'
 import { generateEventTriggerCreateSQL } from './EventTriggerList.utils'
 import { DEFAULT_EVENT_TRIGGER_SQL, EVENT_TRIGGER_TEMPLATES } from './EventTriggers.constants'
+import { DeleteEventTrigger } from '@/components/interfaces/Database/Triggers/DeleteEventTrigger'
+import {
+  ReportsSelectFilter,
+  selectFilterSchema,
+} from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseEventTriggerDeleteMutation } from '@/data/database-event-triggers/database-event-trigger-delete-mutation'
+import {
+  useDatabaseEventTriggersQuery,
+  type DatabaseEventTrigger,
+} from '@/data/database-event-triggers/database-event-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const DEFAULT_OWNER_FILTER = ['postgres']
 

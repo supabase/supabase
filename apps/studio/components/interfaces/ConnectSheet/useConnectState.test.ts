@@ -1,7 +1,19 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { useConnectState } from './useConnectState'
+
+vi.mock('common', () => ({
+  useParams: () => ({ ref: 'test-ref' }),
+}))
+
+vi.mock('@/data/read-replicas/replicas-query', () => ({
+  useReadReplicasQuery: () => ({ data: [] }),
+}))
+
+vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
+  useCheckEntitlements: vi.fn().mockImplementation(() => ({ hasAccess: true })),
+}))
 
 describe('useConnectState', () => {
   // ============================================================================
@@ -268,13 +280,28 @@ describe('useConnectState', () => {
       expect(fieldIds).toContain('connectionType')
     })
 
-    test('should show useSharedPooler only for transaction connection method', () => {
+    test('should show useSharedPooler only for transaction connection method when user has dedicated_pooler entitlement', async () => {
+      const { useCheckEntitlements } = await import('@/hooks/misc/useCheckEntitlements')
+      vi.mocked(useCheckEntitlements).mockReturnValue({ hasAccess: true } as any)
+
       const { result } = renderHook(() =>
         useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
       )
 
       const fieldIds = result.current.activeFields.map((f) => f.id)
       expect(fieldIds).toContain('useSharedPooler')
+    })
+
+    test('should hide useSharedPooler even if using transaction method when user lacks dedicated_pooler entitlement', async () => {
+      const { useCheckEntitlements } = await import('@/hooks/misc/useCheckEntitlements')
+      vi.mocked(useCheckEntitlements).mockReturnValue({ hasAccess: false } as any)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
+      )
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).not.toContain('useSharedPooler')
     })
 
     test('should hide useSharedPooler for direct connection method', () => {
@@ -371,6 +398,7 @@ describe('useConnectState', () => {
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
       expect(stepIds).toContain('shadcn-add')
+      expect(stepIds).toContain('shadcn-env')
     })
   })
 

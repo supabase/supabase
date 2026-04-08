@@ -4,9 +4,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 05 Mar 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Thu, 02 Apr 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/100000-github-stars</guid>
+  <title>100,000 GitHub stars</title>
+  <link>https://supabase.com/blog/100000-github-stars</link>
+  <description>Supabase hits 100,000 GitHub stars. A reflection on community, open source, and what got us here.</description>
+  <pubDate>Thu, 02 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-docs-over-ssh</guid>
+  <title>Supabase docs over SSH</title>
+  <link>https://supabase.com/blog/supabase-docs-over-ssh</link>
+  <description>Browse Supabase docs with grep, find, and cat.</description>
+  <pubDate>Wed, 01 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/navigating-regional-network-blocks</guid>
+  <title>Navigating Regional Network Blocks</title>
+  <link>https://supabase.com/blog/navigating-regional-network-blocks</link>
+  <description>A look at recent ISP and government-directed blocks of Supabase domains in three regions—what triggered them, how we worked with authorities and customers to restore access, and what multi-tenant platforms can do to prepare.</description>
+  <pubDate>Thu, 26 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-joins-the-stripe-projects-developer-preview</guid>
+  <title>Supabase joins the Stripe Projects developer preview</title>
+  <link>https://supabase.com/blog/supabase-joins-the-stripe-projects-developer-preview</link>
+  <description>Supabase is a co-design partner in the Stripe Projects developer preview.</description>
+  <pubDate>Thu, 19 Mar 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/log-drains-now-available-on-pro</guid>
   <title>Log Drains: Now available on Pro</title>
   <link>https://supabase.com/blog/log-drains-now-available-on-pro</link>

@@ -1,4 +1,3 @@
-import Panel from 'components/ui/Panel'
 import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -14,6 +13,7 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
+import Panel from '@/components/ui/Panel'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>

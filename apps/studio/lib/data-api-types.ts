@@ -1,6 +1,5 @@
-import type { TablePrivilegesGrant } from 'data/privileges/table-privileges-grant-mutation'
-
 import type { DeepReadonly } from './type-helpers'
+import type { TablePrivilegesGrant } from '@/data/privileges/table-privileges-grant-mutation'
 
 export const API_ACCESS_ROLES = ['anon', 'authenticated', 'service_role'] as const
 export type ApiAccessRole = (typeof API_ACCESS_ROLES)[number]

@@ -1,6 +1,6 @@
-import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from 'lib/constants'
-import { PasswordStrengthScore } from 'lib/password-strength'
 import { InlineLinkClassName } from './InlineLink'
+import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from '@/lib/constants'
+import { PasswordStrengthScore } from '@/lib/password-strength'
 
 interface Props {
   passwordStrengthScore: PasswordStrengthScore

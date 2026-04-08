@@ -1,6 +1,7 @@
 import { type ImportDataFileDroppedEvent } from 'common/telemetry-constants'
-import { flagInvalidFileImport } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 import { useCallback, useState, type DragEvent } from 'react'
+
+import { flagInvalidFileImport } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 
 interface UseCsvFileDropOptions {
   enabled: boolean

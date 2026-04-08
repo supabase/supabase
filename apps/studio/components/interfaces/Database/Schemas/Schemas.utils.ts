@@ -1,14 +1,15 @@
 import dagre from '@dagrejs/dagre'
 import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import { Edge, Node, Position } from '@xyflow/react'
 import { uniqBy } from 'lodash'
-import { Edge, Node, Position } from 'reactflow'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { tryParseJson } from 'lib/helpers'
 
-import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
+import { TableNodeData } from './Schemas.constants'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
+import { tryParseJson } from '@/lib/helpers'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -107,6 +108,15 @@ export async function getGraphDataFromTables(
           sourceHandle,
           target: targetId,
           targetHandle: targetId,
+          deletable: false,
+          data: {
+            sourceName: rel.source_table_name,
+            sourceSchemaName: rel.source_schema,
+            sourceColumnName: rel.source_column_name,
+            targetName: rel.target_table_name,
+            targetSchemaName: rel.target_table_schema,
+            targetColumnName: rel.target_column_name,
+          },
         })
       }
 
@@ -132,6 +142,15 @@ export async function getGraphDataFromTables(
         sourceHandle,
         target,
         targetHandle,
+        type: 'default',
+        data: {
+          sourceName: rel.source_table_name,
+          sourceSchemaName: rel.source_schema,
+          sourceColumnName: rel.source_column_name,
+          targetName: rel.target_table_name,
+          targetSchemaName: rel.target_table_schema,
+          targetColumnName: rel.target_column_name,
+        },
       })
     }
   }
@@ -163,7 +182,7 @@ function findTablesHandleIds(
   return []
 }
 
-export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
+export const getLayoutedElementsViaDagre = (nodes: Node<TableNodeData>[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
@@ -204,7 +223,7 @@ export const getLayoutedElementsViaDagre = (nodes: Node[], edges: Edge[]) => {
 }
 
 const getLayoutedElementsViaLocalStorage = (
-  nodes: Node[],
+  nodes: Node<TableNodeData>[],
   edges: Edge[],
   positions: { [key: string]: { x: number; y: number } }
 ) => {

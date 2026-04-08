@@ -1,13 +1,4 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseIndexDeleteMutation } from 'data/database-indexes/index-delete-mutation'
-import { useIndexesQuery, type DatabaseIndex } from 'data/database-indexes/indexes-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { sortBy } from 'lodash'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -30,6 +21,15 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringL
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
+import AlertError from '@/components/ui/AlertError'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
+import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 const Indexes = () => {
   const { data: project } = useSelectedProjectQuery()

@@ -1,10 +1,11 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
+import { Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { Button, CodeBlock, type CodeBlockLang, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 
 interface EdgeFunctionBlockProps {
   /** Title of the EdgeFunctionBlock */

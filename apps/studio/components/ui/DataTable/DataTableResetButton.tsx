@@ -1,9 +1,9 @@
 import { X } from 'lucide-react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
+import { useHotKey } from '@/hooks/ui/useHotKey'
 
 export function DataTableResetButton() {
   const { table } = useDataTable()

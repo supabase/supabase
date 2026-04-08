@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
@@ -10,11 +8,13 @@ import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { CONNECT_MODES } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
 import { ConnectStepsSection } from './ConnectStepsSection'
-import { useConnectState } from './useConnectState'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
+import { useConnectState } from './useConnectState'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
-import { useTrack } from 'lib/telemetry/track'
 
 function isConnectMode(value: string): value is ConnectMode {
   return CONNECT_MODES.some((mode) => mode === value)

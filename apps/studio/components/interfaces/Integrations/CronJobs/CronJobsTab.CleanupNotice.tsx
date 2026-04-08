@@ -2,7 +2,6 @@ import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
 import { CheckCircle2, XCircle } from 'lucide-react'
 import {
   Button,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -21,6 +20,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
 import {

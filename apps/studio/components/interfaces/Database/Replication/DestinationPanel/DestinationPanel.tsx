@@ -1,4 +1,3 @@
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
@@ -25,6 +24,7 @@ import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {

@@ -1,9 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
-
-import { AIOptInLevelSelector } from 'components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
-import { useAIOptInForm } from 'hooks/forms/useAIOptInForm'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   cn,
@@ -16,6 +12,10 @@ import {
   DialogTitle,
   Form_Shadcn_,
 } from 'ui'
+
+import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
+import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface AIOptInModalProps {
   visible: boolean

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
 
 interface CellDetailPanelProps {
   column: string
