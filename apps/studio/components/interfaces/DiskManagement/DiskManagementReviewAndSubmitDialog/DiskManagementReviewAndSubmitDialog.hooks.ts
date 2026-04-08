@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { DiskType } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -11,6 +10,7 @@ import {
   getAvailableComputeOptions,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
+import { DiskType } from '../ui/DiskManagement.constants'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
