@@ -106,11 +106,13 @@ export const ResourceExhaustionWarningBanner = () => {
       ?.replace('[infra-path]', 'infrastructure')
   })()
 
-  const buttonText =
-    activeWarnings.length > 1
+  const buttonText = (() => {
+    if (isComputeUpgradeMetric && isFreePlan) return 'Upgrade plan'
+    return activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.buttonText
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.buttonText
+  })()
 
   const hasNoWarnings = activeWarnings.length === 0
   const hasNoWarningContent = warningContent === undefined
