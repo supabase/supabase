@@ -45,11 +45,11 @@ const page: GoPageInput = {
         },
         {
           title: 'AI-powered root cause analysis',
-          description: "Get AI-driven analysis on what broke and why, not just a stack trace.",
+          description: 'Get AI-driven analysis on what broke and why, not just a stack trace.',
         },
         {
           title: 'Know what to patch and why',
-          description: "Walk away with a clear fix, not just an alert that something went wrong.",
+          description: 'Walk away with a clear fix, not just an alert that something went wrong.',
         },
       ],
     },
