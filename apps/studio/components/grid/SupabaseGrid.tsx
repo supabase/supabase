@@ -2,8 +2,6 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
 import { createPortal } from 'react-dom'
 
 import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -102,35 +100,33 @@ export const SupabaseGrid = ({
   const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
 
   return (
-    <DndProvider backend={HTML5Backend} context={window}>
-      <div className="sb-grid h-full flex flex-col">
-        <HeaderComponent
-          customHeader={customHeader}
-          isRefetching={isRefetching}
-          tableQueriesEnabled={tableQueriesEnabled}
-        />
+    <div className="sb-grid h-full flex flex-col">
+      <HeaderComponent
+        customHeader={customHeader}
+        isRefetching={isRefetching}
+        tableQueriesEnabled={tableQueriesEnabled}
+      />
 
-        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
+      {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
-        {children || (
-          <>
-            <Grid
-              ref={gridRef}
-              {...gridProps}
-              rows={rows}
-              error={error}
-              isDisabled={!tableQueriesEnabled}
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-              isError={isError}
-            />
-            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
-            <Shortcuts gridRef={gridRef} rows={rows} />
-          </>
-        )}
+      {children || (
+        <>
+          <Grid
+            ref={gridRef}
+            {...gridProps}
+            rows={rows}
+            error={error}
+            isDisabled={!tableQueriesEnabled}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+            isError={isError}
+          />
+          <Footer enableForeignRowsQuery={tableQueriesEnabled} />
+          <Shortcuts gridRef={gridRef} rows={rows} />
+        </>
+      )}
 
-        {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
-      </div>
-    </DndProvider>
+      {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
+    </div>
   )
 }
