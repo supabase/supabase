@@ -24,7 +24,7 @@ import { isPendingAddRow, isPendingDeleteRow } from '../../types'
 import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import { RowRenderer } from './RowRenderer'
+import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
 import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
 import { handleCopyCell } from '@/components/grid/SupabaseGrid.utils'
 import { useIsTableFilterBarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -369,6 +369,7 @@ export const Grid = memo(
               items={columnsWithDirtyCellClass.map((column) => column.key)}
               strategy={verticalListSortingStrategy}
             >
+              <RowContextMenuProvider>
               <DataGrid
                 ref={ref}
                 className={`${gridClass} flex-grow`}
@@ -388,7 +389,8 @@ export const Grid = memo(
                   }
                 }}
                 onCellKeyDown={handleCopyCell}
-              />
+                />
+              </RowContextMenuProvider>
               {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
               <DragOverlay>
                 {draggedColumn ? <ColumnOverlayItem column={draggedColumn} /> : null}

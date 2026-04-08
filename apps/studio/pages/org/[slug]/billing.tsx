@@ -1,15 +1,16 @@
 import { useParams } from 'common'
-import { BillingSettings } from 'components/interfaces/Organization/BillingSettings/BillingSettings'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useEffect } from 'react'
+
+import { BillingSettings } from '@/components/interfaces/Organization/BillingSettings/BillingSettings'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
-} from 'state/organization-settings'
-import type { NextPageWithLayout } from 'types'
+} from '@/state/organization-settings'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
   const { panel, slug } = useParams()

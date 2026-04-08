@@ -2,7 +2,6 @@ import * as Sentry from '@sentry/nextjs'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { useConstant } from 'common'
 import { createContext, PropsWithChildren, useContext } from 'react'
-import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
@@ -21,6 +20,7 @@ import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUt
 import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
 import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { Dictionary } from '@/types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 

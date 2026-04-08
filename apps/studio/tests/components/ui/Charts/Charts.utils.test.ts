@@ -1,4 +1,6 @@
 import { renderHook } from '@testing-library/react'
+import { describe, expect, it, test } from 'vitest'
+
 import {
   compactNumberFormatter,
   formatPercentage,
@@ -6,8 +8,7 @@ import {
   numberFormatter,
   precisionFormatter,
   useStacked,
-} from 'components/ui/Charts/Charts.utils'
-import { describe, expect, it, test } from 'vitest'
+} from '@/components/ui/Charts/Charts.utils'
 
 test('isFloat', () => {
   expect(isFloat(123)).toBe(false)

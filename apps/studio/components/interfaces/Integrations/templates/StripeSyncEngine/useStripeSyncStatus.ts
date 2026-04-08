@@ -1,4 +1,3 @@
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useEffect } from 'react'
 import { getCurrentVersion, parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
@@ -10,6 +9,7 @@ import {
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { useStripeSyncingState } from '@/data/database-integrations/stripe/sync-state-query'
 import { Schema, useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 // Maximum time allowed for installation or uninstallation operations before the UI times out
 const OPERATION_TIME_OUT_MS: number = 5 * 60 * 1000 // 5 minutes

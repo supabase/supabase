@@ -2,7 +2,6 @@ import { FlaskConical, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -22,6 +21,7 @@ import {
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const LocalDropdown = ({
   triggerClassName,

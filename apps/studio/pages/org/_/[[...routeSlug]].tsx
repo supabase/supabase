@@ -1,21 +1,21 @@
-import {
-  Header,
-  LoadingCardView,
-  NoOrganizationsState,
-} from 'components/interfaces/Home/ProjectList/EmptyStates'
-import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { withAuth } from 'hooks/misc/withAuth'
-import { buildStudioPageTitle } from 'lib/page-title'
 import { NextPage } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
+import {
+  Header,
+  LoadingCardView,
+  NoOrganizationsState,
+} from '@/components/interfaces/Home/ProjectList/EmptyStates'
+import { buildOrgUrl } from '@/components/interfaces/Organization/Organization.utils'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()

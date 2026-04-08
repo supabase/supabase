@@ -1,8 +1,8 @@
 import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from 'lib/api/apiWrapper'
-import { createFolder, deleteFolder, getFolders, getSnippets } from 'lib/api/snippets.utils'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { createFolder, deleteFolder, getFolders, getSnippets } from '@/lib/api/snippets.utils'
 
 const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

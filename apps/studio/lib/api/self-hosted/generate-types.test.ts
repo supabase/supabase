@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { generateTypescriptTypes } from './generate-types'
 
-vi.mock('data/fetchers', () => ({
+vi.mock('@/data/fetchers', () => ({
   fetchGet: vi.fn(),
 }))
 
-vi.mock('lib/constants', () => ({
+vi.mock('@/lib/constants', () => ({
   PG_META_URL: 'http://localhost:8080',
 }))
 
@@ -21,7 +21,7 @@ describe('api/self-hosted/generate-types', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    const fetchers = await import('data/fetchers')
+    const fetchers = await import('@/data/fetchers')
     const util = await import('./util')
 
     mockFetchGet = vi.mocked(fetchers.fetchGet)

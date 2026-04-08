@@ -1,53 +1,53 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import dayjs from 'dayjs'
+import type { editor } from 'monaco-editor'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   TEMPLATES,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { LogData, LogsWarning, LogTemplate } from 'components/interfaces/Settings/Logs/Logs.types'
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { LogData, LogsWarning, LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
 import {
   maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
 import {
   buildLogQueryParams,
   resolveLogDateRange,
-} from 'components/interfaces/Settings/Logs/logsDateRange'
-import LogsQueryPanel from 'components/interfaces/Settings/Logs/LogsQueryPanel'
-import { LogTable } from 'components/interfaces/Settings/Logs/LogTable'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useContentQuery } from 'data/content/content-query'
+} from '@/components/interfaces/Settings/Logs/logsDateRange'
+import LogsQueryPanel from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
+import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import LoadingOpacity from '@/components/ui/LoadingOpacity'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import { useContentQuery } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import dayjs from 'dayjs'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useTrack } from 'lib/telemetry/track'
-import type { editor } from 'monaco-editor'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
-
-import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
+} from '@/data/content/content-upsert-mutation'
+import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import type { LogSqlSnippets, NextPageWithLayout } from '@/types'
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
