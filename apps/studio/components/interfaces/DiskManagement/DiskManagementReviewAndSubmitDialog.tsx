@@ -191,6 +191,26 @@ export const DiskManagementReviewAndSubmitDialog = ({
     (hasThroughputChanges && form.getValues('storageType') === 'gp3') ||
     hasTotalSizeChanges
 
+  const storageTypeBefore = (form.formState.defaultValues?.storageType ?? '') as DiskType
+  const storageTypeAfter = form.getValues('storageType') as DiskType
+
+  // Show hero whenever any line-item price actually changes, not just compute
+  const anyBillableDiskChange =
+    Number(diskSizePrice.newPrice) !== Number(diskSizePrice.oldPrice) ||
+    Number(iopsPrice.newPrice) !== Number(iopsPrice.oldPrice) ||
+    Number(throughputPrice.newPrice) !== Number(throughputPrice.oldPrice)
+
+  // Show cooldown warning whenever any disk attribute that enforces the 4-hour lock changes
+  const anyDiskAttributeChange = hasIOPSChanges || hasStorageTypeChanges || hasTotalSizeChanges
+
+  // Show throughput row whenever either the before or after storage type is GP3
+  // (covers GP3→IO2 where the throughput charge drops to zero)
+  const showThroughputRow =
+    !isAwsK8sProject &&
+    !isAwsNimbus &&
+    (storageTypeBefore === 'gp3' || storageTypeAfter === 'gp3') &&
+    (hasThroughputChanges || hasStorageTypeChanges)
+
   const totalBeforePrice =
     Number(computeSizePrice.oldPrice) +
     Number(diskSizePrice.oldPrice) +
@@ -212,7 +232,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     hasComputeChanges ||
     hasStorageTypeChanges ||
     hasIOPSChanges ||
-    (form.getValues('storageType') === 'gp3' && hasThroughputChanges) ||
+    showThroughputRow ||
     hasTotalSizeChanges ||
     hasGrowthPercentChanges ||
     hasMinIncrementChanges ||
@@ -252,7 +272,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         </DialogHeader>
         <DialogSectionSeparator />
 
-        {hasComputeChanges && (
+        {(hasComputeChanges || anyBillableDiskChange) && (
           <>
             <div className="relative flex border-b">
               <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-gradient-to-t from-[hsl(var(--background-surface-100))] to-transparent">
@@ -312,7 +332,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
               </BreakdownRow>
             )}
             {(hasIOPSChanges || hasStorageTypeChanges) && (
-              <BreakdownRow label="IOPS">
+              <BreakdownRow
+                label="IOPS"
+                description={
+                  anyDiskAttributeChange && !hasTotalSizeChanges && !hasStorageTypeChanges
+                    ? 'For 4 hours after changes you will not be able to modify disk attributes.'
+                    : undefined
+                }
+              >
                 <div className="flex flex-col items-end gap-0.5">
                   <ValueChange
                     from={(form.formState.defaultValues?.provisionedIOPS ?? 0).toLocaleString()}
@@ -322,7 +349,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 </div>
               </BreakdownRow>
             )}
-            {form.getValues('storageType') === 'gp3' && hasThroughputChanges && (
+            {showThroughputRow && (
               <BreakdownRow label="Throughput">
                 <div className="flex flex-col items-end gap-0.5">
                   <ValueChange
