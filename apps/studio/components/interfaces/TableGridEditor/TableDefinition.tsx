@@ -53,17 +53,26 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
     }
   )
 
-  const { data: definition, isLoading } = isViewLike(entity) ? viewResult : tableResult
+  const { data: viewData, isLoading: isViewLoading } = viewResult
+  const { data: tableData, isLoading: isTableLoading } = tableResult
+
+  const isLoading = isViewLike(entity) ? isViewLoading : isTableLoading
+  const definition = isViewLike(entity) ? viewData?.definition : tableData
+
+  const viewOptions =
+    isViewLike(entity) && viewData?.viewOptions
+      ? ` with (${viewData.viewOptions})`
+      : ''
 
   const prepend = isView(entity)
-    ? `create view ${entity.schema}.${entity.name} as\n`
+    ? `create view ${entity.schema}.${entity.name}${viewOptions} as\n`
     : isMaterializedView(entity)
-      ? `create materialized view ${entity.schema}.${entity.name} as\n`
+      ? `create materialized view ${entity.schema}.${entity.name}${viewOptions} as\n`
       : ''
 
   const formattedDefinition = useMemo(
     () => (definition ? formatSql(prepend + definition) : undefined),
-    [definition]
+    [definition, prepend]
   )
 
   const handleEditorOnMount = async (editor: any, monaco: any) => {

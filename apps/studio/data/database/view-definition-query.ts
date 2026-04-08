@@ -31,10 +31,13 @@ export async function getViewDefinition(
     signal
   )
 
-  return result[0].definition.trim()
+  return {
+    definition: result[0].definition.trim(),
+    viewOptions: result[0].view_options ?? null,
+  }
 }
 
-export type ViewDefinitionData = string
+export type ViewDefinitionData = { definition: string; viewOptions: string | null }
 export type ViewDefinitionError = ExecuteSqlError
 
 export const useViewDefinitionQuery = <TData = ViewDefinitionData>(
