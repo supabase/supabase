@@ -33,7 +33,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^5.7.0",
-    "vite": "^6.3.0"
+    "vite": "^6.4.2"
   },
   "description": "An Ionic project"
 }
