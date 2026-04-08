@@ -1,16 +1,5 @@
-import {
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import type { PostgresColumn } from '@supabase/postgres-meta'
 import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
@@ -236,12 +225,7 @@ export const Grid = memo(
         }
       }, [rowClass])
 
-      const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-          coordinateGetter: sortableKeyboardCoordinates,
-        })
-      )
+      const sensors = useSensors(useSensor(PointerSensor))
       const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
 
       return (
@@ -353,8 +337,7 @@ export const Grid = memo(
               const column = table.columns.find((col) => col.name === active.id)
               setDraggedColumn(column)
             }}
-            onDragOver={({ active, over, activatorEvent }) => {
-              if (activatorEvent.type === 'keydown') return
+            onDragOver={({ active, over }) => {
               // Dragged column is not over another column
               if (over == null) return
               // Dragged column is over itself
@@ -362,18 +345,8 @@ export const Grid = memo(
               // Our ids are the columns keys (their names) so it's safe to either cast or call toString
               snap.moveColumn(active.id.toString(), over.id.toString())
             }}
-            onDragCancel={() => {
+            onDragEnd={() => {
               setDraggedColumn(undefined)
-            }}
-            onDragEnd={({ active, over, activatorEvent }) => {
-              setDraggedColumn(undefined)
-              if (activatorEvent.type !== 'keydown') return
-              // Dragged column is not over another column
-              if (over == null) return
-              // Dragged column is over itself
-              if (active.id === over.id) return
-              // Our ids are the columns keys (their names) so it's safe to either cast or call toString
-              snap.moveColumn(active.id.toString(), over.id.toString())
             }}
           >
             <SortableContext
