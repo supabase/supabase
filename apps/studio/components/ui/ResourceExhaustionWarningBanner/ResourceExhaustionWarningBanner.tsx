@@ -7,10 +7,14 @@ import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+
+const COMPUTE_UPGRADE_METRICS = ['disk_io', 'cpu', 'ram']
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -74,6 +78,9 @@ export const ResourceExhaustionWarningBanner = () => {
     null: '/project/[ref]/settings/[infra-path]',
     disk_space: '/project/[ref]/settings/compute-and-disk',
     read_only: '/project/[ref]/settings/compute-and-disk',
+    disk_io: '/project/[ref]/settings/compute-and-disk',
+    cpu: '/project/[ref]/settings/compute-and-disk',
+    ram: '/project/[ref]/settings/compute-and-disk',
     auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
     auth_restricted_email_sending: '/project/[ref]/auth/smtp',
     default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
@@ -87,9 +94,17 @@ export const ResourceExhaustionWarningBanner = () => {
     return typeof url === 'function' ? url(metric as string) : url
   }
 
-  const correctionUrl = getCorrectionUrl(metric)
-    ?.replace('[ref]', ref ?? 'default')
-    ?.replace('[infra-path]', 'infrastructure')
+  const isFreePlan = organization?.plan?.id === 'free'
+  const isComputeUpgradeMetric = metric !== null && metric !== undefined && COMPUTE_UPGRADE_METRICS.includes(metric)
+
+  const correctionUrl = (() => {
+    if (isComputeUpgradeMetric && isFreePlan) {
+      return `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=resource_exhaustion_banner`
+    }
+    return getCorrectionUrl(metric)
+      ?.replace('[ref]', ref ?? 'default')
+      ?.replace('[infra-path]', 'infrastructure')
+  })()
 
   const buttonText =
     activeWarnings.length > 1

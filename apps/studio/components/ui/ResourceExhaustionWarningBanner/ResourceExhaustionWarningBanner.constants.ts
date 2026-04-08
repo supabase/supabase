@@ -72,7 +72,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
-    buttonText: 'Learn more',
+    buttonText: 'Upgrade compute',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
@@ -127,7 +127,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/high-cpu-usage`,
-    buttonText: 'Learn more',
+    buttonText: 'Upgrade compute',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -155,7 +155,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-ram`,
-    buttonText: 'Learn more',
+    buttonText: 'Upgrade compute',
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {
