@@ -26,7 +26,7 @@ Check updates for each service to learn more.
 - ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147). Read more in "[Upgrade to Postgres 17](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17)" how-to guide
 
 ### Studio
-- Updated to `supabase/studio:2026.04.08-sha-xxxxx`
+- Updated to `2026.04.08-sha-205cbe7`
 
 ### API gateway
 - ⚠️ Added configuration for SAML SSO (requires `.env`, `docker-compose.yml` and `volumes/api/kong.yml` update) - PR [#43385](https://github.com/supabase/supabase/pull/43385)
@@ -48,6 +48,7 @@ Check updates for each service to learn more.
 
 ### Postgres
 - ⚠️ Added `docker-compose.pg17.yml` overlay configuration - PR [#44147](https://github.com/supabase/supabase/pull/44147)
+- ⚠️ Added `upgrade-pg17.sh` - PR [#44147](https://github.com/supabase/supabase/pull/44147)
 - ⚠️ Added [documentation](https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17) explaning the upgrade to Postgres 17
 
 ---
@@ -68,7 +69,7 @@ Check updates for each service to learn more.
 - Added `./tests` with 100+ test cases - PR [#43573](https://github.com/supabase/supabase/pull/43573)
 
 ### Studio
-- Updated to `supabase/studio:2026.03.16-sha-5528817`
+- Updated to `2026.03.16-sha-5528817`
 - ⚠️ Added the link to Data API page in Integrations - PR [#43268](https://github.com/supabase/supabase/pull/43268)
 - ⚠️ Added `PGRST_DB_SCHEMAS`, `PGRST_DB_EXTRA_SEARCH_PATH`, and `PGRST_DB_MAX_ROWS` to Studio configuration (requires `docker-compose.yml` update) - PR [#43268](https://github.com/supabase/supabase/pull/43268)
 
