@@ -135,9 +135,6 @@ importers:
       rimraf:
         specifier: ^6.0.0
         version: 6.0.1
-      sass:
-        specifier: ^1.72.0
-        version: 1.72.0
       supabase:
         specifier: ^2.76.10
         version: 2.76.14(supports-color@8.1.1)
@@ -16902,11 +16899,6 @@ packages:
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
-  sass@1.72.0:
-    resolution: {integrity: sha512-Gpczt3WA56Ly0Mn8Sl21Vj94s1axi9hDIzDFn9Ph9x3C3p4nNyvsqJoQyVXKou6cBlfFWEgRW4rT8Tb4i3XnVA==}
-    engines: {node: '>=14.0.0'}
-    hasBin: true
-
   sass@1.77.4:
     resolution: {integrity: sha512-vcF3Ckow6g939GMA4PeU7b2K/9FALXk2KF9J87txdHzXbUF9XRQRwSxcAs/fGaTnJeBFd7UoV22j3lzMLdM0Pw==}
     engines: {node: '>=14.0.0'}
@@ -31503,7 +31495,8 @@ snapshots:
 
   immutable@3.8.3: {}
 
-  immutable@4.3.8: {}
+  immutable@4.3.8:
+    optional: true
 
   import-fresh@3.3.0:
     dependencies:
@@ -36336,12 +36329,6 @@ snapshots:
       is-regex: 1.2.1
 
   safer-buffer@2.1.2: {}
-
-  sass@1.72.0:
-    dependencies:
-      chokidar: 3.6.0
-      immutable: 4.3.8
-      source-map-js: 1.2.1
 
   sass@1.77.4:
     dependencies:
