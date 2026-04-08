@@ -167,6 +167,7 @@ Supabase uses PostgreSQL with the `pgvector` extension, which supports two prima
 ### IVFFlat Index
 
 **Best for:**
+
 - Large datasets (100k–10M rows)
 - Fast approximate search
 - Lower memory usage
@@ -175,10 +176,12 @@ Supabase uses PostgreSQL with the `pgvector` extension, which supports two prima
 create index on documents
 using ivfflat (embedding vector_cosine_ops)
 with (lists = 100);
+```
 
 ### HNSW Index
 
 **Best for:**
+
 - High accuracy requirements
 - Read-heavy workloads
 - Low-latency semantic search
@@ -187,6 +190,7 @@ with (lists = 100);
 ```sql
 create index on documents
 using hnsw (embedding vector_cosine_ops);
+```
 
 ## See also
 
@@ -195,3 +199,7 @@ using hnsw (embedding vector_cosine_ops);
 - [Vector indexes](/docs/guides/ai/vector-indexes)
 - [Hybrid search](/docs/guides/ai/hybrid-search)
 - [Keyword search](/docs/guides/ai/keyword-search)
+
+```
+
+```
