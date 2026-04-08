@@ -332,27 +332,16 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {hasGrowthPercentChanges && (
               <BreakdownRow label="Growth percent">
                 <ValueChange
-                  from={String(
-                    form.formState.defaultValues?.growthPercent ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                  )}
-                  to={String(
-                    form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
-                  )}
+                  from={`${form.formState.defaultValues?.growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent}%`}
+                  to={`${form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent}%`}
                 />
               </BreakdownRow>
             )}
             {hasMinIncrementChanges && (
               <BreakdownRow label="Min increment">
                 <ValueChange
-                  from={String(
-                    form.formState.defaultValues?.minIncrementGb ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                  )}
-                  to={String(
-                    form.getValues('minIncrementGb') ??
-                      DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
-                  )}
+                  from={`${form.formState.defaultValues?.minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize} GB`}
+                  to={`${form.getValues('minIncrementGb') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize} GB`}
                 />
               </BreakdownRow>
             )}
