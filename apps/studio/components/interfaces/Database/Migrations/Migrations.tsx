@@ -47,9 +47,9 @@ const Migrations = () => {
   const migrations =
     search.length === 0
       ? data
-      : (data.filter(
+      : data.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
-        ) ?? [])
+        ) ?? []
 
   return (
     <>
@@ -120,7 +120,7 @@ const Migrations = () => {
                         migrations.map((migration) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
                           const label = versionDayjs
-                            ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
+                            ? versionDayjs.utc().format('DD MMM YYYY, HH:mm:ss')
                             : 'Unknown'
                           const insertedAt = versionDayjs ? versionDayjs.toISOString() : undefined
 

@@ -24,6 +24,6 @@ export function parseMigrationVersion(version: string | null | undefined): Dayjs
   // Must contain only digits
   if (!/^\d{14}$/.test(version)) return undefined
 
-  const parsed = dayjs(version, 'YYYYMMDDHHmmss', true)
+  const parsed = dayjs.utc(version, 'YYYYMMDDHHmmss', true)
   return parsed.isValid() ? parsed : undefined
 }
