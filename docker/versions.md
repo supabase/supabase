@@ -1,7 +1,7 @@
 # Docker Image Versions
 
 ## 2026-04-08
-- supabase/studio:2026.04.08-sha-xxxxx (prev supabase/studio:2026.03.16-sha-5528817)
+- supabase/studio:2026.04.08-sha-205cbe7 (prev supabase/studio:2026.03.16-sha-5528817)
 - postgrest/postgrest:v14.8 (prev postgrest/postgrest:v14.6)
 - supabase/storage-api:v1.48.26 (prev supabase/storage-api:v1.44.2)
 - supabase/postgres-meta:v0.96.3 (prev supabase/postgres-meta:v0.95.2)
