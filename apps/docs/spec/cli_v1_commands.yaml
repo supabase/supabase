@@ -279,7 +279,7 @@ commands:
     title: supabase telemetry
     summary: Manage CLI telemetry settings
     description: |
-      The Supabase CLI collects anonymous telemetry data about general usage. Participating in this program is optional. You can opt out by running `supabase telemetry disable` or setting `SUPABASE_TELEMETRY_DISABLED=1`. Use `supabase telemetry status` to check your current setting and `supabase telemetry enable` to opt back in.
+      The Supabase CLI collects telemetry data about general usage. Participating in this program is optional. You can opt out by running `supabase telemetry disable` or setting `SUPABASE_TELEMETRY_DISABLED=1`. Use `supabase telemetry status` to check your current setting and `supabase telemetry enable` to opt back in.
     tags:
       - local-dev
     links: []
