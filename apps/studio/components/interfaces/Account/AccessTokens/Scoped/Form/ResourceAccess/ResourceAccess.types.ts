@@ -1,5 +1,6 @@
-import { TokenFormValues } from 'components/interfaces/Account/AccessTokens/AccessToken.schemas'
 import { Control, ControllerRenderProps, UseFormSetValue } from 'react-hook-form'
+
+import { TokenFormValues } from '@/components/interfaces/Account/AccessTokens/AccessToken.schemas'
 
 export interface ResourceAccessProps {
   control: Control<TokenFormValues>

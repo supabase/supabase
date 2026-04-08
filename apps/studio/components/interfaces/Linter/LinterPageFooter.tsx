@@ -1,9 +1,10 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { DOCS_URL } from 'lib/constants'
 import { X } from 'lucide-react'
 import { Button, cn } from 'ui'
+
 import { Markdown } from '../Markdown'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { DOCS_URL } from '@/lib/constants'
 
 interface LinterPageFooterProps {
   isLoading: boolean

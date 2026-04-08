@@ -5,6 +5,7 @@ import CodeBlockSection from './CodeBlockSection'
 import FaqSection from './FaqSection'
 import FeatureGridSection from './FeatureGridSection'
 import FormSection from './FormSection'
+import HubSpotMeetingSection from './HubSpotMeetingSection'
 import MetricsSection from './MetricsSection'
 import QuoteSection from './QuoteSection'
 import SingleColumnSection from './SingleColumnSection'
@@ -67,6 +68,9 @@ export default function SectionRenderer({ section, customRenderers }: SectionRen
         break
       case 'quote':
         content = <QuoteSection section={section} />
+        break
+      case 'hubspot-meeting':
+        content = <HubSpotMeetingSection section={section} />
         break
       default: {
         const _exhaustive: never = section

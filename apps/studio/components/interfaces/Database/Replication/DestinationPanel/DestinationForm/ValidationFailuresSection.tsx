@@ -1,4 +1,3 @@
-import type { ValidationFailure } from 'data/replication/validate-destination-mutation'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -8,6 +7,8 @@ import {
   Card,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
   destinationFailures: ValidationFailure[]

@@ -1,18 +1,18 @@
 import { useFlag, useParams } from 'common'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 
 export const useGenerateSettingsMenu = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-
   const showDashboardPreferences = useFlag('dashboardPreferences')
+
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
 
   const { projectSettingsLegacyJwtKeys: legacyJwtKeysEnabled, billingAll: billingEnabled } =
@@ -110,23 +110,18 @@ export const useGenerateSettingsMenu = () => {
           url: `/project/${ref}/settings/addons`,
           items: [],
         },
-      ],
-    },
-    ...(IS_PLATFORM && showDashboardPreferences
-      ? [
-          {
-            title: 'Preferences',
-            items: [
+        ...(showDashboardPreferences
+          ? [
               {
-                name: 'Dashboard preferences',
-                key: 'preferences',
-                url: `/project/${ref}/settings/preferences`,
+                name: 'Dashboard',
+                key: 'dashboard',
+                url: `/project/${ref}/settings/dashboard`,
                 items: [],
               },
-            ],
-          },
-        ]
-      : []),
+            ]
+          : []),
+      ],
+    },
     {
       title: 'Integrations',
       items: [

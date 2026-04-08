@@ -1,4 +1,4 @@
-import { DOCS_URL } from 'lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 export const API_DOCS_CATEGORIES = {
   INTRODUCTION: 'introduction',

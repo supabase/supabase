@@ -1,7 +1,8 @@
-import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
-import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
-import { DOCS_URL } from 'lib/constants'
 import { boolean, number, object, string } from 'yup'
+
+import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { DOCS_URL } from '@/lib/constants'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -16,8 +17,8 @@ const PROVIDER_EMAIL = {
   link: `${DOCS_URL}/guides/auth/passwords`,
   properties: {
     EXTERNAL_EMAIL_ENABLED: {
-      title: 'Enable Email provider',
-      description: 'This will enable Email based signup and login for your application',
+      title: 'Enable email provider',
+      description: 'Allow email-based sign up and log in for your application.',
       type: 'boolean',
     },
     MAILER_SECURE_EMAIL_CHANGE_ENABLED: {
@@ -32,24 +33,28 @@ const PROVIDER_EMAIL = {
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
     },
+    SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: {
+      title: 'Require current password when updating',
+      description: `Requires that the user supplies their current password when changing their password. [Learn more](${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing).`,
+      type: 'boolean',
+      isPaid: false,
+    },
     PASSWORD_HIBP_ENABLED: {
       title: 'Prevent use of leaked passwords',
-      description:
-        'Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API.',
+      description: `Rejects the use of known or easy to guess passwords on sign up or password change. Powered by the HaveIBeenPwned.org Pwned Passwords API. [Learn more](${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection)`,
       type: 'boolean',
-      link: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
       entitlementKey: 'auth.password_hibp',
     },
     PASSWORD_MIN_LENGTH: {
       title: 'Minimum password length',
       type: 'number',
       description:
-        'Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.',
+        'Passwords shorter than this value will be rejected as weak. Minimum 6 characters, though 8 or more is recommended.',
       units: 'characters',
     },
     PASSWORD_REQUIRED_CHARACTERS: {
       type: 'select',
-      title: 'Password Requirements',
+      title: 'Password requirements',
       description: 'Passwords that do not have at least one of each will be rejected as weak.',
       enum: [
         {
@@ -71,18 +76,17 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
-
     MAILER_OTP_EXP: {
-      title: 'Email OTP Expiration',
+      title: 'Email OTP expiration',
       type: 'number',
-      description: 'Duration before an email otp / link expires.',
+      description: 'Duration before an email OTP / link expires.',
       units: 'seconds',
     },
     MAILER_OTP_LENGTH: {
-      title: 'Email OTP Length',
+      title: 'Email OTP length',
       type: 'number',
-      description: 'Number of digits in the email OTP',
-      units: 'number',
+      description: 'Number of digits in the email OTP.',
+      units: 'digits',
     },
   },
   validationSchema: object().shape({
@@ -196,9 +200,25 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     }),
 
     // Phone SMS
-    SMS_OTP_EXP: number().min(0, 'Must be more than 0').required('This is required'),
-    SMS_OTP_LENGTH: number().min(6, 'Must be 6 or more in length').required('This is required'),
-    SMS_TEMPLATE: string().required('SMS template is required.'),
+    SMS_OTP_EXP: number()
+      .min(0, 'Must be more than 0')
+      .when('SMS_PROVIDER', {
+        is: (val: string) => val !== 'twilio_verify',
+        then: (schema) => schema.required('This is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMS_OTP_LENGTH: number()
+      .min(6, 'Must be 6 or more in length')
+      .when('SMS_PROVIDER', {
+        is: (val: string) => val !== 'twilio_verify',
+        then: (schema) => schema.required('This is required'),
+        otherwise: (schema) => schema,
+      }),
+    SMS_TEMPLATE: string().when('SMS_PROVIDER', {
+      is: (val: string) => val !== 'twilio_verify',
+      then: (schema) => schema.required('SMS template is required.'),
+      otherwise: (schema) => schema,
+    }),
     SMS_TEST_OTP: string()
       .matches(
         /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g,
@@ -457,69 +477,56 @@ const EXTERNAL_PROVIDER_APPLE = {
   },
   validationSchema: object().shape({
     EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_SECRET: string()
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !!EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
-            .test({
-              message: 'Secret key is not a correctly generated JWT.',
-              test: (value?: string): boolean => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const header = JSON.parse(parts[0])
-                  const body = JSON.parse(parts[1])
-                  return (
-                    typeof header === 'object' &&
-                    typeof body === 'object' &&
-                    header &&
-                    body &&
-                    header.alg === 'ES256' &&
-                    body.aud === 'https://appleid.apple.com'
-                  )
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
-
+    EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema
+          .matches(/^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i, 'Secret key should be a JWT.')
+          .test({
+            message: 'Secret key is not a correctly generated JWT.',
+            test: (value?: string): boolean => {
+              if (!value) {
                 return true
-              },
-            })
-            .test({
-              message: 'Secret key expires in less than 7 days!',
-              test: (value?: string) => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const body = JSON.parse(parts[1])
-                  return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
+              }
+              try {
+                const parts = value.split('.').map((value) => parseBase64URL(value))
+                const header = JSON.parse(parts[0])
+                const body = JSON.parse(parts[1])
+                return (
+                  typeof header === 'object' &&
+                  typeof body === 'object' &&
+                  header &&
+                  body &&
+                  header.alg === 'ES256' &&
+                  body.aud === 'https://appleid.apple.com'
+                )
+              } catch (e: any) {
+                console.log(e)
+                return false
+              }
 
+              return true
+            },
+          })
+          .test({
+            message: 'Secret key expires in less than 7 days!',
+            test: (value?: string) => {
+              if (!value) {
                 return true
-              },
-            }),
-      })
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema.matches(
-            /^$/,
-            'Secret Key should only be set if Service ID for OAuth is provided.'
-          ),
-      }),
+              }
+              try {
+                const parts = value.split('.').map((value) => parseBase64URL(value))
+                const body = JSON.parse(parts[1])
+                return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
+              } catch (e: any) {
+                console.log(e)
+                return false
+              }
+
+              return true
+            },
+          }),
+    }),
     EXTERNAL_APPLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
@@ -1554,7 +1561,9 @@ const PROVIDER_SAML = {
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    SAML_EXTERNAL_URL: string()
+      .matches(urlRegex(), { message: 'Must be a valid URL', excludeEmptyString: true })
+      .optional(),
     SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {

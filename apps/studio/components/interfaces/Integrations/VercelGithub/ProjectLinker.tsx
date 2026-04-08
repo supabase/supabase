@@ -1,37 +1,37 @@
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH } from 'lib/constants'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
-import { EMPTY_ARR } from 'lib/void'
-import Link from 'next/link'
 import {
   Badge,
   Button,
+  cn,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  cn,
 } from 'ui'
+
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from '@/data/integrations/integrations.types'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH } from '@/lib/constants'
+import { openInstallGitHubIntegrationWindow } from '@/lib/github'
+import { EMPTY_ARR } from '@/lib/void'
 
 export interface Project {
   name: string

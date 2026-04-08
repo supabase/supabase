@@ -1,23 +1,23 @@
 import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { IS_PLATFORM } from 'common'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,
   LogsEndpointParams,
-} from 'components/interfaces/Settings/Logs/Logs.types'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
   checkForILIKEClause,
   checkForWithClause,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { get } from '@/data/fetchers'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams

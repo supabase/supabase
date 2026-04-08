@@ -80,7 +80,7 @@ export function ConnectConfigSection({
                       className="flex-1 rounded-lg text-left"
                     >
                       <div className="flex items-center gap-2">
-                        {option.icon && <ConnectionIcon icon={option.icon} />}
+                        {option.icon && <ConnectionIcon supportsDarkMode icon={option.icon} />}
                         <span className="text-sm">{option.label}</span>
                       </div>
                     </RadioGroupStackedItem>
@@ -244,7 +244,7 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   return (
-    <div className="grid grid-cols-4 rounded-lg border">
+    <div className="grid grid-cols-4 rounded-lg border overflow-hidden">
       {modes.map((mode) => (
         <button
           key={mode.id}

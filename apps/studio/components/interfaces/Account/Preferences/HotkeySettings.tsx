@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useForm } from 'react-hook-form'
 import { Card, Form_Shadcn_ } from 'ui'
 import {
@@ -15,6 +13,8 @@ import {
 import * as z from 'zod'
 
 import { HotkeyToggle } from './HotkeyToggle'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 const HotkeySchema = z.object({
   commandMenuEnabled: z.boolean(),
@@ -87,14 +87,14 @@ export const HotkeySettings = () => {
               form={form}
               name="aiAssistantEnabled"
               keys={['Meta', 'i']}
-              label="AI Assistant Panel"
+              label="AI Assistant panel"
               onToggle={setAiAssistantEnabled}
             />
             <HotkeyToggle
               form={form}
               name="inlineEditorEnabled"
               keys={['Meta', 'e']}
-              label="Inline SQL Editor Panel"
+              label="Inline SQL Editor panel"
               onToggle={setInlineEditorEnabled}
             />
             <HotkeyToggle

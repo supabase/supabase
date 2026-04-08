@@ -1,12 +1,11 @@
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, TextSearch } from 'lucide-react'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
+import { UIEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import {
   Button,
-  CodeBlock,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -15,15 +14,16 @@ import {
   SheetContent,
   SheetDescription,
   SheetTitle,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { Admonition } from 'ui-patterns'
+
 import { useQueryPerformanceSort } from './hooks/useQueryPerformanceSort'
 import {
   hasIndexRecommendations,
@@ -38,8 +38,8 @@ import {
 } from './QueryPerformance.constants'
 import { QueryPerformanceRow } from './QueryPerformance.types'
 import { formatDuration } from './QueryPerformance.utils'
-import { parseAsString, parseAsArrayOf, parseAsJson, useQueryStates } from 'nuqs'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface QueryPerformanceGridProps {
   aggregatedData: QueryPerformanceRow[]
@@ -48,6 +48,7 @@ interface QueryPerformanceGridProps {
   currentSelectedQuery?: string | null
   onCurrentSelectQuery?: (query: string) => void
   onRetry?: () => void
+  onScroll?: (event: UIEvent<HTMLDivElement>) => void
 }
 
 const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
@@ -79,6 +80,7 @@ export const QueryPerformanceGrid = ({
   currentSelectedQuery,
   onCurrentSelectQuery,
   onRetry,
+  onScroll,
 }: QueryPerformanceGridProps) => {
   const { sort, setSortConfig } = useQueryPerformanceSort()
   const gridRef = useRef<DataGridHandle>(null)
@@ -512,6 +514,7 @@ export const QueryPerformanceGrid = ({
           headerRowHeight={36}
           columns={columns}
           rows={reportData}
+          onScroll={onScroll}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { BatchConfig, DestinationConfig } from './create-destination-pipeline-mutation'
 import { replicationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number

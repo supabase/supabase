@@ -1,8 +1,9 @@
 import { Loader2 } from 'lucide-react'
 import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import type { ClassifiedQuery } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 import { ISSUE_DOT_COLORS, ISSUE_ICONS } from './QueryInsightsTable.constants'
-import { formatDuration, getTableName, getColumnName } from './QueryInsightsTable.utils'
+import { formatDuration, getColumnName, getTableName } from './QueryInsightsTable.utils'
 
 interface QueryInsightsTableRowProps {
   item: ClassifiedQuery

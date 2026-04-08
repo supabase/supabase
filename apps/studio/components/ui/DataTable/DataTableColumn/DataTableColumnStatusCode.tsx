@@ -1,6 +1,6 @@
 import { Minus } from 'lucide-react'
-
 import { cn } from 'ui'
+
 import { getStatusColor } from '../DataTable.utils'
 
 export const DataTableColumnStatusCode = ({

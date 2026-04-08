@@ -1,21 +1,21 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { useParams } from 'common'
 import { isEmpty } from 'lodash'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
+import { Button, Card, CardContent } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useParams } from 'common'
 import {
   PolicyTableRow,
   PolicyTableRowProps,
-} from 'components/interfaces/Auth/Policies/PolicyTableRow'
-import { ProtectedSchemaWarning } from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Card, CardContent } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+} from '@/components/interfaces/Auth/Policies/PolicyTableRow'
+import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PoliciesProps {
   search?: string

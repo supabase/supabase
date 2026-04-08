@@ -1,9 +1,6 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-
-import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
-import { useParams } from 'common'
-import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +11,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
+
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
+import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
 interface BatchRestartDialogProps {
   open: boolean

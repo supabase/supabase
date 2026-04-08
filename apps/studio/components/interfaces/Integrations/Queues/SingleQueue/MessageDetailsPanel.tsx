@@ -1,18 +1,9 @@
 import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
 import { isNil, noop } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { MonacoEditor } from 'components/grid/components/common/MonacoEditor'
-import { RowAction, RowData } from 'components/interfaces/Auth/Users/UserOverview'
-import { useDatabaseQueueMessageArchiveMutation } from 'data/database-queues/database-queue-messages-archive-mutation'
-import { useDatabaseQueueMessageDeleteMutation } from 'data/database-queues/database-queue-messages-delete-mutation'
-import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import { useDatabaseQueueMessageReadMutation } from 'data/database-queues/database-queue-messages-read-mutation'
-import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { prettifyJSON } from 'lib/helpers'
 import {
   Button,
   ResizablePanel,
@@ -22,6 +13,15 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
+import { MonacoEditor } from '@/components/grid/components/common/MonacoEditor'
+import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
+import { useDatabaseQueueMessageArchiveMutation } from '@/data/database-queues/database-queue-messages-archive-mutation'
+import { useDatabaseQueueMessageDeleteMutation } from '@/data/database-queues/database-queue-messages-delete-mutation'
+import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { useDatabaseQueueMessageReadMutation } from '@/data/database-queues/database-queue-messages-read-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prettifyJSON } from '@/lib/helpers'
 
 export const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 

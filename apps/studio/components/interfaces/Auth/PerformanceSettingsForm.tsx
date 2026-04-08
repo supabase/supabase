@@ -3,19 +3,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Card,
@@ -24,8 +11,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -34,6 +23,19 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -226,15 +228,18 @@ export const PerformanceSettingsForm = () => {
                       <div className="flex flex-col gap-2">
                         <FormControl_Shadcn_>
                           <div className="relative">
-                            <PrePostTab postTab="seconds">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={5}
                                 max={30}
                                 {...field}
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </div>
                         </FormControl_Shadcn_>
 
@@ -366,8 +371,13 @@ export const PerformanceSettingsForm = () => {
                       <FormControl_Shadcn_>
                         <div className="flex flex-col gap-2">
                           <div className="relative">
-                            <PrePostTab postTab={chosenUnit === 'percent' ? '%' : 'connections'}>
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>
+                                  {chosenUnit === 'percent' ? '%' : 'connections'}
+                                </InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 {...field}
                                 min={3}
@@ -378,7 +388,7 @@ export const PerformanceSettingsForm = () => {
                                 }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </div>
                           {isLoadingMaxConns ? (
                             <ShimmeringLoader className="py-2 w-16 ml-auto" />

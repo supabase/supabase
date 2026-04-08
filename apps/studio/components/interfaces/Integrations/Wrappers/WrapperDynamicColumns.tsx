@@ -1,8 +1,9 @@
-import ColumnType from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnType'
-import useLatest from 'hooks/misc/useLatest'
 import { X } from 'lucide-react'
 import { useEffect, useReducer } from 'react'
 import { Button, Input } from 'ui'
+
+import ColumnType from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnType'
+import useLatest from '@/hooks/misc/useLatest'
 
 export type SimpleColumn = {
   id: number

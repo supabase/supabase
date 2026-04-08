@@ -1,4 +1,4 @@
-import type { SqlError } from 'state/editor-panel-state'
+import type { SqlError } from '@/state/editor-panel-state'
 
 export function formatSqlError(error: SqlError): { header: string | undefined; lines: string[] } {
   if (error.formattedError) {

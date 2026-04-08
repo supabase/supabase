@@ -8,8 +8,10 @@ import {
   Badge,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -68,15 +70,18 @@ export const AdvancedSettings = ({
                   }
                 >
                   <FormControl_Shadcn_>
-                    <PrePostTab postTab="milliseconds">
-                      <Input_Shadcn_
+                    <InputGroup>
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>milliseconds</InputGroupText>
+                      </InputGroupAddon>
+                      <InputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 10000"
                       />
-                    </PrePostTab>
+                    </InputGroup>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -99,15 +104,18 @@ export const AdvancedSettings = ({
                   }
                 >
                   <FormControl_Shadcn_>
-                    <PrePostTab postTab="workers">
-                      <Input_Shadcn_
+                    <InputGroup>
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>workers</InputGroupText>
+                      </InputGroupAddon>
+                      <InputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 4"
                       />
-                    </PrePostTab>
+                    </InputGroup>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -133,15 +141,18 @@ export const AdvancedSettings = ({
                   }
                 >
                   <FormControl_Shadcn_>
-                    <PrePostTab postTab="connections">
-                      <Input_Shadcn_
+                    <InputGroup>
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>connections</InputGroupText>
+                      </InputGroupAddon>
+                      <InputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 2"
                       />
-                    </PrePostTab>
+                    </InputGroup>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
               )}
@@ -205,15 +216,18 @@ export const AdvancedSettings = ({
                       }
                     >
                       <FormControl_Shadcn_>
-                        <PrePostTab postTab="connections">
-                          <Input_Shadcn_
+                        <InputGroup>
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>connections</InputGroupText>
+                          </InputGroupAddon>
+                          <InputGroupInput
                             {...field}
                             type="number"
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
                             placeholder="Default: 4"
                           />
-                        </PrePostTab>
+                        </InputGroup>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}
@@ -245,15 +259,18 @@ export const AdvancedSettings = ({
                       }
                     >
                       <FormControl_Shadcn_>
-                        <PrePostTab postTab="minutes">
-                          <Input_Shadcn_
+                        <InputGroup>
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>minutes</InputGroupText>
+                          </InputGroupAddon>
+                          <InputGroupInput
                             {...field}
                             type="number"
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
                             placeholder="Default: None (No staleness limit)"
                           />
-                        </PrePostTab>
+                        </InputGroup>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                   )}

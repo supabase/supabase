@@ -1,8 +1,9 @@
-import { PlatformWebhooksPage } from 'components/interfaces/Platform/Webhooks'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useRouter } from 'next/router'
-import type { NextPageWithLayout } from 'types'
+
+import { PlatformWebhooksPage } from '@/components/interfaces/Platform/Webhooks'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const ProjectWebhookEndpointSettings: NextPageWithLayout = () => {
   const { query } = useRouter()

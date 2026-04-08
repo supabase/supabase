@@ -1,20 +1,8 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { PresetHookResult } from 'components/interfaces/Reports/Reports.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DownloadResultsButton } from 'components/ui/DownloadResultsButton'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import { getErrorMessage } from 'lib/get-error-message'
 import { RefreshCw, RotateCcw, X } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { Button, cn, LoadingLine } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -24,11 +12,24 @@ import { captureQueryPerformanceError } from '../QueryPerformance.utils'
 import { QueryPerformanceFilterBar } from '../QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from '../QueryPerformanceGrid'
 import { QueryPerformanceMetrics } from '../QueryPerformanceMetrics'
+import { QueryPerformanceInfiniteHook } from '../useQueryPerformanceQuery'
 import { transformStatementDataToRows } from './WithStatements.utils'
+import { PresetHookResult } from '@/components/interfaces/Reports/Reports.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface WithStatementsProps {
   queryHitRate: PresetHookResult
-  queryPerformanceQuery: DbQueryHook<any>
+  queryPerformanceQuery: QueryPerformanceInfiniteHook
   queryMetrics: PresetHookResult
 }
 
@@ -40,7 +41,16 @@ export const WithStatements = ({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const state = useDatabaseSelectorStateSnapshot()
-  const { data, isLoading, isRefetching, error: queryError } = queryPerformanceQuery
+  const {
+    data,
+    isLoading,
+    isRefetching,
+    isFetchingNextPage,
+    hasNextPage,
+    error: queryError,
+    fetchNextPage,
+    refetch: runQuery,
+  } = queryPerformanceQuery
   const isPrimaryDatabase = state.selectedDatabaseId === ref
   const formattedDatabaseId = formatDatabaseID(state.selectedDatabaseId ?? '')
 
@@ -60,7 +70,7 @@ export const WithStatements = ({
   })
 
   const handleRefresh = () => {
-    queryPerformanceQuery.runQuery()
+    runQuery()
     queryHitRate.runQuery()
     queryMetrics.runQuery()
   }
@@ -71,6 +81,13 @@ export const WithStatements = ({
 
   const { data: databases } = useReadReplicasQuery({ projectRef: ref })
 
+  const handleScroll = useInfiniteScroll({
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  })
+
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,16 +96,22 @@ export const WithStatements = ({
   useEffect(() => {
     if (mainQueryError) {
       const errorMessage = getErrorMessage(mainQueryError)
-      captureQueryPerformanceError(mainQueryError, {
-        projectRef: ref,
-        databaseIdentifier: state.selectedDatabaseId,
-        queryPreset: 'unified',
-        queryType: 'mainQuery',
-        postgresVersion: project?.dbVersion,
-        databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
-        sql: queryPerformanceQuery.resolvedSql,
-        errorMessage: errorMessage || undefined,
-      })
+      const isNotInstalled =
+        typeof errorMessage === 'string' &&
+        errorMessage.includes('pg_stat_statements') &&
+        errorMessage.includes('does not exist')
+      if (!isNotInstalled) {
+        captureQueryPerformanceError(mainQueryError, {
+          projectRef: ref,
+          databaseIdentifier: state.selectedDatabaseId,
+          queryPreset: 'unified',
+          queryType: 'mainQuery',
+          postgresVersion: project?.dbVersion,
+          databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
+          sql: queryPerformanceQuery.resolvedSql,
+          errorMessage: errorMessage || undefined,
+        })
+      }
     }
   }, [
     mainQueryError,
@@ -138,18 +161,31 @@ export const WithStatements = ({
         ? getErrorMessage(metricsError) || 'Failed to load query metrics'
         : null
 
+  const isPgStatStatementsNotInstalled =
+    typeof errorMessage === 'string' &&
+    errorMessage.includes('pg_stat_statements') &&
+    errorMessage.includes('does not exist')
+
   return (
     <>
       {hasError && (
         <div className="px-6 pt-4">
-          <Admonition
-            type="destructive"
-            title="Error loading query performance data"
-            description={
-              errorMessage ||
-              'An error occurred while loading query performance data. Please try refreshing the page.'
-            }
-          />
+          {isPgStatStatementsNotInstalled ? (
+            <Admonition
+              type="warning"
+              title="pg_stat_statements extension is not enabled"
+              description="Query Performance requires the pg_stat_statements extension. Enable it in Database → Extensions."
+            />
+          ) : (
+            <Admonition
+              type="destructive"
+              title="Error loading query performance data"
+              description={
+                errorMessage ||
+                'An error occurred while loading query performance data. Please try refreshing the page.'
+              }
+            />
+          )}
         </div>
       )}
       <QueryPerformanceMetrics />
@@ -183,7 +219,7 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching} />
+      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
@@ -193,6 +229,7 @@ export const WithStatements = ({
             : null
         }
         onRetry={handleRefresh}
+        onScroll={handleScroll}
       />
       <div
         className={cn('px-6 py-6 flex gap-x-4 border-t relative', {

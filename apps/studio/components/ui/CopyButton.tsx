@@ -1,6 +1,5 @@
 import { Check, Copy } from 'lucide-react'
 import { ComponentProps, forwardRef, useEffect, useState } from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 type CopyButtonBaseProps = {

@@ -19,6 +19,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
 
   return [
     {
@@ -68,13 +69,13 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       enabled: platformWebhooksEnabled,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-      enabled: true,
-      isNew: false,
-      isPlatformOnly: false,
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+      name: 'JIT database access',
+      discussionsUrl: undefined,
+      isNew: true,
+      isPlatformOnly: true,
       isDefaultOptIn: false,
+      enabled: jitDbAccessEnabled,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -82,15 +83,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
       enabled: true,
       isNew: false,
-      isPlatformOnly: false,
-      isDefaultOptIn: false,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
-      name: 'Queue table operations',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/42460',
-      enabled: true,
-      isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: false,
     },
