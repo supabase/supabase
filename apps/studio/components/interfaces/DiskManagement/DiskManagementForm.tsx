@@ -23,7 +23,7 @@ import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement
 import { DiskManagementMessage } from './DiskManagement.types'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
-import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { AutoScaleFields } from './fields/AutoScaleFields'
 import { ComputeSizeField } from './fields/ComputeSizeField'
 import { DiskSizeField } from './fields/DiskSizeField'

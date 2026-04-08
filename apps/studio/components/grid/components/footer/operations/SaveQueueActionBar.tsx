@@ -16,11 +16,9 @@ import { useOperationQueueShortcuts } from '@/components/grid/hooks/useOperation
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { getModKeyLabel } from '@/lib/helpers'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export const SaveQueueActionBar = () => {
-  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { handleSave, handleCancel } = useOperationQueueActions()
@@ -66,9 +64,13 @@ export const SaveQueueActionBar = () => {
                     onClick={handleSave}
                     disabled={isSaving}
                     loading={isSaving}
+                    iconRight={
+                      isSaving ? undefined : (
+                        <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
+                      )
+                    }
                   >
                     Save
-                    <span className="text-[10px] text-foreground/40 ml-1.5">{`${modKey}S`}</span>
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
