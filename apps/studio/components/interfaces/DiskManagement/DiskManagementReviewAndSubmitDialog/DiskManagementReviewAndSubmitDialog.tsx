@@ -1,13 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ArrowRight } from 'lucide-react'
-import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Alert_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
   ButtonProps,
-  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,59 +18,21 @@ import {
   WarningIcon,
 } from 'ui'
 
-import { DiskStorageSchemaType } from './DiskManagement.schema'
-import { DiskManagementMessage } from './DiskManagement.types'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { DiskManagementMessage } from '../DiskManagement.types'
+import { DISK_AUTOSCALE_CONFIG_DEFAULTS } from '../ui/DiskManagement.constants'
 import {
-  calculateComputeSizePrice,
-  calculateDiskSizePrice,
-  calculateIOPSPrice,
-  calculateThroughputPrice,
-  getAvailableComputeOptions,
-  mapAddOnVariantIdToComputeSize,
-} from './DiskManagement.utils'
-import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
+  BreakdownRow,
+  PriceDelta,
+  ValueChange,
+} from './DiskManagementReviewAndSubmitDialog.components'
+import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog.hooks'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import {
-  useIsAwsNimbusCloudProvider,
-  useSelectedProjectQuery,
-} from '@/hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatCurrency } from '@/lib/helpers'
 
-interface BreakdownRowProps {
-  label: string
-  description?: string
-  children: React.ReactNode
-}
-
-const BreakdownRow = ({ label, description, children }: BreakdownRowProps) => (
-  <div className="flex items-start justify-between py-3 px-0 border-b border-dashed last:border-b-0">
-    <div className="flex flex-col gap-0.5">
-      <span className="text-sm text-foreground-light">{label}</span>
-      {description && <span className="text-xs text-warning-600 max-w-72">{description}</span>}
-    </div>
-    {children}
-  </div>
-)
-
-const ValueChange = ({ from, to }: { from: string; to: string }) => (
-  <span className="text-sm font-mono uppercase">
-    <span className="text-foreground-lighter">{from}</span>
-    <span className="text-foreground-lighter mx-2">&rarr;</span>
-    <span className="text-foreground">{to}</span>
-  </span>
-)
-
-const PriceDelta = ({ delta }: { delta: number }) => (
-  <span className={cn('text-xs', delta >= 0 ? 'text-brand' : 'text-destructive')}>
-    {delta >= 0 ? `+${formatCurrency(delta)}` : `-${formatCurrency(Math.abs(delta))}`}{' '}
-    <span className="text-foreground-lighter">per month</span>
-  </span>
-)
-
-interface DiskSizeMeterProps {
+interface DiskManagementReviewAndSubmitDialogProps {
   loading: boolean
   form: UseFormReturn<DiskStorageSchemaType>
   numReplicas: number
@@ -80,7 +40,6 @@ interface DiskSizeMeterProps {
   disabled?: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
-
   buttonSize?: ButtonProps['size']
   message?: DiskManagementMessage | null
 }
@@ -95,148 +54,38 @@ export const DiskManagementReviewAndSubmitDialog = ({
   onSubmit,
   message,
   buttonSize = 'medium',
-}: DiskSizeMeterProps) => {
+}: DiskManagementReviewAndSubmitDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const isAwsNimbus = useIsAwsNimbusCloudProvider()
-
-  const isAwsK8sProject = project?.cloud_provider === 'AWS_K8S'
-
-  const { formState, getValues } = form
 
   const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+    { resource: { project_id: project?.id } }
   )
 
-  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
-
-  const planId = org?.plan.id ?? 'free'
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
 
-  const availableAddons = useMemo(() => {
-    return addons?.available_addons ?? []
-  }, [addons])
-  const availableOptions = useMemo(() => {
-    return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
-  }, [availableAddons, project?.cloud_provider])
-
-  const computeSizePrice = calculateComputeSizePrice({
-    availableOptions,
-    oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
-    newComputeSize: form.getValues('computeSize'),
-    plan: org?.plan.id ?? 'free',
-  })
-  const diskSizePrice = calculateDiskSizePrice({
-    planId: planId,
-    oldSize: formState.defaultValues?.totalSize || 0,
-    oldStorageType: formState.defaultValues?.storageType as DiskType,
-    newSize: getValues('totalSize'),
-    newStorageType: getValues('storageType') as DiskType,
-    numReplicas,
-  })
-  const iopsPrice = calculateIOPSPrice({
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
-    oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
-    newStorageType: form.getValues('storageType') as DiskType,
-    newProvisionedIOPS: form.getValues('provisionedIOPS'),
-    numReplicas,
-  })
-  const throughputPrice = calculateThroughputPrice({
-    storageType: form.getValues('storageType') as DiskType,
-    newThroughput: form.getValues('throughput') || 0,
-    oldThroughput: form.formState.defaultValues?.throughput || 0,
-    numReplicas,
-  })
-
-  const hasComputeChanges =
-    form.formState.defaultValues?.computeSize !== form.getValues('computeSize')
-  const hasTotalSizeChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
-  const hasStorageTypeChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.storageType !== form.getValues('storageType')
-  const hasThroughputChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.throughput !== form.getValues('throughput')
-  const hasIOPSChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS')
-
-  const hasGrowthPercentChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent')
-  const hasMinIncrementChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb')
-  const hasMaxSizeChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb')
-
-  const hasDiskConfigChanges =
-    hasIOPSChanges ||
-    (hasThroughputChanges && form.getValues('storageType') === 'gp3') ||
-    hasTotalSizeChanges
-
-  const storageTypeBefore = (form.formState.defaultValues?.storageType ?? '') as DiskType
-  const storageTypeAfter = form.getValues('storageType') as DiskType
-
-  // Show hero whenever any line-item price actually changes, not just compute
-  const anyBillableDiskChange =
-    Number(diskSizePrice.newPrice) !== Number(diskSizePrice.oldPrice) ||
-    Number(iopsPrice.newPrice) !== Number(iopsPrice.oldPrice) ||
-    Number(throughputPrice.newPrice) !== Number(throughputPrice.oldPrice)
-
-  // Show cooldown warning whenever any disk attribute that enforces the 4-hour lock changes
-  const anyDiskAttributeChange = hasIOPSChanges || hasStorageTypeChanges || hasTotalSizeChanges
-
-  // Show throughput row whenever either the before or after storage type is GP3
-  // (covers GP3→IO2 where the throughput charge drops to zero)
-  const showThroughputRow =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    (storageTypeBefore === 'gp3' || storageTypeAfter === 'gp3') &&
-    (hasThroughputChanges || hasStorageTypeChanges)
-
-  const totalBeforePrice =
-    Number(computeSizePrice.oldPrice) +
-    Number(diskSizePrice.oldPrice) +
-    Number(iopsPrice.oldPrice) +
-    Number(throughputPrice.oldPrice)
-
-  const totalAfterPrice =
-    Number(computeSizePrice.newPrice) +
-    Number(diskSizePrice.newPrice) +
-    Number(iopsPrice.newPrice) +
-    Number(throughputPrice.newPrice)
-
-  const oldComputeLabel = mapAddOnVariantIdToComputeSize(
-    form.formState.defaultValues?.computeSize ?? 'ci_nano'
-  )
-  const newComputeLabel = mapAddOnVariantIdToComputeSize(form.getValues('computeSize'))
-
-  const hasAnyBreakdownRows =
-    hasComputeChanges ||
-    hasStorageTypeChanges ||
-    hasIOPSChanges ||
-    showThroughputRow ||
-    hasTotalSizeChanges ||
-    hasGrowthPercentChanges ||
-    hasMinIncrementChanges ||
-    hasMaxSizeChanges
+  const {
+    computeSizePrice,
+    diskSizePrice,
+    iopsPrice,
+    throughputPrice,
+    totalBeforePrice,
+    totalAfterPrice,
+    hasComputeChanges,
+    hasTotalSizeChanges,
+    hasStorageTypeChanges,
+    hasIOPSChanges,
+    hasGrowthPercentChanges,
+    hasMinIncrementChanges,
+    hasMaxSizeChanges,
+    anyBillableDiskChange,
+    anyDiskAttributeChange,
+    showThroughputRow,
+    hasAnyBreakdownRows,
+    oldComputeLabel,
+    newComputeLabel,
+  } = useDiskManagementReviewChanges(form, numReplicas)
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -437,10 +286,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <>
             <DialogSectionSeparator />
             <DialogSection>
-              <Alert_Shadcn_
-                variant={message.type === 'error' ? 'destructive' : 'default'}
-                className=""
-              >
+              <Alert_Shadcn_ variant={message.type === 'error' ? 'destructive' : 'default'}>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
               </Alert_Shadcn_>
