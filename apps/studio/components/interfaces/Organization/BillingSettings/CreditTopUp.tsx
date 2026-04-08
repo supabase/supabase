@@ -84,6 +84,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   })
 
   const [topUpModalVisible, setTopUpModalVisible] = useState(false)
+  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -281,6 +282,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
                     selectedPaymentMethod={form.getValues('paymentMethod')}
                     readOnly={executingTopUp || paymentConfirmationLoading}
+                    useAsDefaultBillingAddress={useAsDefaultBillingAddress}
+                    onUseAsDefaultBillingAddressChange={setUseAsDefaultBillingAddress}
                   />
                 )}
               />

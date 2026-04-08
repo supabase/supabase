@@ -1,7 +1,8 @@
 import { screen } from '@testing-library/react'
-import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { customRender as render } from 'tests/lib/custom-render'
 import { expect, test, vi } from 'vitest'
+
+import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { customRender as render } from '@/tests/lib/custom-render'
 
 let contextMenuMountCount = 0
 

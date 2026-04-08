@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useTrack } from 'lib/telemetry/track'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,12 +21,14 @@ import { getExtensionDefaultSchema } from '../IntegrationOverviewTabV2.utils'
 import { AdvancedSettings } from './AdvancedSettings'
 import { InstallationOverview } from './InstallationOverview'
 import { InstallationSettings } from './InstallationSettings'
+import { type IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
 } from '@/data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { ResponseError } from '@/types'
 
 export interface InstallIntegrationSheetProps {

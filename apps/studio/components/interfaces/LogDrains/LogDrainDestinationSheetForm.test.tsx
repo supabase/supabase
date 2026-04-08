@@ -1,10 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
-import { render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
+import { render } from '@/tests/helpers'
 
 const { trackMock, useFlagMock, useLogDrainsQueryMock, useParamsMock, useTrackMock } = vi.hoisted(
   () => ({
@@ -27,7 +27,7 @@ vi.mock(import('common'), async (importOriginal) => {
   }
 })
 
-vi.mock(import('data/log-drains/log-drains-query'), async (importOriginal) => {
+vi.mock(import('@/data/log-drains/log-drains-query'), async (importOriginal) => {
   const actual = await importOriginal()
 
   return {
@@ -36,7 +36,7 @@ vi.mock(import('data/log-drains/log-drains-query'), async (importOriginal) => {
   }
 })
 
-vi.mock('lib/telemetry/track', () => ({
+vi.mock('@/lib/telemetry/track', () => ({
   useTrack: useTrackMock,
 }))
 

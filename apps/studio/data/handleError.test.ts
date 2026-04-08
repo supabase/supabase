@@ -5,8 +5,8 @@ import { ResponseError } from '@/types/base'
 
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
-vi.mock('lib/constants', () => ({ API_URL: 'http://localhost' }))
-vi.mock('lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
+vi.mock('@/lib/constants', () => ({ API_URL: 'http://localhost' }))
+vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
 
 // Import after mocks are set up
 const { handleError } = await import('./fetchers')

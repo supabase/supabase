@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Card, Form_Shadcn_ } from 'ui'
@@ -8,6 +6,8 @@ import * as z from 'zod'
 
 import { DashboardToggle } from './DashboardToggle'
 import { useIsInlineEditorSetting, useIsQueueOperationsSetting } from './useDashboardSettings'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const DashboardSettingsSchema = z.object({
   inlineEditorEnabled: z.boolean(),

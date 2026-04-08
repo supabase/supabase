@@ -61,12 +61,29 @@ export function getBlogSocialImage({ imgThumb, imgSocial }: BlogImageFields) {
   return image ? resolveBlogImagePath(image) : undefined
 }
 
+/**
+ * Build-time ID appended to OG image URLs that point to the dynamic
+ * `generate-og` Edge Function. A fresh value on every deploy forces
+ * social-media crawlers (X, LinkedIn, etc.) to bypass their image cache.
+ */
+const buildId = Date.now()
+
 export function getAbsoluteBlogSocialImage(
   { imgThumb, imgSocial }: BlogImageFields,
   siteOrigin: string = SITE_ORIGIN
 ) {
   const image = imgSocial || imgThumb
-  return image ? toAbsoluteBlogImageUrl(image, siteOrigin) : undefined
+  if (!image) return undefined
+
+  const url = toAbsoluteBlogImageUrl(image, siteOrigin)
+
+  // Only bust cache for the dynamic OG function, not static images
+  if (url.includes('/functions/v1/generate-og')) {
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}v=${buildId}`
+  }
+
+  return url
 }
 
 export function validateBlogFrontmatterImages(

@@ -121,7 +121,7 @@ export const MultiSelectV2 = ({
         <PopoverContent_Shadcn_ className="p-0 w-96 border-strong" side="bottom" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder={searchPlaceholder} />
-            <CommandList_Shadcn_>
+            <CommandList_Shadcn_ onWheel={(event) => event.stopPropagation()}>
               <CommandEmpty_Shadcn_>No options found</CommandEmpty_Shadcn_>
               <CommandGroup_Shadcn_>
                 <ScrollArea className={cn(formattedOptions.length > 7 ? 'h-[210px]' : '')}>

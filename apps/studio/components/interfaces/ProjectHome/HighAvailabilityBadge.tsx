@@ -1,9 +1,9 @@
-import { DOCS_URL } from 'lib/constants'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 
 import { ServerLightGrid } from './ServerLightGrid'
+import { DOCS_URL } from '@/lib/constants'
 
 interface HighAvailabilityBadgeProps {
   size?: 'default' | 'small'

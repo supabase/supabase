@@ -1,7 +1,7 @@
-import { fetchGet } from 'data/fetchers'
-import { PG_META_URL } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { assertSelfHosted } from './util'
+import { fetchGet } from '@/data/fetchers'
+import { PG_META_URL } from '@/lib/constants'
+import type { ResponseError } from '@/types'
 
 export type GenerateTypescriptTypesOptions = {
   headers?: HeadersInit

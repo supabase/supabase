@@ -118,7 +118,7 @@ vi.mock('sonner', () => ({
   },
 }))
 
-vi.mock('data/utils/deployment-commit-query', () => ({
+vi.mock('@/data/utils/deployment-commit-query', () => ({
   useDeploymentCommitQuery: mockUseDeploymentCommitQuery,
 }))
 

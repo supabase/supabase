@@ -1,8 +1,4 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
-import { stripeSyncKeys } from 'data/database-integrations/stripe/keys'
-import { installStripeSync } from 'data/database-integrations/stripe/stripe-sync-install-mutation'
-import { databaseKeys } from 'data/database/keys'
-import { useTrack } from 'lib/telemetry/track'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -14,10 +10,14 @@ import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { getStripeSyncSchemaComment } from '../templates/StripeSyncEngine/useStripeSyncStatus'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
+import { stripeSyncKeys } from '@/data/database-integrations/stripe/keys'
+import { installStripeSync } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { enableDatabaseWebhooks } from '@/data/database/hooks-enable-mutation'
+import { databaseKeys } from '@/data/database/keys'
 import { getSchemas, invalidateSchemasQuery } from '@/data/database/schemas-query'
 import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export type Navigation = {
   route: string
@@ -528,7 +528,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
                 (mod) => mod.StripeSyncEngineOverviewTab
               ),
             { loading: Loading }
