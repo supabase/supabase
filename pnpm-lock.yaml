@@ -4263,8 +4263,8 @@ packages:
     peerDependencies:
       react: '>= 16'
 
-  '@hono/node-server@1.19.10':
-    resolution: {integrity: sha512-hZ7nOssGqRgyV3FVVQdfi+U4q02uB23bpnYpdvNXkYTRRyWx84b7yf1ans+dnJ/7h41sGL3CeQTfO+ZGxuO+Iw==}
+  '@hono/node-server@1.19.13':
+    resolution: {integrity: sha512-TsQLe4i2gvoTtrHje625ngThGBySOgSK3Xo2XRYOdqGN1teR8+I7vchQC46uLJi8OF62YTYA3AhSpumtkhsaKQ==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
@@ -21369,7 +21369,7 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@hono/node-server@1.19.10(hono@4.12.7)':
+  '@hono/node-server@1.19.13(hono@4.12.7)':
     dependencies:
       hono: 4.12.7
 
@@ -21864,7 +21864,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.27.0(supports-color@8.1.1)(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.10(hono@4.12.7)
+      '@hono/node-server': 1.19.13(hono@4.12.7)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
