@@ -894,24 +894,6 @@
         "title": "Manage CLI telemetry settings",
         "slug": "supabase-telemetry",
         "type": "cli-command"
-      },
-      {
-        "id": "supabase-telemetry-enable",
-        "title": "Enable CLI telemetry",
-        "slug": "supabase-telemetry-enable",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-telemetry-disable",
-        "title": "Disable CLI telemetry",
-        "slug": "supabase-telemetry-disable",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-telemetry-status",
-        "title": "Show CLI telemetry status",
-        "slug": "supabase-telemetry-status",
-        "type": "cli-command"
       }
     ]
   }
