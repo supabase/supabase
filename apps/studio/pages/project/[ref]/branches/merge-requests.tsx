@@ -1,34 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import {
-  BranchManagementSection,
-  BranchRow,
-} from 'components/interfaces/BranchManagement/BranchPanels'
-import { BranchSelector } from 'components/interfaces/BranchManagement/BranchSelector'
-import { PullRequestsEmptyState } from 'components/interfaces/BranchManagement/EmptyStates'
-import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -38,6 +14,30 @@ import {
   Tooltip,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useIsBranching2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  BranchManagementSection,
+  BranchRow,
+} from '@/components/interfaces/BranchManagement/BranchPanels'
+import { BranchSelector } from '@/components/interfaces/BranchManagement/BranchSelector'
+import { PullRequestsEmptyState } from '@/components/interfaces/BranchManagement/EmptyStates'
+import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const MergeRequestsPage: NextPageWithLayout = () => {
   const router = useRouter()

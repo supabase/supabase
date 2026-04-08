@@ -1,0 +1,21 @@
+---
+title = "schema \"pg_pgrst_no_exposed_schemas\" does not exist"
+topics = [
+  "database",
+  "rest-api",
+  "platform"
+]
+[[errors]]
+message = "schema pg_pgrst_no_exposed_schemas does not exist"
+---
+
+PostgREST logs showing the error:
+
+- `schema "pg_pgrst_no_exposed_schemas" does not exist`
+
+## Why this happens
+
+- This error is seen when the Data API is disabled on the Supabase project.
+- Currently, we don’t really shutdown postgrest when data api is disabled. You will see a schema called `pg_pgrst_no_exposed_schemas` added in the exposed schemas.
+- This should not adversely affect the project, although it may result in additional entries in your logs.
+- We're aware of this issue and are working on it.

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/Account/Preferences/useDashboardSettings'
 
 import { useOperationQueueActions } from './useOperationQueueActions'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useHotKey } from '@/hooks/ui/useHotKey'

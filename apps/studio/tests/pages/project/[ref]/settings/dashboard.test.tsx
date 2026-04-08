@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import DashboardPage from 'pages/project/[ref]/settings/dashboard'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import DashboardPage from '@/pages/project/[ref]/settings/dashboard'
 
 const { mockIsPlatform, mockRouter, mockUseFlag } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -15,8 +16,8 @@ vi.mock('common', () => ({
   useFlag: mockUseFlag,
 }))
 
-vi.mock('lib/constants', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('lib/constants')
+vi.mock('@/lib/constants', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
   return {
     ...actual,
     get IS_PLATFORM() {
@@ -29,12 +30,12 @@ vi.mock('next/router', () => ({
   useRouter: () => mockRouter,
 }))
 
-vi.mock('components/layouts/DefaultLayout', () => ({
+vi.mock('@/components/layouts/DefaultLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
 
-vi.mock('components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
+vi.mock('@/components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))

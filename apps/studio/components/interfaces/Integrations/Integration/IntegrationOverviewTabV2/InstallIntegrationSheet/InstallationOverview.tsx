@@ -1,6 +1,3 @@
-import { Markdown } from 'components/interfaces/Markdown'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Card,
@@ -16,6 +13,9 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { getEnableExtensionsSQL } from '../IntegrationOverviewTabV2.utils'
 import { type ExtensionsSchema, type InstallIntegrationSheetProps } from './InstallIntegrationSheet'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const InstallationOverview = ({
   integration,

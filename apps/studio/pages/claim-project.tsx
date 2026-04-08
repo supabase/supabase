@@ -1,19 +1,19 @@
+import { useParams } from 'common'
 import Head from 'next/head'
 import { PropsWithChildren, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { ProjectClaimBenefits } from 'components/interfaces/Organization/ProjectClaim/benefits'
-import { ProjectClaimChooseOrg } from 'components/interfaces/Organization/ProjectClaim/choose-org'
-import { ProjectClaimConfirm } from 'components/interfaces/Organization/ProjectClaim/confirm'
-import { ProjectClaimLayout } from 'components/interfaces/Organization/ProjectClaim/layout'
-import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
-import { useOrganizationProjectClaimQuery } from 'data/organizations/organization-project-claim-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { ProjectClaimBenefits } from '@/components/interfaces/Organization/ProjectClaim/benefits'
+import { ProjectClaimChooseOrg } from '@/components/interfaces/Organization/ProjectClaim/choose-org'
+import { ProjectClaimConfirm } from '@/components/interfaces/Organization/ProjectClaim/confirm'
+import { ProjectClaimLayout } from '@/components/interfaces/Organization/ProjectClaim/layout'
+import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
+import { useOrganizationProjectClaimQuery } from '@/data/organizations/organization-project-claim-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { withAuth } from '@/hooks/misc/withAuth'
+import type { NextPageWithLayout } from '@/types'
 
 const ClaimProjectPageLayout = ({ children }: PropsWithChildren) => {
   const { appTitle } = useCustomContent(['app:title'])

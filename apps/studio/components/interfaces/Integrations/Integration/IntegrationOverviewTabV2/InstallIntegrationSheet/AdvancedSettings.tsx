@@ -1,8 +1,3 @@
-import { extensionsWithRecommendedSchemas } from 'components/interfaces/Database/Extensions/Extensions.constants'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { type Dispatch, type SetStateAction } from 'react'
 import {
   Accordion_Shadcn_,
@@ -23,6 +18,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { getExtensionDefaultSchema } from '../IntegrationOverviewTabV2.utils'
 import { type ExtensionsSchema, type InstallIntegrationSheetProps } from './InstallIntegrationSheet'
+import { extensionsWithRecommendedSchemas } from '@/components/interfaces/Database/Extensions/Extensions.constants'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 type AdvancedSettingsProps = InstallIntegrationSheetProps & {
   extensionsSchema: ExtensionsSchema

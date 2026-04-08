@@ -1,10 +1,11 @@
 import { sendTelemetryEvent } from 'common'
 import { TelemetryEvent, TelemetryGroups } from 'common/telemetry-constants'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { API_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useCallback } from 'react'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { API_URL } from '@/lib/constants'
 
 type EventMap = {
   [E in TelemetryEvent as E['action']]: E

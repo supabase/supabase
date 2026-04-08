@@ -1,15 +1,3 @@
-import { useIsJitDbAccessEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ConnectionPooling } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
-import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
-import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
-import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
-import { SettingsDatabaseEmptyStateLocal } from 'components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -20,12 +8,24 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiskManagementPanelForm } from '@/components/interfaces/DiskManagement/DiskManagementPanelForm'
 import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
+import { ConnectionPooling } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
+import { DatabaseReadOnlyAlert } from '@/components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
+import ResetDbPassword from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
+import { PoolingModesModal } from '@/components/interfaces/Settings/Database/PoolingModesModal'
+import { SettingsDatabaseEmptyStateLocal } from '@/components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsAwsCloudProvider, useIsAwsK8sCloudProvider } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()

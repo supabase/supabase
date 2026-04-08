@@ -1,10 +1,6 @@
 import { useFlag } from 'common'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -15,6 +11,10 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { DashboardPreferences } from '@/components/interfaces/Settings/General/DashboardPreferences'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const Preferences: NextPageWithLayout = () => {
   const router = useRouter()
