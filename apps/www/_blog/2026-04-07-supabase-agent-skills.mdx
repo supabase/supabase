@@ -39,21 +39,23 @@ The skill covers three areas: documentation access, security, and tooling workfl
 
 ### Docs and product knowledge
 
-The core principle: verify against current docs before implementing. Supabase changes frequently. Function signatures, config settings, and API conventions shift between versions. Training data goes stale.
+The core principle: verify against current docs before implementing.
 
-The skill instructs agents to look up documentation using three methods, in priority order:
+Supabase moves fast. Function signatures, CLI flags, config options, and API conventions change between releases. An agent working from training data alone is essentially working from a snapshot — one that could be months or years old.
 
-1. **MCP `search_docs` tool**: returns relevant snippets directly
-2. **Fetch docs as markdown**: any Supabase docs page can be fetched by appending `.md` to its URL
-3. **Web search**: for topics where you don't know which page to look at
+The skill instructs agents to look up documentation before writing any Supabase-specific code, using three methods in priority order:
 
-The skill doesn't tell agents what the current API looks like. It tells them how to find out. This keeps the skill small, maintainable, and always accurate. Fetch the docs, don't replicate them.
+1. **MCP `search_docs` tool**: returns relevant snippets ordered by relevance
+2. **Fetch docs as markdown**: use bash tools liek `curl` to fetch Supabase docs as markdown files. Supabase docs pages can be fetched as markdown by appending `.md` to its URL
+3. **Native web search tools**: freely search the web whenever the other two options are not available
+
+The skill doesn't tell agents what the current API looks like. It tells them how to find out. This keeps the skill small, maintainable, and always accurate — the docs are the source of truth, and they're already maintained. There's no value in replicating them inside the skill.
 
 ### Security and RLS
 
-Supabase has specific security traps that silently create vulnerabilities. We have these covered in our documentation but we observed that agents lean on the knowledge they have in their training data rather than searching the documentation available online. Searching and fetching web pages are expensive so agents prefer to keep it offline and go with what they already know.
+Supabase has specific security traps that silently create vulnerabilities. The skill instructs agents to check the docs before implementing anything, but agents are lazy about it: even with `search_docs` available, they can can choose to keep it offline and go with what they already know from training data rather than making an extra round-trip. That means security-sensitive patterns might get missed even when the correct guidance exists in the docs.
 
-To ensure that the model never misses these security traps, this skill includes an inline checklist that agents apply to every task touching auth, RLS, views, storage, or user data:
+To ensure agents never skip these, the skill includes an inline checklist of security requirements that apply to every Supabase project. These aren't pulled from docs on demand — they're loaded with the skill, so the agent has no excuse to miss them:
 
 - **Never use `user_metadata` for authorization.** It's user-editable. Use `app_metadata` instead.
 - **Never expose the `service_role` key on the frontend.** In Next.js, any `NEXT_PUBLIC_` env var is sent to the browser.
