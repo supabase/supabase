@@ -2,7 +2,6 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { PropsWithChildren, useRef } from 'react'
 import { DataGridHandle } from 'react-data-grid'
-import { createPortal } from 'react-dom'
 
 import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
