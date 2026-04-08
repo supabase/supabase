@@ -5,7 +5,6 @@ topics = [
   "rest-api",
   "platform"
 ]
-
 [[errors]]
 message = "schema pg_pgrst_no_exposed_schemas does not exist"
 ---
@@ -13,7 +12,6 @@ message = "schema pg_pgrst_no_exposed_schemas does not exist"
 PostgREST logs showing the error:
 
 - `schema "pg_pgrst_no_exposed_schemas" does not exist`
-
 
 ## Why this happens
 
