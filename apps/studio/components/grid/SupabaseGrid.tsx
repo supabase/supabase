@@ -2,8 +2,6 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { PropsWithChildren, useRef } from 'react'
 import { DataGridHandle } from 'react-data-grid'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
 
 import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
@@ -44,7 +42,6 @@ export const SupabaseGrid = ({
   const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
-
   const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const { filters } = useTableFilter()
@@ -95,33 +92,31 @@ export const SupabaseGrid = ({
   const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
 
   return (
-    <DndProvider backend={HTML5Backend} context={window}>
-      <div className="sb-grid h-full flex flex-col">
-        <HeaderComponent
-          customHeader={customHeader}
-          isRefetching={isRefetching}
-          tableQueriesEnabled={tableQueriesEnabled}
-        />
+    <div className="sb-grid h-full flex flex-col">
+      <HeaderComponent
+        customHeader={customHeader}
+        isRefetching={isRefetching}
+        tableQueriesEnabled={tableQueriesEnabled}
+      />
 
-        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
+      {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
-        {children || (
-          <>
-            <Grid
-              ref={gridRef}
-              {...gridProps}
-              rows={rows}
-              error={error}
-              isDisabled={!tableQueriesEnabled}
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-              isError={isError}
-            />
-            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
-            <Shortcuts gridRef={gridRef} rows={rows} />
-          </>
-        )}
-      </div>
-    </DndProvider>
+      {children || (
+        <>
+          <Grid
+            ref={gridRef}
+            {...gridProps}
+            rows={rows}
+            error={error}
+            isDisabled={!tableQueriesEnabled}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+            isError={isError}
+          />
+          <Footer enableForeignRowsQuery={tableQueriesEnabled} />
+          <Shortcuts gridRef={gridRef} rows={rows} />
+        </>
+      )}
+    </div>
   )
 }

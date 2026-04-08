@@ -1,13 +1,16 @@
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import { forwardRef, memo, Ref, useCallback, useMemo, useRef } from 'react'
+import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
 import { Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
 import { useTableFilter } from '../../hooks/useTableFilter'
-import type { GridProps, SupaRow } from '../../types'
+import type { GridProps, SupaColumn, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
+import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
 import { RowContextMenuProvider, RowRenderer } from './RowRenderer'
@@ -222,6 +225,9 @@ export const Grid = memo(
         }
       }, [rowClass])
 
+      const sensors = useSensors(useSensor(PointerSensor))
+      const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
+
       return (
         <div
           data-testid="table-editor-grid-container"
@@ -324,28 +330,57 @@ export const Grid = memo(
             </div>
           )}
 
-          <RowContextMenuProvider>
-            <DataGrid
-              ref={ref}
-              className={`${gridClass} flex-grow`}
-              rowClass={computedRowClass}
-              columns={columnsWithDirtyCellClass}
-              rows={rows ?? []}
-              renderers={{ renderRow: RowRenderer }}
-              rowKeyGetter={rowKeyGetter}
-              selectedRows={snap.selectedRows}
-              onColumnResize={snap.updateColumnSize}
-              onRowsChange={onRowsChange}
-              onSelectedCellChange={onSelectedCellChange}
-              onSelectedRowsChange={onSelectedRowsChange}
-              onCellDoubleClick={(props) => {
-                if (typeof props.column.name === 'string') {
-                  onRowDoubleClick(props.row, { name: props.column.name })
-                }
-              }}
-              onCellKeyDown={handleCopyCell}
-            />
-          </RowContextMenuProvider>
+          <DndContext
+            sensors={sensors}
+            onDragStart={({ active }) => {
+              // Update the dragged column state to show the drag overlay
+              const column = table.columns.find((col) => col.name === active.id)
+              setDraggedColumn(column)
+            }}
+            onDragOver={({ active, over }) => {
+              // Dragged column is not over another column
+              if (over == null) return
+              // Dragged column is over itself
+              if (active.id === over.id) return
+              // Our ids are the columns keys (their names) so it's safe to either cast or call toString
+              snap.moveColumn(active.id.toString(), over.id.toString())
+            }}
+            onDragEnd={() => {
+              setDraggedColumn(undefined)
+            }}
+          >
+            <SortableContext
+              items={columnsWithDirtyCellClass.map((column) => column.key)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <RowContextMenuProvider>
+                <DataGrid
+                  ref={ref}
+                  className={`${gridClass} flex-grow`}
+                  rowClass={computedRowClass}
+                  columns={columnsWithDirtyCellClass}
+                  rows={rows ?? []}
+                  renderers={{ renderRow: RowRenderer }}
+                  rowKeyGetter={rowKeyGetter}
+                  selectedRows={snap.selectedRows}
+                  onColumnResize={snap.updateColumnSize}
+                  onRowsChange={onRowsChange}
+                  onSelectedCellChange={onSelectedCellChange}
+                  onSelectedRowsChange={onSelectedRowsChange}
+                  onCellDoubleClick={(props) => {
+                    if (typeof props.column.name === 'string') {
+                      onRowDoubleClick(props.row, { name: props.column.name })
+                    }
+                  }}
+                  onCellKeyDown={handleCopyCell}
+                />
+              </RowContextMenuProvider>
+              {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
+              <DragOverlay>
+                {draggedColumn ? <ColumnOverlayItem column={draggedColumn} /> : null}
+              </DragOverlay>
+            </SortableContext>
+          </DndContext>
         </div>
       )
     }
