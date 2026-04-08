@@ -83,8 +83,14 @@ export const DeleteProjectModal = ({
 
       toast.success(`Successfully deleted ${project?.name}`)
 
-      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-      else router.push('/organizations')
+      // Only redirect if still viewing the deleted project
+      if (router.asPath.startsWith(`/project/${projectRef}`)) {
+        if (lastVisitedOrganization) {
+          router.push(`/org/${lastVisitedOrganization}`)
+        } else {
+          router.push('/organizations')
+        }
+      }
     },
   })
   const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
