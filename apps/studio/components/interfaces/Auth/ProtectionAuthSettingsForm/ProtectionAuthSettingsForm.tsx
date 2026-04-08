@@ -51,7 +51,6 @@ const schema = object({
   DISABLE_SIGNUP: boolean().required(),
   EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
   SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
   SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
     is: true,
@@ -104,7 +103,6 @@ export const ProtectionAuthSettingsForm = () => {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
       SECURITY_MANUAL_LINKING_ENABLED: false,
-      SITE_URL: '',
       SECURITY_CAPTCHA_ENABLED: false,
       SECURITY_CAPTCHA_SECRET: '',
       SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
@@ -123,7 +121,6 @@ export const ProtectionAuthSettingsForm = () => {
         DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
         EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
         SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-        SITE_URL: authConfig.SITE_URL || '',
         SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED || false,
         SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
         SECURITY_CAPTCHA_PROVIDER: authConfig.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
