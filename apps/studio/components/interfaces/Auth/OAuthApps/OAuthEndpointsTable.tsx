@@ -1,7 +1,5 @@
 import { useParams } from 'common'
-import { useOpenIDConfigurationQuery } from 'data/oauth-server-apps/oauth-openid-configuration-query'
 import { Card, CardContent, cn } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
   PageSectionContent,
@@ -10,24 +8,18 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useOpenIDConfigurationQuery } from '@/data/oauth-server-apps/oauth-openid-configuration-query'
+
 interface OAuthEndpointsTableProps {
-  /**
-   * When true, the component is shown in a preview/disabled state with blurred values.
-   * This is used when the OAuth server is toggled on but not yet saved.
-   */
-  isPreview?: boolean
-  /**
-   * External loading state passed from parent (e.g., when auth config is still loading)
-   */
   isLoading?: boolean
   className?: string
 }
 
 export const OAuthEndpointsTable = ({
-  isPreview = false,
   isLoading: isLoadingProp = false,
   className,
 }: OAuthEndpointsTableProps) => {
@@ -35,7 +27,7 @@ export const OAuthEndpointsTable = ({
 
   const { data: openidConfig, isLoading: isEndpointsLoading } = useOpenIDConfigurationQuery(
     { projectRef },
-    { enabled: !isPreview && !isLoadingProp }
+    { enabled: !isLoadingProp }
   )
 
   const isLoading = isLoadingProp || isEndpointsLoading
@@ -62,14 +54,13 @@ export const OAuthEndpointsTable = ({
   ]
 
   return (
-    <PageSection className={cn(isPreview && 'opacity-60 pointer-events-none', className)}>
+    <PageSection className={cn(className)}>
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>OAuth Endpoints</PageSectionTitle>
           <PageSectionDescription>
-            {isPreview
-              ? 'Save changes to enable OAuth endpoints.'
-              : 'Share these endpoints with third-party applications that need to integrate with your OAuth 2.1 server.'}
+            Share these endpoints with third-party applications that need to integrate with your
+            OAuth 2.1 server.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -87,13 +78,7 @@ export const OAuthEndpointsTable = ({
                   label={endpoint.name}
                   className="mt-4"
                 >
-                  <Input
-                    readOnly
-                    copy={!isPreview}
-                    disabled={isPreview}
-                    value={isPreview ? '••••••••••••••••••••••••' : endpoint.value ?? ''}
-                    className={cn(isPreview && 'select-none')}
-                  />
+                  <Input readOnly copy value={endpoint.value ?? ''} />
                 </FormItemLayout>
               ))
             )}

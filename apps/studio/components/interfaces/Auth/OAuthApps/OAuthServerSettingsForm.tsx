@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dynamic from 'next/dynamic'
 import { useParams } from 'common'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -11,22 +11,17 @@ import {
   Card,
   CardContent,
   CardFooter,
-  cn,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
   Switch,
 } from 'ui'
+import { PageSection, PageSectionContent } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { PageSection, PageSectionContent } from 'ui-patterns'
-
-const OAuthEndpointsTable = dynamic(() =>
-  import('./OAuthEndpointsTable').then((mod) => ({ default: mod.OAuthEndpointsTable }))
-)
 import * as z from 'zod'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -36,6 +31,10 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+
+const OAuthEndpointsTable = dynamic(() =>
+  import('./OAuthEndpointsTable').then((mod) => ({ default: mod.OAuthEndpointsTable }))
+)
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -357,14 +356,8 @@ export const OAuthServerSettingsForm = () => {
           </Form_Shadcn_>
         </PageSectionContent>
       </PageSection>
-      {(form.watch('OAUTH_SERVER_ENABLED') || authConfig?.OAUTH_SERVER_ENABLED) && (
-        <OAuthEndpointsTable
-          isPreview={!authConfig?.OAUTH_SERVER_ENABLED}
-          isLoading={isPending}
-          className={cn(
-            !form.watch('OAUTH_SERVER_ENABLED') && authConfig?.OAUTH_SERVER_ENABLED && 'opacity-60'
-          )}
-        />
+      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && form.watch('OAUTH_SERVER_ENABLED') && (
+        <OAuthEndpointsTable isLoading={isPending} />
       )}
 
       {/* Dynamic Apps Confirmation Modal */}

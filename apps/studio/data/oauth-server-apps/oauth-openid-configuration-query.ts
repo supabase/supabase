@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { useProjectEndpointQuery } from 'data/config/project-endpoint-query'
-import { handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oauthServerAppKeys } from './keys'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OpenIDConfigurationVariables = {
   projectRef: string | undefined
@@ -56,10 +56,9 @@ export const useOpenIDConfigurationQuery = <TData = OpenIDConfigurationData>(
     ...options
   }: UseCustomQueryOptions<OpenIDConfigurationData, OpenIDConfigurationError, TData> = {}
 ) => {
-  const { data: endpointData, isLoading: isEndpointLoading } = useProjectEndpointQuery({
+  const { data: clientEndpoint, isPending: isEndpointLoading } = useProjectApiUrl({
     projectRef,
   })
-  const clientEndpoint = endpointData?.endpoint
 
   const {
     data: authConfig,
