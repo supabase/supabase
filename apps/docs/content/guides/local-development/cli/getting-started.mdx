@@ -346,17 +346,38 @@ supabase stop
 
 ## Telemetry
 
-The Supabase CLI collects usage telemetry to help improve the developer experience.
+The Supabase CLI collects anonymous telemetry data about general usage. Participating in this program is optional, and you can opt out at any time.
 
-You can manage telemetry with the following commands:
+### Why
 
-| Command                      | Description                    |
-| ---------------------------- | ------------------------------ |
-| `supabase telemetry disable` | Opt out of telemetry           |
-| `supabase telemetry enable`  | Opt back in to telemetry       |
-| `supabase telemetry status`  | Check current telemetry status |
+Telemetry helps the Supabase team understand how the CLI is used, which commands are most popular, and where users run into issues. This data directly informs decisions about which features to improve and which bugs to prioritize.
 
-You can also disable telemetry with environment variables: set `SUPABASE_TELEMETRY_DISABLED=1` to disable Supabase CLI telemetry only, or `DO_NOT_TRACK=1` to disable telemetry across all tools that respect this standard.
+### What is collected
+
+- Command name and exit code
+- Command duration
+- CLI version, OS, and architecture
+- Whether the CLI is running in CI, a TTY, or under an AI agent
+- Anonymous device identifier (no personally identifiable information)
+
+The CLI does not collect file paths, environment variable values, database credentials, project contents, or any sensitive data. Flag values are redacted by default unless explicitly marked as safe (for example, `--project-ref`).
+
+### How to opt out
+
+You can disable telemetry by running:
+
+```bash
+supabase telemetry disable
+```
+
+You can check the current status and re-enable with:
+
+```bash
+supabase telemetry status
+supabase telemetry enable
+```
+
+You can also opt out using the `SUPABASE_TELEMETRY_DISABLED=1` environment variable. The broader `DO_NOT_TRACK=1` convention is also respected.
 
 ## Learn more
 
