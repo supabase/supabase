@@ -1,4 +1,4 @@
-import { sqlKeys } from '../sql/keys'
+import { sqlKeys } from '@/data/sql/keys'
 
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,

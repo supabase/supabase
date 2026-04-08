@@ -1,14 +1,9 @@
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { IS_PLATFORM } from 'lib/constants'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,10 +12,15 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
+import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityActionsProps = {
   id: string

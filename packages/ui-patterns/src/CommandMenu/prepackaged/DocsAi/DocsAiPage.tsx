@@ -12,8 +12,8 @@ import {
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  markdownComponents,
 } from 'ui'
+import { markdownComponents } from 'ui-patterns/Markdown'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {

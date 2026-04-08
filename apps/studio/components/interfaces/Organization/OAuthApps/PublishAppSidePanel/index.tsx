@@ -1,22 +1,12 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Edit, Upload } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import {
-  OAuthAppCreateResponse,
-  useOAuthAppCreateMutation,
-} from 'data/oauth/oauth-app-create-mutation'
-import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
-import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { DOCS_URL } from 'lib/constants'
-import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
-import { uploadAttachment } from 'lib/upload'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -25,11 +15,21 @@ import {
   Input,
   Modal,
   SidePanel,
-  cn,
 } from 'ui'
+
 import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { ScopesPanel } from './Scopes'
+import { DocsButton } from '@/components/ui/DocsButton'
+import {
+  OAuthAppCreateResponse,
+  useOAuthAppCreateMutation,
+} from '@/data/oauth/oauth-app-create-mutation'
+import { useOAuthAppUpdateMutation } from '@/data/oauth/oauth-app-update-mutation'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { DOCS_URL } from '@/lib/constants'
+import { isValidHttpUrl, uuidv4 } from '@/lib/helpers'
+import { uploadAttachment } from '@/lib/upload'
 
 export interface PublishAppSidePanelProps {
   visible: boolean

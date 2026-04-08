@@ -6,34 +6,34 @@ import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useEffect, useMemo, useState } from 'react'
-
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs/LogDetailsPanel'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
-  AuditLog,
-  useOrganizationAuditLogsQuery,
-} from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import Table from '@/components/to-be-cleaned/Table'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import {
+  AuditLog,
+  useOrganizationAuditLogsQuery,
+} from '@/data/organizations/organization-audit-logs-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
@@ -135,7 +135,7 @@ export const AuditLogs = () => {
     })
     ?.filter((log) => {
       if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
+        return filters.projects.includes(log.target.metadata.ref || '')
       } else {
         return log
       }

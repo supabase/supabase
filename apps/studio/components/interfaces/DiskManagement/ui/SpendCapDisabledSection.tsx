@@ -1,8 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,
@@ -10,6 +7,9 @@ import {
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function SpendCapDisabledSection() {
   const { data: org } = useSelectedOrganizationQuery()

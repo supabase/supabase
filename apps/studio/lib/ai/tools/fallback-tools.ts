@@ -3,11 +3,12 @@ import { tool } from 'ai'
 // import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
 import { IS_PLATFORM } from 'common'
 import { stripIndent } from 'common-tags'
-import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
-import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { executeQuery } from 'lib/api/self-hosted/query'
 import { z } from 'zod'
+
+import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
+import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const getFallbackTools = ({
   projectRef,

@@ -1,18 +1,18 @@
+import { basename } from 'path'
 import { IS_PLATFORM } from 'common'
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
-import { basename } from 'path'
 import { useEffect, useMemo, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 import { DiffEditor } from '@/components/ui/DiffEditor'
-import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
+import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
 import type {
   EdgeFunctionsDiffResult,
   FileInfo,
   FileStatus,
-} from 'hooks/branches/useEdgeFunctionsDiff'
-import { EMPTY_ARR } from 'lib/void'
-import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+} from '@/hooks/branches/useEdgeFunctionsDiff'
+import { EMPTY_ARR } from '@/lib/void'
 
 const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
   files: EMPTY_ARR,

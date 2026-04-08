@@ -1,5 +1,4 @@
 import { LARGEST_SIZE_LIMIT_BUCKETS_COUNT } from '@supabase/pg-meta'
-import { InlineLink } from 'components/ui/InlineLink'
 import Link from 'next/link'
 import { type FieldError } from 'react-hook-form'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -9,6 +8,7 @@ import {
   formatBytesForDisplay,
   isBucketLimitErrorMessage,
 } from './StorageSettings.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 interface StorageFileSizeLimitErrorMessageProps {
   error?: FieldError

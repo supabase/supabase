@@ -1,8 +1,9 @@
-import { useHotKey } from 'hooks/ui/useHotKey'
-import { getModKeyLabel } from 'lib/helpers'
 import { noop } from 'lodash'
 import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { Button } from 'ui'
+
+import { useHotKey } from '@/hooks/ui/useHotKey'
+import { getModKeyLabel } from '@/lib/helpers'
 
 interface ActionBarProps {
   loading?: boolean

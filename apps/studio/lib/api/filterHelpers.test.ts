@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  enforceAndLogicalOperator,
   FilterGroupType,
   isFilterGroup,
   serializeOperators,
@@ -205,61 +204,5 @@ describe('validateFilterGroup', () => {
       conditions: [],
     }
     expect(validateFilterGroup(group, properties)).toBe(true)
-  })
-})
-
-describe('enforceAndLogicalOperator', () => {
-  test('converts OR to AND at root level', () => {
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
-    }
-    const result = enforceAndLogicalOperator(group)
-    expect(result.logicalOperator).toBe('AND')
-  })
-
-  test('preserves conditions when converting', () => {
-    const condition = { propertyName: 'name', operator: '=', value: 'test' }
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [condition],
-    }
-    const result = enforceAndLogicalOperator(group)
-    expect(result.conditions).toEqual([condition])
-  })
-
-  test('recursively converts nested groups to AND', () => {
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [
-        { propertyName: 'name', operator: '=', value: 'test' },
-        {
-          logicalOperator: 'OR',
-          conditions: [
-            { propertyName: 'age', operator: '>', value: 18 },
-            {
-              logicalOperator: 'OR',
-              conditions: [{ propertyName: 'active', operator: '=', value: true }],
-            },
-          ],
-        },
-      ],
-    }
-    const result = enforceAndLogicalOperator(group)
-
-    expect(result.logicalOperator).toBe('AND')
-    expect((result.conditions[1] as FilterGroupType).logicalOperator).toBe('AND')
-    expect(
-      ((result.conditions[1] as FilterGroupType).conditions[1] as FilterGroupType).logicalOperator
-    ).toBe('AND')
-  })
-
-  test('handles empty conditions array', () => {
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [],
-    }
-    const result = enforceAndLogicalOperator(group)
-    expect(result).toEqual({ logicalOperator: 'AND', conditions: [] })
   })
 })

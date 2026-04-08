@@ -1,5 +1,3 @@
-import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   Sheet,
@@ -12,9 +10,11 @@ import {
 } from 'ui'
 
 import { OperationList } from './OperationList'
+import { useOperationQueueActions } from '@/components/grid/hooks/useOperationQueueActions'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { getModKeyLabel } from '@/lib/helpers'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 
 export const OperationQueueSidePanel = () => {
@@ -63,14 +63,14 @@ export const OperationQueueSidePanel = () => {
                 onClick={confirmOnClose}
                 disabled={isSaving || operations.length === 0}
               >
-                Revert{operations.length > 1 && ' all'}
+                Discard
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={isSaving || operations.length === 0}
                 loading={isSaving}
               >
-                Save{operations.length > 1 && ' all'}
+                Save
                 <span className="text-foreground/40 text-[10px] ml-1.5">{modKey}S</span>
               </Button>
             </div>

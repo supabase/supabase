@@ -1,5 +1,6 @@
-import { AnalyticsInterval } from 'data/analytics/constants'
 import { YAxisProps } from 'recharts'
+
+import { AnalyticsInterval } from '@/data/analytics/constants'
 
 export type ReportDataProviderAttribute = {
   attribute: string

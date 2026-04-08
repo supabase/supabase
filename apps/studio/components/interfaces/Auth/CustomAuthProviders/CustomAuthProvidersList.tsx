@@ -1,8 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Edit, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
 import { parseAsBoolean, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -23,6 +24,7 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { CreateOrUpdateCustomProviderSheet } from './CreateOrUpdateCustomProviderSheet'
@@ -40,8 +42,6 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns/admonition'
 
 const CUSTOM_PROVIDERS_SORT_VALUES = [
   'name:asc',

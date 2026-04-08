@@ -1,19 +1,32 @@
-import useDbQuery from 'hooks/analytics/useDbQuery'
 import { useMemo } from 'react'
 
-export const useSlowQueriesCount = (projectRef?: string, refreshKey: number = 0) => {
-  // SQL to count queries with total execution time > 1000ms (1 second)
-  // refreshKey is used in useMemo to force recomputation when refresh is triggered
-  const sql = useMemo(
-    () => `
+import useDbQuery from '@/hooks/analytics/useDbQuery'
+
+export function buildSlowQueriesCountSql(): string {
+  return `
     -- observability-slow-queries-count
     set search_path to public, extensions;
 
     SELECT
-      count(*)::int as slow_queries_count
-    FROM pg_stat_statements
-    WHERE total_exec_time + total_plan_time > 1000;
-  `,
+      CASE
+        WHEN EXISTS (
+          SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements'
+        )
+        THEN (
+          SELECT count(*)::int
+          FROM pg_stat_statements
+          WHERE total_exec_time + total_plan_time > 1000
+        )
+        ELSE 0
+      END AS slow_queries_count;
+  `
+}
+
+export const useSlowQueriesCount = (projectRef?: string, refreshKey: number = 0) => {
+  // refreshKey is used in useMemo to force recomputation when refresh is triggered
+  const sql = useMemo(
+    () => buildSlowQueriesCountSql(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [refreshKey]
   )
 

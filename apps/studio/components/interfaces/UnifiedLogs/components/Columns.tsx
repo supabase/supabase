@@ -1,15 +1,14 @@
 import { ColumnDef } from '@tanstack/react-table'
-
-import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
-import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
+import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
+import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -64,7 +63,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     // Date column - always visible
     {
       accessorKey: 'date',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+      header: 'Date',
       cell: ({ row }) => {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
@@ -195,7 +194,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Event message" />,
+      header: 'Event message',
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logCount = row.original.log_count

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const ConfirmDeleteModal = () => {
   const [deleting, setDeleting] = useState(false)

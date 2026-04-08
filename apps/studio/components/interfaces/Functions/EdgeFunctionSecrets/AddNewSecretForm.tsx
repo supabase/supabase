@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -13,17 +11,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import z from 'zod'
 
 import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
+import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
 
 type SecretPair = {
   name: string

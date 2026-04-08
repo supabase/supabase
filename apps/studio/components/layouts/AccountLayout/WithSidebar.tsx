@@ -1,10 +1,10 @@
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { cn, Menu } from 'ui'
 
 import type { SidebarSection } from './AccountLayout.types'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface WithSidebarProps {
   title: string

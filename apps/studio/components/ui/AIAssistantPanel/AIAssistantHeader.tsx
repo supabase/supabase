@@ -1,6 +1,5 @@
 import { Clipboard, Ellipsis, Plus, Settings, X } from 'lucide-react'
 import { useState } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   AiIconAnimation,
   Button,
@@ -15,6 +14,7 @@ import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOptInModal } from './AIOptInModal'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean

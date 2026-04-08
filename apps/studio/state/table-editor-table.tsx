@@ -1,19 +1,19 @@
-import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
-import {
-  loadTableEditorStateFromLocalStorage,
-  parseSupaTable,
-  saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
-import { Filter, SupaRow } from 'components/grid/types'
-import { getInitialGridColumns } from 'components/grid/utils/column'
-import { getGridColumns } from 'components/grid/utils/gridColumns'
-import { Entity } from 'data/table-editor/table-editor-types'
 import { createContext, PropsWithChildren, useContext, useEffect, useRef } from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
 import { useTableEditorStateSnapshot } from './table-editor'
+import { TableIndexAdvisorProvider } from '@/components/grid/context/TableIndexAdvisorContext'
+import {
+  loadTableEditorStateFromLocalStorage,
+  parseSupaTable,
+  saveTableEditorStateToLocalStorageDebounced,
+} from '@/components/grid/SupabaseGrid.utils'
+import { Filter, SupaRow } from '@/components/grid/types'
+import { getInitialGridColumns } from '@/components/grid/utils/column'
+import { getGridColumns } from '@/components/grid/utils/gridColumns'
+import { Entity } from '@/data/table-editor/table-editor-types'
 
 export const createTableEditorTableState = ({
   projectRef,

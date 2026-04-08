@@ -1,21 +1,10 @@
 import { useParams } from 'common'
-import { DeleteBucketModal } from 'components/interfaces/Storage/DeleteBucketModal'
-import { EditBucketModal } from 'components/interfaces/Storage/EditBucketModal'
-import { EmptyBucketModal } from 'components/interfaces/Storage/EmptyBucketModal'
-import { useSelectedBucket } from 'components/interfaces/Storage/FilesBuckets/useSelectedBucket'
-import StorageBucketsError from 'components/interfaces/Storage/StorageBucketsError'
-import { StorageExplorer } from 'components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
@@ -24,9 +13,25 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
+import { DeleteBucketModal } from '@/components/interfaces/Storage/DeleteBucketModal'
+import { EditBucketModal } from '@/components/interfaces/Storage/EditBucketModal'
+import { EmptyBucketModal } from '@/components/interfaces/Storage/EmptyBucketModal'
+import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
+import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucketWarning'
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
+import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
+import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
+import type { NextPageWithLayout } from '@/types'
 
 const BucketPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -71,9 +76,14 @@ const BucketPage: NextPageWithLayout = () => {
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="truncate">{bucketId}</span>
             {bucket?.public && (
-              <Badge variant="warning" className="flex-shrink-0">
-                Public
-              </Badge>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="warning" className="flex flex-shrink-0">
+                    Public
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
+              </Tooltip>
             )}
           </div>
         }
@@ -84,6 +94,7 @@ const BucketPage: NextPageWithLayout = () => {
           },
           {
             label: 'Buckets',
+            href: `/project/${ref}/storage/files`,
           },
         ]}
         primaryActions={
@@ -140,8 +151,11 @@ const BucketPage: NextPageWithLayout = () => {
           </>
         }
       >
-        <div className="flex-1 min-h-0 px-6 pb-6">
-          <StorageExplorer />
+        <div className="flex-1 min-h-0 px-6 pb-6 flex flex-col gap-4">
+          {ref && bucketId && <PublicBucketWarning projectRef={ref} bucketId={bucketId} />}
+          <div className="flex-1 min-h-0">
+            <StorageExplorer />
+          </div>
         </div>
       </PageLayout>
 

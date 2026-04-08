@@ -64,7 +64,7 @@
     "mdast-util-to-markdown": "^1.5.0",
     "micromark-extension-gfm": "^2.0.3",
     "micromark-extension-mdxjs": "^1.0.1",
-    "next": "catalog:",
+    "next": "^15.5.14",
     "next-mdx-remote": "^6.0.0",
     "next-seo": "^6.5.0",
     "next-themes": "^0.3.0",
@@ -89,6 +89,7 @@
     "typescript": "catalog:",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
+    "unicornstudio-react": "2.0.1-1",
     "use-debounce": "^7.0.1",
     "vanilla-tilt": "1.7.0",
     "yup": "^1.4.0"

@@ -1,16 +1,17 @@
+import { basename } from 'path'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useMemo } from 'react'
+
 import {
   getEdgeFunctionBody,
   type EdgeFunctionBodyData,
-} from 'data/edge-functions/edge-function-body-query'
+} from '@/data/edge-functions/edge-function-body-query'
 import {
   useEdgeFunctionsQuery,
   type EdgeFunctionsData,
-} from 'data/edge-functions/edge-functions-query'
-import { edgeFunctionsKeys } from 'data/edge-functions/keys'
-import { handleError } from 'data/fetchers'
-import { basename } from 'path'
-import { useCallback, useMemo } from 'react'
+} from '@/data/edge-functions/edge-functions-query'
+import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
+import { handleError } from '@/data/fetchers'
 
 interface UseEdgeFunctionsDiffProps {
   currentBranchRef?: string

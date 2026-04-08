@@ -1,13 +1,14 @@
+import { useCallback, useMemo } from 'react'
+
+import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import type {
   Entitlement,
   EntitlementConfig,
   EntitlementType,
   FeatureKey,
-} from 'data/entitlements/entitlements-query'
-import { useEntitlementsQuery } from 'data/entitlements/entitlements-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { useCallback, useMemo } from 'react'
-import { useSelectedOrganizationQuery } from './useSelectedOrganization'
+} from '@/data/entitlements/entitlements-query'
+import { useEntitlementsQuery } from '@/data/entitlements/entitlements-query'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function isNumericConfig(
   config: EntitlementConfig,
