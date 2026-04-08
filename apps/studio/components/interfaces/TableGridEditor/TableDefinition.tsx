@@ -17,6 +17,7 @@ import {
 import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { formatSql } from 'lib/formatSql'
 import { timeout } from 'lib/helpers'
+import { formatViewOptionsClause } from 'lib/view-options'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -59,8 +60,8 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const isLoading = isViewLike(entity) ? isViewLoading : isTableLoading
   const definition = isViewLike(entity) ? viewData?.definition : tableData
 
-  const viewOptions = isViewLike(entity) && viewData?.viewOptions
-    ? ` with (${viewData.viewOptions})`
+  const viewOptions = isViewLike(entity)
+    ? formatViewOptionsClause(viewData?.viewOptions)
     : ''
 
   const prepend = isView(entity)
