@@ -13,6 +13,8 @@ Check updates for each service to learn more.
 
 ## Unreleased
 
+⚠️ **Upcoming default changes:** In a future release, several defaults will change: Postgres 15 → 17, Kong → Envoy, MinIO → RustFS, Analytics/Vector removed from the default stack, and the new API keys and authentication replacing the "legacy" architecture. Most of these are already available as optional configurations.
+
 ---
 
 ## [2026-04-08]
