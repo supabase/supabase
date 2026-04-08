@@ -1,0 +1,23 @@
+---
+title = "PostgREST not recognizing the objects(tables/functions/views) in a schema even after adding it to the exposed schemas"
+topics = [
+  "database",
+  "rest-api",
+  "platform"
+]
+keywords = []
+---
+
+PostgREST is returning errors by not recognizing the objects(tables/tables/views) in a schema and logging errors similar to:
+
+```console
+Could not find the table 'X' in the schema cache
+```
+
+## Why this happens
+
+This happens because, when you have multiple schemas, the default schema will be the first in the list of exposed schemas.
+
+## How to fix this
+
+If you want to use the objects without specifying a schema you'd need to put it first. Else, you should initialise the Supabase client with the schema([”With custom schemas”](https://supabase.com/docs/reference/javascript/initializing)) or specify the schema on each request using ".schema('your_schema')" (["Switching schemas per query"](https://supabase.com/docs/reference/javascript/select))
