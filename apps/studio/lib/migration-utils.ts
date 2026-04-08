@@ -27,3 +27,12 @@ export function parseMigrationVersion(version: string | null | undefined): Dayjs
   const parsed = dayjs.utc(version, 'YYYYMMDDHHmmss', true)
   return parsed.isValid() ? parsed : undefined
 }
+
+/**
+ * Formats a migration version string as a human-readable UTC date label.
+ * Returns 'Unknown' if the version cannot be parsed.
+ */
+export function formatMigrationVersionLabel(version: string | null | undefined): string {
+  const parsed = parseMigrationVersion(version)
+  return parsed ? parsed.format('DD MMM YYYY, HH:mm:ss') : 'Unknown'
+}

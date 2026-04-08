@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { describe, expect, it } from 'vitest'
 
-import { parseMigrationVersion } from './migration-utils'
+import { formatMigrationVersionLabel, parseMigrationVersion } from './migration-utils'
 
 dayjs.extend(utc)
 
@@ -80,5 +80,17 @@ describe('parseMigrationVersion', () => {
     const result = parseMigrationVersion('20231128095400')
 
     expect(result?.toISOString()).toBe('2023-11-28T09:54:00.000Z')
+  })
+})
+
+describe('formatMigrationVersionLabel', () => {
+  it('should format a valid version as a UTC date string', () => {
+    expect(formatMigrationVersionLabel('20231128095400')).toBe('28 Nov 2023, 09:54:00')
+  })
+
+  it('should return Unknown for an invalid version', () => {
+    expect(formatMigrationVersionLabel('001')).toBe('Unknown')
+    expect(formatMigrationVersionLabel(null)).toBe('Unknown')
+    expect(formatMigrationVersionLabel(undefined)).toBe('Unknown')
   })
 })
