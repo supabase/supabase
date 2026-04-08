@@ -282,7 +282,11 @@ export const OAuthServerSettingsForm = () => {
                         )}
                       />
                       {(() => {
-                        const authorizationUrl = `${authConfig?.SITE_URL}${form.watch('OAUTH_SERVER_AUTHORIZATION_PATH') || '/oauth/consent'}`
+                        const siteUrl = authConfig?.SITE_URL?.trim()
+                        const authorizationPath =
+                          form.watch('OAUTH_SERVER_AUTHORIZATION_PATH')?.trim() || '/oauth/consent'
+                        const authorizationUrl = siteUrl ? `${siteUrl}${authorizationPath}` : ''
+
                         return (
                           <Admonition
                             type="tip"
@@ -290,14 +294,20 @@ export const OAuthServerSettingsForm = () => {
                             description={
                               <>
                                 Preview Authorization URL:{' '}
-                                <a
-                                  href={authorizationUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-foreground-light underline hover:text-foreground transition"
-                                >
-                                  {authorizationUrl}
-                                </a>
+                                {authorizationUrl ? (
+                                  <a
+                                    href={authorizationUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-foreground-light underline hover:text-foreground transition"
+                                  >
+                                    {authorizationUrl}
+                                  </a>
+                                ) : (
+                                  <span className="text-foreground-light">
+                                    Set a Site URL to preview
+                                  </span>
+                                )}
                               </>
                             }
                           />
