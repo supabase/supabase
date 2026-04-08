@@ -3,6 +3,7 @@ import type { GoPageInput } from 'marketing'
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'stripe/schedule',
+  expiresAt: '2026-05-31',
   metadata: {
     title: 'Schedule a Meeting at Stripe Sessions 2026 | Supabase',
     description:

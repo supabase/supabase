@@ -5,6 +5,7 @@ import { Button } from 'ui'
 const page: GoPageInput = {
   template: 'thank-you',
   slug: 'postgresconf-sjc-2026/contest/thank-you',
+  expiresAt: '2026-05-31',
   metadata: {
     title: "You're entered | Supabase at PostgresConf San Jose 2026",
     description:

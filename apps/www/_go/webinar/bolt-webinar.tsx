@@ -4,6 +4,7 @@ import { MediaBlock } from 'marketing'
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'vibe-coding-done-right-webinar',
+  expiresAt: '2026-03-31',
   metadata: {
     title: 'Vibe Coding, Done Right: Learn More | Supabase + Bolt.new',
     description:

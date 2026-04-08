@@ -5,6 +5,7 @@ import { Button } from 'ui'
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'accenture-reinvention-2026/contest',
+  expiresAt: '2026-05-31',
   metadata: {
     title:
       'Win an iPhone 17 Pro Max | Supabase at Accenture AI & Data Conference (ReinventionX) 2026',

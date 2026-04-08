@@ -5,6 +5,7 @@ import { Button } from 'ui'
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'startup-grind-2026/contest',
+  expiresAt: '2026-05-31',
   metadata: {
     title: 'Win an iPhone 17 Pro Max | Supabase at Startup Grind 2026',
     description:

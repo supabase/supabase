@@ -5,6 +5,7 @@ import { Button } from 'ui'
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'sf-rooftop-party',
+  expiresAt: '2026-05-31',
   metadata: {
     title: 'Win a MacBook Neo | Supabase, Stigg & Dreambase Rooftop Party',
     description:

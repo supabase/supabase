@@ -35,24 +35,24 @@ const pages: GoPageInput[] = [
   contestRules,
   figmaWebinarMay2026,
   figmaWebinarMay2026ThankYou,
-  boltWebinar, // remove after March 31, 2026
-  boltWebinarThankYou, // remove after March 31, 2026
-  stripeExecDinner, // remove after May 31, 2026
-  stripeExecDinnerThankYou, // remove after May 31, 2026
-  stripeMeetingScheduler, // remove after May 31, 2026
-  stripeSessionsContest, // remove after May 31, 2026
-  stripeParty, // remove after May 31, 2026
-  sxswContest, // remove after April 30, 2026
-  accentureContest, // remove after May 31, 2026
-  postgresconfContest, // remove after May 31, 2026
-  postgresconfContestThankYou, // remove after May 31, 2026
+  boltWebinar,
+  boltWebinarThankYou,
+  stripeExecDinner,
+  stripeExecDinnerThankYou,
+  stripeMeetingScheduler,
+  stripeSessionsContest,
+  stripeParty,
+  sxswContest,
+  accentureContest,
+  postgresconfContest,
+  postgresconfContestThankYou,
   mcpDevSummitContest,
   mcpDevSummitContestThankYou,
   pgconfDevContest,
   pgconfDevContestThankYou,
   aiEngineerEuropeContest,
   aiEngineerEuropeContestThankYou,
-  startupGrindContest, // remove after May 31, 2026
+  startupGrindContest,
   supabaseStripeProjects,
 ]
 

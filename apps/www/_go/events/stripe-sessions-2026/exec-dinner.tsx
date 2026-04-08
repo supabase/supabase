@@ -10,6 +10,7 @@ const joe = authors.find((a) => a.author_id === 'joe_sciarrino')
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'exec-dinner-april-2026',
+  expiresAt: '2026-05-31',
   metadata: {
     title: 'Executive Dinner: The Future of Scalable Databases | Supabase',
     description:

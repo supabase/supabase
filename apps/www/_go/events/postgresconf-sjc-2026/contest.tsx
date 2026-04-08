@@ -11,6 +11,7 @@ const speaker2 = authors.find((a) => a.author_id === 'sugu_sougoumarane')
 const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'postgresconf-sjc-2026/contest',
+  expiresAt: '2026-05-31',
   metadata: {
     title: 'Win a Mac Mini | Supabase at PostgresConf San Jose 2026',
     description:
