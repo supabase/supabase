@@ -60,9 +60,7 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const definition = isViewLike(entity) ? viewData?.definition : tableData
 
   const viewOptions =
-    isViewLike(entity) && viewData?.viewOptions
-      ? ` with (${viewData.viewOptions})`
-      : ''
+    isViewLike(entity) && viewData?.viewOptions ? ` with (${viewData.viewOptions})` : ''
 
   const prepend = isView(entity)
     ? `create view ${entity.schema}.${entity.name}${viewOptions} as\n`
