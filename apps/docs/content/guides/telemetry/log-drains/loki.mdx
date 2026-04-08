@@ -1,0 +1,115 @@
+---
+id: 'log-drains-loki'
+title: 'Log Drains with Loki'
+description: 'Configure Supabase Log Drains to send logs to Grafana Cloud Loki'
+---
+
+Use this guide to forward Supabase logs to Grafana Cloud Loki using a Log Drain destination.
+
+<Admonition type="note">
+
+This guide focuses on Grafana Cloud Loki. You can also use self-hosted Loki, but you must enable structured metadata support in your Loki deployment.
+
+</Admonition>
+
+## Prerequisites
+
+- A Supabase project on Pro, Team, or Enterprise with Log Drains enabled.
+- A Grafana Cloud stack with Loki available.
+- Admin access to both Supabase and Grafana Cloud.
+- The following Loki destination values:
+  - Base URL of your Loki endpoint.
+  - Loki username (instance ID).
+  - Access policy token with `logs:write` permission.
+
+The final push URL format should be:
+
+`<loki-base-url>/loki/api/v1/push`
+
+## 1. Retrieve Loki connection details
+
+1. Sign in to Grafana Cloud and open your organization at `https://grafana.com/orgs/<org-id>`.
+2. Select the target stack and open **Details**.
+3. In the hosted Loki section, copy:
+   - The Loki URL from **Grafana Data source settings**.
+   - The Loki username / instance ID.
+4. Save these values for destination setup in Supabase.
+
+## 2. Create a Grafana Cloud access policy and token
+
+1. In Grafana Cloud, go to **Administration > Users and Access > Cloud Access Policies**.
+2. Create a policy for Supabase log ingestion.
+3. Grant only `logs:write`.
+4. Add a token for that policy, set an expiration, and copy the generated token securely.
+
+## 3. Configure the Loki destination in Supabase
+
+1. Open your project in Supabase and go to [Project Settings > Log Drains](/dashboard/project/_/settings/log-drains).
+2. Click **Add a new destination**.
+3. Set:
+   - **Name**: a descriptive destination name.
+   - **Type**: `Loki`.
+   - **Loki URL**: your Loki URL with `/loki/api/v1/push` appended (avoid double-appending if already present).
+   - **Username**: Loki username / instance ID.
+   - **Password**: Grafana Cloud access policy token.
+4. Click **Save destination**.
+
+## 4. Verify logs in Grafana Cloud
+
+1. Open **Explore** in Grafana Cloud.
+2. In the query builder, start with:
+   - Label: `service`
+   - Value: one of your Supabase sources such as `postgres_logs`
+3. For discovery, start with a broad query and then narrow down.
+
+Example LogQL queries:
+
+**Errors across common Supabase services**
+
+```txt
+{service=~"postgres_logs|edge_logs|realtime_logs|storage_logs"} | detected_level=~"error|fatal"
+```
+
+**Slow query signals**
+
+```txt
+{service="postgres_logs"} |= "duration:" | metadata_parsed_error_severity="LOG"
+```
+
+**Lock waits / deadlocks**
+
+```txt
+{service="postgres_logs"} |~ "deadlock|lock wait|canceling statement"
+```
+
+**Filter by user or database**
+
+```txt
+{service="postgres_logs"} | metadata_parsed_user_name="your_user"
+{service="postgres_logs"} | metadata_parsed_database_name="postgres"
+```
+
+**Filter by PostgreSQL error code**
+
+```txt
+{service="postgres_logs"} | metadata_parsed_sql_state_code="23505"
+```
+
+## Security and operations recommendations
+
+- Use least privilege: grant only `logs:write` to the access policy used for this drain.
+- Set token expirations and rotate tokens regularly.
+- Rotate safely by creating a new token, updating Supabase destination credentials, then deleting the old token.
+- Store tokens in a dedicated secret manager.
+
+## Loki protocol details
+
+- Supabase payloads are formatted for Loki HTTP API ingestion.
+- Events are sent in batches up to 250 events per request.
+- Log source and product are used as stream labels.
+- `event_message` and `timestamp` are removed from metadata fields to avoid duplication.
+
+See the official Loki docs for API specifics and structured metadata setup:
+
+- [Loki HTTP API ingestion reference](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs)
+- [Loki structured metadata](https://grafana.com/docs/loki/latest/get-started/labels/structured-metadata/)
