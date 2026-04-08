@@ -1,14 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import NoPermission from 'components/ui/NoPermission'
-import {
-  FunctionsCombinedStatsVariables,
-  useFunctionsCombinedStatsQuery,
-} from 'data/analytics/functions-combined-stats-query'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -29,6 +20,15 @@ import type { EdgeFunctionChartRawDatum } from './EdgeFunctionOverview.utils'
 import { EdgeFunctionPerformanceSection } from './EdgeFunctionPerformanceSection'
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
 import { EdgeFunctionUsageSection } from './EdgeFunctionUsageSection'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import NoPermission from '@/components/ui/NoPermission'
+import {
+  FunctionsCombinedStatsVariables,
+  useFunctionsCombinedStatsQuery,
+} from '@/data/analytics/functions-combined-stats-query'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const EdgeFunctionOverview = () => {
   const router = useRouter()

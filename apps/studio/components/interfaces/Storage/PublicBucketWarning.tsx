@@ -1,7 +1,5 @@
 import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { storageKeys } from 'data/storage/keys'
 import { useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -9,7 +7,9 @@ import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { executeSql } from '@/data/sql/execute-sql-query'
+import { storageKeys } from '@/data/storage/keys'
 import { usePublicBucketsWithSelectPoliciesQuery } from '@/data/storage/public-buckets-with-select-policies-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 

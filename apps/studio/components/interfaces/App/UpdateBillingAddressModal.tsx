@@ -3,20 +3,6 @@ import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
-import {
-  getAddressElementAppearanceOptions,
-  STRIPE_ELEMENT_FONTS,
-} from 'components/interfaces/Billing/Payment/Payment.utils'
-import { BillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
-import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -32,6 +18,21 @@ import {
   Form_Shadcn_ as Form,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import {
+  getAddressElementAppearanceOptions,
+  STRIPE_ELEMENT_FONTS,
+} from '@/components/interfaces/Billing/Payment/Payment.utils'
+import { BillingCustomerDataForm } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
+import { useBillingCustomerDataForm } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from '@/data/organizations/organization-tax-id-update-mutation'
+import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 

@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
-vi.mock('lib/constants', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('lib/constants')
+vi.mock('@/lib/constants', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
   return {
     ...actual,
     IS_PLATFORM: true,

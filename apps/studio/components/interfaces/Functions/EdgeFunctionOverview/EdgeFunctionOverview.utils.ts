@@ -2,8 +2,9 @@ import dayjs from 'dayjs'
 import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
-import type { ChartIntervals } from 'types'
 import type { ChartConfig } from 'ui'
+
+import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
   timestamp: string | number

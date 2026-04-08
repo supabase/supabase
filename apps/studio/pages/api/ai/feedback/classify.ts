@@ -1,9 +1,10 @@
 import { generateText, Output } from 'ai'
-import { getModel } from 'lib/ai/model'
-import { DEFAULT_COMPLETION_MODEL } from 'lib/ai/model.utils'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import apiWrapper from '@/lib/api/apiWrapper'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req

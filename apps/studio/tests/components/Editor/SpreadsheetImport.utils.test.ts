@@ -1,8 +1,9 @@
+import { describe, expect, test } from 'vitest'
+
 import {
   inferColumnType,
   parseSpreadsheetText,
-} from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
-import { describe, expect, test } from 'vitest'
+} from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 
 describe('SpreadsheetImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {

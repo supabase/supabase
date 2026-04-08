@@ -3,26 +3,6 @@ import { loadStripe, StripeAddressElement, StripeElementsOptions } from '@stripe
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import {
-  getAddressElementAppearanceOptions,
-  STRIPE_ELEMENT_FONTS,
-} from 'components/interfaces/Billing/Payment/Payment.utils'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { organizationKeys } from 'data/organizations/keys'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,6 +11,26 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BillingCustomerDataForm } from './BillingCustomerDataForm'
 import { useBillingCustomerDataForm } from './useBillingCustomerDataForm'
+import {
+  getAddressElementAppearanceOptions,
+  STRIPE_ELEMENT_FONTS,
+} from '@/components/interfaces/Billing/Payment/Payment.utils'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { organizationKeys } from '@/data/organizations/keys'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from '@/data/organizations/organization-tax-id-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 

@@ -1,12 +1,12 @@
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { customRender } from 'tests/lib/custom-render'
-import { routerMock } from 'tests/lib/route-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { IntegrationDefinition } from '../../Landing/Integrations.constants'
 import { InstallIntegrationSheet } from './InstallIntegrationSheet/InstallIntegrationSheet'
+import { customRender } from '@/tests/lib/custom-render'
+import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 

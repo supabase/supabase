@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
@@ -32,6 +31,7 @@ import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
+import type { NextPageWithLayout } from '@/types'
 
 const BucketPage: NextPageWithLayout = () => {
   const router = useRouter()

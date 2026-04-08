@@ -1,12 +1,13 @@
 import { tool } from 'ai'
+import { z } from 'zod'
+
 import {
   EDGE_FUNCTION_PROMPT,
   PG_BEST_PRACTICES,
   REALTIME_PROMPT,
   RLS_PROMPT,
-} from 'lib/ai/prompts'
-import { fixSqlBackslashEscapes } from 'lib/ai/util'
-import { z } from 'zod'
+} from '@/lib/ai/prompts'
+import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
 const KNOWLEDGE = {
   pg_best_practices: PG_BEST_PRACTICES,

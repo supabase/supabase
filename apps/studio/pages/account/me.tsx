@@ -1,19 +1,3 @@
-import { AccountConnections } from 'components/interfaces/Account/Preferences/AccountConnections'
-import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
-import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
-import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
-import { DashboardSettings } from 'components/interfaces/Account/Preferences/DashboardSettings'
-import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
-import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
-import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { AlertError } from 'components/ui/AlertError'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfile } from 'lib/profile'
-import type { NextPageWithLayout } from 'types'
 import { Card, CardContent } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -24,6 +8,23 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
+import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
+import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
+import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
+import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
+import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
+import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
+import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { AlertError } from '@/components/ui/AlertError'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
+import type { NextPageWithLayout } from '@/types'
 
 const User: NextPageWithLayout = () => {
   return IS_PLATFORM ? <PlatformPreferences /> : <SelfHostedPreferences />
