@@ -2,18 +2,16 @@ import type { LogData } from './Messages.types'
 import { jsonSyntaxHighlight, SelectionDetailedTimestampRow } from './MessagesFormatters'
 
 const LogsDivider = () => {
-  return (
-    <div className="h-px w-full bg-panel-border-interior-light [[data-theme*=dark]_&]:bg-panel-border-interior-dark" />
-  )
+  return <div className="h-px w-full bg-border-muted" />
 }
 
 export const SelectedRealtimeMessagePanel = ({ log }: { log: LogData }) => {
   return (
     <>
       <div className="px-8">
-        <span className="col-span-4 text-sm text-scale-900">Message</span>
+        <span className="col-span-4 text-sm text-foreground-lighter">Message</span>
 
-        <p className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-xs text-scale-1200">
+        <p className="text-wrap mt-2 overflow-x-auto whitespace-pre-wrap font-mono text-xs text-foreground">
           {log.message}
         </p>
       </div>
