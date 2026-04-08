@@ -1,4 +1,6 @@
 export const CONFIG_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all PostgreSQL configuration settings from pg_settings
 SELECT
   name,
   setting,

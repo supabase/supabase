@@ -16,6 +16,8 @@ export const getUnsafeEntitiesInApiSql = ({ schemas }: { schemas: Array<string> 
   const schemaList = schemas.map(literal).join(', ')
 
   return /* SQL */ `
+-- source: dashboard
+-- description: List API-exposed entities with potential security issues such as missing RLS or security invoker
     select
       n.nspname as schema,
       c.relname as name,

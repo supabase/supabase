@@ -58,6 +58,8 @@ function list({
   zod: typeof pgIndexArrayZod
 } {
   let sql = `
+-- source: dashboard
+-- description: List all indexes with metadata
     with indexes as (${INDEXES_SQL})
     select *
     from indexes
@@ -84,6 +86,8 @@ function list({
 
 function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgIndexOptionalZod } {
   const sql = `
+-- source: dashboard
+-- description: Retrieve a single index by identifier
     with indexes as (${INDEXES_SQL})
     select *
     from indexes

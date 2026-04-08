@@ -10,7 +10,8 @@ export const getTableColumnsSql = ({ table, schema }: { table?: string; schema?:
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
   const sql = /* SQL */ `
-  
+-- source: dashboard
+-- description: List tables and views with their columns, optionally filtered by table and schema
   SELECT
     tbl.schemaname,
     tbl.tablename,

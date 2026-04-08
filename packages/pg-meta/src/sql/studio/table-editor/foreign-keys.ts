@@ -68,9 +68,11 @@ export const getForeignKeyConstraintsSql = ({ schema }: { schema: string }) => {
   if (!schema) throw new Error('schema is required')
 
   const sql = /* SQL */ `
-SELECT 
-  con.oid as id, 
-  con.conname as constraint_name, 
+-- source: dashboard
+-- description: List all foreign key constraints in a schema with source and target columns
+SELECT
+  con.oid as id,
+  con.conname as constraint_name,
   con.confdeltype as deletion_action,
   con.confupdtype as update_action,
   rel.oid as source_id,

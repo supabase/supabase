@@ -2,8 +2,10 @@ import { ident } from '../../../pg-format'
 
 export const getTableConstraintsSql = ({ id }: { id: number }) => {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: List constraints for a table by OID including type and name
   with table_info as (
-    select 
+    select
       n.nspname::text as schema,
       c.relname::text as name,
       to_regclass(concat('"', n.nspname, '"."', c.relname, '"')) as regclass
@@ -36,4 +38,5 @@ export const getDropConstraintSQL = ({
   schema: string
   table: string
   name: string
-}) => `ALTER TABLE ${ident(schema)}.${ident(table)} DROP CONSTRAINT ${ident(name)}`
+}) =>
+  `-- source: dashboard\n-- description: Drop a named constraint from a table\nALTER TABLE ${ident(schema)}.${ident(table)} DROP CONSTRAINT ${ident(name)}`

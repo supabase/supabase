@@ -4,8 +4,10 @@ export const getViewDefinitionSql = ({ id }: { id: number }) => {
   }
 
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Fetch the SQL definition of a view by its OID
     with table_info as (
-      select 
+      select
         n.nspname::text as schema,
         c.relname::text as name,
         to_regclass(concat('"', n.nspname, '"."', c.relname, '"')) as regclass

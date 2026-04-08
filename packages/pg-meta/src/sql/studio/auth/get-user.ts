@@ -1,5 +1,7 @@
 export const getUserSQL = (userId: string) => {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Fetch a single auth user by ID with their identity providers
 select
   auth.users.id,
   auth.users.email,

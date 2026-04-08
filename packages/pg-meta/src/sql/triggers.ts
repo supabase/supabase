@@ -1,4 +1,6 @@
 export const TRIGGERS_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all triggers with events, orientation, timing, and function details
 SELECT
   pg_t.oid AS id,
   pg_t.tgrelid AS table_id,

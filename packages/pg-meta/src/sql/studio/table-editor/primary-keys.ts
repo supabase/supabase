@@ -14,5 +14,5 @@ export const getAddPrimaryKeySQL = ({
   columns: string[]
 }) => {
   const primaryKeyColumns = columns.map((col) => ident(col)).join(', ')
-  return `ALTER TABLE ${ident(schema)}.${ident(table)} ADD PRIMARY KEY (${primaryKeyColumns})`
+  return `-- source: dashboard\n-- description: Add a primary key constraint to a table\nALTER TABLE ${ident(schema)}.${ident(table)} ADD PRIMARY KEY (${primaryKeyColumns})`
 }

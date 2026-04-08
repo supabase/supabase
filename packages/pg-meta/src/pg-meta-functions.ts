@@ -59,6 +59,8 @@ export function list({
   zod: typeof pgFunctionArrayZod
 } {
   let sql = /* SQL */ `
+-- source: dashboard
+-- description: List all functions with metadata
     with f as (
       ${FUNCTIONS_SQL}
     )
@@ -115,6 +117,8 @@ export function retrieve({
 }): FunctionsRetrieveReturn {
   if (id) {
     const sql = /* SQL */ `
+-- source: dashboard
+-- description: Retrieve a single function by identifier
       with f as (
         ${FUNCTIONS_SQL}
       )
@@ -127,7 +131,7 @@ export function retrieve({
       zod: pgFunctionOptionalZod,
     }
   } else if (name && schema && args) {
-    const sql = /* SQL */ `with f as (
+    const sql = /* SQL */ `-- source: dashboard\n-- description: Retrieve a single function by identifier\nwith f as (
       ${FUNCTIONS_SQL}
     )
     select
@@ -196,6 +200,8 @@ function _generateCreateFunctionSql(
   { replace = false } = {}
 ): string {
   return /* SQL */ `
+-- source: dashboard
+-- description: Create a new function
     CREATE ${replace ? 'OR REPLACE' : ''} FUNCTION ${ident(schema!)}.${ident(name!)}(${
       args?.join(', ') || ''
     })
@@ -287,6 +293,8 @@ export function update(currentFunc: PGFunction, { name, schema, definition }: PG
       : ''
 
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Update function properties
     DO LANGUAGE plpgsql $$
     BEGIN
       IF ${typeof definition === 'string' ? 'TRUE' : 'FALSE'} THEN
@@ -325,7 +333,7 @@ export const pgFunctionDeleteZod = z.object({
 export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>
 
 export function remove(func: PGFunction, { cascade = false }: PGFunctionDelete = {}) {
-  const sql = /* SQL */ `DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}
+  const sql = /* SQL */ `-- source: dashboard\n-- description: Drop a function\nDROP FUNCTION ${ident(func.schema)}.${ident(func.name)}
   (${func.identity_argument_types})
   ${cascade ? 'CASCADE' : 'RESTRICT'};`
 

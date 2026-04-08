@@ -1,6 +1,8 @@
 import { safeSql } from '../pg-format'
 
 export const FOREIGN_TABLES_SQL = /* SQL */ safeSql`
+-- source: dashboard
+-- description: List all foreign tables with their server and data wrapper info
 select
   c.oid::int8 as id,
   n.nspname as schema,

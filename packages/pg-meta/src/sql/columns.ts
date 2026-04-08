@@ -1,6 +1,8 @@
 import { safeSql } from '../pg-format'
 
 export const COLUMNS_SQL = /* SQL */ safeSql`
+-- source: dashboard
+-- description: List all columns with metadata for tables, views, and foreign tables
 -- Adapted from information_schema.columns
 
 SELECT

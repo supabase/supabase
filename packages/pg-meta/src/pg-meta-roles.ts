@@ -36,6 +36,8 @@ function list({
   zod: typeof pgRoleArrayZod
 } {
   let sql = `
+-- source: dashboard
+-- description: List all roles with metadata
 with
   roles as (${ROLES_SQL})
 select
@@ -83,7 +85,7 @@ function retrieve(identifier: RoleIdentifier): {
   sql: string
   zod: typeof pgRoleOptionalZod
 } {
-  const sql = `with roles as (${ROLES_SQL}) select * from roles where ${getIdentifierWhereClause(identifier)};`
+  const sql = `-- source: dashboard\n-- description: Retrieve a single role by identifier\nwith roles as (${ROLES_SQL}) select * from roles where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgRoleOptionalZod,
@@ -125,6 +127,8 @@ function create({
   config = {},
 }: RoleCreateParams): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Create a new role
 create role ${ident(name)}
   ${isSuperuser ? 'superuser' : ''}
   ${canCreateDb ? 'createdb' : ''}
@@ -175,6 +179,8 @@ function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: st
     validUntil,
   } = params
   const sql = `
+-- source: dashboard
+-- description: Update role properties
 do $$
 declare
   old record;
@@ -222,6 +228,8 @@ function remove(
   { ifExists = false }: RoleRemoveParams = {}
 ): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Drop a role
 do $$
 declare
   old record;

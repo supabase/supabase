@@ -143,6 +143,8 @@ export const getPaginatedUsersSQL = ({
     ${whereStatement}`
 
   let usersQuery = `
+-- source: dashboard
+-- description: Paginated list of auth users with providers and optional filters
 with
   users_data as (${usersData})
 select
@@ -295,6 +297,8 @@ export const getImprovedPaginatedUsersSQL = ({
       ${limit}`
 
   const usersQuery = `
+-- source: dashboard
+-- description: Improved paginated list of auth users using index-optimized cursor-based pagination
 WITH
   users_data AS (${usersData})
 SELECT

@@ -50,13 +50,15 @@ export const getTableRowsCountSql = ({
 
     if (isUsingReadReplica) {
       const sql = `
+-- source: dashboard
+-- description: Count rows in a table using estimates or exact count, optimized for read replicas
 with approximation as (
     select reltuples as estimate
     from pg_class
     where oid = ${table.id}
 )
-select 
-  case 
+select
+  case
     when estimate > ${THRESHOLD_COUNT} then (select -1)
     else (${countBaseSql})
   end as count,
@@ -67,6 +69,8 @@ from approximation;
       return sql
     } else {
       const sql = `
+-- source: dashboard
+-- description: Count rows in a table using query plan estimates or exact count with optional filters
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (
@@ -74,8 +78,8 @@ with approximation as (
     from pg_class
     where oid = ${table.id}
 )
-select 
-  case 
+select
+  case
     when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
     else (${countBaseSql})
   end as count,

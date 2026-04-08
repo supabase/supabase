@@ -12,7 +12,7 @@ export const getDuplicateTableSQL = ({
   sourceTableSchema: string
 }) => {
   return [
-    `CREATE TABLE ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} (LIKE ${ident(sourceTableSchema)}.${ident(sourceTableName)} INCLUDING ALL);`,
+    `-- source: dashboard\n-- description: Create a duplicate table with the same structure as the source table\nCREATE TABLE ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} (LIKE ${ident(sourceTableSchema)}.${ident(sourceTableName)} INCLUDING ALL);`,
     comment != undefined
       ? `comment on table ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} is ${literal(comment)};`
       : '',
@@ -28,13 +28,15 @@ export const getDuplicateRowsSQL = ({
   sourceTableName: string
   sourceTableSchema: string
 }) => {
-  return `INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} SELECT * FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
+  return `-- source: dashboard\n-- description: Copy all rows from the source table into the duplicated table\nINSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} SELECT * FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
 }
 
 export const getTableEditorSql = ({ id }: { id?: number }) => {
   if (!id) return ''
 
   return /* SQL */ `
+-- source: dashboard
+-- description: Fetch comprehensive table editor data including columns, relationships, indexes, and RLS status
     with base_table_info as (
         select
             c.oid::int8 as id,

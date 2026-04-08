@@ -1,4 +1,6 @@
 export const EXTENSIONS_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all available and installed PostgreSQL extensions
 SELECT
   e.name,
   n.nspname AS schema,

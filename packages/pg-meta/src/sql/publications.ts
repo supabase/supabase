@@ -1,4 +1,6 @@
 export const PUBLICATIONS_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all logical replication publications with their subscribed tables
 SELECT
   p.oid :: int8 AS id,
   p.pubname AS name,

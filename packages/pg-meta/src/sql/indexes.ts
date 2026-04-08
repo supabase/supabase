@@ -1,4 +1,6 @@
 export const INDEXES_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all indexes with attributes, access methods, and definition
   SELECT
     idx.indexrelid::int8 AS id,
     idx.indrelid::int8 AS table_id,

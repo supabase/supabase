@@ -54,6 +54,8 @@ function list({
   zod: typeof pgTablePrivilegesArrayZod
 } {
   let sql = `
+-- source: dashboard
+-- description: List all table privileges with metadata
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -97,6 +99,8 @@ function retrieve({
 } {
   if (id) {
     const sql = /* SQL */ `
+-- source: dashboard
+-- description: Retrieve a single table privilege by identifier
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -107,6 +111,8 @@ where table_privileges.relation_id = ${literal(id)};`
     }
   } else {
     const sql = /* SQL */ `
+-- source: dashboard
+-- description: Retrieve a single table privilege by identifier
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -137,6 +143,8 @@ type TablePrivilegesGrant = {
 }
 function grant(grants: TablePrivilegesGrant[]): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Grant privilege on table
 do $$
 begin
 ${grants
@@ -168,6 +176,8 @@ type TablePrivilegesRevoke = {
 }
 function revoke(revokes: TablePrivilegesRevoke[]): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Revoke privilege from table
 do $$
 begin
 ${revokes

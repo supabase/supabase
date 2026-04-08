@@ -95,6 +95,8 @@ export function retrieve(identifier: ViewIdentifier): {
 }
 
 const generateEnrichedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => safeSql`
+-- source: dashboard
+-- description: List all views with metadata
 with views as (${VIEWS_SQL})
   ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
 select

@@ -1,4 +1,6 @@
 export const SCHEMAS_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all schemas with owner and comments
 -- Adapted from information_schema.schemata
 
 select

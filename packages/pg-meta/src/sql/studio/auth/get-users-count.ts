@@ -3,7 +3,7 @@ import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../database/get-count-estim
 import { prefixToUUID, stringRange } from './get-users-common'
 import type { OptimizedSearchColumns } from './get-users-types'
 
-export const USERS_COUNT_ESTIMATE_SQL = `select reltuples as estimate from pg_class where oid = 'auth.users'::regclass`
+export const USERS_COUNT_ESTIMATE_SQL = `-- source: dashboard\n-- description: Estimate total number of auth users from pg_class statistics\nselect reltuples as estimate from pg_class where oid = 'auth.users'::regclass`
 
 export const getUsersCountSQL = ({
   filter,
@@ -92,6 +92,8 @@ export const getUsersCountSQL = ({
     const escapedSelectSql = literal(selectBaseSql)
 
     const sql = `
+-- source: dashboard
+-- description: Count auth users with optional filters using estimate or exact count
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (${USERS_COUNT_ESTIMATE_SQL})

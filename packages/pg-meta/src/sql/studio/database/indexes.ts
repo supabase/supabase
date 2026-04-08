@@ -1,5 +1,7 @@
 export const getIndexesSQL = ({ schema }: { schema: string }) => {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: List all indexes for a given schema with their columns and definitions
 SELECT
   n.nspname        AS schema,
   t.relname        AS "table",

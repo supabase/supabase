@@ -1,6 +1,8 @@
 import { safeSql } from '../pg-format'
 
 export const VIEWS_SQL = /* SQL */ safeSql`
+-- source: dashboard
+-- description: List all views with updatability status and comments
 SELECT
   c.oid :: int8 AS id,
   n.nspname AS schema,

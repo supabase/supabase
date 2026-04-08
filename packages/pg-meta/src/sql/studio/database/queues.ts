@@ -1,7 +1,9 @@
 export const QUEUES_SCHEMA = 'pgmq_public'
 
 export const HIDE_QUEUES_FROM_POSTGREST_SQL = /* SQL */ `
-  drop function if exists 
+-- source: dashboard
+-- description: Drop pgmq_public wrapper functions and revoke permissions to hide queues from PostgREST
+  drop function if exists
     ${QUEUES_SCHEMA}.pop(queue_name text),
     ${QUEUES_SCHEMA}.send(queue_name text, message jsonb, sleep_seconds integer),
     ${QUEUES_SCHEMA}.send_batch(queue_name text, message jsonb[], sleep_seconds integer),
@@ -32,6 +34,8 @@ export const getExposeQueuesSQL = ({ isNewerPgmqversion }: { isNewerPgmqversion:
   const jsonBArg = isNewerPgmqversion ? `, jsonb` : ''
 
   return /* SQL */ `
+-- source: dashboard
+-- description: Expose pgmq queues through PostgREST by creating wrapper functions and granting permissions
   create schema if not exists ${QUEUES_SCHEMA};
   grant usage on schema ${QUEUES_SCHEMA} to postgres, anon, authenticated, service_role;
 
@@ -210,6 +214,8 @@ export const getExposeQueuesSQL = ({ isNewerPgmqversion }: { isNewerPgmqversion:
 // [Joshen] Check if all the relevant functions exist to indicate whether PGMQ has been exposed through PostgREST
 export const getQueuesExposePostgrestStatusSQL = () => {
   return /**SQL */ `
+-- source: dashboard
+-- description: Check if pgmq queues are currently exposed through PostgREST
     SELECT exists (select schema_name FROM information_schema.schemata WHERE schema_name = '${QUEUES_SCHEMA}');
   `.trim()
 }

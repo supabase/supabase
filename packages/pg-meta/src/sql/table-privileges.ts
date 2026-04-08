@@ -1,4 +1,6 @@
 export const TABLE_PRIVILEGES_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List privileges for all relations including tables, views, and materialized views
 -- Despite the name \`table_privileges\`, this includes other kinds of relations:
 -- views, matviews, etc. "Relation privileges" just doesn't roll off the tongue.
 --

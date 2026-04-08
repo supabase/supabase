@@ -1,6 +1,8 @@
 import { safeSql } from '../pg-format'
 
 export const MATERIALIZED_VIEWS_SQL = /* SQL */ safeSql`
+-- source: dashboard
+-- description: List all materialized views with schema and population status
 select
   c.oid::int8 as id,
   n.nspname as schema,

@@ -11,7 +11,7 @@ export const getCreateEnumeratedTypeSQL = ({
   values: string[]
   description?: string
 }) => {
-  const createSql = `create type "${schema}"."${name}" as enum (${values
+  const createSql = `-- source: dashboard\n-- description: Create a new enumerated type in the specified schema\ncreate type "${schema}"."${name}" as enum (${values
     .map((x) => `'${x}'`)
     .join(', ')});`
   const commentSql =
@@ -21,7 +21,7 @@ export const getCreateEnumeratedTypeSQL = ({
 }
 
 export const getDeleteEnumeratedTypeSQL = ({ schema, name }: { schema: string; name: string }) => {
-  return `drop type if exists ${schema}."${name}"`
+  return `-- source: dashboard\n-- description: Drop an enumerated type if it exists\ndrop type if exists ${schema}."${name}"`
 }
 
 export const getUpdateEnumeratedTypeSQL = ({
@@ -35,7 +35,9 @@ export const getUpdateEnumeratedTypeSQL = ({
   description?: string
   values?: { original: string; updated: string; isNew: boolean }[]
 }) => {
-  const statements: string[] = []
+  const statements: string[] = [
+    '-- source: dashboard\n-- description: Update an enumerated type by renaming, adding, or modifying values\n',
+  ]
   if (name.original !== name.updated) {
     statements.push(`alter type "${schema}"."${name.original}" rename to "${name.updated}";`)
   }

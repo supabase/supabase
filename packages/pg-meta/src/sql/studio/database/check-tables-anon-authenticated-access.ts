@@ -4,6 +4,8 @@
  */
 export const getTablesWithAnonAuthenticatedAccessSQL = ({ schema }: { schema: string }) =>
   /* SQL */ `
+-- source: dashboard
+-- description: List tables in a schema accessible by anon or authenticated roles
 SELECT c.relname AS table_name
 FROM pg_catalog.pg_class AS c
 JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace

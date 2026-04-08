@@ -1,4 +1,6 @@
 export const POLICIES_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all row-level security policies with their conditions and roles
 select
   pol.oid :: int8 as id,
   n.nspname as schema,

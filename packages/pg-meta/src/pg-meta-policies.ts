@@ -56,6 +56,8 @@ function list({
   zod: typeof pgPolicyArrayZod
 } {
   let sql = `
+-- source: dashboard
+-- description: List all policies with metadata
     with policies as (${POLICIES_SQL})
     select *
     from policies
@@ -84,7 +86,7 @@ function retrieve(identifier: PolicyIdentifier): {
   sql: string
   zod: typeof pgPolicyOptionalZod
 } {
-  const sql = `with policies as (${POLICIES_SQL}) select * from policies where ${getIdentifierWhereClause(identifier)};`
+  const sql = `-- source: dashboard\n-- description: Retrieve a single policy by identifier\nwith policies as (${POLICIES_SQL}) select * from policies where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgPolicyOptionalZod,
@@ -113,6 +115,8 @@ function create({
   roles = ['public'],
 }: PolicyCreateParams): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Create a new policy
 create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
   as ${action}
   for ${command}
@@ -142,13 +146,13 @@ function update(
   const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(',')};`
 
   // nameSql must be last
-  const sql = `BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
+  const sql = `-- source: dashboard\n-- description: Update policy properties\nBEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
 
   return { sql }
 }
 
 function remove(identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>): { sql: string } {
-  const sql = `DROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(
+  const sql = `-- source: dashboard\n-- description: Drop a policy\nDROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(
     identifier.table
   )};`
   return { sql }

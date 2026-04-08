@@ -99,6 +99,8 @@ const generateEnrichedForeignTablesSql = ({
 }: {
   includeColumns?: boolean
 }) => safeSql`
+-- source: dashboard
+-- description: List all foreign tables with metadata
 with foreign_tables as (${FOREIGN_TABLES_SQL})
   ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
 select

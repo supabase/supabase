@@ -50,6 +50,8 @@ function list({
   zod: typeof pgColumnArrayZod
 } {
   let sql = `
+-- source: dashboard
+-- description: List all columns with metadata
 with
   columns as (${COLUMNS_SQL})
 select
@@ -99,7 +101,7 @@ function retrieve(identifier: ColumnIdentifier): {
   sql: string
   zod: typeof pgColumnOptionalZod
 } {
-  const sql = `WITH columns AS (${COLUMNS_SQL}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
+  const sql = `-- source: dashboard\n-- description: Retrieve a single column by identifier\nWITH columns AS (${COLUMNS_SQL}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgColumnOptionalZod,
@@ -167,6 +169,8 @@ function create({
       : `COMMENT ON COLUMN ${ident(schema)}.${ident(table)}.${ident(name)} IS ${literal(comment)}`
 
   const sql = `
+-- source: dashboard
+-- description: Create a new column
   ALTER TABLE ${ident(schema)}.${ident(table)} ADD COLUMN ${ident(name)} ${typeIdent(type)}
     ${defaultValueClause}
     ${isNullableClause}
@@ -376,6 +380,8 @@ $$;
   // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
   // identitySql must be after isNullableSql.
   const sql = `
+-- source: dashboard
+-- description: Update column properties
 BEGIN;
   ${isNullableSql}
   ${typeSql}
@@ -394,7 +400,7 @@ function remove(
   column: Pick<PGColumn, 'name' | 'schema' | 'table'>,
   { cascade = false } = {}
 ): { sql: string } {
-  const sql = `ALTER TABLE ${ident(column.schema)}.${ident(column.table)} DROP COLUMN ${ident(
+  const sql = `-- source: dashboard\n-- description: Drop a column\nALTER TABLE ${ident(column.schema)}.${ident(column.table)} DROP COLUMN ${ident(
     column.name
   )} ${cascade ? 'CASCADE' : 'RESTRICT'};`
   return { sql }

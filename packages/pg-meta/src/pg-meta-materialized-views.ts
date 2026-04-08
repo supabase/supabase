@@ -101,6 +101,8 @@ const generateEnrichedMaterializedViewsSql = ({
 }: {
   includeColumns?: boolean
 }) => safeSql`
+-- source: dashboard
+-- description: List all materialized views with metadata
 with materialized_views as (${MATERIALIZED_VIEWS_SQL})
   ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
 select

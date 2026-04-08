@@ -10,13 +10,15 @@ export const getCronJobsMinimalSql = ({
   limit: number
 }) =>
   `
-SELECT 
+-- source: dashboard
+-- description: List cron jobs with minimal fields, optionally filtered by name
+SELECT
   job.jobid,
   job.jobname,
   job.schedule,
   job.command,
   job.active
-FROM 
+FROM
   cron.job job
 ${!!searchTerm ? `WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}` : ''}
 ORDER BY job.jobid
@@ -34,6 +36,8 @@ export const getCronJobsSql = ({
   limit: number
 }) =>
   `
+-- source: dashboard
+-- description: List cron jobs with their latest run status and timestamps
 WITH latest_runs AS (
   SELECT 
     jobid,
@@ -93,6 +97,8 @@ export const getDeleteOldCronJobRunDetailsByCtidSql = (
   const safeCtidEnd = literal(`(${endPage},0)`)
 
   return `
+-- source: dashboard
+-- description: Delete old cron job run details within a ctid page range older than a given interval
 WITH deleted AS (
   DELETE FROM cron.job_run_details
   WHERE ctid >= ${safeCtidStart}::tid
@@ -109,6 +115,8 @@ const CRON_CLEANUP_SCHEDULE_EXPRESSION = '0 12 * * *'
 
 export const getScheduleDeleteCronJobRunDetailsSql = (interval: string) =>
   `
+-- source: dashboard
+-- description: Schedule a cron job to delete old job run details on a recurring schedule
 SELECT cron.schedule(
   ${literal(CRON_CLEANUP_SCHEDULE_NAME)},
   ${literal(CRON_CLEANUP_SCHEDULE_EXPRESSION)},
@@ -122,6 +130,8 @@ SELECT cron.schedule(
  */
 export const getJobRunDetailsPageCountSql = () =>
   `
+-- source: dashboard
+-- description: Get the total number of storage pages in the cron job_run_details table
 SELECT pg_relation_size(oid) / current_setting('block_size')::int8 AS num_pages
 FROM pg_class
 WHERE relname = 'job_run_details'

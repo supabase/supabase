@@ -35,7 +35,7 @@ function list({
   sql: string
   zod: typeof pgPublicationArrayZod
 } {
-  let sql = `with publications as (${PUBLICATIONS_SQL}) select * from publications`
+  let sql = `-- source: dashboard\n-- description: List all publications with metadata\nwith publications as (${PUBLICATIONS_SQL}) select * from publications`
   if (limit) {
     sql += ` limit ${limit}`
   }
@@ -63,7 +63,7 @@ function retrieve(identifier: PublicationIdentifier): {
   sql: string
   zod: typeof pgPublicationOptionalZod
 } {
-  const sql = `with publications as (${PUBLICATIONS_SQL}) select * from publications where ${getIdentifierWhereClause(identifier)};`
+  const sql = `-- source: dashboard\n-- description: Retrieve a single publication by identifier\nwith publications as (${PUBLICATIONS_SQL}) select * from publications where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgPublicationOptionalZod,
@@ -113,6 +113,8 @@ function create({
   if (publish_truncate) publishOps.push('truncate')
 
   const sql = `
+-- source: dashboard
+-- description: Create a new publication
 CREATE PUBLICATION ${ident(name)} ${tableClause}
   WITH (publish = '${publishOps.join(',')}');`
 
@@ -142,6 +144,8 @@ function update(
   }: PublicationUpdateParams
 ): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Update publication properties
 do $$
 declare
   id oid := ${literal(id)};
@@ -238,7 +242,7 @@ end $$;
 }
 
 function remove(publication: Pick<PGPublication, 'name'>): { sql: string } {
-  const sql = `DROP PUBLICATION IF EXISTS ${ident(publication.name)};`
+  const sql = `-- source: dashboard\n-- description: Drop a publication\nDROP PUBLICATION IF EXISTS ${ident(publication.name)};`
   return { sql }
 }
 

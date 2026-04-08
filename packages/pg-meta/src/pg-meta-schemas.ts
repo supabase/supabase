@@ -48,13 +48,13 @@ function retrieve({ id, name }: { id?: number; name?: string }): {
   zod: typeof pgSchemaOptionalZod
 } {
   if (id) {
-    const sql = `${SCHEMAS_SQL} and n.oid = ${literal(id)};`
+    const sql = `-- source: dashboard\n-- description: Retrieve a single schema by identifier\n${SCHEMAS_SQL} and n.oid = ${literal(id)};`
     return {
       sql,
       zod: pgSchemaOptionalZod,
     }
   } else {
-    const sql = `${SCHEMAS_SQL} and n.nspname = ${literal(name)};`
+    const sql = `-- source: dashboard\n-- description: Retrieve a single schema by identifier\n${SCHEMAS_SQL} and n.nspname = ${literal(name)};`
     return {
       sql,
       zod: pgSchemaOptionalZod,
@@ -67,7 +67,7 @@ type SchemaCreateParams = {
   owner?: string
 }
 function create({ name, owner }: SchemaCreateParams): { sql: string } {
-  const sql = `create schema ${ident(name)}
+  const sql = `-- source: dashboard\n-- description: Create a new schema\ncreate schema ${ident(name)}
   ${owner === undefined ? '' : `authorization ${ident(owner)}`};
 `
   return { sql }
@@ -90,6 +90,8 @@ function update(
   { name: newName, owner }: SchemaUpdateParams
 ): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Update schema properties
 do $$
 declare
   id oid := ${id === undefined ? `${literal(name)}::regnamespace` : literal(id)};
@@ -132,6 +134,8 @@ function remove(
   { cascade = false }: SchemaRemoveParams = {}
 ): { sql: string } {
   const sql = `
+-- source: dashboard
+-- description: Drop a schema
 do $$
 declare
   id oid := ${id === undefined ? `${literal(name)}::regnamespace` : literal(id)};

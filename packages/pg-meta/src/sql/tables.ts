@@ -1,6 +1,8 @@
 import { safeSql } from '../pg-format'
 
 export const TABLES_SQL = /* SQL */ safeSql`
+-- source: dashboard
+-- description: List all tables with size, RLS status, primary keys, and relationships
 SELECT
   c.oid :: int8 AS id,
   nc.nspname AS schema,

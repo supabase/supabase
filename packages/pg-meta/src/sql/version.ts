@@ -1,4 +1,6 @@
 export const VERSION_SQL = /* SQL */ `
+-- source: dashboard
+-- description: Fetch PostgreSQL version, active connections, and max connections
 select
   version(),
   current_setting('server_version_num')::int8 as version_number,

@@ -26,7 +26,8 @@ function list({
   sql: string
   zod: typeof pgExtensionArrayZod
 } {
-  let sql = EXTENSIONS_SQL
+  let sql =
+    `-- source: dashboard\n-- description: List all extensions with metadata\n` + EXTENSIONS_SQL
   if (limit) {
     sql = `${sql} LIMIT ${limit}`
   }
@@ -43,7 +44,7 @@ function retrieve({ name }: { name: string }): {
   sql: string
   zod: typeof pgExtensionOptionalZod
 } {
-  const sql = `${EXTENSIONS_SQL} WHERE name = ${literal(name)};`
+  const sql = `-- source: dashboard\n-- description: Retrieve a single extension by identifier\n${EXTENSIONS_SQL} WHERE name = ${literal(name)};`
   return {
     sql,
     zod: pgExtensionOptionalZod,
@@ -61,6 +62,8 @@ function create({ name, schema, version, cascade = false }: ExtensionCreateParam
   sql: string
 } {
   const sql = `
+-- source: dashboard
+-- description: Create a new extension
 CREATE EXTENSION ${ident(name)}
   ${schema === undefined ? '' : `SCHEMA ${ident(schema)}`}
   ${version === undefined ? '' : `VERSION ${literal(version)}`}
@@ -87,7 +90,7 @@ function update(
   const schemaSql =
     schema === undefined ? '' : `ALTER EXTENSION ${ident(name)} SET SCHEMA ${ident(schema)};`
 
-  const sql = `BEGIN; ${updateSql} ${schemaSql} COMMIT;`
+  const sql = `-- source: dashboard\n-- description: Update extension properties\nBEGIN; ${updateSql} ${schemaSql} COMMIT;`
   return { sql }
 }
 
@@ -96,7 +99,7 @@ type ExtensionRemoveParams = {
 }
 
 function remove(name: string, { cascade = false }: ExtensionRemoveParams = {}): { sql: string } {
-  const sql = `DROP EXTENSION ${ident(name)} ${cascade ? 'CASCADE' : 'RESTRICT'};`
+  const sql = `-- source: dashboard\n-- description: Drop an extension\nDROP EXTENSION ${ident(name)} ${cascade ? 'CASCADE' : 'RESTRICT'};`
   return { sql }
 }
 

@@ -1,8 +1,11 @@
 import { ident } from '../../../pg-format'
 import pgMetaExtensions from '../../../pg-meta-extensions'
+import { safeSql } from '../../../pg-format'
 
 export const getDatabaseExtensionsSQL = () =>
-  `
+  safeSql`
+-- source: dashboard
+-- description: List all available extensions with their default schema and version
 SELECT
   e.name,
   n.nspname AS schema,

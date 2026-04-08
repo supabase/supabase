@@ -6,6 +6,8 @@ type SimplifiedWrapperMeta = {
 
 export const getFDWsSql = () => {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: List all foreign data wrappers with their servers, handlers, and linked foreign tables
     select
       s.oid as "id",
       w.fdwname as "name",
@@ -69,6 +71,8 @@ export function getCreateFDWSql({
     .join('\n')
 
   const createWrapperSql = /* SQL */ `
+-- source: dashboard
+-- description: Create a new foreign data wrapper
     create foreign data wrapper "${formState.wrapper_name}"
     handler "${wrapperMeta.handlerName}"
     validator "${wrapperMeta.validatorName}";
@@ -239,6 +243,8 @@ export function getCreateFDWSql({
   const options = [...schemaOptions, "strict 'true'"].join(', ')
 
   const importForeignSchemaSql = /* SQL */ `
+-- source: dashboard
+-- description: Import a foreign schema into a local schema from a foreign server
   import foreign schema "${sourceSchema}" from server ${formState.server_name} into ${targetSchema} options (${options});
 `
 
@@ -317,6 +323,8 @@ export const getDeleteFDWSql = ({
   const deleteEncryptedSecretsSql = deleteEncryptedSecretsSqlArray.join('\n')
 
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Drop a foreign data wrapper and delete its associated encrypted secrets
     drop foreign data wrapper if exists "${wrapper.name}" cascade;
 
     ${deleteEncryptedSecretsSql}
@@ -347,6 +355,8 @@ export const getUpdateFDWSql = ({
   })
 
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Update a foreign data wrapper by deleting and recreating it with new configuration
     ${deleteWrapperSql}
 
     ${createWrapperSql}
@@ -369,6 +379,8 @@ export function getImportForeignSchemaSql({
   const options = [...schemaOptions, "strict 'true'"].join(', ')
 
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Import a foreign schema from a named server into a target schema
   import foreign schema "${sourceSchema}" from server ${serverName} into ${targetSchema} options (${options});
 `
 
@@ -377,6 +389,8 @@ export function getImportForeignSchemaSql({
 
 export function getDropForeignTableSql({ schema, table }: { schema: string; table: string }) {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Drop a foreign table if it exists
 drop foreign table if exists "${schema}"."${table}";
 `
 

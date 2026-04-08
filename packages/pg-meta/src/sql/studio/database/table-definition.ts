@@ -10,6 +10,8 @@
  */
 
 export const CREATE_PG_GET_TABLEDEF_SQL = /* SQL */ `
+-- source: dashboard
+-- description: Create temporary helper functions to generate a full CREATE TABLE DDL definition
   DROP TYPE IF EXISTS pg_temp.tabledefs CASCADE;
   CREATE TYPE pg_temp.tabledefs AS ENUM ('PKEY_INTERNAL','PKEY_EXTERNAL','FKEYS_INTERNAL', 'FKEYS_EXTERNAL', 'COMMENTS', 'FKEYS_NONE', 'INCLUDE_TRIGGERS', 'NO_TRIGGERS');
 
@@ -706,10 +708,12 @@ export const CREATE_PG_GET_TABLEDEF_SQL = /* SQL */ `
 
 export const getTableDefinitionSql = ({ id }: { id: number }) => {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Generate a CREATE TABLE DDL definition for a single table by OID
     ${CREATE_PG_GET_TABLEDEF_SQL}
 
     with table_info as (
-      select 
+      select
         n.nspname::text as schema,
         c.relname::text as name
       from pg_class c
@@ -737,6 +741,8 @@ export const getEntityDefinitionsSql = ({
   limit?: number
 }) => {
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: Generate CREATE TABLE/VIEW DDL definitions for all entities in given schemas
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
 with records as (

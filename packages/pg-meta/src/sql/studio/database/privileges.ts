@@ -90,6 +90,8 @@ export function getExposedTablesSql({
   ignoredSchemas?: string[]
 }) {
   return /* SQL */ `
+-- source: dashboard
+-- description: List tables with their grant status for anon, authenticated, and service_role
     with ${getTableGrantsCTEs({ search, ignoredSchemas })}
     select
       (select count(*)::int from table_grants) as total_count,
@@ -127,6 +129,8 @@ export function getExposedTableCountsSql({
     selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
 
   return /* SQL */ `
+-- source: dashboard
+-- description: Count total tables and granted tables for selected schemas
     with ${getTableGrantsCTEs({ ignoredSchemas })}
     select
       count(*)::int as total_count,
@@ -197,6 +201,8 @@ export function getExposedFunctionsSql({
   ignoredSchemas?: string[]
 }) {
   return /* SQL */ `
+-- source: dashboard
+-- description: List functions with their execute grant status for anon, authenticated, and service_role
     with ${getFunctionGrantsCTEs({ search, ignoredSchemas })}
     select
       (select count(*)::int from function_grants) as total_count,
@@ -233,6 +239,8 @@ export function getExposedFunctionCountsSql({
     selectedSchemas.length > 0 ? selectedSchemas.map((s) => `'${s}'`).join(', ') : "''"
 
   return /* SQL */ `
+-- source: dashboard
+-- description: Count total functions and granted functions for selected schemas
     with ${getFunctionGrantsCTEs({ ignoredSchemas })}
     select
       count(*)::int as total_count,
@@ -243,6 +251,8 @@ export function getExposedFunctionCountsSql({
 
 export function getDefaultPrivilegesStateSql({ schema = 'public' }: { schema?: string } = {}) {
   return /* SQL */ `
+-- source: dashboard
+-- description: Check if default privileges are set for anon, authenticated, and service_role in a schema
     select
       count(*)::int as grant_count
     from pg_default_acl d
@@ -302,6 +312,8 @@ export const buildTablePrivilegesSql = (oids: number[], action: 'grant' | 'revok
       : 'revoke all on table %I.%I from anon, authenticated, service_role'
 
   return /* SQL */ `
+-- source: dashboard
+-- description: Grant or revoke table privileges for anon, authenticated, and service_role by table OIDs
     do $$
     declare
       nspname name;
@@ -337,6 +349,8 @@ export const buildFunctionPrivilegesSql = (schemaNames: string[], action: 'grant
       : 'revoke all on function %I.%I(%s) from anon, authenticated, service_role'
 
   return /* SQL */ `
+-- source: dashboard
+-- description: Grant or revoke function execute privileges for anon, authenticated, and service_role
     do $$
     declare
       nspname name;

@@ -1,6 +1,8 @@
 export const THRESHOLD_COUNT = 50000
 
 export const COUNT_ESTIMATE_SQL = /* SQL */ `
+-- source: dashboard
+-- description: Create a temporary function to estimate row count from a query's execution plan
 CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
     query text
 ) RETURNS integer LANGUAGE plpgsql AS $$

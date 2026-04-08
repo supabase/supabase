@@ -1,4 +1,6 @@
 export const TYPES_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all PostgreSQL types with enum values and composite attributes
 select
   t.oid::int8 as id,
   t.typname as name,

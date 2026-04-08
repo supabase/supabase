@@ -10,7 +10,8 @@ export function getTableIndexAdvisorSql(schema: string, table: string): string {
   const regexTable = escapedTable.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
 
   return /* SQL */ `
--- Get top 5 SELECT queries involving this table and run through index_advisor
+-- source: dashboard
+-- description: Find top 5 SELECT queries for a table and run them through index_advisor for recommendations
 set search_path to public, extensions;
 
 with top_queries as (

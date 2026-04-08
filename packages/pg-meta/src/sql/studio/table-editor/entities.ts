@@ -17,6 +17,8 @@ export const getEntityTypesSQL = ({
   const outerOrderBy = sort === 'alphabetical' ? `r.name asc` : `r.type_sort asc, r.name asc`
 
   const sql = /* SQL */ `
+-- source: dashboard
+-- description: List entities (tables, views, etc.) in given schemas with type, comment, and RLS status
     with records as (
       select
         c.oid::int8 as "id",

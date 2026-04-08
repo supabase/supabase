@@ -36,7 +36,9 @@ function list({
   sql: string
   zod: typeof pgConfigArrayZod
 } {
-  let sql = CONFIG_SQL
+  let sql =
+    `-- source: dashboard\n-- description: List all configuration settings with metadata\n` +
+    CONFIG_SQL
   if (limit) {
     sql += ` LIMIT ${limit}`
   }

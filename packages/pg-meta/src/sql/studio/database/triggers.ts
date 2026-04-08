@@ -28,6 +28,8 @@ export function getDatabaseTriggerUpdateSQL({
   const { name, activation, events, schema, table, function_schema, function_name, function_args } =
     updatedTrigger
   return /* SQL */ `
+-- source: dashboard
+-- description: Update a trigger by dropping and recreating it within a transaction
 BEGIN;
 DROP TRIGGER "${originalTrigger.name}" ON "${originalTrigger.schema}"."${originalTrigger.table}";
 CREATE TRIGGER "${name}" ${activation} ${events.join(' OR ')} ON "${schema}"."${table}" 

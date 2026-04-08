@@ -1,4 +1,6 @@
 export const FUNCTIONS_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all PostgreSQL functions with arguments, return types, and configuration
 -- CTE with sane arg_modes, arg_names, and arg_types.
 -- All three are always of the same length.
 -- All three include all args, including OUT and TABLE args.

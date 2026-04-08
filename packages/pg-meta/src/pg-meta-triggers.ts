@@ -83,7 +83,7 @@ type TriggersRetrieveReturn = {
 export function retrieve(identifier: TriggerIdentifier): TriggersRetrieveReturn
 export function retrieve(params: TriggerIdentifier): TriggersRetrieveReturn {
   const whereIdentifierCondition = getIdentifierWhereClause(params)
-  const sql = `with triggers as (${TRIGGERS_SQL}) select * from triggers where ${whereIdentifierCondition};`
+  const sql = `-- source: dashboard\n-- description: Retrieve a single trigger by identifier\nwith triggers as (${TRIGGERS_SQL}) select * from triggers where ${whereIdentifierCondition};`
   return {
     sql,
     zod: pgTriggerOptionalZod,
@@ -127,7 +127,7 @@ export function create({
   const triggerCondition = condition ? `when (${condition})` : ''
   const functionArgsStr = function_args.map(literal).join(',')
 
-  const sql = `create trigger ${ident(
+  const sql = `-- source: dashboard\n-- description: Create a new trigger\ncreate trigger ${ident(
     name
   )} ${activation} ${triggerEvents} on ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} execute function ${qualifiedFunctionName}(${functionArgsStr});`
 
@@ -176,7 +176,7 @@ export function update(
       : ''
 
   // updateNameSql must be last
-  const sql = `begin; ${enabledModeSql}; ${updateNameSql}; commit;`
+  const sql = `-- source: dashboard\n-- description: Update trigger properties\nbegin; ${enabledModeSql}; ${updateNameSql}; commit;`
 
   return {
     sql,
@@ -193,7 +193,7 @@ export function remove(
 } {
   const qualifiedTableName = `${ident(id.schema)}.${ident(id.table)}`
 
-  const sql = `drop trigger ${ident(id.name)} on ${qualifiedTableName} ${cascade ? 'cascade' : ''};`
+  const sql = `-- source: dashboard\n-- description: Drop a trigger\ndrop trigger ${ident(id.name)} on ${qualifiedTableName} ${cascade ? 'cascade' : ''};`
 
   return {
     sql,

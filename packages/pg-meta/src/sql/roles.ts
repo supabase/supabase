@@ -1,4 +1,6 @@
 export const ROLES_SQL = /* SQL */ `
+-- source: dashboard
+-- description: List all database roles with connection limits and configuration
 -- Can't use pg_authid here since some managed Postgres providers don't expose it
 -- https://github.com/supabase/postgres-meta/issues/212
 

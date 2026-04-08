@@ -23,7 +23,9 @@ ${query}
  * - Replace docs url with docsUrl (${docsUrl})
  */
 export const getLintsSQL = ({ docsUrl }: { docsUrl: string }) =>
-  /* SQL */ `set local search_path = '';
+  /* SQL */ `-- source: dashboard
+-- description: Run database linting checks for security, performance, and best practice issues
+set local search_path = '';
 
 (
 with foreign_keys as (

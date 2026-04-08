@@ -235,10 +235,11 @@ export const getTableRowsSql = ({
     }
   })
 
-  const selectClause = selectExpressions.join(',')
+  const selectClause = `${selectExpressions.join(',')}`
   const finalQuery = new Query()
   // Now, we apply our selection logic with the tables truncation on the _base_query constructed before
   const finalQueryChain = finalQuery.from('_base_query').select(selectClause)
+
   return `${baseSelectQuery}
   ${finalQueryChain.toSql({ isCTE: true, isFinal: true })}`
 }

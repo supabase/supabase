@@ -130,19 +130,25 @@ function remove(
   table: Pick<PGTable, 'name' | 'schema'>,
   { cascade = false } = {}
 ): { sql: SafeSqlFragment } {
-  const sql = safeSql`DROP TABLE ${ident(table.schema)}.${ident(table.name)} ${
+  const sql = safeSql`
+  -- source: dashboard
+  -- description: Drop a table
+  DROP TABLE ${ident(table.schema)}.${ident(table.name)} ${
     cascade ? safeSql`CASCADE` : safeSql`RESTRICT`
   };`
   return { sql }
 }
 
 const generateEnrichedTablesSql = ({ includeColumns }: { includeColumns?: boolean }) => safeSql`
+  -- source: dashboard
+  -- description: List all tables with metadata
   with tables as (${TABLES_SQL})
   ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
   select
     *
     ${includeColumns ? safeSql`, ${coalesceRowsToArray('columns', safeSql`columns.table_id = tables.id`)}` : safeSql``}
-  from tables`
+  from tables
+`
 
 type TableCreateParams = {
   name: string
@@ -161,10 +167,16 @@ function create({ name, schema = 'public', comment, no_transaction = false }: Ta
       : safeSql``
 
   if (no_transaction) {
-    const sql = safeSql`${tableSql} ${commentSql}`
+    const sql = safeSql`
+    -- source: dashboard
+    -- description: Create a new table
+    ${tableSql} ${commentSql}`
     return { sql }
   }
-  const sql = safeSql`BEGIN; ${tableSql} ${commentSql} COMMIT;`
+  const sql = safeSql`
+  -- source: dashboard
+  -- description: Create a new table
+  BEGIN; ${tableSql} ${commentSql} COMMIT;`
   return { sql }
 }
 
@@ -256,6 +268,8 @@ $$;
 
   // nameSql must be last, right below schemaSql
   const sql = safeSql`
+  -- source: dashboard
+  -- description: Update table properties
 BEGIN;
   ${enableRls}
   ${forceRls}
