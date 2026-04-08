@@ -1,15 +1,15 @@
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import type { LogData } from 'components/interfaces/Settings/Logs/Logs.types'
-import {
-  genDefaultQuery,
-  isUnixMicro,
-  unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import type { AlertErrorProps } from 'components/ui/AlertError'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { parseEdgeFunctionEventMessage } from '../EdgeFunctionRecentInvocations.utils'
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
+import {
+  genDefaultQuery,
+  isUnixMicro,
+  unixMicroToIsoTimestamp,
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { AlertErrorProps } from '@/components/ui/AlertError'
 
 dayjs.extend(relativeTime)
 

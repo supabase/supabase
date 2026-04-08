@@ -1335,6 +1335,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/documents/dpa-signed': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Check if organization has signed any version of the DPA
+     * @description Results are cached per organization for up to 24 hours. Signed status may not reflect immediately after a document is completed.
+     */
+    get: operations['OrgDocumentsController_getDpaSignedStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/documents/soc2-type-2-report': {
     parameters: {
       query?: never
@@ -1828,6 +1848,23 @@ export interface paths {
     put?: never
     /** Confirm subscription change and apply pending changes */
     post: operations['OrganizationsController_confirmSubscription']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/preview-creation': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Preview tax breakdown for organization creation */
+    post: operations['OrganizationsController_previewOrganizationCreation']
     delete?: never
     options?: never
     head?: never
@@ -4653,6 +4690,13 @@ export interface components {
         state?: string | null
       }
       billing_name?: string
+      /** @enum {boolean} */
+      clear_tax_id?: true
+      tax_id?: {
+        country?: string
+        type: string
+        value: string
+      }
     }
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse: {
@@ -6099,6 +6143,11 @@ export interface components {
       }
       timestamp: string
     }
+    DocumentSignedStatusResponse: {
+      /** Format: date-time */
+      checked_at: string
+      signed: boolean
+    }
     DownloadableBackupsResponse: {
       backups: {
         id: number
@@ -6964,6 +7013,7 @@ export interface components {
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
       OAUTH_SERVER_AUTHORIZATION_PATH: string | null
       OAUTH_SERVER_ENABLED: boolean
+      PASSKEY_ENABLED: boolean
       PASSWORD_HIBP_ENABLED: boolean
       PASSWORD_MIN_LENGTH: number
       PASSWORD_REQUIRED_CHARACTERS: string
@@ -6984,6 +7034,7 @@ export interface components {
       SECURITY_MANUAL_LINKING_ENABLED: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       SECURITY_SB_FORWARDED_FOR_ENABLED: boolean
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: boolean
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
@@ -7021,6 +7072,9 @@ export interface components {
       SMTP_SENDER_NAME: string
       SMTP_USER: string
       URI_ALLOW_LIST: string
+      WEBAUTHN_RP_DISPLAY_NAME: string | null
+      WEBAUTHN_RP_ID: string | null
+      WEBAUTHN_RP_ORIGINS: string | null
     }
     InstallPlatformAppBody: {
       /** Format: uuid */
@@ -7660,7 +7714,10 @@ export interface components {
         name: string
         projects: {
           name: string
-          /** @description Project ref */
+          /**
+           * @description Project ref
+           * @example abcdefghijklmnopqrst
+           */
           ref: string
         }[]
       }[]
@@ -7671,7 +7728,10 @@ export interface components {
         name: string
         projects: {
           name: string
-          /** @description Project ref */
+          /**
+           * @description Project ref
+           * @example abcdefghijklmnopqrst
+           */
           ref: string
         }[]
       }[]
@@ -8157,6 +8217,37 @@ export interface components {
       name: string
       schema: string
     }
+    PreviewOrganizationCreationBody: {
+      address?: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      tax_id?: {
+        country?: string
+        type: string
+        value: string
+      }
+      /** @enum {string} */
+      tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
+    }
+    PreviewOrganizationCreationResponse: {
+      currency: string
+      plan_price: number
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
+      total: number
+    }
     PreviewProjectTransferResponse: {
       errors: {
         key: string
@@ -8181,6 +8272,127 @@ export interface components {
         key: string
         message: string
       }[]
+    }
+    PreviewSubscriptionChangeResponse: {
+      active_projects: {
+        /** @enum {string} */
+        instance_size:
+          | 'pico'
+          | 'nano'
+          | 'micro'
+          | 'small'
+          | 'medium'
+          | 'large'
+          | 'xlarge'
+          | '2xlarge'
+          | '4xlarge'
+          | '8xlarge'
+          | '12xlarge'
+          | '16xlarge'
+          | '24xlarge'
+          | '24xlarge_optimized_memory'
+          | '24xlarge_optimized_cpu'
+          | '24xlarge_high_memory'
+          | '48xlarge'
+          | '48xlarge_optimized_memory'
+          | '48xlarge_optimized_cpu'
+          | '48xlarge_high_memory'
+        name: string
+        ref: string
+        /** @enum {string} */
+        status:
+          | 'INACTIVE'
+          | 'ACTIVE_HEALTHY'
+          | 'ACTIVE_UNHEALTHY'
+          | 'COMING_UP'
+          | 'UNKNOWN'
+          | 'GOING_DOWN'
+          | 'INIT_FAILED'
+          | 'REMOVED'
+          | 'RESTORING'
+          | 'UPGRADING'
+          | 'PAUSING'
+          | 'RESTORE_FAILED'
+          | 'RESTARTING'
+          | 'PAUSE_FAILED'
+          | 'RESIZING'
+      }[]
+      billed_via_partner: boolean
+      breakdown: {
+        breakdown?: {
+          amount?: number
+          /** @enum {string} */
+          project_db_instance_size?:
+            | 'pico'
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+            | '24xlarge'
+            | '24xlarge_optimized_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_high_memory'
+            | '48xlarge'
+            | '48xlarge_optimized_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_high_memory'
+          project_name: string
+          project_ref: string
+          /** @enum {string} */
+          project_status?:
+            | 'INACTIVE'
+            | 'ACTIVE_HEALTHY'
+            | 'ACTIVE_UNHEALTHY'
+            | 'COMING_UP'
+            | 'UNKNOWN'
+            | 'GOING_DOWN'
+            | 'INIT_FAILED'
+            | 'REMOVED'
+            | 'RESTORING'
+            | 'UPGRADING'
+            | 'PAUSING'
+            | 'RESTORE_FAILED'
+            | 'RESTARTING'
+            | 'PAUSE_FAILED'
+            | 'RESIZING'
+          usage: number
+        }[]
+        description: string
+        quantity?: number
+        total_price: number
+        unit_price?: number
+        unit_price_desc?: string
+      }[]
+      /** @enum {string} */
+      monthly_invoice_tax_status: 'calculated' | 'not_applicable' | 'failed'
+      number_of_projects: number
+      /** @enum {boolean} */
+      pending_subscription_flow: true
+      /** @enum {string} */
+      plan_change_type: 'upgrade' | 'downgrade' | 'none'
+      slug: string
+      upfront_charge: {
+        customer_balance: number
+        prorated_credit: number
+        tax: {
+          currency: string
+          tax_amount: number
+          tax_rate_percentage: number
+          total_amount_excluding_tax: number
+          total_amount_including_tax: number
+        } | null
+        /** @enum {string} */
+        tax_status: 'calculated' | 'not_applicable' | 'failed'
+        taxable_amount: number
+        total: number
+      } | null
     }
     PrivateLinkResponse: {
       appliedSuccessfully: boolean
@@ -10130,6 +10342,7 @@ export interface components {
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
       OAUTH_SERVER_AUTHORIZATION_PATH?: string | null
       OAUTH_SERVER_ENABLED?: boolean | null
+      PASSKEY_ENABLED?: boolean
       PASSWORD_HIBP_ENABLED?: boolean | null
       PASSWORD_MIN_LENGTH?: number | null
       /** @enum {string|null} */
@@ -10157,6 +10370,7 @@ export interface components {
       SECURITY_MANUAL_LINKING_ENABLED?: boolean | null
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number | null
       SECURITY_SB_FORWARDED_FOR_ENABLED?: boolean | null
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD?: boolean | null
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean | null
       SESSIONS_INACTIVITY_TIMEOUT?: number | null
       SESSIONS_SINGLE_PER_USER?: boolean | null
@@ -10196,6 +10410,9 @@ export interface components {
       SMTP_SENDER_NAME?: string | null
       SMTP_USER?: string | null
       URI_ALLOW_LIST?: string | null
+      WEBAUTHN_RP_DISPLAY_NAME?: string | null
+      WEBAUTHN_RP_ID?: string | null
+      WEBAUTHN_RP_ORIGINS?: string | null
     }
     UpdateGoTrueConfigHooksBody: {
       HOOK_AFTER_USER_CREATED_ENABLED?: boolean | null
@@ -10264,6 +10481,9 @@ export interface components {
       slug: string
       stripe_customer_id: string
     }
+    /** @example {
+     *       "password": "correct-horse-battery-staple"
+     *     } */
     UpdatePasswordBody: {
       password: string
     }
@@ -10767,6 +10987,14 @@ export interface components {
       file_size_limit?: number | null
       public: boolean
     }
+    /** @example {
+     *       "fileSizeLimit": 10485760,
+     *       "features": {
+     *         "imageTransformation": {
+     *           "enabled": true
+     *         }
+     *       }
+     *     } */
     UpdateStorageConfigBody: {
       external?: {
         /** @enum {string} */
@@ -14705,7 +14933,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PreviewSubscriptionChangeResponse']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -15015,6 +15245,49 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CreateDpaDocumentResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgDocumentsController_getDpaSignedStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DocumentSignedStatusResponse']
         }
       }
       /** @description Unauthorized */
@@ -17019,6 +17292,29 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  OrganizationsController_previewOrganizationCreation: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PreviewOrganizationCreationBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PreviewOrganizationCreationResponse']
+        }
       }
     }
   }

@@ -1,8 +1,3 @@
-import { AuditLogs } from 'components/interfaces/Account/AuditLogs'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -11,6 +6,12 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
+import { AuditLogs } from '@/components/interfaces/Account/AuditLogs'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const Audit: NextPageWithLayout = () => {
   return (

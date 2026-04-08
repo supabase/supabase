@@ -1,5 +1,6 @@
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import apiWrapper from '@/lib/api/apiWrapper'
 
 const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })

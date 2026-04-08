@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import { organizationKeys as organizationKeysV1 } from 'data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationMemberUnassignRoleVariables = {
   slug: string

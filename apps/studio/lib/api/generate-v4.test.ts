@@ -1,11 +1,10 @@
+import { UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
-// End of third-party imports
 
 import generateV4 from '../../pages/api/ai/sql/generate-v4'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
-import { UIMessage } from 'ai'
+import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
-vi.mock('lib/ai/tools/tool-sanitizer', () => ({
+vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
 }))
 
@@ -44,25 +43,30 @@ test('generateV4 calls the tool sanitizer', async () => {
     setHeader: vi.fn(() => mockRes),
   }
 
-  vi.mock('lib/ai/org-ai-details', () => ({
+  vi.mock('@/lib/ai/ai-details', () => ({
     getOrgAIDetails: vi.fn().mockResolvedValue({
       aiOptInLevel: 'schema_and_log_and_data',
       hasAccessToAdvanceModel: true,
+      isDpaSigned: false,
+    }),
+    getProjectAIDetails: vi.fn().mockResolvedValue({
+      region: 'us-east-1',
+      isSensitive: false,
     }),
   }))
 
-  vi.mock('lib/ai/model', () => ({
+  vi.mock('@/lib/ai/model', () => ({
     getModel: vi.fn().mockResolvedValue({
       modelParams: { model: {} },
       promptProviderOptions: {},
     }),
   }))
 
-  vi.mock('data/sql/execute-sql-query', () => ({
+  vi.mock('@/data/sql/execute-sql-query', () => ({
     executeSql: vi.fn().mockResolvedValue({ result: [] }),
   }))
 
-  vi.mock('lib/ai/tools', () => ({
+  vi.mock('@/lib/ai/tools', () => ({
     getTools: vi.fn().mockResolvedValue({}),
   }))
 

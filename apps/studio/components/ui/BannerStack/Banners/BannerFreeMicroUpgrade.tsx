@@ -1,14 +1,14 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { ChevronsUpAnimated } from 'components/ui/ComputeBadgeWrapper'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useTrack } from 'lib/telemetry/track'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 
 import { BannerCard } from '../BannerCard'
 import { BANNER_ID, useBannerStack } from '../BannerStackProvider'
+import { ChevronsUpAnimated } from '@/components/ui/ComputeBadgeWrapper'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerFreeMicroUpgrade = () => {
   const { ref } = useParams()

@@ -1,13 +1,13 @@
 import { getDropForeignTableSql } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { foreignTableKeys } from 'data/foreign-tables/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { fdwKeys } from './keys'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { foreignTableKeys } from '@/data/foreign-tables/keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type FDWDropForeignTableVariables = {
   projectRef?: string

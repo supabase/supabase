@@ -2856,6 +2856,7 @@ export const self_hosting: NavMenuConstant = {
           name: 'Add Reverse Proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
+        { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',

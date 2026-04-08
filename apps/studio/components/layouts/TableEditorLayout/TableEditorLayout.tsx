@@ -4,7 +4,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import NoPermission from '@/components/ui/NoPermission'

@@ -1,12 +1,6 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import AlertError from 'components/ui/AlertError'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Badge,
   Button,
@@ -43,6 +37,12 @@ import {
   toAlertError,
   type RecentErrorGroup,
 } from './EdgeFunctionRecentErrors.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import AlertError from '@/components/ui/AlertError'
+import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface EdgeFunctionRecentErrorsProps {
   functionId?: string

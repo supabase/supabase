@@ -1,15 +1,17 @@
 import { useIsLoggedIn, useParams } from 'common'
-import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import CopyButton from 'components/ui/CopyButton'
-import { createCliLoginSession } from 'data/cli/login'
-import { withAuth } from 'hooks/misc/withAuth'
+import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import type { NextPageWithLayout } from 'types'
 import { InputOTP, InputOTPGroup, InputOTPSlot, LogoLoader } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
+import CopyButton from '@/components/ui/CopyButton'
+import { createCliLoginSession } from '@/data/cli/login'
+import { withAuth } from '@/hooks/misc/withAuth'
+import type { NextPageWithLayout } from '@/types'
 
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -45,7 +47,7 @@ const CliLoginPage: NextPageWithLayout = () => {
   }, [isLoggedIn, router, router.isReady, session_id, public_key, token_name, device_code])
 
   return (
-    <APIAuthorizationLayout>
+    <APIAuthorizationLayout HeadProvider={Head}>
       <div className={`flex flex-col items-center justify-center h-full`}>
         {device_code ? (
           <>

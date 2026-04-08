@@ -1,4 +1,6 @@
-export const VIEWS_SQL = /* SQL */ `
+import { safeSql } from '../pg-format'
+
+export const VIEWS_SQL = /* SQL */ safeSql`
 SELECT
   c.oid :: int8 AS id,
   n.nspname AS schema,

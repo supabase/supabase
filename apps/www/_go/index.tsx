@@ -14,6 +14,7 @@ import stripeSessionsContest from './events/stripe-sessions-2026/contest'
 import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
 import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-thank-you'
 import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-scheduler'
+import stripeParty from './events/stripe-sessions-2026/party'
 import sxswContest from './events/sxsw-2026/contest'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
@@ -40,6 +41,7 @@ const pages: GoPageInput[] = [
   stripeExecDinnerThankYou, // remove after May 31, 2026
   stripeMeetingScheduler, // remove after May 31, 2026
   stripeSessionsContest, // remove after May 31, 2026
+  stripeParty, // remove after May 31, 2026
   sxswContest, // remove after April 30, 2026
   accentureContest, // remove after May 31, 2026
   postgresconfContest, // remove after May 31, 2026

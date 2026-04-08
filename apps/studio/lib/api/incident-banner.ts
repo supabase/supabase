@@ -1,8 +1,8 @@
-import { IS_PROD } from 'common'
 import { createHash } from 'crypto'
+import { IS_PROD } from 'common'
 import z from 'zod'
 
-import { InternalServerError } from 'lib/api/apiHelpers'
+import { InternalServerError } from '@/lib/api/apiHelpers'
 
 const INCIDENT_IO_BASE_URL = 'https://api.incident.io/v2'
 

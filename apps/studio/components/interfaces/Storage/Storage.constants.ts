@@ -54,12 +54,6 @@ export const STORAGE_CLIENT_LIBRARY_MAPPINGS = {
   getPublicUrl: [],
 }
 
-export const CONTEXT_MENU_KEYS = {
-  STORAGE_COLUMN: 'STORAGE_COLUMN',
-  STORAGE_ITEM: 'STORAGE_ITEM',
-  STORAGE_FOLDER: 'STORAGE_FOLDER',
-}
-
 export const BUCKET_TYPES = {
   files: {
     displayName: 'Files',

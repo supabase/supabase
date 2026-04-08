@@ -12,7 +12,9 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import {
   checkHasNonPositiveValues,
+  computeYAxisWidth,
   formatLogTick,
+  formatYAxisTick,
 } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
@@ -176,6 +178,11 @@ export const ChartBlock = ({
 
   const effectiveLogScale = logScale && !hasNonPositiveValues
 
+  const yAxisWidth = computeYAxisWidth(data, metricLabel, {
+    isLogScale: effectiveLogScale,
+    isPercentage,
+  })
+
   const getInitialHighlightedValue = useCallback(() => {
     if (!chartData?.data?.length) return undefined
     const lastDataPoint = chartData.data[chartData.data.length - 1]
@@ -301,13 +308,13 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={effectiveLogScale ? 52 : undefined}
-                  tickFormatter={effectiveLogScale ? formatLogTick : undefined}
+                  width={yAxisWidth}
+                  tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                 />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[200px]"
+                      className="min-w-[200px]"
                       labelSuffix={isPercentage ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />
@@ -329,13 +336,12 @@ export const ChartBlock = ({
                   scale={effectiveLogScale ? 'log' : 'auto'}
                   domain={effectiveLogScale ? [1, 'auto'] : isPercentage ? [0, 100] : undefined}
                   allowDataOverflow={effectiveLogScale}
-                  width={effectiveLogScale ? 52 : undefined}
-                  tickFormatter={effectiveLogScale ? formatLogTick : undefined}
+                  width={yAxisWidth}
+                  tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                 />
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[200px]"
                       labelSuffix={chartData?.format === '%' ? '%' : ''}
                       labelFormatter={(x) => dayjs(x).format('DD MMM YYYY')}
                     />

@@ -1,6 +1,8 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { getCloudProviderArchitecture } from './cloudprovider-utils'
 import { PROVIDERS } from './constants'
+
 describe('getCloudProviderArchitecture', () => {
   it('should return the correct architecture', () => {
     const result = getCloudProviderArchitecture(PROVIDERS.AWS.id)

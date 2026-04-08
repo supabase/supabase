@@ -1,16 +1,31 @@
 import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { replicaKeys } from './keys'
 import { DashboardPreference } from '@/components/interfaces/Settings/General/DashboardPreferences'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export const MAX_REPLICAS_BELOW_XL = 2
-export const MAX_REPLICAS_ABOVE_XL = 5
+/**
+ * Unless explicitly defined here, caps default to `READ_REPLICAS_MAX_COUNT`.
+ */
+export const READ_REPLICA_COMPUTE_CAPS: Record<string, number> = {
+  ci_pico: 0,
+  ci_nano: 0,
+  ci_micro: 0,
+  ci_small: 4,
+  ci_medium: 4,
+  ci_large: 4,
+}
+
+export const READ_REPLICAS_MAX_COUNT = 5
+
+export function getMaxReplicas(computeAddon?: string): number {
+  return READ_REPLICA_COMPUTE_CAPS[`${computeAddon}`] ?? READ_REPLICAS_MAX_COUNT
+}
 
 export type ReadReplicasVariables = {
   projectRef?: string

@@ -8,7 +8,7 @@ import {
   ExecuteSqlOptions,
   GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
-import { ResponseError } from 'types'
+
 import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { generateTypescriptTypes } from './generate-types'
 import { getLints } from './lints'
@@ -16,6 +16,7 @@ import { getLogQuery, retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
+import { ResponseError } from '@/types'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit

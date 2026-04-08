@@ -11,25 +11,30 @@ const {
   mockUseStorageExplorerStateSnapshot,
   mockUseAsyncCheckPermissions,
   mockIsAPIDocsSidePanelEnabled,
+  mockUseStoragePreference,
 } = vi.hoisted(() => ({
   mockTrack: vi.fn(),
   mockUseStorageExplorerStateSnapshot: vi.fn(),
   mockUseAsyncCheckPermissions: vi.fn(),
   mockIsAPIDocsSidePanelEnabled: vi.fn(),
+  mockUseStoragePreference: vi.fn(),
 }))
 
-vi.mock('lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
-vi.mock('state/storage-explorer', () => ({
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
+vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => mockUseStorageExplorerStateSnapshot(),
 }))
-vi.mock('hooks/misc/useCheckPermissions', () => ({
+vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
 }))
-vi.mock('components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useIsAPIDocsSidePanelEnabled: () => mockIsAPIDocsSidePanelEnabled(),
 }))
-vi.mock('components/ui/APIDocsButton', () => ({
+vi.mock('@/components/ui/APIDocsButton', () => ({
   APIDocsButton: () => null,
+}))
+vi.mock('./useStoragePreference', () => ({
+  useStoragePreference: (...args: any[]) => mockUseStoragePreference(...args),
 }))
 
 function makeColumn(name: string) {
@@ -41,13 +46,10 @@ function makeColumn(name: string) {
   }
 }
 
-function createSnapshot(view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS) {
+function createSnapshot() {
   return {
+    projectRef: 'test-ref',
     columns: [makeColumn('my-bucket'), makeColumn('images'), makeColumn('2024')],
-    sortBy: STORAGE_SORT_BY.NAME,
-    setSortBy: vi.fn(),
-    sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
-    setSortByOrder: vi.fn(),
     popColumn: vi.fn(),
     popColumnAtIndex: vi.fn(),
     popOpenedFolders: vi.fn(),
@@ -60,8 +62,19 @@ function createSnapshot(view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS) {
     selectedBucket: { id: 'bucket-id', name: 'my-bucket' },
     isSearching: false,
     setIsSearching: vi.fn(),
+  }
+}
+
+function createPreference(view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS) {
+  return {
     view,
     setView: vi.fn(),
+    sortBy: STORAGE_SORT_BY.NAME,
+    setSortBy: vi.fn(),
+    sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
+    setSortByOrder: vi.fn(),
+    sortBucket: 'created_at',
+    setSortBucket: vi.fn(),
   }
 }
 
@@ -71,8 +84,10 @@ describe('FileExplorerHeader', () => {
     mockUseStorageExplorerStateSnapshot.mockReset()
     mockUseAsyncCheckPermissions.mockReset()
     mockIsAPIDocsSidePanelEnabled.mockReset()
+    mockUseStoragePreference.mockReset()
 
     mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot())
+    mockUseStoragePreference.mockReturnValue(createPreference())
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockIsAPIDocsSidePanelEnabled.mockReturnValue(false)
   })
@@ -202,7 +217,7 @@ describe('FileExplorerHeader', () => {
   })
 
   it('does not render Navigate in list view', () => {
-    mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot(STORAGE_VIEWS.LIST))
+    mockUseStoragePreference.mockReturnValue(createPreference(STORAGE_VIEWS.LIST))
 
     render(
       <FileExplorerHeader

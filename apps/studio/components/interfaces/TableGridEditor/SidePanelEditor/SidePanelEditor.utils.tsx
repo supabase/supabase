@@ -679,7 +679,7 @@ export const createTable = async ({
                 { id: toastId }
               )
             },
-            treatEmptyAsNull: importContent.treatEmptyAsNull,
+            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
           })
 
           if (error !== undefined) {
@@ -715,7 +715,7 @@ export const createTable = async ({
                 { id: toastId }
               )
             },
-            treatEmptyAsNull: importContent.treatEmptyAsNull,
+            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
           })
         }
 
@@ -970,12 +970,12 @@ export const formatRowsForInsert = ({
   rows,
   headers,
   columns = [],
-  treatEmptyAsNull = true,
+  emptyStringAsNullHeaders = headers,
 }: {
   rows: unknown[]
   headers: string[]
   columns?: RetrieveTableResult['columns']
-  treatEmptyAsNull?: boolean
+  emptyStringAsNullHeaders?: string[]
 }) => {
   return rows.map((row) => {
     const formattedRow: Record<string, unknown> = {}
@@ -988,9 +988,7 @@ export const formatRowsForInsert = ({
 
       const originalValue = row[header]
 
-      if (originalValue === '' && treatEmptyAsNull && column?.is_nullable) {
-        formattedRow[header] = null
-      } else if ((column?.format ?? '').includes('json')) {
+      if ((column?.format ?? '').includes('json')) {
         formattedRow[header] = tryParseJson(originalValue)
       } else if ((column?.data_type ?? '') === 'ARRAY') {
         if (
@@ -1004,7 +1002,8 @@ export const formatRowsForInsert = ({
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] = ''
+        formattedRow[header] =
+          column?.is_nullable && emptyStringAsNullHeaders.includes(header) ? null : ''
       } else {
         formattedRow[header] = originalValue
       }
@@ -1019,16 +1018,16 @@ export async function insertRowsViaSpreadsheet({
   file,
   table,
   selectedHeaders,
+  emptyStringAsNullHeaders = selectedHeaders,
   onProgressUpdate,
-  treatEmptyAsNull = true,
 }: {
   projectRef: string
   connectionString: string | undefined | null
   file: File
   table: RetrieveTableResult
   selectedHeaders: string[]
+  emptyStringAsNullHeaders?: string[]
   onProgressUpdate: (progress: number) => void
-  treatEmptyAsNull: boolean
 }): Promise<{ error: unknown }> {
   let chunkNumber = 0
   let insertError: unknown = undefined
@@ -1048,7 +1047,7 @@ export async function insertRowsViaSpreadsheet({
           rows: results.data,
           headers: selectedHeaders,
           columns: table.columns,
-          treatEmptyAsNull,
+          emptyStringAsNullHeaders,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
@@ -1085,16 +1084,16 @@ export async function insertTableRows({
   table,
   rows,
   selectedHeaders,
+  emptyStringAsNullHeaders = selectedHeaders,
   onProgressUpdate,
-  treatEmptyAsNull = true,
 }: {
   projectRef: string
   connectionString: string | undefined | null
   table: RetrieveTableResult
   rows: unknown[]
   selectedHeaders: string[]
+  emptyStringAsNullHeaders?: string[]
   onProgressUpdate: (progress: number) => void
-  treatEmptyAsNull: boolean
 }): Promise<{ error: unknown }> {
   let insertError: unknown = undefined
   let insertProgress = 0
@@ -1103,7 +1102,7 @@ export async function insertTableRows({
     rows,
     headers: selectedHeaders,
     columns: table.columns,
-    treatEmptyAsNull,
+    emptyStringAsNullHeaders,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)
