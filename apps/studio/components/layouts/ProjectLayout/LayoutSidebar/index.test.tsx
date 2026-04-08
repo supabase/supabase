@@ -21,6 +21,10 @@ vi.mock('@/components/ui/AdvisorPanel/AdvisorPanel', () => ({
   AdvisorPanel: () => <div data-testid="advisor-panel-sidebar">Advisor Panel</div>,
 }))
 
+vi.mock('components/interfaces/Support/SupportFormPage', () => ({
+  SupportFormPage: () => <div data-testid="support-panel-sidebar">Support Panel</div>,
+}))
+
 vi.mock('nuqs', async () => {
   let queryValue = 'ai-assistant'
   return {
@@ -160,6 +164,7 @@ describe('LayoutSidebar', () => {
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.EDITOR_PANEL]).toBeUndefined()
         // Advisor panel should still be available (doesn't require project)
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
+        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.SUPPORT_PANEL]).toBeDefined()
       })
     })
 
@@ -185,6 +190,13 @@ describe('LayoutSidebar', () => {
       })
 
       expect(await screen.findByTestId('advisor-panel-sidebar')).toBeTruthy()
+
+      // Support panel should also work
+      act(() => {
+        sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.SUPPORT_PANEL)
+      })
+
+      expect(await screen.findByTestId('support-panel-sidebar')).toBeTruthy()
     })
   })
 

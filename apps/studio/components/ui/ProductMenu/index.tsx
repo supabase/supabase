@@ -6,7 +6,6 @@ import { ProductMenuItem } from './ProductMenuItem'
 interface ProductMenuProps {
   page?: string
   menu: ProductMenuGroup[]
-  /** Called when a menu item link is clicked (e.g. to close a sheet on navigation) */
   onItemClick?: () => void
 }
 

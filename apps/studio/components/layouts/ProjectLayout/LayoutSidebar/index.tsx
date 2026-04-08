@@ -6,7 +6,7 @@ import { SIDEBAR_KEYS, type TYPEOF_SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { useMobileSheet } from '@/components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
+export function isSidebarId(content: unknown): content is TYPEOF_SIDEBAR_KEYS {
   return (
     typeof content === 'string' &&
     Object.values(SIDEBAR_KEYS).includes(content as TYPEOF_SIDEBAR_KEYS)

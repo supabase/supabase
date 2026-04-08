@@ -28,6 +28,7 @@ import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { FloatingMobileToolbarPreview } from './FloatingMobileToolbarPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
+import { NavigationV2Preview } from './NavigationV2Preview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { TableFilterBarPreview } from './TableFilterBarPreview'
@@ -49,6 +50,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR]: <FloatingMobileToolbarPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_V2]: <NavigationV2Preview />,
 }
 
 export const FeaturePreviewModal = () => {

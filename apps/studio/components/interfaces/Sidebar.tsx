@@ -27,18 +27,22 @@ import {
   useSidebar,
 } from 'ui'
 
+import { ActiveDot } from '../ui/ActiveDot'
 import { Route } from '../ui/ui.types'
 import {
   useIsAPIDocsSidePanelEnabled,
+  useIsNavigationV2Enabled,
   useIsPlatformWebhooksEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
+import { ConnectSheet } from './ConnectSheet/ConnectSheet'
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { SidebarHeader } from '@/components/layouts/NavigationV2/SidebarHeader'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -65,6 +69,7 @@ export interface SidebarProps extends ComponentPropsWithoutRef<typeof SidebarPri
 export const Sidebar = ({ className, ...props }: SidebarProps) => {
   const { setOpen } = useSidebar()
   const hideSideBar = useHideSidebar()
+  const isNavigationV2 = useIsNavigationV2Enabled()
 
   const [sidebarBehaviour, setSidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
@@ -78,52 +83,69 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
   }, [sidebarBehaviour, setOpen])
 
   return (
-    <AnimatePresence>
-      {!hideSideBar && (
-        <SidebarMotion
-          {...props}
-          className={cn('z-50', className)}
-          transition={{ delay: 0.4, duration: 0.4 }}
-          overflowing={sidebarBehaviour === 'expandable'}
-          collapsible="icon"
-          variant="sidebar"
-          onMouseEnter={() => {
-            if (sidebarBehaviour === 'expandable') setOpen(true)
-          }}
-          onMouseLeave={() => {
-            if (sidebarBehaviour === 'expandable') setOpen(false)
-          }}
-        >
-          <SidebarContent
-            footer={
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="text"
-                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
-                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="start" className="w-40">
-                  <DropdownMenuRadioGroup
-                    value={sidebarBehaviour}
-                    onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
-                  >
-                    <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="expandable">
-                      Expand on hover
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            }
-          />
-        </SidebarMotion>
-      )}
-    </AnimatePresence>
+    <>
+      <AnimatePresence>
+        {!hideSideBar && (
+          <SidebarMotion
+            {...props}
+            className={cn('z-50', className)}
+            transition={{ delay: 0.4, duration: 0.4 }}
+            overflowing={sidebarBehaviour === 'expandable'}
+            collapsible="icon"
+            variant="sidebar"
+            onMouseEnter={() => {
+              if (sidebarBehaviour === 'expandable') setOpen(true)
+            }}
+            onMouseLeave={() => {
+              if (sidebarBehaviour === 'expandable') setOpen(false)
+            }}
+          >
+            {isNavigationV2 && <SidebarHeader variant="desktop" />}
+            <SidebarContent
+              footer={
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="text"
+                      className={cn('w-min px-1.5 mx-0.5', sidebarBehaviour === 'open' && '!px-2')}
+                      icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="top" align="start" className="w-40">
+                    <DropdownMenuRadioGroup
+                      value={sidebarBehaviour}
+                      onValueChange={(value) => setSidebarBehaviour(value as SidebarBehaviourType)}
+                    >
+                      <DropdownMenuLabel>Sidebar control</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioItem value="open">Expanded</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="closed">Collapsed</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="expandable">
+                        Expand on hover
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              }
+            />
+          </SidebarMotion>
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
+export function SidebarMobileSheetMenu() {
+  const router = useRouter()
+  const isNavigationV2 = useIsNavigationV2Enabled()
+  const sheetScope = router.pathname.startsWith('/project') ? 'project' : 'organization'
+
+  return (
+    <div className="flex h-full min-h-0 flex-col bg-sidebar text-foreground">
+      <SidebarHeader variant="mobile-sheet" scope={sheetScope} />
+      <SidebarContent />
+      {!isNavigationV2 && <ConnectSheet />}
+    </div>
   )
 }
 
@@ -131,30 +153,33 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
   const { ref: projectRef } = useParams()
 
   return (
-    <>
-      <AnimatePresence mode="wait">
-        <SidebarContentPrimitive>
-          {projectRef ? (
-            <motion.div key="project-links">
-              <ProjectLinks />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="org-links"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-            >
-              <OrganizationLinks />
-            </motion.div>
-          )}
-        </SidebarContentPrimitive>
-      </AnimatePresence>
-      <SidebarFooter>
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <AnimatePresence mode="wait">
+          <SidebarContentPrimitive>
+            {projectRef ? (
+              <motion.div key="project-links" className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <ProjectLinks />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="org-links"
+                className="flex min-h-0 min-w-0 flex-1 flex-col"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+              >
+                <OrganizationLinks />
+              </motion.div>
+            )}
+          </SidebarContentPrimitive>
+        </AnimatePresence>
+      </div>
+      <SidebarFooter className="shrink-0">
         <SidebarGroup className="p-0">{footer}</SidebarGroup>
       </SidebarFooter>
-    </>
+    </div>
   )
 }
 
@@ -204,17 +229,6 @@ export function SideBarNavLink({
   )
 }
 
-const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
-  return (
-    <div
-      className={cn(
-        'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
-        hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
-      )}
-    />
-  )
-}
-
 const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
@@ -226,7 +240,6 @@ const ProjectLinks = () => {
   const { mutate: sendEvent } = useSendEventMutation()
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
@@ -336,6 +349,7 @@ const ProjectLinks = () => {
                   <ActiveDot
                     hasErrors={errorLints.length > 0}
                     hasWarnings={securityLints.length > 0}
+                    className="left-[18px] top-2"
                   />
                 )}
                 <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />

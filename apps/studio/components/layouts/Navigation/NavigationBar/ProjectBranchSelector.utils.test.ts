@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
+import { getProjectBranchSelectorState, getSelectedOrgInitial } from './ProjectBranchSelector.utils'
 
 describe('getProjectBranchSelectorState', () => {
   it('returns main branch when branching disabled', () => {
@@ -61,7 +61,6 @@ describe('getProjectBranchSelectorState', () => {
       selectedOrganization: { slug: 'my-org', name: 'My Org' } as any,
     })
     expect(result.organizationHref).toBe('/org/my-org')
-    expect(result.selectedOrgInitial).toBe('M')
   })
 
   it('returns organizations fallback when no org slug', () => {
@@ -71,15 +70,19 @@ describe('getProjectBranchSelectorState', () => {
       selectedOrganization: undefined,
     })
     expect(result.organizationHref).toBe('/organizations')
-    expect(result.selectedOrgInitial).toBe('O')
+  })
+})
+
+describe('getSelectedOrgInitial', () => {
+  it('returns first letter of org name', () => {
+    expect(getSelectedOrgInitial('My Org')).toBe('M')
   })
 
-  it('handles org name with leading/trailing spaces for initial', () => {
-    const result = getProjectBranchSelectorState({
-      selectedBranch: undefined,
-      isBranchingEnabled: false,
-      selectedOrganization: { slug: 'x', name: '  Acme  ' } as any,
-    })
-    expect(result.selectedOrgInitial).toBe('A')
+  it('returns O for placeholder name (matches selector fallback)', () => {
+    expect(getSelectedOrgInitial('O')).toBe('O')
+  })
+
+  it('trims whitespace before taking initial', () => {
+    expect(getSelectedOrgInitial('  Acme  ')).toBe('A')
   })
 })

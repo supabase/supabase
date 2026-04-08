@@ -1,7 +1,8 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { ChevronsUpDown, HelpCircle } from 'lucide-react'
-import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
@@ -55,6 +56,8 @@ interface OrganizationProjectSelectorSelectorProps {
   modal?: boolean
   /** When true, render only the command list (no popover/trigger). For use inside sheet or popover. */
   embedded?: boolean
+  /** When true, render the desktop (non-embedded) command content without a trigger/popover. */
+  renderOnlyContent?: boolean
   className?: string
 }
 
@@ -75,6 +78,7 @@ export const OrganizationProjectSelector = ({
   fetchOnMount = false,
   modal = false,
   embedded = false,
+  renderOnlyContent = false,
   className,
 }: OrganizationProjectSelectorSelectorProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
@@ -83,6 +87,7 @@ export const OrganizationProjectSelector = ({
   const [openInternal, setOpenInternal] = useState(false)
   const open = _open ?? openInternal
   const setOpen = _setOpen ?? setOpenInternal
+  const shouldForceOpen = renderOnlyContent
   const listboxId = useId()
 
   const [search, setSearch] = useState('')
@@ -107,7 +112,7 @@ export const OrganizationProjectSelector = ({
     fetchNextPage,
   } = useOrgProjectsInfiniteQuery(
     { slug, search: search.length === 0 ? search : debouncedSearch },
-    { enabled: fetchOnMount || open, placeholderData: keepPreviousData }
+    { enabled: fetchOnMount || open || shouldForceOpen, placeholderData: keepPreviousData }
   )
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
@@ -138,8 +143,7 @@ export const OrganizationProjectSelector = ({
     if (!isLoadingProjects && isSuccessProjects) {
       onInitialLoad?.(projects)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingProjects, isSuccessProjects])
+  }, [isLoadingProjects, isSuccessProjects, onInitialLoad, projects])
 
   function renderListContent() {
     if (isLoadingProjects) {
@@ -193,14 +197,21 @@ export const OrganizationProjectSelector = ({
       )
     }
     return (
-      <ScrollArea className={(projects || []).length > 7 ? 'h-full md:h-[210px]' : ''}>
+      <ScrollArea
+        className={
+          renderOnlyContent ? 'h-full' : (projects || []).length > 7 ? 'h-full md:h-[210px]' : ''
+        }
+      >
         {projects?.map((project) => (
           <ProjectCommandItem
             key={project.ref}
             project={project}
             selectedRef={selectedRef ?? undefined}
             onSelect={onSelect}
-            onClose={() => setOpen(false)}
+            onClose={() => {
+              if (renderOnlyContent) return
+              setOpen(false)
+            }}
             renderRow={renderRow}
             checkPosition={checkPosition}
             isOptionDisabled={isOptionDisabled}
@@ -219,7 +230,10 @@ export const OrganizationProjectSelector = ({
   const commandContent = (
     <Command_Shadcn_
       shouldFilter={false}
-      className={cn(className, embedded && 'flex flex-col flex-1 min-h-0 overflow-hidden')}
+      className={cn(
+        className,
+        (embedded || renderOnlyContent) && 'flex flex-col flex-1 min-h-0 overflow-hidden'
+      )}
     >
       {embedded && !!renderActions && (
         <div className="flex items-center gap-2 shrink-0 border-b p-2">
@@ -232,30 +246,47 @@ export const OrganizationProjectSelector = ({
         onValueChange={setSearch}
         placeholder={searchPlaceholder}
         handleReset={() => setSearch('')}
-        wrapperClassName={embedded ? 'shrink-0 border-b' : undefined}
+        wrapperClassName={embedded || renderOnlyContent ? 'shrink-0 border-b' : undefined}
         className="text-base sm:text-sm"
       />
-      <CommandList_Shadcn_
-        className={
-          embedded
-            ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden !max-h-none'
-            : 'max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden'
-        }
-      >
-        <CommandGroup_Shadcn_ className={embedded ? 'flex-1 min-h-0 overflow-hidden' : ''}>
-          {renderListContent()}
-        </CommandGroup_Shadcn_>
-        {!!renderActions && !embedded && (
-          <>
-            <div className="h-px bg-border-overlay -mx-1 shrink-0" />
-            {renderActions(setOpen)}
-          </>
-        )}
-      </CommandList_Shadcn_>
+      {renderOnlyContent ? (
+        <>
+          <div className="flex-1 min-h-0 w-full">
+            <CommandList_Shadcn_ className="h-full max-h-none w-full overflow-hidden overflow-x-hidden">
+              <CommandGroup_Shadcn_ className="min-h-0 overflow-hidden">
+                {renderListContent()}
+              </CommandGroup_Shadcn_>
+            </CommandList_Shadcn_>
+          </div>
+          {!!renderActions && <div className="shrink-0 border-t">{renderActions(setOpen)}</div>}
+        </>
+      ) : (
+        <CommandList_Shadcn_
+          className={
+            embedded
+              ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden !max-h-none'
+              : 'max-h-none md:max-h-[300px] h-full flex-1 overflow-y-auto overflow-x-hidden'
+          }
+        >
+          <CommandGroup_Shadcn_ className={embedded ? 'flex-1 min-h-0 overflow-hidden' : ''}>
+            {renderListContent()}
+          </CommandGroup_Shadcn_>
+          {!!renderActions && !embedded && (
+            <>
+              <div className="h-px bg-border-overlay -mx-1 shrink-0" />
+              {renderActions(setOpen)}
+            </>
+          )}
+        </CommandList_Shadcn_>
+      )}
     </Command_Shadcn_>
   )
 
   if (embedded) {
+    return commandContent
+  }
+
+  if (renderOnlyContent) {
     return commandContent
   }
 
@@ -273,7 +304,6 @@ export const OrganizationProjectSelector = ({
           <Button
             block
             type="default"
-            role="combobox"
             size="small"
             aria-expanded={open}
             aria-controls={listboxId}

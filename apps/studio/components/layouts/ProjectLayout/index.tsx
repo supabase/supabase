@@ -36,8 +36,10 @@ import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import { RestoringState } from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { useIsNavigationV2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { SidebarMobileSheetMenu } from '@/components/interfaces/Sidebar'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -134,6 +136,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     )
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+    const isNavigationV2 = useIsNavigationV2Enabled()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
@@ -199,17 +202,28 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
-        setMobileSheetContent(
-          <MobileMenuContent
-            currentProductMenu={productMenu ?? null}
-            currentProduct={product}
-            currentSectionKey={currentSectionKey}
-            onCloseSheet={() => setMobileSheetContent(null)}
-          />
-        )
+        if (isNavigationV2) {
+          setMobileSheetContent(<SidebarMobileSheetMenu />)
+        } else {
+          setMobileSheetContent(
+            <MobileMenuContent
+              currentProductMenu={productMenu ?? null}
+              currentProduct={product}
+              currentSectionKey={currentSectionKey}
+              onCloseSheet={() => setMobileSheetContent(null)}
+            />
+          )
+        }
       })
       return unregister
-    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+    }, [
+      registerOpenMenu,
+      productMenu,
+      product,
+      currentSectionKey,
+      setMobileSheetContent,
+      isNavigationV2,
+    ])
 
     return (
       <>
@@ -318,7 +332,7 @@ const MenuBarWrapper = ({
   return !isLoading && productMenu && showMenuBar ? children : null
 }
 
-interface ContentWrapperProps {
+export interface ContentWrapperProps {
   isLoading: boolean
   isBlocking?: boolean
   children: ReactNode
@@ -336,7 +350,7 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
+export const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()

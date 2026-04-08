@@ -11,17 +11,23 @@ import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { Organization } from '@/types'
 
 interface OrganizationDropdownProps {
   embedded?: boolean
   className?: string
   onClose?: () => void
+  /** Same command UI as the header org popover; use inside another popover or column. */
+  renderCommandContentOnly?: boolean
+  onSelectOrganization?: (org: Organization) => void
 }
 
 export const OrganizationDropdown = ({
   embedded = false,
   className,
   onClose,
+  renderCommandContentOnly = false,
+  onSelectOrganization,
 }: OrganizationDropdownProps = {}) => {
   const router = useRouter()
   const { slug: routeSlug } = useParams()
@@ -38,16 +44,23 @@ export const OrganizationDropdown = ({
   const orgName = selectedOrganization?.name
 
   const [open, setOpen] = useState(false)
-  const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
+  const isEmbeddedContext = renderCommandContentOnly || embedded
+  const close = useEmbeddedCloseHandler(
+    isEmbeddedContext,
+    onClose,
+    isEmbeddedContext ? undefined : setOpen
+  )
 
-  if (isLoadingOrganizations && !embedded)
+  if (isLoadingOrganizations && !embedded && !renderCommandContentOnly)
     return <ShimmeringLoader className="p-2 md:mr-2 w-[90px]" />
 
   if (isError) return <AppLayoutDropdownError message="Failed to load organizations" />
 
+  const commandEmbedded = renderCommandContentOnly ? false : embedded
+
   const commandContent = (
     <OrganizationDropdownCommandContent
-      embedded={embedded}
+      embedded={commandEmbedded}
       className={className}
       organizations={organizations ?? []}
       selectedSlug={slug}
@@ -55,8 +68,13 @@ export const OrganizationDropdown = ({
       hasRouteSlug={!!routeSlug}
       organizationCreationEnabled={organizationCreationEnabled}
       onClose={close}
+      onSelectOrganization={onSelectOrganization}
     />
   )
+
+  if (renderCommandContentOnly) {
+    return isLoadingOrganizations ? <GenericSkeletonLoader className="p-2" /> : commandContent
+  }
 
   if (embedded)
     return isLoadingOrganizations ? <GenericSkeletonLoader className="p-2" /> : commandContent

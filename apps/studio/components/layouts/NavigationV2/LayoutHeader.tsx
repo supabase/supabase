@@ -5,17 +5,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ReactNode } from 'react'
-import { cn } from 'ui'
+import type { ReactNode } from 'react'
+import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns'
 
-import { BreadcrumbsView } from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HeaderUpgradeButton } from './HeaderUpgradeButton'
-import { HomeIcon } from './HomeIcon'
-import { LocalVersionPopover } from './LocalVersionPopover'
-import { MergeRequestButton } from './MergeRequestButton'
-import { OrgProjectBranchNav } from './OrgProjectBranchNav'
 import {
   useIsBranching2Enabled,
   useIsFloatingMobileToolbarEnabled,
@@ -24,32 +17,19 @@ import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButt
 import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
 import { UserDropdown } from '@/components/interfaces/UserDropdown'
-import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
-import { AssistantButton } from '@/components/layouts/AppLayout/AssistantButton'
-import { InlineEditorButton } from '@/components/layouts/AppLayout/InlineEditorButton'
-import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
+import { BreadcrumbsView } from '@/components/layouts/Navigation/LayoutHeader/BreadcrumbsView'
+import { FeedbackDropdown } from '@/components/layouts/Navigation/LayoutHeader/FeedbackDropdown/FeedbackDropdown'
+import { HeaderUpgradeButton } from '@/components/layouts/Navigation/LayoutHeader/HeaderUpgradeButton'
+import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
+import { LayoutHeaderDivider } from '@/components/layouts/Navigation/LayoutHeader/LayoutHeader'
+import { LocalVersionPopover } from '@/components/layouts/Navigation/LayoutHeader/LocalVersionPopover'
+import { MergeRequestButton } from '@/components/layouts/Navigation/LayoutHeader/MergeRequestButton'
+import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useOrgUsageExceedingLimits } from '@/hooks/misc/useOrgUsageExceedingLimits'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
-
-export const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
-  <span className={cn('text-border-stronger pr-2', className)} {...props}>
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      stroke="currentColor"
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-      shapeRendering="geometricPrecision"
-      aria-hidden={true}
-    >
-      <path d="M16 3.549L7.12 20.600" />
-    </svg>
-  </span>
-)
 
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
@@ -65,12 +45,14 @@ export const LayoutHeader = ({
   backToDashboardURL,
 }: LayoutHeaderProps) => {
   const router = useRouter()
+  const hideSidebar = useHideSidebar()
   const { ref: projectRef } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: selectedProject } = useSelectedProjectQuery()
   const gitlessBranching = useIsBranching2Enabled()
-
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
+  const { exceedingLimits } = useOrgUsageExceedingLimits(selectedOrganization)
 
   const isAccountPage = router.pathname.startsWith('/account')
 
@@ -100,31 +82,11 @@ export const LayoutHeader = ({
         )}
         <div
           className={cn(
-            'flex items-center justify-between h-full pr-3 flex-1 overflow-x-auto gap-x-8 pl-4'
+            'flex items-center justify-between h-full px-1 pl-3 flex-1 overflow-x-auto gap-x-4'
           )}
         >
-          <div className="flex md:hidden items-center text-sm not-sr-only">
-            <AnimatePresence>
-              {headerTitle && (
-                <motion.div
-                  className="flex items-center -ml-1"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{
-                    duration: 0.15,
-                    ease: 'easeOut',
-                  }}
-                >
-                  <LayoutHeaderDivider />
-                  <span className="text-foreground">{headerTitle}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          <div className="hidden md:flex items-center text-sm">
-            <HomeIcon />
-            <OrgProjectBranchNav className="ml-2" />
+          <div className="hidden md:flex items-center justify-start text-sm gap-x-2 md:w-1/3">
+            {hideSidebar && <HomeIcon />}
             <AnimatePresence>
               {headerTitle && (
                 <motion.div
@@ -146,7 +108,7 @@ export const LayoutHeader = ({
             <AnimatePresence>
               {projectRef && (
                 <motion.div
-                  className="ml-3 items-center gap-x-2 flex"
+                  className="items-center gap-x-2 flex"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -155,70 +117,46 @@ export const LayoutHeader = ({
                     ease: 'easeOut',
                   }}
                 >
-                  {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
                   <ConnectButton buttonType={connectButtonType} />
+                  {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
                 </motion.div>
               )}
             </AnimatePresence>
             <BreadcrumbsView defaultValue={breadcrumbs} />
+
+            {exceedingLimits && (
+              <div className="ml-2">
+                <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                  <Badge variant="destructive">Exceeding usage limits</Badge>
+                </Link>
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center w-full max-w-60 xl:max-w-60 justify-center">
+            <CommandMenuTriggerInput
+              showShortcut={commandMenuEnabled}
+              placeholder="Search..."
+              className={cn(
+                'flex !min-w-60 w-full rounded-full bg-transparent border-strong',
+                '[&_.command-shortcut>div]:border-none',
+                '[&_.command-shortcut>div]:pr-2',
+                '[&_.command-shortcut>div]:bg-transparent',
+                '[&_.command-shortcut>div]:text-foreground-lighter'
+              )}
+            />
+          </div>
+          <div className="flex items-center justify-end gap-x-1 md:w-1/3">
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
                 <DevToolbarTrigger />
                 <FeedbackDropdown />
-
-                <div className="flex items-center gap-1 md:gap-2">
-                  <CommandMenuTriggerInput
-                    showShortcut={commandMenuEnabled}
-                    placeholder="Search..."
-                    className={cn(
-                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
-                      '[&_.command-shortcut>div]:border-none',
-                      '[&_.command-shortcut>div]:pr-2',
-                      '[&_.command-shortcut>div]:bg-transparent',
-                      '[&_.command-shortcut>div]:text-foreground-lighter'
-                    )}
-                  />
-                  <HelpButton />
-                  <AdvisorButton projectRef={projectRef} />
-                  <AnimatePresence initial={false}>
-                    {!!projectRef && (
-                      <>
-                        <InlineEditorButton />
-                        <AssistantButton />
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
                 <HeaderUpgradeButton className="hidden md:flex" />
                 <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (
               <>
                 <LocalVersionPopover />
-                <div className="flex items-center gap-1 md:gap-2">
-                  <CommandMenuTriggerInput
-                    placeholder="Search..."
-                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                        [&_.command-shortcut>div]:border-none
-                        [&_.command-shortcut>div]:pr-2
-                        [&_.command-shortcut>div]:bg-transparent
-                        [&_.command-shortcut>div]:text-foreground-lighter
-                      "
-                  />
-                  <HelpButton />
-                  <AdvisorButton projectRef={projectRef} />
-                  <AnimatePresence initial={false}>
-                    {!!projectRef && (
-                      <>
-                        <InlineEditorButton />
-                        <AssistantButton />
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
                 <LocalDropdown triggerClassName="hidden md:flex" />
               </>
             )}

@@ -20,6 +20,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
+  const navigationV2Enabled = useFlag('studioNavLayoutV2')
 
   return [
     {
@@ -112,6 +113,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isNew: true,
       isPlatformOnly: false,
       isDefaultOptIn: true,
+    },
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_V2,
+      name: 'New navigation layout',
+      discussionsUrl: undefined,
+      enabled: navigationV2Enabled,
+      isNew: true,
+      isPlatformOnly: false,
+      isDefaultOptIn: false,
     },
   ].sort((a, b) => Number(b.isNew) - Number(a.isNew))
 }

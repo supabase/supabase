@@ -1,4 +1,4 @@
-import type { OrgMetricsUsage } from '@/data/usage/org-usage-query'
+import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 
 export const getResourcesExceededLimitsOrg = (usageMetrics: OrgMetricsUsage[]): string[] => {
   if (!usageMetrics.length) return []
@@ -19,4 +19,9 @@ export const getResourcesExceededLimitsOrg = (usageMetrics: OrgMetricsUsage[]): 
       return usageMetric.usage > freeUnits
     })
     .map((it) => it.metric)
+}
+
+export function hasOrgUsageExceededLimits(orgUsage: OrgUsageResponse | null | undefined): boolean {
+  if (!orgUsage) return false
+  return getResourcesExceededLimitsOrg(orgUsage.usages || []).length > 0
 }

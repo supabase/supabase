@@ -1,17 +1,14 @@
 import { LOCAL_STORAGE_KEYS, useBreakpoint, useParams } from 'common'
+import { useIsNavigationV2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
-import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
+import { useEffect, useState, type PropsWithChildren } from 'react'
+import { ResizablePanel, ResizablePanelGroup } from 'ui'
 
-import { BannerStack } from '../ui/BannerStack/BannerStack'
-import { BannerStackProvider } from '../ui/BannerStack/BannerStackProvider'
+import { DefaultLayoutProviders } from './DefaultLayoutProviders'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
 import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
-import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
-import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
+import { DefaultLayoutV2 } from './NavigationV2/DefaultLayout'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
-import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -39,7 +36,37 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  const { ref } = useParams()
+  const isNavigationV2 = useIsNavigationV2Enabled()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
+  // to whatever is specified).
+  if (!isMounted) return null
+
+  if (isNavigationV2) {
+    return (
+      <DefaultLayoutV2 headerTitle={headerTitle} hideMobileMenu={hideMobileMenu}>
+        {children}
+      </DefaultLayoutV2>
+    )
+  }
+
+  return (
+    <DefaultLayoutV1 headerTitle={headerTitle} hideMobileMenu={hideMobileMenu}>
+      {children}
+    </DefaultLayoutV1>
+  )
+}
+
+const DefaultLayoutV1 = ({
+  children,
+  headerTitle,
+  hideMobileMenu,
+}: PropsWithChildren<DefaultLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
 
@@ -65,71 +92,48 @@ export const DefaultLayout = ({
   const contentMinSizePercentage = 50
   const contentMaxSizePercentage = 70
 
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
-  // to whatever is specified).
-  if (!isMounted) {
-    return null
-  }
-
   return (
-    <SidebarProvider defaultOpen={false}>
-      <LayoutSidebarProvider>
-        <ProjectContextProvider projectRef={ref}>
-          <MobileSheetProvider>
-            <BannerStackProvider>
-              <div className="flex flex-col h-screen w-screen">
-                {/* Top Banner */}
-                <AppBannerWrapper />
-                <div className="flex-shrink-0">
-                  {isMobile && (
-                    <MobileNavigationBar
-                      hideMobileMenu={hideMobileMenu}
-                      backToDashboardURL={backToDashboardURL}
-                    />
-                  )}
-                  <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
-                </div>
-                {/* Main Content Area */}
-                <div className="flex flex-1 w-full overflow-y-hidden">
-                  {/* Sidebar - Only show for project pages, not account pages */}
-                  {!router.pathname.startsWith('/account') && <Sidebar />}
-                  {/* Main Content with Layout Sidebar */}
-                  <ResizablePanelGroup
-                    orientation="horizontal"
-                    className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
-                    autoSaveId="default-layout-content"
-                  >
-                    <ResizablePanel
-                      id="panel-content"
-                      className="w-full"
-                      minSize={`${contentMinSizePercentage}`}
-                      maxSize={`${contentMaxSizePercentage}`}
-                      defaultSize={`${contentMaxSizePercentage}`}
-                    >
-                      <div className="h-full overflow-y-auto">{children}</div>
-                    </ResizablePanel>
-                    <LayoutSidebar
-                      minSize={`${100 - contentMaxSizePercentage}`}
-                      maxSize={`${100 - contentMinSizePercentage}`}
-                      defaultSize={`${100 - contentMaxSizePercentage}`}
-                    />
-                  </ResizablePanelGroup>
-                </div>
-              </div>
-
-              <BannerStack />
-              <StudioMobileSheetNav />
-            </BannerStackProvider>
-          </MobileSheetProvider>
-        </ProjectContextProvider>
-      </LayoutSidebarProvider>
-    </SidebarProvider>
+    <DefaultLayoutProviders>
+      <div className="flex flex-col h-screen w-screen">
+        {/* Top Banner */}
+        <AppBannerWrapper />
+        <div className="flex-shrink-0">
+          {isMobile && (
+            <MobileNavigationBar
+              hideMobileMenu={hideMobileMenu}
+              backToDashboardURL={backToDashboardURL}
+            />
+          )}
+          <LayoutHeader headerTitle={headerTitle} backToDashboardURL={backToDashboardURL} />
+        </div>
+        {/* Main Content Area */}
+        <div className="flex flex-1 w-full overflow-y-hidden">
+          {/* Sidebar - Only show for project pages, not account pages */}
+          {!router.pathname.startsWith('/account') && <Sidebar />}
+          {/* Main Content with Layout Sidebar */}
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-0"
+            autoSaveId="default-layout-content"
+          >
+            <ResizablePanel
+              id="panel-content"
+              className="w-full"
+              minSize={`${contentMinSizePercentage}`}
+              maxSize={`${contentMaxSizePercentage}`}
+              defaultSize={`${contentMaxSizePercentage}`}
+            >
+              <div className="h-full overflow-y-auto">{children}</div>
+            </ResizablePanel>
+            <LayoutSidebar
+              minSize={`${100 - contentMaxSizePercentage}`}
+              maxSize={`${100 - contentMinSizePercentage}`}
+              defaultSize={`${100 - contentMaxSizePercentage}`}
+            />
+          </ResizablePanelGroup>
+        </div>
+      </div>
+    </DefaultLayoutProviders>
   )
 }
 

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, type PropsWithChildren } from 'react'
 
+import { SupportFormPage } from '@/components/interfaces/Support/SupportFormPage'
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import useLatest from '@/hooks/misc/useLatest'
@@ -29,6 +30,7 @@ export const SIDEBAR_KEYS = {
   AI_ASSISTANT: 'ai-assistant',
   EDITOR_PANEL: 'editor-panel',
   ADVISOR_PANEL: 'advisor-panel',
+  SUPPORT_PANEL: 'support-panel',
   HELP_PANEL: 'help-panel',
 } as const
 
@@ -64,6 +66,13 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
         )}
       />
     ),
+    {},
+    undefined,
+    true
+  )
+  useRegisterSidebar(
+    SIDEBAR_KEYS.SUPPORT_PANEL,
+    () => <SupportFormPage variant="inline" />,
     {},
     undefined,
     true

@@ -4,7 +4,6 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { cn, Menu } from 'ui'
 
 import type { SidebarSection } from './AccountLayout.types'
-import { useAppStateSnapshot } from '@/state/app-state'
 
 interface WithSidebarProps {
   title: string
@@ -31,7 +30,6 @@ export const WithSidebar = ({
   backToDashboardURL,
 }: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const { mobileMenuOpen, setMobileMenuOpen } = useAppStateSnapshot()
 
   return (
     <div className="flex flex-col md:flex-row h-full">
@@ -65,79 +63,75 @@ export const SidebarContent = ({
   className,
 }: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
   return (
-    <>
-      <div
-        id="with-sidebar"
-        className={cn(
-          'h-full bg-dash-sidebar flex flex-col justify-between',
-          'hide-scrollbar w-full md:w-64 md:border-r border-default',
-          className
+    <div
+      id="with-sidebar"
+      className={cn(
+        'h-full bg-dash-sidebar flex flex-col justify-between',
+        'hide-scrollbar w-full md:w-64 md:border-r border-default',
+        className
+      )}
+    >
+      <div className="flex-1 flex flex-col">
+        {backToDashboardURL && (
+          <div className="flex-shrink-0 hidden md:block">
+            <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
+              <Link
+                href={backToDashboardURL}
+                className="flex text-sm flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
+              >
+                <ArrowLeft strokeWidth={1.5} size={16} />
+                Back to dashboard
+              </Link>
+            </div>
+          </div>
         )}
-      >
-        <div className="flex-1 flex flex-col">
-          {backToDashboardURL && (
-            <div className="flex-shrink-0 hidden md:block">
-              <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
-                <Link
-                  href={backToDashboardURL}
-                  className="flex text-sm flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
-                >
-                  <ArrowLeft strokeWidth={1.5} size={16} />
-                  Back to dashboard
-                </Link>
-              </div>
-            </div>
-          )}
-          {header && header}
-          <div className="flex-1 overflow-auto">
-            <div className="flex flex-col space-y-8">
-              <Menu type="pills">
-                {customSidebarContent}
-                {sections.map((section, idx) => (
-                  <div key={section.key || section.heading}>
-                    {Boolean(section.heading) ? (
-                      <SectionWithHeaders
-                        key={section.key}
-                        section={section}
-                        subitems={subitems}
-                        subitemsParentKey={subitemsParentKey}
-                      />
-                    ) : (
-                      <div className="my-6 space-y-8">
-                        <div className="mx-3">
-                          {section.links.map((link, i: number) => {
-                            const isActive = link.isActive && !subitems
-                            return (
-                              <Menu.Item
-                                key={`${link.key}-${i}`}
-                                rounded
-                                active={isActive}
-                                icon={link.icon}
-                              >
-                                <Link href={link.href || ''} className="block">
-                                  <div className="flex w-full items-center justify-between gap-1">
-                                    <div className="flex items-center gap-2 truncate w-full">
-                                      <span className="truncate">{link.label}</span>
-                                    </div>
+        {header && header}
+        <div className="flex-1 overflow-auto">
+          <div className="flex flex-col space-y-8">
+            <Menu type="pills">
+              {customSidebarContent}
+              {sections.map((section, idx) => (
+                <div key={section.key || section.heading}>
+                  {Boolean(section.heading) ? (
+                    <SectionWithHeaders
+                      key={section.key}
+                      section={section}
+                      subitems={subitems}
+                      subitemsParentKey={subitemsParentKey}
+                    />
+                  ) : (
+                    <div className="my-6 space-y-8">
+                      <div className="mx-3">
+                        {section.links.map((link, i: number) => {
+                          const isActive = link.isActive && !subitems
+                          return (
+                            <Menu.Item
+                              key={`${link.key}-${i}`}
+                              rounded
+                              active={isActive}
+                              icon={link.icon}
+                            >
+                              <Link href={link.href || ''} className="block">
+                                <div className="flex w-full items-center justify-between gap-1">
+                                  <div className="flex items-center gap-2 truncate w-full">
+                                    <span className="truncate">{link.label}</span>
                                   </div>
-                                </Link>
-                              </Menu.Item>
-                            )
-                          })}
-                        </div>
+                                </div>
+                              </Link>
+                            </Menu.Item>
+                          )
+                        })}
                       </div>
-                    )}
-                    {idx !== sections.length - 1 && (
-                      <div className="h-px w-full bg-border-overlay" />
-                    )}
-                  </div>
-                ))}
-              </Menu>
-            </div>
+                    </div>
+                  )}
+                  {idx !== sections.length - 1 && <div className="h-px w-full bg-border-overlay" />}
+                </div>
+              ))}
+            </Menu>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

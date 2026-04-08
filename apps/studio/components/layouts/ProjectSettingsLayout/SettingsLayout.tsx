@@ -1,8 +1,10 @@
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
+import { ProjectLayoutV2 } from '../NavigationV2/ProjectLayout'
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
+import { useIsNavigationV2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -28,6 +30,15 @@ interface SettingsLayoutProps {
 }
 
 export const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutProps>) => {
+  const isNavigationV2 = useIsNavigationV2Enabled()
+
+  if (isNavigationV2) {
+    return (
+      <ProjectLayoutV2 isBlocking={false} title={title || 'Settings'} product="Settings">
+        {children}
+      </ProjectLayoutV2>
+    )
+  }
   return (
     <ProjectLayout
       isBlocking={false}

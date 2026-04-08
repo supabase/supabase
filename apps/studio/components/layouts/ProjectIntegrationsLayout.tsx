@@ -5,7 +5,9 @@ import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { useIsNavigationV2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { ProjectLayoutV2 } from '@/components/layouts/NavigationV2/ProjectLayout'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import AlertError from '@/components/ui/AlertError'
 import { ProductMenuItem } from '@/components/ui/ProductMenu/ProductMenuItem'
@@ -19,9 +21,18 @@ import { withAuth } from '@/hooks/misc/withAuth'
  */
 export const ProjectIntegrationsLayout = withAuth(({ children }: PropsWithChildren) => {
   const router = useRouter()
+  const isNavigationV2 = useIsNavigationV2Enabled()
   const segments = router.asPath.split('/')
   // construct the page url to be used to determine the active state for the sidebar
   const page = `${segments[3]}${segments[4] ? `/${segments[4]}` : ''}`
+
+  if (isNavigationV2) {
+    return (
+      <ProjectLayoutV2 title="Integrations" product="Integrations" isBlocking={false}>
+        {children}
+      </ProjectLayoutV2>
+    )
+  }
 
   return (
     <ProjectLayout

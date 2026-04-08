@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   singleThemes,
-  Theme,
+  type Theme,
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
@@ -33,13 +32,7 @@ export function UserDropdown({
   triggerClassName?: string
   contentClassName?: string
 }) {
-  const router = useRouter()
-  const { theme, setTheme } = useTheme()
-  const appStateSnapshot = useAppStateSnapshot()
-  const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
-  const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
-
-  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const { username, avatarUrl, isLoading } = useProfileNameAndPicture()
 
   return (
     <DropdownMenu>
@@ -60,101 +53,108 @@ export function UserDropdown({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
-        {IS_PLATFORM && (
-          <>
-            <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-              {!!username ? (
-                <>
-                  <span title={username} className="w-full text-left text-foreground truncate">
-                    {username}
-                  </span>
-                  {primaryEmail !== username && profileShowEmailEnabled && (
-                    <span
-                      title={primaryEmail}
-                      className="w-full text-left text-foreground-light text-xs truncate"
-                    >
-                      {primaryEmail}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span title={primaryEmail} className="w-full text-left text-foreground truncate">
-                  {primaryEmail}
-                </span>
-              )}
-            </div>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
-                <Link
-                  href="/account/me"
-                  onClick={() => {
-                    if (router.pathname !== '/account/me') {
-                      appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
-                    }
-                  }}
-                >
-                  <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Account preferences
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex gap-2 cursor-pointer"
-                onClick={() => toggleFeaturePreviewModal(true)}
-                // onSelect={() => toggleFeaturePreviewModal(true)}
-              >
-                <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Feature previews
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
-                <Link
-                  href="https://supabase.com/changelog"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Changelog
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-            </DropdownMenuGroup>
-          </>
-        )}
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={theme}
-            onValueChange={(value) => {
-              setTheme(value)
-            }}
-          >
-            {singleThemes.map((theme: Theme) => (
-              <DropdownMenuRadioItem
-                key={theme.value}
-                value={theme.value}
-                className="cursor-pointer"
-              >
-                {theme.name}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
-        {IS_PLATFORM && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onSelect={() => {
-                  router.push('/logout')
-                }}
-              >
-                Log out
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </>
-        )}
+        <UserDropdownContent />
       </DropdownMenuContent>
     </DropdownMenu>
+  )
+}
+
+export const UserDropdownContent = () => {
+  const router = useRouter()
+  const { theme, setTheme } = useTheme()
+  const appStateSnapshot = useAppStateSnapshot()
+  const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
+  const { username, primaryEmail } = useProfileNameAndPicture()
+  const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+
+  return (
+    <>
+      {IS_PLATFORM && (
+        <>
+          <div className="px-2 py-1 flex flex-col gap-0 text-sm">
+            {!!username ? (
+              <>
+                <span title={username} className="w-full text-left text-foreground truncate">
+                  {username}
+                </span>
+                {primaryEmail !== username && profileShowEmailEnabled && (
+                  <span
+                    title={primaryEmail}
+                    className="w-full text-left text-foreground-light text-xs truncate"
+                  >
+                    {primaryEmail}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span title={primaryEmail} className="w-full text-left text-foreground truncate">
+                {primaryEmail}
+              </span>
+            )}
+          </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
+              <Link
+                href="/account/me"
+                onClick={() => {
+                  if (router.pathname !== '/account/me') {
+                    appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)
+                  }
+                }}
+              >
+                <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                Account preferences
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="flex gap-2 cursor-pointer"
+              onClick={() => toggleFeaturePreviewModal(true)}
+              // onSelect={() => toggleFeaturePreviewModal(true)}
+            >
+              <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+              Feature previews
+            </DropdownMenuItem>
+            <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
+              <Link href="https://supabase.com/changelog" target="_blank" rel="noopener noreferrer">
+                <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                Changelog
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </DropdownMenuGroup>
+        </>
+      )}
+      <DropdownMenuGroup>
+        <DropdownMenuLabel>Theme</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          value={theme}
+          onValueChange={(value) => {
+            setTheme(value)
+          }}
+        >
+          {singleThemes.map((theme: Theme) => (
+            <DropdownMenuRadioItem key={theme.value} value={theme.value} className="cursor-pointer">
+              {theme.name}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuGroup>
+      {IS_PLATFORM && (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onSelect={() => {
+                router.push('/logout')
+              }}
+            >
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </>
+      )}
+    </>
   )
 }

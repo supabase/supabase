@@ -70,6 +70,7 @@ vi.mock('common', () => ({
     (..._refs: any[]) =>
     (_value: unknown) => {},
   IS_PLATFORM: false,
+  useFlag: () => false,
   LOCAL_STORAGE_KEYS: {
     FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
       `free-micro-upgrade-banner-dismissed-${ref}`,

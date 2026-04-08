@@ -1,9 +1,11 @@
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { usePathname } from 'next/navigation'
-import { PropsWithChildren, useEffect, useRef } from 'react'
+import { useEffect, useRef, type PropsWithChildren } from 'react'
 
+import { ProjectLayoutV2 } from '../NavigationV2/ProjectLayout'
 import { ProjectLayout } from '../ProjectLayout'
 import ObservabilityMenu from './ObservabilityMenu'
+import { useIsNavigationV2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
 import { BannerMetricsAPI } from '@/components/ui/BannerStack/Banners/BannerMetricsAPI'
@@ -81,8 +83,17 @@ const ObservabilityLayoutContent = ({
   ])
 
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
+  const isNavigationV2 = useIsNavigationV2Enabled()
 
   if (reportsAll) {
+    if (isNavigationV2) {
+      return (
+        <ProjectLayoutV2 title={title} product="Observability" isBlocking={false}>
+          {children}
+        </ProjectLayoutV2>
+      )
+    }
+
     return (
       <ProjectLayout
         product="Observability"

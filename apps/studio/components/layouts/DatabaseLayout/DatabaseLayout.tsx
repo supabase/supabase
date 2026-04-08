@@ -1,8 +1,10 @@
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
+import { ProjectLayoutV2 } from '../NavigationV2/ProjectLayout'
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateDatabaseMenu } from './DatabaseMenu.utils'
+import { useIsNavigationV2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -19,6 +21,16 @@ export const DatabaseProductMenu = () => {
 }
 
 const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const isNavigationV2 = useIsNavigationV2Enabled()
+
+  if (isNavigationV2) {
+    return (
+      <ProjectLayoutV2 product="Database" isBlocking={false}>
+        {children}
+      </ProjectLayoutV2>
+    )
+  }
+
   return (
     <ProjectLayout
       product="Database"
