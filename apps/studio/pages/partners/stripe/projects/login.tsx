@@ -14,14 +14,9 @@ import {
 
 import { APIAuthorizationLayout } from '@/components/layouts/APIAuthorizationLayout'
 import { useConfirmAccountRequestMutation } from '@/data/partners/stripe-projects-confirm-mutation'
-import {
-  accountRequestQueryOptions,
-  type AccountRequestDetails,
-} from '@/data/partners/stripe-projects-query'
+import { accountRequestQueryOptions } from '@/data/partners/stripe-projects-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { useSignOut } from '@/lib/auth'
-
-type OrgSummary = NonNullable<AccountRequestDetails['linked_organization']>
 
 const StripeProjectsLoginPage = () => {
   const router = useRouter()
@@ -38,7 +33,7 @@ const StripeProjectsLoginPage = () => {
   } = useQuery(accountRequestQueryOptions({ arId: ar_id }))
 
   const {
-    mutateAsync: confirmAccountRequest,
+    mutate: confirmAccountRequest,
     isPending: isConfirming,
     isSuccess: isConfirmed,
   } = useConfirmAccountRequestMutation()
@@ -54,7 +49,7 @@ const StripeProjectsLoginPage = () => {
 
   const handleApprove = async () => {
     if (!ar_id || isConfirming) return
-    await confirmAccountRequest({ arId: ar_id }).catch(() => {})
+    confirmAccountRequest({ arId: ar_id })
   }
 
   const linkedOrg = accountRequest?.linked_organization
