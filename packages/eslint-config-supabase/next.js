@@ -86,6 +86,7 @@ module.exports = defineConfig([
       'app/**/*.tsx',
       'components/interfaces/**/content/**/content.tsx',
       'vitest.config.ts',
+      'postcss.config.js',
     ],
     rules: {
       'no-restricted-exports': [
