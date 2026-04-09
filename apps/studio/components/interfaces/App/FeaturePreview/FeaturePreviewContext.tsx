@@ -39,10 +39,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        const localStorageValue = localStorage.getItem(b.key)
-        return {
-          ...a,
-          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+        try {
+          const localStorageValue = window.localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
+        } catch {
+          return { ...a, [b.key]: defaultOptIn }
         }
       }, {})
     )
