@@ -210,7 +210,7 @@ export const getStaticEvents = async (): Promise<{
     .select('id, city, country, link, start_at, timezone, launch_week')
     .eq('is_published', true)
 
-  if (error) console.log('meetups error: ', error)
+  if (error) console.error('meetups error: ', error)
 
   const meetupEvents: SupabaseEvent[] =
     meetups?.map((meetup: any) => ({

@@ -80,7 +80,7 @@ export default function launchweek() {
       }
     } catch (error) {
       // alert('Error loading user data!')
-      console.log(error)
+      console.error(error)
     } finally {
       // setLoading(false)
     }
