@@ -55,7 +55,7 @@ import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const ResourceExhaustionDevtool =
-  process.env.NODE_ENV !== 'production'
+  process.env.NODE_ENV === 'development'
     ? dynamic(() =>
         import('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionDevtool').then(
           (m) => m.ResourceExhaustionDevtool

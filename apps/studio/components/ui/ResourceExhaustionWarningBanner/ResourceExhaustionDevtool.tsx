@@ -9,8 +9,8 @@ import { Button, cn } from 'ui'
 import { usageKeys } from '@/data/usage/keys'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 
-if (process.env.NODE_ENV === 'production') {
-  throw new Error('ResourceExhaustionDevtool must not be imported in production')
+if (process.env.NODE_ENV !== 'development') {
+  throw new Error('ResourceExhaustionDevtool must only be imported in development')
 }
 
 type Severity = 'warning' | 'critical' | null
