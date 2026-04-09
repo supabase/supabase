@@ -91,7 +91,7 @@ export const getDisabledStateConfig = ({
           text: 'text-brand-900',
           subtext: 'text-brand-700',
           iconBg: 'bg-brand-600',
-          icon: 'text-white dark:text-black',
+          icon: 'text-contrast',
         }
       : isDisabling || statusName === 'starting' || statusName === 'unknown'
         ? {
@@ -99,7 +99,7 @@ export const getDisabledStateConfig = ({
             text: 'text-warning-900',
             subtext: 'text-warning-700',
             iconBg: 'bg-warning-600',
-            icon: 'text-white dark:text-black',
+            icon: 'text-contrast',
           }
         : statusName === 'failed'
           ? {
@@ -107,14 +107,14 @@ export const getDisabledStateConfig = ({
               text: 'text-destructive-900',
               subtext: 'text-destructive-700',
               iconBg: 'bg-destructive-600',
-              icon: 'text-white dark:text-black',
+              icon: 'text-contrast',
             }
           : {
               bg: 'bg-surface-100',
               text: 'text-foreground',
               subtext: 'text-foreground-light',
               iconBg: 'bg-foreground-lighter',
-              icon: 'text-white dark:text-black',
+              icon: 'text-contrast',
             }
 
   return { title, message, badge, icon, colors }
