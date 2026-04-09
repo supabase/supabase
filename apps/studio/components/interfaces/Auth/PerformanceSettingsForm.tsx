@@ -368,9 +368,9 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <div className="flex flex-col gap-2">
-                          <div className="relative">
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <FormControl_Shadcn_>
                             <InputGroup>
                               <InputGroupInput
                                 type="number"
@@ -389,23 +389,23 @@ export const PerformanceSettingsForm = () => {
                                 </InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </div>
-                          {isLoadingMaxConns ? (
-                            <ShimmeringLoader className="py-2 w-16 ml-auto" />
-                          ) : (
-                            <p className="text-xs text-right text-foreground-muted">
-                              <span className="text-foreground-light">
-                                {chosenUnit === 'percent'
-                                  ? Math.floor(
-                                      maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                    ).toString()
-                                  : Math.min(maxConnectionLimit, field.value!)}
-                              </span>{' '}
-                              / {maxConnectionLimit}
-                            </p>
-                          )}
+                          </FormControl_Shadcn_>
                         </div>
-                      </FormControl_Shadcn_>
+                        {isLoadingMaxConns ? (
+                          <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                        ) : (
+                          <p className="text-xs text-right text-foreground-muted">
+                            <span className="text-foreground-light">
+                              {chosenUnit === 'percent'
+                                ? Math.floor(
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                  ).toString()
+                                : Math.min(maxConnectionLimit, field.value!)}
+                            </span>{' '}
+                            / {maxConnectionLimit}
+                          </p>
+                        )}
+                      </div>
                     </FormItemLayout>
                   )}
                 />
