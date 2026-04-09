@@ -1,7 +1,7 @@
 {
   "hooks": {
     "SessionStart": [
-      {
+     {
         "matcher": "startup",
         "hooks": [
           {
