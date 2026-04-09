@@ -231,13 +231,6 @@ vi.mock('@/data/organizations/organization-customer-profile-update-mutation', ()
   }),
 }))
 
-const mockUpdateTaxId = vi.fn(() => Promise.resolve())
-vi.mock('@/data/organizations/organization-tax-id-update-mutation', () => ({
-  useOrganizationTaxIdUpdateMutation: () => ({
-    mutateAsync: mockUpdateTaxId,
-  }),
-}))
-
 vi.mock('@/data/organizations/organizations-query', () => ({
   invalidateOrganizationsQuery: vi.fn(() => Promise.resolve()),
 }))
@@ -403,7 +396,6 @@ describe('UpdateBillingAddressModal', () => {
 
     await waitFor(() => {
       expect(mockUpdateCustomerProfile).not.toHaveBeenCalled()
-      expect(mockUpdateTaxId).not.toHaveBeenCalled()
     })
   })
 })
