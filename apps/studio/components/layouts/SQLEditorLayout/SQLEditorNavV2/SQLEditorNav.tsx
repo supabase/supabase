@@ -171,6 +171,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [folders, privateSnippets]
   )
 
+  // react-accessible-treeview throws if expandedIds contains an ID not present in the
+  // current tree data. This can happen when a folder is deleted or the tree refreshes
+  // while expandedFolderIds state still holds the old ID. Filter out stale IDs to prevent this.
   const privateSnippetsTreeNodeIds = useMemo(
     () => new Set(privateSnippetsTreeState.map((node) => node.id.toString())),
     [privateSnippetsTreeState]
