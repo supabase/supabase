@@ -1,11 +1,11 @@
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DATABASE_PASSWORD_REGEX } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'
+import CopyButton from '@/components/ui/CopyButton'
 import Panel from '@/components/ui/Panel'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { passwordStrength } from '@/lib/password-strength'
@@ -68,21 +68,34 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                 </>
               }
             >
-              <FormControl_Shadcn_>
-                <Input
-                  copy={field.value.length > 0}
-                  type="password"
-                  placeholder="Type in a strong password"
-                  {...field}
-                  autoComplete="off"
-                  onChange={async (event) => {
-                    const newValue = event.target.value
-                    field.onChange(event)
+              <div className="relative">
+                <FormControl_Shadcn_>
+                  <Input_Shadcn_
+                    type="password"
+                    placeholder="Type in a strong password"
+                    {...field}
+                    autoComplete="off"
+                    className={field.value.length > 0 ? 'pr-10' : undefined}
+                    onChange={async (event) => {
+                      const newValue = event.target.value
+                      field.onChange(event)
 
-                    updatePasswordStrength(form, newValue)
-                  }}
-                />
-              </FormControl_Shadcn_>
+                      updatePasswordStrength(form, newValue)
+                    }}
+                  />
+                </FormControl_Shadcn_>
+                {field.value.length > 0 && (
+                  <CopyButton
+                    iconOnly
+                    size="tiny"
+                    type="default"
+                    title="Copy password"
+                    aria-label="Copy password"
+                    text={field.value}
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                  />
+                )}
+              </div>
             </FormItemLayout>
           )
         }}
