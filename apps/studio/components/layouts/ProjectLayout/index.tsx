@@ -55,8 +55,7 @@ import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const IS_DEV_OR_PREVIEW =
-  process.env.NODE_ENV === 'development' ||
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+  process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
 
 const ResourceExhaustionDevtool = IS_DEV_OR_PREVIEW
   ? dynamic(() =>

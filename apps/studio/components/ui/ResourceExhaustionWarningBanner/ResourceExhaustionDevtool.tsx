@@ -9,10 +9,7 @@ import { Button, cn } from 'ui'
 import { usageKeys } from '@/data/usage/keys'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 
-if (
-  process.env.NODE_ENV !== 'development' &&
-  process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview'
-) {
+if (process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview') {
   throw new Error('ResourceExhaustionDevtool must only be imported in development or preview')
 }
 
