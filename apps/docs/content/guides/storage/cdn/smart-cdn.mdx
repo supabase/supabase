@@ -41,7 +41,7 @@ For instance, you can use a URL like `/storage/v1/object/sign/profile-pictures/c
 
 Signed URLs are the primary way to serve assets from private buckets to end users. With Smart CDN enabled, signed URL responses are cached at the CDN edge, just like any other storage request.
 
-Unlike public bucket URLs, each signed URL contains a unique token query parameter (`?token=...`). Smart CDN treats each unique token as a separate cache key, meaning the first request with any given signed URL results in a cache miss, and only subsequent requests using that exact same URL will receive a cache hit. Two different signed URLs for the same object even if generated seconds apart, each maintain their own independent cache entry.
+Unlike public bucket URLs, each signed URL contains a unique token query parameter (`?token=...`). Smart CDN treats each unique token as a separate cache key, meaning the first request with any given signed URL results in a cache miss, and only subsequent requests using that exact same URL will receive a cache hit. Two different signed URLs for the same object, even if generated seconds apart, each maintain their own independent cache entry.
 
 This affects how you should think about serving private assets:
 
@@ -50,4 +50,4 @@ This affects how you should think about serving private assets:
 - Revoking or expiring a token does not purge its CDN cache entry. The cached response persists at the edge until the cache duration expires.
 - Deleting the object invalidates all cached entries for that object across all tokens. This can take up to a minute to propagate.
 
-Token expiry (`expiresIn`) and the object's response cache TTL (`cacheControl`) are independent. Once a response is cached at the edge, that cached response can continue to be served for the same signed URL until the CDN cache duration expires, even if the token in that URL has already expired. If you need to cut off access to an asset immediately, delete the object from the bucket rather than relying on token expiry alone.
+Token expiry (`expiresIn`) and the object's response cache TTL (`cacheControl`) are independent. Once a response is cached at the edge, that cached response can continue to be served for the same signed URL until the CDN cache duration expires, even if the token in that URL has already expired. If you need to cut off access to an asset, delete the object from the bucket rather than relying on token expiry alone.
