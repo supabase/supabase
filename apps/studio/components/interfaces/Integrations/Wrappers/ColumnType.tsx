@@ -1,11 +1,4 @@
 import {
-  POSTGRES_DATA_TYPE_OPTIONS,
-  POSTGRES_DATA_TYPES,
-  RECOMMENDED_ALTERNATIVE_DATA_TYPE,
-} from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import type { PostgresDataTypeOption } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import {
   Calendar,
   Check,
   ChevronsUpDown,
@@ -43,6 +36,14 @@ import {
   ScrollArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import {
+  POSTGRES_DATA_TYPE_OPTIONS,
+  POSTGRES_DATA_TYPES,
+  RECOMMENDED_ALTERNATIVE_DATA_TYPE,
+} from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import type { PostgresDataTypeOption } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.types'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   name: string
