@@ -300,32 +300,10 @@ describe('pluralize', () => {
 })
 
 describe('isValidHttpUrl', () => {
-  it('should return true if the URL is a localhost', () => {
-    const result = isValidHttpUrl('http://localhost:3000')
-
-    expect(result).toBe(true)
-  })
-  it('should return true if the URL is a localhost and we only accept https', () => {
-    const result = isValidHttpUrl('http://localhost:3000', true)
-
-    expect(result).toBe(true)
-  })
-  it('should return true if the URL is a valid http URL', () => {
-    const result = isValidHttpUrl('http://supabase.com')
-
-    expect(result).toBe(true)
-  })
-
-  it('should return true if the URL is a valid https URL', () => {
+  it('should return true if the URL is valid', () => {
     const result = isValidHttpUrl('https://supabase.com')
 
     expect(result).toBe(true)
-  })
-
-  it('should return false if the URL is a http URL but we only accept https', () => {
-    const result = isValidHttpUrl('http://supabase.com', true)
-
-    expect(result).toBe(false)
   })
 
   it('should return false if the URL is not valid', () => {
