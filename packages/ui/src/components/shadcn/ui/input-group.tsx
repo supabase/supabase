@@ -155,6 +155,11 @@ function InputGroupInput({ className, ...props }: InputProps) {
     // The component might not be inside a react-hook-form
   }
 
+  let ariaDescribedby = formDescriptionId
+  if (error) {
+    ariaDescribedby = `${formDescriptionId} ${formMessageId}`
+  }
+
   return (
     <Input
       data-slot="input-group-control"
@@ -163,7 +168,7 @@ function InputGroupInput({ className, ...props }: InputProps) {
         className
       )}
       id={formItemId}
-      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+      aria-describedby={ariaDescribedby}
       aria-invalid={!!error}
       {...props}
     />
@@ -190,6 +195,11 @@ function InputGroupTextarea({ className, ...props }: TextareaProps) {
     // The component might not be inside a react-hook-form
   }
 
+  let ariaDescribedby = formDescriptionId
+  if (error) {
+    ariaDescribedby = `${formDescriptionId} ${formMessageId}`
+  }
+
   return (
     <Textarea
       data-slot="input-group-control"
@@ -198,7 +208,7 @@ function InputGroupTextarea({ className, ...props }: TextareaProps) {
         className
       )}
       id={formItemId}
-      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+      aria-describedby={ariaDescribedby}
       aria-invalid={!!error}
       {...props}
     />
