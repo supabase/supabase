@@ -1,13 +1,26 @@
 import { useParams } from 'common'
-import { AlertTriangle, ExternalLink } from 'lucide-react'
+import { AlertTriangle, BookOpen, ChevronDown, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import {
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const COMPUTE_UPGRADE_METRICS = ['disk_io', 'cpu', 'ram']
 
@@ -15,6 +28,8 @@ export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: organization } = useSelectedOrganizationQuery()
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const aiSnap = useAiAssistantStateSnapshot()
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -114,6 +129,17 @@ export const ResourceExhaustionWarningBanner = () => {
           ?.buttonText
   })()
 
+  const aiPrompt =
+    activeWarnings.length > 1
+      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt
+      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
+          ?.aiPrompt
+
+  const handleAskAI = () => {
+    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    aiSnap.newChat({ initialInput: aiPrompt })
+  }
+
   const hasNoWarnings = activeWarnings.length === 0
   const hasNoWarningContent = warningContent === undefined
   const isUsageOrInfraPage =
@@ -168,15 +194,32 @@ export const ResourceExhaustionWarningBanner = () => {
         <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       </div>
       <div className="flex items-center gap-x-2">
-        {learnMoreUrl !== undefined && (
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <a href={learnMoreUrl} target="_blank" rel="noreferrer">
-              Learn more
-            </a>
-          </Button>
+        {(learnMoreUrl !== undefined || aiPrompt !== undefined) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" icon={<Wrench size={14} />} iconRight={<ChevronDown size={14} />}>
+                Troubleshoot
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {learnMoreUrl !== undefined && (
+                <DropdownMenuItem asChild>
+                  <a href={learnMoreUrl} target="_blank" rel="noreferrer" className="flex items-center gap-x-2 cursor-pointer">
+                    <BookOpen size={14} />
+                    Documentation
+                  </a>
+                </DropdownMenuItem>
+              )}
+              {aiPrompt !== undefined && (
+                <DropdownMenuItem className="flex items-center gap-x-2 cursor-pointer" onClick={handleAskAI}>
+                  Ask AI Assistant
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
         {correctionUrl !== undefined && (
-          <Button asChild type="default">
+          <Button asChild type="primary">
             <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
           </Button>
         )}

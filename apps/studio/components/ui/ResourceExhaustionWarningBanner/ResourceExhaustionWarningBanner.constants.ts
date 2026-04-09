@@ -14,6 +14,7 @@ interface ResourceWarningMessage {
   }
   docsUrl?: string
   buttonText?: string
+  aiPrompt?: string
   metric: string | null
 }
 
@@ -73,6 +74,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-disk-io`,
     buttonText: 'Upgrade compute',
+    aiPrompt:
+      'My database is running out of Disk IO budget. Can you query pg_stat_statements to find the top queries by shared blocks read and written, identify which are causing the most disk I/O, and suggest specific optimizations to reduce disk usage?',
     metric: 'disk_io',
   },
   disk_space_exhaustion: {
@@ -128,6 +131,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/high-cpu-usage`,
     buttonText: 'Upgrade compute',
+    aiPrompt:
+      'My database is experiencing high CPU usage. Can you query pg_stat_statements to find the top queries by total execution time and mean execution time, identify which are most CPU-intensive, and suggest specific optimizations such as missing indexes or query rewrites to reduce CPU load?',
     metric: 'cpu',
   },
   memory_and_swap_exhaustion: {
@@ -156,6 +161,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     },
     docsUrl: `${DOCS_URL}/guides/troubleshooting/exhaust-ram`,
     buttonText: 'Upgrade compute',
+    aiPrompt:
+      'My database is experiencing high memory and swap usage. Can you query pg_stat_statements to find the top queries by shared buffer hits and rows returned, identify which queries are putting the most pressure on memory, and suggest optimizations to reduce memory consumption?',
     metric: 'ram',
   },
   auth_rate_limit_exhaustion: {
@@ -212,6 +219,8 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
     },
     docsUrl: undefined,
     buttonText: 'Check usage',
+    aiPrompt:
+      'My database is exhausting multiple resources (CPU, memory, and/or disk IO). Can you query pg_stat_statements to identify the most expensive queries overall, and suggest which optimizations would have the biggest impact on reducing resource consumption?',
     metric: null,
   },
 }
