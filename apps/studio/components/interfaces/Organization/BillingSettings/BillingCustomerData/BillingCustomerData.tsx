@@ -102,6 +102,7 @@ export const BillingCustomerData = () => {
               org.slug === slug
                 ? {
                     ...org,
+                    ...(data.address !== undefined ? { organization_missing_address: false } : {}),
                     ...(data.tax_id !== undefined
                       ? { organization_missing_tax_id: data.tax_id == null }
                       : {}),
