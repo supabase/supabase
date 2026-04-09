@@ -45,7 +45,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: `${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`,
-    buttonText: 'Learn more',
+    buttonText: 'Manage disk',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
