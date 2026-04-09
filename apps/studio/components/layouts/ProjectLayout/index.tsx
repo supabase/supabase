@@ -54,14 +54,17 @@ import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-const ResourceExhaustionDevtool =
-  process.env.NODE_ENV === 'development'
-    ? dynamic(() =>
-        import('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionDevtool').then(
-          (m) => m.ResourceExhaustionDevtool
-        )
+const IS_DEV_OR_PREVIEW =
+  process.env.NODE_ENV === 'development' ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+
+const ResourceExhaustionDevtool = IS_DEV_OR_PREVIEW
+  ? dynamic(() =>
+      import('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionDevtool').then(
+        (m) => m.ResourceExhaustionDevtool
       )
-    : () => null
+    )
+  : () => null
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
