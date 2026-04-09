@@ -99,7 +99,14 @@ export const BillingCustomerData = () => {
           (prev) => {
             if (!prev) return prev
             return prev.map((org) =>
-              org.slug === slug ? { ...org, organization_missing_tax_id: data.tax_id == null } : org
+              org.slug === slug
+                ? {
+                    ...org,
+                    ...(data.tax_id !== undefined
+                      ? { organization_missing_tax_id: data.tax_id == null }
+                      : {}),
+                  }
+                : org
             )
           }
         )
