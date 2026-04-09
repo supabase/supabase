@@ -2,6 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
+import { FieldError } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
 import { Button } from '../../Button'
@@ -137,7 +138,23 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 function InputGroupInput({ className, ...props }: InputProps) {
   // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
   // so we apply them manually here
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+  let error: FieldError | undefined = undefined
+  let formItemId = ''
+  let formDescriptionId = ''
+  let formMessageId = ''
+
+  try {
+    const formField = useFormField()
+    if (formField) {
+      error = formField.error
+      formItemId = formField.formItemId
+      formDescriptionId = formField.formDescriptionId
+      formMessageId = formField.formMessageId
+    }
+  } catch {
+    // The component might not be inside a react-hook-form
+  }
+
   return (
     <Input
       data-slot="input-group-control"
@@ -156,7 +173,23 @@ function InputGroupInput({ className, ...props }: InputProps) {
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
   // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
   // so we apply them manually here
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+  let error: FieldError | undefined = undefined
+  let formItemId = ''
+  let formDescriptionId = ''
+  let formMessageId = ''
+
+  try {
+    const formField = useFormField()
+    if (formField) {
+      error = formField.error
+      formItemId = formField.formItemId
+      formDescriptionId = formField.formDescriptionId
+      formMessageId = formField.formMessageId
+    }
+  } catch {
+    // The component might not be inside a react-hook-form
+  }
+
   return (
     <Textarea
       data-slot="input-group-control"
