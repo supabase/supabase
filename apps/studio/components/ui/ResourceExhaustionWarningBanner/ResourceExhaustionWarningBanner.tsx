@@ -135,7 +135,7 @@ export const ResourceExhaustionWarningBanner = () => {
   })()
 
   const buttonText = (() => {
-    if (isComputeUpgradeMetric && isFreePlan) return 'Upgrade plan'
+    if (isComputeUpgradeMetric) return 'Upgrade compute'
     return activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.buttonText
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
@@ -144,7 +144,9 @@ export const ResourceExhaustionWarningBanner = () => {
 
   const aiPrompt =
     activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt
+      ? isComputeUpgradeMetric
+        ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt
+        : undefined
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
           ?.aiPrompt
 
