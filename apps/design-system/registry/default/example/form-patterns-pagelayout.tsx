@@ -13,10 +13,11 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
+  FormInputGroupTextArea,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
   Popover_Shadcn_,
@@ -237,7 +238,13 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl_Shadcn_>
                           <InputGroup>
-                            <InputGroupInput {...field} type="number" min={5} max={30} />
+                            <FormInputGroupInput
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              type="number"
+                              min={5}
+                              max={30}
+                            />
                             <InputGroupAddon align="inline-end">
                               <InputGroupText className="font-mono">MB</InputGroupText>
                             </InputGroupAddon>
@@ -285,7 +292,7 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl_Shadcn_>
                           <InputGroup>
-                            <InputGroupTextarea
+                            <FormInputGroupTextArea
                               {...field}
                               rows={4}
                               placeholder="Enter multi-line text"
