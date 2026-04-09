@@ -61,8 +61,12 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, value.toString())
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value ? 'true' : 'false')
+        }
+      } catch {
+        // Silently fail in restricted storage modes (e.g. Safari private browsing)
       }
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
