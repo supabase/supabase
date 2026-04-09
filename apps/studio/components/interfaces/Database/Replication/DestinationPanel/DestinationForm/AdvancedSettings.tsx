@@ -71,9 +71,6 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <InputGroup>
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>milliseconds</InputGroupText>
-                      </InputGroupAddon>
                       <InputGroupInput
                         {...field}
                         type="number"
@@ -81,6 +78,9 @@ export const AdvancedSettings = ({
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 10000"
                       />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>milliseconds</InputGroupText>
+                      </InputGroupAddon>
                     </InputGroup>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -105,9 +105,6 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <InputGroup>
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>workers</InputGroupText>
-                      </InputGroupAddon>
                       <InputGroupInput
                         {...field}
                         type="number"
@@ -115,6 +112,9 @@ export const AdvancedSettings = ({
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 4"
                       />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>workers</InputGroupText>
+                      </InputGroupAddon>
                     </InputGroup>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -142,9 +142,6 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <InputGroup>
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>connections</InputGroupText>
-                      </InputGroupAddon>
                       <InputGroupInput
                         {...field}
                         type="number"
@@ -152,6 +149,9 @@ export const AdvancedSettings = ({
                         onChange={handleNumberChange(field)}
                         placeholder="Default: 2"
                       />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>connections</InputGroupText>
+                      </InputGroupAddon>
                     </InputGroup>
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -217,9 +217,6 @@ export const AdvancedSettings = ({
                     >
                       <FormControl_Shadcn_>
                         <InputGroup>
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>connections</InputGroupText>
-                          </InputGroupAddon>
                           <InputGroupInput
                             {...field}
                             type="number"
@@ -227,6 +224,9 @@ export const AdvancedSettings = ({
                             onChange={handleNumberChange(field)}
                             placeholder="Default: 4"
                           />
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>connections</InputGroupText>
+                          </InputGroupAddon>
                         </InputGroup>
                       </FormControl_Shadcn_>
                     </FormItemLayout>
@@ -260,9 +260,6 @@ export const AdvancedSettings = ({
                     >
                       <FormControl_Shadcn_>
                         <InputGroup>
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>minutes</InputGroupText>
-                          </InputGroupAddon>
                           <InputGroupInput
                             {...field}
                             type="number"
@@ -270,6 +267,9 @@ export const AdvancedSettings = ({
                             onChange={handleNumberChange(field)}
                             placeholder="Default: None (No staleness limit)"
                           />
+                          <InputGroupAddon align="inline-end">
+                            <InputGroupText>minutes</InputGroupText>
+                          </InputGroupAddon>
                         </InputGroup>
                       </FormControl_Shadcn_>
                     </FormItemLayout>

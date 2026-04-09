@@ -107,7 +107,6 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
           >
             <FormControl_Shadcn_ className="max-w-32">
               <InputGroup>
-                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
                 <InputGroupInput
                   type="number"
                   {...field}
@@ -120,6 +119,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                     })
                   }}
                 />
+                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
               </InputGroup>
             </FormControl_Shadcn_>
           </FormItemLayout>

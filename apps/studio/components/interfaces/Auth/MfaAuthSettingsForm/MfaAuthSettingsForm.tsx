@@ -374,9 +374,6 @@ export const MfaAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_>
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>factors</InputGroupText>
-                            </InputGroupAddon>
                             <InputGroupInput
                               type="number"
                               min={0}
@@ -384,6 +381,9 @@ export const MfaAuthSettingsForm = () => {
                               {...field}
                               disabled={!canUpdateConfig}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>factors</InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -481,9 +481,6 @@ export const MfaAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_>
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>digits</InputGroupText>
-                            </InputGroupAddon>
                             <InputGroupInput
                               type="number"
                               min={6}
@@ -491,6 +488,9 @@ export const MfaAuthSettingsForm = () => {
                               {...field}
                               disabled={!canUpdateConfig || !hasAccessToMFA}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>digits</InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>

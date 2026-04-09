@@ -396,15 +396,15 @@ export const SmtpForm = () => {
                             >
                               <FormControl_Shadcn_>
                                 <InputGroup>
-                                  <InputGroupAddon align="inline-end">
-                                    <InputGroupText>seconds</InputGroupText>
-                                  </InputGroupAddon>
                                   <InputGroupInput
                                     type="number"
                                     value={field.value}
                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                     disabled={!canUpdateConfig}
                                   />
+                                  <InputGroupAddon align="inline-end">
+                                    <InputGroupText>seconds</InputGroupText>
+                                  </InputGroupAddon>
                                 </InputGroup>
                               </FormControl_Shadcn_>
                             </FormItemLayout>

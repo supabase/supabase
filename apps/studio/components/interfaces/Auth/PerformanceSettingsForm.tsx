@@ -229,9 +229,6 @@ export const PerformanceSettingsForm = () => {
                         <FormControl_Shadcn_>
                           <div className="relative">
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>seconds</InputGroupText>
-                              </InputGroupAddon>
                               <InputGroupInput
                                 type="number"
                                 min={5}
@@ -239,6 +236,9 @@ export const PerformanceSettingsForm = () => {
                                 {...field}
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </div>
                         </FormControl_Shadcn_>
@@ -372,11 +372,6 @@ export const PerformanceSettingsForm = () => {
                         <div className="flex flex-col gap-2">
                           <div className="relative">
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>
-                                  {chosenUnit === 'percent' ? '%' : 'connections'}
-                                </InputGroupText>
-                              </InputGroupAddon>
                               <InputGroupInput
                                 type="number"
                                 {...field}
@@ -388,6 +383,11 @@ export const PerformanceSettingsForm = () => {
                                 }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>
+                                  {chosenUnit === 'percent' ? '%' : 'connections'}
+                                </InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </div>
                           {isLoadingMaxConns ? (

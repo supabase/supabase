@@ -229,17 +229,17 @@ const FormField = ({
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
-                        <InputGroupAddon align="inline-end">
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {properties.units}
-                          </ReactMarkdown>
-                        </InputGroupAddon>
                         <InputGroupInput
                           {...field}
                           id={name}
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
+                        <InputGroupAddon align="inline-end">
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {properties.units}
+                          </ReactMarkdown>
+                        </InputGroupAddon>
                       </InputGroup>
                     ) : (
                       <Input_Shadcn_

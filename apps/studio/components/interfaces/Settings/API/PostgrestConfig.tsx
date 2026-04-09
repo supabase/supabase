@@ -611,9 +611,6 @@ export const PostgrestConfig = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupText>rows</InputGroupText>
-                                </InputGroupAddon>
                                 <InputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
@@ -621,6 +618,9 @@ export const PostgrestConfig = () => {
                                   type="number"
                                   onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>rows</InputGroupText>
+                                </InputGroupAddon>
                               </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
@@ -641,9 +641,6 @@ export const PostgrestConfig = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupAddon align="inline-end">
-                                  <InputGroupText>connections</InputGroupText>
-                                </InputGroupAddon>
                                 <InputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
@@ -657,6 +654,9 @@ export const PostgrestConfig = () => {
                                   }
                                   value={field.value === null ? '' : field.value}
                                 />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
                               </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>

@@ -196,9 +196,6 @@ const DiskSizeConfigurationModal = ({
                           label="New disk size"
                         >
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>GB</InputGroupText>
-                            </InputGroupAddon>
                             <FormControl_Shadcn_>
                               <InputGroupInput
                                 {...field}
@@ -206,6 +203,9 @@ const DiskSizeConfigurationModal = ({
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>GB</InputGroupText>
+                              </InputGroupAddon>
                             </FormControl_Shadcn_>
                           </InputGroup>
                         </FormItemLayout>

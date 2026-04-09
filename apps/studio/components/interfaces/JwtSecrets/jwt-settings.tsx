@@ -329,9 +329,6 @@ const JWTSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>seconds</InputGroupText>
-                              </InputGroupAddon>
                               <InputGroupInput
                                 {...field}
                                 id="JWT_EXP"
@@ -344,6 +341,9 @@ const JWTSettings = () => {
                                   )
                                 }
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>

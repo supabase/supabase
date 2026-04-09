@@ -120,9 +120,6 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
               >
                 <FormControl_Shadcn_ className="max-w-32">
                   <InputGroup>
-                    <InputGroupAddon align="inline-end">
-                      <InputGroupText>MB/s</InputGroupText>
-                    </InputGroupAddon>
                     <InputGroupInput
                       type="number"
                       {...field}
@@ -135,6 +132,9 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                       }}
                       disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
                     />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>MB/s</InputGroupText>
+                    </InputGroupAddon>
                   </InputGroup>
                 </FormControl_Shadcn_>
               </FormItemLayout>

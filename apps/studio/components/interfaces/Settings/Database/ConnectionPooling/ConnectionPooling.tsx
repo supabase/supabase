@@ -266,9 +266,6 @@ export const ConnectionPooling = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>connections</InputGroupText>
-                              </InputGroupAddon>
                               <InputGroupInput
                                 {...field}
                                 type="number"
@@ -283,6 +280,9 @@ export const ConnectionPooling = () => {
                                   )
                                 }
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>connections</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                           {!!maxConnData &&
@@ -330,9 +330,6 @@ export const ConnectionPooling = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>clients</InputGroupText>
-                              </InputGroupAddon>
                               <InputGroupInput
                                 {...field}
                                 type="number"
@@ -347,6 +344,9 @@ export const ConnectionPooling = () => {
                                   )
                                 }
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
