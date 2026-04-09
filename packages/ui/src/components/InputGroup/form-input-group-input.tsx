@@ -10,7 +10,7 @@ export function FormInputGroupInput({ className, ...props }: InputProps) {
   return (
     <InputGroupInput
       id={formItemId}
-      aria-describedby={error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
       aria-invalid={!!error}
       {...props}
     />

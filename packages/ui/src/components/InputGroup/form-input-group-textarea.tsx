@@ -10,7 +10,7 @@ export function FormInputGroupTextArea({ className, ...props }: TextareaProps) {
   return (
     <InputGroupTextarea
       id={formItemId}
-      aria-describedby={error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
       aria-invalid={!!error}
       {...props}
     />
