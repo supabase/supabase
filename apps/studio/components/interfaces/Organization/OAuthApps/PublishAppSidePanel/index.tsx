@@ -152,27 +152,31 @@ export const PublishAppSidePanel = ({
         ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
         : iconUrl
 
-    if (selectedApp === undefined) {
-      // Create application
-      await createOAuthApp({
-        slug,
-        name,
-        website,
-        redirect_uris: redirect_uris.map((uris) => uris.value),
-        scopes,
-        icon: uploadedIconUrl,
-      })
-    } else {
-      // Update application
-      await updateOAuthApp({
-        id: selectedApp.id,
-        slug,
-        name,
-        website,
-        redirect_uris: redirect_uris.map((uris) => uris.value),
-        scopes,
-        icon: uploadedIconUrl,
-      })
+    try {
+      if (selectedApp === undefined) {
+        // Create application
+        await createOAuthApp({
+          slug,
+          name,
+          website,
+          redirect_uris: redirect_uris.map((uris) => uris.value),
+          scopes,
+          icon: uploadedIconUrl,
+        })
+      } else {
+        // Update application
+        await updateOAuthApp({
+          id: selectedApp.id,
+          slug,
+          name,
+          website,
+          redirect_uris: redirect_uris.map((uris) => uris.value),
+          scopes,
+          icon: uploadedIconUrl,
+        })
+      }
+    } catch {
+      // Error side effects are handled in the mutation hook options
     }
   }
 
