@@ -4,7 +4,7 @@ import { useFormField } from '../shadcn/ui/form'
 import { InputGroupTextarea } from '../shadcn/ui/input-group'
 import type { TextareaProps } from '../shadcn/ui/textarea'
 
-export function FormInputGroupTextArea({ className, ...props }: TextareaProps) {
+export function FormInputGroupTextArea(props: TextareaProps) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
   return (
