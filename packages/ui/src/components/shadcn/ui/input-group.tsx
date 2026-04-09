@@ -138,10 +138,10 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 function InputGroupInput({ className, ...props }: InputProps) {
   // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
   // so we apply them manually here
-  let error: FieldError | undefined = undefined
-  let formItemId = ''
-  let formDescriptionId = ''
-  let formMessageId = ''
+  let error: FieldError | undefined
+  let formItemId: string | undefined
+  let formDescriptionId: string | undefined
+  let formMessageId: string | undefined
 
   try {
     const formField = useFormField()
@@ -173,10 +173,10 @@ function InputGroupInput({ className, ...props }: InputProps) {
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
   // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
   // so we apply them manually here
-  let error: FieldError | undefined = undefined
-  let formItemId = ''
-  let formDescriptionId = ''
-  let formMessageId = ''
+  let error: FieldError | undefined
+  let formItemId: string | undefined
+  let formDescriptionId: string | undefined
+  let formMessageId: string | undefined
 
   try {
     const formField = useFormField()
