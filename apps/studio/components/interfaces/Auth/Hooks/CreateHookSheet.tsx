@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
@@ -187,9 +188,9 @@ export const CreateHookSheet = ({
     if (values.postgresValues.functionName !== '') {
       permissionChanges = [
         ...permissionChanges,
-        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} to supabase_auth_admin;`,
-        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${values.postgresValues.schema} to supabase_auth_admin;`,
-        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${values.postgresValues.schema}.${values.postgresValues.functionName} from authenticated, anon, public;`,
+        `-- Grant access to function to supabase_auth_admin\ngrant execute on function ${ident(values.postgresValues.schema)}.${ident(values.postgresValues.functionName)} to supabase_auth_admin;`,
+        `-- Grant access to schema to supabase_auth_admin\ngrant usage on schema ${ident(values.postgresValues.schema)} to supabase_auth_admin;`,
+        `-- Revoke function permissions from authenticated, anon and public\nrevoke execute on function ${ident(values.postgresValues.schema)}.${ident(values.postgresValues.functionName)} from authenticated, anon, public;`,
       ]
     }
     return permissionChanges
