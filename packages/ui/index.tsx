@@ -142,6 +142,8 @@ export {
   FormMessage as FormMessage_Shadcn_,
   FormField as FormField_Shadcn_,
   useWatch as useWatch_Shadcn_,
+  FormInputGroupInput,
+  FormInputGroupTextArea,
 } from './src/components/shadcn/ui/form'
 
 export {
@@ -201,8 +203,6 @@ export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-ar
 export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
 
 export * from './src/components/shadcn/ui/input-group'
-export * from './src/components/InputGroup/form-input-group-input'
-export * from './src/components/InputGroup/form-input-group-textarea'
 
 export * from './src/components/shadcn/ui/switch'
 
