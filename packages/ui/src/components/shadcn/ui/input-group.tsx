@@ -28,6 +28,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
 
         // Error state.
         'has-[[data-slot][aria-invalid=true]]:bg-destructive-200 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive-400 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+        'has-[[data-slot][aria-invalid=true]]:has-[[data-slot=input-group-control]:focus-visible]:border-destructive',
 
         // Disabled state.
         'has-[[data-slot=input-group-control]:disabled]:cursor-not-allowed has-[[data-slot=input-group-control]:disabled]:text-foreground-muted',
@@ -128,7 +129,11 @@ function InputGroupInput({ className, ...props }: InputProps) {
     <Input
       data-slot="input-group-control"
       className={cn(
-        'flex-1 rounded-none border-0 -m-px bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+        'flex-1 rounded-none border border-transparent -m-px bg-transparent shadow-none',
+        'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
+        'read-only:border-transparent',
+        'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
+        'aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
         className
       )}
       {...props}
@@ -141,7 +146,8 @@ function InputGroupTextarea({ className, ...props }: TextareaProps) {
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        'flex-1 resize-none rounded-none border-0 bg-transparent py-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+        'flex-1 resize-none rounded-none border border-transparent bg-transparent py-0 shadow-none',
+        'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
         className
       )}
       {...props}
