@@ -1,8 +1,9 @@
 import { expect, Page } from '@playwright/test'
+
+import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/auth-helpers.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
-import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/auth-helpers.js'
 
 test.describe('auth users list refresh', () => {
   test.beforeEach(async ({ page, ref }) => {
@@ -51,7 +52,10 @@ test('should show web3 users as enabled when the matching web3 provider is enabl
   page,
   ref,
 }) => {
-  test.skip(process.env.IS_PLATFORM !== 'true', 'Provider enabled status is only resolved in platform mode')
+  test.skip(
+    process.env.IS_PLATFORM !== 'true',
+    'Provider enabled status is only resolved in platform mode'
+  )
 
   const userId = '11111111-1111-4111-8111-111111111111'
 

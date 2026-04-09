@@ -226,10 +226,16 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             )
             const enabledProperty =
               provider.name.toLowerCase() === 'web3'
-                ? ({ solana: 'EXTERNAL_WEB3_SOLANA_ENABLED', ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED' } as const)[
-                    ((user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)?.chain ?? '').toLowerCase() as
-                      | 'solana'
-                      | 'ethereum'
+                ? (
+                    {
+                      solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
+                      ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
+                    } as const
+                  )[
+                    (
+                      (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
+                        ?.chain ?? ''
+                    ).toLowerCase() as 'solana' | 'ethereum'
                   ]
                 : Object.keys(providerMeta?.properties ?? {}).find((x) =>
                     x.toLowerCase().endsWith('_enabled')
