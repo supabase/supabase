@@ -6,15 +6,39 @@ import { Button } from '../../Button'
 import { Input, type InputProps } from './input'
 import { Textarea, type TextareaProps } from './textarea'
 
+interface InputGroupProps extends React.ComponentProps<'div'> {
+  /**
+   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * regular <Input> and <Textarea> components.
+   */
+  id?: string
+  /**
+   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * regular <Input> and <Textarea> components.
+   */
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
+  /**
+   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * regular <Input> and <Textarea> components.
+   */
+  'aria-describedby'?: string
+}
+
+/*
+ * Used to group input elements together with addons like labels, buttons, or text. When using this component
+ * inside a <Form_Shadcn_>, use FormInputGroupInput and FormInputGroupTextArea instead of the regular Input
+ * and Textarea components to ensure proper form field association and accessibility.
+ */
 function InputGroup({
   className,
-  // Those three props are passed by <FormControl_Shadcn_> but they should be applied on the input itself
-  // <InputGroupInput> or <InputGroupTextarea>
   id,
   'aria-invalid': ariaInvalid,
   'aria-describedby': ariaDescribedby,
   ...props
-}: React.ComponentProps<'div'>) {
+}: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
@@ -132,8 +156,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 }
 
 /*
- * Use this component to add an input inside an `<InputGroup>` when not in a react-hook-form form (e.g <Form_Shadcn_>).
- * Otherwise, use <FormInputGroupInput />
+ * If you need to use this component inside a <Form_Shadcn_>, use FormInputGroupInput instead.
  */
 function InputGroupInput({ className, ...props }: InputProps) {
   return (
@@ -148,6 +171,9 @@ function InputGroupInput({ className, ...props }: InputProps) {
   )
 }
 
+/*
+ * If you need to use this component inside a <Form_Shadcn_>, use FormInputGroupTextArea instead.
+ */
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
   return (
     <Textarea
