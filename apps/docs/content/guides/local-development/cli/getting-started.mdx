@@ -72,11 +72,27 @@ The Supabase CLI requires **Node.js 20 or later** when run via `npx` or `npm`. O
 
 </Admonition>
 
+<Admonition type="note">
+
+Installing the Supabase CLI globally using `npm install -g supabase` is **not supported**.
+
+For global usage, install the CLI via Homebrew, Scoop, or the standalone binary.
+
+Alternatively, you can run the CLI using `npx supabase` or install it locally as a dev dependency.
+
+</Admonition>
+
 You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
 
 ```sh
 npm install supabase --save-dev
 ```
+
+<Admonition type="note">
+
+Global installation using `npm install -g supabase` is not supported. For global CLI usage, install via [Homebrew](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos), [Scoop](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=windows), or the [standalone binary](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux).
+
+</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -173,7 +189,9 @@ The Supabase CLI uses Docker containers to manage the local development stack. F
     dark: '/docs/img/guides/cli/docker-mac.png',
     light: '/docs/img/guides/cli/docker-mac-light.png',
   }}
-  zoomable
+
+width={2880}
+height={1800}
 />
 
 </TabPanel>
@@ -185,7 +203,9 @@ The Supabase CLI uses Docker containers to manage the local development stack. F
     dark: '/docs/img/guides/cli/docker-win.png',
     light: '/docs/img/guides/cli/docker-win-light.png',
   }}
-  zoomable
+
+width={2560}
+height={1520}
 />
 
 </TabPanel>
@@ -323,6 +343,27 @@ When you are finished working on your Supabase project, you can stop the stack (
 ```bash
 supabase stop
 ```
+
+## Telemetry
+
+The Supabase CLI collects telemetry data about general usage. Participating in this program is optional, and you can opt out at any time.
+
+### How to opt out
+
+You can disable telemetry by running:
+
+```bash
+supabase telemetry disable
+```
+
+You can check the current status and re-enable with:
+
+```bash
+supabase telemetry status
+supabase telemetry enable
+```
+
+You can also opt out using the `SUPABASE_TELEMETRY_DISABLED=1` environment variable. The broader `DO_NOT_TRACK=1` convention is also respected.
 
 ## Learn more
 

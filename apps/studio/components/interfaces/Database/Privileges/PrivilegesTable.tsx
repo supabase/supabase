@@ -1,18 +1,18 @@
-import Table from 'components/to-be-cleaned/Table'
-import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
 import { Switch } from 'ui'
+
 import {
   ALL_PRIVILEGE_TYPES,
   COLUMN_PRIVILEGE_TYPES,
   TABLE_PRIVILEGE_TYPES,
 } from './Privileges.constants'
 import { usePrivilegesState } from './Privileges.utils'
+import Table from '@/components/to-be-cleaned/Table'
+import type { ColumnPrivilege } from '@/data/privileges/column-privileges-query'
 
-export interface PrivilegesTableProps
-  extends Pick<
-    ReturnType<typeof usePrivilegesState>,
-    'tableCheckedStates' | 'columnCheckedStates' | 'toggleTablePrivilege' | 'toggleColumnPrivilege'
-  > {
+export interface PrivilegesTableProps extends Pick<
+  ReturnType<typeof usePrivilegesState>,
+  'tableCheckedStates' | 'columnCheckedStates' | 'toggleTablePrivilege' | 'toggleColumnPrivilege'
+> {
   columnPrivileges: ColumnPrivilege[]
   disabled: boolean
   isApplyingChanges?: boolean

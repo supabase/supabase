@@ -1,9 +1,10 @@
-import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
 
 type ForgotPasswordLayoutProps = {
   heading?: string

@@ -1,16 +1,16 @@
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import CopyButton from 'components/ui/CopyButton'
-import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
-import { ExplainHeader } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
+import Results from './Results'
+import { ExplainVisualizer } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer'
+import { ExplainHeader } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import {
   isExplainQuery,
   isTextFormatExplain,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import Results from './Results'
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import CopyButton from '@/components/ui/CopyButton'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityTabExplainProps = {
   id: string

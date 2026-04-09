@@ -1,16 +1,20 @@
-import { useRouter } from 'next/router'
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   const router = useRouter()
   const setIsOpen = useSetCommandMenuOpen()
-  let { ref } = useParams()
+  let { ref, slug } = useParams()
+  const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   ref ||= '_'
+  const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
   const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
     useIsFeatureEnabled([
@@ -22,6 +26,13 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
     [
+      {
+        id: 'nav-project-settings-add-ons',
+        name: 'Add-ons',
+        value: 'Add-ons addons add ons add on add-on',
+        route: `/project/${ref}/settings/addons`,
+        defaultHidden: true,
+      },
       {
         id: 'nav-project-settings-general',
         name: 'General Settings',
@@ -42,10 +53,30 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           : `/project/${ref}/auth/policies`,
         defaultHidden: true,
       },
+      ...(platformWebhooksEnabled
+        ? [
+            {
+              id: 'nav-project-settings-webhooks',
+              name: 'Project Webhooks',
+              route: `/project/${ref}/settings/webhooks`,
+              defaultHidden: true,
+            } as IRouteCommand,
+            ...(hasOrgSlug
+              ? [
+                  {
+                    id: 'nav-organization-settings-webhooks',
+                    name: 'Organization Webhooks',
+                    route: `/org/${slug}/webhooks`,
+                    defaultHidden: true,
+                  } as IRouteCommand,
+                ]
+              : []),
+          ]
+        : []),
       {
         id: 'nav-project-settings-api',
         name: 'API Settings',
-        route: `/project/${ref}/settings/api`,
+        route: `/project/${ref}/integrations/data_api/settings`,
         defaultHidden: true,
       },
       {
@@ -145,6 +176,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [ref] }
+    { ...options, deps: [platformWebhooksEnabled, ref, slug] }
   )
 }

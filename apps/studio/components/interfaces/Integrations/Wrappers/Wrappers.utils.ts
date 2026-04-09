@@ -1,6 +1,112 @@
-import { FDW, FDWTable } from 'data/fdw/fdws-query'
-import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
-import type { WrapperMeta } from './Wrappers.types'
+import * as z from 'zod'
+
+import { WRAPPER_HANDLERS, WRAPPERS } from './Wrappers.constants'
+import type { Table, WrapperMeta } from './Wrappers.types'
+import { FDW, FDWTable } from '@/data/fdw/fdws-query'
+
+const tableSchema = z
+  .object({
+    index: z.number(),
+    columns: z.array(z.object({ name: z.string(), type: z.string() })),
+    is_new_schema: z.boolean(),
+    schema: z.string(),
+    schema_name: z.string(),
+    table_name: z.string(),
+    object: z.any().optional(),
+  })
+  .passthrough() // passthrough is needed for table options
+
+export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
+  let wrapperSchema = {
+    // Common validation for all wrappers
+    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  } as Record<string, any>
+
+  // Add wrapper specific options
+  wrapperMeta.server.options.forEach((option) => {
+    if (option.required) {
+      wrapperSchema[option.name] = z.string().min(1, 'Required')
+      return
+    }
+    wrapperSchema[option.name] = z.string().optional()
+  })
+
+  return z.discriminatedUnion('mode', [
+    z
+      .object({
+        mode: z.literal('tables'),
+        tables: z
+          .array(tableSchema, { required_error: 'Please provide at least one table' })
+          .min(1, 'Please provide at least one table'),
+      })
+      .merge(z.object(wrapperSchema)),
+    z
+      .object({
+        mode: z.literal('schema'),
+        source_schema: z.string().min(1, 'Please provide a source schema'),
+        target_schema: z.string().min(1, 'Please provide an unique target schema'),
+      })
+      .merge(z.object(wrapperSchema)),
+  ])
+}
+
+export const getEditionFormSchema = (wrapperMeta: WrapperMeta) => {
+  let wrapperSchema = {
+    // Common validation for all wrappers
+    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+    tables: z
+      .array(tableSchema, { required_error: 'Please provide at least one table' })
+      .min(1, 'Please provide at least one table'),
+  } as Record<string, any>
+
+  // Add wrapper specific options
+  wrapperMeta.server.options.forEach((option) => {
+    if (option.required) {
+      wrapperSchema[option.name] = z.string().min(1, 'Required')
+      return
+    }
+    wrapperSchema[option.name] = z.string().optional()
+  })
+  return z.object(wrapperSchema)
+}
+
+export const getTableFormSchema = (table: Table) => {
+  let tableSchema = {
+    table_name: z.string().min(1, 'Required'),
+    schema: z.string().min(1, 'Required'),
+    schema_name: z.string().optional(),
+    columns: z.array(
+      z.object({
+        name: z.string().min(1, 'Required'),
+        type: z.string().min(1, 'Required'),
+      })
+    ),
+  } as Record<string, any>
+
+  table.options.forEach((option) => {
+    if (option.required) {
+      tableSchema[option.name] = z.string().min(1, 'Required')
+      return
+    }
+    tableSchema[option.name] = z.string().optional()
+  })
+
+  return (
+    z
+      .object(tableSchema)
+      // passthrough is needed for table options
+      .passthrough()
+      .superRefine((values, ctx) => {
+        if (values.schema === 'custom' && !values.schema_name) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['schema_name'],
+            message: 'Required',
+          })
+        }
+      })
+  )
+}
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(
@@ -49,6 +155,8 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
     return errors
   }
 }
+
+export const NewTable = {} as FormattedWrapperTable
 
 export interface FormattedWrapperTable {
   index: number

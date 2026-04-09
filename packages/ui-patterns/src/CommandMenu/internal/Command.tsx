@@ -5,6 +5,7 @@ import { cn, CommandItem_Shadcn_ } from 'ui'
 
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
 import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { useQuery } from '../api/hooks/queryHooks'
 import { useResetCommandMenu, useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import type { IActionCommand, ICommand, IRouteCommand } from './types'
 
@@ -19,7 +20,7 @@ const generateCommandClassNames = (isLink: boolean) =>
     'rounded-md',
     'text-sm',
     'group',
-    'py-3',
+    'py-2 md:py-3',
     'text-foreground-light',
     'relative',
     'flex',
@@ -56,6 +57,7 @@ const CommandItem = forwardRef<
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
   const telemetryContext = useCommandMenuTelemetryContext()
+  const query = useQuery()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
@@ -68,6 +70,8 @@ const CommandItem = forwardRef<
           command_name: command.name,
           command_value: command.value,
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
+          search_query: query || undefined,
+          result_path: isRouteCommand(command) ? command.route : undefined,
           app: telemetryContext.app,
         },
         groups: {},

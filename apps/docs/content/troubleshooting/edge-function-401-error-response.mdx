@@ -1,0 +1,237 @@
+---
+title = "Edge Function 401 error response"
+topics = [ "functions" ]
+keywords = ["401", "error", "JWT", "authorization"]
+
+[[errors]]
+http_status_code = 401
+message = "Invalid JWT"
+---
+
+A 401 response from an Edge Function means either:
+
+- The function failed the [legacy auth verification check](/docs/guides/functions/development-tips#skipping-authorization-checks)
+- Your function's logic deliberately returned a 401 response
+
+## Quick triage
+
+Check the response body returned by the request
+
+### Case 1: `"Invalid JWT"` or `"Missing authorization header"`
+
+```json
+{ "code": 401, "message": "Invalid JWT" }
+```
+
+```json
+{ "code": 401, "message": "Missing authorization header" }
+```
+
+Both of these messages come from the [legacy auth verification check](/docs/guides/functions/development-tips#skipping-authorization-checks)
+
+Go to: [Built-in JWT check failures](#built-in-jwt-check-failures)
+
+### Case 2: Custom message or empty body
+
+If the response body contains a message you coded, or nothing at all, then your function code _did_ execute and returned a 401 itself.
+
+Go to: [Your function returned a 401](#your-function-returned-a-401)
+
+### Case 3: Not sure
+
+Run this query in [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++++cast%28timestamp+AS+datetime%29++AS+timestamp%2C%0A++++req.pathname+++++++++++++++++AS+function_name%2C%0A%0A++++CASE%0A++++++++WHEN+metadata.execution_id+IS+NOT+NULL%0A++++++++++++THEN+%27your_code_returned_401%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+%28new_auth.prefix+IS+NOT+NULL+OR+legacy_payload.algorithm+<>+%27HS256%27%29%0A++++++++++++THEN+%27incompatible_keys%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A++++++++AND+%0A++++++++++++%28%0A++++++++++++++++%28legacy_auth_data.invalid+IS+NOT+NULL+OR+new_auth.error+IS+NOT+NULL%29%0A++++++++++++++++++++OR%0A++++++++++++++++legacy_payload.algorithm+%3D+%27HS256%27%0A++++++++++++%29%0A++++++++++++THEN+%27invalid_key%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+legacy_auth_data+++++++IS+NULL%0A+++++++++AND+new_auth.prefix+IS+NULL%0A++++++++++++THEN+%27missing_auth_header%27%0A++++END+AS+cause%0A%0AFROM+function_edge_logs%0A%0A++++--+unnesting+metadata%0A++++CROSS+JOIN+UNNEST%28metadata%29++++++++++AS+metadata%0A++++CROSS+JOIN+UNNEST%28metadata.request%29++AS+req%0A++++CROSS+JOIN+UNNEST%28metadata.response%29+AS+res%0A++++--+unnesting+auth+details%0A++++LEFT+JOIN+UNNEST%28req.sb%29++++++++++++++++++++AS+sb%0A++++LEFT+JOIN+UNNEST%28sb.apikey%29+++++++++++++++++AS+apikey%0A++++LEFT+JOIN+UNNEST%28apikey.authorization%29++++++AS+new_auth%0A++++LEFT+JOIN+UNNEST%28sb.jwt%29++++++++++++++++++++AS+legacy_jwt%0A++++LEFT+JOIN+UNNEST%28legacy_jwt.authorization%29++AS+legacy_auth_data%0A++++LEFT+JOIN+UNNEST%28legacy_auth_data.payload%29++AS+legacy_payload%0A%0AWHERE+res.status_code+%3D+401%0AORDER+BY+timestamp+DESC%0ALIMIT+200) to classify recent 401s:
+
+```sql
+select
+  cast(timestamp as datetime) as timestamp,
+  req.pathname as function_name,
+  case
+    when metadata.execution_id is not null then 'your_code_returned_401'
+    when metadata.execution_id is null
+    and (
+      new_auth.prefix is not null
+      or legacy_payload.algorithm != 'HS256'
+    ) then 'incompatible_keys'
+    when metadata.execution_id is null
+    and (
+      (legacy_auth_data.invalid is not null or new_auth.error is not null)
+      or legacy_payload.algorithm = 'HS256'
+    ) then 'invalid_key'
+    when metadata.execution_id is null
+    and legacy_auth_data is null
+    and new_auth.prefix is null then 'missing_auth_header'
+  end as cause
+from
+  function_edge_logs
+  -- unnesting metadata
+  cross join UNNEST(metadata) as metadata
+  cross join UNNEST(metadata.request) as req
+  cross join UNNEST(metadata.response) as res
+  -- unnesting auth details
+  left join UNNEST(req.sb) as sb
+  left join UNNEST(sb.apikey) as apikey
+  left join UNNEST(apikey.authorization) as new_auth
+  left join UNNEST(sb.jwt) as legacy_jwt
+  left join UNNEST(legacy_jwt.authorization) as legacy_auth_data
+  left join UNNEST(legacy_auth_data.payload) as legacy_payload
+where res.status_code = 401
+order by timestamp desc
+limit 50;
+```
+
+Depending on the output, you can use this table to find the appropriate debugging section:
+
+| Value                    | Go to                                                         |
+| ------------------------ | ------------------------------------------------------------- |
+| `your_code_returned_401` | [Your function returned a 401](#your-function-returned-a-401) |
+| `incompatible_keys`      | [Incompatible key format](#incompatible-key-format)           |
+| `invalid_key`            | [Invalid key](#invalid-key)                                   |
+| `missing_auth_header`    | [Missing Authorization header](#missing-authorization-header) |
+
+---
+
+## Your function returned a 401
+
+Your function ran, and somewhere in your code, its logic returned a 401.
+
+**Example:**
+
+```js
+return new Response(JSON.stringify(data), {
+  headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  status: 401, // <-- you set this
+})
+```
+
+**How to fix:**
+
+1. Search your function code for `401`. Look for explicit status codes on `Response` objects.
+2. Trace the condition that triggered it. If you're interacting with a third-party API in your code, that service may be returning 401 that you're forwarding in the response object.
+3. Add logging before the return so future occurrences leave a trace:
+
+```js
+console.error('Returning 401 - reason:', reason)
+```
+
+See: [Error handling in Edge Functions](/docs/guides/functions/error-handling)
+
+---
+
+## Built-in JWT check failures
+
+Supabase Edge Functions have a legacy auth verification check that runs before your code. When it fails, your function never executes, and you get a 401 with `"Invalid JWT"` or `"Missing authorization header"` directly from the platform.
+
+<Admonition type="deprecation">
+
+Supabase now recommends turning off this built-in check and managing authentication directly in your function code, giving you more control over access. See [Securing Edge Functions](/docs/guides/functions/auth).
+
+</Admonition>
+
+The subsections below cover specific failure modes.
+
+### Incompatible key format
+
+Your project uses the [new asymmetric keys](/blog/jwt-signing-keys) for authentication. However, the [legacy auth verification check](/docs/guides/functions/development-tips#skipping-authorization-checks) only understands the legacy format.
+
+**Fix:** Disable the built-in JWT check using one of the below methods and optionally [handle auth in your function code](/docs/guides/functions/auth)
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Method A: Dashboard"
+      id="item-1"
+    >
+
+In the [Functions Dashboard](/dashboard/project/_/functions/), open the affected function's `detail tab` and toggle off JWT verification.
+
+![image](/docs/img/troubleshooting/401_edge_functions_toggle_off_JWT_check.png)
+
+  </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Method B: Supabase CLI"
+      id="item-2"
+    >
+
+Redeploy the edge function from the [Supabase CLI](/docs/guides/functions/quickstart) with the `--no-verify-jwt` flag
+
+```sh
+supabase functions deploy YOUR_FUNCTION_NAME --no-verify-jwt
+```
+
+    </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Method C: Management API"
+      id="item-3"
+    >
+Disable the legacy auth check with the [Supabase Management API](/docs/reference/api/introduction):
+
+1. Generate a token at [Account Preferences](/dashboard/account/tokens).
+2. Get your project ID from [General Settings](/dashboard/project/_/settings/general).
+3. Run:
+
+```sh
+curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME' \
+  --request PATCH \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{"verify_jwt": false}'
+```
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+
+### Invalid key
+
+The built-in check is enabled and the key you sent doesn't match your project's keys.
+
+**Fix (recommended):** Disable the built-in check using the steps in [Incompatible key format](#incompatible-key-format).
+
+**Fix (alternative):** If you want to keep the built-in check, ensure you're sending a valid key. Use one of your [legacy API keys](/dashboard/project/_/settings/api-keys/legacy) with the [Supabase client library](/docs/guides/api/rest/client-libs) when making your request.
+
+```js
+const supabase = createClient('https://xyzcompany.supabase.co', 'anon-key-or-service_role-key')
+```
+
+### Missing authorization header
+
+The built-in check is enabled but your request has no `Authorization` header at all.
+
+If you're using a [Supabase client library](/docs/guides/api/rest/client-libs), the header is added automatically. If you're calling the function from an external client (cURL, fetch, etc.), you need to supply it:
+
+```sh
+curl -L -X POST 'https://PROJECT_REF.supabase.co/functions/v1/hello-world' \
+  -H 'Authorization: Bearer YOUR_ANON_OR_SERVICE_ROLE_KEY' \
+  --data '{"name":"Functions"}'
+```
+
+Alternatively, you can disable the built-in check entirely (see [Incompatible key format](#incompatible-key-format)).
+
+---
+
+## Additional resources
+
+- [Securing Edge Functions with Auth](/docs/guides/functions/auth)
+- [Logging Edge Function Requests](/docs/guides/functions/logging)
+- [Error Handling Edge Functions](/docs/guides/functions/error-handling)
+- [Quickstart: Dashboard deployment](/docs/guides/functions/quickstart-dashboard)
+- [Quickstart: CLI deployment](/docs/guides/functions/quickstart)
+
+## Still stuck?
+
+- Check the [Discord](https://discord.com/channels/839993398554656828/1006358244786196510), [Supabase GitHub Discussions](https://github.com/orgs/supabase/discussions), and [Reddit page](https://www.reddit.com/r/Supabase/) for similar reports that can help with debugging
+- Open a [support ticket](/dashboard/support/new) for your project if the problem persists and you believe it is a platform issue

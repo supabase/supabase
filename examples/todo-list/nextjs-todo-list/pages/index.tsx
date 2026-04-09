@@ -1,11 +1,22 @@
 import Head from 'next/head'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { supabase } from '@/lib/initSupabase'
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
 import TodoList from '@/components/TodoList'
+import { Session } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
-  const session = useSession()
-  const supabase = useSupabaseClient()
+  const [session, setSession] = useState<Session | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session))
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => setSession(session))
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <>

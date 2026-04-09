@@ -1,19 +1,19 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
-import type { OrgProject } from 'data/projects/org-projects-infinite-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { Organization } from 'types'
 import { Input } from 'ui'
+
+import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-send'
+import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useProjectDeleteMutation } from '@/data/projects/project-delete-mutation'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { Organization } from '@/types'
 
 export const DeleteProjectModal = ({
   visible,
@@ -83,8 +83,14 @@ export const DeleteProjectModal = ({
 
       toast.success(`Successfully deleted ${project?.name}`)
 
-      if (lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-      else router.push('/organizations')
+      // Only redirect if still viewing the deleted project
+      if (router.asPath.startsWith(`/project/${projectRef}`)) {
+        if (lastVisitedOrganization) {
+          router.push(`/org/${lastVisitedOrganization}`)
+        } else {
+          router.push('/organizations')
+        }
+      }
     },
   })
   const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
@@ -140,9 +146,7 @@ export const DeleteProjectModal = ({
       {!isFree && (
         <>
           <div className="space-y-1">
-            <h4 className="text-base">
-              Help us improve by sharing why you're deleting your project.
-            </h4>
+            <h4 className="text-base">What made you decide to delete your project?</h4>
           </div>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap gap-2" data-toggle="buttons">

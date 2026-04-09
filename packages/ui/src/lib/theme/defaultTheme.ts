@@ -35,10 +35,11 @@ const defaults = {
   `,
   size: {
     // buttons, inputs, input labels use these sizes
+    // text-base on mobile (below md) to avoid zoom on focus
     text: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -867,8 +868,9 @@ export default {
       shadow-xl
     `,
     header: `
+      flex items-center
       space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
-      border-b
+      border-b h-[var(--header-height)]
     `,
     contents: `
       relative
@@ -1062,8 +1064,8 @@ export default {
     },
     size: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },

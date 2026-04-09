@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { UnifiedLogs } from 'components/interfaces/UnifiedLogs/UnifiedLogs'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ProjectLayout } from 'components/layouts/ProjectLayout'
-import type { NextPageWithLayout } from 'types'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { UnifiedLogs } from '@/components/interfaces/UnifiedLogs/UnifiedLogs'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { ProjectLayout } from '@/components/layouts/ProjectLayout'
+import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -24,7 +24,8 @@ export const LogPage: NextPageWithLayout = () => {
   if (isUnifiedLogsEnabled) {
     return (
       <DefaultLayout>
-        <ProjectLayout>
+        {/* Omit the generic product segment here; project/org context already makes the route clear. */}
+        <ProjectLayout browserTitle={{ section: 'Unified Logs' }}>
           <UnifiedLogs />
         </ProjectLayout>
       </DefaultLayout>

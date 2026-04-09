@@ -1,7 +1,8 @@
-import { SignInPartner } from 'components/interfaces/SignIn/SignInPartner'
-import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
-import type { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
+
+import { SignInPartner } from '@/components/interfaces/SignIn/SignInPartner'
+import ForgotPasswordLayout from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const SignInPartnerPage: NextPageWithLayout = () => {
   return <SignInPartner />

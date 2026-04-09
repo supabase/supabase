@@ -2,15 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
-import { useProjectCloneMutation } from 'data/projects/clone-mutation'
-import { useCloneBackupsQuery } from 'data/projects/clone-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
 import {
   Button,
   Dialog,
@@ -27,8 +18,16 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
 import { AdditionalMonthlySpend } from './AdditionalMonthlySpend'
 import { NewProjectPrice } from './RestoreToNewProject.utils'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useProjectCloneMutation } from '@/data/projects/clone-mutation'
+import { useCloneBackupsQuery } from '@/data/projects/clone-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
 
 interface CreateNewProjectDialogProps {
   open: boolean
@@ -37,6 +36,7 @@ interface CreateNewProjectDialogProps {
   onOpenChange: (value: boolean) => void
   onCloneSuccess: () => void
   additionalMonthlySpend: NewProjectPrice
+  hasAccess?: boolean
 }
 
 export const CreateNewProjectDialog = ({
@@ -46,10 +46,9 @@ export const CreateNewProjectDialog = ({
   onOpenChange,
   onCloneSuccess,
   additionalMonthlySpend,
+  hasAccess,
 }: CreateNewProjectDialogProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
 
@@ -66,11 +65,9 @@ export const CreateNewProjectDialog = ({
     },
   })
 
-  const isFreePlan = organization?.plan?.id === 'free'
-
   const { data: cloneBackups } = useCloneBackupsQuery(
     { projectRef: project?.ref },
-    { enabled: !isFreePlan }
+    { enabled: hasAccess }
   )
   const hasPITREnabled = cloneBackups?.pitr_enabled
 

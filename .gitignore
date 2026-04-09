@@ -123,6 +123,7 @@ next-env.d.ts
 !.claude/skills/
 .claude/skills/me-*
 CLAUDE.md
+!.claude/CLAUDE.md
 
 #include template .env file for docker-compose
 !docker/.env
@@ -157,3 +158,6 @@ keys.json
 
 # Playwright MCP
 .playwright-mcp/*
+
+# Application
+**/.superset/**

@@ -6,6 +6,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/hardening-data-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/compute-add-ons',
     destination: '/docs/guides/platform/compute-and-disk',
   },
@@ -2648,6 +2658,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
     destination: '/docs/guides/auth/server-side/advanced-guide',
   },
@@ -2823,7 +2838,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/oauth-scopes',
-    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
   },
   {
     permanent: true,

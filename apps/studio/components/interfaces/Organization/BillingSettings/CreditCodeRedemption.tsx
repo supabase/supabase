@@ -1,9 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Calendar, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -29,16 +26,18 @@ import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 
 const FORM_ID = 'credit-code-redemption'
 
 const FormSchema = z.object({
-  code: z.coerce.string(),
+  code: z.string().min(1, 'Code is required'),
 })
 
 type CreditCodeRedemptionForm = z.infer<typeof FormSchema>
@@ -53,7 +52,6 @@ export const CreditCodeRedemption = ({
   onClose?: () => void
 }) => {
   const router = useRouter()
-  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
   )
@@ -78,6 +76,7 @@ export const CreditCodeRedemption = ({
     resolver: zodResolver(FormSchema),
     defaultValues: { code: '' },
   })
+  const { isValid } = form.formState
 
   const {
     mutate: redeemCode,
@@ -145,8 +144,6 @@ export const CreditCodeRedemption = ({
       initHcaptchaRef.current()
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
-
-  if (!redeemCodeEnabled) return null
 
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
@@ -224,19 +221,24 @@ export const CreditCodeRedemption = ({
               </div>
             )}
 
-            <div className="mt-4 flex flex-col gap-y-4">
-              <Separator />
-              <div className="flex justify-center items-center gap-x-2">
-                {org?.plan.id === 'free' && (
-                  <UpgradePlanButton plan="Pro" source="code-redeem" slug={org.slug}>
-                    Upgrade organization
-                  </UpgradePlanButton>
-                )}
-                <Button asChild type="default">
-                  <Link href={`/org/${org?.slug}`}>Go to organization</Link>
-                </Button>
+            {(!router.pathname.includes('/org/') || org?.plan.id === 'free') && (
+              <div className="mt-4 flex flex-col gap-y-4">
+                <Separator />
+                <div className="flex justify-center items-center gap-x-2">
+                  {org?.plan.id === 'free' && (
+                    <UpgradePlanButton plan="Pro" source="code-redeem" slug={org.slug}>
+                      Upgrade organization
+                    </UpgradePlanButton>
+                  )}
+
+                  {!router.pathname.includes('/org/') && (
+                    <Button asChild type="default">
+                      <Link href={`/org/${org?.slug}`}>Go to organization</Link>
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <>
@@ -265,7 +267,12 @@ export const CreditCodeRedemption = ({
                       control={form.control}
                       name="code"
                       render={({ field }) => (
-                        <FormItemLayout label="Code" className="gap-1" layout="horizontal">
+                        <FormItemLayout
+                          hideMessage
+                          label="Code"
+                          className="gap-1"
+                          layout="horizontal"
+                        >
                           <Input_Shadcn_
                             {...field}
                             className="uppercase w-56 ml-auto"
@@ -312,7 +319,7 @@ export const CreditCodeRedemption = ({
                       type="primary"
                       className="pointer-events-auto"
                       loading={redeemingCode}
-                      disabled={codeRedemptionDisabled}
+                      disabled={codeRedemptionDisabled || !isValid}
                       htmlType="submit"
                       tooltip={{
                         content: {

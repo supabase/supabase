@@ -1,30 +1,29 @@
-import { Github, MoreVertical, Trash, Copy, Check } from 'lucide-react'
+import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
-import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
-
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { BASE_PATH } from 'lib/constants'
-import { createNavigationHandler } from 'lib/navigation'
-import type { Organization } from 'types'
+import InlineSVG from 'react-inlinesvg'
+import { toast } from 'sonner'
 import {
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
+  Button,
+  copyToClipboard,
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   TableCell,
   TableRow,
-  Button,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
-import { toast } from 'sonner'
-import { copyToClipboard } from 'ui'
+import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
+import { BASE_PATH } from '@/lib/constants'
+import { createNavigationHandler } from '@/lib/navigation'
+import type { Organization } from '@/types'
 
 export interface ProjectTableRowProps {
   project: OrgProject
@@ -46,7 +45,6 @@ export const ProjectTableRow = ({
   const router = useRouter()
   const { name, ref: projectRef } = project
   const projectStatus = inferProjectStatus(project.status)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
 
   const url = rewriteHref ?? `/project/${project.ref}`
@@ -139,6 +137,7 @@ export const ProjectTableRow = ({
                 projectRef={project.ref}
                 cloudProvider={project.cloud_provider}
                 computeSize={getComputeSize(project)}
+                resourceWarnings={resourceWarnings}
               />
             ) : (
               <span className="text-xs text-foreground-muted">–</span>
@@ -177,23 +176,17 @@ export const ProjectTableRow = ({
                   className="gap-x-2"
                   onClick={(e) => {
                     e.stopPropagation()
-                    setIsDeleteModalOpen(true)
+                    router.push(`/project/${projectRef}/settings/general`)
                   }}
                 >
-                  <Trash size={14} />
-                  <span>Delete project</span>
+                  <Settings size={14} />
+                  <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </TableCell>
       </TableRow>
-      <DeleteProjectModal
-        visible={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        project={project}
-        organization={organization}
-      />
     </>
   )
 }

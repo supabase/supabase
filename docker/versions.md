@@ -1,5 +1,29 @@
 # Docker Image Versions
 
+## 2026-04-08
+- supabase/studio:2026.04.08-sha-205cbe7 (prev supabase/studio:2026.03.16-sha-5528817)
+- postgrest/postgrest:v14.8 (prev postgrest/postgrest:v14.6)
+- supabase/storage-api:v1.48.26 (prev supabase/storage-api:v1.44.2)
+- supabase/postgres-meta:v0.96.3 (prev supabase/postgres-meta:v0.95.2)
+- supabase/logflare:1.36.1 (prev supabase/logflare:1.31.2)
+
+## 2026-03-16
+- supabase/studio:2026.03.16-sha-5528817 (prev supabase/studio:2026.02.16-sha-26c615c)
+- kong/kong:3.9.1 (prev kong:2.8.1)
+- postgrest/postgrest:v14.6 (prev postgrest/postgrest:v14.5)
+- supabase/storage-api:v1.44.2 (prev supabase/storage-api:v1.37.8)
+- supabase/edge-runtime:v1.71.2 (prev supabase/edge-runtime:v1.70.3)
+
+## 2026-02-16
+- supabase/studio:2026.02.16-sha-26c615c (prev supabase/studio:2026.01.27-sha-6aa59ff)
+- supabase/gotrue:v2.186.0 (prev supabase/gotrue:v2.185.0)
+- postgrest/postgrest:v14.5 (prev postgrest/postgrest:v14.3)
+- supabase/realtime:v2.76.5 (prev supabase/realtime:v2.72.0)
+- supabase/storage-api:v1.37.8 (prev supabase/storage-api:v1.37.1)
+- supabase/edge-runtime:v1.70.3 (prev supabase/edge-runtime:v1.70.0)
+- supabase/logflare:1.31.2 (prev supabase/logflare:1.30.3)
+- timberio/vector:0.53.0-alpine (prev timberio/vector:0.28.1-alpine)
+
 ## 2026-02-05
 - supabase/storage-api:v1.37.1 (prev supabase/storage-api:v1.33.5)
 

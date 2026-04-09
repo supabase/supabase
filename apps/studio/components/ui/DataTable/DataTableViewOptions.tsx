@@ -1,6 +1,5 @@
 import { GripVertical, Settings2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
-
+import { useId, useMemo, useState } from 'react'
 import {
   Checkbox_Shadcn_,
   Command_Shadcn_ as Command,
@@ -13,6 +12,7 @@ import {
   PopoverContent_Shadcn_ as PopoverContent,
   PopoverTrigger_Shadcn_ as PopoverTrigger,
 } from 'ui'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { Sortable, SortableDragHandle, SortableItem } from './primitives/Sortable'
 import { useDataTable } from './providers/DataTableProvider'
@@ -22,6 +22,7 @@ export function DataTableViewOptions() {
   const [open, setOpen] = useState(false)
   const [drag, setDrag] = useState(false)
   const [search, setSearch] = useState('')
+  const listboxId = useId()
 
   const columnOrder = table.getState().columnOrder
 
@@ -41,12 +42,13 @@ export function DataTableViewOptions() {
           size="tiny"
           role="combobox"
           aria-expanded={open}
+          aria-controls={listboxId}
           className="w-[26px]"
           icon={<Settings2 className="text-foreground" />}
           tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
         />
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="end" className="w-[200px] p-0">
+      <PopoverContent id={listboxId} side="bottom" align="end" className="w-[200px] p-0">
         <Command>
           <CommandInput value={search} onValueChange={setSearch} placeholder="Search columns..." />
           <CommandList>

@@ -1,6 +1,6 @@
-import CopyButton from 'components/ui/CopyButton'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
+import CopyButton from '@/components/ui/CopyButton'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface LogEntry {
   id: string

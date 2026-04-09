@@ -1,10 +1,11 @@
-import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
 import { AnalyticsBucket as AnalyticsBucketIcon, VectorBucket as VectorBucketIcon } from 'icons'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
 import { BUCKET_TYPES } from './Storage.constants'
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 
 export const BucketsUpgradePlan = ({ type }: { type: 'analytics' | 'vector' }) => {
   return (

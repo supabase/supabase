@@ -446,9 +446,6 @@ async function generateEmbeddings() {
   }
 
   requireEnvOrThrow([
-    'DOCS_GITHUB_APP_ID',
-    'DOCS_GITHUB_APP_INSTALLATION_ID',
-    'DOCS_GITHUB_APP_PRIVATE_KEY',
     'NEXT_PUBLIC_MISC_ANON_KEY',
     'NEXT_PUBLIC_MISC_URL',
     'NEXT_PUBLIC_SUPABASE_URL',

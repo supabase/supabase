@@ -1,11 +1,11 @@
 import { toString as CronToString } from 'cronstrue'
 import { Column } from 'react-data-grid'
-
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { cn } from 'ui'
+
 import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 import { CronJobTableCell } from './CronJobTableCell'
+import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 
 export function buildCronQuery(name: string, schedule: string, command: string) {
   const escapedName = name.replace(/'/g, "''")
@@ -127,7 +127,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     }
   }
 
-  const regexDBFunction = /select\s+[a-zA-Z-_]*\.?[a-zA-Z-_]*\s*\(\)/g
+  const regexDBFunction = /select\s+[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\s*\(\)/g
   if (command.toLocaleLowerCase().match(regexDBFunction)) {
     const [schemaName, functionName] = command
       .replace('SELECT ', '')
@@ -236,7 +236,7 @@ export const formatCronJobColumns = ({
       minWidth: col.minWidth ?? 100,
       maxWidth: col.maxWidth,
       width: col.width,
-      resizable: false,
+      resizable: col.resizable ?? false,
       sortable: false,
       draggable: false,
       headerCellClass: undefined,

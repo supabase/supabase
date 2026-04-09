@@ -38,32 +38,61 @@ jobs:
           cache: 'pnpm'
 
       - name: Update @supabase/*-js packages in pnpm-workspace.yaml
+        env:
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           # Update @supabase/supabase-js
-          sed -i "s/'@supabase\/supabase-js': .*/'@supabase\/supabase-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+          sed -i "s|'@supabase/supabase-js': .*|'@supabase/supabase-js': ${VERSION}|" pnpm-workspace.yaml
 
           # Update @supabase/auth-js
-          sed -i "s/'@supabase\/auth-js': .*/'@supabase\/auth-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+          sed -i "s|'@supabase/auth-js': .*|'@supabase/auth-js': ${VERSION}|" pnpm-workspace.yaml
 
           # Update @supabase/realtime-js
-          sed -i "s/'@supabase\/realtime-js': .*/'@supabase\/realtime-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+          sed -i "s|'@supabase/realtime-js': .*|'@supabase/realtime-js': ${VERSION}|" pnpm-workspace.yaml
 
           # Update @supabase/postgrest-js
-          sed -i "s/'@supabase\/postgrest-js': .*/'@supabase\/postgrest-js': ${{ github.event.inputs.version }}/" pnpm-workspace.yaml
+          sed -i "s|'@supabase/postgrest-js': .*|'@supabase/postgrest-js': ${VERSION}|" pnpm-workspace.yaml
 
           echo "Updated pnpm-workspace.yaml:"
           cat pnpm-workspace.yaml
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-      
+
+      - name: Fetch release notes
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_FULL=$(git show HEAD:pnpm-workspace.yaml | grep -oP "(?<='@supabase/supabase-js': )[\d]+\.[\d]+\.[\d]+(-[\w.]+)?")
+          CURRENT_BASE=$(echo "$CURRENT_FULL" | grep -oP '[\d]+\.[\d]+\.[\d]+')
+          [[ "$CURRENT_FULL" == *"-"* ]] && INCLUDE_CURRENT=true || INCLUDE_CURRENT=false
+          [[ "$VERSION" == *"-"* ]] && STABLE_ONLY=false || STABLE_ONLY=true
+          RELEASES=$(gh api "repos/supabase/supabase-js/releases?per_page=100")
+          RELEASE_NOTES=$(echo "$RELEASES" | jq -r \
+            --arg current "v${CURRENT_BASE}" \
+            --arg new "v${VERSION}" \
+            --argjson stable_only "$STABLE_ONLY" \
+            --argjson include_current "$INCLUDE_CURRENT" \
+            '[.[] | select(.draft == false) | select(if $stable_only then .prerelease == false else true end)] |
+             (map(.tag_name) | index($new)) as $start |
+             (map(.tag_name) | index($current)) as $end |
+             ($end | if . != null and $include_current then . + 1 else . end) as $end_adj |
+             if $start == null then ["Target version not found in last 100 releases."]
+             elif $end_adj != null and $start >= $end_adj then ["Downgrade — no release notes available."]
+             else [.[$start:$end_adj][] | "## " + .tag_name + "\n\n" + (.body // "No release notes.")]
+             end | .[]')
+          echo "RELEASE_NOTES<<EOF" >> "$GITHUB_ENV"
+          echo "$RELEASE_NOTES" >> "$GITHUB_ENV"
+          echo "EOF" >> "$GITHUB_ENV"
+
       - name: Generate token
         id: app-token
         uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         with:
           app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
           private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
-      
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
@@ -81,6 +110,12 @@ jobs:
             - Updated @supabase/realtime-js to ${{ github.event.inputs.version }}
             - Updated @supabase/postgest-js to ${{ github.event.inputs.version }}
             - Refreshed pnpm-lock.yaml
+
+            ---
+
+            ## Release Notes
+
+            ${{ env.RELEASE_NOTES }}
 
             This PR was created automatically.
           branch: 'gha/auto-update-js-libs-v${{ github.event.inputs.version }}'

@@ -1,6 +1,6 @@
 import { ChevronDown, SortAsc, SortDesc } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useRowSelection } from 'react-data-grid'
+import { useHeaderRowSelection } from 'react-data-grid'
 import {
   Button,
   DropdownMenu,
@@ -18,7 +18,7 @@ export const SelectHeaderCell = ({
   allRowsSelected: boolean
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [isRowSelected, onRowSelectionChange] = useRowSelection()
+  const { isRowSelected, onRowSelectionChange } = useHeaderRowSelection()
 
   const isIndeterminate = selectedUsers.size > 0 && !allRowsSelected
 
@@ -36,7 +36,7 @@ export const SelectHeaderCell = ({
           className="sb-grid-select-cell__header__input"
           disabled={false}
           checked={isRowSelected}
-          onChange={(e) => onRowSelectionChange({ type: 'HEADER', checked: e.target.checked })}
+          onChange={(e) => onRowSelectionChange({ checked: e.target.checked })}
         />
       </div>
     </div>

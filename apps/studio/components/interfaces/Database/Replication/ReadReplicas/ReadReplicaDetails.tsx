@@ -1,17 +1,6 @@
+import { useParams } from 'common'
 import { BarChart2 } from 'lucide-react'
 import { useMemo } from 'react'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
-import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
-import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
-import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
-import { BASE_PATH } from '@/lib/constants'
-import { useFlag, useParams } from 'common'
 import { AWS_REGIONS } from 'shared-data'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
 import {
@@ -28,11 +17,21 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
+import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { BASE_PATH } from '@/lib/constants'
+
 const attribute = 'physical_replication_lag_physical_replication_lag_seconds'
 
 export const ReadReplicaDetails = () => {
   const { ref: projectRef, replicaId } = useParams()
-  const reportGranularityV2 = useFlag('reportGranularityV2')
 
   const { data = [], isPending: isLoadingDatabases } = useReadReplicasQuery({ projectRef })
   const replica = data.find((x) => x.identifier === replicaId)
@@ -57,10 +56,7 @@ export const ReadReplicaDetails = () => {
     { enabled: status === REPLICA_STATUS.ACTIVE_HEALTHY }
   )
 
-  const { selectedDateRange } = useReportDateRange(
-    REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES,
-    reportGranularityV2
-  )
+  const { selectedDateRange } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
   // [Joshen] This is unused but intentional to scaffold the usage for now, refer to comment below
   const { data: infraMonitoringData, isPending: isFetchingInfraMonitoring } =
     useInfraMonitoringAttributesQuery(

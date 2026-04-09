@@ -1,50 +1,26 @@
-import dynamic from 'next/dynamic'
-import {
-  ArrowLeftRight,
-  Check,
-  ClipboardCheck,
-  FolderLock,
-  Globe2,
-  HeartPulse,
-  InfoIcon,
-  Lightbulb,
-  List,
-  Lock,
-  ShieldAlert,
-  ShieldCheck,
-  Sparkles,
-  Timer,
-  Users,
-  UserX,
-} from 'lucide-react'
 import { CubeIcon } from '@heroicons/react/outline'
-import { Image } from 'ui'
+import { useBreakpoint } from 'common'
+import { Check, InfoIcon, Sparkles, Timer } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import {
   FrameworkLink,
-  type FrameworkLinkProps,
+  getEditors,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
-  getEditors,
 } from './solutions.utils'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
-import { companyStats } from 'data/company-stats'
-import { DerivLogo, SoshiLogo } from '~/components/BrandLogo'
+import { SoshiLogo } from '@/components/BrandLogo'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -148,7 +124,7 @@ const data: () => {
           icon: Sparkles,
           heading: 'Speed and AI-powered innovation',
           subheading:
-            'Supabase is just Postgres, so it&apos;s easy to scale your Hackathon project into a real product. Connect to your favorite AI tools and use built-in Vectors to store embeddings in Postgres. Use Foreign Data Wrappers to connect to Google Sheets, MySQL, BigQuery, and more.',
+            'Supabase is just Postgres, so it&apos;s easy to scale your Hackathon project into a real product. Connect to your favorite AI tools and use built-in Vectors to store embeddings in Postgres. Use Foreign Data Wrappers to connect to BigQuery, Snowflake, S3, Stripe, and more.',
         },
       ],
     },
@@ -486,8 +462,9 @@ const data: () => {
           icon: 'M10.2805 18.2121C11.2419 18.6711 12.3325 18.8932 13.4711 18.8084C15.2257 18.6776 16.7596 17.843 17.8169 16.6015M8.21496 8.36469C9.27117 7.14237 10.7928 6.322 12.5311 6.19248C13.7196 6.10392 14.8558 6.34979 15.8474 6.85054M17.8169 16.6015L20.5242 19.3223C22.1857 17.5141 23.1562 15.1497 23.1562 12.5005C23.1562 6.89135 18.6091 2.34424 13 2.34424C10.9595 2.34424 9.16199 2.87659 7.57035 3.91232C8.35717 3.56865 9.22613 3.37801 10.1396 3.37801C12.6236 3.37801 14.7783 4.78762 15.8474 6.85054M17.8169 16.6015V16.6015C16.277 15.059 16.3448 12.5527 16.5387 10.3817C16.5557 10.191 16.5644 9.99794 16.5644 9.80282C16.5644 8.73844 16.3056 7.73451 15.8474 6.85054M13 22.6567C7.39086 22.6567 2.84375 18.1096 2.84375 12.5005C2.84375 9.84123 3.8026 7.48969 5.4753 5.67921L8.21496 8.42354V8.42354C9.76942 9.98064 9.69844 12.5133 9.51947 14.7062C9.50526 14.8803 9.49802 15.0564 9.49802 15.2341C9.49802 18.7705 12.3648 21.6373 15.9012 21.6373C16.8116 21.6373 17.6776 21.4473 18.4618 21.1048C16.8609 22.1588 15.06 22.6567 13 22.6567Z',
           subheading: (
             <>
-              Connect Supabase to <span className="text-foreground">Redshift, BigQuery, MySQL</span>
-              , and external APIs for seamless integrations.
+              Connect Supabase to{' '}
+              <span className="text-foreground">BigQuery, Snowflake, ClickHouse</span>, and external
+              APIs for seamless integrations.
             </>
           ),
           image: (

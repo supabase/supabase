@@ -1,6 +1,4 @@
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, CriticalIcon } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -9,7 +7,10 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { DeleteProjectButton } from './DeleteProjectButton'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DeleteProjectPanel = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -30,9 +31,9 @@ export const DeleteProjectPanel = () => {
     <PageSection id="delete-project">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Delete Project</PageSectionTitle>
+          <PageSectionTitle>Delete project</PageSectionTitle>
           <PageSectionDescription>
-            Permanently remove your project and its database.
+            Permanently remove your project and its database
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

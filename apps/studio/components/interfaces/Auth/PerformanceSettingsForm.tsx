@@ -3,19 +3,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { ScaffoldSection, ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Card,
@@ -24,8 +11,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -34,6 +23,19 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -46,7 +48,8 @@ const FormSchema = z.object({
 
 export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('auth.performance_settings')
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'custom_config_gotrue'
@@ -72,8 +75,7 @@ export const PerformanceSettingsForm = () => {
   })
   const maxConnectionLimit = maxConnData?.maxConnections ?? 60
 
-  const isProPlan = organization?.plan.id !== 'free'
-  const promptProPlanUpgrade = IS_PLATFORM && !isProPlan
+  const promptUpgrade = IS_PLATFORM && !isLoadingEntitlement && !hasAccessToPerformance
 
   const { mutate: updateAuthConfig, isPending: isSaving } = useAuthConfigUpdateMutation()
 
@@ -101,7 +103,7 @@ export const PerformanceSettingsForm = () => {
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
-    if (!isProPlan) return
+    if (!hasAccessToPerformance) return
 
     setIsUpdatingRequestDurationForm(true)
 
@@ -155,7 +157,7 @@ export const PerformanceSettingsForm = () => {
       if (!isUpdatingDatabaseForm) {
         databaseForm.reset({
           DB_MAX_POOL_SIZE:
-            authConfig?.DB_MAX_POOL_SIZE !== null ? authConfig?.DB_MAX_POOL_SIZE ?? 10 : 10,
+            authConfig?.DB_MAX_POOL_SIZE !== null ? (authConfig?.DB_MAX_POOL_SIZE ?? 10) : 10,
           DB_MAX_POOL_SIZE_UNIT:
             authConfig?.DB_MAX_POOL_SIZE_UNIT !== null
               ? authConfig?.DB_MAX_POOL_SIZE_UNIT
@@ -181,7 +183,7 @@ export const PerformanceSettingsForm = () => {
     )
   }
 
-  if (isLoadingAuthConfig) {
+  if (isLoadingAuthConfig || isLoadingEntitlement) {
     return (
       <ScaffoldSection isFullWidth>
         <GenericSkeletonLoader />
@@ -192,7 +194,7 @@ export const PerformanceSettingsForm = () => {
   return (
     <>
       <ScaffoldSection isFullWidth>
-        {promptProPlanUpgrade && (
+        {promptUpgrade && (
           <UpgradeToPro
             source="authPerformance"
             featureProposition="configure advanced Auth server settings"
@@ -226,15 +228,18 @@ export const PerformanceSettingsForm = () => {
                       <div className="flex flex-col gap-2">
                         <FormControl_Shadcn_>
                           <div className="relative">
-                            <PrePostTab postTab="seconds">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 min={5}
                                 max={30}
                                 {...field}
-                                disabled={!canUpdateConfig || promptProPlanUpgrade}
+                                disabled={!canUpdateConfig || promptUpgrade}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </div>
                         </FormControl_Shadcn_>
 
@@ -254,13 +259,13 @@ export const PerformanceSettingsForm = () => {
                   </Button>
                 )}
                 <Button
-                  type={promptProPlanUpgrade ? 'default' : 'primary'}
+                  type={promptUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
                     !requestDurationForm.formState.isDirty ||
-                    promptProPlanUpgrade
+                    promptUpgrade
                   }
                   loading={isUpdatingRequestDurationForm}
                 >
@@ -325,7 +330,7 @@ export const PerformanceSettingsForm = () => {
                         >
                           <SelectTrigger_Shadcn_
                             size="small"
-                            disabled={!canUpdateConfig || promptProPlanUpgrade}
+                            disabled={!canUpdateConfig || promptUpgrade}
                           >
                             <SelectValue_Shadcn_>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
@@ -366,8 +371,13 @@ export const PerformanceSettingsForm = () => {
                       <FormControl_Shadcn_>
                         <div className="flex flex-col gap-2">
                           <div className="relative">
-                            <PrePostTab postTab={chosenUnit === 'percent' ? '%' : 'connections'}>
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>
+                                  {chosenUnit === 'percent' ? '%' : 'connections'}
+                                </InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput
                                 type="number"
                                 {...field}
                                 min={3}
@@ -376,9 +386,9 @@ export const PerformanceSettingsForm = () => {
                                     ? 80
                                     : Math.floor(maxConnectionLimit * 0.8)
                                 }
-                                disabled={!canUpdateConfig || promptProPlanUpgrade}
+                                disabled={!canUpdateConfig || promptUpgrade}
                               />
-                            </PrePostTab>
+                            </InputGroup>
                           </div>
                           {isLoadingMaxConns ? (
                             <ShimmeringLoader className="py-2 w-16 ml-auto" />
@@ -408,7 +418,7 @@ export const PerformanceSettingsForm = () => {
                   </Button>
                 )}
                 <Button
-                  type={promptProPlanUpgrade ? 'default' : 'primary'}
+                  type={promptUpgrade ? 'default' : 'primary'}
                   htmlType="submit"
                   disabled={
                     !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty

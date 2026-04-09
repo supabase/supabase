@@ -3,17 +3,17 @@ import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
+import { Badge, Button, cn } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type {
   Integration,
   IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { BASE_PATH } from 'lib/constants'
-import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { Badge, Button, cn } from 'ui'
+} from '@/data/integrations/integrations.types'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { BASE_PATH } from '@/lib/constants'
+import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14

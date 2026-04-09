@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import DefaultLayout from 'components/Layouts/Default'
-import BlogGridItem from 'components/Blog/BlogGridItem'
 
-import { getAllCMSPosts } from 'lib/get-cms-posts'
-import { capitalize } from 'lib/helpers'
-import { getSortedPosts, getAllCategories } from 'lib/posts'
-import type PostTypes from 'types/post'
+import BlogGridItem from '@/components/Blog/BlogGridItem'
+import DefaultLayout from '@/components/Layouts/Default'
+import { capitalize } from '@/lib/helpers'
+import { getAllCategories, getSortedPosts } from '@/lib/posts'
+import type PostTypes from '@/types/post'
 
 type Params = { category: string }
 
@@ -44,11 +43,7 @@ export default async function CategoriesPage({
     limit: 0,
     categories: [params.category],
   })
-  const cmsPosts = await getAllCMSPosts()
-  const blogs = [
-    ...(staticPosts as any[]),
-    ...(cmsPosts as any[]).filter((p) => (p.categories || []).includes(params.category)),
-  ] as unknown as PostTypes[]
+  const blogs = [...staticPosts] as PostTypes[]
   const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
 
   return (

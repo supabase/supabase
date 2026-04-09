@@ -1,25 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useParams } from 'common'
-import { TEMPLATES_SCHEMAS } from 'components/interfaces/Auth/AuthTemplatesValidation'
-import { slugifyTitle } from 'components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
-import { TemplateEditor } from 'components/interfaces/Auth/EmailTemplates/TemplateEditor'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import {
   Button,
   Card,
@@ -56,6 +42,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
+import { z } from 'zod'
+
+import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
+import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -287,7 +287,7 @@ const RedirectToTemplates = () => {
 
 TemplatePage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Emails">{page}</AuthLayout>
   </DefaultLayout>
 )
 

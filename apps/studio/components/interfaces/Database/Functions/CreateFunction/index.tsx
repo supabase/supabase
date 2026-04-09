@@ -4,48 +4,49 @@ import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
-import { DatabaseFunction } from 'data/database-functions/database-functions-query'
-import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import type { FormSchema } from 'types'
 import {
   Button,
+  cn,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Radio,
   ScrollArea,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Separator,
   Sheet,
   SheetContent,
   SheetFooter,
   SheetSection,
   Toggle,
-  cn,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
+import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
+import { POSTGRES_DATA_TYPES } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from '@/data/database-functions/database-functions-query'
+import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import type { FormSchema } from '@/types'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -87,7 +88,7 @@ export const CreateFunction = ({
   })
   const language = form.watch('language')
 
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
   })
@@ -158,7 +159,7 @@ export const CreateFunction = ({
   const { data: protectedSchemas } = useProtectedSchemas()
 
   return (
-    <Sheet open={visible} onOpenChange={confirmOnClose}>
+    <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
         showClose={false}
         size={'default'}
@@ -331,7 +332,7 @@ export const CreateFunction = ({
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                        <FormFieldConfigParams readonly={isEditing} />
+                        <CreateFunctionConfigParamsSection />
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -402,26 +403,11 @@ export const CreateFunction = ({
             </Button>
           </SheetFooter>
         </div>
-        <CloseConfirmationModal {...closeConfirmationModalProps} />
+        <DiscardChangesConfirmationDialog {...modalProps} />
       </SheetContent>
     </Sheet>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)
 
 interface FormFieldConfigParamsProps {
   readonly?: boolean
@@ -513,75 +499,6 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
             disabled={readonly}
           >
             Add a new argument
-          </Button>
-        )}
-      </div>
-    </>
-  )
-}
-
-interface FormFieldConfigParamsProps {
-  readonly?: boolean
-}
-
-const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
-  const { fields, append, remove } = useFieldArray<z.infer<typeof FormSchema>>({
-    name: 'config_params',
-  })
-
-  return (
-    <>
-      <h5 className="text-base text-foreground">Configuration Parameters</h5>
-      <div className="space-y-2 pt-4">
-        {readonly && isEmpty(fields) && (
-          <span className="text-foreground-lighter">No argument for this function</span>
-        )}
-        {fields.map((field, index) => {
-          return (
-            <div className="flex flex-row space-x-1" key={field.id}>
-              <FormField_Shadcn_
-                name={`config_params.${index}.name`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_name" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-              <FormField_Shadcn_
-                name={`config_params.${index}.value`}
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="flex-1">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="parameter_value" />
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-
-              {!readonly && (
-                <Button
-                  type="danger"
-                  icon={<Trash size={12} />}
-                  onClick={() => remove(index)}
-                  className="h-[38px] w-[38px]"
-                />
-              )}
-            </div>
-          )
-        })}
-
-        {!readonly && (
-          <Button
-            type="default"
-            icon={<Plus size={12} />}
-            onClick={() => append({ name: '', type: '' })}
-            disabled={readonly}
-          >
-            Add a new config
           </Button>
         )}
       </div>

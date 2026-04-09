@@ -1,23 +1,23 @@
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
-import type { Filter } from 'components/grid/types'
-import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
 import { format } from 'date-fns'
 import { Loader2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Button, Calendar } from 'ui'
+import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
   FilterBar,
   FilterGroup,
   FilterOption,
   FilterProperty,
-  SerializableFilterProperty,
   isGroup,
+  SerializableFilterProperty,
   updateGroupAtPath,
 } from 'ui-patterns'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
+import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
+import type { Filter } from '@/components/grid/types'
+import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
   portal?: boolean
@@ -59,7 +59,10 @@ function filterGroupToFilters(group: FilterGroup): Filter[] {
 
 // Custom date picker component for the FilterBar
 function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
+  const parsed = search ? new Date(search) : undefined
+  const [date, setDate] = useState<Date | undefined>(
+    parsed && !isNaN(parsed.getTime()) ? parsed : undefined
+  )
 
   return (
     <div className="w-[300px] space-y-4">
@@ -190,7 +193,9 @@ export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) =
     [generateFilters, serializableFilterProperties, handleFilterChange, setFreeformText]
   )
 
-  const icon = isRefetching ? (
+  const icon = isGenerating ? (
+    <AiIconAnimation size={16} loading />
+  ) : isRefetching ? (
     <Loader2 className="animate-spin text-brand h-4 w-4 shrink-0" aria-label="Loading table data" />
   ) : null
 
@@ -205,7 +210,7 @@ export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) =
         actions={actions}
         isLoading={isGenerating}
         variant="pill"
-        className="bg-transparent border-0"
+        className="bg-transparent border-0 overflow-visible px-1.5"
         icon={icon}
       />
     </div>

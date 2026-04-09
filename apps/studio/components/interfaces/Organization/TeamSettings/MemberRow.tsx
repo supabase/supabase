@@ -1,29 +1,28 @@
-import { ArrowRight, Check, User, X } from 'lucide-react'
+import { useParams } from 'common'
+import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-
-import { useParams } from 'common'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { getGitHubProfileImgUrl } from 'lib/github'
-import { useProfile } from 'lib/profile'
 import {
   Badge,
+  cn,
+  HoverCard_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
-  HoverCard_Shadcn_,
   ScrollArea,
   TableCell,
   TableRow,
-  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 interface MemberRowProps {
   member: OrganizationMember
@@ -51,8 +50,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
   const isEmailUser = member.username === member.primary_email
   const isFlyUser = Boolean(member.primary_email?.endsWith('customer.fly.io'))
 
-  const profileImageUrl =
-    isInvitedUser || isEmailUser || isFlyUser ? undefined : getGitHubProfileImgUrl(member.username)
+  // Use generic avatar for all team members instead of attempting to fetch from GitHub
+  const profileImageUrl = undefined
 
   return (
     <TableRow>
@@ -73,40 +72,44 @@ export const MemberRow = ({ member }: MemberRowProps) => {
               </div>
             }
           />
-          <div className="flex item-center gap-x-2">
+          <div className="flex item-center gap-x-3">
             <p className="text-foreground-light truncate">{member.primary_email}</p>
-            {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
+            <div className="flex items-center gap-x-2">
+              {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
+              {isInvitedUser && member.invited_at && (
+                <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
+                  {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
+                </Badge>
+              )}
+              {member.is_sso_user && <Badge variant="default">SSO</Badge>}
+              {(member.metadata as any)?.origin && (
+                <PartnerIcon
+                  organization={{
+                    managed_by:
+                      MEMBER_ORIGIN_TO_MANAGED_BY[
+                        (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                      ] ?? 'supabase',
+                  }}
+                  tooltipText="Managed by Vercel Marketplace."
+                />
+              )}
+            </div>
           </div>
-
-          {(member.metadata as any)?.origin && (
-            <PartnerIcon
-              organization={{
-                managed_by:
-                  MEMBER_ORIGIN_TO_MANAGED_BY[
-                    (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
-                  ] ?? 'supabase',
-              }}
-              tooltipText="This user is managed by Vercel Marketplace."
-            />
-          )}
         </div>
       </TableCell>
 
       <TableCell>
-        {isInvitedUser && member.invited_at && (
-          <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
-            {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
-          </Badge>
-        )}
-        {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-      </TableCell>
-
-      <TableCell>
-        <div className="flex items-center justify-center">
+        <div className="flex items-center gap-x-1.5">
           {member.mfa_enabled ? (
-            <Check className="text-brand" strokeWidth={2} size={20} />
+            <>
+              <span className="text-foreground-lighter">Enabled</span>
+              <Check className="text-brand" strokeWidth={2} size={16} />
+            </>
           ) : (
-            <X className="text-foreground-light" strokeWidth={1.5} size={20} />
+            <>
+              <span className="text-foreground-lighter">Disabled</span>
+              <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
+            </>
           )}
         </div>
       </TableCell>
@@ -124,25 +127,25 @@ export const MemberRow = ({ member }: MemberRowProps) => {
             const roleName = (role?.name ?? '').split('_')[0]
             const projectsApplied =
               role?.projects.length === 0
-                ? orgProjects?.map((p) => p.name) ?? []
+                ? (orgProjects?.map((p) => p.name) ?? [])
                 : (role?.projects ?? [])
                     .map(({ ref }) => orgProjects?.find((p) => p.ref === ref)?.name ?? '')
                     .filter((x) => x.length > 0)
 
             return (
               <div key={`role-${id}`} className="flex items-center gap-x-2">
-                <p>{roleName}</p>
+                <p className="text-foreground-light">{roleName}</p>
                 {hasProjectScopedRoles && (
                   <>
-                    <span>•</span>
+                    <ChevronRight className="text-foreground-muted/50" size={14} />
                     {projectsApplied.length === 1 ? (
-                      <span className="text-foreground truncate" title={projectsApplied[0]}>
+                      <span className="text-foreground-light truncate" title={projectsApplied[0]}>
                         {projectsApplied[0]}
                       </span>
                     ) : (
                       <HoverCard_Shadcn_ openDelay={200}>
                         <HoverCardTrigger_Shadcn_ asChild>
-                          <span className="text-foreground">
+                          <span className="text-foreground-light">
                             {role?.projects.length === 0
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}

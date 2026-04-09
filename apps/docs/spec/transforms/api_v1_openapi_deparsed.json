@@ -75,15 +75,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -199,15 +201,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -258,6 +262,13 @@
                     "format": "uri",
                     "description": "HTTP endpoint to receive branch status updates."
                   }
+                },
+                "example": {
+                  "branch_name": "preview-login-page",
+                  "git_branch": "feature/login-page",
+                  "persistent": true,
+                  "request_review": true,
+                  "notify_url": "https://example.com/webhooks/branches"
                 }
               }
             }
@@ -407,15 +418,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -432,6 +445,7 @@
             "description": "If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled).",
             "schema": {
               "default": "true",
+              "example": false,
               "type": "boolean"
             }
           }
@@ -490,15 +504,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -519,6 +535,9 @@
                   "migration_version": {
                     "type": "string"
                   }
+                },
+                "example": {
+                  "migration_version": "20250312000000"
                 }
               }
             }
@@ -581,15 +600,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -610,6 +631,9 @@
                   "migration_version": {
                     "type": "string"
                   }
+                },
+                "example": {
+                  "migration_version": "20250312000000"
                 }
               }
             }
@@ -672,15 +696,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -701,6 +727,9 @@
                   "migration_version": {
                     "type": "string"
                   }
+                },
+                "example": {
+                  "migration_version": "20250312000000"
                 }
               }
             }
@@ -763,15 +792,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -836,15 +867,17 @@
             "name": "branch_id_or_ref",
             "required": true,
             "in": "path",
-            "description": "Branch ID",
+            "description": "Branch ref or deprecated branch ID",
             "schema": {
+              "example": "abcdefghijklmnopqrst",
               "oneOf": [
                 {
                   "type": "string",
                   "minLength": 20,
                   "maxLength": 20,
                   "pattern": "^[a-z]+$",
-                  "description": "Project ref"
+                  "description": "Project ref",
+                  "example": "abcdefghijklmnopqrst"
                 },
                 {
                   "type": "string",
@@ -859,7 +892,18 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "public,auth",
               "type": "string"
+            }
+          },
+          {
+            "name": "pgdelta",
+            "required": false,
+            "in": "query",
+            "description": "Use pg-delta instead of Migra for diffing when true",
+            "schema": {
+              "example": false,
+              "type": "boolean"
             }
           }
         ],
@@ -926,7 +970,8 @@
                         "minLength": 20,
                         "maxLength": 20,
                         "pattern": "^[a-z]+$",
-                        "description": "Project ref"
+                        "description": "Project ref",
+                        "example": "abcdefghijklmnopqrst"
                       },
                       "organization_id": {
                         "type": "string",
@@ -936,7 +981,8 @@
                       "organization_slug": {
                         "type": "string",
                         "pattern": "^[\\w-]+$",
-                        "description": "Organization slug"
+                        "description": "Organization slug",
+                        "example": "tsrqponmlkjihgfedcba"
                       },
                       "name": {
                         "type": "string",
@@ -944,13 +990,11 @@
                       },
                       "region": {
                         "type": "string",
-                        "description": "Region of your project",
-                        "example": "us-east-1"
+                        "description": "Region of your project"
                       },
                       "created_at": {
                         "type": "string",
-                        "description": "Creation timestamp",
-                        "example": "2023-03-29T16:32:59Z"
+                        "description": "Creation timestamp"
                       },
                       "status": {
                         "type": "string",
@@ -1058,7 +1102,8 @@
                   "organization_slug": {
                     "type": "string",
                     "pattern": "^[\\w-]+$",
-                    "description": "Organization slug"
+                    "description": "Organization slug",
+                    "example": "tsrqponmlkjihgfedcba"
                   },
                   "plan": {
                     "type": "string",
@@ -1141,15 +1186,13 @@
                           "code": {
                             "type": "string",
                             "enum": ["americas", "emea", "apac"],
-                            "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
-                            "example": "apac"
+                            "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint."
                           }
                         },
                         "required": ["type", "code"]
                       }
                     ],
-                    "description": "Region selection. Only one of region or region_selection can be specified.",
-                    "example": "{ type: 'smartGroup', code: 'americas' }"
+                    "description": "Region selection. Only one of region or region_selection can be specified."
                   },
                   "kps_enabled": {
                     "type": "boolean",
@@ -1157,9 +1200,9 @@
                     "description": "This field is deprecated and is ignored in this request"
                   },
                   "desired_instance_size": {
+                    "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
                     "type": "string",
                     "enum": [
-                      "pico",
                       "nano",
                       "micro",
                       "small",
@@ -1184,25 +1227,18 @@
                   "template_url": {
                     "type": "string",
                     "format": "uri",
-                    "description": "Template URL used to create the project from the CLI.",
-                    "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-                  },
-                  "release_channel": {
-                    "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-                    "description": "Release channel. If not provided, GA will be used.",
-                    "deprecated": true
-                  },
-                  "postgres_engine": {
-                    "type": "string",
-                    "enum": ["15", "17", "17-oriole"],
-                    "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "deprecated": true
+                    "description": "Template URL used to create the project from the CLI."
                   }
                 },
                 "required": ["db_pass", "name", "organization_slug"],
                 "additionalProperties": false,
-                "hideDefinitions": ["release_channel", "postgres_engine"]
+                "hideDefinitions": ["release_channel", "postgres_engine"],
+                "example": {
+                  "db_pass": "correct-horse-battery-staple",
+                  "name": "acme-prod",
+                  "organization_slug": "tsrqponmlkjihgfedcba",
+                  "region": "us-east-1"
+                }
               }
             }
           }
@@ -1225,7 +1261,8 @@
                       "minLength": 20,
                       "maxLength": 20,
                       "pattern": "^[a-z]+$",
-                      "description": "Project ref"
+                      "description": "Project ref",
+                      "example": "abcdefghijklmnopqrst"
                     },
                     "organization_id": {
                       "type": "string",
@@ -1235,7 +1272,8 @@
                     "organization_slug": {
                       "type": "string",
                       "pattern": "^[\\w-]+$",
-                      "description": "Organization slug"
+                      "description": "Organization slug",
+                      "example": "tsrqponmlkjihgfedcba"
                     },
                     "name": {
                       "type": "string",
@@ -1243,13 +1281,11 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Region of your project",
-                      "example": "us-east-1"
+                      "description": "Region of your project"
                     },
                     "created_at": {
                       "type": "string",
-                      "description": "Creation timestamp",
-                      "example": "2023-03-29T16:32:59Z"
+                      "description": "Creation timestamp"
                     },
                     "status": {
                       "type": "string",
@@ -1317,6 +1353,7 @@
             "in": "query",
             "description": "Slug of your organization",
             "schema": {
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -1335,12 +1372,10 @@
             "name": "desired_instance_size",
             "required": false,
             "in": "query",
-            "description": "Desired instance size",
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "schema": {
-              "example": "nano",
               "type": "string",
               "enum": [
-                "pico",
                 "nano",
                 "micro",
                 "small",
@@ -1401,7 +1436,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -1454,7 +1509,27 @@
                                 "type": "string"
                               },
                               "code": {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "us-east-1",
+                                  "us-east-2",
+                                  "us-west-1",
+                                  "us-west-2",
+                                  "ap-southeast-1",
+                                  "ap-northeast-1",
+                                  "ap-northeast-2",
+                                  "ap-east-1",
+                                  "ap-southeast-2",
+                                  "eu-west-1",
+                                  "eu-west-2",
+                                  "eu-west-3",
+                                  "eu-north-1",
+                                  "eu-central-1",
+                                  "eu-central-2",
+                                  "ca-central-1",
+                                  "ap-south-1",
+                                  "sa-east-1"
+                                ]
                               },
                               "type": {
                                 "type": "string",
@@ -1522,7 +1597,8 @@
                       "slug": {
                         "type": "string",
                         "pattern": "^[\\w-]+$",
-                        "description": "Organization slug"
+                        "description": "Organization slug",
+                        "example": "tsrqponmlkjihgfedcba"
                       },
                       "name": {
                         "type": "string"
@@ -1573,7 +1649,10 @@
                   }
                 },
                 "required": ["name"],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "name": "Acme"
+                }
               }
             }
           }
@@ -1594,7 +1673,8 @@
                     "slug": {
                       "type": "string",
                       "pattern": "^[\\w-]+$",
-                      "description": "Organization slug"
+                      "description": "Organization slug",
+                      "example": "tsrqponmlkjihgfedcba"
                     },
                     "name": {
                       "type": "string"
@@ -1632,6 +1712,7 @@
             "in": "query",
             "schema": {
               "format": "uuid",
+              "example": "66666666-6666-4666-8666-666666666666",
               "type": "string"
             }
           },
@@ -1640,6 +1721,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": "code",
               "type": "string",
               "enum": ["code", "token", "id_token token"]
             }
@@ -1649,6 +1731,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": "https://app.acme.com/auth/callback",
               "type": "string"
             }
           },
@@ -1657,6 +1740,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "projects:read projects:write",
               "type": "string"
             }
           },
@@ -1665,6 +1749,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "st_9f4d3a206b2e4a7e8c91",
               "type": "string"
             }
           },
@@ -1673,6 +1758,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "query",
               "type": "string"
             }
           },
@@ -1681,6 +1767,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "Z_P4EKbGwIkA01e3Y5fp4tMCvn_Ae5nUw7qY7XwkTrQ",
               "type": "string"
             }
           },
@@ -1689,6 +1776,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "S256",
               "type": "string",
               "enum": ["plain", "sha256", "S256"]
             }
@@ -1700,6 +1788,7 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -1772,7 +1861,16 @@
                     "type": "string"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "grant_type": "authorization_code",
+                  "client_id": "66666666-6666-4666-8666-666666666666",
+                  "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
+                  "code": "oauth_code_9f4d3a206b2e4a7e8c91",
+                  "code_verifier": "qW0Z6d9pQnW0mL1dK1q9wFq6Yz2nV5rA8jT3mP7sH4c",
+                  "redirect_uri": "https://app.acme.com/auth/callback",
+                  "scope": "projects:read projects:write"
+                }
               }
             }
           }
@@ -1839,7 +1937,12 @@
                   }
                 },
                 "required": ["client_id", "client_secret", "refresh_token"],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "client_id": "66666666-6666-4666-8666-666666666666",
+                  "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
+                  "refresh_token": "oauth_refresh_9f4d3a206b2e4a7e8c91"
+                }
               }
             }
           }
@@ -1873,6 +1976,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -1882,6 +1986,7 @@
             "in": "query",
             "schema": {
               "format": "uuid",
+              "example": "66666666-6666-4666-8666-666666666666",
               "type": "string"
             }
           },
@@ -1890,6 +1995,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": "code",
               "type": "string",
               "enum": ["code", "token", "id_token token"]
             }
@@ -1899,6 +2005,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": "https://app.acme.com/auth/callback",
               "type": "string"
             }
           },
@@ -1907,6 +2014,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "st_9f4d3a206b2e4a7e8c91",
               "type": "string"
             }
           },
@@ -1915,6 +2023,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "query",
               "type": "string"
             }
           },
@@ -1923,6 +2032,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "Z_P4EKbGwIkA01e3Y5fp4tMCvn_Ae5nUw7qY7XwkTrQ",
               "type": "string"
             }
           },
@@ -1931,6 +2041,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "S256",
               "type": "string",
               "enum": ["plain", "sha256", "S256"]
             }
@@ -1967,6 +2078,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2142,6 +2254,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "44444444-4444-4444-8444-444444444444",
               "type": "string"
             }
           }
@@ -2277,6 +2390,44 @@
         "x-oauth-scope": "database:read"
       }
     },
+    "/v1/profile": {
+      "get": {
+        "operationId": "v1-get-profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "gotrue_id": {
+                      "type": "string"
+                    },
+                    "primary_email": {
+                      "type": "string"
+                    },
+                    "username": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["gotrue_id", "primary_email", "username"]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gets the user's profile",
+        "tags": ["Profile"],
+        "x-endpoint-owners": ["management-api"]
+      }
+    },
     "/v1/projects/{ref}/actions": {
       "get": {
         "description": "Returns a paginated list of action runs of the specified project.",
@@ -2291,6 +2442,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2300,6 +2452,7 @@
             "in": "query",
             "schema": {
               "minimum": 0,
+              "example": 0,
               "type": "number"
             }
           },
@@ -2309,6 +2462,7 @@
             "in": "query",
             "schema": {
               "minimum": 10,
+              "example": 20,
               "type": "number"
             }
           }
@@ -2445,6 +2599,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -2509,6 +2664,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2518,6 +2674,7 @@
             "in": "path",
             "description": "Action Run ID",
             "schema": {
+              "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n",
               "type": "string"
             }
           }
@@ -2653,6 +2810,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2662,6 +2820,7 @@
             "in": "path",
             "description": "Action Run ID",
             "schema": {
+              "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n",
               "type": "string"
             }
           }
@@ -2757,6 +2916,12 @@
                       "RUNNING"
                     ]
                   }
+                },
+                "example": {
+                  "clone": "RUNNING",
+                  "configure": "RUNNING",
+                  "migrate": "RUNNING",
+                  "deploy": "CREATED"
                 }
               }
             }
@@ -2827,6 +2992,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2836,6 +3002,7 @@
             "in": "path",
             "description": "Action Run ID",
             "schema": {
+              "example": "run_01hq3q9m7y5q7e4a7x2c8m1p4n",
               "type": "string"
             }
           }
@@ -2897,6 +3064,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -2906,6 +3074,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           }
@@ -3011,6 +3180,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3020,6 +3190,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           }
@@ -3051,7 +3222,12 @@
                     "nullable": true
                   }
                 },
-                "required": ["type", "name"]
+                "required": ["type", "name"],
+                "example": {
+                  "type": "secret",
+                  "name": "ci_secret_key",
+                  "description": "CI deploy key"
+                }
               }
             }
           }
@@ -3156,6 +3332,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -3218,6 +3395,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3227,6 +3405,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           }
@@ -3291,6 +3470,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3300,6 +3480,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "22222222-2222-4222-8222-222222222222",
               "type": "string"
             }
           },
@@ -3309,6 +3490,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           }
@@ -3335,6 +3517,10 @@
                     "additionalProperties": {},
                     "nullable": true
                   }
+                },
+                "example": {
+                  "name": "ci_secret_key_rotated",
+                  "description": "Rotated after March release"
                 }
               }
             }
@@ -3438,6 +3624,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3447,6 +3634,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "22222222-2222-4222-8222-222222222222",
               "type": "string"
             }
           },
@@ -3456,6 +3644,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           }
@@ -3558,6 +3747,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -3567,6 +3757,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "22222222-2222-4222-8222-222222222222",
               "type": "string"
             }
           },
@@ -3576,6 +3767,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           },
@@ -3585,6 +3777,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": false,
               "type": "boolean"
             }
           },
@@ -3593,6 +3786,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "rotating_key",
               "type": "string"
             }
           }
@@ -3698,6 +3892,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -3863,6 +4058,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -3940,7 +4136,14 @@
                     "description": "HTTP endpoint to receive branch status updates."
                   }
                 },
-                "required": ["branch_name"]
+                "required": ["branch_name"],
+                "example": {
+                  "branch_name": "preview-login-page",
+                  "git_branch": "feature/login-page",
+                  "persistent": true,
+                  "with_data": false,
+                  "notify_url": "https://example.com/webhooks/branches"
+                }
               }
             }
           }
@@ -4103,6 +4306,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4158,6 +4362,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -4166,6 +4371,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "example": "preview-login-page",
               "type": "string"
             }
           }
@@ -4329,6 +4535,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4507,6 +4714,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4561,6 +4769,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4578,7 +4787,10 @@
                     "minLength": 1
                   }
                 },
-                "required": ["custom_hostname"]
+                "required": ["custom_hostname"],
+                "example": {
+                  "custom_hostname": "docs.example.com"
+                }
               }
             }
           }
@@ -4759,6 +4971,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -4939,6 +5152,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5119,6 +5333,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5230,6 +5445,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5246,7 +5462,10 @@
                     "enum": ["enabled", "disabled", "unavailable"]
                   }
                 },
-                "required": ["state"]
+                "required": ["state"],
+                "example": {
+                  "state": "enabled"
+                }
               }
             }
           }
@@ -5360,6 +5579,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5430,6 +5650,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5512,6 +5733,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5539,7 +5761,11 @@
                     "type": "string"
                   }
                 },
-                "required": ["ipv4_addresses"]
+                "required": ["ipv4_addresses"],
+                "example": {
+                  "ipv4_addresses": ["203.0.113.10"],
+                  "requester_ip": false
+                }
               }
             }
           }
@@ -5594,6 +5820,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5643,6 +5870,10 @@
                             "type": "string"
                           }
                         }
+                      },
+                      "example": {
+                        "dbAllowedCidrs": ["203.0.113.0/24"],
+                        "dbAllowedCidrsV6": ["2001:db8::/32"]
                       },
                       "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
                     },
@@ -5708,6 +5939,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5752,6 +5984,14 @@
                         }
                       }
                     }
+                  }
+                },
+                "example": {
+                  "add": {
+                    "dbAllowedCidrs": ["203.0.113.0/24"]
+                  },
+                  "remove": {
+                    "dbAllowedCidrs": ["198.51.100.0/24"]
                   }
                 }
               }
@@ -5878,6 +6118,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -5901,6 +6142,10 @@
                       "type": "string"
                     }
                   }
+                },
+                "example": {
+                  "dbAllowedCidrs": ["203.0.113.0/24"],
+                  "dbAllowedCidrsV6": ["2001:db8::/32"]
                 }
               }
             }
@@ -5951,6 +6196,10 @@
                             "type": "string"
                           }
                         }
+                      },
+                      "example": {
+                        "dbAllowedCidrs": ["203.0.113.0/24"],
+                        "dbAllowedCidrsV6": ["2001:db8::/32"]
                       },
                       "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
                     },
@@ -6018,6 +6267,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6083,6 +6333,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6098,7 +6349,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["root_key"]
+                "required": ["root_key"],
+                "example": {
+                  "root_key": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+                }
               }
             }
           }
@@ -6166,6 +6420,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6245,6 +6500,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6272,6 +6528,11 @@
                     "minimum": 0,
                     "maximum": 1000
                   }
+                },
+                "example": {
+                  "db_schema": "public,storage",
+                  "db_pool": 20,
+                  "max_rows": 1000
                 }
               }
             }
@@ -6351,6 +6612,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6373,7 +6635,8 @@
                       "minLength": 20,
                       "maxLength": 20,
                       "pattern": "^[a-z]+$",
-                      "description": "Project ref"
+                      "description": "Project ref",
+                      "example": "abcdefghijklmnopqrst"
                     },
                     "organization_id": {
                       "type": "string",
@@ -6383,7 +6646,8 @@
                     "organization_slug": {
                       "type": "string",
                       "pattern": "^[\\w-]+$",
-                      "description": "Organization slug"
+                      "description": "Organization slug",
+                      "example": "tsrqponmlkjihgfedcba"
                     },
                     "name": {
                       "type": "string",
@@ -6391,13 +6655,11 @@
                     },
                     "region": {
                       "type": "string",
-                      "description": "Region of your project",
-                      "example": "us-east-1"
+                      "description": "Region of your project"
                     },
                     "created_at": {
                       "type": "string",
-                      "description": "Creation timestamp",
-                      "example": "2023-03-29T16:32:59Z"
+                      "description": "Creation timestamp"
                     },
                     "status": {
                       "type": "string",
@@ -6501,6 +6763,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6569,6 +6832,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6586,7 +6850,10 @@
                     "maxLength": 256
                   }
                 },
-                "required": ["name"]
+                "required": ["name"],
+                "example": {
+                  "name": "Acme Platform"
+                }
               }
             }
           }
@@ -6661,6 +6928,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6736,6 +7004,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6753,8 +7022,7 @@
                       "type": "string",
                       "maxLength": 256,
                       "pattern": "^(?!SUPABASE_).*",
-                      "description": "Secret name must not start with the SUPABASE_ prefix.",
-                      "example": "string"
+                      "description": "Secret name must not start with the SUPABASE_ prefix."
                     },
                     "value": {
                       "type": "string",
@@ -6762,7 +7030,17 @@
                     }
                   },
                   "required": ["name", "value"]
-                }
+                },
+                "example": [
+                  {
+                    "name": "OPENAI_API_KEY",
+                    "value": "sk-example-secret"
+                  },
+                  {
+                    "name": "STRIPE_WEBHOOK_SECRET",
+                    "value": "whsec_example"
+                  }
+                ]
               }
             }
           }
@@ -6816,6 +7094,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6828,7 +7107,8 @@
                 "type": "array",
                 "items": {
                   "type": "string"
-                }
+                },
+                "example": ["OPENAI_API_KEY"]
               }
             }
           }
@@ -6883,6 +7163,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6957,6 +7238,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -6978,7 +7260,12 @@
                     "required": ["database"]
                   }
                 },
-                "required": ["requestedConfig"]
+                "required": ["requestedConfig"],
+                "example": {
+                  "requestedConfig": {
+                    "database": true
+                  }
+                }
               }
             }
           }
@@ -7053,6 +7340,7 @@
             "in": "query",
             "schema": {
               "default": "public",
+              "example": "public,auth",
               "type": "string"
             }
           },
@@ -7065,6 +7353,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7132,6 +7421,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7202,6 +7492,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7256,6 +7547,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7272,7 +7564,10 @@
                     "maxLength": 63
                   }
                 },
-                "required": ["vanity_subdomain"]
+                "required": ["vanity_subdomain"],
+                "example": {
+                  "vanity_subdomain": "acme-prod"
+                }
               }
             }
           }
@@ -7340,6 +7635,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7356,7 +7652,10 @@
                     "maxLength": 63
                   }
                 },
-                "required": ["vanity_subdomain"]
+                "required": ["vanity_subdomain"],
+                "example": {
+                  "vanity_subdomain": "acme-prod"
+                }
               }
             }
           }
@@ -7424,6 +7723,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7443,7 +7743,11 @@
                     "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                   }
                 },
-                "required": ["target_version"]
+                "required": ["target_version"],
+                "example": {
+                  "target_version": "17",
+                  "release_channel": "ga"
+                }
               }
             }
           }
@@ -7511,6 +7815,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7795,6 +8100,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -7803,6 +8109,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "9f4d3a20-6b2e-4a7e-8c91-1d5f3e7a2b4c",
               "type": "string"
             }
           }
@@ -7916,6 +8223,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -7989,6 +8297,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8043,6 +8352,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8076,11 +8386,13 @@
                       "ap-south-1",
                       "sa-east-1"
                     ],
-                    "description": "Region you want your read replica to reside in",
-                    "example": "us-east-1"
+                    "description": "Region you want your read replica to reside in"
                   }
                 },
-                "required": ["read_replica_region"]
+                "required": ["read_replica_region"],
+                "example": {
+                  "read_replica_region": "us-west-1"
+                }
               }
             }
           }
@@ -8128,6 +8440,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8143,7 +8456,10 @@
                     "type": "string"
                   }
                 },
-                "required": ["database_identifier"]
+                "required": ["database_identifier"],
+                "example": {
+                  "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde"
+                }
               }
             }
           }
@@ -8191,6 +8507,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -8199,6 +8516,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": ["auth", "rest"],
               "type": "array",
               "items": {
                 "type": "string",
@@ -8222,6 +8540,7 @@
             "schema": {
               "minimum": 0,
               "maximum": 10000,
+              "example": 2000,
               "type": "integer"
             }
           }
@@ -8287,11 +8606,19 @@
                               "db_connected": {
                                 "type": "boolean"
                               },
+                              "replication_connected": {
+                                "type": "boolean"
+                              },
                               "connected_cluster": {
                                 "type": "integer"
                               }
                             },
-                            "required": ["healthy", "db_connected", "connected_cluster"]
+                            "required": [
+                              "healthy",
+                              "db_connected",
+                              "replication_connected",
+                              "connected_cluster"
+                            ]
                           },
                           {
                             "type": "object",
@@ -8360,6 +8687,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8443,6 +8771,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8528,6 +8857,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8752,7 +9082,11 @@
                   }
                 },
                 "required": ["algorithm"],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "algorithm": "RS256",
+                  "status": "standby"
+                }
               }
             }
           }
@@ -8836,6 +9170,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -8928,6 +9263,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "33333333-3333-4333-8333-333333333333",
               "type": "string"
             }
           },
@@ -8940,6 +9276,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9013,6 +9350,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "33333333-3333-4333-8333-333333333333",
               "type": "string"
             }
           },
@@ -9025,6 +9363,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9105,6 +9444,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "33333333-3333-4333-8333-333333333333",
               "type": "string"
             }
           },
@@ -9117,6 +9457,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9134,7 +9475,10 @@
                   }
                 },
                 "required": ["status"],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "status": "standby"
+                }
               }
             }
           }
@@ -9220,6 +9564,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -9896,6 +10241,21 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "passkey_enabled": {
+                      "type": "boolean"
+                    },
+                    "webauthn_rp_display_name": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "webauthn_rp_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "webauthn_rp_origins": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "mfa_phone_otp_length": {
                       "type": "integer"
                     },
@@ -9981,6 +10341,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -10007,7 +10371,7 @@
                       "nullable": true
                     },
                     "sessions_inactivity_timeout": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -10019,7 +10383,7 @@
                       "nullable": true
                     },
                     "sessions_timebox": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "site_url": {
@@ -10157,6 +10521,12 @@
                     "oauth_server_authorization_path": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "custom_oauth_enabled": {
+                      "type": "boolean"
+                    },
+                    "custom_oauth_max_providers": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -10326,6 +10696,10 @@
                     "mfa_phone_verify_enabled",
                     "mfa_web_authn_enroll_enabled",
                     "mfa_web_authn_verify_enabled",
+                    "passkey_enabled",
+                    "webauthn_rp_display_name",
+                    "webauthn_rp_id",
+                    "webauthn_rp_origins",
                     "mfa_phone_otp_length",
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
@@ -10346,6 +10720,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -10389,7 +10764,9 @@
                     "uri_allow_list",
                     "oauth_server_enabled",
                     "oauth_server_allow_dynamic_registration",
-                    "oauth_server_authorization_path"
+                    "oauth_server_authorization_path",
+                    "custom_oauth_enabled",
+                    "custom_oauth_max_providers"
                   ]
                 }
               }
@@ -10439,6 +10816,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -10667,6 +11045,10 @@
                     "pattern": "^[^,]+$",
                     "nullable": true
                   },
+                  "security_sb_forwarded_for_enabled": {
+                    "type": "boolean",
+                    "nullable": true
+                  },
                   "security_captcha_enabled": {
                     "type": "boolean",
                     "nullable": true
@@ -10681,12 +11063,12 @@
                     "nullable": true
                   },
                   "sessions_timebox": {
-                    "type": "integer",
+                    "type": "number",
                     "minimum": 0,
                     "nullable": true
                   },
                   "sessions_inactivity_timeout": {
-                    "type": "integer",
+                    "type": "number",
                     "minimum": 0,
                     "nullable": true
                   },
@@ -11371,6 +11753,21 @@
                     "type": "boolean",
                     "nullable": true
                   },
+                  "passkey_enabled": {
+                    "type": "boolean"
+                  },
+                  "webauthn_rp_display_name": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "webauthn_rp_id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "webauthn_rp_origins": {
+                    "type": "string",
+                    "nullable": true
+                  },
                   "mfa_phone_enroll_enabled": {
                     "type": "boolean",
                     "nullable": true
@@ -11414,7 +11811,15 @@
                   "oauth_server_authorization_path": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "custom_oauth_enabled": {
+                    "type": "boolean"
                   }
+                },
+                "example": {
+                  "site_url": "https://app.example.com",
+                  "disable_signup": false,
+                  "jwt_exp": 3600
                 }
               }
             }
@@ -12092,6 +12497,21 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "passkey_enabled": {
+                      "type": "boolean"
+                    },
+                    "webauthn_rp_display_name": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "webauthn_rp_id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "webauthn_rp_origins": {
+                      "type": "string",
+                      "nullable": true
+                    },
                     "mfa_phone_otp_length": {
                       "type": "integer"
                     },
@@ -12177,6 +12597,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "security_sb_forwarded_for_enabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "security_captcha_enabled": {
                       "type": "boolean",
                       "nullable": true
@@ -12203,7 +12627,7 @@
                       "nullable": true
                     },
                     "sessions_inactivity_timeout": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "sessions_single_per_user": {
@@ -12215,7 +12639,7 @@
                       "nullable": true
                     },
                     "sessions_timebox": {
-                      "type": "integer",
+                      "type": "number",
                       "nullable": true
                     },
                     "site_url": {
@@ -12353,6 +12777,12 @@
                     "oauth_server_authorization_path": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "custom_oauth_enabled": {
+                      "type": "boolean"
+                    },
+                    "custom_oauth_max_providers": {
+                      "type": "integer"
                     }
                   },
                   "required": [
@@ -12522,6 +12952,10 @@
                     "mfa_phone_verify_enabled",
                     "mfa_web_authn_enroll_enabled",
                     "mfa_web_authn_verify_enabled",
+                    "passkey_enabled",
+                    "webauthn_rp_display_name",
+                    "webauthn_rp_id",
+                    "webauthn_rp_origins",
                     "mfa_phone_otp_length",
                     "mfa_phone_template",
                     "mfa_phone_max_frequency",
@@ -12542,6 +12976,7 @@
                     "saml_enabled",
                     "saml_external_url",
                     "saml_allow_encrypted_assertions",
+                    "security_sb_forwarded_for_enabled",
                     "security_captcha_enabled",
                     "security_captcha_provider",
                     "security_captcha_secret",
@@ -12585,7 +13020,9 @@
                     "uri_allow_list",
                     "oauth_server_enabled",
                     "oauth_server_allow_dynamic_registration",
-                    "oauth_server_authorization_path"
+                    "oauth_server_authorization_path",
+                    "custom_oauth_enabled",
+                    "custom_oauth_max_providers"
                   ]
                 }
               }
@@ -12637,6 +13074,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -12655,6 +13093,10 @@
                     "type": "string"
                   },
                   "custom_jwks": {}
+                },
+                "example": {
+                  "oidc_issuer_url": "https://login.acme.com",
+                  "jwks_url": "https://login.acme.com/.well-known/jwks.json"
                 }
               }
             }
@@ -12746,6 +13188,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -12841,6 +13284,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -12850,6 +13294,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "88888888-8888-4888-8888-888888888888",
               "type": "string"
             }
           }
@@ -12940,6 +13385,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -12949,6 +13395,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "88888888-8888-4888-8888-888888888888",
               "type": "string"
             }
           }
@@ -13041,6 +13488,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13092,6 +13540,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13171,6 +13620,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13222,6 +13672,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13274,6 +13725,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13544,6 +13996,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13607,7 +14060,11 @@
                     ]
                   }
                 },
-                "required": ["addon_variant", "addon_type"]
+                "required": ["addon_variant", "addon_type"],
+                "example": {
+                  "addon_variant": "pitr_7",
+                  "addon_type": "pitr"
+                }
               }
             }
           }
@@ -13656,6 +14113,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -13664,6 +14122,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "example": "pitr_7",
               "oneOf": [
                 {
                   "type": "string",
@@ -13747,6 +14206,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13813,6 +14273,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13882,6 +14343,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -13929,6 +14391,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14109,6 +14572,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14117,6 +14581,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "sql",
               "type": "string",
               "enum": ["sql"]
             }
@@ -14297,6 +14762,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14315,6 +14781,7 @@
             "in": "query",
             "schema": {
               "format": "date-time",
+              "example": "2025-03-01T00:00:00Z",
               "type": "string"
             }
           },
@@ -14324,6 +14791,7 @@
             "in": "query",
             "schema": {
               "format": "date-time",
+              "example": "2025-03-01T23:59:59Z",
               "type": "string"
             }
           }
@@ -14440,6 +14908,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14448,6 +14917,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "1day",
               "type": "string",
               "enum": ["15min", "30min", "1hr", "3hr", "1day", "3day", "7day"]
             }
@@ -14588,6 +15058,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14708,6 +15179,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -14716,6 +15188,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": "1hr",
               "type": "string",
               "enum": ["15min", "1hr", "3hr", "1day"]
             }
@@ -14725,6 +15198,7 @@
             "required": true,
             "in": "query",
             "schema": {
+              "example": "3c078cce-ad70-4148-9f37-4da362789053",
               "type": "string"
             }
           }
@@ -14837,6 +15311,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14852,7 +15327,10 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["read_only"]
+                "required": ["read_only"],
+                "example": {
+                  "read_only": true
+                }
               }
             }
           }
@@ -14928,6 +15406,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -14997,6 +15476,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15046,7 +15526,7 @@
             "fga_permissions": ["database_migrations_read"]
           }
         ],
-        "summary": "[Beta] List applied migration versions",
+        "summary": "List applied migration versions",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15070,6 +15550,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15101,7 +15582,12 @@
                     "type": "string"
                   }
                 },
-                "required": ["query"]
+                "required": ["query"],
+                "example": {
+                  "query": "create table public.widgets(id bigint primary key);",
+                  "name": "create_widgets_table",
+                  "rollback": "drop table if exists public.widgets;"
+                }
               }
             }
           }
@@ -15131,7 +15617,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Apply a database migration",
+        "summary": "Apply a database migration",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15155,6 +15641,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15186,7 +15673,12 @@
                     "type": "string"
                   }
                 },
-                "required": ["query"]
+                "required": ["query"],
+                "example": {
+                  "query": "create table public.widgets(id bigint primary key);",
+                  "name": "create_widgets_table",
+                  "rollback": "drop table if exists public.widgets;"
+                }
               }
             }
           }
@@ -15216,7 +15708,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Upsert a database migration without applying",
+        "summary": "Upsert a database migration without applying",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15240,6 +15732,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15250,6 +15743,7 @@
             "description": "Rollback migrations greater or equal to this version",
             "schema": {
               "pattern": "^\\d+$",
+              "example": "20250312000000",
               "type": "string"
             }
           }
@@ -15279,7 +15773,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Rollback database migrations and remove them from history table",
+        "summary": "Rollback database migrations and remove them from history table",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15305,6 +15799,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15314,6 +15809,7 @@
             "in": "path",
             "schema": {
               "pattern": "^\\d+$",
+              "example": "20250312000000",
               "type": "string"
             }
           }
@@ -15378,7 +15874,7 @@
             "fga_permissions": ["database_migrations_read"]
           }
         ],
-        "summary": "[Beta] Fetch an existing entry from migration history",
+        "summary": "Fetch an existing entry from migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15402,6 +15898,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -15411,6 +15908,7 @@
             "in": "path",
             "schema": {
               "pattern": "^\\d+$",
+              "example": "20250312000000",
               "type": "string"
             }
           }
@@ -15428,6 +15926,10 @@
                   "rollback": {
                     "type": "string"
                   }
+                },
+                "example": {
+                  "name": "create_widgets_table",
+                  "rollback": "drop table if exists public.widgets;"
                 }
               }
             }
@@ -15458,7 +15960,7 @@
             "fga_permissions": ["database_migrations_write"]
           }
         ],
-        "summary": "[Beta] Patch an existing entry in migration history",
+        "summary": "Patch an existing entry in migration history",
         "tags": ["Database"],
         "x-badges": [
           {
@@ -15483,6 +15985,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15506,7 +16009,11 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["query"]
+                "required": ["query"],
+                "example": {
+                  "query": "select * from pg_stat_activity limit 1;",
+                  "read_only": true
+                }
               }
             }
           }
@@ -15565,6 +16072,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15585,7 +16093,10 @@
                     "items": {}
                   }
                 },
-                "required": ["query"]
+                "required": ["query"],
+                "example": {
+                  "query": "select * from pg_stat_activity limit 1;"
+                }
               }
             }
           }
@@ -15640,6 +16151,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15696,6 +16208,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15783,6 +16296,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15799,7 +16313,10 @@
                     "minLength": 4
                   }
                 },
-                "required": ["password"]
+                "required": ["password"],
+                "example": {
+                  "password": "correct-horse-battery-staple"
+                }
               }
             }
           }
@@ -15839,7 +16356,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["database_write"]
+            "fga_permissions": ["database_config_write"]
           }
         ],
         "summary": "Updates the database password",
@@ -15868,6 +16385,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -15980,6 +16498,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16000,7 +16519,11 @@
                     "minLength": 1
                   }
                 },
-                "required": ["role", "rhost"]
+                "required": ["role", "rhost"],
+                "example": {
+                  "role": "postgres",
+                  "rhost": "203.0.113.10"
+                }
               }
             }
           }
@@ -16110,6 +16633,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16172,7 +16696,23 @@
                     }
                   }
                 },
-                "required": ["user_id", "roles"]
+                "required": ["user_id", "roles"],
+                "example": {
+                  "user_id": "55555555-5555-4555-8555-555555555555",
+                  "roles": [
+                    {
+                      "role": "postgres",
+                      "expires_at": 1740787200,
+                      "allowed_networks": {
+                        "allowed_cidrs": [
+                          {
+                            "cidr": "203.0.113.0/24"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
               }
             }
           }
@@ -16280,6 +16820,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16396,6 +16937,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -16405,6 +16947,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "55555555-5555-4555-8555-555555555555",
               "type": "string"
             }
           }
@@ -16439,6 +16982,79 @@
         "x-endpoint-owners": ["security"]
       }
     },
+    "/v1/projects/{ref}/database/openapi": {
+      "get": {
+        "description": "Returns the PostgREST OpenAPI specification for the project. This is the replacement for querying `/rest/v1/` directly with the anon key.",
+        "operationId": "v1-get-database-openapi",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "schema",
+            "required": false,
+            "in": "query",
+            "description": "The database schema to generate the OpenAPI spec for",
+            "schema": {
+              "default": "public",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to fetch PostgREST OpenAPI spec"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["database_read"]
+          }
+        ],
+        "summary": "Get PostgREST OpenAPI spec",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "database:read"
+      }
+    },
     "/v1/projects/{ref}/functions": {
       "get": {
         "description": "Returns all functions you've previously added to the specified project.",
@@ -16453,6 +17069,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16567,6 +17184,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -16576,6 +17194,7 @@
             "in": "query",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
+              "example": "hello-world",
               "type": "string"
             }
           },
@@ -16584,6 +17203,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "Hello World",
               "type": "string"
             }
           },
@@ -16593,6 +17213,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           },
@@ -16602,6 +17223,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": false,
               "type": "boolean"
             }
           },
@@ -16610,6 +17232,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "index.ts",
               "type": "string"
             }
           },
@@ -16618,6 +17241,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "import_map.json",
               "type": "string"
             }
           },
@@ -16626,6 +17250,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "44c691990518d25498f0fd80cf6631ecf2b58eb9c5eb2a087dd1688f2904dac7",
               "type": "string"
             }
           }
@@ -16657,7 +17282,13 @@
                     "type": "boolean"
                   }
                 },
-                "required": ["slug", "name", "body"]
+                "required": ["slug", "name", "body"],
+                "example": {
+                  "slug": "hello-world",
+                  "name": "Hello World",
+                  "body": "Deno.serve(() => new Response('Hello, world!'))",
+                  "verify_jwt": true
+                }
               }
             }
           }
@@ -16771,6 +17402,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -16822,7 +17454,18 @@
                     }
                   },
                   "required": ["id", "slug", "name", "status", "version"]
-                }
+                },
+                "example": [
+                  {
+                    "id": "3c078cce-ad70-4148-9f37-4da362789053",
+                    "slug": "hello-world",
+                    "name": "Hello World",
+                    "status": "ACTIVE",
+                    "version": 2,
+                    "verify_jwt": true,
+                    "entrypoint_path": "index.ts"
+                  }
+                ]
               }
             }
           }
@@ -16947,6 +17590,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -16956,6 +17600,7 @@
             "in": "query",
             "schema": {
               "pattern": "^[A-Za-z][A-Za-z0-9_-]*$",
+              "example": "hello-world",
               "type": "string"
             }
           },
@@ -16965,6 +17610,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": false,
               "type": "boolean"
             }
           }
@@ -17008,7 +17654,15 @@
                     "required": ["entrypoint_path"]
                   }
                 },
-                "required": ["metadata"]
+                "required": ["metadata"],
+                "example": {
+                  "file": ["./supabase/functions/hello-world/index.ts"],
+                  "metadata": {
+                    "entrypoint_path": "index.ts",
+                    "verify_jwt": true,
+                    "name": "Hello World"
+                  }
+                }
               }
             }
           }
@@ -17116,6 +17770,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17126,6 +17781,7 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
+              "example": "hello-world",
               "type": "string"
             }
           }
@@ -17236,6 +17892,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17246,6 +17903,7 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
+              "example": "hello-world",
               "type": "string"
             }
           },
@@ -17255,6 +17913,7 @@
             "in": "query",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
+              "example": "hello-world",
               "type": "string"
             }
           },
@@ -17263,6 +17922,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "Hello World",
               "type": "string"
             }
           },
@@ -17272,6 +17932,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": true,
               "type": "boolean"
             }
           },
@@ -17281,6 +17942,7 @@
             "in": "query",
             "description": "Boolean string, true or false",
             "schema": {
+              "example": false,
               "type": "boolean"
             }
           },
@@ -17289,6 +17951,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "index.ts",
               "type": "string"
             }
           },
@@ -17297,6 +17960,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "import_map.json",
               "type": "string"
             }
           },
@@ -17305,6 +17969,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "example": "44c691990518d25498f0fd80cf6631ecf2b58eb9c5eb2a087dd1688f2904dac7",
               "type": "string"
             }
           }
@@ -17331,6 +17996,11 @@
                   "verify_jwt": {
                     "type": "boolean"
                   }
+                },
+                "example": {
+                  "name": "Hello World",
+                  "body": "Deno.serve(() => new Response('Hello again!'))",
+                  "verify_jwt": true
                 }
               }
             }
@@ -17442,6 +18112,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17452,6 +18123,7 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
+              "example": "hello-world",
               "type": "string"
             }
           }
@@ -17507,6 +18179,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -17517,6 +18190,7 @@
             "description": "Function slug",
             "schema": {
               "pattern": "^[A-Za-z0-9_-]+$",
+              "example": "hello-world",
               "type": "string"
             }
           }
@@ -17579,6 +18253,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -17651,9 +18326,9 @@
         "x-oauth-scope": "storage:read"
       }
     },
-    "/v1/projects/{ref}/config/disk/util": {
+    "/v1/projects/{ref}/config/disk": {
       "get": {
-        "operationId": "v1-get-disk-utilization",
+        "operationId": "v1-get-database-disk",
         "parameters": [
           {
             "name": "ref",
@@ -17664,6 +18339,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -17676,26 +18352,60 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "timestamp": {
-                      "type": "string"
-                    },
-                    "metrics": {
-                      "type": "object",
-                      "properties": {
-                        "fs_size_bytes": {
-                          "type": "number"
+                    "attributes": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "iops": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "size_gb": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "throughput_mibps": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["gp3"]
+                            }
+                          },
+                          "required": ["iops", "size_gb", "type"]
                         },
-                        "fs_avail_bytes": {
-                          "type": "number"
-                        },
-                        "fs_used_bytes": {
-                          "type": "number"
+                        {
+                          "type": "object",
+                          "properties": {
+                            "iops": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "size_gb": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "exclusiveMinimum": true
+                            },
+                            "type": {
+                              "type": "string",
+                              "enum": ["io2"]
+                            }
+                          },
+                          "required": ["iops", "size_gb", "type"]
                         }
-                      },
-                      "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+                      ]
+                    },
+                    "last_modified_at": {
+                      "type": "string"
                     }
                   },
-                  "required": ["timestamp", "metrics"]
+                  "required": ["attributes"]
                 }
               }
             }
@@ -17710,7 +18420,7 @@
             "description": "Rate limit exceeded"
           },
           "500": {
-            "description": "Failed to get disk utilization"
+            "description": "Failed to get database disk attributes"
           }
         },
         "security": [
@@ -17721,12 +18431,10 @@
             "fga_permissions": ["infra_disk_config_read"]
           }
         ],
-        "summary": "Get disk utilization",
+        "summary": "Get database disk attributes",
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api", "infra"]
-      }
-    },
-    "/v1/projects/{ref}/config/disk": {
+      },
       "post": {
         "operationId": "v1-modify-database-disk",
         "parameters": [
@@ -17739,6 +18447,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -17803,7 +18512,15 @@
                     ]
                   }
                 },
-                "required": ["attributes"]
+                "required": ["attributes"],
+                "example": {
+                  "attributes": {
+                    "type": "gp3",
+                    "size_gb": 100,
+                    "iops": 3000,
+                    "throughput_mibps": 125
+                  }
+                }
               }
             }
           }
@@ -17838,6 +18555,82 @@
         "x-endpoint-owners": ["management-api", "infra"]
       }
     },
+    "/v1/projects/{ref}/config/disk/util": {
+      "get": {
+        "operationId": "v1-get-disk-utilization",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string"
+                    },
+                    "metrics": {
+                      "type": "object",
+                      "properties": {
+                        "fs_size_bytes": {
+                          "type": "number"
+                        },
+                        "fs_avail_bytes": {
+                          "type": "number"
+                        },
+                        "fs_used_bytes": {
+                          "type": "number"
+                        }
+                      },
+                      "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+                    }
+                  },
+                  "required": ["timestamp", "metrics"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to get disk utilization"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["infra_disk_config_read"]
+          }
+        ],
+        "summary": "Get disk utilization",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["management-api", "infra"]
+      }
+    },
     "/v1/projects/{ref}/config/disk/autoscale": {
       "get": {
         "operationId": "v1-get-project-disk-autoscale-config",
@@ -17851,6 +18644,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -17929,6 +18723,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18090,6 +18885,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18179,7 +18975,15 @@
                     "required": ["upstreamTarget"]
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "fileSizeLimit": 10485760,
+                  "features": {
+                    "imageTransformation": {
+                      "enabled": true
+                    }
+                  }
+                }
               }
             }
           }
@@ -18227,6 +19031,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18315,6 +19120,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18434,6 +19240,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18456,6 +19263,10 @@
                     "enum": ["transaction", "session"],
                     "description": "Dedicated pooler mode for the project"
                   }
+                },
+                "example": {
+                  "default_pool_size": 25,
+                  "pool_mode": "transaction"
                 }
               }
             }
@@ -18528,6 +19339,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18683,6 +19495,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -18792,7 +19605,13 @@
                     "type": "boolean"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "max_connections": 120,
+                  "shared_buffers": "256MB",
+                  "work_mem": "4MB",
+                  "statement_timeout": "60000ms"
+                }
               }
             }
           }
@@ -18950,6 +19769,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19026,7 +19846,11 @@
                     "suspend": {
                       "type": "boolean",
                       "nullable": true,
-                      "description": "Whether to suspend realtime"
+                      "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                    },
+                    "presence_enabled": {
+                      "type": "boolean",
+                      "description": "Whether to enable presence"
                     }
                   },
                   "required": [
@@ -19039,7 +19863,8 @@
                     "max_joins_per_second",
                     "max_presence_events_per_second",
                     "max_payload_size_in_kb",
-                    "suspend"
+                    "suspend",
+                    "presence_enabled"
                   ]
                 }
               }
@@ -19058,6 +19883,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_read"]
           }
         ],
         "summary": "Gets realtime configuration",
@@ -19076,6 +19904,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19141,10 +19970,19 @@
                   },
                   "suspend": {
                     "type": "boolean",
-                    "description": "Whether to suspend realtime"
+                    "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+                  },
+                  "presence_enabled": {
+                    "type": "boolean",
+                    "description": "Whether to enable presence"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "example": {
+                  "private_only": false,
+                  "max_concurrent_users": 1000,
+                  "max_channels_per_client": 100
+                }
               }
             }
           }
@@ -19166,9 +20004,60 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_write"]
           }
         ],
         "summary": "Updates realtime configuration",
+        "tags": ["Realtime"],
+        "x-endpoint-owners": ["realtime"]
+      }
+    },
+    "/v1/projects/{ref}/config/realtime/shutdown": {
+      "post": {
+        "operationId": "v1-shutdown-realtime",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Realtime connections shutdown successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "404": {
+            "description": "Tenant not found"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["realtime_config_write"]
+          }
+        ],
+        "summary": "Shutdowns realtime connections for a project",
         "tags": ["Realtime"],
         "x-endpoint-owners": ["realtime"]
       }
@@ -19186,6 +20075,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19267,7 +20157,25 @@
                     ]
                   }
                 },
-                "required": ["type"]
+                "required": ["type"],
+                "example": {
+                  "type": "saml",
+                  "metadata_url": "https://sso.acme.com/metadata.xml",
+                  "domains": ["acme.com"],
+                  "attribute_mapping": {
+                    "keys": {
+                      "email": {
+                        "name": "email"
+                      },
+                      "first_name": {
+                        "name": "first_name"
+                      },
+                      "last_name": {
+                        "name": "last_name"
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -19430,6 +20338,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -19603,6 +20512,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -19612,6 +20522,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "77777777-7777-4777-8777-777777777777",
               "type": "string"
             }
           }
@@ -19774,6 +20685,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -19783,6 +20695,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "77777777-7777-4777-8777-777777777777",
               "type": "string"
             }
           }
@@ -19858,6 +20771,10 @@
                       "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
                     ]
                   }
+                },
+                "example": {
+                  "metadata_url": "https://sso.acme.com/metadata.xml",
+                  "domains": ["acme.com", "contractors.acme.com"]
                 }
               }
             }
@@ -20021,6 +20938,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -20030,6 +20948,7 @@
             "in": "path",
             "schema": {
               "format": "uuid",
+              "example": "77777777-7777-4777-8777-777777777777",
               "type": "string"
             }
           }
@@ -20194,6 +21113,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20310,6 +21230,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20327,7 +21248,10 @@
                     "format": "int64"
                   }
                 },
-                "required": ["recovery_time_target_unix"]
+                "required": ["recovery_time_target_unix"],
+                "example": {
+                  "recovery_time_target_unix": 1740787200
+                }
               }
             }
           }
@@ -20379,6 +21303,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20395,7 +21320,10 @@
                     "maxLength": 20
                   }
                 },
-                "required": ["name"]
+                "required": ["name"],
+                "example": {
+                  "name": "before-upgrade"
+                }
               }
             }
           }
@@ -20414,9 +21342,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -20463,6 +21396,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           },
@@ -20490,9 +21424,14 @@
                     "status": {
                       "type": "string",
                       "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+                    },
+                    "completed_on": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true
                     }
                   },
-                  "required": ["name", "status"]
+                  "required": ["name", "status", "completed_on"]
                 }
               }
             }
@@ -20544,6 +21483,7 @@
               "minLength": 20,
               "maxLength": 20,
               "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
               "type": "string"
             }
           }
@@ -20560,7 +21500,10 @@
                     "maxLength": 20
                   }
                 },
-                "required": ["name"]
+                "required": ["name"],
+                "example": {
+                  "name": "before-upgrade"
+                }
               }
             }
           }
@@ -20600,6 +21543,200 @@
         "x-oauth-scope": "database:write"
       }
     },
+    "/v1/organizations/{slug}/entitlements": {
+      "get": {
+        "description": "Returns the entitlements available to the organization based on their plan and any overrides.",
+        "operationId": "v1-get-organization-entitlements",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entitlements": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "feature": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "enum": [
+                                  "instances.compute_update_available_sizes",
+                                  "instances.read_replicas",
+                                  "instances.disk_modifications",
+                                  "instances.high_availability",
+                                  "instances.orioledb",
+                                  "replication.etl",
+                                  "storage.max_file_size",
+                                  "storage.max_file_size.configurable",
+                                  "storage.image_transformations",
+                                  "storage.vector_buckets",
+                                  "storage.iceberg_catalog",
+                                  "security.audit_logs_days",
+                                  "security.questionnaire",
+                                  "security.soc2_report",
+                                  "security.private_link",
+                                  "security.enforce_mfa",
+                                  "log.retention_days",
+                                  "custom_domain",
+                                  "vanity_subdomain",
+                                  "ipv4",
+                                  "pitr.available_variants",
+                                  "log_drains",
+                                  "branching_limit",
+                                  "branching_persistent",
+                                  "auth.mfa_phone",
+                                  "auth.mfa_web_authn",
+                                  "auth.mfa_enhanced_security",
+                                  "auth.hooks",
+                                  "auth.platform.sso",
+                                  "auth.custom_jwt_template",
+                                  "auth.saml_2",
+                                  "auth.user_sessions",
+                                  "auth.leaked_password_protection",
+                                  "auth.advanced_auth_settings",
+                                  "auth.performance_settings",
+                                  "auth.password_hibp",
+                                  "backup.retention_days",
+                                  "backup.restore_to_new_project",
+                                  "function.max_count",
+                                  "function.size_limit_mb",
+                                  "realtime.max_concurrent_users",
+                                  "realtime.max_events_per_second",
+                                  "realtime.max_joins_per_second",
+                                  "realtime.max_channels_per_client",
+                                  "realtime.max_bytes_per_second",
+                                  "realtime.max_presence_events_per_second",
+                                  "realtime.max_payload_size_in_kb",
+                                  "project_scoped_roles",
+                                  "security.member_roles",
+                                  "project_pausing",
+                                  "project_cloning",
+                                  "project_restore_after_expiry",
+                                  "assistant.advance_model",
+                                  "integrations.github_connections",
+                                  "dedicated_pooler",
+                                  "observability.dashboard_advanced_metrics"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": ["boolean", "numeric", "set"]
+                              }
+                            },
+                            "required": ["key", "type"]
+                          },
+                          "hasAccess": {
+                            "type": "boolean"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["boolean", "numeric", "set"]
+                          },
+                          "config": {
+                            "oneOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "enabled": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": ["enabled"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "enabled": {
+                                    "type": "boolean"
+                                  },
+                                  "value": {
+                                    "type": "number"
+                                  },
+                                  "unlimited": {
+                                    "type": "boolean"
+                                  },
+                                  "unit": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": ["enabled", "value", "unlimited", "unit"]
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "enabled": {
+                                    "type": "boolean"
+                                  },
+                                  "set": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "required": ["enabled", "set"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["feature", "hasAccess", "type", "config"]
+                      }
+                    }
+                  },
+                  "required": ["entitlements"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["organization_projects_read"]
+          }
+        ],
+        "summary": "Get entitlements for an organization",
+        "tags": ["Organizations"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: organizations:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["billing"],
+        "x-oauth-scope": "organizations:read"
+      }
+    },
     "/v1/organizations/{slug}/members": {
       "get": {
         "operationId": "v1-list-organization-members",
@@ -20611,6 +21748,7 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           }
@@ -20651,6 +21789,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "fga_permissions": ["members_read"]
           }
         ],
         "summary": "List members of an organization",
@@ -20676,6 +21817,7 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           }
@@ -20763,6 +21905,7 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -20771,6 +21914,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "example": "0123456789abcdef0123456789abcdef01234567",
               "type": "string"
             }
           }
@@ -20930,6 +22074,7 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -20938,6 +22083,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "example": "0123456789abcdef0123456789abcdef01234567",
               "type": "string"
             }
           }
@@ -20982,6 +22128,7 @@
             "description": "Organization slug",
             "schema": {
               "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
               "type": "string"
             }
           },
@@ -20993,6 +22140,7 @@
             "schema": {
               "minimum": 0,
               "default": 0,
+              "example": 0,
               "type": "integer"
             }
           },
@@ -21005,6 +22153,7 @@
               "minimum": 1,
               "maximum": 100,
               "default": 100,
+              "example": 20,
               "type": "integer"
             }
           },
@@ -21014,6 +22163,7 @@
             "in": "query",
             "description": "Search projects by name",
             "schema": {
+              "example": "acme",
               "type": "string"
             }
           },
@@ -21024,6 +22174,7 @@
             "description": "Sort order for projects",
             "schema": {
               "default": "name_asc",
+              "example": "created_desc",
               "type": "string",
               "enum": ["name_asc", "name_desc", "created_asc", "created_desc"]
             }
@@ -21034,7 +22185,7 @@
             "in": "query",
             "description": "A comma-separated list of project statuses to filter by.\n\nThe following values are supported: `ACTIVE_HEALTHY`, `INACTIVE`.",
             "schema": {
-              "example": "?statuses=ACTIVE_HEALTHY,INACTIVE",
+              "example": "ACTIVE_HEALTHY,INACTIVE",
               "type": "string"
             }
           }
@@ -21336,6 +22487,13 @@
             "format": "uri",
             "description": "HTTP endpoint to receive branch status updates."
           }
+        },
+        "example": {
+          "branch_name": "preview-login-page",
+          "git_branch": "feature/login-page",
+          "persistent": true,
+          "request_review": true,
+          "notify_url": "https://example.com/webhooks/branches"
         }
       },
       "BranchResponse": {
@@ -21456,6 +22614,9 @@
           "migration_version": {
             "type": "string"
           }
+        },
+        "example": {
+          "migration_version": "20250312000000"
         }
       },
       "BranchUpdateResponse": {
@@ -21614,7 +22775,8 @@
             "minLength": 20,
             "maxLength": 20,
             "pattern": "^[a-z]+$",
-            "description": "Project ref"
+            "description": "Project ref",
+            "example": "abcdefghijklmnopqrst"
           },
           "organization_id": {
             "type": "string",
@@ -21624,7 +22786,8 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug"
+            "description": "Organization slug",
+            "example": "tsrqponmlkjihgfedcba"
           },
           "name": {
             "type": "string",
@@ -21632,13 +22795,11 @@
           },
           "region": {
             "type": "string",
-            "description": "Region of your project",
-            "example": "us-east-1"
+            "description": "Region of your project"
           },
           "created_at": {
             "type": "string",
-            "description": "Creation timestamp",
-            "example": "2023-03-29T16:32:59Z"
+            "description": "Creation timestamp"
           },
           "status": {
             "type": "string",
@@ -21715,7 +22876,8 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug"
+            "description": "Organization slug",
+            "example": "tsrqponmlkjihgfedcba"
           },
           "plan": {
             "type": "string",
@@ -21798,15 +22960,13 @@
                   "code": {
                     "type": "string",
                     "enum": ["americas", "emea", "apac"],
-                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
-                    "example": "apac"
+                    "description": "The Smart Region Group's code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint."
                   }
                 },
                 "required": ["type", "code"]
               }
             ],
-            "description": "Region selection. Only one of region or region_selection can be specified.",
-            "example": "{ type: 'smartGroup', code: 'americas' }"
+            "description": "Region selection. Only one of region or region_selection can be specified."
           },
           "kps_enabled": {
             "type": "boolean",
@@ -21814,9 +22974,9 @@
             "description": "This field is deprecated and is ignored in this request"
           },
           "desired_instance_size": {
+            "description": "Desired instance size. Omit this field to always default to the smallest possible size.",
             "type": "string",
             "enum": [
-              "pico",
               "nano",
               "micro",
               "small",
@@ -21841,25 +23001,18 @@
           "template_url": {
             "type": "string",
             "format": "uri",
-            "description": "Template URL used to create the project from the CLI.",
-            "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
-          },
-          "release_channel": {
-            "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
-            "description": "Release channel. If not provided, GA will be used.",
-            "deprecated": true
-          },
-          "postgres_engine": {
-            "type": "string",
-            "enum": ["15", "17", "17-oriole"],
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "deprecated": true
+            "description": "Template URL used to create the project from the CLI."
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
         "additionalProperties": false,
-        "hideDefinitions": ["release_channel", "postgres_engine"]
+        "hideDefinitions": ["release_channel", "postgres_engine"],
+        "example": {
+          "db_pass": "correct-horse-battery-staple",
+          "name": "acme-prod",
+          "organization_slug": "tsrqponmlkjihgfedcba",
+          "region": "us-east-1"
+        }
       },
       "V1ProjectResponse": {
         "type": "object",
@@ -21874,7 +23027,8 @@
             "minLength": 20,
             "maxLength": 20,
             "pattern": "^[a-z]+$",
-            "description": "Project ref"
+            "description": "Project ref",
+            "example": "abcdefghijklmnopqrst"
           },
           "organization_id": {
             "type": "string",
@@ -21884,7 +23038,8 @@
           "organization_slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug"
+            "description": "Organization slug",
+            "example": "tsrqponmlkjihgfedcba"
           },
           "name": {
             "type": "string",
@@ -21892,13 +23047,11 @@
           },
           "region": {
             "type": "string",
-            "description": "Region of your project",
-            "example": "us-east-1"
+            "description": "Region of your project"
           },
           "created_at": {
             "type": "string",
-            "description": "Creation timestamp",
-            "example": "2023-03-29T16:32:59Z"
+            "description": "Creation timestamp"
           },
           "status": {
             "type": "string",
@@ -21964,7 +23117,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -22017,7 +23190,27 @@
                       "type": "string"
                     },
                     "code": {
-                      "type": "string"
+                      "type": "string",
+                      "enum": [
+                        "us-east-1",
+                        "us-east-2",
+                        "us-west-1",
+                        "us-west-2",
+                        "ap-southeast-1",
+                        "ap-northeast-1",
+                        "ap-northeast-2",
+                        "ap-east-1",
+                        "ap-southeast-2",
+                        "eu-west-1",
+                        "eu-west-2",
+                        "eu-west-3",
+                        "eu-north-1",
+                        "eu-central-1",
+                        "eu-central-2",
+                        "ca-central-1",
+                        "ap-south-1",
+                        "sa-east-1"
+                      ]
                     },
                     "type": {
                       "type": "string",
@@ -22052,7 +23245,8 @@
           "slug": {
             "type": "string",
             "pattern": "^[\\w-]+$",
-            "description": "Organization slug"
+            "description": "Organization slug",
+            "example": "tsrqponmlkjihgfedcba"
           },
           "name": {
             "type": "string"
@@ -22069,7 +23263,10 @@
           }
         },
         "required": ["name"],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "name": "Acme"
+        }
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -22106,7 +23303,16 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "grant_type": "authorization_code",
+          "client_id": "66666666-6666-4666-8666-666666666666",
+          "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
+          "code": "oauth_code_9f4d3a206b2e4a7e8c91",
+          "code_verifier": "qW0Z6d9pQnW0mL1dK1q9wFq6Yz2nV5rA8jT3mP7sH4c",
+          "redirect_uri": "https://app.acme.com/auth/callback",
+          "scope": "projects:read projects:write"
+        }
       },
       "OAuthTokenResponse": {
         "type": "object",
@@ -22143,7 +23349,12 @@
           }
         },
         "required": ["client_id", "client_secret", "refresh_token"],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "client_id": "66666666-6666-4666-8666-666666666666",
+          "client_secret": "sb_secret_live_example_9f4d3a206b2e4a7e8c91",
+          "refresh_token": "oauth_refresh_9f4d3a206b2e4a7e8c91"
+        }
       },
       "SnippetList": {
         "type": "object",
@@ -22337,6 +23548,21 @@
           "content"
         ]
       },
+      "V1ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "gotrue_id": {
+            "type": "string"
+          },
+          "primary_email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "required": ["gotrue_id", "primary_email", "username"]
+      },
       "ListActionRunResponse": {
         "type": "array",
         "items": {
@@ -22507,6 +23733,12 @@
             "type": "string",
             "enum": ["CREATED", "DEAD", "EXITED", "PAUSED", "REMOVING", "RESTARTING", "RUNNING"]
           }
+        },
+        "example": {
+          "clone": "RUNNING",
+          "configure": "RUNNING",
+          "migrate": "RUNNING",
+          "deploy": "CREATED"
         }
       },
       "UpdateRunStatusResponse": {
@@ -22600,7 +23832,12 @@
             "nullable": true
           }
         },
-        "required": ["type", "name"]
+        "required": ["type", "name"],
+        "example": {
+          "type": "secret",
+          "name": "ci_secret_key",
+          "description": "CI deploy key"
+        }
       },
       "UpdateApiKeyBody": {
         "type": "object",
@@ -22620,6 +23857,10 @@
             "additionalProperties": {},
             "nullable": true
           }
+        },
+        "example": {
+          "name": "ci_secret_key_rotated",
+          "description": "Rotated after March release"
         }
       },
       "CreateBranchBody": {
@@ -22691,7 +23932,14 @@
             "description": "HTTP endpoint to receive branch status updates."
           }
         },
-        "required": ["branch_name"]
+        "required": ["branch_name"],
+        "example": {
+          "branch_name": "preview-login-page",
+          "git_branch": "feature/login-page",
+          "persistent": true,
+          "with_data": false,
+          "notify_url": "https://example.com/webhooks/branches"
+        }
       },
       "UpdateCustomHostnameResponse": {
         "type": "object",
@@ -22824,7 +24072,10 @@
             "minLength": 1
           }
         },
-        "required": ["custom_hostname"]
+        "required": ["custom_hostname"],
+        "example": {
+          "custom_hostname": "docs.example.com"
+        }
       },
       "JitAccessResponse": {
         "type": "object",
@@ -22889,7 +24140,10 @@
             "enum": ["enabled", "disabled", "unavailable"]
           }
         },
-        "required": ["state"]
+        "required": ["state"],
+        "example": {
+          "state": "enabled"
+        }
       },
       "NetworkBanResponse": {
         "type": "object",
@@ -22946,7 +24200,11 @@
             "type": "string"
           }
         },
-        "required": ["ipv4_addresses"]
+        "required": ["ipv4_addresses"],
+        "example": {
+          "ipv4_addresses": ["203.0.113.10"],
+          "requester_ip": false
+        }
       },
       "NetworkRestrictionsResponse": {
         "type": "object",
@@ -22989,6 +24247,10 @@
                 }
               }
             },
+            "example": {
+              "dbAllowedCidrs": ["203.0.113.0/24"],
+              "dbAllowedCidrsV6": ["2001:db8::/32"]
+            },
             "description": "Populated when a new config has been received, but not registered as successfully applied to a project."
           },
           "status": {
@@ -23021,6 +24283,10 @@
               "type": "string"
             }
           }
+        },
+        "example": {
+          "dbAllowedCidrs": ["203.0.113.0/24"],
+          "dbAllowedCidrsV6": ["2001:db8::/32"]
         }
       },
       "NetworkRestrictionsPatchRequest": {
@@ -23059,6 +24325,14 @@
                 }
               }
             }
+          }
+        },
+        "example": {
+          "add": {
+            "dbAllowedCidrs": ["203.0.113.0/24"]
+          },
+          "remove": {
+            "dbAllowedCidrs": ["198.51.100.0/24"]
           }
         }
       },
@@ -23144,7 +24418,10 @@
             "type": "string"
           }
         },
-        "required": ["root_key"]
+        "required": ["root_key"],
+        "example": {
+          "root_key": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+        }
       },
       "PostgrestConfigWithJWTSecretResponse": {
         "type": "object",
@@ -23188,6 +24465,11 @@
             "minimum": 0,
             "maximum": 1000
           }
+        },
+        "example": {
+          "db_schema": "public,storage",
+          "db_pool": 20,
+          "max_rows": 1000
         }
       },
       "V1PostgrestConfigResponse": {
@@ -23234,7 +24516,10 @@
             "maxLength": 256
           }
         },
-        "required": ["name"]
+        "required": ["name"],
+        "example": {
+          "name": "Acme Platform"
+        }
       },
       "SecretResponse": {
         "type": "object",
@@ -23260,8 +24545,7 @@
               "type": "string",
               "maxLength": 256,
               "pattern": "^(?!SUPABASE_).*",
-              "description": "Secret name must not start with the SUPABASE_ prefix.",
-              "example": "string"
+              "description": "Secret name must not start with the SUPABASE_ prefix."
             },
             "value": {
               "type": "string",
@@ -23269,13 +24553,24 @@
             }
           },
           "required": ["name", "value"]
-        }
+        },
+        "example": [
+          {
+            "name": "OPENAI_API_KEY",
+            "value": "sk-example-secret"
+          },
+          {
+            "name": "STRIPE_WEBHOOK_SECRET",
+            "value": "whsec_example"
+          }
+        ]
       },
       "DeleteSecretsBody": {
         "type": "array",
         "items": {
           "type": "string"
-        }
+        },
+        "example": ["OPENAI_API_KEY"]
       },
       "SslEnforcementResponse": {
         "type": "object",
@@ -23308,7 +24603,12 @@
             "required": ["database"]
           }
         },
-        "required": ["requestedConfig"]
+        "required": ["requestedConfig"],
+        "example": {
+          "requestedConfig": {
+            "database": true
+          }
+        }
       },
       "TypescriptResponse": {
         "type": "object",
@@ -23341,7 +24641,10 @@
             "maxLength": 63
           }
         },
-        "required": ["vanity_subdomain"]
+        "required": ["vanity_subdomain"],
+        "example": {
+          "vanity_subdomain": "acme-prod"
+        }
       },
       "SubdomainAvailabilityResponse": {
         "type": "object",
@@ -23372,7 +24675,11 @@
             "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           }
         },
-        "required": ["target_version"]
+        "required": ["target_version"],
+        "example": {
+          "target_version": "17",
+          "release_channel": "ga"
+        }
       },
       "ProjectUpgradeInitiateResponse": {
         "type": "object",
@@ -23704,11 +25011,13 @@
               "ap-south-1",
               "sa-east-1"
             ],
-            "description": "Region you want your read replica to reside in",
-            "example": "us-east-1"
+            "description": "Region you want your read replica to reside in"
           }
         },
-        "required": ["read_replica_region"]
+        "required": ["read_replica_region"],
+        "example": {
+          "read_replica_region": "us-west-1"
+        }
       },
       "RemoveReadReplicaBody": {
         "type": "object",
@@ -23717,7 +25026,10 @@
             "type": "string"
           }
         },
-        "required": ["database_identifier"]
+        "required": ["database_identifier"],
+        "example": {
+          "database_identifier": "abcdefghijklmnopqrst-rr-us-west-1-abcde"
+        }
       },
       "V1ServiceHealthResponse": {
         "type": "object",
@@ -23773,11 +25085,19 @@
                   "db_connected": {
                     "type": "boolean"
                   },
+                  "replication_connected": {
+                    "type": "boolean"
+                  },
                   "connected_cluster": {
                     "type": "integer"
                   }
                 },
-                "required": ["healthy", "db_connected", "connected_cluster"]
+                "required": [
+                  "healthy",
+                  "db_connected",
+                  "replication_connected",
+                  "connected_cluster"
+                ]
               },
               {
                 "type": "object",
@@ -24042,7 +25362,11 @@
           }
         },
         "required": ["algorithm"],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "algorithm": "RS256",
+          "status": "standby"
+        }
       },
       "SigningKeysResponse": {
         "type": "object",
@@ -24093,7 +25417,10 @@
           }
         },
         "required": ["status"],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "status": "standby"
+        }
       },
       "AuthConfigResponse": {
         "type": "object",
@@ -24762,6 +26089,21 @@
             "type": "boolean",
             "nullable": true
           },
+          "passkey_enabled": {
+            "type": "boolean"
+          },
+          "webauthn_rp_display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "webauthn_rp_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "webauthn_rp_origins": {
+            "type": "string",
+            "nullable": true
+          },
           "mfa_phone_otp_length": {
             "type": "integer"
           },
@@ -24847,6 +26189,10 @@
             "type": "boolean",
             "nullable": true
           },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -24873,7 +26219,7 @@
             "nullable": true
           },
           "sessions_inactivity_timeout": {
-            "type": "integer",
+            "type": "number",
             "nullable": true
           },
           "sessions_single_per_user": {
@@ -24885,7 +26231,7 @@
             "nullable": true
           },
           "sessions_timebox": {
-            "type": "integer",
+            "type": "number",
             "nullable": true
           },
           "site_url": {
@@ -25023,6 +26369,12 @@
           "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
+          },
+          "custom_oauth_enabled": {
+            "type": "boolean"
+          },
+          "custom_oauth_max_providers": {
+            "type": "integer"
           }
         },
         "required": [
@@ -25192,6 +26544,10 @@
           "mfa_phone_verify_enabled",
           "mfa_web_authn_enroll_enabled",
           "mfa_web_authn_verify_enabled",
+          "passkey_enabled",
+          "webauthn_rp_display_name",
+          "webauthn_rp_id",
+          "webauthn_rp_origins",
           "mfa_phone_otp_length",
           "mfa_phone_template",
           "mfa_phone_max_frequency",
@@ -25212,6 +26568,7 @@
           "saml_enabled",
           "saml_external_url",
           "saml_allow_encrypted_assertions",
+          "security_sb_forwarded_for_enabled",
           "security_captcha_enabled",
           "security_captcha_provider",
           "security_captcha_secret",
@@ -25255,7 +26612,9 @@
           "uri_allow_list",
           "oauth_server_enabled",
           "oauth_server_allow_dynamic_registration",
-          "oauth_server_authorization_path"
+          "oauth_server_authorization_path",
+          "custom_oauth_enabled",
+          "custom_oauth_max_providers"
         ]
       },
       "UpdateAuthConfigBody": {
@@ -25478,6 +26837,10 @@
             "pattern": "^[^,]+$",
             "nullable": true
           },
+          "security_sb_forwarded_for_enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
           "security_captcha_enabled": {
             "type": "boolean",
             "nullable": true
@@ -25492,12 +26855,12 @@
             "nullable": true
           },
           "sessions_timebox": {
-            "type": "integer",
+            "type": "number",
             "minimum": 0,
             "nullable": true
           },
           "sessions_inactivity_timeout": {
-            "type": "integer",
+            "type": "number",
             "minimum": 0,
             "nullable": true
           },
@@ -26182,6 +27545,21 @@
             "type": "boolean",
             "nullable": true
           },
+          "passkey_enabled": {
+            "type": "boolean"
+          },
+          "webauthn_rp_display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "webauthn_rp_id": {
+            "type": "string",
+            "nullable": true
+          },
+          "webauthn_rp_origins": {
+            "type": "string",
+            "nullable": true
+          },
           "mfa_phone_enroll_enabled": {
             "type": "boolean",
             "nullable": true
@@ -26225,7 +27603,15 @@
           "oauth_server_authorization_path": {
             "type": "string",
             "nullable": true
+          },
+          "custom_oauth_enabled": {
+            "type": "boolean"
           }
+        },
+        "example": {
+          "site_url": "https://app.example.com",
+          "disable_signup": false,
+          "jwt_exp": 3600
         }
       },
       "CreateThirdPartyAuthBody": {
@@ -26238,6 +27624,10 @@
             "type": "string"
           },
           "custom_jwks": {}
+        },
+        "example": {
+          "oidc_issuer_url": "https://login.acme.com",
+          "jwks_url": "https://login.acme.com/.well-known/jwks.json"
         }
       },
       "ThirdPartyAuth": {
@@ -26578,7 +27968,11 @@
             ]
           }
         },
-        "required": ["addon_variant", "addon_type"]
+        "required": ["addon_variant", "addon_type"],
+        "example": {
+          "addon_variant": "pitr_7",
+          "addon_type": "pitr"
+        }
       },
       "ProjectClaimTokenResponse": {
         "type": "object",
@@ -26944,7 +28338,10 @@
             "type": "boolean"
           }
         },
-        "required": ["read_only"]
+        "required": ["read_only"],
+        "example": {
+          "read_only": true
+        }
       },
       "CreateRoleResponse": {
         "type": "object",
@@ -27005,7 +28402,12 @@
             "type": "string"
           }
         },
-        "required": ["query"]
+        "required": ["query"],
+        "example": {
+          "query": "create table public.widgets(id bigint primary key);",
+          "name": "create_widgets_table",
+          "rollback": "drop table if exists public.widgets;"
+        }
       },
       "V1UpsertMigrationBody": {
         "type": "object",
@@ -27021,7 +28423,12 @@
             "type": "string"
           }
         },
-        "required": ["query"]
+        "required": ["query"],
+        "example": {
+          "query": "create table public.widgets(id bigint primary key);",
+          "name": "create_widgets_table",
+          "rollback": "drop table if exists public.widgets;"
+        }
       },
       "V1GetMigrationResponse": {
         "type": "object",
@@ -27063,6 +28470,10 @@
           "rollback": {
             "type": "string"
           }
+        },
+        "example": {
+          "name": "create_widgets_table",
+          "rollback": "drop table if exists public.widgets;"
         }
       },
       "V1RunQueryBody": {
@@ -27080,7 +28491,11 @@
             "type": "boolean"
           }
         },
-        "required": ["query"]
+        "required": ["query"],
+        "example": {
+          "query": "select * from pg_stat_activity limit 1;",
+          "read_only": true
+        }
       },
       "V1ReadOnlyQueryBody": {
         "type": "object",
@@ -27094,7 +28509,10 @@
             "items": {}
           }
         },
-        "required": ["query"]
+        "required": ["query"],
+        "example": {
+          "query": "select * from pg_stat_activity limit 1;"
+        }
       },
       "GetProjectDbMetadataResponse": {
         "type": "object",
@@ -27136,7 +28554,10 @@
             "minLength": 4
           }
         },
-        "required": ["password"]
+        "required": ["password"],
+        "example": {
+          "password": "correct-horse-battery-staple"
+        }
       },
       "V1UpdatePasswordResponse": {
         "type": "object",
@@ -27159,7 +28580,11 @@
             "minLength": 1
           }
         },
-        "required": ["role", "rhost"]
+        "required": ["role", "rhost"],
+        "example": {
+          "role": "postgres",
+          "rhost": "203.0.113.10"
+        }
       },
       "JitAuthorizeAccessResponse": {
         "type": "object",
@@ -27331,7 +28756,23 @@
             }
           }
         },
-        "required": ["user_id", "roles"]
+        "required": ["user_id", "roles"],
+        "example": {
+          "user_id": "55555555-5555-4555-8555-555555555555",
+          "roles": [
+            {
+              "role": "postgres",
+              "expires_at": 1740787200,
+              "allowed_networks": {
+                "allowed_cidrs": [
+                  {
+                    "cidr": "203.0.113.0/24"
+                  }
+                ]
+              }
+            }
+          ]
+        }
       },
       "FunctionResponse": {
         "type": "object",
@@ -27395,7 +28836,13 @@
             "type": "boolean"
           }
         },
-        "required": ["slug", "name", "body"]
+        "required": ["slug", "name", "body"],
+        "example": {
+          "slug": "hello-world",
+          "name": "Hello World",
+          "body": "Deno.serve(() => new Response('Hello, world!'))",
+          "verify_jwt": true
+        }
       },
       "BulkUpdateFunctionBody": {
         "type": "array",
@@ -27440,7 +28887,18 @@
             }
           },
           "required": ["id", "slug", "name", "status", "version"]
-        }
+        },
+        "example": [
+          {
+            "id": "3c078cce-ad70-4148-9f37-4da362789053",
+            "slug": "hello-world",
+            "name": "Hello World",
+            "status": "ACTIVE",
+            "version": 2,
+            "verify_jwt": true,
+            "entrypoint_path": "index.ts"
+          }
+        ]
       },
       "BulkUpdateFunctionResponse": {
         "type": "object",
@@ -27531,7 +28989,15 @@
             "required": ["entrypoint_path"]
           }
         },
-        "required": ["metadata"]
+        "required": ["metadata"],
+        "example": {
+          "file": ["./supabase/functions/hello-world/index.ts"],
+          "metadata": {
+            "entrypoint_path": "index.ts",
+            "verify_jwt": true,
+            "name": "Hello World"
+          }
+        }
       },
       "DeployFunctionResponse": {
         "type": "object",
@@ -27639,6 +29105,11 @@
           "verify_jwt": {
             "type": "boolean"
           }
+        },
+        "example": {
+          "name": "Hello World",
+          "body": "Deno.serve(() => new Response('Hello again!'))",
+          "verify_jwt": true
         }
       },
       "V1StorageBucketResponse": {
@@ -27665,29 +29136,63 @@
         },
         "required": ["id", "name", "owner", "created_at", "updated_at", "public"]
       },
-      "DiskUtilMetricsResponse": {
+      "DiskResponse": {
         "type": "object",
         "properties": {
-          "timestamp": {
-            "type": "string"
-          },
-          "metrics": {
-            "type": "object",
-            "properties": {
-              "fs_size_bytes": {
-                "type": "number"
+          "attributes": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "iops": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "size_gb": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "throughput_mibps": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["gp3"]
+                  }
+                },
+                "required": ["iops", "size_gb", "type"]
               },
-              "fs_avail_bytes": {
-                "type": "number"
-              },
-              "fs_used_bytes": {
-                "type": "number"
+              {
+                "type": "object",
+                "properties": {
+                  "iops": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "size_gb": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["io2"]
+                  }
+                },
+                "required": ["iops", "size_gb", "type"]
               }
-            },
-            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+            ]
+          },
+          "last_modified_at": {
+            "type": "string"
           }
         },
-        "required": ["timestamp", "metrics"]
+        "required": ["attributes"]
       },
       "DiskRequestBody": {
         "type": "object",
@@ -27745,7 +29250,39 @@
             ]
           }
         },
-        "required": ["attributes"]
+        "required": ["attributes"],
+        "example": {
+          "attributes": {
+            "type": "gp3",
+            "size_gb": 100,
+            "iops": 3000,
+            "throughput_mibps": 125
+          }
+        }
+      },
+      "DiskUtilMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object",
+            "properties": {
+              "fs_size_bytes": {
+                "type": "number"
+              },
+              "fs_avail_bytes": {
+                "type": "number"
+              },
+              "fs_used_bytes": {
+                "type": "number"
+              }
+            },
+            "required": ["fs_size_bytes", "fs_avail_bytes", "fs_used_bytes"]
+          }
+        },
+        "required": ["timestamp", "metrics"]
       },
       "DiskAutoscaleConfig": {
         "type": "object",
@@ -27962,7 +29499,15 @@
             "required": ["upstreamTarget"]
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "fileSizeLimit": 10485760,
+          "features": {
+            "imageTransformation": {
+              "enabled": true
+            }
+          }
+        }
       },
       "V1PgbouncerConfigResponse": {
         "type": "object",
@@ -28071,6 +29616,10 @@
             "enum": ["transaction", "session"],
             "description": "Dedicated pooler mode for the project"
           }
+        },
+        "example": {
+          "default_pool_size": 25,
+          "pool_mode": "transaction"
         }
       },
       "UpdateSupavisorConfigResponse": {
@@ -28286,7 +29835,13 @@
             "type": "boolean"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "max_connections": 120,
+          "shared_buffers": "256MB",
+          "work_mem": "4MB",
+          "statement_timeout": "60000ms"
+        }
       },
       "RealtimeConfigResponse": {
         "type": "object",
@@ -28355,7 +29910,11 @@
           "suspend": {
             "type": "boolean",
             "nullable": true,
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
         "required": [
@@ -28368,7 +29927,8 @@
           "max_joins_per_second",
           "max_presence_events_per_second",
           "max_payload_size_in_kb",
-          "suspend"
+          "suspend",
+          "presence_enabled"
         ]
       },
       "UpdateRealtimeConfigBody": {
@@ -28428,10 +29988,19 @@
           },
           "suspend": {
             "type": "boolean",
-            "description": "Whether to suspend realtime"
+            "description": "Disables the Realtime service for this project when true. Set to false to re-enable it."
+          },
+          "presence_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable presence"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "example": {
+          "private_only": false,
+          "max_concurrent_users": 1000,
+          "max_channels_per_client": 100
+        }
       },
       "CreateProviderBody": {
         "type": "object",
@@ -28506,7 +30075,25 @@
             ]
           }
         },
-        "required": ["type"]
+        "required": ["type"],
+        "example": {
+          "type": "saml",
+          "metadata_url": "https://sso.acme.com/metadata.xml",
+          "domains": ["acme.com"],
+          "attribute_mapping": {
+            "keys": {
+              "email": {
+                "name": "email"
+              },
+              "first_name": {
+                "name": "first_name"
+              },
+              "last_name": {
+                "name": "last_name"
+              }
+            }
+          }
+        }
       },
       "CreateProviderResponse": {
         "type": "object",
@@ -28902,6 +30489,10 @@
               "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
             ]
           }
+        },
+        "example": {
+          "metadata_url": "https://sso.acme.com/metadata.xml",
+          "domains": ["acme.com", "contractors.acme.com"]
         }
       },
       "UpdateProviderResponse": {
@@ -29170,7 +30761,10 @@
             "format": "int64"
           }
         },
-        "required": ["recovery_time_target_unix"]
+        "required": ["recovery_time_target_unix"],
+        "example": {
+          "recovery_time_target_unix": 1740787200
+        }
       },
       "V1RestorePointPostBody": {
         "type": "object",
@@ -29180,7 +30774,10 @@
             "maxLength": 20
           }
         },
-        "required": ["name"]
+        "required": ["name"],
+        "example": {
+          "name": "before-upgrade"
+        }
       },
       "V1RestorePointResponse": {
         "type": "object",
@@ -29191,9 +30788,14 @@
           "status": {
             "type": "string",
             "enum": ["AVAILABLE", "PENDING", "REMOVED", "FAILED"]
+          },
+          "completed_on": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           }
         },
-        "required": ["name", "status"]
+        "required": ["name", "status", "completed_on"]
       },
       "V1UndoBody": {
         "type": "object",
@@ -29203,7 +30805,149 @@
             "maxLength": 20
           }
         },
-        "required": ["name"]
+        "required": ["name"],
+        "example": {
+          "name": "before-upgrade"
+        }
+      },
+      "V1ListEntitlementsResponse": {
+        "type": "object",
+        "properties": {
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "feature": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "enum": [
+                        "instances.compute_update_available_sizes",
+                        "instances.read_replicas",
+                        "instances.disk_modifications",
+                        "instances.high_availability",
+                        "instances.orioledb",
+                        "replication.etl",
+                        "storage.max_file_size",
+                        "storage.max_file_size.configurable",
+                        "storage.image_transformations",
+                        "storage.vector_buckets",
+                        "storage.iceberg_catalog",
+                        "security.audit_logs_days",
+                        "security.questionnaire",
+                        "security.soc2_report",
+                        "security.private_link",
+                        "security.enforce_mfa",
+                        "log.retention_days",
+                        "custom_domain",
+                        "vanity_subdomain",
+                        "ipv4",
+                        "pitr.available_variants",
+                        "log_drains",
+                        "branching_limit",
+                        "branching_persistent",
+                        "auth.mfa_phone",
+                        "auth.mfa_web_authn",
+                        "auth.mfa_enhanced_security",
+                        "auth.hooks",
+                        "auth.platform.sso",
+                        "auth.custom_jwt_template",
+                        "auth.saml_2",
+                        "auth.user_sessions",
+                        "auth.leaked_password_protection",
+                        "auth.advanced_auth_settings",
+                        "auth.performance_settings",
+                        "auth.password_hibp",
+                        "backup.retention_days",
+                        "backup.restore_to_new_project",
+                        "function.max_count",
+                        "function.size_limit_mb",
+                        "realtime.max_concurrent_users",
+                        "realtime.max_events_per_second",
+                        "realtime.max_joins_per_second",
+                        "realtime.max_channels_per_client",
+                        "realtime.max_bytes_per_second",
+                        "realtime.max_presence_events_per_second",
+                        "realtime.max_payload_size_in_kb",
+                        "project_scoped_roles",
+                        "security.member_roles",
+                        "project_pausing",
+                        "project_cloning",
+                        "project_restore_after_expiry",
+                        "assistant.advance_model",
+                        "integrations.github_connections",
+                        "dedicated_pooler",
+                        "observability.dashboard_advanced_metrics"
+                      ]
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["boolean", "numeric", "set"]
+                    }
+                  },
+                  "required": ["key", "type"]
+                },
+                "hasAccess": {
+                  "type": "boolean"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["boolean", "numeric", "set"]
+                },
+                "config": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["enabled"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "value": {
+                          "type": "number"
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        },
+                        "unit": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["enabled", "value", "unlimited", "unit"]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "set": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": ["enabled", "set"]
+                    }
+                  ]
+                }
+              },
+              "required": ["feature", "hasAccess", "type", "config"]
+            }
+          }
+        },
+        "required": ["entitlements"]
       },
       "V1OrganizationMemberResponse": {
         "type": "object",

@@ -1,9 +1,9 @@
+import { useParams } from 'common'
 import Image from 'next/image'
 
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
 import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { BASE_PATH } from '@/lib/constants'
 
 export const AdvisorRulesPreview = () => {
   const { ref } = useParams()

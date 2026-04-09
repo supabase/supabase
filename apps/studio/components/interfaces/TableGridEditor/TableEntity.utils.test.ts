@@ -1,7 +1,8 @@
-import type { SupaTable } from 'components/grid/types'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { describe, expect, it } from 'vitest'
+
 import { formatTableRowsToSQL } from './TableEntity.utils'
+import type { SupaTable } from '@/components/grid/types'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
   it('should format rows into a single SQL INSERT statement', () => {
@@ -24,7 +25,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES ('1', 'Person 1'), ('2', 'Person 2'), ('3', 'Person 3');`
+    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2'), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -48,7 +49,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES ('1', 'Person 1'), ('2', null), ('3', 'Person 3');`
+    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, null), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -84,7 +85,55 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
       },
     ]
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES ('2', 'Person 1', ARRAY["tag-a","tag-c"], '{"version": 1}'), ('3', 'ONeil', ARRAY["tag-a"], '{"version": 1, "name": "O''Neil"}');`
+    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version": 1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version": 1, "name": "O''Neil"}');`
+    expect(result).toBe(expected)
+  })
+
+  it('should emit valid Postgres literals for booleans, numbers and text arrays', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'text', format: 'text', position: 0 },
+        { name: 'public', dataType: 'bool', format: 'bool', position: 1 },
+        { name: 'avif_autodetection', dataType: 'bool', format: 'bool', position: 2 },
+        { name: 'file_size_limit', dataType: 'int8', format: 'int8', position: 3 },
+        { name: 'allowed_mime_types', dataType: 'ARRAY', format: '_text', position: 4 },
+      ],
+      name: 'buckets',
+      schema: 'storage',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [
+      {
+        id: 'emails',
+        public: true,
+        avif_autodetection: false,
+        file_size_limit: 10485760,
+        allowed_mime_types: ['image/*', "image/o'neil"],
+      },
+    ]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "storage"."buckets" ("id", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types") VALUES ('emails', true, false, 10485760, ARRAY['image/*','image/o''neil']);`
+    expect(result).toBe(expected)
+  })
+
+  it('should escape fallback string formats outside text and varchar', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [{ name: 'email', dataType: 'USER-DEFINED', format: 'citext', position: 0 }],
+      name: 'users',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [{ email: "o'neil@example.com" }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "public"."users" ("email") VALUES ('o''neil@example.com');`
     expect(result).toBe(expected)
   })
 
@@ -124,7 +173,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES ('1', 'Person 1'), ('2', 'Person 2');`
+    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2');`
     expect(result).toBe(expected)
   })
 })

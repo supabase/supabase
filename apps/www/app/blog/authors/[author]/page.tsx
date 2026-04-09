@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 
-import blogAuthors from 'lib/authors.json'
-import { getAllCMSPosts } from 'lib/get-cms-posts'
-import { getSortedPosts } from 'lib/posts'
-import type PostTypes from 'types/post'
 import AuthorClient from './AuthorClient'
+import blogAuthors from '@/lib/authors.json'
+import { getSortedPosts } from '@/lib/posts'
+import type PostTypes from '@/types/post'
 
 type Params = { author: string }
 
@@ -55,15 +54,7 @@ export default async function AuthorPage({ params: paramsPromise }: { params: Pr
     return postAuthors.some((a: string) => toCanonicalAuthorId(a) === authorId)
   })
 
-  // Get CMS posts by this author (normalize identifiers)
-  const allCmsPosts = await getAllCMSPosts({})
-  const cmsPosts = allCmsPosts.filter((post: any) => {
-    return post.authors?.some(
-      (a: any) => toCanonicalAuthorId(a.author_id ?? a.username ?? '') === authorId
-    )
-  })
-
-  const blogs = [...(staticPosts as any[]), ...(cmsPosts as any[])].sort(
+  const blogs = [...(staticPosts as any[])].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   ) as unknown as PostTypes[]
 

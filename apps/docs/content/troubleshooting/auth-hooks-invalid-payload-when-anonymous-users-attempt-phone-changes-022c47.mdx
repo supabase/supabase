@@ -2,10 +2,11 @@
 title = "Auth Hooks: 'Invalid payload' when anonymous users attempt phone changes"
 topics = [ "auth", "cli" ]
 keywords = []
+database_id = "c1de4561-e95f-41e3-b298-fac9ae331a54"
+
 [[errors]]
 http_status_code = 500
 message = "Invalid payload sent to hook"
-
 ---
 
 An 'Invalid payload sent to hook' error (500) occurs in Auth hooks when the payload includes `new_phone` for an anonymous user.

@@ -1,5 +1,4 @@
 import { Search, X } from 'lucide-react'
-
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -25,6 +24,7 @@ export const FilterInput = ({ value, onChange, placeholder, className }: FilterI
       actions={[
         value && (
           <Button
+            key="clear"
             size="tiny"
             type="text"
             icon={<X />}
