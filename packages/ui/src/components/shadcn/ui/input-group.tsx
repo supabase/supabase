@@ -3,10 +3,19 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { Button } from '../../Button'
+import { useFormField } from './form'
 import { Input, type InputProps } from './input'
 import { Textarea, type TextareaProps } from './textarea'
 
-function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
+function InputGroup({
+  className,
+  // Those three props are passed by <FormControl_Shadcn_> but they should be applied on the input itself
+  // <InputGroupInput> or <InputGroupTextarea>
+  id,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedby,
+  ...props
+}: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="input-group"
@@ -124,6 +133,9 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 }
 
 function InputGroupInput({ className, ...props }: InputProps) {
+  // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
+  // so we apply them manually here
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
   return (
     <Input
       data-slot="input-group-control"
@@ -131,12 +143,18 @@ function InputGroupInput({ className, ...props }: InputProps) {
         'flex-1 rounded-none border-0 -m-px bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
         className
       )}
+      id={formItemId}
+      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
       {...props}
     />
   )
 }
 
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
+  // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
+  // so we apply them manually here
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
   return (
     <Textarea
       data-slot="input-group-control"
@@ -144,6 +162,9 @@ function InputGroupTextarea({ className, ...props }: TextareaProps) {
         'flex-1 resize-none rounded-none border-0 bg-transparent py-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
         className
       )}
+      id={formItemId}
+      aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
       {...props}
     />
   )
