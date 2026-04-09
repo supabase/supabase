@@ -31,6 +31,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -126,10 +127,12 @@ const CONNECTION_METHOD_TO_TELEMETRY: Record<
  * Step component for direct database connections.
  * Uses state to determine which connection string to show.
  */
-function DirectConnectionContent({ state, isHighAvailability }: StepContentProps) {
+function DirectConnectionContent({ state }: StepContentProps) {
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+  const { data: project } = useSelectedProjectQuery()
+  const isHighAvailability = project?.high_availability ?? false
 
   const connectionSource = state.connectionSource
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
@@ -246,9 +249,8 @@ function DirectConnectionContent({ state, isHighAvailability }: StepContentProps
     }
   }
 
-  const poolerBadge = isHighAvailability
-    ? null
-    : connectionMethod === 'transaction'
+  const poolerBadge =
+    connectionMethod === 'transaction'
       ? useSharedPooler || !hasDedicatedPooler
         ? 'Shared Pooler'
         : 'Dedicated Pooler'
@@ -258,7 +260,11 @@ function DirectConnectionContent({ state, isHighAvailability }: StepContentProps
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-x-2">{poolerBadge && <Badge>{poolerBadge}</Badge>}</div>
+      {poolerBadge && !isHighAvailability && (
+        <div className="flex items-center gap-x-2">
+          <Badge>{poolerBadge}</Badge>
+        </div>
+      )}
       <CodeBlock
         className="[&_code]:text-foreground"
         wrapperClassName="lg:col-span-2"

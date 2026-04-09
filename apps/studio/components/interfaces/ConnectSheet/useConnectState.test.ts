@@ -533,17 +533,6 @@ describe('useConnectState', () => {
       expect(connectionTypeField?.label).toBe('Connection Type')
     })
 
-    test('should expose isHighAvailability flag', async () => {
-      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
-      vi.mocked(useSelectedProjectQuery).mockReturnValue({
-        data: { high_availability: true },
-      } as any)
-
-      const { result } = renderHook(() => useConnectState())
-
-      expect(result.current.isHighAvailability).toBe(true)
-    })
-
     test('should not affect non-HA projects', async () => {
       const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useSelectedProjectQuery).mockReturnValue({

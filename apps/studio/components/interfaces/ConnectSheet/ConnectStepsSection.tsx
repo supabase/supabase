@@ -25,7 +25,6 @@ interface ConnectStepsSectionProps {
   steps: ResolvedStep[]
   state: ConnectState
   projectKeys: ProjectKeys
-  isHighAvailability: boolean
 }
 
 /**
@@ -116,13 +115,11 @@ function StepContent({
   state,
   projectKeys,
   connectionStringPooler,
-  isHighAvailability,
 }: {
   contentId: string
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
-  isHighAvailability: boolean
 }) {
   // Resolve any template placeholders in the content path
   const filePath = useMemo(() => resolveContentPath(contentId, state), [contentId, state])
@@ -143,17 +140,11 @@ function StepContent({
       state={state}
       projectKeys={projectKeys}
       connectionStringPooler={connectionStringPooler}
-      isHighAvailability={isHighAvailability}
     />
   )
 }
 
-export function ConnectStepsSection({
-  steps,
-  state,
-  projectKeys,
-  isHighAvailability,
-}: ConnectStepsSectionProps) {
+export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsSectionProps) {
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const connectionStringPooler = useConnectionStringPooler()
 
@@ -179,7 +170,6 @@ export function ConnectStepsSection({
                 state={state}
                 projectKeys={projectKeys}
                 connectionStringPooler={connectionStringPooler}
-                isHighAvailability={isHighAvailability}
               />
             </ConnectSheetStep>
           ))}

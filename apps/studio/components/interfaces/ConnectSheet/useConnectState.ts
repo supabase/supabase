@@ -191,7 +191,6 @@ export interface UseConnectStateReturn {
   resolvedSteps: ResolvedStep[]
   getFieldOptions: (fieldId: string) => FieldOption[]
   schema: ConnectSchema
-  isHighAvailability: boolean
 }
 
 export function useConnectState(initialState?: Partial<ConnectState>): UseConnectStateReturn {
@@ -356,6 +355,5 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     resolvedSteps,
     getFieldOptions,
     schema: connectSchema,
-    isHighAvailability,
   }
 }
