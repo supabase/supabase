@@ -352,7 +352,7 @@ export const PublishAppSidePanel = ({
                                 {...field}
                                 placeholder="e.g https://my-website.com"
                               />
-                              {index > 0 ? (
+                              {callbackUrlsFields.length > 0 ? (
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupButton
                                     type="default"
