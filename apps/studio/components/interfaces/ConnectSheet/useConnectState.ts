@@ -305,11 +305,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         }
 
         if (mode === 'direct') {
-          if (isHighAvailability) {
-            next.connectionMethod = 'transaction'
-          } else {
-            next.connectionMethod = next.connectionMethod ?? 'direct'
-          }
+          next.connectionMethod = next.connectionMethod ?? 'direct'
           next.connectionType = next.connectionType ?? 'uri'
           next.connectionSource = projectRef ?? '_'
         }
@@ -325,7 +321,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         return next
       })
     },
-    [projectRef, isHighAvailability]
+    [projectRef]
   )
 
   const activeFields = useMemo(() => {

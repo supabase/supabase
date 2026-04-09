@@ -533,21 +533,6 @@ describe('useConnectState', () => {
       expect(connectionTypeField?.label).toBe('Connection Type')
     })
 
-    test('should default connectionMethod to transaction for HA projects', async () => {
-      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
-      vi.mocked(useSelectedProjectQuery).mockReturnValue({
-        data: { high_availability: true },
-      } as any)
-
-      const { result } = renderHook(() => useConnectState())
-
-      act(() => {
-        result.current.setMode('direct')
-      })
-
-      expect(result.current.state.connectionMethod).toBe('transaction')
-    })
-
     test('should expose isHighAvailability flag', async () => {
       const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useSelectedProjectQuery).mockReturnValue({
