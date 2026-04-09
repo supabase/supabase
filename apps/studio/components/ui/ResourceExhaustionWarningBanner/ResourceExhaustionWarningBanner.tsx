@@ -16,18 +16,23 @@ import {
 
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const COMPUTE_UPGRADE_METRICS = ['disk_io', 'cpu', 'ram']
+const COMPUTE_UPGRADE_WARNING_TYPES = [
+  'disk_io_exhaustion',
+  'cpu_exhaustion',
+  'memory_and_swap_exhaustion',
+]
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
@@ -110,11 +115,19 @@ export const ResourceExhaustionWarningBanner = () => {
   }
 
   const isFreePlan = organization?.plan?.id === 'free'
-  const isComputeUpgradeMetric = metric !== null && metric !== undefined && COMPUTE_UPGRADE_METRICS.includes(metric)
+
+  // True for a single compute warning, or when all active warnings are compute-related
+  const isComputeUpgradeMetric =
+    (metric !== null && metric !== undefined && COMPUTE_UPGRADE_METRICS.includes(metric)) ||
+    (activeWarnings.length > 1 &&
+      activeWarnings.every((w) => COMPUTE_UPGRADE_WARNING_TYPES.includes(w)))
 
   const correctionUrl = (() => {
     if (isComputeUpgradeMetric && isFreePlan) {
       return `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=resource_exhaustion_banner`
+    }
+    if (isComputeUpgradeMetric && activeWarnings.length > 1) {
+      return `/project/${ref ?? 'default'}/settings/compute-and-disk`
     }
     return getCorrectionUrl(metric)
       ?.replace('[ref]', ref ?? 'default')
@@ -194,32 +207,50 @@ export const ResourceExhaustionWarningBanner = () => {
         <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
       </div>
       <div className="flex items-center gap-x-2">
-        {(learnMoreUrl !== undefined || aiPrompt !== undefined) && (
+        {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="default" icon={<Wrench size={14} />} iconRight={<ChevronDown size={14} />}>
+              <Button
+                type="default"
+                icon={<Wrench size={14} />}
+                iconRight={<ChevronDown size={14} />}
+              >
                 Troubleshoot
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {learnMoreUrl !== undefined && (
-                <DropdownMenuItem asChild>
-                  <a href={learnMoreUrl} target="_blank" rel="noreferrer" className="flex items-center gap-x-2 cursor-pointer">
-                    <BookOpen size={14} />
-                    Documentation
-                  </a>
-                </DropdownMenuItem>
-              )}
-              {aiPrompt !== undefined && (
-                <DropdownMenuItem className="flex items-center gap-x-2 cursor-pointer" onClick={handleAskAI}>
-                  Ask AI Assistant
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem asChild>
+                <a
+                  href={learnMoreUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-x-2 cursor-pointer"
+                >
+                  <BookOpen size={14} />
+                  Documentation
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex items-center gap-x-2 cursor-pointer"
+                onClick={handleAskAI}
+              >
+                Ask AI Assistant
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
+        ) : learnMoreUrl !== undefined ? (
+          <Button asChild type="default" icon={<BookOpen size={14} />}>
+            <a href={learnMoreUrl} target="_blank" rel="noreferrer">
+              Learn more
+            </a>
+          </Button>
+        ) : aiPrompt !== undefined ? (
+          <Button type="default" onClick={handleAskAI}>
+            Ask AI Assistant
+          </Button>
+        ) : null}
         {correctionUrl !== undefined && (
-          <Button asChild type="primary">
+          <Button asChild type="primary" disabled={isOrgLoading}>
             <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
           </Button>
         )}
