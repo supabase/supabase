@@ -349,14 +349,16 @@ export const PublishAppSidePanel = ({
                           <FormControl_Shadcn_>
                             <InputGroup>
                               <InputGroupInput {...field} />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupButton
-                                  type="default"
-                                  onClick={() => removeCallbackUrl(index)}
-                                >
-                                  Remove
-                                </InputGroupButton>
-                              </InputGroupAddon>
+                              {index > 0 ? (
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupButton
+                                    type="default"
+                                    onClick={() => removeCallbackUrl(index)}
+                                  >
+                                    Remove
+                                  </InputGroupButton>
+                                </InputGroupAddon>
+                              ) : null}
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
