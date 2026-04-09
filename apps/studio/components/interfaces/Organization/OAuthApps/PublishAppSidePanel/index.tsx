@@ -152,6 +152,11 @@ export const PublishAppSidePanel = ({
         ? await uploadAttachment('oauth-app-icons', `${slug}/${uuidv4()}.png`, iconFile)
         : iconUrl
 
+    if (iconFile !== undefined && uploadedIconUrl === undefined) {
+      toast.error('Failed to upload OAuth application icon')
+      return
+    }
+
     try {
       if (selectedApp === undefined) {
         // Create application
