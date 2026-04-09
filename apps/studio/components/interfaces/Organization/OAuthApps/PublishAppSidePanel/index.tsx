@@ -348,7 +348,10 @@ export const PublishAppSidePanel = ({
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput {...field} />
+                              <InputGroupInput
+                                {...field}
+                                placeholder="e.g https://my-website.com"
+                              />
                               {index > 0 ? (
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupButton
@@ -365,8 +368,8 @@ export const PublishAppSidePanel = ({
                       )}
                     />
                   ))}
-                  {errors.redirect_uris != null ? (
-                    <p className="text-red-900 text-sm">{errors.redirect_uris.message}</p>
+                  {errors.redirect_uris?.root != null ? (
+                    <p className="text-red-900 text-sm">{errors.redirect_uris?.root.message}</p>
                   ) : null}
                 </div>
               </SidePanel.Content>
