@@ -63,7 +63,7 @@ const formSchema = z.object({
           .string()
           .min(1, 'Please provide a URL')
           .url('Please provide a URL')
-          .refine((value) => isValidHttpUrl(value), 'Please provide a valid URL'),
+          .refine((value) => isValidHttpUrl(value, true), 'Please provide a valid HTTPS URL'),
       }),
       { required_error: 'Please provide at least one callback URL' }
     )

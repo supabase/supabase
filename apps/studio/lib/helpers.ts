@@ -252,12 +252,15 @@ export function pluralize(count: number, singular: string, plural?: string) {
   return count === 1 ? singular : plural || singular + 's'
 }
 
-export const isValidHttpUrl = (value: string) => {
+export const isValidHttpUrl = (value: string, httpsOnly = false) => {
   let url: URL
   try {
     url = new URL(value)
   } catch (_) {
     return false
+  }
+  if (httpsOnly) {
+    return url.host.split(':').at(0) === 'localhost' || url.protocol === 'https:'
   }
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
