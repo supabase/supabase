@@ -52,6 +52,8 @@ See the [Restore Dashboard backup guide](/guides/platform/migrating-within-supab
 Use the [Supabase CLI](/docs/reference/cli/introduction) to copy your downloaded storage files to the new project's buckets:
 
 ```bash
+supabase login
+supabase link --project-ref [NEW_PROJECT_REF]
 supabase storage cp /path/to/downloaded/files ss:///bucket_name -r --experimental
 ```
 
