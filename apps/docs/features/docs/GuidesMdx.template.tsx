@@ -52,7 +52,7 @@ interface BaseGuideTemplateProps {
   meta?: GuideFrontmatter
   content?: string
   children?: ReactNode
-  editLink: EditLink
+  editLink?: EditLink
   mdxOptions?: SerializeOptions
 }
 
@@ -90,28 +90,30 @@ const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideT
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
-            {content && (
-              <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />
-            )}
+            {content && <MDXRemoteBase source={content} options={mdxOptions} />}
             {children}
 
-            <footer className="mt-16 not-prose">
-              <a
-                href={
-                  editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
-                }
-                className={cn(
-                  'w-fit',
-                  'flex items-center gap-1',
-                  'text-sm text-scale-1000 hover:text-scale-1200',
-                  'transition-colors'
-                )}
-                target="_blank"
-                rel="noreferrer noopener edit"
-              >
-                Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
-              </a>
-            </footer>
+            {editLink && (
+              <footer className="mt-16 not-prose">
+                <a
+                  href={
+                    editLink.includesProtocol
+                      ? editLink.link
+                      : `https://github.com/${editLink.link}`
+                  }
+                  className={cn(
+                    'w-fit',
+                    'flex items-center gap-1',
+                    'text-sm text-scale-1000 hover:text-scale-1200',
+                    'transition-colors'
+                  )}
+                  target="_blank"
+                  rel="noreferrer noopener edit"
+                >
+                  Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+                </a>
+              </footer>
+            )}
           </article>
         </div>
         <GuidesSidebar
