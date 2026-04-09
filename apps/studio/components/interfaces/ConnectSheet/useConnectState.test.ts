@@ -15,6 +15,12 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: vi.fn().mockImplementation(() => ({ hasAccess: true })),
 }))
 
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: vi.fn().mockImplementation(() => ({
+    data: { high_availability: false },
+  })),
+}))
+
 describe('useConnectState', () => {
   // ============================================================================
   // Initial State Tests
@@ -481,6 +487,92 @@ describe('useConnectState', () => {
 
       const options = result.current.getFieldOptions('library')
       expect(options.length).toBeGreaterThan(0)
+    })
+  })
+
+  // ============================================================================
+  // High Availability Tests
+  // ============================================================================
+
+  describe('high availability projects', () => {
+    test('should hide connectionMethod field for HA projects', async () => {
+      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useSelectedProjectQuery).mockReturnValue({
+        data: { high_availability: true },
+      } as any)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).not.toContain('connectionMethod')
+    })
+
+    test('should hide useSharedPooler field for HA projects', async () => {
+      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useSelectedProjectQuery).mockReturnValue({
+        data: { high_availability: true },
+      } as any)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
+      )
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).not.toContain('useSharedPooler')
+    })
+
+    test('should rename connectionType label to "Connection Type" for HA projects', async () => {
+      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useSelectedProjectQuery).mockReturnValue({
+        data: { high_availability: true },
+      } as any)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const connectionTypeField = result.current.activeFields.find((f) => f.id === 'connectionType')
+      expect(connectionTypeField?.label).toBe('Connection Type')
+    })
+
+    test('should default connectionMethod to transaction for HA projects', async () => {
+      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useSelectedProjectQuery).mockReturnValue({
+        data: { high_availability: true },
+      } as any)
+
+      const { result } = renderHook(() => useConnectState())
+
+      act(() => {
+        result.current.setMode('direct')
+      })
+
+      expect(result.current.state.connectionMethod).toBe('transaction')
+    })
+
+    test('should expose isHighAvailability flag', async () => {
+      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useSelectedProjectQuery).mockReturnValue({
+        data: { high_availability: true },
+      } as any)
+
+      const { result } = renderHook(() => useConnectState())
+
+      expect(result.current.isHighAvailability).toBe(true)
+    })
+
+    test('should not affect non-HA projects', async () => {
+      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useSelectedProjectQuery).mockReturnValue({
+        data: { high_availability: false },
+      } as any)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).toContain('connectionMethod')
+      expect(fieldIds).toContain('connectionType')
+
+      const connectionTypeField = result.current.activeFields.find((f) => f.id === 'connectionType')
+      expect(connectionTypeField?.label).toBe('Type')
     })
   })
 

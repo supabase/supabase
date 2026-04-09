@@ -305,8 +305,11 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         }
 
         if (mode === 'direct') {
-          next.connectionMethod =
-            next.connectionMethod ?? (isHighAvailability ? 'transaction' : 'direct')
+          if (isHighAvailability) {
+            next.connectionMethod = 'transaction'
+          } else {
+            next.connectionMethod = next.connectionMethod ?? 'direct'
+          }
           next.connectionType = next.connectionType ?? 'uri'
           next.connectionSource = projectRef ?? '_'
         }
