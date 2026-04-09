@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertTriangle, RotateCcw, X } from 'lucide-react'
+import { AlertTriangle, EyeOff, RotateCcw, X } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
 
@@ -21,6 +21,8 @@ const WARNING_TYPES = [
 
 type WarningKey = (typeof WARNING_TYPES)[number]['key']
 
+const LS_KEY = 'supabase-dev-toolbar'
+
 const INITIAL_STATE: Record<WarningKey, Severity> = {
   disk_io_exhaustion: null,
   cpu_exhaustion: null,
@@ -32,9 +34,14 @@ const INITIAL_STATE: Record<WarningKey, Severity> = {
 export const SupabaseDevToolbar = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const [visible, setVisible] = useState(
+    () => typeof window === 'undefined' || localStorage.getItem(LS_KEY) !== 'false'
+  )
   const [open, setOpen] = useState(false)
   const [isReadOnly, setIsReadOnly] = useState(false)
   const [severities, setSeverities] = useState<Record<WarningKey, Severity>>(INITIAL_STATE)
+
+  if (!visible) return null
 
   const hasActiveOverrides = isReadOnly || Object.values(severities).some((v) => v !== null)
 
@@ -90,8 +97,19 @@ export const SupabaseDevToolbar = () => {
               <button
                 onClick={() => setOpen(false)}
                 className="text-foreground-lighter hover:text-foreground transition p-1 rounded"
+                title="Collapse"
               >
                 <X size={12} />
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.setItem(LS_KEY, 'false')
+                  setVisible(false)
+                }}
+                className="text-foreground-lighter hover:text-foreground transition p-1 rounded"
+                title="Hide toolbar (re-enable via localStorage)"
+              >
+                <EyeOff size={12} />
               </button>
             </div>
           </div>
