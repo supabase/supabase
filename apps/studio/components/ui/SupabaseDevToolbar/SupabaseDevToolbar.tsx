@@ -9,10 +9,6 @@ import { Button, cn } from 'ui'
 import { usageKeys } from '@/data/usage/keys'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 
-if (process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview') {
-  throw new Error('ResourceExhaustionDevtool must only be imported in development or preview')
-}
-
 type Severity = 'warning' | 'critical' | null
 
 const WARNING_TYPES = [
@@ -33,7 +29,7 @@ const INITIAL_STATE: Record<WarningKey, Severity> = {
   auth_rate_limit_exhaustion: null,
 }
 
-export const ResourceExhaustionDevtool = () => {
+export const SupabaseDevToolbar = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
@@ -54,7 +50,6 @@ export const ResourceExhaustionDevtool = () => {
       auth_restricted_email_sending: null,
       need_pitr: null,
     }
-
     queryClient.setQueryData(usageKeys.resourceWarnings(undefined, ref), [mockWarning])
   }
 
@@ -76,9 +71,9 @@ export const ResourceExhaustionDevtool = () => {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col items-end gap-2">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-0">
       {open && (
-        <div className="w-72 rounded-lg border border-overlay bg-surface-100 shadow-xl text-sm">
+        <div className="mb-0 w-72 rounded-t-lg border border-b-0 border-overlay bg-surface-100 shadow-xl text-sm">
           <div className="flex items-center justify-between px-3 py-2 border-b border-overlay">
             <div className="flex items-center gap-1.5 font-medium text-foreground">
               <AlertTriangle size={13} className="text-warning" />
@@ -88,7 +83,7 @@ export const ResourceExhaustionDevtool = () => {
               <button
                 onClick={handleReset}
                 className="text-foreground-lighter hover:text-foreground transition p-1 rounded"
-                title="Reset all to real data"
+                title="Reset to real data"
               >
                 <RotateCcw size={12} />
               </button>
@@ -102,7 +97,6 @@ export const ResourceExhaustionDevtool = () => {
           </div>
 
           <div className="p-3 space-y-2">
-            {/* Read-only toggle */}
             <div className="flex items-center justify-between">
               <span className="text-foreground-light">Read-only mode</span>
               <div className="flex gap-1">
@@ -162,7 +156,7 @@ export const ResourceExhaustionDevtool = () => {
         onClick={() => setOpen((v) => !v)}
         icon={<AlertTriangle size={13} />}
         className={cn(
-          'shadow-md font-mono text-xs h-7 px-2',
+          'rounded-b-none shadow-md font-mono text-xs h-7 px-2',
           hasActiveOverrides && 'border-warning text-warning'
         )}
       >
