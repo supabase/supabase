@@ -195,8 +195,8 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <InputGroup>
-                            <FormControl_Shadcn_>
+                          <FormControl_Shadcn_>
+                            <InputGroup>
                               <InputGroupInput
                                 {...field}
                                 id="new-disk-size"
@@ -206,8 +206,8 @@ const DiskSizeConfigurationModal = ({
                               <InputGroupAddon align="inline-end">
                                 <InputGroupText>GB</InputGroupText>
                               </InputGroupAddon>
-                            </FormControl_Shadcn_>
-                          </InputGroup>
+                            </InputGroup>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />
