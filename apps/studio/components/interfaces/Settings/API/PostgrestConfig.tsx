@@ -15,10 +15,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   FormItem_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Skeleton,
   Switch,
@@ -611,7 +611,7 @@ export const PostgrestConfig = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
@@ -641,7 +641,7 @@ export const PostgrestConfig = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}

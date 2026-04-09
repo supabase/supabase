@@ -8,9 +8,9 @@ import {
   Badge,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -71,7 +71,7 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <InputGroup>
-                      <InputGroupInput
+                      <FormInputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
@@ -105,7 +105,7 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <InputGroup>
-                      <InputGroupInput
+                      <FormInputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
@@ -142,7 +142,7 @@ export const AdvancedSettings = ({
                 >
                   <FormControl_Shadcn_>
                     <InputGroup>
-                      <InputGroupInput
+                      <FormInputGroupInput
                         {...field}
                         type="number"
                         value={field.value ?? ''}
@@ -217,7 +217,7 @@ export const AdvancedSettings = ({
                     >
                       <FormControl_Shadcn_>
                         <InputGroup>
-                          <InputGroupInput
+                          <FormInputGroupInput
                             {...field}
                             type="number"
                             value={field.value ?? ''}
@@ -260,7 +260,7 @@ export const AdvancedSettings = ({
                     >
                       <FormControl_Shadcn_>
                         <InputGroup>
-                          <InputGroupInput
+                          <FormInputGroupInput
                             {...field}
                             type="number"
                             value={field.value ?? ''}

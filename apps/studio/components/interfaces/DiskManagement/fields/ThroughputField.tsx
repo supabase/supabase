@@ -6,9 +6,9 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -120,7 +120,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
               >
                 <FormControl_Shadcn_ className="max-w-32">
                   <InputGroup>
-                    <InputGroupInput
+                    <FormInputGroupInput
                       type="number"
                       {...field}
                       value={field.value}

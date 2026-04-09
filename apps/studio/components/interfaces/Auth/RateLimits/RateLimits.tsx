@@ -13,9 +13,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Switch,
   Tooltip,
@@ -238,7 +238,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}
@@ -309,7 +309,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}
@@ -358,7 +358,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}
@@ -406,7 +406,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}
@@ -454,7 +454,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}
@@ -501,7 +501,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}
@@ -549,7 +549,7 @@ export const RateLimits = () => {
                           <TooltipTrigger asChild>
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   type="number"
                                   min={0}
                                   {...field}

@@ -35,10 +35,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Modal,
 } from 'ui'
@@ -329,7 +329,7 @@ const JWTSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 id="JWT_EXP"
                                 type="number"

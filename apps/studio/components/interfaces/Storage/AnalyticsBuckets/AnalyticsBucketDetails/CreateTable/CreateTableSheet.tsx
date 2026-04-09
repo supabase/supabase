@@ -10,10 +10,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -313,7 +313,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                                 {x.name}
                                               </InputGroupAddon>
                                               <FormControl_Shadcn_>
-                                                <InputGroupInput
+                                                <FormInputGroupInput
                                                   {...field}
                                                   type={x.type === 'number' ? 'number' : 'text'}
                                                   disabled={isCreating}

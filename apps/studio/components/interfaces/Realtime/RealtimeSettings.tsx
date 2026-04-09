@@ -13,10 +13,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   FormMessage_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Switch,
 } from 'ui'
@@ -278,7 +278,7 @@ export const RealtimeSettings = () => {
                           >
                             <FormControl_Shadcn_>
                               <InputGroup>
-                                <InputGroupInput
+                                <FormInputGroupInput
                                   {...field}
                                   type="number"
                                   disabled={!canUpdateConfig}
@@ -314,7 +314,7 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!canUpdateConfig}
@@ -341,7 +341,7 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
@@ -395,7 +395,7 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
@@ -449,7 +449,7 @@ export const RealtimeSettings = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}

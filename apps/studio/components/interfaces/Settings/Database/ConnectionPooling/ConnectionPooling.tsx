@@ -15,9 +15,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Separator,
 } from 'ui'
@@ -266,7 +266,7 @@ export const ConnectionPooling = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 className="w-full"
@@ -330,7 +330,7 @@ export const ConnectionPooling = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 className="w-full"

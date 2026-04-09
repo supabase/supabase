@@ -6,10 +6,10 @@ import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -100,7 +100,7 @@ export function DiskSizeField({
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <FormControl_Shadcn_ className="max-w-32">
                 <InputGroup>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     type="number"
                     id={field.name}
                     {...field}

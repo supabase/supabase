@@ -11,9 +11,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -229,7 +229,7 @@ export const PerformanceSettingsForm = () => {
                         <div className="relative">
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 type="number"
                                 min={5}
                                 max={30}
@@ -372,7 +372,7 @@ export const PerformanceSettingsForm = () => {
                         <div className="relative">
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 type="number"
                                 {...field}
                                 min={3}

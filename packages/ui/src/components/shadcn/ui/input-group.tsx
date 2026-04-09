@@ -2,11 +2,9 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
-import { FieldError } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
 import { Button } from '../../Button'
-import { useFormField } from './form'
 import { Input, type InputProps } from './input'
 import { Textarea, type TextareaProps } from './textarea'
 
@@ -135,31 +133,11 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   )
 }
 
+/*
+ * Use this component to add an input inside an `<InputGroup>` when not in a react-hook-form form (e.g <Form_Shadcn_>).
+ * Otherwise, use <FormInputGroupInput />
+ */
 function InputGroupInput({ className, ...props }: InputProps) {
-  // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
-  // so we apply them manually here
-  let error: FieldError | undefined
-  let formItemId: string | undefined
-  let formDescriptionId: string | undefined
-  let formMessageId: string | undefined
-
-  try {
-    const formField = useFormField()
-    if (formField) {
-      error = formField.error
-      formItemId = formField.formItemId
-      formDescriptionId = formField.formDescriptionId
-      formMessageId = formField.formMessageId
-    }
-  } catch {
-    // The component might not be inside a react-hook-form
-  }
-
-  let ariaDescribedby = formDescriptionId
-  if (error) {
-    ariaDescribedby = `${formDescriptionId} ${formMessageId}`
-  }
-
   return (
     <Input
       data-slot="input-group-control"
@@ -167,39 +145,12 @@ function InputGroupInput({ className, ...props }: InputProps) {
         'flex-1 rounded-none border-0 -m-px bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
         className
       )}
-      id={formItemId}
-      aria-describedby={ariaDescribedby}
-      aria-invalid={!!error}
       {...props}
     />
   )
 }
 
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
-  // This is usually passed by <FormControl_Shadcn_> but they would be passed to the parent <InputGroup>
-  // so we apply them manually here
-  let error: FieldError | undefined
-  let formItemId: string | undefined
-  let formDescriptionId: string | undefined
-  let formMessageId: string | undefined
-
-  try {
-    const formField = useFormField()
-    if (formField) {
-      error = formField.error
-      formItemId = formField.formItemId
-      formDescriptionId = formField.formDescriptionId
-      formMessageId = formField.formMessageId
-    }
-  } catch {
-    // The component might not be inside a react-hook-form
-  }
-
-  let ariaDescribedby = formDescriptionId
-  if (error) {
-    ariaDescribedby = `${formDescriptionId} ${formMessageId}`
-  }
-
   return (
     <Textarea
       data-slot="input-group-control"
@@ -207,9 +158,6 @@ function InputGroupTextarea({ className, ...props }: TextareaProps) {
         'flex-1 resize-none rounded-none border-0 bg-transparent py-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
         className
       )}
-      id={formItemId}
-      aria-describedby={ariaDescribedby}
-      aria-invalid={!!error}
       {...props}
     />
   )

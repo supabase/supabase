@@ -7,10 +7,10 @@ import {
   Calendar,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -229,7 +229,7 @@ const FormField = ({
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
-                        <InputGroupInput
+                        <FormInputGroupInput
                           {...field}
                           id={name}
                           type="number"

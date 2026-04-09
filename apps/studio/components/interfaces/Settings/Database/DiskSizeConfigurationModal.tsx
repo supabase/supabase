@@ -15,10 +15,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InfoIcon,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Modal,
   WarningIcon,
@@ -197,7 +197,7 @@ const DiskSizeConfigurationModal = ({
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 id="new-disk-size"
                                 type="number"

@@ -12,9 +12,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Switch,
 } from 'ui'
@@ -242,7 +242,7 @@ export const SessionsAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_ className="w-full">
                           <InputGroup>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               min={0}
                               {...field}
@@ -329,7 +329,7 @@ export const SessionsAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_ className="w-full">
                           <InputGroup>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               min={0}
                               {...field}
@@ -359,7 +359,7 @@ export const SessionsAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_ className="w-full">
                           <InputGroup>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               {...field}
                               className="flex-1"

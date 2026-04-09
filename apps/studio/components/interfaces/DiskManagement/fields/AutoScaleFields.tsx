@@ -5,9 +5,9 @@ import {
   cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -70,7 +70,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
             >
               <FormControl_Shadcn_ className="max-w-20">
                 <InputGroup>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     {...field}
                     type="number"
                     value={field.value ?? undefined}
@@ -116,7 +116,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
             >
               <FormControl_Shadcn_ className="max-w-32">
                 <InputGroup>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     {...field}
                     type="number"
                     value={field.value ?? undefined}
@@ -157,7 +157,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
             >
               <FormControl_Shadcn_ className="max-w-32">
                 <InputGroup>
-                  <InputGroupInput
+                  <FormInputGroupInput
                     {...field}
                     type="number"
                     value={field.value ?? undefined}
