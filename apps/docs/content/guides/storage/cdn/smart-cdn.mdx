@@ -50,4 +50,4 @@ This affects how you should think about serving private assets:
 - Revoking or expiring a token does not purge its CDN cache entry. The cached response persists at the edge until the cache duration expires.
 - Deleting the object invalidates all cached entries for that file across all tokens. This propagates within 60 seconds.
 
-Token expiry (`expiresIn`) and CDN cache duration (`cacheControl`) are independent. Once a response is cached at the edge, it can still be served to requests that arrive with the same token URL, even after the original token expires. If you need to cut off access to an asset immediately, delete the object from the bucket rather than relying on token expiry alone.
+Token expiry (`expiresIn`) and CDN cache duration (`cacheControl`) are independent. Once a response is cached at the edge, that cached response can continue to be served for the exact same signed URL until the CDN cache duration expires, even if the token in that URL has already expired. If you need to cut off access to an asset immediately, delete the object from the bucket rather than relying on token expiry alone.
