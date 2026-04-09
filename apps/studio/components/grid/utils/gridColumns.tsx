@@ -250,7 +250,7 @@ function getCellRenderer(
   return withPendingAddPlaceholders(formatter, columnDef)
 }
 
-function getColumnType(columnDef: SupaColumn): ColumnType {
+export function getColumnType(columnDef: SupaColumn): ColumnType {
   if (isForeignKeyColumn(columnDef)) {
     return 'foreign_key'
   } else if (isNumericalColumn(columnDef.dataType)) {

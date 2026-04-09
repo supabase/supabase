@@ -43,7 +43,8 @@ export const useBackupsQuery = <TData = BackupsData>(
       enabled &&
       !isOrioleDbInAws &&
       typeof projectRef !== 'undefined' &&
-      projectStatus !== PROJECT_STATUS.COMING_UP,
+      projectStatus !== PROJECT_STATUS.COMING_UP &&
+      projectStatus !== PROJECT_STATUS.UNKNOWN,
     ...options,
   })
 }

@@ -23,7 +23,11 @@ export const OrganizationCard = ({
   onClick?: () => void
 }) => {
   const isUserMFAEnabled = useIsMFAEnabled()
-  const { data } = useOrgProjectsInfiniteQuery({ slug: organization.slug })
+  const isPlatformOrg = organization.plan?.id === 'platform'
+  const { data } = useOrgProjectsInfiniteQuery(
+    { slug: organization.slug },
+    { enabled: !isPlatformOrg }
+  )
   const numProjects = data?.pages[0].pagination.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa
 

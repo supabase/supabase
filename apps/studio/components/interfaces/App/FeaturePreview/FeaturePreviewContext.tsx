@@ -39,10 +39,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     setFlags(
       featurePreviews.reduce((a, b) => {
         const defaultOptIn = b.isDefaultOptIn
-        const localStorageValue = localStorage.getItem(b.key)
-        return {
-          ...a,
-          [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+        try {
+          const localStorageValue = window.localStorage.getItem(b.key)
+          return {
+            ...a,
+            [b.key]: !localStorageValue ? defaultOptIn : localStorageValue === 'true',
+          }
+        } catch {
+          return { ...a, [b.key]: defaultOptIn }
         }
       }, {})
     )
@@ -57,8 +61,12 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
   const value = {
     flags,
     onUpdateFlag: (key: string, value: boolean) => {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, value.toString())
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value ? 'true' : 'false')
+        }
+      } catch {
+        // Silently fail in restricted storage modes (e.g. Safari private browsing)
       }
       const updatedFlags = { ...flags, [key]: value }
       setFlags(updatedFlags)
@@ -69,11 +77,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
 }
 
 // Helpers
-
-export const useIsAPIDocsSidePanelEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]
-}
 
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
@@ -106,11 +109,6 @@ export const useIsPgDeltaDiffEnabled = () => {
 export const useIsAdvisorRulesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]
-}
-
-export const useIsQueueOperationsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS]
 }
 
 export const useIsPlatformWebhooksEnabled = () => {

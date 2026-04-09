@@ -4,13 +4,13 @@ import type {
   StripeAddressElementChangeEvent,
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { TaxIdFormValues, TaxIdSchema } from './BillingCustomerDataForm'
 import { TAX_IDS } from './TaxID.constants'
 import { getEffectiveTaxCountry, resolveStoredTaxId, sanitizeTaxIdValue } from './TaxID.utils'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 
 type StripeAddressValue = StripeAddressElementChangeEvent['value']
 type StripeAddressValidationState = 'unknown' | 'complete' | 'incomplete'

@@ -1,7 +1,9 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from '@/data/sql/execute-sql-query'
 import { tableKeys } from '@/data/tables/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -26,19 +28,25 @@ export async function createDatabaseQueue({
   enableRls,
   configuration,
 }: DatabaseQueueCreateVariables) {
+  if (!isQueueNameValid(name)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
+
   const { partitionInterval, retentionInterval } = configuration ?? {}
 
   const query =
     type === 'partitioned'
-      ? `select from pgmq.create_partitioned('${name}', '${partitionInterval}', '${retentionInterval}');`
+      ? `select from pgmq.create_partitioned(${literal(name)}, ${literal(partitionInterval)}, ${literal(retentionInterval)});`
       : type === 'unlogged'
-        ? `SELECT pgmq.create_unlogged('${name}');`
-        : `SELECT pgmq.create('${name}');`
+        ? `SELECT pgmq.create_unlogged(${literal(name)});`
+        : `SELECT pgmq.create(${literal(name)});`
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim(),
+    sql: `${query} ${enableRls ? `alter table pgmq.${ident('q_' + name)} enable row level security;` : ''}`.trim(),
     queryKey: databaseQueuesKeys.create(),
   })
 

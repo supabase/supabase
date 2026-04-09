@@ -1,8 +1,8 @@
+import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_REST_URL } from 'lib/constants/api'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { PROJECT_REST_URL } from '@/lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 

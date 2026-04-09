@@ -1,3 +1,4 @@
+import { ident, literal } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseQueuesKeys } from './keys'
@@ -23,7 +24,7 @@ const preciseMetricsSqlQuery = (queueName: string) => {
   SELECT
     COUNT(*) AS row_count
   FROM
-    "pgmq"."q_${queueName}";
+    "pgmq".${ident('q_' + queueName)};
 `
 }
 
@@ -34,7 +35,7 @@ const estimateMetricsSqlQuery = (queueName: string) => {
     from
   pg_class
     where
-  relname = 'q_${queueName}'
+  relname = ${literal('q_' + queueName)}
   and relnamespace = 'pgmq'::regnamespace;
 `
 }

@@ -1,8 +1,8 @@
 import { getImpersonationSQL } from '@supabase/pg-meta'
-import type { User } from 'data/auth/users-infinite-query'
-import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
 
 import { uuidv4 } from './helpers'
+import type { User } from '@/data/auth/users-infinite-query'
+import { RoleImpersonationState as ValtioRoleImpersonationState } from '@/state/role-impersonation-state'
 
 type PostgrestImpersonationRole =
   | {

@@ -1,4 +1,6 @@
-import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import { describe, expect, test } from 'vitest'
+
+import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   BUCKET_LIMIT_ERROR_PREFIX,
   convertFromBytes,
@@ -6,8 +8,7 @@ import {
   decodeBucketLimitErrorMessage,
   encodeBucketLimitErrorMessage,
   isBucketLimitErrorMessage,
-} from 'components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { describe, expect, test } from 'vitest'
+} from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 
 describe('StorageSettings.utils: convertFromBytes', () => {
   test('should convert 1024 to 1KB', () => {
