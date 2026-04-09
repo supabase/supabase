@@ -34,8 +34,16 @@ export const ConnectSheet = () => {
   const track = useTrack()
   const prevShowConnect = useRef(false)
 
-  const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
-    useConnectState()
+  const {
+    state,
+    activeFields,
+    resolvedSteps,
+    schema,
+    getFieldOptions,
+    setMode,
+    updateField,
+    isHighAvailability,
+  } = useConnectState()
 
   useEffect(() => {
     const justOpened = showConnect && !prevShowConnect.current
@@ -121,7 +129,12 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+          <ConnectStepsSection
+            steps={resolvedSteps}
+            state={state}
+            projectKeys={projectKeys}
+            isHighAvailability={isHighAvailability}
+          />
         </div>
       </SheetContent>
     </Sheet>

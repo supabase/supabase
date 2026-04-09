@@ -156,4 +156,5 @@ export interface StepContentProps {
   state: ConnectState
   projectKeys: ProjectKeys
   connectionStringPooler: ConnectionStringPooler
+  isHighAvailability: boolean
 }

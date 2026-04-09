@@ -126,7 +126,7 @@ const CONNECTION_METHOD_TO_TELEMETRY: Record<
  * Step component for direct database connections.
  * Uses state to determine which connection string to show.
  */
-function DirectConnectionContent({ state }: StepContentProps) {
+function DirectConnectionContent({ state, isHighAvailability }: StepContentProps) {
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
@@ -246,8 +246,9 @@ function DirectConnectionContent({ state }: StepContentProps) {
     }
   }
 
-  const poolerBadge =
-    connectionMethod === 'transaction'
+  const poolerBadge = isHighAvailability
+    ? null
+    : connectionMethod === 'transaction'
       ? useSharedPooler || !hasDedicatedPooler
         ? 'Shared Pooler'
         : 'Dedicated Pooler'
@@ -268,7 +269,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
       >
         {connectionString}
       </CodeBlock>
-      {projectRef && (
+      {projectRef && !isHighAvailability && (
         <div className="mt-2">
           <IPv4StatusPanel
             method={connectionMethod}
