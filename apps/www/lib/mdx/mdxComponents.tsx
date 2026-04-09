@@ -1,8 +1,9 @@
 'use client'
 
 import { CH } from '@code-hike/mdx/components'
-import dynamic from 'next/dynamic'
 import { ArrowUpRight, Triangle } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import type { PropsWithChildren } from 'react'
 import {
   Badge,
   cn,
@@ -10,15 +11,16 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Heading,
-  Image,
-  Mermaid,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
-import type { PropsWithChildren } from 'react'
-import type { ImageProps } from 'ui/src/components/Image/Image'
+import { Image, type ImageProps } from 'ui-patterns/Image'
+import { Mermaid } from 'ui-patterns/Mermaid'
 
 const Avatar = dynamic(() => import('~/components/Avatar'))
 const Chart = dynamic(() => import('~/components/Charts/PGCharts'))
+const DeveloperGrowthChart = dynamic(() => import('~/components/Charts/DeveloperGrowthChart'), {
+  ssr: false,
+})
 const CodeBlock = dynamic(() => import('~/components/CodeBlock/CodeBlock'))
 const Tabs = dynamic(() => import('~/components/Tabs/Tabs'), { ssr: false })
 const TabPanel = dynamic(
@@ -104,6 +106,7 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     PGChart: (props: any) => {
       return <Chart {...props} />
     },
+    DeveloperGrowthChart,
     pre: (props: any) => {
       if (props.className !== ignoreClass) {
         const childProps = props.children?.props

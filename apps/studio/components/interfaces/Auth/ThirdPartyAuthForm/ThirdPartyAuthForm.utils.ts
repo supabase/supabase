@@ -1,5 +1,5 @@
-import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
-import { BASE_PATH } from 'lib/constants'
+import { ThirdPartyAuthIntegration } from '@/data/third-party-auth/integrations-query'
+import { BASE_PATH } from '@/lib/constants'
 
 export const INTEGRATION_TYPES = [
   'firebase',

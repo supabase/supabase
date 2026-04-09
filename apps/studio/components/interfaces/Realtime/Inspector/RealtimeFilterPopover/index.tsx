@@ -1,31 +1,31 @@
+import { useParams } from 'common'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useParams } from 'common'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
+  cn,
   IconBroadcast,
   IconDatabaseChanges,
   IconPresence,
   Input,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   Toggle,
-  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface RealtimeFilterPopoverProps {
   config: RealtimeConfig

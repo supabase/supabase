@@ -1,10 +1,10 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useRouter } from 'next/router'
 
 import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -22,10 +22,11 @@ export const TaxIdBanner = () => {
 
   const shouldFetch = Boolean(
     !!slug &&
-      org?.plan?.id !== 'free' &&
-      isDismissLoaded &&
-      !isDismissed &&
-      !!org?.organization_missing_tax_id
+    org?.plan?.id !== 'free' &&
+    !org?.billing_partner &&
+    isDismissLoaded &&
+    !isDismissed &&
+    !!org?.organization_missing_tax_id
   )
   const { data: customerProfile } = useOrganizationCustomerProfileQuery(
     { slug },
@@ -39,6 +40,7 @@ export const TaxIdBanner = () => {
     router.pathname.includes('sign-in') ||
     !org ||
     org.plan?.id === 'free' ||
+    org.billing_partner ||
     !isDismissLoaded ||
     isDismissed ||
     !org.organization_missing_tax_id ||

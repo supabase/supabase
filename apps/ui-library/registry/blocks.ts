@@ -11,6 +11,7 @@ import passwordBasedAuthTanstack from './default/blocks/password-based-auth-tans
 import realtimeAvatarStack from './default/blocks/realtime-avatar-stack/registry-item.json' with { type: 'json' }
 import realtimeChat from './default/blocks/realtime-chat/registry-item.json' with { type: 'json' }
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' with { type: 'json' }
+import realtimeMonaco from './default/blocks/realtime-monaco/registry-item.json' with { type: 'json' }
 import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' with { type: 'json' }
 import socialAuthReactRouter from './default/blocks/social-auth-react-router/registry-item.json' with { type: 'json' }
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
@@ -51,6 +52,7 @@ export const blocks = [
   ...combine(currentUserAvatar as RegistryItem),
   ...combine(realtimeAvatarStack as RegistryItem),
   ...combine(realtimeChat as RegistryItem),
+  ...combine(realtimeMonaco as RegistryItem),
   // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
   infiniteQueryHook as RegistryItem,
 

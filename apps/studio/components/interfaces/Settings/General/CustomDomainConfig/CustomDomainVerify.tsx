@@ -1,12 +1,4 @@
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyQuery } from 'data/custom-domains/custom-domains-reverify-query'
-import { DOCS_URL } from 'lib/constants'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
@@ -21,6 +13,14 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import DNSRecord from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
+import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useCustomDomainReverifyQuery } from '@/data/custom-domains/custom-domains-reverify-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()

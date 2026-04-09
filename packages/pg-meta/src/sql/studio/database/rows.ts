@@ -1,5 +1,5 @@
 import { Filter, Query } from '../../../query'
-import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../get-count-estimate'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './get-count-estimate'
 
 /**
  * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table

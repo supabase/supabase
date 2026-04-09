@@ -1,15 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from 'components/ui/AlertError'
-import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
-import { Service } from 'data/graphql/graphql'
 import dayjs from 'dayjs'
 import { BarChart2, Bot, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { StatusCode } from 'ui-patterns'
 import {
@@ -31,7 +25,6 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { ErrorCodeTooltip } from 'components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
@@ -46,6 +39,13 @@ import {
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import AlertError from '@/components/ui/AlertError'
+import { getStatusColor } from '@/components/ui/DataTable/DataTable.utils'
+import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
+import { Service } from '@/data/graphql/graphql'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const StatCard = ({
   title,

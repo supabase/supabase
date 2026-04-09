@@ -1,7 +1,5 @@
 'use client'
 
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { useTrack } from 'lib/telemetry/track'
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -12,6 +10,8 @@ import {
 } from 'ui'
 
 import { RestartProjectDialog } from './RestartProjectDialog'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface StepTriggerProps {
   number: number

@@ -1,4 +1,4 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 export interface UserContent<
   T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,

@@ -1,7 +1,5 @@
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
+import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
+
+import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
 interface RestartTableDialogProps {
   open: boolean

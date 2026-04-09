@@ -1,7 +1,6 @@
 import { ChevronRight, Loader } from 'lucide-react'
 import Link from 'next/link'
 import React, { cloneElement, PropsWithChildren } from 'react'
-
 import { cn } from 'ui'
 
 interface CardButtonProps {
@@ -33,8 +32,10 @@ interface UrlContainerProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorEl
 
 interface NonLinkContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {}
 
-interface ButtonContainerProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {}
+interface ButtonContainerProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'title'
+> {}
 
 // Union of all container props
 type ContainerProps =

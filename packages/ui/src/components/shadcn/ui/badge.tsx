@@ -25,8 +25,7 @@ const badgeVariants = cva(
 )
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 // Forward refs in order to allow tooltips to be applied to the badge
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(

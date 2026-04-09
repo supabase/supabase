@@ -1,17 +1,6 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import Link from 'next/link'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -19,6 +8,17 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
   const { slug } = useParams()

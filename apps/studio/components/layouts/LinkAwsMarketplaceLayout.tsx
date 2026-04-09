@@ -1,11 +1,12 @@
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
 import Image from 'next/legacy/image'
 import type { PropsWithChildren } from 'react'
 import { Separator } from 'ui'
+
 import { withAuth } from '../../hooks/misc/withAuth'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { BASE_PATH } from '@/lib/constants'
 
 export interface LinkAwsMarketplaceLayoutProps {}
 

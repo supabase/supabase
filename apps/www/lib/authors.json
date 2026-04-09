@@ -607,6 +607,14 @@
     "author_image_url": "https://github.com/saxonf.png"
   },
   {
+    "author_id": "sara_read",
+    "author": "Sara Read",
+    "username": "supa-sara",
+    "position": "Incident Manager",
+    "author_url": "https://github.com/supa-sara",
+    "author_image_url": "https://github.com/supa-sara.png"
+  },
+  {
     "author_id": "gregpapas",
     "author": "Greg Papas",
     "username": "gregpapas",
@@ -851,6 +859,14 @@
     "author_image_url": "https://github.com/deepthi.png"
   },
   {
+    "author_id": "joe_sciarrino",
+    "author": "Joe Sciarrino",
+    "username": "jhydra12",
+    "position": "Head of Product, Supabase Warehouse",
+    "author_url": "https://github.com/jhydra12",
+    "author_image_url": "https://github.com/jhydra12.png"
+  },
+  {
     "author_id": "manan_gupta",
     "author": "Manan Gupta",
     "username": "GuptaManan100",
@@ -889,5 +905,21 @@
     "company": "Performanze",
     "author_url": "#",
     "author_image_url": "/images/blog/avatars/victor-orozco.jpeg"
+  },
+  {
+    "author_id": "ana_mogul",
+    "author": "Ana Mogul",
+    "username": "ana1337x",
+    "position": "Product Marketing Manager",
+    "author_url": "https://linkedin.com/in/amogul",
+    "author_image_url": "/images/blog/avatars/ana-mogul.jpeg"
+  },
+  {
+    "author_id": "gregor_vand",
+    "author": "Gregor Vand",
+    "username": "gregorvand",
+    "position": "Technical Program Manager",
+    "author_url": "https://www.linkedin.com/in/gregorvand/",
+    "author_image_url": "https://github.com/gregorvand.png"
   }
 ]

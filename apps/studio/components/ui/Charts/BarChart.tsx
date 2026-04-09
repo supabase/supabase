@@ -1,4 +1,3 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
 import dayjs from 'dayjs'
 import { ComponentProps, useMemo, useState } from 'react'
 import {
@@ -18,6 +17,7 @@ import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
+import { CHART_COLORS, DateTimeFormats } from '@/components/ui/Charts/Charts.constants'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string

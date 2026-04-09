@@ -1,9 +1,9 @@
 # Usage
-#   Start:              docker compose up
-#   With helpers:       docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+#   Start:              docker compose up -d
 #   Stop:               docker compose down
-#   Destroy:            docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
+#   Dev mode:           docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up -d
 #   Reset everything:  ./reset.sh
+#
 
 name: supabase
 
@@ -11,7 +11,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.02.16-sha-26c615c
+    image: supabase/studio:2026.04.08-sha-205cbe7
     restart: unless-stopped
     healthcheck:
       test:
@@ -26,8 +26,6 @@ services:
       retries: 3
     depends_on:
       analytics:
-        condition: service_healthy
-      kong:
         condition: service_healthy
     environment:
       # Binds nestjs listener to both IPv4 and IPv6 network interfaces
@@ -83,6 +81,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    depends_on:
+      studio:
+        condition: service_healthy
     ports:
       - ${KONG_HTTP_PORT}:8000/tcp
       - ${KONG_HTTPS_PORT}:8443/tcp
@@ -97,9 +98,11 @@ services:
       KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_DNS_NOT_FOUND_TTL: 1
       KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction,post-function
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+      KONG_PROXY_ACCESS_LOG: /dev/stdout combined
       #KONG_SSL_CERT: /home/kong/server.crt
       #KONG_SSL_CERT_KEY: /home/kong/server.key
       SUPABASE_ANON_KEY: ${ANON_KEY}
@@ -217,6 +220,14 @@ services:
       # GOTRUE_MFA_PHONE_VERIFY_ENABLED: ${MFA_PHONE_VERIFY_ENABLED}
       # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
 
+      # SAML SSO
+      # GOTRUE_SAML_ENABLED: ${SAML_ENABLED}
+      # GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
+      # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
+      # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
+      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
+      # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
+
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
       # full list of hooks and additional details about custom_access_token_hook
@@ -241,7 +252,7 @@ services:
 
   rest:
     container_name: supabase-rest
-    image: postgrest/postgrest:v14.5
+    image: postgrest/postgrest:v14.8
     restart: unless-stopped
     depends_on:
       db:
@@ -299,6 +310,7 @@ services:
       #API_JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      METRICS_JWT_SECRET: ${JWT_SECRET}
       ERL_AFLAGS: -proto_dist inet_tcp
       DNS_NODES: "''"
       RLIMIT_NOFILE: "10000"
@@ -310,7 +322,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.37.8
+    image: supabase/storage-api:v1.48.26
     restart: unless-stopped
     depends_on:
       db:
@@ -333,6 +345,7 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+      start_period: 10s
     environment:
       ANON_KEY: ${ANON_KEY}
       SERVICE_KEY: ${SERVICE_ROLE_KEY}
@@ -345,6 +358,7 @@ services:
       #JWT_JWKS: ${JWT_JWKS:-{"keys":[]}}
 
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      STORAGE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
@@ -388,12 +402,12 @@ services:
       IMGPROXY_BIND: ":5001"
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
       IMGPROXY_USE_ETAG: "true"
-      IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
+      IMGPROXY_AUTO_WEBP: ${IMGPROXY_AUTO_WEBP}
       IMGPROXY_MAX_SRC_RESOLUTION: 16.8
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.95.2
+    image: supabase/postgres-meta:v0.96.3
     restart: unless-stopped
     depends_on:
       db:
@@ -410,7 +424,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.70.3
+    image: supabase/edge-runtime:v1.71.2
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
@@ -441,7 +455,7 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.31.2
+    image: supabase/logflare:1.36.1
     restart: unless-stopped
     # ports:
     #   - 4000:4000
@@ -594,7 +608,8 @@ services:
         ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
     depends_on:
       db:
         condition: service_healthy

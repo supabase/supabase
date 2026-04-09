@@ -1,18 +1,3 @@
-import { AccountConnections } from 'components/interfaces/Account/Preferences/AccountConnections'
-import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
-import { AccountIdentities } from 'components/interfaces/Account/Preferences/AccountIdentities'
-import { AnalyticsSettings } from 'components/interfaces/Account/Preferences/AnalyticsSettings'
-import { HotkeySettings } from 'components/interfaces/Account/Preferences/HotkeySettings'
-import { InlineEditorSettings } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
-import { ThemeSettings } from 'components/interfaces/Account/Preferences/ThemeSettings'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { AlertError } from 'components/ui/AlertError'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useProfile } from 'lib/profile'
-import type { NextPageWithLayout } from 'types'
 import { Card, CardContent } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -24,13 +9,30 @@ import {
 } from 'ui-patterns/PageHeader'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
+import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
+import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
+import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
+import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
+import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
+import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
+import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { AlertError } from '@/components/ui/AlertError'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
+import type { NextPageWithLayout } from '@/types'
+
 const User: NextPageWithLayout = () => {
-  return <ProfileCard />
+  return IS_PLATFORM ? <PlatformPreferences /> : <SelfHostedPreferences />
 }
 
 User.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Account">
+    <DefaultLayout headerTitle={IS_PLATFORM ? 'Account' : 'Preferences'}>
       <AccountLayout title="Preferences">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
@@ -38,7 +40,18 @@ User.getLayout = (page) => (
 
 export default User
 
-const ProfileCard = () => {
+const PreferencesPageHeader = ({ description }: { description: string }) => (
+  <PageHeader size="small">
+    <PageHeaderMeta>
+      <PageHeaderSummary>
+        <PageHeaderTitle>Preferences</PageHeaderTitle>
+        <PageHeaderDescription>{description}</PageHeaderDescription>
+      </PageHeaderSummary>
+    </PageHeaderMeta>
+  </PageHeader>
+)
+
+const PlatformPreferences = () => {
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
       'profile:show_information',
@@ -49,16 +62,7 @@ const ProfileCard = () => {
 
   return (
     <>
-      <PageHeader size="small">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Preferences</PageHeaderTitle>
-            <PageHeaderDescription>
-              Manage your account profile, connections, and dashboard experience.
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
+      <PreferencesPageHeader description="Manage your account profile, connections, and dashboard experience." />
       <PageContainer size="small">
         {isLoading && (
           <Card>
@@ -89,11 +93,26 @@ const ProfileCard = () => {
 
         <HotkeySettings />
 
-        <InlineEditorSettings />
+        <DashboardSettings />
 
         {profileShowAnalyticsAndMarketing && <AnalyticsSettings />}
 
         {profileShowAccountDeletion && <AccountDeletion />}
+      </PageContainer>
+    </>
+  )
+}
+
+const SelfHostedPreferences = () => {
+  return (
+    <>
+      <PreferencesPageHeader description="Manage how the dashboard looks and behaves on this browser and device." />
+      <PageContainer size="small">
+        <ThemeSettings />
+
+        <HotkeySettings />
+
+        <DashboardSettings />
       </PageContainer>
     </>
   )

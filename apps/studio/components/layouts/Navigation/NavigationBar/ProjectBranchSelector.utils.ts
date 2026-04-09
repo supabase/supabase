@@ -1,5 +1,5 @@
-import type { Branch } from 'data/branches/branches-query'
-import type { Organization } from 'types'
+import type { Branch } from '@/data/branches/branches-query'
+import type { Organization } from '@/types'
 
 export interface ProjectBranchSelectorState {
   selectedBranch: Branch | undefined
@@ -17,7 +17,7 @@ export function getProjectBranchSelectorState(params: {
   const { selectedBranch, isBranchingEnabled, selectedOrganization } = params
 
   const isMainBranch = !isBranchingEnabled || selectedBranch?.is_default === true
-  const branchDisplayName = isBranchingEnabled ? selectedBranch?.name ?? 'main' : 'main'
+  const branchDisplayName = isBranchingEnabled ? (selectedBranch?.name ?? 'main') : 'main'
   const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() ?? 'O'
   const organizationHref = selectedOrganization?.slug
     ? `/org/${selectedOrganization.slug}`

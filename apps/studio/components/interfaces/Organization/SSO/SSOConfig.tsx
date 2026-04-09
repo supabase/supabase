@@ -164,7 +164,7 @@ export const SSOConfig = () => {
     if (ssoConfig) {
       form.reset({
         enabled: ssoConfig.enabled,
-        domains: ssoConfig.domains.map((domain) => ({ value: domain })),
+        domains: ssoConfig.domains?.map((domain) => ({ value: domain })) ?? [],
         metadataXmlUrl: ssoConfig.metadata_xml_url,
         metadataXmlFile: ssoConfig.metadata_xml_file,
         emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),

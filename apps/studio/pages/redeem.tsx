@@ -1,4 +1,4 @@
-import { FeatureFlagContext, useFlag } from 'common'
+import { FeatureFlagContext } from 'common'
 import Link from 'next/link'
 import { useContext, useState } from 'react'
 import { Button } from 'ui'
@@ -19,7 +19,6 @@ import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
 const RedeemCreditsContent = () => {
-  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
   const { isLoading: isLoadingProfile } = useProfile()
   const { hasLoaded } = useContext(FeatureFlagContext)
 
@@ -72,7 +71,7 @@ const RedeemCreditsContent = () => {
             <ShimmeringLoader className="w-full h-[70px]" />
             <ShimmeringLoader className="w-full h-[70px]" />
           </>
-        ) : redeemCodeEnabled ? (
+        ) : (
           organizations?.map((org) => (
             <OrganizationCard
               key={org.id}
@@ -81,8 +80,6 @@ const RedeemCreditsContent = () => {
               onClick={() => setSelectedOrg(org.slug)}
             />
           ))
-        ) : (
-          <Admonition type="note" title="Code redemption coming soon" />
         )}
       </div>
 

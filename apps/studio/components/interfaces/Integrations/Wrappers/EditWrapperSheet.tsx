@@ -1,29 +1,53 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { compact, isEmpty, mapValues } from 'lodash'
+import { compact } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { UUID_REGEX } from '@/lib/constants'
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { invalidateSchemasQuery } from 'data/database/schemas-query'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { FDW } from 'data/fdw/fdws-query'
-import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
-import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import {
+  Button,
+  Card,
+  CardContent,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import * as z from 'zod'
+
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   convertKVStringArrayToJson,
   FormattedWrapperTable,
   formatWrapperTables,
-  makeValidateRequired,
+  getEditionFormSchema,
+  NewTable,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { FDW } from '@/data/fdw/fdws-query'
+import { getDecryptedValues } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { UUID_REGEX } from '@/lib/constants'
 
 export interface EditWrapperSheetProps {
   wrapper: FDW
@@ -48,319 +72,286 @@ export const EditWrapperSheet = ({
   const { mutate: updateFDW, isPending: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
-      setWrapperTables([])
 
-      const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
+      const { tables } = getValues()
+      const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
     },
   })
 
-  const [wrapperTables, setWrapperTables] = useState(() =>
-    formatWrapperTables(wrapper, wrapperMeta)
+  const initialValues: Record<string, any> = useMemo(
+    () => ({
+      wrapper_name: wrapper?.name,
+      server_name: wrapper?.server_name,
+      ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
+      tables: formatWrapperTables(wrapper, wrapperMeta),
+    }),
+    [wrapper, wrapperMeta]
   )
-  const [isEditingTable, setIsEditingTable] = useState(false)
+
+  const formSchema = getEditionFormSchema(wrapperMeta)
+  type FormSchema = z.infer<typeof formSchema>
+  const form = useForm<FormSchema>({
+    defaultValues: initialValues,
+    resolver: zodResolver(formSchema),
+  })
+
+  const { getValues, reset, resetField, setError } = form
+  const { errors, isDirty, isSubmitting } = form.formState
+
+  const {
+    fields: tablesField,
+    append: appendTable,
+    remove: removeTable,
+    update: updateTable,
+  } = useFieldArray({
+    control: form.control,
+    name: 'tables',
+  })
+
   const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
     undefined
   )
-  const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
   const [isUpdateConfirmationOpen, setIsUpdateConfirmationOpen] = useState(false)
-  const [pendingFormState, setPendingFormState] = useState<Record<string, string> | null>(null)
-  const hasChangesRef = useRef(false)
-
-  const initialValues = {
-    wrapper_name: wrapper?.name,
-    server_name: wrapper?.server_name,
-    ...convertKVStringArrayToJson(wrapper?.server_options ?? []),
-  }
 
   const onUpdateTable = (values: FormattedWrapperTable) => {
-    setWrapperTables((prev) => {
-      // if the new values have tableIndex, we are editing an existing table
-      if (values.tableIndex !== undefined) {
-        const tableIndex = values.tableIndex
-        const wrapperTables = [...prev]
-        delete values.tableIndex
-        wrapperTables[tableIndex] = values
-        return wrapperTables
-      }
-      return [...prev, values]
-    })
-    setIsEditingTable(false)
+    if (values.index !== undefined) {
+      updateTable(values.index, values)
+    } else {
+      appendTable(values)
+    }
     setSelectedTableToEdit(undefined)
   }
 
-  const onSubmit = async (values: Record<string, string>) => {
-    const validate = makeValidateRequired(wrapperMeta.server.options)
-    const errors = validate(values)
-
-    const { wrapper_name } = values
-    if (wrapper_name.length === 0) errors.name = 'Please provide a name for your wrapper'
-    if (!wrapperMeta.canTargetSchema && wrapperTables.length === 0)
-      errors.tables = 'Please add at least one table'
-    if (!isEmpty(errors)) {
-      setFormErrors(errors)
+  const onSubmit: SubmitHandler<FormSchema> = async (values) => {
+    const { tables } = values
+    if (tables.length === 0) {
+      setError('tables', {
+        type: 'validate',
+        message: 'Please provide at least one table.',
+      })
       return
     }
-
-    setFormErrors({})
-    setPendingFormState({ ...values, server_name: `${wrapper_name}_server` })
     setIsUpdateConfirmationOpen(true)
   }
 
-  const checkIsDirty = useCallback(() => hasChangesRef.current, [])
-
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty,
+    checkIsDirty: () => isDirty,
     onClose,
   })
 
   useEffect(() => {
     if (!isClosing) return
-    if (checkIsDirty()) {
+    if (isDirty) {
       confirmOnClose()
     } else {
       onClose()
     }
     setIsClosing(false)
-  }, [checkIsDirty, confirmOnClose, isClosing, onClose, setIsClosing])
+  }, [isDirty, confirmOnClose, isClosing, onClose, setIsClosing])
+
+  const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
+
+  const [isLoadingSecrets, setIsLoadingSecrets] = useState(false)
+  useEffect(() => {
+    const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
+
+    const encryptedIdsToFetch = compact(
+      encryptedOptions.map((option) => {
+        const value = initialValues[option.name]
+        return value ?? null
+      })
+    ).filter((x) => UUID_REGEX.test(x))
+    // [Joshen] ^ Validate UUID to filter out already decrypted values
+
+    const fetchEncryptedValues = async (ids: string[]) => {
+      try {
+        setIsLoadingSecrets(true)
+        // If the secrets haven't loaded, escape and run the effect again when they're loaded
+        const decryptedValues = await getDecryptedValues({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          ids: ids,
+        })
+
+        encryptedOptions.forEach((option) => {
+          const encryptedId = initialValues[option.name]
+
+          resetField(option.name, { defaultValue: decryptedValues[encryptedId] })
+        })
+      } catch (error) {
+        toast.error('Failed to fetch encrypted values')
+      } finally {
+        setIsLoadingSecrets(false)
+      }
+    }
+
+    if (encryptedIdsToFetch.length > 0) {
+      fetchEncryptedValues(encryptedIdsToFetch)
+    }
+  }, [initialValues, wrapperMeta, resetField, project?.ref, project?.connectionString])
 
   return (
     <>
       <div className="flex flex-col h-full" tabIndex={-1}>
-        <Form
-          id={FORM_ID}
-          initialValues={initialValues}
-          onSubmit={onSubmit}
-          className="h-full flex flex-col"
-        >
-          {({
-            values,
-            initialValues,
-            resetForm,
-          }: {
-            values: Record<string, string>
-            initialValues: Record<string, string>
-            resetForm: (value: Record<string, Record<string, string>>) => void
-          }) => {
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            const [loadingSecrets, setLoadingSecrets] = useState(false)
-
-            const initialTables = formatWrapperTables({
-              handler: wrapper.handler,
-              tables: wrapper?.tables ?? [],
-            })
-            const hasFormChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-            const hasTableChanges = JSON.stringify(initialTables) !== JSON.stringify(wrapperTables)
-            const hasChanges = hasFormChanges || hasTableChanges
-            hasChangesRef.current = hasChanges
-
-            // [Alaister] although this "technically" is breaking the rules of React hooks
-            // it won't error because the hooks are always rendered in the same order
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            useEffect(() => {
-              const fetchEncryptedValues = async (ids: string[]) => {
-                try {
-                  setLoadingSecrets(true)
-                  // If the secrets haven't loaded, escape and run the effect again when they're loaded
-                  const decryptedValues = await getDecryptedValues({
-                    projectRef: project?.ref,
-                    connectionString: project?.connectionString,
-                    ids: ids,
-                  })
-
-                  // replace all values which are in the decryptedValues object with the decrypted value
-                  const transformValues = (values: Record<string, string>) => {
-                    return mapValues(values, (value) => {
-                      return decryptedValues[value] ?? value
-                    })
-                  }
-
-                  resetForm({
-                    values: transformValues(values),
-                    initialValues: transformValues(initialValues),
-                  })
-                } catch (error) {
-                  toast.error('Failed to fetch encrypted values')
-                } finally {
-                  setLoadingSecrets(false)
-                }
-              }
-
-              const encryptedOptions = wrapperMeta.server.options.filter(
-                (option) => option.encrypted
-              )
-
-              const encryptedIdsToFetch = compact(
-                encryptedOptions.map((option) => {
-                  const value = initialValues[option.name]
-                  return value ?? null
-                })
-              ).filter((x) => UUID_REGEX.test(x))
-              // [Joshen] ^ Validate UUID to filter out already decrypted values
-
-              if (encryptedIdsToFetch.length > 0) {
-                fetchEncryptedValues(encryptedIdsToFetch)
-              }
-              /**
-               * [Joshen] We're deliberately not adding values and initialValues to the dependency array here
-               * as we only want to fetch the encrypted values once on load + values and initialValues will be updated
-               * as a result of that
-               */
-              // eslint-disable-next-line react-hooks/exhaustive-deps
-            }, [project?.ref, project?.connectionString])
-
-            return (
-              <>
-                <SheetHeader>
-                  <SheetTitle>
-                    Edit {wrapperMeta.label} wrapper: {wrapper.name}
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex-grow overflow-y-auto">
-                  <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      <Input
-                        id="wrapper_name"
-                        label="Wrapper Name"
-                        error={formErrors.wrapper_name}
-                        descriptionText={
-                          values.wrapper_name !== initialValues.wrapper_name ? (
-                            <>
-                              Your wrapper's server name will be updated to{' '}
-                              <code className="text-code-inline">{values.wrapper_name}_server</code>
-                            </>
-                          ) : (
-                            <>
-                              Your wrapper's server name is{' '}
-                              <code className="text-code-inline">{values.wrapper_name}_server</code>
-                            </>
-                          )
-                        }
+        <Form_Shadcn_ {...form}>
+          <form
+            id={FORM_ID}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col h-full"
+          >
+            <SheetHeader>
+              <SheetTitle>
+                Edit {wrapperMeta.label} wrapper: {wrapper.name}
+              </SheetTitle>
+            </SheetHeader>
+            <SheetSection className="flex-grow overflow-y-auto">
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Wrapper Configuration</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
+                    <CardContent>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="wrapper_name"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="vertical"
+                            label="Wrapper Name"
+                            description={
+                              wrapper_name !== initialValues.wrapper_name ? (
+                                <>
+                                  Your wrapper's server name will be updated to{' '}
+                                  <code className="text-code-inline">{wrapper_name}_server</code>
+                                </>
+                              ) : (
+                                <>
+                                  Your wrapper's server name is{' '}
+                                  <code className="text-code-inline">{wrapper_name}_server</code>
+                                </>
+                              )
+                            }
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
                       />
-                    </FormSectionContent>
-                  </FormSection>
-                  <FormSection
-                    header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
-                  >
-                    <FormSectionContent loading={false}>
-                      {wrapperMeta.server.options
-                        .filter((option) => !option.hidden)
-                        .map((option) => (
+                    </CardContent>
+                  </Card>
+                </PageSectionContent>
+              </PageSection>
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>{wrapperMeta.label} Configuration</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
+                    {wrapperMeta.server.options
+                      .filter((option) => !option.hidden)
+                      .map((option) => (
+                        <CardContent key={option.name}>
                           <InputField
-                            key={option.name}
                             option={option}
-                            loading={option.encrypted ? loadingSecrets : false}
-                            error={formErrors[option.name]}
+                            control={form.control}
+                            loading={option.secureEntry ? isLoadingSecrets : undefined}
                           />
-                        ))}
-                    </FormSectionContent>
-                  </FormSection>
-                  <FormSection
-                    header={
-                      <FormSectionLabel>
-                        <p>Foreign Tables</p>
-                        <p className="text-foreground-light mt-2 w-[90%]">
-                          You can query your data from these foreign tables after the wrapper is
-                          created
-                        </p>
-                      </FormSectionLabel>
-                    }
-                  >
-                    <FormSectionContent loading={false}>
-                      {wrapperTables.length === 0 ? (
-                        <div className="flex justify-end translate-y-4">
-                          <Button type="default" onClick={() => setIsEditingTable(true)}>
-                            Add foreign table
-                          </Button>
+                        </CardContent>
+                      ))}
+                  </Card>
+                </PageSectionContent>
+              </PageSection>
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Foreign Tables</PageSectionTitle>
+                    <PageSectionDescription>
+                      You can query your data from these foreign tables after the wrapper is created
+                    </PageSectionDescription>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent className="flex flex-col space-y-2">
+                  {tablesField.map((t, tableIndex) => {
+                    // FIXME: make inference work
+                    const table = t as unknown as FormattedWrapperTable
+                    return (
+                      <div
+                        key={t.id}
+                        className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
+                      >
+                        <div>
+                          <p className="text-sm">
+                            {table.schema_name}.{table.table_name}
+                          </p>
+                          <p className="text-sm text-foreground-light">
+                            Columns: {table.columns.map((column: any) => column.name).join(', ')}
+                          </p>
                         </div>
-                      ) : (
-                        <div className="space-y-2">
-                          {wrapperTables.map((table, i) => {
-                            const target = table?.table ?? table.object
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<Edit />}
+                            onClick={() => {
+                              setSelectedTableToEdit(table)
+                            }}
+                          />
+                          <Button
+                            type="default"
+                            className="px-1"
+                            icon={<Trash />}
+                            onClick={() => {
+                              removeTable(tableIndex)
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
 
-                            return (
-                              <div
-                                key={`${table.schema_name}.${table.table_name}`}
-                                className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                              >
-                                <div>
-                                  <p className="text-sm">
-                                    {table.schema_name}.{table.table_name}{' '}
-                                  </p>
-                                  <p className="text-sm text-foreground-light mt-1">
-                                    Target: {target}
-                                  </p>
-                                  <p className="text-sm text-foreground-light">
-                                    Columns: {table.columns.map((column) => column.name).join(', ')}
-                                  </p>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  {/* Wrappers which import foreign schema don't have tables and their tables can't be edited */}
-                                  {wrapperMeta.tables.length !== 0 && (
-                                    <Button
-                                      type="default"
-                                      className="px-1"
-                                      icon={<Edit />}
-                                      onClick={() => {
-                                        setIsEditingTable(true)
-                                        setSelectedTableToEdit({ ...table, tableIndex: i })
-                                      }}
-                                    />
-                                  )}
-                                  <Button
-                                    type="default"
-                                    className="px-1"
-                                    icon={<Trash />}
-                                    onClick={() => {
-                                      setWrapperTables((prev) => prev.filter((_, j) => j !== i))
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )}
-                      {wrapperTables.length > 0 && (
-                        <div className="flex justify-end">
-                          <Button type="default" onClick={() => setIsEditingTable(true)}>
-                            Add foreign table
-                          </Button>
-                        </div>
-                      )}
-                      {wrapperTables.length === 0 && formErrors.tables && (
-                        <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
-                      )}
-                    </FormSectionContent>
-                  </FormSection>
-                </div>
-                <SheetFooter>
-                  <Button
-                    size="tiny"
-                    type="default"
-                    htmlType="button"
-                    onClick={confirmOnClose}
-                    disabled={isSaving}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    size="tiny"
-                    type="primary"
-                    form={FORM_ID}
-                    htmlType="submit"
-                    disabled={isSaving}
-                    loading={isSaving}
-                  >
-                    Save wrapper
-                  </Button>
-                </SheetFooter>
-              </>
-            )
-          }}
-        </Form>
+                  <div className="flex justify-end">
+                    <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                      Add foreign table
+                    </Button>
+                  </div>
+                  {tablesField.length === 0 && errors.tables && (
+                    <p className="text-sm text-right text-red-900">
+                      {errors.tables.message?.toString()}
+                    </p>
+                  )}
+                </PageSectionContent>
+              </PageSection>
+            </SheetSection>
+            <SheetFooter>
+              <Button
+                size="tiny"
+                type="default"
+                htmlType="button"
+                onClick={confirmOnClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="tiny"
+                type="primary"
+                form={FORM_ID}
+                htmlType="submit"
+                disabled={isSubmitting || !isDirty}
+                loading={isSubmitting}
+              >
+                Save wrapper
+              </Button>
+            </SheetFooter>
+          </form>
+        </Form_Shadcn_>
       </div>
 
       <ConfirmationModal
@@ -373,21 +364,19 @@ export const EditWrapperSheet = ({
         loading={isSaving}
         onCancel={() => {
           setIsUpdateConfirmationOpen(false)
-          setPendingFormState(null)
           onClose()
         }}
         onConfirm={() => {
-          if (pendingFormState === null) return
+          const { tables, ...values } = getValues()
           updateFDW({
             projectRef: project?.ref,
             connectionString: project?.connectionString,
             wrapper,
             wrapperMeta,
-            formState: pendingFormState,
-            tables: wrapperTables,
+            formState: values,
+            tables,
           })
           setIsUpdateConfirmationOpen(false)
-          setPendingFormState(null)
         }}
       >
         <p className="text-sm text-foreground-light">
@@ -401,11 +390,10 @@ export const EditWrapperSheet = ({
       <DiscardChangesConfirmationDialog {...modalProps} />
 
       <WrapperTableEditor
-        visible={isEditingTable}
+        visible={selectedTableToEdit != null}
         tables={wrapperMeta.tables}
         onCancel={() => {
           setSelectedTableToEdit(undefined)
-          setIsEditingTable(false)
         }}
         onSave={onUpdateTable}
         initialData={selectedTableToEdit}

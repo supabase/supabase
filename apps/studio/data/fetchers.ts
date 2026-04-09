@@ -1,14 +1,14 @@
 import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { getAccessToken, IS_PLATFORM } from 'common'
-import { API_URL } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
-import { ResponseError } from 'types'
-import { UnknownAPIResponseError } from 'types/api-errors'
 
 import type { paths } from './api'
 import { ERROR_PATTERNS } from './error-patterns'
+import { API_URL } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+import { UnknownAPIResponseError } from '@/types/api-errors'
 import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript

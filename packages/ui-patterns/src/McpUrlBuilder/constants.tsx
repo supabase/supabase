@@ -1,4 +1,4 @@
-import { CodeBlock } from 'ui/src/components/CodeBlock'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type {
   AntigravityMcpConfig,

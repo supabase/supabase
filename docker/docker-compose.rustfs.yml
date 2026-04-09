@@ -16,7 +16,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
-      - rustfs-data:/data:z
+      - rustfs-data:/data
 
   rustfs-createbucket:
     image: rustfs/rc

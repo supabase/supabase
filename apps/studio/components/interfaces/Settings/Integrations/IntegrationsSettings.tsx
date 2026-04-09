@@ -1,15 +1,15 @@
-import { SidePanelVercelProjectLinker } from 'components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
-import { ScaffoldContainer, ScaffoldDivider } from 'components/layouts/Scaffold'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import Link from 'next/link'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
 
 import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
 import { GitHubSection } from './GithubIntegration/GithubSection'
 import { VercelSection } from './VercelIntegration/VercelSection'
+import { SidePanelVercelProjectLinker } from '@/components/interfaces/Organization/IntegrationSettings/SidePanelVercelProjectLinker'
+import { ScaffoldContainer, ScaffoldDivider } from '@/components/layouts/Scaffold'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
   return (

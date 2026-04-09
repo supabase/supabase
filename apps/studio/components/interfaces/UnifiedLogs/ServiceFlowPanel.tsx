@@ -1,14 +1,7 @@
 import { useParams } from 'common'
-import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import {
-  ServiceFlowType,
-  useUnifiedLogInspectionQuery,
-} from 'data/logs/unified-log-inspection-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useState } from 'react'
 import {
   cn,
-  CodeBlock,
   ResizableHandle,
   ResizablePanel,
   Skeleton,
@@ -17,6 +10,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
 import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
@@ -31,6 +25,12 @@ import {
 import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
+import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import {
+  ServiceFlowType,
+  useUnifiedLogInspectionQuery,
+} from '@/data/logs/unified-log-inspection-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ServiceFlowPanelProps {
   selectedRow: ColumnSchema

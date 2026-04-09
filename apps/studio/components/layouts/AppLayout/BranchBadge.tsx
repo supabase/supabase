@@ -1,5 +1,6 @@
-import type { Branch } from 'data/branches/branches-query'
 import { Badge } from 'ui'
+
+import type { Branch } from '@/data/branches/branches-query'
 
 interface BranchBadgeProps {
   branch: Branch | undefined

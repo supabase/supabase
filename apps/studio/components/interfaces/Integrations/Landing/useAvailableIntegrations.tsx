@@ -71,14 +71,14 @@ export const useAvailableIntegrations = () => {
           label: 'Overview',
         },
       ],
-      navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      navigate: ({ pageId = 'overview' }) => {
         switch (pageId) {
           case 'overview':
             return dynamic(
               () =>
-                import(
-                  'components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index'
-                ).then((mod) => mod.IntegrationOverviewTabV2),
+                import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
+                  (mod) => mod.IntegrationOverviewTabV2
+                ),
               {
                 loading: Loading,
               }

@@ -1,10 +1,4 @@
 import { useParams, useViewport } from 'common'
-import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
-import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
-import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
 import { AnimatePresence } from 'framer-motion'
 import { Menu, Search, X } from 'lucide-react'
 import { useRef } from 'react'
@@ -15,8 +9,14 @@ import { useFloatingToolbarDrag } from './useFloatingToolbarDrag'
 import { useFloatingToolbarNavSize } from './useFloatingToolbarNavSize'
 import { useFloatingToolbarSheet } from './useFloatingToolbarSheet'
 import { useFloatingToolbarSidebarClick } from './useFloatingToolbarSidebarClick'
+import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
+import { AssistantButton } from '@/components/layouts/AppLayout/AssistantButton'
+import { InlineEditorButton } from '@/components/layouts/AppLayout/InlineEditorButton'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
 
-const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
+export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
   const navRef = useRef<HTMLElement | null>(null)
   const sheet = useFloatingToolbarSheet(hideMobileMenu)
   const drag = useFloatingToolbarDrag(navRef)
@@ -58,6 +58,7 @@ const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean })
       >
         <AnimatePresence initial={false}>
           <ButtonTooltip
+            key="search"
             type={isSearchOpen ? 'secondary' : 'outline'}
             size="tiny"
             id="search-trigger"
@@ -80,24 +81,25 @@ const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean })
           >
             <Search size={16} strokeWidth={1} />
           </ButtonTooltip>
-          <span data-sidebar-id={SIDEBAR_KEYS.HELP_PANEL}>
+          <span key="help" data-sidebar-id={SIDEBAR_KEYS.HELP_PANEL}>
             <HelpButton />
           </span>
-          <span data-sidebar-id={SIDEBAR_KEYS.ADVISOR_PANEL}>
+          <span key="advisor" data-sidebar-id={SIDEBAR_KEYS.ADVISOR_PANEL}>
             <AdvisorButton projectRef={projectRef} />
           </span>
           {!!projectRef && (
             <>
-              <span data-sidebar-id={SIDEBAR_KEYS.EDITOR_PANEL}>
+              <span key="editor" data-sidebar-id={SIDEBAR_KEYS.EDITOR_PANEL}>
                 <InlineEditorButton />
               </span>
-              <span data-sidebar-id={SIDEBAR_KEYS.AI_ASSISTANT}>
+              <span key="assistant" data-sidebar-id={SIDEBAR_KEYS.AI_ASSISTANT}>
                 <AssistantButton />
               </span>
             </>
           )}
           {sheet.showMenuButton && sheet.isSheetOpen && (
             <Button
+              key="menu"
               title="Menu dropdown button"
               type={sheet.isMenuOpen ? 'secondary' : 'default'}
               className={cn(
@@ -129,5 +131,3 @@ const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean })
     </nav>
   )
 }
-
-export default FloatingMobileToolbar

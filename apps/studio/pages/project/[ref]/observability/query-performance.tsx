@@ -1,22 +1,23 @@
-import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
-import { NumericFilter } from 'components/interfaces/Reports/v2/ReportsNumericFilter'
-
 import { useParams } from 'common'
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { useQueryPerformanceSort } from 'components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
-import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
-import { Presets } from 'components/interfaces/Reports/Reports.types'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { Admonition } from 'ui-patterns'
+
+import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { useQueryPerformanceSort } from '@/components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
+import { QueryPerformance } from '@/components/interfaces/QueryPerformance/QueryPerformance'
+import { type QuerySource } from '@/components/interfaces/QueryPerformance/QueryPerformance.types'
+import { useQueryPerformanceInfiniteQuery } from '@/components/interfaces/QueryPerformance/useQueryPerformanceQuery'
+import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
+import { Presets } from '@/components/interfaces/Reports/Reports.types'
+import { queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
+import { NumericFilter } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -25,12 +26,20 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { sort: sortConfig } = useQueryPerformanceSort()
 
   const [
-    { search: searchQuery, roles, minCalls, totalTimeFilter: totalTimeFilterRaw, indexAdvisor },
+    {
+      search: searchQuery,
+      roles,
+      sources,
+      minCalls,
+      totalTimeFilter: totalTimeFilterRaw,
+      indexAdvisor,
+    },
   ] = useQueryStates({
     sort: parseAsString,
     order: parseAsString,
     search: parseAsString.withDefault(''),
     roles: parseAsArrayOf(parseAsString).withDefault([]),
+    sources: parseAsArrayOf(parseAsString).withDefault([]),
     minCalls: parseAsInteger,
     totalTimeFilter: parseAsJson<NumericFilter | null>((value) =>
       value === null || value === undefined ? null : (value as NumericFilter)
@@ -52,11 +61,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         ? totalTimeFilter.value
         : undefined
 
-  const queryPerformanceQuery = useQueryPerformanceQuery({
+  const queryPerformanceQuery = useQueryPerformanceInfiniteQuery({
     searchQuery,
     orderBy: sortConfig || undefined,
     preset: 'unified',
     roles,
+    sources: sources as QuerySource[],
     runIndexAdvisor: isIndexAdvisorEnabled,
     minCalls: minCalls ?? undefined,
     minTotalTime,

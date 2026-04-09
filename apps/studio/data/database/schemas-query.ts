@@ -2,9 +2,9 @@ import pgMeta from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
+import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 export type SchemasVariables = {
   projectRef?: string

@@ -1,16 +1,8 @@
+import { ExternalLink } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useTheme } from 'next-themes'
-import { ExternalLink } from 'lucide-react'
-
-import { useErrorCodesQuery } from 'data/content-api/docs-error-codes-query'
-import { Service } from 'data/graphql/graphql'
-import { BASE_PATH } from 'lib/constants'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   cn,
   DropdownMenuItem,
@@ -21,7 +13,15 @@ import {
   InfoIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { useErrorCodesQuery } from '@/data/content-api/docs-error-codes-query'
+import { Service } from '@/data/graphql/graphql'
+import { BASE_PATH } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface ErrorCodeTooltipProps {
   errorCode: string

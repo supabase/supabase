@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { partition } from 'lodash'
 import {
   Clock,
@@ -14,21 +15,6 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useBranchQuery } from 'data/branches/branch-query'
-import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
-import { useBranchRestoreMutation } from 'data/branches/branch-restore-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import type { Branch } from 'data/branches/branches-query'
-import { branchKeys } from 'data/branches/keys'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -38,9 +24,23 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
+import { useIsBranching2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useBranchQuery } from '@/data/branches/branch-query'
+import { useBranchResetMutation } from '@/data/branches/branch-reset-mutation'
+import { useBranchRestoreMutation } from '@/data/branches/branch-restore-mutation'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import type { Branch } from '@/data/branches/branches-query'
+import { branchKeys } from '@/data/branches/keys'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 interface OverviewProps {
   isGithubConnected: boolean

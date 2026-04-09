@@ -1,4 +1,5 @@
-import { Lint } from 'data/lint/lint-query'
+import { Lint } from '@/data/lint/lint-query'
+
 export enum LINTER_LEVELS {
   ERROR = 'ERROR',
   WARN = 'WARN',

@@ -1,6 +1,3 @@
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { DOCS_URL } from 'lib/constants'
 import { Activity, BookOpen, Mail, Wrench } from 'lucide-react'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
@@ -8,6 +5,9 @@ import { AiIconAnimation, ButtonGroup, ButtonGroupItem } from 'ui'
 
 import type { HelpOptionId } from './HelpPanel.constants'
 import { HELP_OPTION_IDS } from './HelpPanel.constants'
+import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { DOCS_URL } from '@/lib/constants'
 
 const DISCORD_URL = 'https://discord.supabase.com'
 const STATUS_URL = 'https://status.supabase.com'

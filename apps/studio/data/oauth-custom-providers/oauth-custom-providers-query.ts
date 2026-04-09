@@ -1,8 +1,8 @@
 import { AuthError, type CustomOAuthProvider } from '@supabase/auth-js'
 import { useQuery } from '@tanstack/react-query'
 
-import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oAuthCustomProvidersKeys } from './keys'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
@@ -27,12 +27,10 @@ export async function getOAuthCustomProviders({
 
   if (error) {
     let newError = error
-    console.log(newError)
-    if (
-      newError.message.startsWith(
-        'AuthUnknownError: JSON.parse: unexpected non-whitespace character'
-      )
-    ) {
+    // Non-JSON responses from the API indicate custom providers aren't enabled.
+    // Different browsers/SDK versions produce different JSON parse error messages,
+    // so we check broadly for JSON parse indicators.
+    if (/JSON\.parse|Unexpected token|unexpected.*character/i.test(newError.message)) {
       newError = new AuthError('Custom providers are not enabled for this project')
     }
     handleError(newError)
@@ -50,7 +48,7 @@ export const useOAuthCustomProvidersQuery = <TData = OAuthCustomProvidersData>(
     ...options
   }: UseCustomQueryOptions<OAuthCustomProvidersData, OAuthCustomProvidersError, TData> = {}
 ) => {
-  const { data: clientEndpoint } = useProjectApiUrl({ projectRef })
+  const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
   const { data: authConfig, isSuccess: isSuccessConfig } = useAuthConfigQuery({ projectRef })
   const isOAuthCustomProvidersEnabled = !!authConfig?.CUSTOM_OAUTH_ENABLED
 

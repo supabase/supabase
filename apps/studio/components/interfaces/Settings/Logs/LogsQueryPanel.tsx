@@ -1,7 +1,4 @@
 import { IS_PLATFORM } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
 import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -28,6 +25,9 @@ import {
 } from './Logs.constants'
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
+import Table from '@/components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]

@@ -1,9 +1,9 @@
-import type { PropsWithChildren } from 'react'
-
-import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { useStudioCommandMenuTelemetry } from 'hooks/misc/useStudioCommandMenuTelemetry'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
+import type { PropsWithChildren } from 'react'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useStudioCommandMenuTelemetry } from '@/hooks/misc/useStudioCommandMenuTelemetry'
 
 export function StudioCommandProvider({ children }: PropsWithChildren) {
   const { onTelemetry } = useStudioCommandMenuTelemetry()

@@ -8,7 +8,7 @@ export const useProjectApiUrl = (
   { projectRef }: { projectRef?: string },
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
-  const { data } = useProjectAddonsQuery({ projectRef })
+  const { data } = useProjectAddonsQuery({ projectRef }, { enabled })
   const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
 
   const {

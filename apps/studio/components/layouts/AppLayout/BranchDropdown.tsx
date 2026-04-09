@@ -1,15 +1,15 @@
 import { useParams } from 'common'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import type { Branch } from 'data/branches/branches-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { BranchBadge } from './BranchBadge'
 import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import type { Branch } from '@/data/branches/branches-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface BranchDropdownProps {
   embedded?: boolean
@@ -57,9 +57,9 @@ export const BranchDropdown = ({
     branches && branches.length > 0
       ? mainBranch
         ? [mainBranch].concat(restOfBranches ?? [])
-        : restOfBranches ?? []
+        : (restOfBranches ?? [])
       : [defaultMainBranch]
-  const branchList = isBranchingEnabled ? sortedBranches ?? [] : [defaultMainBranch]
+  const branchList = isBranchingEnabled ? (sortedBranches ?? []) : [defaultMainBranch]
 
   const commandContent = (
     <BranchDropdownCommandContent

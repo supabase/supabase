@@ -20,7 +20,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
   const [height, setHeight] = useState<number | 'auto'>('auto')
   useEffect(() => {
     if (!paragraphRef) return
-    setHeight(isActive ? paragraphRef.current?.clientHeight ?? 0 : 0)
+    setHeight(isActive ? (paragraphRef.current?.clientHeight ?? 0) : 0)
   }, [isActive])
 
   return (

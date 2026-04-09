@@ -1,17 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { StorageSizeUnits } from 'components/interfaces/Storage/StorageSettings/StorageSettings.constants'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -35,8 +26,17 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
+import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const FormSchema = z
   .object({

@@ -1,8 +1,4 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import { useFeaturePreviewModal } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import useLatest from 'hooks/misc/useLatest'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { isEmpty, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -27,6 +23,10 @@ import PolicyTemplates from '../PolicyTemplates'
 import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
 import PolicyEditorModalTitle from './PolicyEditorModalTitle'
+import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import useLatest from '@/hooks/misc/useLatest'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface PolicyEditorModalProps {
   visible?: boolean
