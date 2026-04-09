@@ -226,8 +226,8 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <div className="flex flex-col gap-2">
-                        <FormControl_Shadcn_>
-                          <div className="relative">
+                        <div className="relative">
+                          <FormControl_Shadcn_>
                             <InputGroup>
                               <InputGroupInput
                                 type="number"
@@ -240,8 +240,8 @@ export const PerformanceSettingsForm = () => {
                                 <InputGroupText>seconds</InputGroupText>
                               </InputGroupAddon>
                             </InputGroup>
-                          </div>
-                        </FormControl_Shadcn_>
+                          </FormControl_Shadcn_>
+                        </div>
 
                         <p className="text-xs text-right text-foreground-muted">
                           10+ seconds recommended
