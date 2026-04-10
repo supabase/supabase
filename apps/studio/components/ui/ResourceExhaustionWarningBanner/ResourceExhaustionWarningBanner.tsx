@@ -156,7 +156,8 @@ export const ResourceExhaustionWarningBanner = () => {
   }
 
   const hasNoWarnings = activeWarnings.length === 0
-  const hasNoWarningContent = warningContent === undefined
+  const hasNoWarningContent =
+    warningContent === undefined || (!warningContent?.title && !warningContent?.description)
   const isUsageOrInfraPage =
     router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
   const onUsageOrInfraAndNotInReadOnlyMode =
