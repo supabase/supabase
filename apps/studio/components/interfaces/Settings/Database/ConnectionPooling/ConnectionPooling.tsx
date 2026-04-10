@@ -15,9 +15,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Separator,
 } from 'ui'
@@ -266,10 +266,7 @@ export const ConnectionPooling = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>connections</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 className="w-full"
@@ -283,6 +280,9 @@ export const ConnectionPooling = () => {
                                   )
                                 }
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>connections</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                           {!!maxConnData &&
@@ -330,10 +330,7 @@ export const ConnectionPooling = () => {
                         >
                           <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>clients</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 className="w-full"
@@ -347,6 +344,9 @@ export const ConnectionPooling = () => {
                                   )
                                 }
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>

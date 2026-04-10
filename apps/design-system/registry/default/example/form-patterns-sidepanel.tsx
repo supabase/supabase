@@ -10,6 +10,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
@@ -250,7 +251,7 @@ export default function FormPatternsSidePanel() {
                     >
                       <FormControl_Shadcn_ className="col-span-6">
                         <InputGroup>
-                          <InputGroupInput {...field} type="number" min={5} max={30} />
+                          <FormInputGroupInput {...field} type="number" min={5} max={30} />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>MB</InputGroupText>
                           </InputGroupAddon>

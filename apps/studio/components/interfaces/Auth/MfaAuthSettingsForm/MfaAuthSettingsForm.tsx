@@ -14,10 +14,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -374,16 +374,16 @@ export const MfaAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_>
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>factors</InputGroupText>
-                            </InputGroupAddon>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               min={0}
                               max={30}
                               {...field}
                               disabled={!canUpdateConfig}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>factors</InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -481,16 +481,16 @@ export const MfaAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_>
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>digits</InputGroupText>
-                            </InputGroupAddon>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               min={6}
                               max={30}
                               {...field}
                               disabled={!canUpdateConfig || !hasAccessToMFA}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>digits</InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
