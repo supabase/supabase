@@ -545,6 +545,10 @@ export const MfaAuthSettingsForm = () => {
                             type="text"
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
+                            data-1p-ignore // 1Password
+                            data-lpignore="true" // LastPass
+                            data-form-type="other" // Dashlane
+                            data-bwignore // Bitwarden
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
