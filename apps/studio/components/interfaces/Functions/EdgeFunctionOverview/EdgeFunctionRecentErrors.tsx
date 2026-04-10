@@ -199,7 +199,7 @@ export const EdgeFunctionRecentErrors = ({
           <div className="flex flex-col gap-6">
             <PageSectionMeta>
               <PageSectionSummary>
-                <PageSectionTitle>Errors Since Last Deploy</PageSectionTitle>
+                <PageSectionTitle>Errors since last deploy</PageSectionTitle>
               </PageSectionSummary>
               <PageSectionAside>
                 <Button
