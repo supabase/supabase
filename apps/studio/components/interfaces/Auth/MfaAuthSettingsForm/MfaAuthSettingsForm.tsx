@@ -253,11 +253,11 @@ export const MfaAuthSettingsForm = () => {
       { projectRef: projectRef!, config: values },
       {
         onError: (error) => {
-          toast.error(`Failed to update phone MFA settings: ${error?.message}`)
+          toast.error(`Failed to update enhanced MFA security settings: ${error?.message}`)
           setIsUpdatingSecurityForm(false)
         },
         onSuccess: () => {
-          toast.success('Successfully updated phone MFA settings')
+          toast.success('Successfully updated enhanced MFA security settings')
           setIsUpdatingSecurityForm(false)
         },
       }
