@@ -265,7 +265,10 @@ export const MfaAuthSettingsForm = () => {
   }
 
   const onSubmitPhoneForm: SubmitHandler<PhoneFormValues> = (values) => {
-    let payload: Record<string, string | number | boolean> = { ...values }
+    let payload: Record<string, string | number | boolean> = {
+      MFA_PHONE_OTP_LENGTH: values.MFA_PHONE_OTP_LENGTH,
+      MFA_PHONE_TEMPLATE: values.MFA_PHONE_TEMPLATE,
+    }
 
     if (hasAccessToMFA) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
