@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { Check, ExternalLink, Eye } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo } from 'react'
 import {
@@ -165,6 +165,24 @@ export const EdgeFunctionRecentErrors = ({
     sinceLastDeployInvocationCount,
     sinceLastDeployInvocationCountError,
   ])
+  const emptyStateIcon =
+    isoTimestampStart && !sinceLastDeployInvocationCountError ? (
+      sinceLastDeployInvocationCount > 0 ? (
+        <Check
+          size={16}
+          strokeWidth={1.5}
+          className="mt-0.5 shrink-0 text-brand"
+          aria-hidden="true"
+        />
+      ) : (
+        <Eye
+          size={16}
+          strokeWidth={1.5}
+          className="mt-0.5 shrink-0 text-foreground-muted"
+          aria-hidden="true"
+        />
+      )
+    ) : null
 
   const handleOpenAssistant = (group: RecentErrorGroup) => {
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
@@ -208,7 +226,10 @@ export const EdgeFunctionRecentErrors = ({
               <GenericSkeletonLoader />
             ) : recentErrorGroups.length === 0 ? (
               <div className="rounded-md border border-dashed px-5 py-6 text-sm text-foreground-light">
-                {emptyStateMessage}
+                <div className="flex items-start gap-3">
+                  {emptyStateIcon}
+                  <div>{emptyStateMessage}</div>
+                </div>
               </div>
             ) : (
               <Card className="p-0 overflow-hidden">
