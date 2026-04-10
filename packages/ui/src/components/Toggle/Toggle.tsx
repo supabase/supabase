@@ -40,7 +40,6 @@ function Toggle({
   beforeLabel,
   labelOptional,
   onChange,
-  onBlur,
   defaultChecked,
   checked,
   className,
