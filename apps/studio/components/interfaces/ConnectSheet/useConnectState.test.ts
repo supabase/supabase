@@ -16,9 +16,7 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 }))
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
-  useSelectedProjectQuery: vi.fn().mockImplementation(() => ({
-    data: { high_availability: false },
-  })),
+  useIsHighAvailability: vi.fn().mockImplementation(() => false),
 }))
 
 describe('useConnectState', () => {
@@ -496,10 +494,8 @@ describe('useConnectState', () => {
 
   describe('high availability projects', () => {
     test('should hide connectionMethod field for HA projects', async () => {
-      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
-      vi.mocked(useSelectedProjectQuery).mockReturnValue({
-        data: { high_availability: true },
-      } as any)
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
 
       const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
 
@@ -508,10 +504,8 @@ describe('useConnectState', () => {
     })
 
     test('should hide useSharedPooler field for HA projects', async () => {
-      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
-      vi.mocked(useSelectedProjectQuery).mockReturnValue({
-        data: { high_availability: true },
-      } as any)
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
 
       const { result } = renderHook(() =>
         useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
@@ -522,10 +516,8 @@ describe('useConnectState', () => {
     })
 
     test('should rename connectionType label to "Connection Type" for HA projects', async () => {
-      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
-      vi.mocked(useSelectedProjectQuery).mockReturnValue({
-        data: { high_availability: true },
-      } as any)
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
 
       const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
 
@@ -534,10 +526,8 @@ describe('useConnectState', () => {
     })
 
     test('should not affect non-HA projects', async () => {
-      const { useSelectedProjectQuery } = await import('@/hooks/misc/useSelectedProject')
-      vi.mocked(useSelectedProjectQuery).mockReturnValue({
-        data: { high_availability: false },
-      } as any)
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(false)
 
       const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
 

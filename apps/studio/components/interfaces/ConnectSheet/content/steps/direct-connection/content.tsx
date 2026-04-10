@@ -31,7 +31,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -131,8 +131,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
-  const { data: project } = useSelectedProjectQuery()
-  const isHighAvailability = project?.high_availability ?? false
+  const isHighAvailability = useIsHighAvailability()
 
   const connectionSource = state.connectionSource
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'

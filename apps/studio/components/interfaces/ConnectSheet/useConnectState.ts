@@ -28,7 +28,7 @@ import { resolveFrameworkLibraryKey } from './Connect.utils'
 import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 // ============================================================================
 // Data Source Helpers
@@ -197,8 +197,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
   const { ref: projectRef } = useParams()
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
-  const { data: project } = useSelectedProjectQuery()
-  const isHighAvailability = project?.high_availability ?? false
+  const isHighAvailability = useIsHighAvailability()
 
   const [state, setState] = useState<ConnectState>(() => {
     const defaults = getDefaultState({ schema: connectSchema })
