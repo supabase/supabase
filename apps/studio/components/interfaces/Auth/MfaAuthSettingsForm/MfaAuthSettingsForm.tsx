@@ -654,7 +654,7 @@ export const MfaAuthSettingsForm = () => {
                     disabled={
                       !canUpdateConfig || isUpdatingSecurityForm || !securityForm.formState.isDirty
                     }
-                    loading={isUpdatingPhoneForm}
+                    loading={isUpdatingSecurityForm}
                   >
                     Save changes
                   </Button>
