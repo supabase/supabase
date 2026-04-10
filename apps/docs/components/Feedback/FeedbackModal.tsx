@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
   Form_Shadcn_,
@@ -29,21 +29,32 @@ type FeedbackModalProps = {
 
 function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps) {
   const form = useForm<FeedbackFields>({
-    defaultValues: { page, comment: '' },
+    defaultValues: { page, title: '', comment: '' },
     resolver: zodResolver(formSchema),
   })
+  const { reset } = form
   const { isSubmitting } = form.formState
+
+  const handleCancel = () => {
+    reset()
+    onCancel()
+  }
+
+  const handleSubmit: SubmitHandler<FeedbackFields> = (values) => {
+    onSubmit(values)
+    reset()
+  }
 
   return (
     <Modal
       hideFooter
       header="Leave a comment"
       visible={visible}
-      onCancel={onCancel}
-      onEscapeKeyDown={onCancel}
+      onCancel={handleCancel}
+      onEscapeKeyDown={handleCancel}
     >
       <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Modal.Content className="pt-4 pb-2 flex flex-col gap-2">
             <input type="hidden" id="page" {...form.register('page')} />
             <FormField_Shadcn_
@@ -88,7 +99,12 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
           <Modal.Separator />
           <Modal.Content className="pt-2 pb-4">
             <div className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+              <Button
+                htmlType="reset"
+                type="default"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
