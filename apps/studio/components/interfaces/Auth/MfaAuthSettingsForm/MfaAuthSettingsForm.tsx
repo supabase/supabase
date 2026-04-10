@@ -1,8 +1,8 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
@@ -37,7 +37,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { boolean, number, object, string } from 'yup'
+import * as z from 'zod'
 
 import AlertError from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
@@ -75,24 +75,37 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
       : { verifyEnabled: false, enrollEnabled: false }
 }
 
-const totpSchema = object({
-  MFA_TOTP: string().required(),
-  MFA_MAX_ENROLLED_FACTORS: number()
-    .min(0, 'Must be a value 0 or larger')
-    .max(30, 'Must be a value no greater than 30'),
+const totpSchema = z.object({
+  MFA_TOTP: z.string().min(1, 'Required'),
+  MFA_MAX_ENROLLED_FACTORS: z.preprocess(
+    (val) => (val ? val : undefined),
+    z.coerce
+      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .min(0, 'Must be a value 0 or larger')
+      .max(30, 'Must be a value no greater than 30')
+  ),
 })
 
-const phoneSchema = object({
-  MFA_PHONE: string().required(),
-  MFA_PHONE_OTP_LENGTH: number()
-    .min(6, 'Must be a value 6 or larger')
-    .max(30, 'must be a value no greater than 30'),
-  MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
+type TotpFormValues = z.infer<typeof totpSchema>
+
+const phoneSchema = z.object({
+  MFA_PHONE: z.string().min(1, 'Required'),
+  MFA_PHONE_OTP_LENGTH: z.preprocess(
+    (val) => (val ? val : undefined),
+    z.coerce
+      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .min(6, 'Must be a value 6 or larger')
+      .max(30, 'must be a value no greater than 30')
+  ),
+  MFA_PHONE_TEMPLATE: z.string().min(1, 'Required'),
 })
 
-const securitySchema = object({
-  MFA_ALLOW_LOW_AAL: boolean().required(),
+type PhoneFormValues = z.infer<typeof phoneSchema>
+
+const securitySchema = z.object({
+  MFA_ALLOW_LOW_AAL: z.boolean({ required_error: 'Required' }),
 })
+type SecurityFormValues = z.infer<typeof securitySchema>
 
 export const MfaAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -138,34 +151,37 @@ export const MfaAuthSettingsForm = () => {
   const hasValidMFAPhoneProvider = authConfig?.EXTERNAL_PHONE_ENABLED === true
   const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
 
-  const totpForm = useForm({
-    resolver: yupResolver(totpSchema),
+  const totpForm = useForm<TotpFormValues>({
+    resolver: zodResolver(totpSchema),
     defaultValues: {
       MFA_TOTP: 'Enabled',
       MFA_MAX_ENROLLED_FACTORS: 10,
     },
   })
+  const { reset: resetTotpForm } = totpForm
 
-  const phoneForm = useForm({
-    resolver: yupResolver(phoneSchema),
+  const phoneForm = useForm<PhoneFormValues>({
+    resolver: zodResolver(phoneSchema),
     defaultValues: {
       MFA_PHONE: 'Disabled',
       MFA_PHONE_OTP_LENGTH: 6,
       MFA_PHONE_TEMPLATE: 'Your code is {{ .Code }}',
     },
   })
+  const { reset: resetPhoneForm } = phoneForm
 
-  const securityForm = useForm({
-    resolver: yupResolver(securitySchema),
+  const securityForm = useForm<SecurityFormValues>({
+    resolver: zodResolver(securitySchema),
     defaultValues: {
       MFA_ALLOW_LOW_AAL: false,
     },
   })
+  const { reset: resetSecurityForm } = securityForm
 
   useEffect(() => {
     if (authConfig) {
       if (!isUpdatingTotpForm) {
-        totpForm.reset({
+        resetTotpForm({
           MFA_TOTP:
             determineMFAStatus(
               authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,
@@ -176,7 +192,7 @@ export const MfaAuthSettingsForm = () => {
       }
 
       if (!isUpdatingPhoneForm) {
-        phoneForm.reset({
+        resetPhoneForm({
           MFA_PHONE:
             determineMFAStatus(
               authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
@@ -188,23 +204,30 @@ export const MfaAuthSettingsForm = () => {
       }
 
       if (!isUpdatingSecurityForm) {
-        securityForm.reset({
+        resetSecurityForm({
           MFA_ALLOW_LOW_AAL: authConfig?.MFA_ALLOW_LOW_AAL ?? true,
         })
       }
     }
-  }, [authConfig, isUpdatingTotpForm, isUpdatingPhoneForm, isUpdatingSecurityForm])
+  }, [
+    authConfig,
+    isUpdatingTotpForm,
+    isUpdatingPhoneForm,
+    isUpdatingSecurityForm,
+    resetTotpForm,
+    resetPhoneForm,
+    resetSecurityForm,
+  ])
 
-  const onSubmitTotpForm = (values: any) => {
+  const onSubmitTotpForm: SubmitHandler<TotpFormValues> = (values) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
       MfaStatusToState(values.MFA_TOTP)
 
     const payload = {
-      ...values,
+      MFA_MAX_ENROLLED_FACTORS: values.MFA_MAX_ENROLLED_FACTORS,
       MFA_TOTP_ENROLL_ENABLED,
       MFA_TOTP_VERIFY_ENABLED,
     }
-    delete payload.MFA_TOTP
 
     setIsUpdatingTotpForm(true)
 
@@ -223,13 +246,11 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  const onSubmitSecurityForm = (values: any) => {
-    const payload = { ...values }
-
+  const onSubmitSecurityForm: SubmitHandler<SecurityFormValues> = (values) => {
     setIsUpdatingSecurityForm(true)
 
     updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+      { projectRef: projectRef!, config: values },
       {
         onError: (error) => {
           toast.error(`Failed to update phone MFA settings: ${error?.message}`)
@@ -243,19 +264,19 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  const onSubmitPhoneForm = (values: any) => {
-    let payload = { ...values }
+  const onSubmitPhoneForm: SubmitHandler<PhoneFormValues> = (values) => {
+    let payload: Record<string, string | number | boolean> = { ...values }
 
     if (hasAccessToMFA) {
       const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
         MfaStatusToState(values.MFA_PHONE)
       payload = {
-        ...payload,
+        MFA_PHONE_OTP_LENGTH: values.MFA_PHONE_OTP_LENGTH,
+        MFA_PHONE_TEMPLATE: values.MFA_PHONE_TEMPLATE,
         MFA_PHONE_ENROLL_ENABLED,
         MFA_PHONE_VERIFY_ENABLED,
       }
     }
-    delete payload.MFA_PHONE
 
     setIsUpdatingPhoneForm(true)
 
