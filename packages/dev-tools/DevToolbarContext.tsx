@@ -29,7 +29,7 @@ const SSE_BACKOFF_MULTIPLIER = 2
 
 declare global {
   interface Window {
-    devTelemetry?: () => void
+    devToolbar?: () => void
   }
 }
 
@@ -67,7 +67,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
       setIsEnabled(true)
     }
 
-    window.devTelemetry = () => {
+    window.devToolbar = () => {
       try {
         localStorage.setItem(STORAGE_KEY, 'true')
       } catch {}
@@ -75,7 +75,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     }
 
     return () => {
-      delete window.devTelemetry
+      delete window.devToolbar
     }
   }, [])
 
