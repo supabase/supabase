@@ -11,11 +11,11 @@ import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 type Severity = 'warning' | 'critical' | null
 
 const WARNING_TYPES = [
-  { key: 'disk_io_exhaustion', label: 'Disk IO' },
-  { key: 'cpu_exhaustion', label: 'CPU' },
-  { key: 'memory_and_swap_exhaustion', label: 'Memory & Swap' },
-  { key: 'disk_space_exhaustion', label: 'Disk Space' },
-  { key: 'auth_rate_limit_exhaustion', label: 'Auth Rate Limit' },
+  { key: 'disk_io_exhaustion', label: 'Disk IO', hasCritical: true },
+  { key: 'cpu_exhaustion', label: 'CPU', hasCritical: true },
+  { key: 'memory_and_swap_exhaustion', label: 'Memory & Swap', hasCritical: true },
+  { key: 'disk_space_exhaustion', label: 'Disk Space', hasCritical: true },
+  { key: 'auth_rate_limit_exhaustion', label: 'Auth Rate Limit', hasCritical: false },
 ] as const
 
 type WarningKey = (typeof WARNING_TYPES)[number]['key']
@@ -101,7 +101,7 @@ export const ResourceWarningsTab = () => {
           </div>
         </div>
 
-        {WARNING_TYPES.map(({ key, label }) => (
+        {WARNING_TYPES.map(({ key, label, hasCritical }) => (
           <div key={key} className="flex items-center justify-between">
             <span className="text-sm text-foreground-light">{label}</span>
             <div className="flex gap-1">
@@ -119,13 +119,15 @@ export const ResourceWarningsTab = () => {
               >
                 Warn
               </SeverityButton>
-              <SeverityButton
-                active={severities[key] === 'critical'}
-                variant="critical"
-                onClick={() => handleSeverityChange(key, 'critical')}
-              >
-                Crit
-              </SeverityButton>
+              {hasCritical && (
+                <SeverityButton
+                  active={severities[key] === 'critical'}
+                  variant="critical"
+                  onClick={() => handleSeverityChange(key, 'critical')}
+                >
+                  Crit
+                </SeverityButton>
+              )}
             </div>
           </div>
         ))}
