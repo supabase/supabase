@@ -3,16 +3,17 @@
 import { useFeatureFlags } from 'common'
 import { Activity, ChevronDown, ChevronUp, Flag } from 'lucide-react'
 import {
-  type ChangeEvent,
-  type Dispatch,
-  type SetStateAction,
   useCallback,
   useEffect,
   useState,
+  type ChangeEvent,
+  type Dispatch,
+  type SetStateAction,
 } from 'react'
 import {
   Badge,
   Button,
+  cn,
   Input_Shadcn_ as Input,
   Sheet,
   SheetContent,
@@ -24,17 +25,16 @@ import {
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
-  cn,
 } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
-import type { DevTelemetryEvent } from './types'
+import type { DevTelemetryEvent, ExtraTab } from './types'
 import {
   CC_ORIGINALS_KEY,
-  PH_ORIGINALS_KEY,
   deleteCookie,
   getCookie,
   parseOverrideValue,
+  PH_ORIGINALS_KEY,
   readOriginals,
   safeJsonParse,
   setCookie,
@@ -42,7 +42,8 @@ import {
   writeOriginals,
 } from './utils'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+const IS_DEV =
+  process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
 
 function EventCard({ event }: { event: DevTelemetryEvent }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -156,7 +157,7 @@ function FlagCard({
   )
 }
 
-export function DevToolbar() {
+export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
   const { isEnabled, isOpen, setIsOpen, events, setEvents } = useDevToolbar()
   const [activeTab, setActiveTab] = useState<string>('events')
   const [flagsSubTab, setFlagsSubTab] = useState<'posthog' | 'configcat'>('posthog')
@@ -284,7 +285,7 @@ export function DevToolbar() {
   const ccOverrideCount = Object.keys(ccFlagOverrides).length
   const totalOverrideCount = phOverrideCount + ccOverrideCount
 
-  if (!IS_LOCAL_DEV || !isEnabled) return null
+  if (!IS_DEV || !isEnabled) return null
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -297,8 +298,10 @@ export function DevToolbar() {
         <SheetHeader className="px-6 py-4 border-b shrink-0 space-y-0">
           <div className="flex items-center gap-3">
             <Activity className="w-5 h-5 text-brand-500" />
-            <SheetTitle className="text-lg font-semibold">Dev Telemetry</SheetTitle>
-            <Badge variant="secondary">Local Only</Badge>
+            <SheetTitle className="text-lg font-semibold">Dev Toolbar</SheetTitle>
+            <Badge variant="secondary">
+              {process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ? 'Preview' : 'Local'}
+            </Badge>
           </div>
           <SheetDescription className="sr-only">
             View telemetry events and feature flags for local development
@@ -320,6 +323,12 @@ export function DevToolbar() {
                 <Flag className="w-4 h-4" />
                 Flags {totalOverrideCount > 0 && `(${totalOverrideCount} overrides)`}
               </TabsTrigger>
+              {extraTabs.map((tab) => (
+                <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 px-4">
+                  {tab.icon}
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
             {activeTab === 'events' && (
               <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
@@ -430,6 +439,11 @@ export function DevToolbar() {
                 </Tabs>
               </div>
             )}
+            {extraTabs.map((tab) => (
+              <TabsContent key={tab.id} value={tab.id} className="flex-1 min-h-0 overflow-y-auto">
+                {tab.content}
+              </TabsContent>
+            ))}
           </Tabs>
         </div>
       </SheetContent>

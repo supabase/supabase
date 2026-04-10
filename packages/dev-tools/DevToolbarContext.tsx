@@ -1,14 +1,14 @@
 'use client'
 
-import { type ClientTelemetryEvent, ensurePlatformSuffix, posthogClient } from 'common'
+import { ensurePlatformSuffix, posthogClient, type ClientTelemetryEvent } from 'common'
 import {
-  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
+  type ReactNode,
 } from 'react'
 
 import type {
@@ -18,7 +18,8 @@ import type {
 } from './types'
 import { getCookie } from './utils'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+const IS_DEV =
+  process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
 const MAX_EVENTS = 200
 const STORAGE_KEY = 'dev-telemetry-toolbar-enabled'
 
@@ -56,7 +57,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   }, [])
 
   useEffect(() => {
-    if (!IS_LOCAL_DEV) return
+    if (!IS_DEV) return
 
     let stored: string | null = null
     try {
@@ -176,7 +177,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     }
   }, [apiUrl, appendEvent, isEnabled])
 
-  if (!IS_LOCAL_DEV) {
+  if (!IS_DEV) {
     return <>{children}</>
   }
 

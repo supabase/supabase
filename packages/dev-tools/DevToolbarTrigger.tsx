@@ -3,11 +3,12 @@
 import { Activity, EyeOff } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+const IS_DEV =
+  process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
 
 export function DevToolbarTrigger() {
   const { isEnabled, isOpen, setIsOpen, events, dismissToolbar } = useDevToolbar()
@@ -23,7 +24,7 @@ export function DevToolbarTrigger() {
     }
   }, [])
 
-  if (!IS_LOCAL_DEV || !isEnabled) {
+  if (!IS_DEV || !isEnabled) {
     return null
   }
 

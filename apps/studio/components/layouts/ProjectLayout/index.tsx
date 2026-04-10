@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
@@ -53,17 +52,6 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-
-const IS_DEV_OR_PREVIEW =
-  process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-
-const SupabaseDevToolbar = IS_DEV_OR_PREVIEW
-  ? dynamic(() =>
-      import('@/components/ui/SupabaseDevToolbar/SupabaseDevToolbar').then(
-        (m) => m.SupabaseDevToolbar
-      )
-    )
-  : () => null
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -286,7 +274,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                   <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
                     <ResourceExhaustionWarningBanner />
                     {children}
-                    <SupabaseDevToolbar />
                   </ContentWrapper>
                 )}
               </main>

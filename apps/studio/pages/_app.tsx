@@ -37,6 +37,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
+import type { ExtraTab } from 'dev-tools'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, type ComponentProps } from 'react'
@@ -63,6 +65,19 @@ import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
+
+const IS_DEV_OR_PREVIEW =
+  process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+
+const ResourceWarningsTab = IS_DEV_OR_PREVIEW
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => m.ResourceWarningsTab)
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_OR_PREVIEW
+  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  : []
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -190,7 +205,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                               <MonacoThemeProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
-                          <DevToolbar />
+                          <DevToolbar extraTabs={devToolbarExtraTabs} />
                         </DevToolbarProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

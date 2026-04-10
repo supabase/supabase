@@ -20,17 +20,23 @@ const noopContext: DevTelemetryToolbarContextType = {
 }
 
 export const DevToolbarProvider =
-  process.env.NODE_ENV !== 'development'
+  process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview'
     ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
     : DevToolbarContextModule.DevToolbarProvider
 
 export const useDevToolbar =
-  process.env.NODE_ENV !== 'development' ? () => noopContext : DevToolbarContextModule.useDevToolbar
+  process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview'
+    ? () => noopContext
+    : DevToolbarContextModule.useDevToolbar
 
 export const DevToolbar =
-  process.env.NODE_ENV !== 'development' ? () => null : DevToolbarModule.DevToolbar
+  process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview'
+    ? () => null
+    : DevToolbarModule.DevToolbar
 
 export const DevToolbarTrigger =
-  process.env.NODE_ENV !== 'development' ? () => null : DevToolbarTriggerModule.DevToolbarTrigger
+  process.env.NODE_ENV !== 'development' && process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview'
+    ? () => null
+    : DevToolbarTriggerModule.DevToolbarTrigger
 
-export type { DevTelemetryEvent, DevToolbarConfig } from './types'
+export type { DevTelemetryEvent, DevToolbarConfig, ExtraTab } from './types'
