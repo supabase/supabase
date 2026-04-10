@@ -2671,6 +2671,10 @@ export const platform: NavMenuConstant = {
           name: 'Network Restrictions',
           url: '/guides/platform/network-restrictions' as `/${string}`,
         },
+        {
+          name: 'Temporary Access',
+          url: '/guides/platform/temporary-access' as `/${string}`,
+        },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
         {

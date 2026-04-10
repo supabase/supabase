@@ -1,0 +1,117 @@
+---
+title: 'Temporary access'
+description: 'Enable temporary access for short-lived database connections tied to a Supabase user.'
+---
+
+Your Supabase project supports connecting to the Postgres database using either your Supabase API token (Personal Access Token) or your current dashboard session token (JWT). This is called temporary access, as the authentication tokens can be short-lived and tied directly
+to a specific Supabase user. Temporary access is disabled by default.
+
+Enabling temporary access only applies to connections to Postgres and Supavisor ("Connection Pooler"); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) require authentication tokens specific to the service and are independent of the Supabase platform user(s).
+
+<Admonition type="note">
+
+Projects need to be at least on Postgres 17.4.0 to enable temporary access. You can find the Postgres version of your project in the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure). If your project is on an older version, you will need to [upgrade](/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project) to use this feature.
+
+</Admonition>
+
+## Manage temporary access via the dashboard
+
+Temporary access can be configured via the "Enable temporary access" settings section in [Database Settings page](/dashboard/project/_/database/settings) of the dashboard.
+
+## Manage temporary access via the Management API
+
+You can also manage temporary access using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current temporary access status
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+# Enable temporary access
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state":"enabled"
+  }'
+
+# Disable temporary access
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state":"disabled"
+  }'
+```
+
+## Configure user access
+
+Once temporary access has been enabled, project users must be authorized and mapped to Postgres roles they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
+When a user is authorized to assume a Postgres role, the user's access token (API or dashboard token) will be used as the password for the Postgres role.
+
+<Admonition type="note">
+
+Postgres roles can still be accessed using the password configured on the role. This allows long-lived service connections to continue using the existing credentials.
+
+Temporary access authentication only applies for Supabase project users authenticating to the database, and assuming the given Postgres role. No new roles or users are created in the Postgres database and the assumed role's permissions will still apply.
+
+</Admonition>
+
+### Apply temporary access restrictions
+
+A user's temporary access can also be restricted to a validity period, after which their temporary access will expire and even though the access token is still valid, the database will reject the connection.
+IP address restrictions can also be applied, ensuring that temporary access will only be authorized from allowed network ranges (IPv4 and/or IPv6).
+
+#### Applying restrictions with the management API
+
+Restrictions can also be applied through the Management API.
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_ACCESS_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Restrict temporary access to IPv4 ranges and expiry date
+# user_id is the gotrue_id of the user with access to the project
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "0000-1111-12345678-1111-0000",
+        "user_roles": [
+          {
+            "role": "postgres",
+            "allowed_networks": {
+              "allowed_cidrs": [{ "cidr": '176.1.12.1/32' }],
+            },
+            "expires_at": 1758721065775,
+          },
+        ],
+  }'
+```
+
+## Using temporary access
+
+To log in to the database using temporary access, existing connection strings can be used and only the password needs to be changed to the user's API or dashboard token.
+
+For example, if a user has been authorized to assume the `postgres` role:
+
+```
+psql 'postgres://postgres:sbp_111222333aaabbbccc@db.ref.supabase.co/postgres'
+```
+
+Since Supabase API tokens can be used, it is also possible to generate API tokens for services you don't want to share your Postgres role password with (for example a GitHub Action). The API token can be configured with an expiry time and temporary access-specific restrictions can also be applied.
+
+Connecting via the shared connection pooler requires the addition of a new connection option. This can be applied either directly in the connection URI or as `conninfo` (easier to read):
+
+```
+# directly in the URI
+psql 'postgres://postgres.{project-ref}:sbp_111222333aaabbbccc@aws-1-us-west-1.pooler.supabase.com:5432/postgres?options=-c%20jit%3don'
+
+# or as a connection info string
+psql "host=aws-1-us-west-1.pooler.supabase.com user=postgres.{project-ref} options='-c jit=on'"
+```
