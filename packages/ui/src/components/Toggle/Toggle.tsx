@@ -22,7 +22,6 @@ interface Props extends Omit<React.HTMLAttributes<HTMLButtonElement>, 'size'> {
   align?: 'right' | 'left'
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   labelLayout?: 'horizontal' | 'vertical'
-  validation?: (x: any) => void
 }
 
 /**
@@ -45,7 +44,6 @@ function Toggle({
   className,
   align = 'left',
   size = 'medium',
-  validation,
   labelLayout,
   ...props
 }: Props) {
