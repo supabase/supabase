@@ -127,7 +127,7 @@ function Listbox({
       return
     } else if (defaultValue) {
       setSelected(defaultValue)
-      const node: any = findNode(selected)
+      const node: any = findNode(defaultValue)
       setSelectedNode(node?.props ? node.props : undefined)
       return
     } else {
