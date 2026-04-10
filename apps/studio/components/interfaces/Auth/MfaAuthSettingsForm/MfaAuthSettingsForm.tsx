@@ -78,7 +78,7 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
 const totpSchema = z.object({
   MFA_TOTP: z.string().min(1, 'Required'),
   MFA_MAX_ENROLLED_FACTORS: z.preprocess(
-    (val) => (val ? val : undefined),
+    (val) => (val != undefined && typeof val === 'string' && val.length > 0 ? val : undefined),
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
       .min(0, 'Must be a value 0 or larger')
@@ -91,7 +91,7 @@ type TotpFormValues = z.infer<typeof totpSchema>
 const phoneSchema = z.object({
   MFA_PHONE: z.string().min(1, 'Required'),
   MFA_PHONE_OTP_LENGTH: z.preprocess(
-    (val) => (val ? val : undefined),
+    (val) => (val != undefined && typeof val === 'string' && val.length > 0 ? val : undefined),
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
       .min(6, 'Must be a value 6 or larger')
