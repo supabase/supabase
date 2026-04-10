@@ -207,7 +207,6 @@ function TextArea({
   actions,
   ...props
 }: TextAreaProps) {
-  const [charLength, setCharLength] = useState(0)
   const [copyLabel, setCopyLabel] = useState('Copy')
 
   function _onCopy(value: any) {
