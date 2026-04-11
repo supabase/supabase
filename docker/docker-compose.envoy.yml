@@ -27,7 +27,7 @@ services:
       - ./volumes/api/envoy/lds.template.yaml:/etc/envoy/lds.template.yaml:ro
       - ./volumes/api/envoy/docker-entrypoint.sh:/docker-entrypoint.sh:ro
     depends_on:
-      analytics:
+      studio:
         condition: service_healthy
     environment:
       ANON_KEY: ${ANON_KEY}
