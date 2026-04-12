@@ -15,7 +15,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormInputGroupInput,
-  Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -25,6 +24,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -541,9 +541,9 @@ export const MfaAuthSettingsForm = () => {
                         description="To format the OTP code use `{{ .Code }}`"
                       >
                         <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            type="text"
+                          <Textarea
                             {...field}
+                            rows={3}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                             data-1p-ignore // 1Password
                             data-lpignore="true" // LastPass
