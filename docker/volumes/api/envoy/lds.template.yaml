@@ -295,6 +295,7 @@ resources:
                           cluster: realtime
                           prefix_rewrite: /api/
                           timeout: 30s
+                          host_rewrite_literal: realtime-dev.supabase-realtime
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
