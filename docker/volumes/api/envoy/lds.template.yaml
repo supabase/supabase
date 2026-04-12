@@ -337,7 +337,19 @@ resources:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
-                            
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  deny_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                             
                       - match:
                           prefix: /mcp
                         route:
@@ -349,7 +361,36 @@ resources:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
-                            
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  deny_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+                            # Enable local access (danger zone!)
+                            # 1. Replace the `rbac` block above with the one below.
+                            # 2. Adjust the IP ranges in `principals`.
+                            # rbac:
+                            #   rules:
+                            #     action: ALLOW
+                            #     policies:
+                            #       allow_local:
+                            #         permissions:
+                            #           - any: true
+                            #         principals:
+                            #           - direct_remote_ip:
+                            #               address_prefix: 127.0.0.1
+                            #               prefix_len: 32
+                            #           - direct_remote_ip:
+                            #               address_prefix: ::1
+                            #               prefix_len: 128
+                             
                       - match:
                           prefix: /
                         route:
