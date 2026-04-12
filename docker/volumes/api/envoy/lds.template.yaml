@@ -598,6 +598,29 @@ resources:
                         end
                       end
 
+                # Mirrors apikey into x-api-key for realtime WS compatibility.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local REALTIME_WS_ROUTE = "realtime-v1-ws-protected"
+
+                      function envoy_on_request(request_handle)
+                        local route_name = request_handle:streamInfo():routeName()
+                        if route_name ~= REALTIME_WS_ROUTE then
+                          return
+                        end
+
+                        local headers = request_handle:headers()
+                        local apikey = headers:get("apikey")
+                        if apikey == nil or apikey == "" then
+                          return
+                        end
+
+                        headers:replace("x-api-key", apikey)
+                      end
+
                 # Synthesizes an Authorization header (Bearer …) from apikey when callers don’t provide a real JWT header.
                 - name: envoy.filters.http.lua
                   typed_config:
