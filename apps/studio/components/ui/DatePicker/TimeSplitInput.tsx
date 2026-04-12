@@ -1,13 +1,13 @@
 import { format } from 'date-fns'
 import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
+import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { cn } from 'ui'
-import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
 
 const inputStyle = cn(
   'w-6 p-0 text-center text-xs text-foreground outline-none cursor-text',

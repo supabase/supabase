@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, getReturnToPath } from 'lib/gotrue'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -13,6 +11,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, getReturnToPath } from '@/lib/gotrue'
 
 const passwordValidation = z
   .string()

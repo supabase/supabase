@@ -77,6 +77,12 @@ const appendRows = <
   append(Array.isArray(rows) && rows.length === 1 ? rows[0] : rows)
 }
 
+/**
+ * Rendering-only field array for text/text pairs.
+ *
+ * Consumers own validation in their resolver schema and can rely on the nested
+ * `FormMessage_Shadcn_` instances here to display per-cell errors.
+ */
 export const KeyValueFieldArray = <
   TFieldValues extends FieldValues,
   TFieldArrayName extends FieldArrayPath<TFieldValues>,

@@ -1,12 +1,7 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { AVAILABLE_REPLICA_REGIONS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { useState } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
+import { toast } from 'sonner'
 import {
   Button,
   InfoIcon,
@@ -19,10 +14,15 @@ import {
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { ReadReplicaEligibilityWarnings } from './ReadReplicaEligibilityWarnings'
 import { ReadReplicaPricingDialog } from './ReadReplicaPricingDialog'
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
 import { useGetReplicaCost } from './useGetReplicaCost'
+import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
   onSuccess: () => void

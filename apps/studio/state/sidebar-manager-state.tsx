@@ -1,8 +1,9 @@
 import { LOCAL_STORAGE_KEYS } from 'common/constants'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { ReactNode, useEffect } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
+
+import useLatest from '@/hooks/misc/useLatest'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type SidebarHandlers = {
   onOpen?: () => void

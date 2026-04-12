@@ -1,8 +1,8 @@
 import { useFlag, useParams } from 'common'
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { IS_PLATFORM } from 'lib/constants'
 
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export interface GenerateAuthMenuOptions {
   ref?: string

@@ -1,4 +1,3 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { Check, Copy, MousePointerClick, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -16,6 +15,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import type { LogData, QueryType } from './Logs.types'
 import { apiKey, role as extractRole, jwtAPIKey } from './Logs.utils'
 import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPreviewSelectionRenderer'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export interface LogSelectionProps {
   log?: LogData

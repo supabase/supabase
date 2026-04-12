@@ -1,8 +1,9 @@
-import { useIsPgDeltaDiffEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useBranchDiffQuery } from 'data/branches/branch-diff-query'
-import { useMigrationsQuery } from 'data/database/migrations-query'
 import { useMemo } from 'react'
+
 import { useEdgeFunctionsDiff, type EdgeFunctionsDiffResult } from './useEdgeFunctionsDiff'
+import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useBranchDiffQuery } from '@/data/branches/branch-diff-query'
+import { useMigrationsQuery } from '@/data/database/migrations-query'
 
 interface UseBranchMergeDiffProps {
   currentBranchRef?: string

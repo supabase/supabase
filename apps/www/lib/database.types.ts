@@ -99,8 +99,12 @@ export type Database = {
           link: string | null
           location: string | null
           is_live: boolean
+          is_published: boolean
           city?: string
+          country?: string
           timezone?: string
+          start_at?: string | null
+          launch_week?: string | null
         }
         Insert: {
           id?: number
@@ -110,8 +114,12 @@ export type Database = {
           link?: string | null
           location?: string | null
           is_live?: boolean
+          is_published?: boolean
           city?: string
+          country?: string
           timezone?: string
+          start_at?: string | null
+          launch_week?: string | null
         }
         Update: {
           id?: number
@@ -121,8 +129,12 @@ export type Database = {
           link?: string | null
           location?: string | null
           is_live?: boolean
+          is_published?: boolean
           city?: string
+          country?: string
           timezone?: string
+          start_at?: string | null
+          launch_week?: string | null
         }
         Relationships: []
       }

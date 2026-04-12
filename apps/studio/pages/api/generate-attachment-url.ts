@@ -2,9 +2,9 @@ import { createClient } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { DASHBOARD_LOG_BUCKET } from 'components/interfaces/Support/dashboard-logs'
-import apiWrapper from 'lib/api/apiWrapper'
-import { getUserClaims } from 'lib/gotrue'
+import { DASHBOARD_LOG_BUCKET } from '@/components/interfaces/Support/dashboard-logs'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { getUserClaims } from '@/lib/gotrue'
 
 export const maxDuration = 120
 

@@ -1,14 +1,12 @@
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { cn } from 'ui'
 
-import { CONTEXT_MENU_KEYS, STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
+import { STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
-import { ColumnContextMenu } from './ColumnContextMenu'
 import { FileExplorerColumn } from './FileExplorerColumn'
-import { FolderContextMenu } from './FolderContextMenu'
-import { ItemContextMenu } from './ItemContextMenu'
+import { useStoragePreference } from './useStoragePreference'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
   columns: StorageColumn[]
@@ -33,6 +31,7 @@ export const FileExplorer = ({
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
+  const { view } = useStoragePreference(snap.projectRef)
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -48,18 +47,14 @@ export const FileExplorer = ({
       ref={fileExplorerRef}
       className={cn(
         'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
-        snap.view === STORAGE_VIEWS.LIST && 'flex-col'
+        view === STORAGE_VIEWS.LIST && 'flex-col'
       )}
     >
-      <ColumnContextMenu id={CONTEXT_MENU_KEYS.STORAGE_COLUMN} />
-      <ItemContextMenu id={CONTEXT_MENU_KEYS.STORAGE_ITEM} />
-      <FolderContextMenu id={CONTEXT_MENU_KEYS.STORAGE_FOLDER} />
-
       {isLoading ? (
         <FileExplorerColumn
           column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
         />
-      ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
+      ) : view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
           {columns.map((column, index) => (
             <FileExplorerColumn
@@ -75,7 +70,7 @@ export const FileExplorer = ({
             />
           ))}
         </div>
-      ) : snap.view === STORAGE_VIEWS.LIST ? (
+      ) : view === STORAGE_VIEWS.LIST ? (
         <>
           {columns.length > 0 && (
             <FileExplorerColumn
@@ -92,7 +87,7 @@ export const FileExplorer = ({
           )}
         </>
       ) : (
-        <div>Unknown view: {snap.view}</div>
+        <div>Unknown view: {view}</div>
       )}
     </div>
   )

@@ -1,10 +1,11 @@
-import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
-import { processIncidentData } from 'data/platform/incident-status-utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
+import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
+import { processIncidentData } from '@/data/platform/incident-status-utils'
 
 interface IncidentAdmonitionProps {
   isActive: boolean

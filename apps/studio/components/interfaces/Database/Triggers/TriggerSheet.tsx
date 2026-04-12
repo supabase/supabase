@@ -1,13 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PostgresTrigger } from '@supabase/postgres-meta'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import FormBoxEmpty from 'components/ui/FormBoxEmpty'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -42,6 +34,14 @@ import {
   TRIGGER_ORIENTATIONS,
   TRIGGER_TYPES,
 } from './Triggers.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import FormBoxEmpty from '@/components/ui/FormBoxEmpty'
+import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
 const formId = 'create-trigger'
 

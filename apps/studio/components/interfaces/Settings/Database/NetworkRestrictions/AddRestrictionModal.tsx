@@ -1,9 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
-import { DOCS_URL } from 'lib/constants'
 import { HelpCircle } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -23,6 +19,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { checkIfPrivate, getAddressEndRange, normalize } from './NetworkRestrictions.utils'
+import InformationBox from '@/components/ui/InformationBox'
+import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
+import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 const IPV4_MAX_CIDR_BLOCK_SIZE = 32
 const IPV6_MAX_CIDR_BLOCK_SIZE = 128

@@ -89,6 +89,7 @@
     "typescript": "catalog:",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",
+    "unicornstudio-react": "2.0.1-1",
     "use-debounce": "^7.0.1",
     "vanilla-tilt": "1.7.0",
     "yup": "^1.4.0"

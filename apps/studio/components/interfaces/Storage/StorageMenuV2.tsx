@@ -1,14 +1,14 @@
 import { IS_PLATFORM, useParams } from 'common'
-import {
-  useIsAnalyticsBucketsEnabled,
-  useIsVectorBucketsEnabled,
-} from 'data/config/project-storage-config-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import Link from 'next/link'
 import { Badge, Menu } from 'ui'
 
 import { BUCKET_TYPES } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
+import {
+  useIsAnalyticsBucketsEnabled,
+  useIsVectorBucketsEnabled,
+} from '@/data/config/project-storage-config-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export const StorageMenuV2 = () => {
   const { ref } = useParams()

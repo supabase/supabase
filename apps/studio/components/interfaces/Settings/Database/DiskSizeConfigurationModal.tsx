@@ -1,14 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import dayjs from 'dayjs'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { SetStateAction, useEffect, useMemo } from 'react'
@@ -22,15 +15,25 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InfoIcon,
-  Input_Shadcn_,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Modal,
-  PrePostTab,
   WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface DiskSizeConfigurationProps {
   visible: boolean
@@ -192,16 +195,19 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <PrePostTab postTab="GB" className="w-full">
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_
+                          <FormControl_Shadcn_>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 id="new-disk-size"
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
-                            </FormControl_Shadcn_>
-                          </PrePostTab>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>GB</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />

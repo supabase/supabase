@@ -1,9 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -21,9 +16,13 @@ import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
   checkDataApiPrivilegesNonEmpty,
@@ -31,6 +30,7 @@ import {
   EMPTY_DATA_API_PRIVILEGES,
   type ApiPrivilegesByRole,
 } from '@/lib/data-api-types'
+import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 

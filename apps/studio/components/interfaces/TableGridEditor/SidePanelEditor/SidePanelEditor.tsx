@@ -2,38 +2,9 @@ import * as Sentry from '@sentry/nextjs'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableRowOperations } from 'components/grid/hooks/useTableRowOperations'
-import { type GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import type { Constraint } from 'data/database/constraints-query'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { databaseKeys } from 'data/database/keys'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { lintKeys } from 'data/lint/keys'
-import { privilegeKeys } from 'data/privileges/keys'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { tableKeys } from 'data/tables/keys'
-import { RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { getTables } from 'data/tables/tables-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { useTrack } from 'lib/telemetry/track'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useTableEditorStateSnapshot, type TableEditorState } from 'state/table-editor'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { Dictionary } from 'types'
 import { SonnerProgress } from 'ui'
 
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
@@ -63,10 +34,41 @@ import {
 } from './TableEditor/ApiAccessToggle'
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { type GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import type { Constraint } from '@/data/database/constraints-query'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import { databaseKeys } from '@/data/database/keys'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { lintKeys } from '@/data/lint/keys'
+import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { tableKeys } from '@/data/tables/keys'
+import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { getTables } from '@/data/tables/tables-query'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
+import { isObjectContainingKeys } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
+import { useTableEditorStateSnapshot, type TableEditorState } from '@/state/table-editor'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import type { Dictionary } from '@/types'
 
 export type SaveTableParams =
   | SaveTableParamsNew
@@ -201,6 +203,7 @@ export const SidePanelEditor = ({
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
+  const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -839,20 +842,20 @@ export const SidePanelEditor = ({
       return console.error('no project or table selected')
     }
 
-    const { file, rowCount, selectedHeaders, resolve } = importContent
+    const { file, rowCount, selectedHeaders, emptyStringAsNullHeaders, resolve } = importContent
     const toastId = toast.loading(
       `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
     )
 
     if (file && rowCount > 0) {
-      // CSV file upload
-      const res: any = await insertRowsViaSpreadsheet(
-        project.ref!,
-        project.connectionString,
+      const res = await insertRowsViaSpreadsheet({
+        projectRef: project.ref!,
+        connectionString: project.connectionString,
         file,
-        selectedTable,
+        table: selectedTable,
         selectedHeaders,
-        (progress: number) => {
+        emptyStringAsNullHeaders,
+        onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
@@ -860,21 +863,24 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
-      )
+        },
+      })
       if (res.error) {
-        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        const message = isObjectContainingKeys(res.error, ['message'])
+          ? res.error.message
+          : 'An unknown error occurred during import'
+        toast.error(`Failed to import data: ${message}`, { id: toastId })
         return resolve()
       }
     } else {
-      // Text paste
-      const res: any = await insertTableRows(
-        project.ref!,
-        project.connectionString,
-        selectedTable,
-        importContent.rows,
+      const res = await insertTableRows({
+        projectRef: project.ref!,
+        connectionString: project.connectionString,
+        table: selectedTable,
+        rows: importContent.rows,
         selectedHeaders,
-        (progress: number) => {
+        emptyStringAsNullHeaders,
+        onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
@@ -884,10 +890,13 @@ export const SidePanelEditor = ({
             />,
             { id: toastId }
           )
-        }
-      )
+        },
+      })
       if (res.error) {
-        toast.error(`Failed to import data: ${res.error.message}`, { id: toastId })
+        const message = isObjectContainingKeys(res.error, ['message'])
+          ? res.error.message
+          : 'An unknown error occurred during import'
+        toast.error(`Failed to import data: ${message}`, { id: toastId })
         return resolve()
       }
     }
@@ -990,6 +999,7 @@ export const SidePanelEditor = ({
         onSelect={onSaveForeignRow}
       />
       <SpreadsheetImport
+        key={csvImportKey}
         visible={snap.sidePanel?.type === 'csv-import'}
         selectedTable={selectedTable}
         saveContent={onImportData}

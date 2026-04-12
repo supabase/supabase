@@ -1,4 +1,4 @@
-import type { FeatureKey } from 'data/entitlements/entitlements-query'
+import type { FeatureKey } from '@/data/entitlements/entitlements-query'
 
 export interface Enum {
   label: string

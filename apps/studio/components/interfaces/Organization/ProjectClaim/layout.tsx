@@ -1,9 +1,10 @@
-import { UserDropdown } from 'components/interfaces/UserDropdown'
-import { FeedbackDropdown } from 'components/layouts/Navigation/LayoutHeader/FeedbackDropdown/FeedbackDropdown'
-import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 import { PropsWithChildren, ReactNode } from 'react'
 import { cn, Separator } from 'ui'
+
+import { UserDropdown } from '@/components/interfaces/UserDropdown'
+import { FeedbackDropdown } from '@/components/layouts/Navigation/LayoutHeader/FeedbackDropdown/FeedbackDropdown'
+import { BASE_PATH } from '@/lib/constants'
 
 export const ProjectClaimLayout = ({
   children,

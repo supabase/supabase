@@ -1,8 +1,5 @@
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { FDWTable } from 'data/fdw/fdws-query'
 import { SqlEditor } from 'icons'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
 import {
   Button,
@@ -17,6 +14,10 @@ import {
   DialogTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import { FDWTable } from '@/data/fdw/fdws-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface InsertDataDialogProps {
   table: string

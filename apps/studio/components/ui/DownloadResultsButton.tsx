@@ -1,12 +1,5 @@
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  convertResultsToCSV,
-  convertResultsToJSON,
-  convertResultsToMarkdown,
-} from 'components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import saveAs from 'file-saver'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -21,6 +14,14 @@ import {
   DropdownMenuTrigger,
   KeyboardShortcut,
 } from 'ui'
+
+import {
+  convertResultsToCSV,
+  convertResultsToJSON,
+  convertResultsToMarkdown,
+} from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useHotKey } from '@/hooks/ui/useHotKey'
 
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
@@ -142,7 +143,7 @@ export const DownloadResultsButton = ({
         )}
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
           <Copy size={14} />
-          <p>Copy as markdown</p>
+          <p>Copy as Markdown</p>
           <span className="ml-auto">
             <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
           </span>

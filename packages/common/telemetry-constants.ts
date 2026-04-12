@@ -1779,62 +1779,6 @@ export interface DpaPdfOpenedEvent {
 }
 
 /**
- * User selected a workflow in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedWorkflowClickedEvent {
-  action: 'home_getting_started_workflow_clicked'
-  properties: {
-    /**
-     * The workflow selected by the user
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Whether this is switching from another workflow
-     */
-    is_switch: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on a step in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedStepClickedEvent {
-  action: 'home_getting_started_step_clicked'
-  properties: {
-    /**
-     * The workflow type (code or no-code)
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * The step number (1-based index)
-     */
-    step_number: number
-    /**
-     * The title of the step
-     */
-    step_title: string
-    /**
-     * The action type of the button clicked
-     */
-    action_type: 'primary' | 'ai_assist' | 'external_link'
-    /**
-     * Whether the step was already completed
-     */
-    was_completed: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User clicked on an activity stat in HomeV2.
  *
  * @group Events
@@ -1945,50 +1889,6 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * User dismissed the Getting Started section in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedClosedEvent {
-  action: 'home_getting_started_closed'
-  properties: {
-    /**
-     * The current workflow when dismissed
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Number of steps completed when dismissed
-     */
-    steps_completed: number
-    /**
-     * Total number of steps in the workflow
-     */
-    total_steps: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * Getting Started section was shown to the user in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedSectionExposedEvent {
-  action: 'home_getting_started_section_exposed'
-  properties: {
-    /**
-     * The current workflow shown (null if choosing workflow)
-     */
-    workflow: 'code' | 'no_code' | null
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User was exposed to the HomeV2 experiment (shown the new home page).
  *
  * @group Events
@@ -2007,7 +1907,7 @@ export interface HomeNewExperimentExposedEvent {
 }
 
 /**
- * Connect section was shown to the user as part of the connectSection experiment.
+ * Connect section was shown to the user on the project homepage.
  *
  * @group Events
  * @source studio
@@ -2015,12 +1915,6 @@ export interface HomeNewExperimentExposedEvent {
  */
 export interface HomeConnectSectionExposedEvent {
   action: 'home_connect_section_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: 'connect' | 'getting-started'
-  }
   groups: TelemetryGroups
 }
 
@@ -2578,6 +2472,24 @@ export interface InlineEditorSettingClickedEvent {
 }
 
 /**
+ * User toggled the queue table operations setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface QueueOperationsSettingClickedEvent {
+  action: 'queue_operations_setting_clicked'
+  properties: {
+    /**
+     * Whether the queue operations was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -3053,6 +2965,28 @@ export interface ComputeBadgeUpgradeClickedEvent {
 }
 
 /**
+ * User dismissed the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerDismissedEvent {
+  action: 'free_micro_upgrade_banner_dismissed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA on the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerCtaClickedEvent {
+  action: 'free_micro_upgrade_banner_cta_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the Navigate action in the storage explorer header.
  *
  * @group Events
@@ -3074,6 +3008,47 @@ export interface StorageExplorerNavigateClickedEvent {
 export interface StorageExplorerNavigateSubmittedEvent {
   action: 'storage_explorer_navigate_submitted'
   groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the pricing value/flexibility experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingPageExperimentExposedEvent {
+  action: 'pricing_page_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingPageExperiment'
+    /**
+     * Experiment variant.
+     * GROWTH-694: flexibility (section), flexibility_card (on card), hourly_rate (on card)
+     * GROWTH-697: multi_project (on card), estimate_cta (on card)
+     */
+    variant:
+      | 'control'
+      | 'flexibility'
+      | 'flexibility_card'
+      | 'hourly_rate'
+      | 'multi_project'
+      | 'estimate_cta'
+  }
+}
+
+/**
+ * User clicked the "Upgrade to Pro" CTA in the dashboard header.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaClickedEvent {
+  action: 'header_upgrade_cta_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -3190,10 +3165,6 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
-  | HomeGettingStartedWorkflowClickedEvent
-  | HomeGettingStartedStepClickedEvent
-  | HomeGettingStartedClosedEvent
-  | HomeGettingStartedSectionExposedEvent
   | HomeNewExperimentExposedEvent
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
@@ -3221,6 +3192,7 @@ export type TelemetryEvent =
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
+  | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
@@ -3246,3 +3218,7 @@ export type TelemetryEvent =
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
   | ComputeBadgeUpgradeClickedEvent
+  | FreeMicroUpgradeBannerDismissedEvent
+  | FreeMicroUpgradeBannerCtaClickedEvent
+  | PricingPageExperimentExposedEvent
+  | HeaderUpgradeCtaClickedEvent

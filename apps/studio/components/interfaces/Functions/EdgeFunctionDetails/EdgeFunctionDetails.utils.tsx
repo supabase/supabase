@@ -1,4 +1,4 @@
-import { EdgeFunction } from 'data/edge-functions/edge-function-query'
+import { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 
 export const generateCLICommands = ({
   selectedFunction,

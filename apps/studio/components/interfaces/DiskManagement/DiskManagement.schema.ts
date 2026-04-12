@@ -1,16 +1,21 @@
-import { CloudProvider, COMPUTE_MAX_IOPS, computeInstanceAddonVariantIdSchema } from 'shared-data'
+import {
+  CloudProvider,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  computeInstanceAddonVariantIdSchema,
+} from 'shared-data'
 import { z } from 'zod'
+
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
   calculateIopsRequiredForThroughput,
-  calculateMaxThroughput,
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsAllowedForDiskSizeWithio2,
+  calculateMaxThroughput,
   formatNumber,
 } from './DiskManagement.utils'
 import { DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
-import { COMPUTE_MAX_THROUGHPUT } from 'shared-data'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),

@@ -1,8 +1,9 @@
-import { memo } from 'react'
 import { Clock } from 'lucide-react'
-import { StyledIcon } from '../shared/TimelineStep'
-import { EventMessage } from '../shared/EventMessage'
+import { memo } from 'react'
+
 import { ColumnSchema } from '../../../UnifiedLogs.schema'
+import { EventMessage } from '../shared/EventMessage'
+import { StyledIcon } from '../shared/TimelineStep'
 
 interface ResponseCompletedBlockProps {
   data: ColumnSchema

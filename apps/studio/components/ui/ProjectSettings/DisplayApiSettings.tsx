@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-
-import { useFlag, useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+
 import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
+import Panel from '@/components/ui/Panel'
+import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const DisplayApiSettings = ({
   showTitle = true,

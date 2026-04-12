@@ -1,9 +1,9 @@
 import { Database, LucideIcon } from 'lucide-react'
-
-import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { Badge } from 'ui'
+
 import { LOG_TYPES } from '../../../UnifiedLogs.constants'
 import { formatServiceTypeForDisplay } from '../../../UnifiedLogs.utils'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
 type LogType = (typeof LOG_TYPES)[number]
 type Level = (typeof LEVELS)[number]

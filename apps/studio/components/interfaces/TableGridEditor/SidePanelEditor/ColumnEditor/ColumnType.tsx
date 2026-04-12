@@ -1,4 +1,3 @@
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { noop } from 'lodash'
 import {
   Calendar,
@@ -43,6 +42,7 @@ import {
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string

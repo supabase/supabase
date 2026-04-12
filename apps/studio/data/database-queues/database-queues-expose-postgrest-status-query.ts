@@ -1,9 +1,9 @@
 import { getQueuesExposePostgrestStatusSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { databaseQueuesKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string

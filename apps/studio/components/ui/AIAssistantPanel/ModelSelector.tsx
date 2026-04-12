@@ -1,24 +1,25 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { useState } from 'react'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Badge,
   Button,
+  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Tooltip,
   TooltipContent,
   TooltipTrigger,
-  Tooltip,
 } from 'ui'
+
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { ASSISTANT_MODELS, isAdvanceOnlyModelId } from 'lib/ai/model.utils'
-import type { AssistantModelId } from 'lib/ai/model.utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { ASSISTANT_MODELS, isAdvanceOnlyModelId } from '@/lib/ai/model.utils'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
 
 interface ModelSelectorProps {
   selectedModel: AssistantModelId
