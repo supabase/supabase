@@ -5,9 +5,9 @@ import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -107,8 +107,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
           >
             <FormControl_Shadcn_ className="max-w-32">
               <InputGroup>
-                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
-                <InputGroupInput
+                <FormInputGroupInput
                   type="number"
                   {...field}
                   value={field.value}
@@ -120,6 +119,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                     })
                   }}
                 />
+                <InputGroupAddon align="inline-end">IOPS</InputGroupAddon>
               </InputGroup>
             </FormControl_Shadcn_>
           </FormItemLayout>

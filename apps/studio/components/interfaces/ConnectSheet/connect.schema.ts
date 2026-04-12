@@ -1,7 +1,7 @@
 import type { ConnectSchema, StepDefinition } from './Connect.types'
 
 /**
- * Install commands for different packages
+ * Base install commands for each library.
  */
 export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
@@ -12,6 +12,19 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
 }
 
+/**
+ * Extra packages required by specific frameworks on top of the base library.
+ * Keyed by library, then by framework (or framework/variant for more specificity).
+ * The install step checks the most specific key first (e.g. "nextjs/app"),
+ * then falls back to the framework key (e.g. "nextjs").
+ */
+export const EXTRA_PACKAGES: Record<string, Record<string, string[]>> = {
+  supabasejs: {
+    'nextjs/app': ['@supabase/ssr'],
+    remix: ['@supabase/ssr'],
+  },
+}
+
 // ============================================================================
 // Step Definitions (reusable)
 // All content paths use template syntax: {{stateKey}} is replaced with state values
@@ -20,6 +33,13 @@ export const INSTALL_COMMANDS: Record<string, string> = {
 const frameworkInstallStep: StepDefinition = {
   id: 'install',
   title: 'Install package',
+  description: 'Run this command to install the required dependencies.',
+  content: 'steps/install',
+}
+
+const frameworkInstallPackagesStep: StepDefinition = {
+  id: 'install',
+  title: 'Install packages',
   description: 'Run this command to install the required dependencies.',
   content: 'steps/install',
 }
@@ -307,15 +327,35 @@ export const connectSchema: ConnectSchema = {
       framework: {
         framework: {
           nextjs: {
-            frameworkUi: {
-              true: [
-                frameworkInstallStep,
-                frameworkShadcnStep,
-                frameworkShadcnEnvStep,
-                frameworkShadcnExploreStep,
-                skillsInstallStep,
-              ],
-              DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
+            frameworkVariant: {
+              app: {
+                frameworkUi: {
+                  true: [
+                    frameworkInstallPackagesStep,
+                    frameworkShadcnStep,
+                    frameworkShadcnEnvStep,
+                    frameworkShadcnExploreStep,
+                    skillsInstallStep,
+                  ],
+                  DEFAULT: [
+                    frameworkInstallPackagesStep,
+                    frameworkNextJsFilesStep,
+                    skillsInstallStep,
+                  ],
+                },
+              },
+              DEFAULT: {
+                frameworkUi: {
+                  true: [
+                    frameworkInstallStep,
+                    frameworkShadcnStep,
+                    frameworkShadcnEnvStep,
+                    frameworkShadcnExploreStep,
+                    skillsInstallStep,
+                  ],
+                  DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
+                },
+              },
             },
           },
           react: {
@@ -330,6 +370,7 @@ export const connectSchema: ConnectSchema = {
               DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],
             },
           },
+          remix: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
           DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
         },
       },
