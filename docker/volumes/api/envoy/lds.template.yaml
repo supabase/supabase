@@ -205,7 +205,7 @@ resources:
                         route:
                           cluster: functions
                           prefix_rewrite: /
-                          timeout: 30s
+                          timeout: 150s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
