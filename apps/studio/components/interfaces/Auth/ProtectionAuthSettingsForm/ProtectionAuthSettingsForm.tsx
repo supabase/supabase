@@ -155,10 +155,10 @@ export const ProtectionAuthSettingsForm = () => {
 
   useEffect(() => {
     if (authConfig && !isUpdatingConfig) {
-      if (authConfig.SECURITY_CAPTCHA_ENABLED) {
-        const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
-          'hcaptcha') as CaptchaProviders
+      const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
+        'hcaptcha') as CaptchaProviders
 
+      if (authConfig.SECURITY_CAPTCHA_ENABLED) {
         protectionForm.reset({
           DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
           EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
@@ -183,7 +183,7 @@ export const ProtectionAuthSettingsForm = () => {
           SITE_URL: authConfig.SITE_URL || '',
           SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
           SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
-          SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
+          SECURITY_CAPTCHA_PROVIDER,
           SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
           SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
           SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
