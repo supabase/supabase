@@ -101,57 +101,41 @@ const DocsSearchPage = () => {
 
   async function openLink(pageType: PageType, link: string) {
     // A simple way to achieve opening links in new tab but room for improvement including support for middle clicks
-    const openInNewTab =
+    let openInNewTab =
       (window.event as KeyboardEvent)?.metaKey || (window.event as KeyboardEvent)?.ctrlKey
-
+    let finalLink: string = link
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
       case PageType.Troubleshooting:
         if (BASE_PATH === '/docs') {
           if (openInNewTab) {
-            window.open(`/docs${link}`, '_blank', 'noreferrer,noopener')
-          } else {
-            router.push(link)
-            setIsOpen(false)
+            finalLink = `/docs${link}`
           }
         } else if (!BASE_PATH) {
-          if (openInNewTab) {
-            window.open(`/docs${link}`, '_blank', 'noreferrer,noopener')
-          } else {
-            router.push(`/docs${link}`)
-            setIsOpen(false)
-          }
+          finalLink = `/docs${link}`
         } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank', 'noreferrer,noopener')
-          if (!openInNewTab) {
-            setIsOpen(false)
-          }
+          finalLink = `https://supabase.com/docs${link}`
+          openInNewTab = true
         }
         break
       case PageType.Integration:
-        if (!BASE_PATH) {
-          if (openInNewTab) {
-            window.open(link, '_blank', 'noreferrer,noopener')
-          } else {
-            router.push(link)
-            setIsOpen(false)
-          }
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank', 'noreferrer,noopener')
-          if (!openInNewTab) {
-            setIsOpen(false)
-          }
+        if (BASE_PATH) {
+          openInNewTab = true
+          finalLink = `https://supabase.com${link}`
         }
         break
       case PageType.GithubDiscussion:
-        window.open(link, '_blank', 'noreferrer,noopener')
-        if (!openInNewTab) {
-          setIsOpen(false)
-        }
+        openInNewTab = true
         break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
+    }
+    if (openInNewTab) {
+      window.open(finalLink, '_blank', 'noreferrer,noopener')
+    } else {
+      router.push(finalLink)
+      setIsOpen(false)
     }
   }
 
