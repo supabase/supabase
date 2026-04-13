@@ -1,8 +1,10 @@
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import type { KeyboardEventHandler, MouseEventHandler } from 'react'
 import {
   Badge,
+  cn,
   TableCell,
   TableHead,
   TableHeader,
@@ -84,6 +86,10 @@ type BucketTableRowProps = {
   bucket: Bucket
   projectRef: string
   formattedGlobalUploadLimit: string
+  /** When set, the row selects the bucket instead of navigating to the bucket page. */
+  onSelectBucket?: (bucket: Bucket) => void
+  /** Picker mode: when true, non-public buckets are disabled and not selectable. */
+  publicBucketsOnly?: boolean
 }
 
 export const BucketTableRow = ({
@@ -91,6 +97,8 @@ export const BucketTableRow = ({
   bucket,
   projectRef,
   formattedGlobalUploadLimit,
+  onSelectBucket,
+  publicBucketsOnly = false,
 }: BucketTableRowProps) => {
   const router = useRouter()
   const { getPolicyCount } = useBucketPolicyCount()
@@ -103,65 +111,112 @@ export const BucketTableRow = ({
     router
   )
 
+  const isDisabled = publicBucketsOnly && !bucket.public
+
+  const handleRowActivate: MouseEventHandler<HTMLTableRowElement> = (e) => {
+    if (isDisabled) {
+      e.preventDefault()
+      return
+    }
+    if (onSelectBucket) {
+      e.preventDefault()
+      onSelectBucket(bucket)
+      return
+    }
+    handleBucketNavigation(e)
+  }
+
+  const handleRowAuxClick: MouseEventHandler<HTMLTableRowElement> = (e) => {
+    if (onSelectBucket || isDisabled) return
+    handleBucketNavigation(e)
+  }
+
+  const handleRowKeyDown: KeyboardEventHandler<HTMLTableRowElement> = (e) => {
+    if (onSelectBucket) {
+      if (isDisabled) return
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onSelectBucket(bucket)
+      }
+      return
+    }
+    handleBucketNavigation(e)
+  }
+
   return (
-    <BucketTableRow
-      key={bucket.id}
-      data-bucket-id={bucket.id}
-      className="relative cursor-pointer h-16 group inset-focus"
-      onClick={handleBucketNavigation}
-      onAuxClick={handleBucketNavigation}
-      onKeyDown={handleBucketNavigation}
-      tabIndex={0}
-    >
-      <BucketTableCell className="w-2 pr-1">
-        <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
-      </BucketTableCell>
-      <BucketTableCell className="flex-1">
-        <div className="flex items-center gap-2.5">
-          <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
-          {bucket.public && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge variant="warning" className="flex">
-                  Public
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
-            </Tooltip>
+    <Tooltip open={isDisabled ? undefined : false}>
+      <TooltipTrigger asChild>
+        <BucketTableRow
+          key={bucket.id}
+          data-bucket-id={bucket.id}
+          className={cn(
+            'relative cursor-pointer h-16 group inset-focus',
+            isDisabled && 'opacity-50 [&>td]:hover:bg-transparent cursor-not-allowed'
           )}
-        </div>
-      </BucketTableCell>
-
-      <BucketTableCell>
-        <p className="text-foreground-light">{getPolicyCount(bucket.id)}</p>
-      </BucketTableCell>
-
-      <BucketTableCell>
-        <p
-          className={`whitespace-nowrap ${bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}`}
+          onClick={handleRowActivate}
+          onAuxClick={handleRowAuxClick}
+          onKeyDown={handleRowKeyDown}
+          tabIndex={isDisabled ? -1 : 0}
+          aria-disabled={isDisabled || undefined}
         >
-          {bucket.file_size_limit
-            ? formatBytes(bucket.file_size_limit)
-            : `Unset (${formattedGlobalUploadLimit})`}
-        </p>
-      </BucketTableCell>
+          <BucketTableCell className="w-2 pr-1">
+            <FilesBucketIcon aria-label="bucket icon" size={16} className="text-foreground-muted" />
+          </BucketTableCell>
+          <BucketTableCell className="flex-1">
+            <div className="flex items-center gap-2.5">
+              <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
+              {bucket.public && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="warning" className="flex">
+                      Public
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          </BucketTableCell>
 
-      <BucketTableCell>
-        <p
-          className={bucket.allowed_mime_types ? 'text-foreground-light' : 'text-foreground-muted'}
-        >
-          {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
-        </p>
-      </BucketTableCell>
+          <BucketTableCell>
+            <p className="text-foreground-light">{getPolicyCount(bucket.id)}</p>
+          </BucketTableCell>
 
-      <BucketTableCell>
-        <div className="flex justify-end items-center h-full">
-          <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
-        </div>
-        <button tabIndex={-1} className="sr-only">
-          Go to bucket details
-        </button>
-      </BucketTableCell>
-    </BucketTableRow>
+          <BucketTableCell>
+            <p
+              className={`whitespace-nowrap ${bucket.file_size_limit ? 'text-foreground-light' : 'text-foreground-muted'}`}
+            >
+              {bucket.file_size_limit
+                ? formatBytes(bucket.file_size_limit)
+                : `Unset (${formattedGlobalUploadLimit})`}
+            </p>
+          </BucketTableCell>
+
+          <BucketTableCell>
+            <p
+              className={
+                bucket.allowed_mime_types ? 'text-foreground-light' : 'text-foreground-muted'
+              }
+            >
+              {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
+            </p>
+          </BucketTableCell>
+
+          <BucketTableCell>
+            <div className="flex justify-end items-center h-full">
+              <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
+            </div>
+            <button tabIndex={-1} className="sr-only" type="button">
+              Go to bucket details
+            </button>
+          </BucketTableCell>
+        </BucketTableRow>
+      </TooltipTrigger>
+      {isDisabled && (
+        <TooltipContent side="top">
+          Private buckets are not selectable for this action. Please select a public bucket.
+        </TooltipContent>
+      )}
+    </Tooltip>
   )
 }

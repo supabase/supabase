@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
   buttonVariants,
@@ -86,7 +86,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
               <Skeleton
                 className={cn(
                   buttonVariants({ size: 'small' }),
-                  'h-14 min-w-[420px] duration-[2s]'
+                  'h-14 min-w-[420px] duration-[2000ms]'
                 )}
               />
             ) : (

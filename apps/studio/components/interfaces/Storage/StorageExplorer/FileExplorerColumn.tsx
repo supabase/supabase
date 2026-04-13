@@ -28,7 +28,7 @@ import {
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerRow } from './FileExplorerRow'
 import { FileExplorerRowContextMenuProvider } from './FileExplorerRowContextMenu'
-import { useStoragePreference } from './useStoragePreference'
+import { isPickerItemSelectable, useStorageExplorerPicker } from './StorageExplorerPickerContext'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { BASE_PATH } from '@/lib/constants'
@@ -96,7 +96,7 @@ export const FileExplorerColumn = ({
   const fileExplorerColumnRef = useRef<any>(null)
 
   const snap = useStorageExplorerStateSnapshot()
-  const { view, setSortByOrder, setSortBy, setView } = useStoragePreference(snap.projectRef)
+  const picker = useStorageExplorerPicker()
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useEffect(() => {
@@ -108,19 +108,44 @@ export const FileExplorerColumn = ({
     }
   }, [column])
 
+  const visibleColumnItems =
+    picker && picker.hideUnsupportedFiles
+      ? column.items.filter((item) => isPickerItemSelectable(item, picker))
+      : column.items
+
   const haveSelectedItems = selectedItems.length > 0
-  const columnItemsId = column.items.map((item) => item.id)
-  const columnFiles = column.items.filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+  const columnItemsId = visibleColumnItems.map((item) => item.id)
+  const columnFiles = visibleColumnItems.filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
   const selectedItemsFromColumn = selectedItems.filter((item) => columnItemsId.includes(item.id))
   const selectedFilesFromColumn = selectedItemsFromColumn.filter(
     (item) => item.type === STORAGE_ROW_TYPES.FILE
   )
 
-  const columnItems = column.items.map((item, index) => ({ ...item, columnIndex: index }))
+  const columnItems = visibleColumnItems.map((item, index) => ({ ...item, columnIndex: index }))
   const columnItemsSize = sum(columnItems.map((item) => get(item, ['metadata', 'size'], 0)))
 
   const isEmpty =
-    column.items.filter((item) => item.status !== STORAGE_ROW_STATUS.LOADING).length === 0
+    visibleColumnItems.filter((item) => item.status !== STORAGE_ROW_STATUS.LOADING).length === 0
+
+  const onSelectCreateFolder = () => {
+    snap.addNewFolderPlaceholder(index)
+  }
+
+  const onSelectAllItems = () => {
+    const colFiles = visibleColumnItems
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      .map((item) => ({ ...item, columnIndex: index }))
+    const colFilesId = colFiles.map((item) => item.id).filter(Boolean)
+    const selectedFromCol = selectedItems.filter((item) => item.id && colFilesId.includes(item.id))
+
+    if (selectedFromCol.length === colFiles.length) {
+      snap.setSelectedItems(
+        selectedItems.filter((item) => item.id && !colFilesId.includes(item.id))
+      )
+    } else {
+      snap.setSelectedItems(uniqBy(selectedItems.concat(colFiles), 'id'))
+    }
+  }
 
   const onDragOver = (event: any) => {
     if (event) {
@@ -162,32 +187,12 @@ export const FileExplorerColumn = ({
 
   const itemProps = useMemo(
     () => ({
-      view: view,
+      view: snap.view,
       columnIndex: index,
       selectedItems,
     }),
-    [view, index, selectedItems]
+    [snap.view, index, selectedItems]
   )
-
-  const onSelectCreateFolder = () => {
-    snap.addNewFolderPlaceholder(index)
-  }
-
-  const onSelectAllItems = () => {
-    const colFiles = snap.columns[index].items
-      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
-      .map((item) => ({ ...item, columnIndex: index }))
-    const colFilesId = colFiles.map((item) => item.id).filter(Boolean)
-    const selectedFromCol = selectedItems.filter((item) => item.id && colFilesId.includes(item.id))
-
-    if (selectedFromCol.length === colFiles.length) {
-      snap.setSelectedItems(
-        selectedItems.filter((item) => item.id && !colFilesId.includes(item.id))
-      )
-    } else {
-      snap.setSelectedItems(uniqBy(selectedItems.concat(colFiles), 'id'))
-    }
-  }
 
   return (
     <ContextMenu_Shadcn_ modal={false}>
@@ -195,9 +200,10 @@ export const FileExplorerColumn = ({
         <div
           ref={fileExplorerColumnRef}
           className={cn(
+            'hide-scrollbar relative flex flex-col',
             fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
-            view === STORAGE_VIEWS.LIST && 'h-full',
-            'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
+            snap.view === STORAGE_VIEWS.LIST && 'min-h-0 flex-1 overflow-hidden',
+            snap.view === STORAGE_VIEWS.COLUMNS && 'h-full flex-shrink-0 overflow-auto'
           )}
           onDragOver={onDragOver}
           onDrop={onDrop}
@@ -206,7 +212,7 @@ export const FileExplorerColumn = ({
           }}
         >
           {/* Checkbox selection for select all */}
-          {view === STORAGE_VIEWS.COLUMNS && (
+          {snap.view === STORAGE_VIEWS.COLUMNS && (
             <div
               className={cn(
                 'sticky top-0 z-10 mb-0 flex items-center bg-table-header-light px-2.5 [[data-theme*=dark]_&]:bg-table-header-dark',
@@ -229,7 +235,7 @@ export const FileExplorerColumn = ({
           )}
 
           {/* List Interface Header */}
-          {view === STORAGE_VIEWS.LIST && (
+          {snap.view === STORAGE_VIEWS.LIST && (
             <div className="sticky top-0 py-2 z-10 flex min-w-min items-center border-b border-overlay bg-surface-100 px-2.5">
               <div className="flex w-[40%] min-w-[250px] items-center">
                 <SelectAllCheckbox />
@@ -246,9 +252,9 @@ export const FileExplorerColumn = ({
           {column.status === STORAGE_ROW_STATUS.LOADING && (
             <div
               className={`
-                ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
-                px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
-              `}
+            ${fullWidth ? 'w-full' : 'w-64 border-r border-default'}
+            px-2 py-1 my-1 flex flex-shrink-0 flex-col space-y-2 overflow-auto
+          `}
             >
               <ShimmeringLoader />
               <ShimmeringLoader />
@@ -260,11 +266,13 @@ export const FileExplorerColumn = ({
           {columnItems.length > 0 && (
             <FileExplorerRowContextMenuProvider>
               <InfiniteListDefault
-                className="h-full"
+                className={snap.view === STORAGE_VIEWS.LIST ? 'min-h-0 flex-1' : 'h-full'}
                 items={columnItems}
                 itemProps={itemProps}
                 getItemKey={getItemKey}
-                getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
+                getItemSize={(index: number) =>
+                  index !== 0 && index === columnItems.length ? 85 : 37
+                }
                 ItemComponent={FileExplorerRow}
                 LoaderComponent={LoaderForIconMenuItems}
                 hasNextPage={column.status !== STORAGE_ROW_STATUS.LOADING && column.hasMoreItems}
@@ -276,7 +284,7 @@ export const FileExplorerColumn = ({
 
           {/* Drag drop upload CTA for when column is empty */}
           {!(snap.isSearching && itemSearchString.length > 0) &&
-            column.items.length === 0 &&
+            visibleColumnItems.length === 0 &&
             column.status !== STORAGE_ROW_STATUS.LOADING && (
               <div className="h-full w-full flex flex-col items-center justify-center">
                 <img
@@ -312,7 +320,7 @@ export const FileExplorerColumn = ({
           />
 
           {/* List interface footer */}
-          {view === STORAGE_VIEWS.LIST && (
+          {snap.view === STORAGE_VIEWS.LIST && (
             <div className="shrink-0 rounded-b-md z-10 flex min-w-min items-center bg-panel-footer-light px-2.5 py-2 [[data-theme*=dark]_&]:bg-panel-footer-dark w-full">
               <p className="text-sm">
                 {formatBytes(columnItemsSize)} for {columnItems.length} items
@@ -341,10 +349,10 @@ export const FileExplorerColumn = ({
             <span className="text-xs">View</span>
           </ContextMenuSubTrigger_Shadcn_>
           <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setView(STORAGE_VIEWS.COLUMNS)}>
+            <ContextMenuItem_Shadcn_ onSelect={() => snap.setView(STORAGE_VIEWS.COLUMNS)}>
               <span className="text-xs">As columns</span>
             </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setView(STORAGE_VIEWS.LIST)}>
+            <ContextMenuItem_Shadcn_ onSelect={() => snap.setView(STORAGE_VIEWS.LIST)}>
               <span className="text-xs">As list</span>
             </ContextMenuItem_Shadcn_>
           </ContextMenuSubContent_Shadcn_>
@@ -355,16 +363,22 @@ export const FileExplorerColumn = ({
             <span className="text-xs">Sort by</span>
           </ContextMenuSubTrigger_Shadcn_>
           <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.NAME)}>
+            <ContextMenuItem_Shadcn_ onSelect={() => void snap.setSortBy(STORAGE_SORT_BY.NAME)}>
               <span className="text-xs">Name</span>
             </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.CREATED_AT)}>
+            <ContextMenuItem_Shadcn_
+              onSelect={() => void snap.setSortBy(STORAGE_SORT_BY.CREATED_AT)}
+            >
               <span className="text-xs">Last created</span>
             </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.UPDATED_AT)}>
+            <ContextMenuItem_Shadcn_
+              onSelect={() => void snap.setSortBy(STORAGE_SORT_BY.UPDATED_AT)}
+            >
               <span className="text-xs">Last modified</span>
             </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}>
+            <ContextMenuItem_Shadcn_
+              onSelect={() => void snap.setSortBy(STORAGE_SORT_BY.LAST_ACCESSED_AT)}
+            >
               <span className="text-xs">Last accessed</span>
             </ContextMenuItem_Shadcn_>
           </ContextMenuSubContent_Shadcn_>
@@ -375,10 +389,14 @@ export const FileExplorerColumn = ({
             <span className="text-xs">Sort by order</span>
           </ContextMenuSubTrigger_Shadcn_>
           <ContextMenuSubContent_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}>
+            <ContextMenuItem_Shadcn_
+              onSelect={() => void snap.setSortByOrder(STORAGE_SORT_BY_ORDER.ASC)}
+            >
               <span className="text-xs">Ascending</span>
             </ContextMenuItem_Shadcn_>
-            <ContextMenuItem_Shadcn_ onSelect={() => setSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}>
+            <ContextMenuItem_Shadcn_
+              onSelect={() => void snap.setSortByOrder(STORAGE_SORT_BY_ORDER.DESC)}
+            >
               <span className="text-xs">Descending</span>
             </ContextMenuItem_Shadcn_>
           </ContextMenuSubContent_Shadcn_>

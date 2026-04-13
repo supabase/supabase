@@ -1,5 +1,5 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'common'
 import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
@@ -10,8 +10,12 @@ import { proxy, useSnapshot } from 'valtio'
 
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import {
+  STORAGE_BUCKET_SORT,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
+  STORAGE_VIEWS,
 } from '@/components/interfaces/Storage/Storage.constants'
 import {
   StorageColumn,
@@ -30,7 +34,6 @@ import {
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
-import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
@@ -42,10 +45,12 @@ import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation
 import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
-import type { Bucket } from '@/data/storage/buckets-query'
+import { useBucketQuery, type Bucket } from '@/data/storage/buckets-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { tryParseJson } from '@/lib/helpers'
 import { lookupMime } from '@/lib/mime'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import { ResponseError } from '@/types'
@@ -63,6 +68,12 @@ const OFFSET = 0
 const DEFAULT_RETRY_SECONDS = 5
 const RATE_LIMIT_RETRY_SECONDS = 60
 
+const DEFAULT_PREFERENCES = {
+  view: STORAGE_VIEWS.COLUMNS,
+  sortBy: STORAGE_SORT_BY.NAME,
+  sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
+  sortBucket: STORAGE_BUCKET_SORT.CREATED_AT,
+}
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 let abortController: AbortController
@@ -70,23 +81,37 @@ if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
 
-function createStorageExplorerState({
-  projectRef,
-  connectionString,
-  bucket,
-  resumableUploadUrl,
-  clientEndpoint,
-}: {
-  projectRef: string
-  connectionString: string
-  bucket?: Bucket
-  resumableUploadUrl: string
-  clientEndpoint: string
-}) {
-  const getSortOptions = () => {
-    const { sortBy, sortByOrder } = getStoragePreference(projectRef)
-    return { column: sortBy, order: sortByOrder }
-  }
+export type CreateStorageExplorerStateOptions = {
+  /** When false, view/sort preferences are not read from or written to localStorage (e.g. embedded file picker). */
+  persistExplorerPreferences?: boolean
+  initialView?: STORAGE_VIEWS
+}
+
+function createStorageExplorerState(
+  {
+    projectRef,
+    connectionString,
+    bucket,
+    resumableUploadUrl,
+    clientEndpoint,
+  }: {
+    projectRef: string
+    connectionString: string
+    bucket?: Bucket
+    resumableUploadUrl: string
+    clientEndpoint: string
+  },
+  explorerOptions?: CreateStorageExplorerStateOptions
+) {
+  const persistExplorerPreferences = explorerOptions?.persistExplorerPreferences ?? true
+  const localStorageKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
+  const storedPrefs =
+    persistExplorerPreferences && typeof window !== 'undefined'
+      ? tryParseJson(localStorage?.getItem(localStorageKey))
+      : null
+  const mergedPrefs = storedPrefs || DEFAULT_PREFERENCES
+  const view = explorerOptions?.initialView ?? mergedPrefs.view
+  const { sortBy, sortByOrder, sortBucket } = mergedPrefs
 
   const state = proxy({
     projectRef,
@@ -100,6 +125,11 @@ function createStorageExplorerState({
         abortController.abort()
         abortController = new AbortController()
       }
+    },
+    latestFetchRequestId: 0,
+    createFetchRequest: () => {
+      state.latestFetchRequestId += 1
+      return state.latestFetchRequestId
     },
 
     abortUploadCallbacks: {} as { [key: string]: (() => void)[] },
@@ -162,6 +192,34 @@ function createStorageExplorerState({
       })
     },
 
+    view,
+    setView: (value: STORAGE_VIEWS) => {
+      state.view = value
+      state.updateExplorerPreference()
+    },
+
+    sortBucket,
+    setSortBucket: async (value: STORAGE_BUCKET_SORT) => {
+      state.sortBucket = value
+      state.updateExplorerPreference()
+    },
+
+    sortBy,
+    setSortBy: async (value: STORAGE_SORT_BY) => {
+      state.sortBy = value
+      state.updateExplorerPreference()
+      state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
+    },
+
+    sortByOrder,
+    setSortByOrder: async (value: STORAGE_SORT_BY_ORDER) => {
+      state.sortByOrder = value
+      state.updateExplorerPreference()
+      state.setSelectedFilePreview(undefined)
+      await state.refetchAllOpenedFolders()
+    },
+
     isSearching: false,
     setIsSearching: (value: boolean) => (state.isSearching = value),
 
@@ -170,6 +228,13 @@ function createStorageExplorerState({
 
     selectedFileCustomExpiry: undefined as StorageItem | undefined,
     setSelectedFileCustomExpiry: (item?: StorageItem) => (state.selectedFileCustomExpiry = item),
+
+    updateExplorerPreference: () => {
+      if (!persistExplorerPreferences) return
+      const lsKey = LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef)
+      const { view, sortBy, sortByOrder, sortBucket } = state
+      localStorage.setItem(lsKey, JSON.stringify({ view, sortBy, sortByOrder, sortBucket }))
+    },
 
     // Functions that manage the UI of the Storage Explorer
 
@@ -274,6 +339,8 @@ function createStorageExplorerState({
       index: number
       searchString?: string
     }) => {
+      const previousColumns = state.columns
+      const requestId = state.createFetchRequest()
       state.abortApiCalls()
       state.updateRowStatus({
         name: folderName,
@@ -299,7 +366,7 @@ function createStorageExplorerState({
         limit: LIMIT,
         offset: OFFSET,
         search: searchString,
-        sortBy: getSortOptions(),
+        sortBy: { column: state.sortBy, order: state.sortByOrder },
       }
 
       try {
@@ -312,6 +379,8 @@ function createStorageExplorerState({
           },
           abortController?.signal
         )
+
+        if (requestId !== state.latestFetchRequestId) return
 
         state.updateRowStatus({
           name: folderName,
@@ -332,13 +401,13 @@ function createStorageExplorerState({
           index
         )
       } catch (error: any) {
+        if (requestId !== state.latestFetchRequestId) return
+
         if (error.name === 'AbortError') {
-          state.updateRowStatus({
-            name: folderName,
-            status: STORAGE_ROW_STATUS.READY,
-            columnIndex: index,
-          })
+          // Preserve current content if this fetch was interrupted.
+          state.columns = previousColumns
         } else {
+          state.columns = previousColumns
           toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
         }
       }
@@ -359,7 +428,7 @@ function createStorageExplorerState({
         limit: LIMIT,
         offset: column.items.length,
         search: searchString,
-        sortBy: getSortOptions(),
+        sortBy: { column: state.sortBy, order: state.sortByOrder },
       }
 
       try {
@@ -408,6 +477,9 @@ function createStorageExplorerState({
       showLoading?: boolean
     }) => {
       if (state.selectedBucket.id === undefined) return
+      const previousColumns = state.columns
+      const previousOpenedFolders = state.openedFolders
+      const requestId = state.createFetchRequest()
 
       const pathsWithEmptyPrefix = [''].concat(paths)
 
@@ -424,7 +496,7 @@ function createStorageExplorerState({
             limit: LIMIT,
             offset: OFFSET,
             search: searchString,
-            sortBy: getSortOptions(),
+            sortBy: { column: state.sortBy, order: state.sortByOrder },
           }
 
           try {
@@ -441,6 +513,8 @@ function createStorageExplorerState({
           }
         })
       )
+
+      if (requestId !== state.latestFetchRequestId) return
 
       const formattedFolders = foldersItems.map((folderItems, idx) => {
         const prefix = paths.slice(0, idx).join('/')
@@ -479,6 +553,12 @@ function createStorageExplorerState({
         return folderInfo
       })
       state.openedFolders = updatedOpenedFolders
+
+      // If request was superseded while processing, keep latest known UI context.
+      if (requestId !== state.latestFetchRequestId) {
+        state.columns = previousColumns
+        state.openedFolders = previousOpenedFolders
+      }
     },
 
     /**
@@ -493,7 +573,7 @@ function createStorageExplorerState({
           options: {
             limit: LIMIT,
             offset: OFFSET,
-            sortBy: getSortOptions(),
+            sortBy: { column: state.sortBy, order: state.sortByOrder },
           },
         })
 
@@ -913,7 +993,7 @@ function createStorageExplorerState({
       const options = {
         limit: 10000,
         offset: OFFSET,
-        sortBy: getSortOptions(),
+        sortBy: { column: state.sortBy, order: state.sortByOrder },
       }
       let folderContents: StorageObject[] = []
 
@@ -1868,13 +1948,16 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
       const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
 
       setState(
-        createStorageExplorerState({
-          projectRef: project.ref,
-          connectionString: project.connectionString ?? '',
-          bucket,
-          resumableUploadUrl,
-          clientEndpoint,
-        })
+        createStorageExplorerState(
+          {
+            projectRef: project.ref,
+            connectionString: project.connectionString ?? '',
+            bucket,
+            resumableUploadUrl,
+            clientEndpoint,
+          },
+          { persistExplorerPreferences: true }
+        )
       )
     }
   }, [
@@ -1886,6 +1969,105 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     storageEndpoint,
     isSuccessSettings,
     bucket,
+  ])
+
+  return (
+    <StorageExplorerStateContext.Provider value={state}>
+      {children}
+    </StorageExplorerStateContext.Provider>
+  )
+}
+
+export type StorageExplorerEmbeddedStateProviderProps = PropsWithChildren<{
+  projectRef: string
+  bucketId: string
+  persistExplorerPreferences?: boolean
+  initialView?: STORAGE_VIEWS
+}>
+
+/**
+ * Isolated storage explorer state for embedded UIs (e.g. file picker) that resolves the bucket by id
+ * without requiring `bucketId` in the route.
+ */
+export const StorageExplorerEmbeddedStateProvider = ({
+  children,
+  projectRef,
+  bucketId,
+  persistExplorerPreferences = false,
+  initialView,
+}: StorageExplorerEmbeddedStateProviderProps) => {
+  const { data: project } = useProjectDetailQuery({ ref: projectRef }, { enabled: !!projectRef })
+  const isPaused = project?.status === PROJECT_STATUS.INACTIVE
+
+  const { data: bucket } = useBucketQuery(
+    { projectRef, bucketId },
+    {
+      enabled: !!projectRef && !!bucketId,
+      healthCheckProjectRef: projectRef,
+    }
+  )
+
+  const [state, setState] = useState(() => createStorageExplorerState(DEFAULT_STATE_CONFIG))
+
+  const {
+    storageEndpoint,
+    hostEndpoint,
+    isSuccess: isSuccessSettings,
+  } = useProjectApiUrl({ projectRef: project?.ref })
+
+  useEffect(() => {
+    const hasDataReady = !!project && !!bucket
+    if (isPaused || !hasDataReady || !isSuccessSettings) return
+
+    const clientEndpoint = storageEndpoint ?? hostEndpoint ?? ''
+    const resumableUploadUrl = `${clientEndpoint}/storage/v1/upload/resumable`
+    const nextConnectionString = project.connectionString ?? ''
+    setState((current) => {
+      const isUninitialized = !current.projectRef
+
+      if (isUninitialized) {
+        return createStorageExplorerState(
+          {
+            projectRef: project.ref,
+            connectionString: nextConnectionString,
+            bucket,
+            resumableUploadUrl,
+            clientEndpoint,
+          },
+          { persistExplorerPreferences, initialView }
+        )
+      }
+
+      const bucketChanged = current.selectedBucket?.id !== bucket.id
+
+      // Keep a stable store instance for the picker and patch context updates in place.
+      current.projectRef = project.ref
+      current.connectionString = nextConnectionString
+      current.resumableUploadUrl = resumableUploadUrl
+      current.selectedBucket = bucket
+
+      if (bucketChanged) {
+        current.columns = []
+        current.openedFolders = []
+        current.clearSelectedItems()
+        current.setSelectedItemsToDelete([])
+        current.setSelectedItemsToMove([])
+        current.setSelectedFilePreview(undefined)
+        current.setSelectedFileCustomExpiry(undefined)
+        current.setIsSearching(false)
+      }
+
+      return current
+    })
+  }, [
+    isPaused,
+    project,
+    bucket,
+    isSuccessSettings,
+    hostEndpoint,
+    storageEndpoint,
+    persistExplorerPreferences,
+    initialView,
   ])
 
   return (

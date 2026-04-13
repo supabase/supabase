@@ -5,7 +5,6 @@ import { cn } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
 import { FileExplorerColumn } from './FileExplorerColumn'
-import { useStoragePreference } from './useStoragePreference'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
@@ -31,7 +30,6 @@ export const FileExplorer = ({
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
-  const { view } = useStoragePreference(snap.projectRef)
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -46,16 +44,17 @@ export const FileExplorer = ({
     <div
       ref={fileExplorerRef}
       className={cn(
-        'file-explorer flex flex-grow overflow-x-auto justify-between h-full w-full relative',
-        view === STORAGE_VIEWS.LIST && 'flex-col'
+        'file-explorer relative flex min-h-0 min-w-0 w-full flex-1 h-full justify-between overflow-x-auto',
+        snap.view === STORAGE_VIEWS.LIST && 'h-full min-h-0 flex-col',
+        snap.view === STORAGE_VIEWS.COLUMNS && 'h-full'
       )}
     >
       {isLoading ? (
         <FileExplorerColumn
           column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
         />
-      ) : view === STORAGE_VIEWS.COLUMNS ? (
-        <div className="flex">
+      ) : snap.view === STORAGE_VIEWS.COLUMNS ? (
+        <div className="flex h-full min-h-0 min-w-0">
           {columns.map((column, index) => (
             <FileExplorerColumn
               key={`column-${index}`}
@@ -70,7 +69,7 @@ export const FileExplorer = ({
             />
           ))}
         </div>
-      ) : view === STORAGE_VIEWS.LIST ? (
+      ) : snap.view === STORAGE_VIEWS.LIST ? (
         <>
           {columns.length > 0 && (
             <FileExplorerColumn
@@ -87,7 +86,7 @@ export const FileExplorer = ({
           )}
         </>
       ) : (
-        <div>Unknown view: {view}</div>
+        <div>Unknown view: {snap.view}</div>
       )}
     </div>
   )

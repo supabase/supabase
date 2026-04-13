@@ -44,6 +44,7 @@ import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
+import { isPickerItemSelectable, useStorageExplorerPicker } from './StorageExplorerPickerContext'
 import { useCopyUrl } from './useCopyUrl'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
@@ -126,8 +127,9 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
-  const { onCopyUrl } = useCopyUrl()
+  const picker = useStorageExplorerPicker()
   const ctx = useFileExplorerContextMenu()
+  const { onCopyUrl } = useCopyUrl()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -136,6 +138,7 @@ export const FileExplorerRow = ({
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const isSelectableInPicker = isPickerItemSelectable(item, picker)
 
   const onSelectFile = async (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
@@ -288,7 +291,11 @@ export const FileExplorerRow = ({
     <div
       style={style}
       className="h-full border-b border-default"
-      onContextMenu={(e) => ctx?.onRowContextMenu(e, rowOptions)}
+      onContextMenu={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        ctx?.onRowContextMenu(event, rowOptions)
+      }}
     >
       <div
         className={cn(
@@ -297,15 +304,24 @@ export const FileExplorerRow = ({
           `${isOpened ? 'bg-selection' : ''}`,
           `${isSelected ? 'bg-selection' : ''}`,
           `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`,
+          `${picker && !isSelectableInPicker ? 'opacity-50 cursor-not-allowed' : ''}`
         )}
         onClick={(event) => {
           event.stopPropagation()
           event.preventDefault()
-          if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            item.type === STORAGE_ROW_TYPES.FOLDER
-              ? openFolder(columnIndex, item)
-              : onSelectFile(columnIndex)
+          if (item.status === STORAGE_ROW_STATUS.LOADING) return
+          if (item.type === STORAGE_ROW_TYPES.FOLDER) {
+            if (!isOpened && !isPreviewed) openFolder(columnIndex, item)
+            return
+          }
+          if (picker) {
+            if (!isSelectableInPicker) return
+            void onSelectFile(columnIndex)
+            return
+          }
+          if (!isOpened && !isPreviewed) {
+            onSelectFile(columnIndex)
           }
         }}
       >
@@ -319,7 +335,7 @@ export const FileExplorerRow = ({
             {!isSelected && (
               <div
                 className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
+                  item.type === STORAGE_ROW_TYPES.FILE && !picker ? 'group-hover:hidden' : ''
                 }`}
                 style={{ top: '2px' }}
               >

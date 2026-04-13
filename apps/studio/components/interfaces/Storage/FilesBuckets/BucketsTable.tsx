@@ -13,6 +13,10 @@ type BucketsTableProps = {
   filterString: string
   formattedGlobalUploadLimit: string
   pagination: BucketsTablePaginationProps
+  /** Picker mode: row click calls this instead of navigating to the bucket. */
+  onSelectBucket?: (bucket: Bucket) => void
+   /** Picker mode: when true, non-public buckets are disabled and not selectable. */
+  publicBucketsOnly?: boolean
 }
 
 export const BucketsTable = (props: BucketsTableProps) => {
@@ -30,6 +34,8 @@ const BucketsTableUnvirtualized = ({
   filterString,
   formattedGlobalUploadLimit,
   pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
+  onSelectBucket,
+  publicBucketsOnly,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
 
@@ -52,6 +58,8 @@ const BucketsTableUnvirtualized = ({
               bucket={bucket}
               projectRef={projectRef}
               formattedGlobalUploadLimit={formattedGlobalUploadLimit}
+              onSelectBucket={onSelectBucket}
+              publicBucketsOnly={publicBucketsOnly}
             />
           ))
         )}
@@ -73,6 +81,8 @@ const BucketsTableVirtualized = ({
   filterString,
   formattedGlobalUploadLimit,
   pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
+  onSelectBucket,
+  publicBucketsOnly,
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -109,6 +119,8 @@ const BucketsTableVirtualized = ({
             bucket={bucket}
             projectRef={projectRef}
             formattedGlobalUploadLimit={formattedGlobalUploadLimit}
+            onSelectBucket={onSelectBucket}
+            publicBucketsOnly={publicBucketsOnly}
           />
         )}
       </VirtualizedTableBody>

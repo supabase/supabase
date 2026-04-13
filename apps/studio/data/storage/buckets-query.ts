@@ -11,6 +11,7 @@ import { useMemo } from 'react'
 import { getBucketNumberEstimate, getBucketNumberEstimateKey } from './buckets-max-size-limit-query'
 import { storageKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -117,11 +118,21 @@ export type BucketsData = Awaited<ReturnType<typeof getBuckets>>
 export type BucketsWithPaginationData = Awaited<ReturnType<typeof getBucketsPaginated>>
 export type BucketsError = ResponseError
 
+type UseBucketQueryOptions<TData> = UseCustomQueryOptions<BucketData, BucketsError, TData> & {
+  /** When set, project health/active checks use this ref (e.g. embedded pickers) instead of the route project. */
+  healthCheckProjectRef?: string
+}
+
 export const useBucketQuery = <TData = BucketData>(
   { projectRef, bucketId }: GetBucketParams,
-  { enabled = true, ...options }: UseCustomQueryOptions<BucketData, BucketsError, TData>
+  { enabled = true, healthCheckProjectRef, ...options }: UseBucketQueryOptions<TData> = {}
 ) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: routeProject } = useSelectedProjectQuery({ enabled: !healthCheckProjectRef })
+  const { data: explicitProject } = useProjectDetailQuery(
+    { ref: healthCheckProjectRef },
+    { enabled: !!healthCheckProjectRef }
+  )
+  const project = healthCheckProjectRef ? explicitProject : routeProject
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<BucketData, BucketsError, TData>({
@@ -176,7 +187,7 @@ export const usePaginatedBucketsQuery = <TData = BucketsWithPaginationData>(
   return useInfiniteQuery({
     queryKey: storageKeys.bucketsList(projectRef, params),
     queryFn: ({ signal, pageParam }) =>
-      getBucketsPaginated({ projectRef, page: pageParam, ...params }, signal),
+      getBucketsPaginated({ projectRef, page: pageParam as number, ...params }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => {

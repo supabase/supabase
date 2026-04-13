@@ -46,6 +46,9 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import type { StorageColumn } from '../Storage.types'
+import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { APIDocsButton } from '@/components/ui/APIDocsButton'
 import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -194,17 +197,22 @@ const HeaderBreadcrumbs = ({
   )
 }
 
-interface FileExplorerHeader {
+interface FileExplorerHeaderProps {
   itemSearchString: string
   setItemSearchString: (value: string) => void
   onFilesUpload: (event: ChangeEvent<HTMLInputElement>, columnIndex?: number) => void
+  variant?: 'default' | 'picker'
+  /** When true with variant picker, hide column/list switch (list-only). */
+  forceListView?: boolean
 }
 
 export const FileExplorerHeader = ({
   itemSearchString = '',
   setItemSearchString = noop,
   onFilesUpload = noop,
-}: FileExplorerHeader) => {
+  variant = 'default',
+  forceListView = false,
+}: FileExplorerHeaderProps) => {
   const snap = useStorageExplorerStateSnapshot()
   const track = useTrack()
 
@@ -218,8 +226,11 @@ export const FileExplorerHeader = ({
   const previousBreadcrumbs = useRef<string[] | null>(null)
 
   const {
-    projectRef,
     columns,
+    sortBy,
+    setSortBy,
+    sortByOrder,
+    setSortByOrder,
     popColumn,
     popColumnAtIndex,
     popOpenedFolders,
@@ -231,30 +242,11 @@ export const FileExplorerHeader = ({
     setSelectedFilePreview,
     selectedBucket,
   } = useStorageExplorerStateSnapshot()
-  const {
-    view,
-    setView,
-    sortBy,
-    setSortBy: setPreferenceSortBy,
-    sortByOrder,
-    setSortByOrder: setPreferenceSortByOrder,
-  } = useStoragePreference(projectRef)
 
-  const breadcrumbs = columns.map((column) => column.name)
+  const breadcrumbs = columns.map((column: StorageColumn) => column.name)
   const backDisabled = columns.length <= 1
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-
-  const setSortBy = async (value: STORAGE_SORT_BY) => {
-    setPreferenceSortBy(value)
-    setSelectedFilePreview(undefined)
-    await refetchAllOpenedFolders()
-  }
-
-  const setSortByOrder = async (value: STORAGE_SORT_BY_ORDER) => {
-    setPreferenceSortByOrder(value)
-    setSelectedFilePreview(undefined)
-    await refetchAllOpenedFolders()
-  }
+  const isPicker = variant === 'picker'
 
   useEffect(() => {
     // [Joshen] Somehow toggle search triggers this despite breadcrumbs
@@ -385,7 +377,7 @@ export const FileExplorerHeader = ({
           {/* Actions */}
           <div className="flex shrink-0 items-center whitespace-nowrap py-[7px]">
             <div className="flex shrink-0 items-center space-x-1 px-2">
-              {view === STORAGE_VIEWS.COLUMNS && (
+              {snap.view === STORAGE_VIEWS.COLUMNS && (
                 <Button
                   size="tiny"
                   icon={<Edit2 />}
@@ -406,108 +398,157 @@ export const FileExplorerHeader = ({
                 Reload
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="text"
-                    icon={
-                      view === 'LIST' ? (
-                        <List size={16} strokeWidth={2} />
-                      ) : (
-                        <Columns size={16} strokeWidth={2} />
-                      )
-                    }
-                  >
-                    View
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40 min-w-0">
-                  {VIEW_OPTIONS.map((option) => (
-                    <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
-                      <div className="flex items-center justify-between w-full">
-                        <p>{option.name}</p>
-                        {view === option.key && (
-                          <Check size={16} className="text-brand" strokeWidth={2} />
-                        )}
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="w-44">
-                      {SORT_BY_OPTIONS.map((option) => (
-                        <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
-                          <div className="flex items-center justify-between w-full">
-                            <p>{option.name}</p>
-                            {sortBy === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
-                            )}
-                          </div>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {SORT_ORDER_OPTIONS.map((option) => (
-                        <DropdownMenuItem
-                          key={option.key}
-                          onClick={() => setSortByOrder(option.key)}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <p>{option.name}</p>
-                            {sortByOrder === option.key && (
-                              <Check size={16} className="text-brand" strokeWidth={2} />
-                            )}
-                          </div>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {isPicker && forceListView ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="text" icon={<List size={16} strokeWidth={2} />}>
+                      Sort
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44 min-w-0">
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="w-44">
+                        {SORT_BY_OPTIONS.map((option) => (
+                          <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
+                            <div className="flex items-center justify-between w-full">
+                              <p>{option.name}</p>
+                              {sortBy === option.key && (
+                                <Check size={16} className="text-brand" strokeWidth={2} />
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent>
+                        {SORT_ORDER_OPTIONS.map((option) => (
+                          <DropdownMenuItem
+                            key={option.key}
+                            onClick={() => setSortByOrder(option.key)}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <p>{option.name}</p>
+                              {sortByOrder === option.key && (
+                                <Check size={16} className="text-brand" strokeWidth={2} />
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="text"
+                      icon={
+                        snap.view === 'LIST' ? (
+                          <List size={16} strokeWidth={2} />
+                        ) : (
+                          <Columns size={16} strokeWidth={2} />
+                        )
+                      }
+                    >
+                      View
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40 min-w-0">
+                    {VIEW_OPTIONS.map((option) => (
+                      <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
+                        <div className="flex items-center justify-between w-full">
+                          <p>{option.name}</p>
+                          {snap.view === option.key && (
+                            <Check size={16} className="text-brand" strokeWidth={2} />
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="w-44">
+                        {SORT_BY_OPTIONS.map((option) => (
+                          <DropdownMenuItem key={option.key} onClick={() => setSortBy(option.key)}>
+                            <div className="flex items-center justify-between w-full">
+                              <p>{option.name}</p>
+                              {sortBy === option.key && (
+                                <Check size={16} className="text-brand" strokeWidth={2} />
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>Sort order</DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent>
+                        {SORT_ORDER_OPTIONS.map((option) => (
+                          <DropdownMenuItem
+                            key={option.key}
+                            onClick={() => setSortByOrder(option.key)}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <p>{option.name}</p>
+                              {sortByOrder === option.key && (
+                                <Check size={16} className="text-brand" strokeWidth={2} />
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
-            <div className="h-6 shrink-0 border-r border-control" />
-            <div className="flex shrink-0 items-center space-x-1 px-2">
-              <div className="hidden">
-                <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
-              </div>
-              <ButtonTooltip
-                icon={<Upload size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={onSelectUpload}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateStorage
-                      ? 'You need additional permissions to upload files'
-                      : undefined,
-                  },
-                }}
-              >
-                Upload files
-              </ButtonTooltip>
-              <ButtonTooltip
-                icon={<FolderPlus size={16} strokeWidth={2} />}
-                type="text"
-                disabled={!canUpdateStorage || breadcrumbs.length === 0}
-                onClick={() => addNewFolderPlaceholder(-1)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canUpdateStorage
-                      ? 'You need additional permissions to create folders'
-                      : undefined,
-                  },
-                }}
-              >
-                Create folder
-              </ButtonTooltip>
-            </div>
+            {!isPicker && (
+              <>
+                <div className="h-6 border-r border-control" />
+                <div className="flex items-center space-x-1 px-2">
+                  <div className="hidden">
+                    <input ref={uploadButtonRef} type="file" multiple onChange={onFilesUpload} />
+                  </div>
+                  <ButtonTooltip
+                    icon={<Upload size={16} strokeWidth={2} />}
+                    type="text"
+                    disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                    onClick={onSelectUpload}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUpdateStorage
+                          ? 'You need additional permissions to upload files'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Upload files
+                  </ButtonTooltip>
+                  <ButtonTooltip
+                    icon={<FolderPlus size={16} strokeWidth={2} />}
+                    type="text"
+                    disabled={!canUpdateStorage || breadcrumbs.length === 0}
+                    onClick={() => addNewFolderPlaceholder(-1)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canUpdateStorage
+                          ? 'You need additional permissions to create folders'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Create folder
+                  </ButtonTooltip>
+                </div>
+              </>
+            )}
 
             <div className="h-6 shrink-0 border-r border-control" />
             <div className="flex shrink-0 items-center px-2">
@@ -537,11 +578,20 @@ export const FileExplorerHeader = ({
                   icon={<Search />}
                   size="tiny"
                   type="text"
-                  className="px-1"
+                  className="py-0 px-1 h-5 w-5"
                   onClick={toggleSearch}
                 />
               )}
             </div>
+
+            {isNewAPIDocsEnabled && !isPicker && (
+              <>
+                <div className="h-6 border-r border-control" />
+                <div className="mx-2">
+                  <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
