@@ -15,11 +15,13 @@ export interface GenerateAuthMenuOptions {
     multiFactor: boolean
     attackProtection: boolean
     performance: boolean
+    passkeys?: boolean
   }
 }
 
 export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuGroup[] {
   const { ref, isPlatform, showOverview, features } = options
+  const passkeysInMenu = Boolean(features.passkeys)
   const baseUrl = `/project/${ref}/auth`
 
   return [
@@ -81,6 +83,16 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                       pages: ['providers', 'third-party'],
                       url: `${baseUrl}/providers`,
                       items: [],
+                    },
+                  ]
+                : []),
+              ...(passkeysInMenu
+                ? [
+                    {
+                      name: 'Passkeys',
+                      key: 'passkeys',
+                      url: `${baseUrl}/passkeys`,
+                      label: 'Beta',
                     },
                   ]
                 : []),
@@ -165,6 +177,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
 export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
   const { ref } = useParams()
   const showOverview = useFlag('authOverviewPage')
+  const enablePasskeyAuth = useFlag('enablePasskeyAuth')
 
   const {
     authenticationSignInProviders,
@@ -193,6 +206,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
       multiFactor: authenticationMultiFactor,
       attackProtection: authenticationAttackProtection,
       performance: authenticationPerformance,
+      passkeys: enablePasskeyAuth,
     },
   })
 }
