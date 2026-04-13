@@ -300,6 +300,21 @@ On the IdP side, create a new SAML application and configure it with your SP det
 
 </TabPanel>
 
+<TabPanel id="auth0" label="Auth0">
+
+**Auth0:**
+
+- Dashboard → Applications → Applications → Create Application → Regular Web Application
+- Settings tab → Advanced Settings → Endpoints tab
+- Copy the **SAML Metadata URL** (this is the IdP metadata URL for Supabase)
+- Settings tab → Advanced Settings → Add-ons → SAML2 Web App
+- Enable SAML2 Web App add-on
+- Settings tab in the add-on:
+  - Application Callback URL (ACS): `{API_EXTERNAL_URL}/auth/v1/sso/saml/acs`
+- Enable the add-on
+
+</TabPanel>
+
 </Tabs>
 
 ## Attribute mapping
