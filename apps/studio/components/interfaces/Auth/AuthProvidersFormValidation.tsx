@@ -614,7 +614,7 @@ const EXTERNAL_PROVIDER_APPLE = {
           try {
             const parts = value.split('.').map((value) => parseBase64URL(value))
             const body = JSON.parse(parts[1])
-            return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
+            return Date.now() < body.exp - 7 * 24 * 60 * 60 * 1000
           } catch (e: any) {
             console.log(e)
             return false
