@@ -5,10 +5,12 @@ import * as DevToolbarContextModule from './DevToolbarContext'
 import * as DevToolbarTriggerModule from './DevToolbarTrigger'
 import type { DevTelemetryToolbarContextType } from './types'
 
-// Tree-shaking pattern: conditionally export stubs in production
-// The bundler replaces process.env.NODE_ENV at build time, making the
-// ternary static. Combined with sideEffects: false, the implementation
-// modules are eliminated from the production bundle.
+// Tree-shaking pattern: conditionally export stubs outside local/staging.
+// The bundler replaces NEXT_PUBLIC_ENVIRONMENT at build time, making the
+// ternary static. In production builds (env === 'prod'), the implementation
+// modules are eliminated from the bundle.
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const isToolbarEnabled = env === 'local' || env === 'staging'
 
 const noopContext: DevTelemetryToolbarContextType = {
   isEnabled: false,
@@ -20,17 +22,17 @@ const noopContext: DevTelemetryToolbarContextType = {
 }
 
 export const DevToolbarProvider =
-  process.env.NODE_ENV !== 'development'
+  !isToolbarEnabled
     ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
     : DevToolbarContextModule.DevToolbarProvider
 
 export const useDevToolbar =
-  process.env.NODE_ENV !== 'development' ? () => noopContext : DevToolbarContextModule.useDevToolbar
+  !isToolbarEnabled ? () => noopContext : DevToolbarContextModule.useDevToolbar
 
 export const DevToolbar =
-  process.env.NODE_ENV !== 'development' ? () => null : DevToolbarModule.DevToolbar
+  !isToolbarEnabled ? () => null : DevToolbarModule.DevToolbar
 
 export const DevToolbarTrigger =
-  process.env.NODE_ENV !== 'development' ? () => null : DevToolbarTriggerModule.DevToolbarTrigger
+  !isToolbarEnabled ? () => null : DevToolbarTriggerModule.DevToolbarTrigger
 
 export type { DevTelemetryEvent, DevToolbarConfig } from './types'
