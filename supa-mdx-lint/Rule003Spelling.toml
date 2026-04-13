@@ -317,6 +317,7 @@ allow_list = [
     "Redis",
     "RedwoodJS",
     "Refine",
+    "[Rr]etryable",
     "Roboflow",
     "Rollup",
     "SaaS",
