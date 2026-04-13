@@ -143,7 +143,7 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
-  const { getFieldState, getValues, setValue } = form
+  const { getFieldState, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
