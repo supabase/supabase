@@ -69,7 +69,7 @@ const smtpEnabledSchema = z.object({
       .max(32767, 'Must not be more than 32,767 an hour')
   ),
   SMTP_USER: z.string().trim().min(1, 'SMTP Username is required'),
-  SMTP_PASS: z.string().trim().min(1, 'SMTP Password is required'),
+  SMTP_PASS: z.string().trim().optional(),
 })
 
 const smtpDisabledSchema = z.object({
@@ -104,7 +104,19 @@ export const SmtpForm = () => {
   )
 
   const form = useForm<SmtpFormValues>({
-    resolver: zodResolver(smtpSchema),
+    resolver: zodResolver(
+      smtpSchema.superRefine((data, ctx) => {
+        const isEnablingSmtp = data.ENABLE_SMTP && !isSmtpEnabled(authConfig)
+
+        if (isEnablingSmtp && !data.SMTP_PASS) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'SMTP Password is required',
+            path: ['SMTP_PASS'],
+          })
+        }
+      })
+    ),
     defaultValues: {
       SMTP_ADMIN_EMAIL: '',
       SMTP_SENDER_NAME: '',
