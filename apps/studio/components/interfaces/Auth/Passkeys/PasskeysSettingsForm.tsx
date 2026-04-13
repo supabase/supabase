@@ -31,27 +31,86 @@ import { DOCS_URL } from '@/lib/constants'
 
 type GoTrueConfig = components['schemas']['GoTrueConfigResponse']
 
-function validWebAuthnOrigins(value: string): boolean {
+function isLocalhost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
+}
+
+function validateRpId(rpId: string): string | null {
+  const trimmed = rpId.trim().toLowerCase()
+  if (!trimmed) return null
+  try {
+    const url = new URL('https://' + trimmed)
+    if (url.hostname !== trimmed) return null
+    return trimmed
+  } catch {
+    return null
+  }
+}
+
+function validateWebAuthnOrigins(
+  value: string,
+  rpId: string | null
+): { valid: true } | { valid: false; message: string } {
   const origins = value
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean)
-  if (origins.length === 0) return false
-  return origins.every((origin) => {
+
+  if (origins.length === 0) {
+    return { valid: false, message: 'At least one origin is required' }
+  }
+
+  if (origins.length > 5) {
+    return { valid: false, message: 'A maximum of 5 origins is allowed' }
+  }
+
+  for (const origin of origins) {
+    let url: URL
     try {
-      const url = new URL(origin)
-      if (url.protocol === 'https:') return true
-      if (
-        url.protocol === 'http:' &&
-        (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
-      ) {
-        return true
-      }
-      return false
+      url = new URL(origin)
     } catch {
-      return false
+      return { valid: false, message: `"${origin}" is not a valid URL` }
     }
-  })
+
+    if (url.protocol === 'http:') {
+      if (!isLocalhost(url.hostname)) {
+        return {
+          valid: false,
+          message: `"${origin}" must use HTTPS unless it is a localhost origin`,
+        }
+      }
+    } else if (url.protocol !== 'https:') {
+      return {
+        valid: false,
+        message: `"${origin}" must use HTTPS unless it is a localhost origin`,
+      }
+    }
+
+    if (url.href !== url.origin + '/') {
+      return {
+        valid: false,
+        message: `"${origin}" must be a plain origin without path, query, or fragment (e.g. "${url.origin}")`,
+      }
+    }
+
+    if (rpId && !isOriginCompatibleWithRpId(url.hostname, rpId)) {
+      return {
+        valid: false,
+        message: `"${origin}" is not compatible with Relying Party ID "${rpId}". The origin's hostname must match or be a subdomain of the RP ID.`,
+      }
+    }
+  }
+
+  return { valid: true }
+}
+
+function isOriginCompatibleWithRpId(originHostname: string, rpId: string): boolean {
+  const host = originHostname.toLowerCase()
+  const id = rpId.toLowerCase()
+  if (isLocalhost(host) && isLocalhost(id)) return true
+  if (host === id) return true
+  if (host.endsWith('.' + id)) return true
+  return false
 }
 
 const schema = z
@@ -63,13 +122,7 @@ const schema = z
   })
   .superRefine((data, ctx) => {
     if (!data.PASSKEY_ENABLED) return
-    if (!data.WEBAUTHN_RP_ID) {
-      ctx.addIssue({
-        path: ['WEBAUTHN_RP_ID'],
-        code: z.ZodIssueCode.custom,
-        message: 'Relying Party ID is required when Passkey is enabled',
-      })
-    }
+
     if (!data.WEBAUTHN_RP_DISPLAY_NAME) {
       ctx.addIssue({
         path: ['WEBAUTHN_RP_DISPLAY_NAME'],
@@ -77,6 +130,26 @@ const schema = z
         message: 'Relying Party Display Name is required when Passkey is enabled',
       })
     }
+
+    let validatedRpId: string | null = null
+    if (!data.WEBAUTHN_RP_ID) {
+      ctx.addIssue({
+        path: ['WEBAUTHN_RP_ID'],
+        code: z.ZodIssueCode.custom,
+        message: 'Relying Party ID is required when Passkey is enabled',
+      })
+    } else {
+      validatedRpId = validateRpId(data.WEBAUTHN_RP_ID)
+      if (validatedRpId === null) {
+        ctx.addIssue({
+          path: ['WEBAUTHN_RP_ID'],
+          code: z.ZodIssueCode.custom,
+          message:
+            'Relying Party ID must be a bare domain (e.g. "example.com"). Do not include a scheme, port, or path.',
+        })
+      }
+    }
+
     const origins = data.WEBAUTHN_RP_ORIGINS
     if (!origins) {
       ctx.addIssue({
@@ -86,12 +159,13 @@ const schema = z
       })
       return
     }
-    if (!validWebAuthnOrigins(origins)) {
+
+    const result = validateWebAuthnOrigins(origins, validatedRpId)
+    if (!result.valid) {
       ctx.addIssue({
         path: ['WEBAUTHN_RP_ORIGINS'],
         code: z.ZodIssueCode.custom,
-        message:
-          'Each origin must be a valid HTTPS URL (HTTP only allowed for localhost/127.0.0.1)',
+        message: result.message,
       })
     }
   })

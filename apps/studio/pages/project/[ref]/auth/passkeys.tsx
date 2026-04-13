@@ -2,7 +2,6 @@ import { IS_PLATFORM, useFeatureFlags, useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
-  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
@@ -14,8 +13,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PasskeysSettingsForm } from '@/components/interfaces/Auth/Passkeys/PasskeysSettingsForm'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const PasskeysPage: NextPageWithLayout = () => {
