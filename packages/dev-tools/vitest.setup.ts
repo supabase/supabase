@@ -20,6 +20,10 @@ Object.defineProperty(window, 'matchMedia', {
 
 vi.mock('next/navigation', () => require('next-router-mock/navigation'))
 
+// jsdom doesn't implement pointer capture methods
+Element.prototype.setPointerCapture = vi.fn()
+Element.prototype.releasePointerCapture = vi.fn()
+
 afterEach(() => {
   cleanup()
 })
