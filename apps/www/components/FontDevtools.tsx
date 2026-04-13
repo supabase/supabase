@@ -111,6 +111,35 @@ function removeLocalFont(family: string) {
   document.getElementById(localFontStyleId(family))?.remove()
 }
 
+type GoogleFont = {
+  family: string
+  weights?: number[]
+}
+
+const GOOGLE_FONTS: GoogleFont[] = [
+  { family: 'Manrope', weights: [200, 300, 400, 500, 600, 700, 800] },
+  { family: 'Inter', weights: [100, 200, 300, 400, 500, 600, 700, 800, 900] },
+]
+
+function googleFontStyleId(family: string) {
+  return `font-devtools-google-${family.toLowerCase().replace(/\s+/g, '-')}`
+}
+
+function ensureGoogleFont(font: GoogleFont) {
+  const id = googleFontStyleId(font.family)
+  if (document.getElementById(id)) return
+  const weights = font.weights?.join(';') ?? '400'
+  const link = document.createElement('link')
+  link.id = id
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font.family)}:wght@${weights}&display=swap`
+  document.head.appendChild(link)
+}
+
+function removeGoogleFont(family: string) {
+  document.getElementById(googleFontStyleId(family))?.remove()
+}
+
 function fv(family: string) {
   return `"${family}", ui-sans-serif, system-ui, sans-serif`
 }
@@ -120,6 +149,8 @@ const SOEHNE = fv('Soehne')
 const UNTITLED = fv('Untitled Sans')
 const SUISSE = fv('Suisse Intl')
 const SIGNIFIER = `"Signifier", ui-serif, Georgia, serif`
+const MANROPE = fv('Manrope')
+const INTER = fv('Inter')
 const GEIST_MONO = 'var(--font-geist-mono), ui-monospace, Menlo, monospace'
 
 type FontOption = {
@@ -127,6 +158,7 @@ type FontOption = {
   heading: string
   copy: string
   localFamilies?: string[]
+  googleFamilies?: string[]
 }
 
 type MonoOption = {
@@ -166,6 +198,12 @@ const FONT_OPTIONS: FontOption[] = [
     copy: SUISSE,
     localFamilies: ['Signifier', 'Suisse Intl'],
   },
+  {
+    label: 'Manrope + Inter',
+    heading: MANROPE,
+    copy: INTER,
+    googleFamilies: ['Manrope', 'Inter'],
+  },
 ]
 
 const MONO_OPTIONS: MonoOption[] = [
@@ -191,6 +229,16 @@ function applyOverrides(option?: FontOption, mono?: string) {
       ensureLocalFont(font)
     } else {
       removeLocalFont(font.family)
+    }
+  }
+
+  // Manage Google font loading
+  const neededGoogle = new Set(option?.googleFamilies ?? [])
+  for (const font of GOOGLE_FONTS) {
+    if (neededGoogle.has(font.family)) {
+      ensureGoogleFont(font)
+    } else {
+      removeGoogleFont(font.family)
     }
   }
 
@@ -265,6 +313,7 @@ export function FontDevtools() {
     setMono('')
     applyOverrides()
     for (const font of LOCAL_FONTS) removeLocalFont(font.family)
+    for (const font of GOOGLE_FONTS) removeGoogleFont(font.family)
     localStorage.removeItem(STORAGE_KEY)
   }, [])
 
