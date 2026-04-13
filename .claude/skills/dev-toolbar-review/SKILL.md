@@ -31,7 +31,7 @@ so PRs touching only those files won't auto-request review. Watch for these in t
 
 The toolbar uses two layers of protection:
 - **Build-time tree-shaking** in `index.ts`: `process.env.NODE_ENV !== 'development'` ternaries that replace components with noops/stubs so the implementation is eliminated from production bundles.
-- **Runtime guards** in components: `IS_LOCAL_DEV` checks that return `null` early.
+- **Runtime guards** in components: `IS_LOCAL_DEV` checks — `DevToolbar` and `DevToolbarTrigger` return `null` to hide themselves, while `DevToolbarProvider` passes children through (`<>{children}</>`) to preserve the component tree.
 
 **Check for:**
 - Guards being removed or broadened. The toolbar is expanding to staging and preview deploys but must remain invisible in production.
@@ -61,8 +61,9 @@ These are read by:
 **Files:** `packages/common/posthog-client.ts`, `packages/dev-tools/DevToolbarContext.tsx`
 
 The toolbar subscribes to client-side PostHog events via `posthogClient.subscribeToEvents()`.
-The PostHog client calls `emitToDevListeners()` after every `capture`, `identify`, `pageview`,
-and `pageleave` call.
+The PostHog client calls `emitToDevListeners()` after `capturePageView`, `capturePageLeave`,
+and `identify`. Note: `captureExperimentExposure` calls `posthog.capture()` directly
+without emitting to dev listeners — experiment exposure events are invisible in the toolbar.
 
 **Check for:**
 - Changes to `emitToDevListeners` or `subscribeToEvents` that could introduce side effects on the actual capture path (e.g., throwing errors, blocking, mutating event data)
@@ -83,9 +84,15 @@ server-side telemetry. Uses exponential backoff on connection errors.
 
 ### 5. App-Level Mounting
 
-**Files:** `apps/studio/pages/_app.tsx`, `apps/www/pages/_app.tsx`, `apps/www/app/providers.tsx`, `apps/docs/features/app.providers.tsx`
+**Provider + toolbar panel** (`DevToolbarProvider`, `DevToolbar`):
+- `apps/studio/pages/_app.tsx`
+- `apps/www/pages/_app.tsx`, `apps/www/app/providers.tsx`
+- `apps/docs/features/app.providers.tsx`
 
-The toolbar is mounted in all three frontend apps (studio, www, docs) via `DevToolbarProvider` wrapping the app tree, with `DevToolbar` and `DevToolbarTrigger` rendered inside.
+**Trigger button** (`DevToolbarTrigger`) — rendered separately in nav/header components:
+- `apps/studio/components/layouts/Navigation/LayoutHeader/LayoutHeader.tsx`
+- `apps/www/components/Nav/index.tsx`
+- `apps/docs/components/Navigation/NavigationMenu/TopNavBar.tsx`
 
 **Check for:**
 - Provider being added or removed from an app
