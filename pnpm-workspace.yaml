@@ -15,7 +15,7 @@ catalog:
   '@types/react-dom': ^18.3.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
-  next: ~16.1.7
+  next: ~16.2.3
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -52,6 +52,8 @@ minimumReleaseAgeExclude:
   - hono
   - lodash
   - lodash-es
+  - next
+  - '@next/*'
 
 onlyBuiltDependencies:
   - node-pty
