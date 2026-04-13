@@ -1,4 +1,4 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Check } from 'lucide-react'
@@ -98,11 +98,12 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             values[key] = !(config as any)[key]
           } else {
             const configValue = (config as any)[key]
-            values[key] = configValue
-              ? configValue
-              : provider.properties[key].type === 'boolean'
-                ? false
-                : ''
+            values[key] =
+              configValue != null
+                ? configValue
+                : provider.properties[key].type === 'boolean'
+                  ? false
+                  : ''
           }
         }
       })
@@ -155,7 +156,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
-    resolver: yupResolver(provider.validationSchema),
+    resolver: zodResolver(provider.validationSchema),
     shouldUnregister: true,
   })
 
