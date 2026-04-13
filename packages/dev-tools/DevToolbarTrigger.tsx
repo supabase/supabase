@@ -66,6 +66,7 @@ function readStoredPosition(): SnapPosition {
 export function DevToolbarTrigger() {
   const { isEnabled, isOpen, setIsOpen, events } = useDevToolbar()
   const [snapPosition, setSnapPosition] = useState<SnapPosition>('bottom-right')
+  const [hasHydrated, setHasHydrated] = useState(false)
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null)
   // Holds the last drag pixel position for one RAF to prime the CSS transition
   const [releasedAt, setReleasedAt] = useState<{ x: number; y: number } | null>(null)
@@ -83,10 +84,14 @@ export function DevToolbarTrigger() {
   } | null>(null)
   const wasDraggingRef = useRef(false)
 
-  // Restore persisted position after mount to avoid SSR hydration mismatch
+  // Restore persisted position after mount to avoid SSR hydration mismatch.
+  // hasHydrated is set via RAF so the correct position is painted before transitions are enabled,
+  // preventing the spring animation from firing on initial load.
   useEffect(() => {
     const stored = readStoredPosition()
     if (stored !== 'bottom-right') setSnapPosition(stored)
+    const id = requestAnimationFrame(() => setHasHydrated(true))
+    return () => cancelAnimationFrame(id)
   }, [])
 
   // Keep snap coords accurate on resize
@@ -186,7 +191,7 @@ export function DevToolbarTrigger() {
             position: 'fixed',
             zIndex: 50,
             ...snapCoords,
-            transition: FULL_TRANSITION,
+            transition: hasHydrated ? FULL_TRANSITION : 'none',
             opacity: isOpen ? 0 : 1,
             pointerEvents: isOpen ? 'none' : undefined,
           }

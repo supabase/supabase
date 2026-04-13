@@ -492,7 +492,7 @@ export function DevToolbar() {
                   {totalOverrideCount > 0 && (
                     <div className="mt-auto p-2 border-t">
                       <Button type="outline" size="tiny" block onClick={clearAllOverrides}>
-                        Reset overrides
+                        Reset & Reload
                       </Button>
                     </div>
                   )}

@@ -164,6 +164,9 @@ export const FeatureFlagProvider = ({
       ])
 
       const flags = phResult.status === 'fulfilled' ? phResult.value : {}
+      if (phResult.status === 'rejected') {
+        console.warn('[FeatureFlags] PostHog flags failed', phResult.reason)
+      }
       const flagValues = ccResult.status === 'fulfilled' ? ccResult.value : []
 
       const isLocalDev = process.env.NODE_ENV === 'development'
