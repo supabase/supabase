@@ -143,7 +143,7 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
-  const { getValues, setValue } = form
+  const { getFieldState, getValues, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -158,7 +158,6 @@ const Wizard: NextPageWithLayout = () => {
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
-
   const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -224,7 +223,8 @@ const Wizard: NextPageWithLayout = () => {
     )
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
-    : undefined
+    : ''
+
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
@@ -390,10 +390,16 @@ const Wizard: NextPageWithLayout = () => {
   }, [slug, setValue, projectName])
 
   useEffect(() => {
-    if (getValues('dbRegion') === undefined && defaultRegion) {
+    const dbRegion = getValues('dbRegion')
+
+    if (
+      (dbRegion == null || dbRegion === '') &&
+      !getFieldState('dbRegion').isDirty &&
+      defaultRegion
+    ) {
       setValue('dbRegion', defaultRegion)
     }
-  }, [defaultRegion, getValues, setValue])
+  }, [defaultRegion, getFieldState, getValues, setValue])
 
   useEffect(() => {
     if (regionError) {
@@ -402,10 +408,15 @@ const Wizard: NextPageWithLayout = () => {
   }, [regionError, setValue, defaultProvider])
 
   useEffect(() => {
-    if (getValues('dbRegion') === undefined && recommendedSmartRegion) {
+    const dbRegion = getValues('dbRegion')
+    if (
+      (dbRegion == null || dbRegion === '') &&
+      !getFieldState('dbRegion').isDirty &&
+      recommendedSmartRegion
+    ) {
       setValue('dbRegion', recommendedSmartRegion)
     }
-  }, [recommendedSmartRegion, getValues, setValue])
+  }, [recommendedSmartRegion, getFieldState, getValues, setValue])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
