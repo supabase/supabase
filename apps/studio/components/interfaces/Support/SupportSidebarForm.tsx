@@ -84,12 +84,12 @@ export function SupportForm({ initialParams }: SupportFormProps) {
   const isSuccess = state.type === 'success'
 
   return (
-    <>
+    <div className="relative h-full overflow-y-auto overflow-x-hidden">
       <IncidentAdmonition
         isActive={hasActiveIncidents}
         className="rounded-none border-x-0 shadow-none"
       />
-      <div className="px-5 pt-5">
+      <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
           {!isSuccess && !hasActiveIncidents && (
             <div className="flex flex-col gap-y-4">
@@ -116,7 +116,7 @@ export function SupportForm({ initialParams }: SupportFormProps) {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
