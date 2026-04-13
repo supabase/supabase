@@ -324,7 +324,6 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
             <Dialog key={template.name}>
               <DialogTrigger asChild>
                 <ResourceItem
-                  key={template.name}
                   media={<Code strokeWidth={1.5} size={16} className="-translate-y-[9px]" />}
                 >
                   <div>
