@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -9,7 +9,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const DB_PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
@@ -25,10 +25,9 @@ function buildDirectPostgresConnectionUri(settings: {
 
 function buildLogicalBackupShellScript(connectionUri: string) {
   return [
-    'npx supabase login',
-    `npx supabase db dump --db-url "${connectionUri}" -f roles.sql --role-only`,
-    `npx supabase db dump --db-url "${connectionUri}" -f schema.sql`,
-    `npx supabase db dump --db-url "${connectionUri}" -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"`,
+    `npx supabase db dump --db-url '${connectionUri}' -f roles.sql --role-only`,
+    `npx supabase db dump --db-url '${connectionUri}' -f schema.sql`,
+    `npx supabase db dump --db-url '${connectionUri}' -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"`,
   ].join('\n')
 }
 
@@ -44,8 +43,6 @@ export const LogicalBackupCliInstructions = ({
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isProjectActive = useIsProjectActive()
-
   const { can: canResetDbPassword } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -75,7 +72,7 @@ export const LogicalBackupCliInstructions = ({
   const shellScript = connectionUri ? buildLogicalBackupShellScript(connectionUri) : ''
 
   const resetPasswordHref = ref ? `/project/${ref}/database/settings#database-password` : '#'
-  const resetDisabled = !canResetDbPassword || !isProjectActive
+  const resetDisabled = !canResetDbPassword
 
   return (
     <div className={cn('space-y-3', className)}>
@@ -83,7 +80,9 @@ export const LogicalBackupCliInstructions = ({
         <h4 className="text-sm font-medium">Back up your database with the Supabase CLI</h4>
         <p className="text-sm text-foreground-light mt-1">
           Use your direct connection string (replace {DB_PASSWORD_PLACEHOLDER} with your database
-          password).{' '}
+          password). If your password contains special characters such as <code>@</code>,{' '}
+          <code>#</code>, or <code>:</code>, percent-encode them first (e.g. <code>@</code> →{' '}
+          <code>%40</code>).{' '}
           <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Backup documentation</InlineLink>
           .
         </p>
@@ -102,9 +101,7 @@ export const LogicalBackupCliInstructions = ({
             side: 'bottom',
             text: !canResetDbPassword
               ? 'You need additional permissions to reset the database password'
-              : !isProjectActive
-                ? 'Reset database password is only available while the project is active'
-                : undefined,
+              : undefined,
           },
         }}
       >
@@ -115,7 +112,7 @@ export const LogicalBackupCliInstructions = ({
         <p className="text-sm text-foreground-light">
           Could not load connection details. Open{' '}
           <InlineLink href={resetPasswordHref}>Database settings</InlineLink> to copy your
-          connection string, then run the commands below.
+          connection string manually.
         </p>
       )}
 
