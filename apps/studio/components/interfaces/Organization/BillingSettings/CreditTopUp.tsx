@@ -268,7 +268,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 name="amount"
                 render={({ field }) => (
                   <FormItemLayout label="Amount (USD)" className="gap-1">
-                    <Input_Shadcn_ {...field} type="number" placeholder="350" />
+                    <Input_Shadcn_ {...field} type="number" placeholder="300" />
                   </FormItemLayout>
                 )}
               />
