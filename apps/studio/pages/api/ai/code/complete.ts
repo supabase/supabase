@@ -210,6 +210,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       headers,
     })
 
+    // Reshape the fetched schemas and candidates into a discriminated union over error states
     const fetchedSchemaSet = new Set(schemasToFetch)
     const schemaListResult: SchemaListResult = schemaListError
       ? { error: true }
