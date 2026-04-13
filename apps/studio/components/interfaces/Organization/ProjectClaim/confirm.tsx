@@ -40,7 +40,7 @@ export const ProjectClaimConfirm = ({
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   const { mutateAsync: approveRequest, isPending: isApproving } =
-    useApiAuthorizationApproveMutation({ onError: () => {} })
+    useApiAuthorizationApproveMutation({ onError: () => { } })
 
   const { mutateAsync: claimProject, isPending: isClaiming } = useOrganizationProjectClaimMutation()
 
@@ -198,6 +198,11 @@ export const ProjectClaimConfirm = ({
                     description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
                     hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+                  />
+                  <ScopeSection
+                    description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+                    hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
+                    hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
                   />
                   <ScopeSection
                     description={PERMISSIONS_DESCRIPTIONS.AUTH}
