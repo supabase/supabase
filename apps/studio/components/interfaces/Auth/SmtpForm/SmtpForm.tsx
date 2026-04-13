@@ -1,8 +1,8 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -23,7 +23,7 @@ import {
 import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as yup from 'yup'
+import * as z from 'zod'
 
 import { urlRegex } from '../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
@@ -35,16 +35,57 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
-interface SmtpFormValues {
-  SMTP_ADMIN_EMAIL?: string
-  SMTP_SENDER_NAME?: string
-  SMTP_HOST?: string
-  SMTP_PORT?: number
-  SMTP_MAX_FREQUENCY?: number
-  SMTP_USER?: string
-  SMTP_PASS?: string
-  ENABLE_SMTP: boolean
-}
+const smtpEnabledSchema = z.object({
+  ENABLE_SMTP: z.literal(true),
+  SMTP_ADMIN_EMAIL: z
+    .string()
+    .trim()
+    .min(1, 'Sender email address is required')
+    .email('Must be a valid email'),
+  SMTP_SENDER_NAME: z.string().trim().min(1, 'Sender name is required'),
+  SMTP_HOST: z
+    .string()
+    .trim()
+    .min(1, 'Host URL is required')
+    .regex(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address'),
+  SMTP_PORT: z.preprocess(
+    (val) => (val === '' || val == null ? undefined : val),
+    z.coerce
+      .number({
+        required_error: 'Port number is required',
+        invalid_type_error: 'Port number is required',
+      })
+      .min(1, 'Must be a valid port number more than 0')
+      .max(65535, 'Must be a valid port number no more than 65535')
+  ),
+  SMTP_MAX_FREQUENCY: z.preprocess(
+    (val) => (val === '' || val == null ? undefined : val),
+    z.coerce
+      .number({
+        required_error: 'Rate limit is required',
+        invalid_type_error: 'Rate limit is required',
+      })
+      .min(1, 'Must be more than 0')
+      .max(32767, 'Must not be more than 32,767 an hour')
+  ),
+  SMTP_USER: z.string().trim().min(1, 'SMTP Username is required'),
+  SMTP_PASS: z.string().trim().min(1, 'SMTP Password is required'),
+})
+
+const smtpDisabledSchema = z.object({
+  ENABLE_SMTP: z.literal(false),
+  SMTP_ADMIN_EMAIL: z.string().optional(),
+  SMTP_SENDER_NAME: z.string().optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.number().optional(),
+  SMTP_MAX_FREQUENCY: z.number().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+})
+
+const smtpSchema = z.discriminatedUnion('ENABLE_SMTP', [smtpEnabledSchema, smtpDisabledSchema])
+
+type SmtpFormValues = z.infer<typeof smtpSchema>
 
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -62,67 +103,8 @@ export const SmtpForm = () => {
     'custom_config_gotrue'
   )
 
-  const smtpSchema = yup.object({
-    SMTP_ADMIN_EMAIL: yup
-      .string()
-      .trim()
-      .when('ENABLE_SMTP', {
-        is: true,
-        then: (schema) =>
-          schema.email('Must be a valid email').required('Sender email address is required'),
-        otherwise: (schema) => schema,
-      }),
-    SMTP_SENDER_NAME: yup
-      .string()
-      .trim()
-      .when('ENABLE_SMTP', {
-        is: true,
-        then: (schema) => schema.required('Sender name is required'),
-        otherwise: (schema) => schema,
-      }),
-    SMTP_HOST: yup
-      .string()
-      .trim()
-      .when('ENABLE_SMTP', {
-        is: true,
-        then: (schema) =>
-          schema
-            .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
-            .required('Host URL is required.'),
-        otherwise: (schema) => schema,
-      }),
-    SMTP_PORT: yup.number().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema
-          .required('Port number is required.')
-          .min(1, 'Must be a valid port number more than 0')
-          .max(65535, 'Must be a valid port number no more than 65535'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_MAX_FREQUENCY: yup.number().when('ENABLE_SMTP', {
-      is: true,
-      then: (schema) =>
-        schema
-          .required('Rate limit is required.')
-          .min(1, 'Must be more than 0')
-          .max(32767, 'Must not be more than 32,767 an hour'),
-      otherwise: (schema) => schema,
-    }),
-    SMTP_USER: yup
-      .string()
-      .trim()
-      .when('ENABLE_SMTP', {
-        is: true,
-        then: (schema) => schema.required('SMTP Username is required'),
-        otherwise: (schema) => schema,
-      }),
-    SMTP_PASS: yup.string().trim(),
-    ENABLE_SMTP: yup.boolean().required(),
-  })
-
   const form = useForm<SmtpFormValues>({
-    resolver: yupResolver(smtpSchema),
+    resolver: zodResolver(smtpSchema),
     defaultValues: {
       SMTP_ADMIN_EMAIL: '',
       SMTP_SENDER_NAME: '',
@@ -134,6 +116,8 @@ export const SmtpForm = () => {
       ENABLE_SMTP: false,
     },
   })
+
+  const { isDirty } = form.formState
 
   // Update form values when auth config is loaded
   useEffect(() => {
@@ -161,7 +145,7 @@ export const SmtpForm = () => {
     return () => subscription.unsubscribe()
   }, [form])
 
-  const onSubmit = (values: SmtpFormValues) => {
+  const onSubmit: SubmitHandler<SmtpFormValues> = (values) => {
     const { ENABLE_SMTP, ...rest } = values
     const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
 
@@ -377,7 +361,7 @@ export const SmtpForm = () => {
                                 <Input_Shadcn_
                                   type="number"
                                   value={field.value}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                  onChange={(e) => field.onChange(e.target.value)}
                                   placeholder="587"
                                   disabled={!canUpdateConfig}
                                 />
@@ -399,7 +383,7 @@ export const SmtpForm = () => {
                                   <FormInputGroupInput
                                     type="number"
                                     value={field.value}
-                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                    onChange={(e) => field.onChange(e.target.value)}
                                     disabled={!canUpdateConfig}
                                   />
                                   <InputGroupAddon align="inline-end">
@@ -468,7 +452,7 @@ export const SmtpForm = () => {
                     </p>
                   ))}
                 <div className="flex items-center gap-x-2">
-                  {form.formState.isDirty && (
+                  {isDirty && (
                     <Button
                       type="default"
                       onClick={() => {
@@ -483,7 +467,7 @@ export const SmtpForm = () => {
                     type="primary"
                     htmlType="submit"
                     loading={isUpdatingConfig}
-                    disabled={!canUpdateConfig || !form.formState.isDirty}
+                    disabled={!canUpdateConfig || !isDirty}
                   >
                     Save changes
                   </Button>
