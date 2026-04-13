@@ -84,7 +84,7 @@ services:
       - name: auth-v1-open-sso-acs
         strip_path: true
         paths:
-        - /sso/saml/acs
+        - /auth/v1/sso/saml/acs
     plugins:
       - name: cors
       
@@ -94,7 +94,7 @@ services:
       - name: auth-v1-open-sso-metadata
         strip_path: true
         paths:
-        - /sso/saml/metadata
+        - /auth/v1/sso/saml/metadata
     plugins:
       - name: cors
 
