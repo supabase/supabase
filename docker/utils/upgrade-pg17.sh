@@ -332,22 +332,36 @@ build_tarball() {
             echo "  Copying libraries..."
             PKGLIBDIR=$(pg_config --pkglibdir)
             LIBDIR=$(pg_config --libdir)
-            cp -L "$PKGLIBDIR"/*.so /export/17/lib/ 2>/dev/null || true
-            cp -L "$LIBDIR"/*.so* /export/17/lib/ 2>/dev/null || true
-            cp -L /nix/var/nix/profiles/default/lib/*.so* /export/17/lib/ 2>/dev/null || true
+            # These paths may overlap (PKGLIBDIR and LIBDIR often point to the
+            # same nix store path). Use cp -Lf to handle overwrites from
+            # read-only nix store source files.
+            cp -Lf "$PKGLIBDIR"/*.so /export/17/lib/ || echo "  Warning: cp from $PKGLIBDIR failed" >&2
+            cp -Lf "$LIBDIR"/*.so* /export/17/lib/ || echo "  Warning: cp from $LIBDIR failed" >&2
+            cp -Lf /nix/var/nix/profiles/default/lib/*.so* /export/17/lib/ || echo "  Warning: cp from nix profile lib failed" >&2
 
             echo "  Copying share data..."
             # Nix-built binaries resolve share dir relative to their location:
             #   <bindir>/../share/postgresql/
             # so we need share/postgresql/ not just share/
             mkdir -p /export/17/share/postgresql
-            cp -rL /usr/share/postgresql/* /export/17/share/postgresql/ 2>/dev/null || true
+            # Remove the cyclic symlink at timezonesets/timezonesets before copying.
+            # Without this, cp -rL may abort partway through, leaving files like
+            # timezonesets/Default uncopied. initdb then fails with:
+            #   FATAL: invalid value for parameter "timezone_abbreviations": "Default"
+            rm -f /usr/share/postgresql/timezonesets/timezonesets 2>/dev/null || true
+            cp -rL /usr/share/postgresql/* /export/17/share/postgresql/
 
             # initiate.sh copies .control/.sql from PGLIBNEW to PGSHARENEW/extension/
             echo "  Copying extension definitions to lib..."
             SHAREDIR=$(pg_config --sharedir)
-            cp "$SHAREDIR"/extension/*.control /export/17/lib/ 2>/dev/null || true
-            cp "$SHAREDIR"/extension/*.sql /export/17/lib/ 2>/dev/null || true
+            cp "$SHAREDIR"/extension/*.control /export/17/lib/ || echo "  Warning: cp .control from $SHAREDIR/extension failed" >&2
+            cp "$SHAREDIR"/extension/*.sql /export/17/lib/ || echo "  Warning: cp .sql from $SHAREDIR/extension failed" >&2
+
+            # Verify critical files before creating tarball
+            echo "  Checking for key files..."
+            [ -f /export/17/bin/postgres ] || { echo "Error: bin/postgres missing"; exit 1; }
+            [ -f /export/17/share/postgresql/timezonesets/Default ] || { echo "Error: timezonesets/Default missing"; exit 1; }
+            ls /export/17/lib/*.so >/dev/null 2>&1 || { echo "Error: no .so files in lib/"; exit 1; }
 
             echo "  Creating tarball (this may take several minutes)..."
             cd /export && tar czf pg_upgrade_bin.tar.gz 17/
