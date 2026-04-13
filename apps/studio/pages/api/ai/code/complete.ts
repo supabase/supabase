@@ -22,6 +22,89 @@ import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const maxDuration = 60
 
+const pgMetaSchemasList = pgMeta.schemas.list()
+type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
+type EntityDefinitionRow = { data: { definitions: Array<{ id: number; sql: string }> } }
+
+type SqlFetchParams = {
+  projectRef: string
+  connectionString: string | null | undefined
+  headers: Record<string, string>
+}
+
+async function fetchSchemas(
+  includeSchema: boolean,
+  { projectRef, connectionString, headers }: SqlFetchParams
+): Promise<{ schemas: Schemas; error: boolean }> {
+  if (!includeSchema) return { schemas: [], error: false }
+  try {
+    const { result } = await executeSql<Schemas>(
+      { projectRef, connectionString, sql: pgMetaSchemasList.sql },
+      undefined,
+      headers,
+      IS_PLATFORM ? undefined : executeQuery
+    )
+    return { schemas: result, error: false }
+  } catch {
+    return { schemas: [], error: true }
+  }
+}
+
+async function fetchSchemaDDL(
+  schemas: string[],
+  { projectRef, connectionString, headers }: SqlFetchParams
+): Promise<{ error: false; defs: string | null } | { error: true }> {
+  if (schemas.length === 0) return { error: false, defs: null }
+  try {
+    const { result } = await executeSql<EntityDefinitionRow[]>(
+      { projectRef, connectionString, sql: getEntityDefinitionsSql({ schemas }) },
+      undefined,
+      headers,
+      IS_PLATFORM ? undefined : executeQuery
+    )
+    const defs = result?.[0]?.data?.definitions?.map((d) => d.sql).join('\n\n') ?? null
+    return { error: false, defs }
+  } catch {
+    return { error: true }
+  }
+}
+
+function buildDatabaseSchemaSection({
+  includeSchema,
+  schemaListError,
+  schemaDDLResult,
+  schemasToFetch,
+  otherSchemaNames,
+}: {
+  includeSchema: boolean
+  schemaListError: boolean
+  schemaDDLResult: { error: false; defs: string | null } | { error: true }
+  schemasToFetch: string[]
+  otherSchemaNames: string
+}): string {
+  if (!includeSchema) {
+    return 'Schema context is unavailable — data opt-in is not enabled for this project.'
+  }
+  if (schemaListError) {
+    return "Failed to retrieve schema list due to a database error. Assume a `public` schema exists. Other schemas may be present — infer from the user's existing code."
+  }
+
+  const lines: string[] = []
+  if (schemasToFetch.length > 0) lines.push(`Loaded definitions for: ${schemasToFetch.join(', ')}`)
+  if (otherSchemaNames)
+    lines.push(`Other available schemas (use getSchemaDefinitions tool): ${otherSchemaNames}`)
+
+  if (schemaDDLResult.error) {
+    lines.push('\nFailed to fetch table definitions due to a database error.')
+  } else if (schemaDDLResult.defs) {
+    lines.push('\n' + schemaDDLResult.defs)
+  } else {
+    lines.push('\nNo table definitions found.')
+  }
+
+  return lines.join('\n')
+}
+
 const requestBodySchema = z.object({
   completionMetadata: z.object({
     textBeforeCursor: z.string(),
@@ -87,27 +170,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const includeSchema = aiOptInLevel !== 'disabled'
 
-    const pgMetaSchemasList = pgMeta.schemas.list()
-    type Schemas = z.infer<(typeof pgMetaSchemasList)['zod']>
-
-    type EntityDefinitionRow = { data: { definitions: Array<{ id: number; sql: string }> } }
-
     // Fetch schema list first so we can determine which schemas to load DDL for.
     // These are best-effort — if they fail, we proceed without DDL context.
-    let schemaListError = false
-    const schemas: Schemas = includeSchema
-      ? await executeSql<Schemas>(
-          { projectRef, connectionString, sql: pgMetaSchemasList.sql },
-          undefined,
-          headers,
-          IS_PLATFORM ? undefined : executeQuery
-        )
-          .then(({ result }) => result)
-          .catch(() => {
-            schemaListError = true
-            return [] as Schemas
-          })
-      : []
+    const { schemas, error: schemaListError } = await fetchSchemas(includeSchema, {
+      projectRef,
+      connectionString,
+      headers,
+    })
 
     // Always include public; also eagerly include any non-public schema whose name
     // appears as `name.` in the cursor context. Checking against the real schema list
@@ -124,27 +193,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         ]
       : []
 
-    let schemaDDLError = false
-    const entityDefs: EntityDefinitionRow[] =
-      schemasToFetch.length > 0
-        ? await executeSql<EntityDefinitionRow[]>(
-            {
-              projectRef,
-              connectionString,
-              sql: getEntityDefinitionsSql({ schemas: schemasToFetch }),
-            },
-            undefined,
-            headers,
-            IS_PLATFORM ? undefined : executeQuery
-          )
-            .then(({ result }) => result)
-            .catch(() => {
-              schemaDDLError = true
-              return [] as EntityDefinitionRow[]
-            })
-        : []
-
-    const schemaDDL = entityDefs?.[0]?.data?.definitions?.map((d) => d.sql).join('\n\n')
+    const schemaDDLResult = await fetchSchemaDDL(schemasToFetch, {
+      projectRef,
+      connectionString,
+      headers,
+    })
 
     const fetchedSchemaSet = new Set(schemasToFetch)
     const otherSchemaNames = schemas
@@ -160,8 +213,21 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ${SECURITY_PROMPT}
     `
 
-    const hasCodeContext =
-      selection.trim() !== '' || textBeforeCursor.trim() !== '' || textAfterCursor.trim() !== ''
+    const userMessage = source`
+      ## Database Schema
+
+      ${buildDatabaseSchemaSection({ includeSchema, schemaListError, schemaDDLResult, schemasToFetch, otherSchemaNames })}
+
+      ## Code
+
+      \`\`\`${language ?? ''}
+      ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
+      \`\`\`
+
+      ## Instruction
+
+      ${prompt}
+    `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
@@ -173,13 +239,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       },
       {
         role: 'user',
-        content: source`
-          ${schemaDDLError ? 'Failed to fetch schema definitions due to a database error.' : schemaDDL ? `Schema definitions (${schemasToFetch.join(', ')}):\n${schemaDDL}` : ''}
-          ${schemaListError ? 'Failed to fetch schema list due to a database error — other schemas may exist.' : otherSchemaNames ? `Other available schemas (use getSchemaDefinitions to look them up): ${otherSchemaNames}` : ''}
-          ${hasCodeContext ? `\nCode:\n${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}` : ''}
-
-          Prompt: ${prompt}
-        `,
+        content: userMessage,
       },
     ]
 
@@ -201,22 +261,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                   const validSchemaNames = schemaNames.filter((name) =>
                     schemas.some((s) => s.name === name)
                   )
-                  if (validSchemaNames.length === 0) return ''
-                  try {
-                    const { result } = await executeSql<EntityDefinitionRow[]>(
-                      {
-                        projectRef,
-                        connectionString,
-                        sql: getEntityDefinitionsSql({ schemas: validSchemaNames }),
-                      },
-                      undefined,
-                      headers,
-                      IS_PLATFORM ? undefined : executeQuery
-                    )
-                    return result?.[0]?.data?.definitions?.map((d) => d.sql).join('\n\n') ?? ''
-                  } catch {
+                  const result = await fetchSchemaDDL(validSchemaNames, {
+                    projectRef,
+                    connectionString,
+                    headers,
+                  })
+                  if (result.error)
                     return 'Failed to fetch schema definitions due to a database error.'
-                  }
+                  return result.defs ?? ''
                 },
               }),
             }
