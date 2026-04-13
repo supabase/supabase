@@ -1527,7 +1527,10 @@ const EXTERNAL_PROVIDER_WORKOS = {
     }),
     z.object({
       EXTERNAL_WORKOS_ENABLED: z.literal(true),
-      EXTERNAL_WORKOS_URL: z.string().min(1, 'WorkOS URL is required'),
+      EXTERNAL_WORKOS_URL: z
+        .string()
+        .min(1, 'WorkOS URL is required')
+        .regex(urlRegex(), 'Must be a valid URL'),
       EXTERNAL_WORKOS_CLIENT_ID: z.string().min(1, 'Client ID is required'),
       EXTERNAL_WORKOS_SECRET: z.string().min(1, 'Client Secret is required'),
     }),
