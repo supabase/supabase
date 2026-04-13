@@ -43,7 +43,7 @@ const useDbQuery = ({
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const connectionString = (databases || []).find(
     (db) => db.identifier === state.selectedDatabaseId
-  )?.connectionString
+  )?.connection_string_read_only // default to using the read_only string
   const identifier = state.selectedDatabaseId
 
   const resolvedSql = typeof sql === 'function' ? sql([]) : sql
