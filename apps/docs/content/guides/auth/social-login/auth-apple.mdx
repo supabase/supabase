@@ -640,7 +640,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     **Use the Compose Auth plugin in your Auth Screen**
 
     ```kotlin
-    val authState = supabaseClient.composeAuth.rememberLoginWithApple(
+    val authState = supabaseClient.composeAuth.rememberSignInWithApple(
     	onResult = { result ->
     		when(result) {
     			NativeSignInResult.ClosedByUser -> {

@@ -208,7 +208,7 @@ export const formatWrapperTables = (
       ...options,
       index,
       id: table.id,
-      columns: table.columns,
+      columns: table.columns ?? [],
       is_new_schema: false,
       schema: table.schema,
       schema_name: table.schema,

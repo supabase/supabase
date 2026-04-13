@@ -54,7 +54,6 @@
     "cmdk": "^1.1.1",
     "color": "^4.2.3",
     "date-fns": "^2.30.0",
-    "formik": "^2.2.9",
     "framer-motion": "^11.0.3",
     "input-otp": "^1.2.3",
     "lodash": "catalog:",
