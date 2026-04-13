@@ -39,22 +39,12 @@ ignoredBuiltDependencies:
   - protobufjs
   - sharp
 
-minimumReleaseAge: 10080
+minimumReleaseAge: 4320
 
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
-  - defu
-  - vite
-  - '@hono/node-server'
-  - hono
-  - lodash
-  - lodash-es
-  - next
-  - '@next/*'
-  - turbo
 
 onlyBuiltDependencies:
   - node-pty
