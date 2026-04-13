@@ -138,7 +138,6 @@ export const LinkSupportTicketForm = ({
                 projectRef={selectedProjectRef}
                 subscriptionPlanId={subscriptionPlanId}
                 category={category}
-                showPlanExpectationInfo={false}
               />
             )}
 

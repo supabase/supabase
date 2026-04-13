@@ -4,7 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
-import { DialogSectionSeparator, Form_Shadcn_ } from 'ui'
+import { cn, Form_Shadcn_, Separator } from 'ui'
 
 import {
   AffectedServicesSelector,
@@ -21,7 +21,8 @@ import {
 import { DashboardLogsToggle } from './DashboardLogsToggle'
 import { MessageField } from './MessageField'
 import { OrganizationSelector } from './OrganizationSelector'
-import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
+import { PlanExpectationInfoContent, ProjectAndPlanInfo } from './ProjectAndPlanInfo'
+import { SupportFormDirectEmailContent } from './SupportFormDirectEmailInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
 import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
@@ -64,16 +65,25 @@ interface SupportFormV2Props {
   initialError: string | null
   state: SupportFormState
   dispatch: Dispatch<SupportFormActions>
+  layout?: 'page' | 'sidebar'
+  selectedProjectRef?: string | null
 }
 
-export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFormV2Props) => {
+export const SupportFormV2 = ({
+  form,
+  initialError,
+  state,
+  dispatch,
+  layout = 'page',
+  selectedProjectRef,
+}: SupportFormV2Props) => {
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
   const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
-  const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
+  const currentProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
 
   const { data: organizations } = useOrganizationsQuery()
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)
@@ -196,17 +206,27 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
     handleFormSubmit(event)
   }
 
+  const sectionPaddingClass = layout === 'page' ? 'px-6' : ''
+  const isSidebar = layout === 'sidebar'
+  const showPlanExpectationInfo =
+    !!selectedOrgSlug &&
+    subscriptionPlanId !== 'enterprise' &&
+    subscriptionPlanId !== 'platform' &&
+    category !== 'Login_issues'
+  const showDirectEmailInfo = state.type !== 'success' && selectedProjectRef !== undefined
+
   return (
     <Form_Shadcn_ {...form}>
-      <form id="support-form" className="flex flex-col gap-y-6">
-        <h3 className="px-6 text-xl">How can we help?</h3>
-
-        <div className="px-6 flex flex-col gap-y-8">
+      <form
+        id="support-form"
+        className={cn('flex flex-col', isSidebar ? 'min-h-full' : 'gap-y-6')}
+      >
+        <div className={cn('flex flex-col gap-y-6', sectionPaddingClass)}>
           <OrganizationSelector form={form} orgSlug={organizationSlug} />
           <ProjectAndPlanInfo
             form={form}
             orgSlug={selectedOrgSlug}
-            projectRef={selectedProjectRef}
+            projectRef={currentProjectRef}
             subscriptionPlanId={subscriptionPlanId}
             category={category}
           />
@@ -218,9 +238,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           />
         </div>
 
-        <DialogSectionSeparator />
-
-        <div className="px-6 flex flex-col gap-y-8">
+        <div className={cn('flex flex-col gap-y-6', sectionPaddingClass, isSidebar && 'py-6')}>
           <SubjectAndSuggestionsInfo form={form} subject={subject} category={category} />
           {!simplifiedSupportForm && (
             <>
@@ -232,30 +250,86 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           <AttachmentUploadDisplay {...attachmentUpload} />
         </div>
 
-        <DialogSectionSeparator />
+        {(DASHBOARD_LOG_CATEGORIES.includes(category) ||
+          (!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category)) ||
+          showPlanExpectationInfo ||
+          showDirectEmailInfo) && (
+          <div className={cn('flex flex-col gap-y-6', sectionPaddingClass)}>
+            <Separator />
 
-        {DASHBOARD_LOG_CATEGORIES.includes(category) && (
-          <>
-            <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
-            <DialogSectionSeparator />
-          </>
+            {DASHBOARD_LOG_CATEGORIES.includes(category) && (
+              <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} />
+            )}
+
+            {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+              <SupportAccessToggle form={form} />
+            )}
+
+            {(showPlanExpectationInfo || showDirectEmailInfo) && (
+              <SupportFormAdditionalInfoSection
+                orgSlug={selectedOrgSlug}
+                subscriptionPlanId={subscriptionPlanId}
+                projectRef={currentProjectRef}
+                showPlanExpectationInfo={showPlanExpectationInfo}
+                showDirectEmailInfo={showDirectEmailInfo}
+              />
+            )}
+          </div>
         )}
 
-        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
-          <>
-            <SupportAccessToggle form={form} />
-            <DialogSectionSeparator />
-          </>
+        {isSidebar ? (
+          <div className="sticky bottom-0 z-10 -mx-5 mt-6 border-t bg-panel-footer-light px-5 py-4">
+            <SubmitButton
+              isSubmitting={state.type === 'submitting'}
+              userEmail={respondToEmail}
+              onClick={handleSubmitButtonClick}
+              descriptionClassName="pr-0"
+            />
+          </div>
+        ) : (
+          <div className="px-6 pt-2">
+            <SubmitButton
+              isSubmitting={state.type === 'submitting'}
+              userEmail={respondToEmail}
+              onClick={handleSubmitButtonClick}
+            />
+          </div>
         )}
-
-        <div className="px-6 pt-2">
-          <SubmitButton
-            isSubmitting={state.type === 'submitting'}
-            userEmail={respondToEmail}
-            onClick={handleSubmitButtonClick}
-          />
-        </div>
       </form>
     </Form_Shadcn_>
+  )
+}
+
+interface SupportFormAdditionalInfoSectionProps {
+  orgSlug: string | null
+  subscriptionPlanId?: OrganizationPlanID
+  projectRef: string | null
+  showPlanExpectationInfo: boolean
+  showDirectEmailInfo: boolean
+}
+
+function SupportFormAdditionalInfoSection({
+  orgSlug,
+  subscriptionPlanId,
+  projectRef,
+  showPlanExpectationInfo,
+  showDirectEmailInfo,
+}: SupportFormAdditionalInfoSectionProps) {
+  return (
+    <div className="flex flex-col gap-y-5">
+      {showPlanExpectationInfo && orgSlug && (
+        <div className="flex flex-col gap-y-2">
+          <h5 className="text-foreground">Support varies by plan</h5>
+          <PlanExpectationInfoContent orgSlug={orgSlug} planId={subscriptionPlanId} />
+        </div>
+      )}
+
+      {showDirectEmailInfo && (
+        <div className="flex flex-col gap-y-2">
+          <h5 className="text-foreground">Having trouble submitting the form?</h5>
+          <SupportFormDirectEmailContent projectRef={projectRef} />
+        </div>
+      )}
+    </div>
   )
 }

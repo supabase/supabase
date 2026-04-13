@@ -23,16 +23,8 @@ export const HelpSection = ({
   onSupportClick,
   className,
 }: HelpSectionProps) => {
-  const description = projectRef
-    ? 'Start with our Assistant, docs, or community.'
-    : 'Start with our docs or community.'
-
   return (
-    <div className={cn('flex flex-col gap-4', className)}>
-      <div className="flex flex-col gap-0.5">
-        <h5 className="text-foreground">Need help with your project?</h5>
-        <p className="text-xs text-foreground-lighter text-balance">{description}</p>
-      </div>
+    <div className={cn('flex flex-col', className)}>
       <HelpOptionsList
         excludeIds={excludeIds}
         isPlatform={isPlatform}
@@ -40,7 +32,6 @@ export const HelpSection = ({
         supportLinkQueryParams={supportLinkQueryParams}
         onAssistantClick={onAssistantClick}
         onSupportClick={onSupportClick}
-        size="tiny"
       />
     </div>
   )
