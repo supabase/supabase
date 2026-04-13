@@ -277,7 +277,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -320,7 +320,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
