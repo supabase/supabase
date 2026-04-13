@@ -293,27 +293,31 @@ export const NewPaymentMethodElement = forwardRef(
       [purchasingAsBusiness]
     )
 
-    // Reset tax ID fields when the billing country changes
+    // Reset tax ID fields when the billing country changes and preselect the
+    // first available tax ID for the new country.
     const prevCountryRef = useRef(addressCountry)
     useEffect(() => {
       if (!addressCountry) return
-      if (prevCountryRef.current && prevCountryRef.current !== addressCountry) {
-        form.setValue('tax_id_type', '')
-        form.setValue('tax_id_value', '')
-        form.setValue('tax_id_name', '')
-      }
-      prevCountryRef.current = addressCountry
-    }, [addressCountry, form])
 
-    // Preselect tax id if there is no more than 2 available tax ids (even if there are two options, first one in the list is likely to be it)
-    useEffect(() => {
-      if (availableTaxIds.length && stripeAddress?.address.country && !currentTaxId) {
-        const taxIdOption = availableTaxIds[0]
-        form.setValue('tax_id_type', taxIdOption.type)
-        form.setValue('tax_id_value', '')
-        form.setValue('tax_id_name', taxIdOption.name)
+      const isCountryChange =
+        prevCountryRef.current !== undefined && prevCountryRef.current !== addressCountry
+      prevCountryRef.current = addressCountry
+
+      // On country change: always reset to the new country's default
+      // On initial load: only preselect if there's no existing tax id
+      if (isCountryChange || !currentTaxId) {
+        if (availableTaxIds.length) {
+          const taxIdOption = availableTaxIds[0]
+          form.setValue('tax_id_type', taxIdOption.type)
+          form.setValue('tax_id_value', '')
+          form.setValue('tax_id_name', taxIdOption.name)
+        } else {
+          form.setValue('tax_id_type', '')
+          form.setValue('tax_id_value', '')
+          form.setValue('tax_id_name', '')
+        }
       }
-    }, [availableTaxIds, addressCountry, currentTaxId])
+    }, [availableTaxIds, addressCountry, currentTaxId, form])
 
     return (
       <div className="space-y-2">
