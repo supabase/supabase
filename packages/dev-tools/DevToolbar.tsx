@@ -67,58 +67,60 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
 
   return (
     <div className="group last:border-b-0">
-      <div
-        role="button"
-        tabIndex={0}
-        aria-expanded={isExpanded}
-        onClick={() => setIsExpanded((prev) => !prev)}
-        onKeyDown={(e) => e.key === 'Enter' && setIsExpanded((prev) => !prev)}
-        className="flex items-center h-9 px-6 gap-5 hover:bg-surface-100 cursor-pointer"
-      >
-        <span className="flex items-center gap-2 shrink-0 w-16">
-          <span
-            className={cn(
-              'w-1.5 h-1.5 rounded-[2px] shrink-0',
-              event.source === 'client' ? 'bg-brand' : 'bg-foreground-lighter'
-            )}
-          />
-          <span
-            className={cn(
-              'font-mono text-xs uppercase',
-              event.source === 'client' ? 'text-brand' : 'text-foreground-light'
-            )}
-          >
-            {event.source}
-          </span>
-        </span>
-
-        <span className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
-          <span className="font-mono text-xs text-foreground-lighter shrink-0 w-20">{time}</span>
-          <span className="font-mono text-xs text-foreground-lighter shrink-0 w-28 truncate uppercase">
-            {event.eventType}
-          </span>
-          <span className="font-mono text-xs text-foreground truncate shrink-0">
-            {event.eventName}
-          </span>
-          {event.distinctId && (
-            <span className="font-mono text-xs text-foreground-muted truncate">
-              {event.distinctId}
-            </span>
-          )}
-        </span>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={handleCopy}
-              aria-label="Copy JSON"
-              className="shrink-0 p-1 rounded hover:bg-surface-200 text-foreground-muted hover:text-foreground-light"
+      <div className="relative flex items-center h-9 hover:bg-surface-100">
+        <button
+          type="button"
+          aria-expanded={isExpanded}
+          onClick={() => setIsExpanded((prev) => !prev)}
+          className="flex items-center flex-1 min-w-0 h-full px-6 gap-5 cursor-pointer"
+        >
+          <span className="flex items-center gap-2 shrink-0 w-16">
+            <span
+              className={cn(
+                'w-1.5 h-1.5 rounded-[2px] shrink-0',
+                event.source === 'client' ? 'bg-brand' : 'bg-foreground-lighter'
+              )}
+            />
+            <span
+              className={cn(
+                'font-mono text-xs uppercase',
+                event.source === 'client' ? 'text-brand' : 'text-foreground-light'
+              )}
             >
-              <Copy className="w-3 h-3" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="left">Copy JSON</TooltipContent>
-        </Tooltip>
+              {event.source}
+            </span>
+          </span>
+
+          <span className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+            <span className="font-mono text-xs text-foreground-lighter shrink-0 w-20">{time}</span>
+            <span className="font-mono text-xs text-foreground-lighter shrink-0 w-28 truncate uppercase">
+              {event.eventType}
+            </span>
+            <span className="font-mono text-xs text-foreground truncate shrink-0">
+              {event.eventName}
+            </span>
+            {event.distinctId && (
+              <span className="font-mono text-xs text-foreground-muted truncate">
+                {event.distinctId}
+              </span>
+            )}
+          </span>
+        </button>
+        <div className="shrink-0 pr-6">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={handleCopy}
+                aria-label="Copy JSON"
+                className="p-1 rounded hover:bg-surface-200 text-foreground-muted hover:text-foreground-light"
+              >
+                <Copy className="w-3 h-3" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left">Copy JSON</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
       {isExpanded && (
         <pre className="px-8 py-2 bg-surface-100 border-b text-xs font-mono overflow-x-auto max-h-[200px] overflow-y-auto text-foreground-light">
