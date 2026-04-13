@@ -262,6 +262,24 @@ export function DevToolbar() {
     setCcFlagOriginals(readOriginals(CC_ORIGINALS_KEY))
   }, [])
 
+  useEffect(() => {
+    const STYLE_ID = 'dev-toolbar-hide-native-devtools'
+    const existing = document.getElementById(STYLE_ID)
+
+    if (isOpen) {
+      if (!existing) {
+        const style = document.createElement('style')
+        style.id = STYLE_ID
+        style.textContent = `
+          .tsqd-open-btn, .tsqd-open-btn-container { display: none !important; }
+        `
+        document.head.appendChild(style)
+      }
+    } else {
+      existing?.remove()
+    }
+  }, [isOpen])
+
   const updatePhOriginals = updateOriginals(PH_ORIGINALS_KEY, setPhFlagOriginals)
   const updateCcOriginals = updateOriginals(CC_ORIGINALS_KEY, setCcFlagOriginals)
 
@@ -378,7 +396,7 @@ export function DevToolbar() {
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
-<Tooltip>
+                <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       type="text"
