@@ -77,8 +77,14 @@ const smtpDisabledSchema = z.object({
   SMTP_ADMIN_EMAIL: z.string().optional(),
   SMTP_SENDER_NAME: z.string().optional(),
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.number().optional(),
-  SMTP_MAX_FREQUENCY: z.number().optional(),
+  SMTP_PORT: z.preprocess(
+    (val) => (val === '' || val == null ? undefined : val),
+    z.coerce.number().optional()
+  ),
+  SMTP_MAX_FREQUENCY: z.preprocess(
+    (val) => (val === '' || val == null ? undefined : val),
+    z.coerce.number().optional()
+  ),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
 })
