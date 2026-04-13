@@ -89,28 +89,54 @@ const PROVIDER_EMAIL = {
       units: 'digits',
     },
   },
-  validationSchema: z.object({
-    MAILER_OTP_EXP: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
-      z.coerce
-        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
-        .min(0, 'Must be greater or equal to 0')
-        .max(86400, 'Must be no more than 86400')
-    ),
-    MAILER_OTP_LENGTH: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
-      z.coerce
-        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
-        .min(6, 'Must be greater or equal to 6')
-        .max(10, 'Must be no more than 10')
-    ),
-    PASSWORD_MIN_LENGTH: z.preprocess(
-      (val) => (val === '' || val == null ? undefined : val),
-      z.coerce
-        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
-        .min(6, 'Must be greater or equal to 6')
-    ),
-  }),
+  validationSchema: z.discriminatedUnion('EXTERNAL_EMAIL_ENABLED', [
+    z.object({
+      EXTERNAL_EMAIL_ENABLED: z.literal(true),
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED: z.boolean(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
+      PASSWORD_HIBP_ENABLED: z.boolean(),
+      MAILER_OTP_EXP: z.preprocess(
+        (val) => (val === '' || val == null ? undefined : val),
+        z.coerce
+          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .min(0, 'Must be greater or equal to 0')
+          .max(86400, 'Must be no more than 86400')
+      ),
+      MAILER_OTP_LENGTH: z.preprocess(
+        (val) => (val === '' || val == null ? undefined : val),
+        z.coerce
+          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .min(6, 'Must be greater or equal to 6')
+          .max(10, 'Must be no more than 10')
+      ),
+      PASSWORD_MIN_LENGTH: z.preprocess(
+        (val) => (val === '' || val == null ? undefined : val),
+        z.coerce
+          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .min(6, 'Must be greater or equal to 6')
+      ),
+      PASSWORD_REQUIRED_CHARACTERS: z.string().min(1, 'This is required'),
+    }),
+    z.object({
+      EXTERNAL_EMAIL_ENABLED: z.literal(false),
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED: z.boolean().optional(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
+      PASSWORD_HIBP_ENABLED: z.boolean().optional(),
+      MAILER_OTP_EXP: z.preprocess(
+        (val) => (val === '' || val == null ? undefined : val),
+        z.coerce.number().optional()
+      ),
+      MAILER_OTP_LENGTH: z.preprocess(
+        (val) => (val === '' || val == null ? undefined : val),
+        z.coerce.number().optional()
+      ),
+      PASSWORD_MIN_LENGTH: z.preprocess(
+        (val) => (val === '' || val == null ? undefined : val),
+        z.coerce.number().optional()
+      ),
+      PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
+    }),
+  ]),
   misc: {
     iconKey: 'email-icon2',
     helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
@@ -173,9 +199,11 @@ const vonagePhoneProviderSchema = z.object({
   SMS_VONAGE_FROM: z.string().min(1, 'Vonage From is required'),
 })
 
-const smsProviderEnabledSchema = z.object({
-  EXTERNAL_PHONE_ENABLED: z.literal(true),
-})
+const smsProviderEnabledSchema = z
+  .object({
+    EXTERNAL_PHONE_ENABLED: z.literal(true),
+  })
+  .passthrough()
 
 const smsProviderDisabledSchema = z
   .object({
@@ -221,7 +249,6 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
         SMS_PROVIDER: z.literal('twilio'),
       })
     )
-    .merge(smsProviderEnabledSchema)
     .merge(smsProviderBaseSchema)
     .merge(smsOtpPhoneProviderSchema)
     .merge(twilioVerifyPhoneProviderSchema.partial())
@@ -238,7 +265,6 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
         SMS_PROVIDER: z.literal('twilio_verify'),
       })
     )
-    .merge(smsProviderEnabledSchema)
     .merge(smsProviderBaseSchema)
     .merge(twilioVerifyPhoneProviderSchema.partial())
     .merge(messagebirdPhoneProviderSchema.partial())
@@ -254,7 +280,6 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
         SMS_PROVIDER: z.literal('messagebird'),
       })
     )
-    .merge(smsProviderEnabledSchema)
     .merge(smsProviderBaseSchema)
     .merge(smsOtpPhoneProviderSchema)
     .merge(twilioPhoneProviderSchema.partial())
@@ -268,7 +293,6 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
         SMS_PROVIDER: z.literal('vonage'),
       })
     )
-    .merge(smsProviderEnabledSchema)
     .merge(smsProviderBaseSchema)
     .merge(smsOtpPhoneProviderSchema)
     .merge(twilioVerifyPhoneProviderSchema.partial())
@@ -285,7 +309,6 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
         SMS_PROVIDER: z.literal('textlocal'),
       })
     )
-    .merge(smsProviderEnabledSchema)
     .merge(smsProviderBaseSchema)
     .merge(smsOtpPhoneProviderSchema)
     .merge(twilioVerifyPhoneProviderSchema.partial())
@@ -293,7 +316,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     .merge(vonagePhoneProviderSchema.partial())
     .merge(textlocalPhoneProviderSchema.partial())
 
-  return z
+  const enabledSchema = z
     .discriminatedUnion('SMS_PROVIDER', [
       twilioSchema,
       twilioVerifySchema,
@@ -302,6 +325,18 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
       textlocalSchema,
     ])
     .refine(validateSmsTestOtp, 'You must provide a valid until date.')
+
+  return z
+    .discriminatedUnion('EXTERNAL_PHONE_ENABLED', [
+      smsProviderDisabledSchema,
+      smsProviderEnabledSchema,
+    ])
+    .refine((values) => {
+      if (values.EXTERNAL_PHONE_ENABLED === true) {
+        return enabledSchema.parse(values)
+      }
+      return true
+    })
 }
 
 export const PROVIDER_PHONE = {
