@@ -112,7 +112,6 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 1.  To sign in your migrated users, use the Supabase Auth [sign in methods](/docs/reference/javascript/auth-signinwithpassword).
 
     To check for edge cases where users aren't successfully migrated, use a fallback strategy. This ensures that users can continue to sign in seamlessly:
-
     1.  Try to sign in the user with Supabase Auth.
     1.  If the signin fails, try to sign in with Auth0.
     1.  If Auth0 signin succeeds, call the admin create user method again to create the user in Supabase Auth.

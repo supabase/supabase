@@ -44,10 +44,7 @@ When the rate limit is exceeded, calling another Edge Function throws a `RateLim
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_ANON_KEY')!
-)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!)
 
 Deno.serve(async (req) => {
   try {
@@ -87,17 +84,14 @@ Deno.serve(async (req) => {
 ```typescript
 Deno.serve(async (req) => {
   try {
-    const response = await fetch(
-      `${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ foo: 'bar' }),
-      }
-    )
+    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ foo: 'bar' }),
+    })
     return response
   } catch (err) {
     if (err instanceof Deno.errors.RateLimitError) {
@@ -136,16 +130,9 @@ You can also use `retryAfterMs` to implement automatic retries within your funct
 ```typescript
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_ANON_KEY')!
-)
+const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_ANON_KEY')!)
 
-async function invokeWithRetry(
-  functionName: string,
-  payload: object,
-  maxRetries = 3
-) {
+async function invokeWithRetry(functionName: string, payload: object, maxRetries = 3) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       const { data, error } = await supabase.functions.invoke(functionName, {
@@ -279,15 +266,15 @@ async function processWithDelay(items: any[]) {
 
 ## Common patterns and their impact
 
-| Pattern | Budget consumption | Recommendation |
-| --- | --- | --- |
-| Simple chain (A to B to C) | Low | Generally safe |
-| Fan-out (A to B, C, D, E) | Moderate | Limit concurrency |
-| Deep recursion (A to A to A...) | High | Set max depth |
-| Unbounded loops | Very high | Avoid, use queues |
+| Pattern                         | Budget consumption | Recommendation    |
+| ------------------------------- | ------------------ | ----------------- |
+| Simple chain (A to B to C)      | Low                | Generally safe    |
+| Fan-out (A to B, C, D, E)       | Moderate           | Limit concurrency |
+| Deep recursion (A to A to A...) | High               | Set max depth     |
+| Unbounded loops                 | Very high          | Avoid, use queues |
 
 ## Increasing rate limits
 
 Currently, all plans have the same rate limit budget. We are working on introducing custom limits for different use cases.
 
-If you need a higher rate limit for your project,  [contact support](/dashboard/support/new) with details about your use case.
+If you need a higher rate limit for your project, [contact support](/dashboard/support/new) with details about your use case.

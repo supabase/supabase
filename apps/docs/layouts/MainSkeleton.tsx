@@ -236,7 +236,7 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
         {mobileMenuOpen
           ? 'Close'
           : 'menuId' in props
-            ? levelsData[props.menuId]?.name ?? levelsData['home'].name
+            ? (levelsData[props.menuId]?.name ?? levelsData['home'].name)
             : props.menuName}
       </span>
     </div>

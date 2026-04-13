@@ -1,38 +1,15 @@
+import { useParams } from 'common'
 import { uniq } from 'lodash'
 import { Loader2, SquarePlus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import {
-  convertKVStringArrayToJson,
-  formatWrapperTables,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import {
-  ScaffoldContainer,
-  ScaffoldSection,
-  ScaffoldSectionTitle,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import {
-  DatabaseExtension,
-  useDatabaseExtensionsQuery,
-} from 'data/database-extensions/database-extensions-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useIcebergNamespacesQuery } from 'data/storage/iceberg-namespaces-query'
-import { useIcebergWrapperCreateMutation } from 'data/storage/iceberg-wrapper-create-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Button, Card, CardContent } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
@@ -43,6 +20,29 @@ import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
+import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import {
+  convertKVStringArrayToJson,
+  formatWrapperTables,
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import {
+  ScaffoldContainer,
+  ScaffoldSection,
+  ScaffoldSectionTitle,
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import {
+  DatabaseExtension,
+  useDatabaseExtensionsQuery,
+} from '@/data/database-extensions/database-extensions-query'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
+import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const AnalyticBucketDetails = () => {
   const router = useRouter()

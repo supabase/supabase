@@ -8,7 +8,7 @@
     "dev": "next dev --turbopack --port 3003",
     "dev:full": "concurrently \"pnpm dev\" \"pnpm content:dev\"",
     "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
-    "build:registry": "tsx --tsconfig ./tsconfig.scripts.json ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
+    "build:registry": "tsx ./scripts/build-registry.mts && prettier --log-level silent --write \"registry/**/*.{ts,tsx,mdx}\" --cache",
     "start": "next start",
     "lint": "eslint .",
     "content:dev": "contentlayer2 dev",

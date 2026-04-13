@@ -1,7 +1,7 @@
-import { Usage } from 'components/interfaces/Organization/Usage/Usage'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import type { NextPageWithLayout } from 'types'
+import { Usage } from '@/components/interfaces/Organization/Usage/Usage'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgUsage: NextPageWithLayout = () => {
   return <Usage />
@@ -9,7 +9,7 @@ const OrgUsage: NextPageWithLayout = () => {
 
 OrgUsage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>{page}</OrganizationLayout>
+    <OrganizationLayout title="Usage">{page}</OrganizationLayout>
   </DefaultLayout>
 )
 

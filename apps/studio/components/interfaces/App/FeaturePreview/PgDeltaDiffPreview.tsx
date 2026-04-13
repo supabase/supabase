@@ -1,4 +1,4 @@
-import { InlineLink } from 'components/ui/InlineLink'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 const PG_DELTA_REPO_URL = 'https://github.com/supabase/pg-toolbelt'
 

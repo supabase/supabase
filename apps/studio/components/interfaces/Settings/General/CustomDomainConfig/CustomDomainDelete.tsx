@@ -1,13 +1,14 @@
-import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { DOCS_URL } from 'lib/constants'
 import { Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import Panel from '@/components/ui/Panel'
+import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from '@/data/custom-domains/custom-domains-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string

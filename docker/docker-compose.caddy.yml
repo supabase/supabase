@@ -2,6 +2,8 @@ services:
 
   kong:
     ports: !reset []
+    environment:
+      KONG_PORT_MAPS: "443:8000,443:8443"
 
   caddy:
     container_name: supabase-caddy
@@ -13,6 +15,8 @@ services:
       - "443:443/udp"
     depends_on:
       kong:
+        condition: service_healthy
+      studio:
         condition: service_healthy
     environment:
       PROXY_DOMAIN: ${PROXY_DOMAIN}

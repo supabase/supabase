@@ -10,8 +10,7 @@ import { alertVariants } from '../shadcn/ui/alert'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../shadcn/ui/collapsible'
 
 export interface AlertCollapsibleProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
-    VariantProps<typeof alertVariants> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, VariantProps<typeof alertVariants> {
   trigger: React.ReactNode
   defaultOpen?: boolean
 }

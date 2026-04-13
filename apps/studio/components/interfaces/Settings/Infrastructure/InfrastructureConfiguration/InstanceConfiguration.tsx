@@ -1,30 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Background,
+  ColorMode,
+  Edge,
+  ReactFlow,
+  ReactFlowProvider,
+  useReactFlow,
+} from '@xyflow/react'
 import { partition } from 'lodash'
 import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import {
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDb,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { timeout } from 'lib/helpers'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -44,6 +35,22 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { timeout } from '@/lib/helpers'
 
 interface InstanceConfigurationUIProps {
   diagramOnly?: boolean
@@ -229,8 +236,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
-            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
         {(isLoading || isLoadingProject) && (
           <Loader2 className="animate-spin text-foreground-light" />
         )}
@@ -305,6 +310,8 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
             )}
             {view === 'flow' ? (
               <ReactFlow
+                // FIXME: https://github.com/xyflow/xyflow/issues/4876
+                colorMode={'' as unknown as ColorMode}
                 fitView
                 fitViewOptions={{ minZoom: 0.9, maxZoom: 0.9 }}
                 className="instance-configuration"
@@ -314,7 +321,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                 nodesConnectable={false}
                 zoomOnDoubleClick={false}
                 edgesFocusable={false}
-                edgesUpdatable={false}
+                edgesReconnectable={false}
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}

@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
-
 import { Button } from 'ui'
+
 import type { DataTableFilterField } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
 

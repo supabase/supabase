@@ -2,6 +2,8 @@ import { render, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { MobileSheetProvider } from '../Navigation/NavigationBar/MobileSheetContext'
+import { ProjectLayout } from './index'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
 const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
@@ -13,6 +15,28 @@ const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hois
   },
   mockSetSelectedDatabaseId: vi.fn(),
   mockSetMobileMenuOpen: vi.fn(),
+}))
+
+const {
+  mockAddBanner,
+  mockDismissBanner,
+  mockProjectState,
+  mockResourceWarningsState,
+  mockBannerDismissedState,
+} = vi.hoisted(() => ({
+  mockAddBanner: vi.fn(),
+  mockDismissBanner: vi.fn(),
+  mockProjectState: {
+    current: {
+      ref: 'default',
+      name: 'Project 1',
+      status: 'ACTIVE_HEALTHY',
+      postgrestStatus: 'ONLINE',
+      infra_compute_size: undefined as string | undefined,
+    },
+  },
+  mockResourceWarningsState: { current: undefined as any[] | undefined },
+  mockBannerDismissedState: { current: false },
 }))
 
 vi.mock('next/router', () => ({
@@ -45,6 +69,12 @@ vi.mock('common', () => ({
   mergeRefs:
     (..._refs: any[]) =>
     (_value: unknown) => {},
+  IS_PLATFORM: false,
+  LOCAL_STORAGE_KEYS: {
+    FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
+      `free-micro-upgrade-banner-dismissed-${ref}`,
+  },
+  isFeatureEnabled: () => false,
 }))
 
 vi.mock('framer-motion', () => ({
@@ -94,15 +124,15 @@ vi.mock('./BuildingState', () => ({ default: () => null }))
 vi.mock('./ConnectingState', () => ({ default: () => null }))
 vi.mock('./LoadingState', () => ({ LoadingState: () => null }))
 vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => null }))
-vi.mock('./PauseFailedState', () => ({ default: () => null }))
-vi.mock('./PausingState', () => ({ default: () => null }))
+vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
+vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
-vi.mock('./ResizingState', () => ({ default: () => null }))
+vi.mock('./ResizingState', () => ({ ResizingState: () => null }))
 vi.mock('./RestartingState', () => ({ default: () => null }))
-vi.mock('./RestoreFailedState', () => ({ default: () => null }))
-vi.mock('./RestoringState', () => ({ default: () => null }))
+vi.mock('./RestoreFailedState', () => ({ RestoreFailedState: () => null }))
+vi.mock('./RestoringState', () => ({ RestoringState: () => null }))
 vi.mock('./UpgradingState', () => ({ UpgradingState: () => null }))
 
 vi.mock('@/components/interfaces/BranchManagement/CreateBranchModal', () => ({
@@ -119,6 +149,27 @@ vi.mock('@/hooks/custom-content/useCustomContent', () => ({
   useCustomContent: () => ({ appTitle: 'Supabase' }),
 }))
 
+vi.mock('@/hooks/misc/useLocalStorage', () => ({
+  useLocalStorageQuery: () => [mockBannerDismissedState.current, vi.fn()],
+}))
+
+vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
+  BANNER_ID: { FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner' },
+  useBannerStack: () => ({
+    addBanner: mockAddBanner,
+    dismissBanner: mockDismissBanner,
+    banners: [],
+  }),
+}))
+
+vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
+  BannerFreeMicroUpgrade: () => null,
+}))
+
+vi.mock('@/data/usage/resource-warnings-query', () => ({
+  useResourceWarningsQuery: () => ({ data: mockResourceWarningsState.current }),
+}))
+
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
     data: { name: 'Organization 1', slug: 'org-1' },
@@ -126,14 +177,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
-  useSelectedProjectQuery: () => ({
-    data: {
-      ref: 'default',
-      name: 'Project 1',
-      status: 'ACTIVE_HEALTHY',
-      postgrestStatus: 'ONLINE',
-    },
-  }),
+  useSelectedProjectQuery: () => ({ data: mockProjectState.current }),
 }))
 
 vi.mock('@/hooks/misc/withAuth', () => ({
@@ -158,8 +202,14 @@ vi.mock('@/state/database-selector', () => ({
   }),
 }))
 
-import { MobileSheetProvider } from './NavigationBar/MobileSheetContext'
-import { ProjectLayout } from './index'
+const renderLayout = () =>
+  render(
+    <MobileSheetProvider>
+      <ProjectLayout product="Database" isBlocking={false}>
+        <div />
+      </ProjectLayout>
+    </MobileSheetProvider>
+  )
 
 describe('ProjectLayout title', () => {
   beforeEach(() => {
@@ -176,7 +226,7 @@ describe('ProjectLayout title', () => {
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
     render(
       <MobileSheetProvider>
-        <ProjectLayout title="Settings" product="Settings" isBlocking={false}>
+        <ProjectLayout browserTitle={{ section: 'Settings' }} product="Settings" isBlocking={false}>
           <div>Page Content</div>
         </ProjectLayout>
       </MobileSheetProvider>
@@ -193,7 +243,6 @@ describe('ProjectLayout title', () => {
     render(
       <MobileSheetProvider>
         <ProjectLayout
-          title="Database"
           product="Database"
           browserTitle={{ entity: 'users', section: 'Tables' }}
           isBlocking={false}
@@ -210,5 +259,93 @@ describe('ProjectLayout title', () => {
         )
       )
     })
+  })
+})
+
+describe('FREE_MICRO_UPGRADE banner', () => {
+  beforeEach(() => {
+    mockRouter.pathname = '/project/[ref]'
+    mockRouter.asPath = '/project/default'
+    mockProjectState.current = {
+      ref: 'default',
+      name: 'Project 1',
+      status: 'ACTIVE_HEALTHY',
+      postgrestStatus: 'ONLINE',
+      infra_compute_size: 'nano',
+    }
+    mockResourceWarningsState.current = [
+      {
+        project: 'default',
+        cpu_exhaustion: true,
+        memory_and_swap_exhaustion: false,
+        disk_space_exhaustion: false,
+      },
+    ]
+    mockBannerDismissedState.current = false
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    mockRouter.pathname = '/project/[ref]/observability/query-performance'
+    mockRouter.asPath = '/project/default/observability/query-performance'
+    mockProjectState.current = {
+      ref: 'default',
+      name: 'Project 1',
+      status: 'ACTIVE_HEALTHY',
+      postgrestStatus: 'ONLINE',
+      infra_compute_size: undefined,
+    }
+    mockResourceWarningsState.current = undefined
+    mockBannerDismissedState.current = false
+  })
+
+  it('calls addBanner when project is nano and compute is near exhaustion', async () => {
+    renderLayout()
+
+    await waitFor(() => {
+      expect(mockAddBanner).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+      )
+    })
+  })
+
+  it('calls dismissBanner when banner was previously dismissed', async () => {
+    mockBannerDismissedState.current = true
+
+    renderLayout()
+
+    await waitFor(() => {
+      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
+    })
+    expect(mockAddBanner).not.toHaveBeenCalled()
+  })
+
+  it('calls dismissBanner when compute warnings are cleared', async () => {
+    mockResourceWarningsState.current = [
+      {
+        project: 'default',
+        cpu_exhaustion: false,
+        memory_and_swap_exhaustion: false,
+        disk_space_exhaustion: false,
+      },
+    ]
+
+    renderLayout()
+
+    await waitFor(() => {
+      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
+    })
+    expect(mockAddBanner).not.toHaveBeenCalled()
+  })
+
+  it('calls dismissBanner when project is not nano compute', async () => {
+    mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+
+    renderLayout()
+
+    await waitFor(() => {
+      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
+    })
+    expect(mockAddBanner).not.toHaveBeenCalled()
   })
 })

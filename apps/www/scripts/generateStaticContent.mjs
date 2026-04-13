@@ -13,6 +13,76 @@ dayjs.extend(advancedFormat)
 
 // Constants
 const FILENAME_SUBSTRING = 11 // based on YYYY-MM-DD format
+const warnedBlogImageIssues = new Set()
+
+const warnBlogImageIssue = (key, message) => {
+  if (warnedBlogImageIssues.has(key)) return
+
+  warnedBlogImageIssues.add(key)
+  console.warn(message)
+}
+
+const validateBlogFrontmatterImages = (frontmatter, filePath) => {
+  const hasImgSocial = typeof frontmatter.imgSocial !== 'undefined'
+  const hasImgThumb = typeof frontmatter.imgThumb !== 'undefined'
+
+  if (hasImgSocial && !hasImgThumb) {
+    warnBlogImageIssue(
+      `${filePath}:imgThumb:missing`,
+      `[blog images] ${filePath}: missing "imgThumb". Adding it keeps on-site thumbnails separate from social previews.`
+    )
+  }
+
+  if (hasImgThumb && !hasImgSocial) {
+    warnBlogImageIssue(
+      `${filePath}:imgSocial:missing`,
+      `[blog images] ${filePath}: missing "imgSocial". Adding it keeps social previews separate from on-site thumbnails.`
+    )
+  }
+
+  const imageFields = [
+    ['imgSocial', frontmatter.imgSocial],
+    ['imgThumb', frontmatter.imgThumb],
+  ]
+
+  for (const [fieldName, imageValue] of imageFields) {
+    if (typeof imageValue === 'undefined') {
+      continue
+    }
+
+    if (typeof imageValue !== 'string') {
+      warnBlogImageIssue(
+        `${filePath}:${fieldName}:invalid-type`,
+        `[blog images] ${filePath}: "${fieldName}" should be a string URL or a relative blog image path.`
+      )
+      continue
+    }
+
+    const trimmedValue = imageValue.trim()
+
+    if (!trimmedValue) {
+      warnBlogImageIssue(
+        `${filePath}:${fieldName}:empty`,
+        `[blog images] ${filePath}: "${fieldName}" is empty. Remove it or provide a valid image path.`
+      )
+      continue
+    }
+
+    if (trimmedValue.startsWith('/images/blog/')) {
+      warnBlogImageIssue(
+        `${filePath}:${fieldName}:prefixed`,
+        `[blog images] ${filePath}: "${fieldName}" should not include the "/images/blog/" prefix. Use a relative path like "my-post/og.png" instead.`
+      )
+    }
+
+    if (trimmedValue.startsWith('./') || trimmedValue.startsWith('../')) {
+      warnBlogImageIssue(
+        `${filePath}:${fieldName}:relative-dot`,
+        `[blog images] ${filePath}: "${fieldName}" should use a clean relative blog path, not "${trimmedValue}".`
+      )
+    }
+  }
+}
 
 /**
  * Fixes Safari dates sorting bug
@@ -52,6 +122,8 @@ const getStaticBlogPosts = () => {
         // Extract contents of the MDX file
         const fileContents = fsSync.readFileSync(fullPath, 'utf8')
         const { data } = matter(fileContents)
+
+        validateBlogFrontmatterImages(data, fullPath)
 
         const options = { month: 'long', day: 'numeric', year: 'numeric' }
         const formattedDate = new Date(data.date).toLocaleDateString('en-IN', options)

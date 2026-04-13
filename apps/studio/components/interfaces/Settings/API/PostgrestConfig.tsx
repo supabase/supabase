@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
@@ -15,10 +15,13 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   FormItem_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Skeleton,
+  Switch,
   useWatch_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
@@ -42,13 +45,16 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
+import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
+import { IS_PLATFORM } from '@/lib/constants'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
 
@@ -63,6 +69,9 @@ const formSchema = z.object({
     .max(1000, "Can't be more than 1000")
     .optional()
     .nullable(),
+
+  // Default privileges toggle
+  defaultPrivilegesGranted: z.boolean(),
 
   // Fields for expose toggles
   tableIdsToAdd: z.array(z.number()),
@@ -98,17 +107,31 @@ export const PostgrestConfig = () => {
     connectionString: project?.connectionString,
   })
 
+  const {
+    data: defaultPrivilegesGranted,
+    isPending: isLoadingDefaultPrivileges,
+    isSuccess: isSuccessDefaultPrivileges,
+  } = useQuery(
+    defaultPrivilegesQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
+  )
+
   const configDbSchemas = useMemo(
     () => (config?.db_schema ? config.db_schema.split(',').map((x) => x.trim()) : []),
     [config?.db_schema]
   )
 
-  const isLoading = isLoadingConfig || isLoadingSchemas
+  const isLoading = isLoadingConfig || isLoadingSchemas || isLoadingDefaultPrivileges
 
   const schemas = useMemo(
     () =>
       allSchemas
-        .filter((x) => !INTERNAL_SCHEMAS.some((schema) => schema === x.name))
+        .filter((x) => {
+          if (x.name === 'graphql_public') return true
+          return !INTERNAL_SCHEMAS.includes(x.name)
+        })
         .map((x) => {
           return {
             id: x.id,
@@ -120,16 +143,21 @@ export const PostgrestConfig = () => {
     [allSchemas]
   )
 
-  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation()
-
-  const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation()
+  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
+    onError: noop,
+  })
+  const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation({ onError: noop })
+  const { mutateAsync: updateDefaultPrivileges } = useUpdateDefaultPrivilegesMutation({
+    onError: noop,
+  })
 
   const [isUpdating, setIsUpdating] = useState(false)
 
   const formId = 'project-postgres-config'
 
-  const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
+  const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+  const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission
 
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
@@ -144,12 +172,13 @@ export const PostgrestConfig = () => {
         .map((x) => x.trim())
         .filter(Boolean),
       dbPool: config?.db_pool,
+      defaultPrivilegesGranted: defaultPrivilegesGranted ?? true,
       tableIdsToAdd: [] as number[],
       tableIdsToRemove: [] as number[],
       functionNamesToAdd: [] as string[],
       functionNamesToRemove: [] as string[],
     }
-  }, [config, configDbSchemas])
+  }, [config, configDbSchemas, defaultPrivilegesGranted])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -178,6 +207,14 @@ export const PostgrestConfig = () => {
           functionNamesToAdd: values.functionNamesToAdd,
           functionNamesToRemove: values.functionNamesToRemove,
         })
+
+        if (values.defaultPrivilegesGranted !== defaultPrivilegesGranted) {
+          await updateDefaultPrivileges({
+            projectRef,
+            connectionString: project?.connectionString,
+            granted: values.defaultPrivilegesGranted,
+          })
+        }
       }
 
       await updatePostgrestConfig(
@@ -196,13 +233,16 @@ export const PostgrestConfig = () => {
           queryKey: privilegeKeys.exposedTablesInfinite(projectRef),
         }),
         queryClient.invalidateQueries({
-          queryKey: privilegeKeys.exposedTableCounts(projectRef, watchedDbSchema),
+          queryKey: privilegeKeys.exposedTableCounts(projectRef),
         }),
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef),
         }),
         queryClient.invalidateQueries({
-          queryKey: privilegeKeys.exposedFunctionCounts(projectRef, watchedDbSchema),
+          queryKey: privilegeKeys.exposedFunctionCounts(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.defaultPrivileges(projectRef),
         }),
       ])
 
@@ -215,6 +255,7 @@ export const PostgrestConfig = () => {
         maxRows: values.maxRows,
         dbExtraSearchPath: values.dbExtraSearchPath,
         dbPool: values.dbPool,
+        defaultPrivilegesGranted: values.defaultPrivilegesGranted,
         tableIdsToAdd: [],
         tableIdsToRemove: [],
         functionNamesToAdd: [],
@@ -228,7 +269,7 @@ export const PostgrestConfig = () => {
   }
 
   const resetFormRef = useLatest(resetForm)
-  const isReady = isSuccessConfig && isSuccessSchemas
+  const isReady = isSuccessConfig && isSuccessSchemas && isSuccessDefaultPrivileges
   useEffect(() => {
     if (isReady) {
       resetFormRef.current()
@@ -250,6 +291,7 @@ export const PostgrestConfig = () => {
     control: form.control,
     name: 'functionNamesToRemove',
   })
+
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -375,6 +417,40 @@ export const PostgrestConfig = () => {
                           }}
                         />
                       </FormItemLayout>
+
+                      {watchedDbSchema.includes('public') && (
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="defaultPrivilegesGranted"
+                          render={({ field }) => (
+                            <FormItem_Shadcn_>
+                              <FormItemLayout
+                                layout="flex-row-reverse"
+                                label="Default privileges for new entities"
+                                description={
+                                  <>
+                                    When enabled, new tables and functions in the{' '}
+                                    <code>public</code> schema are automatically accessible via the
+                                    Data API. We recommend disabling this and manually granting
+                                    access to each new entity.
+                                  </>
+                                }
+                              >
+                                <FormControl_Shadcn_>
+                                  <div>
+                                    <Switch
+                                      size="large"
+                                      disabled={!canUpdatePostgrestConfig}
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </div>
+                                </FormControl_Shadcn_>
+                              </FormItemLayout>
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+                      )}
 
                       {watchedDbSchema.length === 0 && (
                         <Admonition
@@ -534,15 +610,18 @@ export const PostgrestConfig = () => {
                             description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="rows">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
                                   onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
-                              </PrePostTab>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>rows</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
@@ -561,8 +640,8 @@ export const PostgrestConfig = () => {
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
@@ -575,7 +654,10 @@ export const PostgrestConfig = () => {
                                   }
                                   value={field.value === null ? '' : field.value}
                                 />
-                              </PrePostTab>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         </FormItem_Shadcn_>
@@ -586,40 +668,44 @@ export const PostgrestConfig = () => {
               )}
             </form>
           </Form_Shadcn_>
-          <CardFooter className="border-t">
-            <FormActions
-              form={formId}
-              isSubmitting={isUpdating}
-              hasChanges={form.formState.isDirty}
-              handleReset={resetForm}
-              disabled={!canUpdatePostgrestConfig}
-              helper={
-                isPermissionsLoaded && !canUpdatePostgrestConfig
-                  ? "You need additional permissions to update your project's API settings"
-                  : undefined
-              }
-            />
-          </CardFooter>
+          {IS_PLATFORM && (
+            <CardFooter className="border-t">
+              <FormActions
+                form={formId}
+                isSubmitting={isUpdating}
+                hasChanges={form.formState.isDirty}
+                handleReset={resetForm}
+                disabled={!canUpdatePostgrestConfig}
+                helper={
+                  isPermissionsLoaded && !canUpdatePostgrestConfigPermission
+                    ? "You need additional permissions to update your project's API settings"
+                    : undefined
+                }
+              />
+            </CardFooter>
+          )}
         </Card>
-        <Card className="mb-4">
-          <CardContent>
-            <FormItemLayout
-              isReactForm={false}
-              layout="flex-row-reverse"
-              label="Harden Data API"
-              description="Expose a custom schema instead of the public schema"
-            >
-              <div className="flex gap-2 items-center justify-end">
-                <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
-                  Harden Data API
-                </Button>
-              </div>
-            </FormItemLayout>
-          </CardContent>
-        </Card>
+        {IS_PLATFORM && (
+          <Card className="mb-4">
+            <CardContent>
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="Harden Data API"
+                description="Expose a custom schema instead of the public schema"
+              >
+                <div className="flex gap-2 items-center justify-end">
+                  <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                    Harden Data API
+                  </Button>
+                </div>
+              </FormItemLayout>
+            </CardContent>
+          </Card>
+        )}
       </PageSectionContent>
 
-      <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />
+      {IS_PLATFORM && <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />}
     </PageSection>
   )
 }

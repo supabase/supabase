@@ -2,6 +2,8 @@ services:
 
   kong:
     ports: !reset []
+    environment:
+      KONG_PORT_MAPS: "443:8000,443:8443"
 
   nginx:
     container_name: supabase-nginx
@@ -12,6 +14,8 @@ services:
       - "443:443"
     depends_on:
       kong:
+        condition: service_healthy
+      studio:
         condition: service_healthy
     environment:
       PROXY_DOMAIN: ${PROXY_DOMAIN}

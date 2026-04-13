@@ -500,6 +500,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/ai-prompts' as `/${string}`,
         },
         {
+          name: 'Agent Skills',
+          url: '/guides/getting-started/ai-skills' as `/${string}`,
+        },
+        {
           name: 'Supabase MCP server',
           url: '/guides/getting-started/mcp' as `/${string}`,
         },
@@ -771,6 +775,12 @@ export const auth: NavMenuConstant = {
               url: '/guides/auth/enterprise-sso/auth-sso-saml' as `/${string}`,
             },
           ],
+        },
+
+        {
+          name: 'Custom OAuth/OIDC Providers',
+          url: '/guides/auth/custom-oauth-providers',
+          enabled: allAuthProvidersEnabled,
         },
 
         {
@@ -1547,6 +1557,11 @@ export const graphql: NavMenuConstant = {
     { name: 'API', url: '/guides/graphql/api', items: [] },
     { name: 'Views', url: '/guides/graphql/views', items: [] },
     { name: 'Functions', url: '/guides/graphql/functions', items: [] },
+    {
+      name: 'Computed Fields',
+      url: '/guides/graphql/computed-fields',
+      items: [],
+    },
     {
       name: 'Configuration & Customization',
       url: '/guides/graphql/configuration',
@@ -2835,19 +2850,23 @@ export const self_hosting: NavMenuConstant = {
     {
       name: 'How-to Guides',
       items: [
+        { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
         { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         {
           name: 'Add Reverse Proxy with HTTPS',
           url: '/guides/self-hosting/self-hosted-proxy-https',
         },
+        { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
         {
           name: 'Restore Project from Platform',
           url: '/guides/self-hosting/restore-from-platform',
         },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
+        { name: 'Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
       ],
     },

@@ -1,8 +1,9 @@
-import PartnerIcon from 'components/ui/PartnerIcon'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
-import type { Organization } from 'types'
 import { cn, CommandItem_Shadcn_ } from 'ui'
+
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import type { Organization } from '@/types'
 
 export interface OrgCommandItemProps {
   org: Organization

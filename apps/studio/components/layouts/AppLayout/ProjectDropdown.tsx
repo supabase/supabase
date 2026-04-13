@@ -1,22 +1,22 @@
 import { useParams } from 'common'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import type { ComponentProps } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 // --- Sub-components ---
 
@@ -141,7 +141,7 @@ export const ProjectDropdown = ({
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
 
   if (isLoadingProject || (isBranch && isLoadingParentProject) || !selectedProject) {
-    if (!embedded) return <GenericSkeletonLoader className="p-2" />
+    if (!embedded) return <ShimmeringLoader className="p-2 md:mr-2 md:w-[90px]" />
   }
 
   const handleSetOpen = embedded ? (_value: boolean) => onClose?.() : setOpen

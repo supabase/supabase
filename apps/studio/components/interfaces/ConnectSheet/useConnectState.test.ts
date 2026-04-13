@@ -1,7 +1,23 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { useConnectState } from './useConnectState'
+
+vi.mock('common', () => ({
+  useParams: () => ({ ref: 'test-ref' }),
+}))
+
+vi.mock('@/data/read-replicas/replicas-query', () => ({
+  useReadReplicasQuery: () => ({ data: [] }),
+}))
+
+vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
+  useCheckEntitlements: vi.fn().mockImplementation(() => ({ hasAccess: true })),
+}))
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useIsHighAvailability: vi.fn().mockImplementation(() => false),
+}))
 
 describe('useConnectState', () => {
   // ============================================================================
@@ -268,13 +284,28 @@ describe('useConnectState', () => {
       expect(fieldIds).toContain('connectionType')
     })
 
-    test('should show useSharedPooler only for transaction connection method', () => {
+    test('should show useSharedPooler only for transaction connection method when user has dedicated_pooler entitlement', async () => {
+      const { useCheckEntitlements } = await import('@/hooks/misc/useCheckEntitlements')
+      vi.mocked(useCheckEntitlements).mockReturnValue({ hasAccess: true } as any)
+
       const { result } = renderHook(() =>
         useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
       )
 
       const fieldIds = result.current.activeFields.map((f) => f.id)
       expect(fieldIds).toContain('useSharedPooler')
+    })
+
+    test('should hide useSharedPooler even if using transaction method when user lacks dedicated_pooler entitlement', async () => {
+      const { useCheckEntitlements } = await import('@/hooks/misc/useCheckEntitlements')
+      vi.mocked(useCheckEntitlements).mockReturnValue({ hasAccess: false } as any)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
+      )
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).not.toContain('useSharedPooler')
     })
 
     test('should hide useSharedPooler for direct connection method', () => {
@@ -324,8 +355,8 @@ describe('useConnectState', () => {
       const { result } = renderHook(() => useConnectState({ mode: 'mcp' }))
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
-      // MCP mode should have configure step
-      expect(stepIds.some((id) => id.includes('configure') || id.includes('mcp'))).toBe(true)
+      // MCP mode (defaults to claude-code) should have claude-add-server step
+      expect(stepIds.some((id) => id.includes('claude') || id.includes('mcp'))).toBe(true)
     })
 
     test('should resolve different steps for different mcp clients', () => {
@@ -371,6 +402,7 @@ describe('useConnectState', () => {
 
       const stepIds = result.current.resolvedSteps.map((s) => s.id)
       expect(stepIds).toContain('shadcn-add')
+      expect(stepIds).toContain('shadcn-env')
     })
   })
 
@@ -453,6 +485,58 @@ describe('useConnectState', () => {
 
       const options = result.current.getFieldOptions('library')
       expect(options.length).toBeGreaterThan(0)
+    })
+  })
+
+  // ============================================================================
+  // High Availability Tests
+  // ============================================================================
+
+  describe('high availability projects', () => {
+    test('should hide connectionMethod field for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).not.toContain('connectionMethod')
+    })
+
+    test('should hide useSharedPooler field for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionMethod: 'transaction' })
+      )
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).not.toContain('useSharedPooler')
+    })
+
+    test('should rename connectionType label to "Connection Type" for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const connectionTypeField = result.current.activeFields.find((f) => f.id === 'connectionType')
+      expect(connectionTypeField?.label).toBe('Connection Type')
+    })
+
+    test('should not affect non-HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(false)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const fieldIds = result.current.activeFields.map((f) => f.id)
+      expect(fieldIds).toContain('connectionMethod')
+      expect(fieldIds).toContain('connectionType')
+
+      const connectionTypeField = result.current.activeFields.find((f) => f.id === 'connectionType')
+      expect(connectionTypeField?.label).toBe('Type')
     })
   })
 

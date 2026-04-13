@@ -1,5 +1,3 @@
-import type { Branch } from 'data/branches/branches-query'
-import { useTrack } from 'lib/telemetry/track'
 import { ListTree, MessageCircle, Plus } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -16,6 +14,8 @@ import {
 } from 'ui'
 
 import { BranchLink } from './BranchLink'
+import type { Branch } from '@/data/branches/branches-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 

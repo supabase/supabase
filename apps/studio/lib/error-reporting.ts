@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
-import { ResponseError } from 'types'
+
+import { ResponseError } from '@/types'
 
 type CaptureMessageOptions = {
   context: string
@@ -51,7 +52,7 @@ export function captureCriticalError(
     return
   }
 
-  handleUnknownError(error, context)
+  handleUnknownAPIResponseError(error, context)
 }
 
 function handleResponseError(error: ResponseError, context: string) {
@@ -85,7 +86,7 @@ function handleError(error: Error, context: string) {
   })
 }
 
-function handleUnknownError(error: unknown, context: string) {
+function handleUnknownAPIResponseError(error: unknown, context: string) {
   if (
     error &&
     typeof error === 'object' &&

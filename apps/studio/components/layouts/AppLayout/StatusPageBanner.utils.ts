@@ -1,4 +1,4 @@
-import type { IncidentCache } from 'lib/api/incident-status'
+import type { IncidentCache } from '@/lib/api/incident-status'
 
 type BannerIncident = { id: string; cache?: IncidentCache | null }
 
@@ -26,6 +26,9 @@ export function shouldShowBanner({
   hasUnknownRegions?: boolean
 }): boolean {
   return incidents.some((incident) => {
+    // Forced incidents are shown unconditionally, regardless of regions or project state
+    if (incident.cache?.force) return true
+
     const affectedRegions = incident.cache?.affected_regions ?? []
     const affectsProjectCreation = incident.cache?.affects_project_creation ?? false
 

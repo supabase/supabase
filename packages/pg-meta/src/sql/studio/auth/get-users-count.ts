@@ -1,5 +1,5 @@
 import { literal } from '../../../pg-format'
-import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../get-count-estimate'
+import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from '../database/get-count-estimate'
 import { prefixToUUID, stringRange } from './get-users-common'
 import type { OptimizedSearchColumns } from './get-users-types'
 

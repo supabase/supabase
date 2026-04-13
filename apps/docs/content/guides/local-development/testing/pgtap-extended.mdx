@@ -67,13 +67,11 @@ create extension if not exists "basejump-supabase_test_helpers" version '0.0.6';
 The test helpers package provides several advantages over writing raw pgTAP tests:
 
 1. **Simplified User Management**
-
    - Create test users with `tests.create_supabase_user()`
    - Switch contexts with `tests.authenticate_as()`
    - Retrieve user IDs using `tests.get_supabase_uid()`
 
 2. **Row Level Security (RLS) Testing Utilities**
-
    - Verify RLS status with `tests.rls_enabled()`
    - Test policy enforcement
    - Simulate different user contexts
@@ -262,7 +260,6 @@ This demo app implements:
 ### What makes this complex?
 
 1. **Layered Permissions**
-
    - Role hierarchies affect access rights
    - Plan types influence user capabilities
    - Content state (draft/published) affects permissions

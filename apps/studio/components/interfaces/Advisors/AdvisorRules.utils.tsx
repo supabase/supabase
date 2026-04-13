@@ -1,6 +1,6 @@
-import { LintException } from 'data/lint/lint-rules-query'
-import { Member } from 'data/organizations/organization-members-query'
 import { lintInfoMap } from '../Linter/Linter.utils'
+import { LintException } from '@/data/lint/lint-rules-query'
+import { Member } from '@/data/organizations/organization-members-query'
 
 export const generateRuleText = (e: LintException, member?: Member) => {
   const lintName = lintInfoMap.find((x) => x.name === e.lint_name)?.title

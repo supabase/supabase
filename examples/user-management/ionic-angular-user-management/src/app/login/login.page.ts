@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { SupabaseService } from '../supabase.service';
+import { Component, OnInit } from '@angular/core'
+import { SupabaseService } from '../supabase.service'
 
 @Component({
   selector: 'app-login',
@@ -8,24 +8,24 @@ import { SupabaseService } from '../supabase.service';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
-  email = '';
+  email = ''
 
   constructor(private readonly supabase: SupabaseService) {}
 
   async handleLogin(event: any) {
-    event.preventDefault();
-    const loader = await this.supabase.createLoader();
-    await loader.present();
+    event.preventDefault()
+    const loader = await this.supabase.createLoader()
+    await loader.present()
     try {
-      const { error } = await this.supabase.signIn(this.email);
+      const { error } = await this.supabase.signIn(this.email)
       if (error) {
-        throw error;
+        throw error
       }
-      await loader.dismiss();
-      await this.supabase.createNotice('Check your email for the login link!');
+      await loader.dismiss()
+      await this.supabase.createNotice('Check your email for the login link!')
     } catch (error: any) {
-      await loader.dismiss();
-      await this.supabase.createNotice(error.error_description || error.message);
+      await loader.dismiss()
+      await this.supabase.createNotice(error.error_description || error.message)
     }
   }
 }

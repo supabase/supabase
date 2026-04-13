@@ -139,11 +139,11 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         path.length > 0
           ? "before:content-['('] before:text-foreground-muted after:content-[')'] after:text-foreground-muted"
           : ''
-      } ${isRootGroup ? 'flex-1 min-w-0' : ''} ${variant === 'pill' ? 'py-2' : ''}`}
+      } ${isRootGroup ? 'flex-1 min-w-0' : ''}`}
     >
       <div
         className={cn(
-          'flex items-stretch flex-wrap',
+          'flex items-center flex-wrap',
           isRootGroup ? 'flex-1 min-w-0' : '',
           variant === 'pill' ? 'gap-1' : 'gap-0'
         )}
@@ -195,7 +195,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-0"
+                className="border-none bg-transparent text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }
@@ -207,7 +207,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 data-form-type="other"
               />
             ) : (
-              <div className="relative inline-block">
+              <div className="relative inline-block py-1">
                 <Input_Shadcn_
                   ref={freeformInputRef}
                   type="text"

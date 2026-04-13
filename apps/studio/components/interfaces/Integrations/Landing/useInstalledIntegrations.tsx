@@ -1,19 +1,18 @@
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
+import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
 import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
-  parseStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -25,9 +24,6 @@ export const useInstalledIntegrations = () => {
         !integrationsWrappers &&
         (integration.type === 'wrapper' || integration.id.endsWith('_wrapper'))
       ) {
-        return false
-      }
-      if (!IS_PLATFORM && integration.id === 'data_api') {
         return false
       }
       return true
@@ -81,7 +77,7 @@ export const useInstalledIntegrations = () => {
         }
         if (integration.id === 'stripe_sync_engine') {
           const stripeSchema = findStripeSchema(schemas)
-          const parsedSchema = parseStripeSchema(stripeSchema)
+          const parsedSchema = parseSchemaComment(stripeSchema?.comment)
           return checkIsInstalled(parsedSchema.status)
         }
         if (integration.type === 'wrapper') {

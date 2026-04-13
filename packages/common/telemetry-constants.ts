@@ -291,10 +291,10 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
-  /**
-   * the instance size selected in the project creation form
-   */
   properties: {
+    /**
+     * The instance size selected in the project creation form.
+     */
     instanceSize?: string
     /**
      * Whether the automatic RLS event trigger option was enabled
@@ -322,6 +322,14 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean
+    /**
+     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
+     * meaning the project was created with default public schema grants revoked.
+     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
+     * false = user is outside the rollout (default grants left intact)
+     * omitted = PostHog flags had not loaded at the time of project creation
+     */
+    tableEditorApiAccessToggleEnabled?: boolean
   }
   groups: TelemetryGroups
 }
@@ -342,6 +350,29 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
     instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User toggled Data API access on a table via the switch in the table editor side panel.
+ * Only fires for new tables — editing existing tables links out to the settings page instead.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableApiAccessToggleClickedEvent {
+  action: 'table_api_access_toggle_clicked'
+  properties: {
+    /**
+     * The resulting state of the toggle after the click.
+     */
+    newState: 'enabled' | 'disabled'
+    /**
+     * The schema containing the table being created.
+     */
+    schemaName: string
+  }
+  groups: TelemetryGroups
 }
 
 /**
@@ -636,6 +667,10 @@ export interface SqlEditorResultCopyJsonClickedEvent {
  */
 export interface AssistantPromptSubmittedEvent {
   action: 'assistant_prompt_submitted'
+  properties: {
+    /** UUID of the chat session in which the prompt was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -647,6 +682,10 @@ export interface AssistantPromptSubmittedEvent {
  */
 export interface AssistantDebugSubmittedEvent {
   action: 'assistant_debug_submitted'
+  properties: {
+    /** UUID of the chat session in which the debug request was submitted */
+    chatId?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -744,6 +783,29 @@ export interface DocsFeedbackClickedEvent {
      * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
      */
     response: 'yes' | 'no'
+  }
+}
+
+/**
+ * User clicked 'Copy as Markdown' option on a page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface CopyAsMarkdownEvent {
+  action: 'copy_as_markdown_clicked'
+}
+
+/**
+ * User clicked "Ask..." to open a new window to consult an agent about the current page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AskAIEvent {
+  action: 'ask_ai_clicked'
+  properties: {
+    agent: 'chatgpt' | 'claude'
   }
 }
 
@@ -1425,6 +1487,10 @@ export interface AssistantMessageRatingSubmittedEvent {
       | 'debugging'
       | 'general_help'
       | 'other'
+    /** Optional reason provided by the user when rating negatively */
+    reason?: string
+    /** UUID of the chat session in which the message was rated */
+    chatId?: string
   }
   groups: TelemetryGroups
 }
@@ -1713,62 +1779,6 @@ export interface DpaPdfOpenedEvent {
 }
 
 /**
- * User selected a workflow in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedWorkflowClickedEvent {
-  action: 'home_getting_started_workflow_clicked'
-  properties: {
-    /**
-     * The workflow selected by the user
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Whether this is switching from another workflow
-     */
-    is_switch: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked on a step in the Getting Started section of HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedStepClickedEvent {
-  action: 'home_getting_started_step_clicked'
-  properties: {
-    /**
-     * The workflow type (code or no-code)
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * The step number (1-based index)
-     */
-    step_number: number
-    /**
-     * The title of the step
-     */
-    step_title: string
-    /**
-     * The action type of the button clicked
-     */
-    action_type: 'primary' | 'ai_assist' | 'external_link'
-    /**
-     * Whether the step was already completed
-     */
-    was_completed: boolean
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User clicked on an activity stat in HomeV2.
  *
  * @group Events
@@ -1879,50 +1889,6 @@ export interface HomeCustomReportBlockRemovedEvent {
 }
 
 /**
- * User dismissed the Getting Started section in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedClosedEvent {
-  action: 'home_getting_started_closed'
-  properties: {
-    /**
-     * The current workflow when dismissed
-     */
-    workflow: 'code' | 'no_code'
-    /**
-     * Number of steps completed when dismissed
-     */
-    steps_completed: number
-    /**
-     * Total number of steps in the workflow
-     */
-    total_steps: number
-  }
-  groups: TelemetryGroups
-}
-
-/**
- * Getting Started section was shown to the user in HomeV2.
- *
- * @group Events
- * @source studio
- * @page /project/{ref}
- */
-export interface HomeGettingStartedSectionExposedEvent {
-  action: 'home_getting_started_section_exposed'
-  properties: {
-    /**
-     * The current workflow shown (null if choosing workflow)
-     */
-    workflow: 'code' | 'no_code' | null
-  }
-  groups: TelemetryGroups
-}
-
-/**
  * User was exposed to the HomeV2 experiment (shown the new home page).
  *
  * @group Events
@@ -1936,6 +1902,54 @@ export interface HomeNewExperimentExposedEvent {
      * The experiment variant shown to the user
      */
     variant: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Connect section was shown to the user on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectSectionExposedEvent {
+  action: 'home_connect_section_exposed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a connect action tile in the Connect section on the project homepage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface HomeConnectActionClickedEvent {
+  action: 'home_connect_action_clicked'
+  properties: {
+    /**
+     * The connect action/tile that was clicked
+     */
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'api_keys'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User opened the ConnectSheet panel.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}
+ */
+export interface ConnectSheetOpenedEvent {
+  action: 'connect_sheet_opened'
+  properties: {
+    /**
+     * Where the sheet was opened from
+     */
+    source: 'header_button' | 'connect_section'
   }
   groups: TelemetryGroups
 }
@@ -2340,7 +2354,33 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * The search query that was active when the command was clicked
+     */
+    search_query?: string
+    /**
+     * The path or URL the clicked item leads to (only present for route commands)
+     */
+    result_path?: string
+    /**
      * In which app the command input was typed
+     */
+    app: 'studio' | 'docs' | 'www'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User closed the command menu.
+ *
+ * @group Events
+ * @source studio, docs, www
+ * @page any
+ */
+export interface CommandMenuClosedEvent {
+  action: 'command_menu_closed'
+  properties: {
+    /**
+     * In which app the command menu was closed
      */
     app: 'studio' | 'docs' | 'www'
   }
@@ -2432,6 +2472,24 @@ export interface InlineEditorSettingClickedEvent {
 }
 
 /**
+ * User toggled the queue table operations setting in account preferences.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/account/preferences
+ */
+export interface QueueOperationsSettingClickedEvent {
+  action: 'queue_operations_setting_clicked'
+  properties: {
+    /**
+     * Whether the queue operations was enabled or disabled
+     */
+    enabled: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the save destination button in add log drains sheet.
  *
  * @group Events
@@ -2457,6 +2515,7 @@ export interface LogDrainSaveButtonClickedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2487,6 +2546,7 @@ export interface LogDrainConfirmButtonSubmittedEvent {
       | 'axiom'
       | 'last9'
       | 'otlp'
+      | 'syslog'
   }
   groups: TelemetryGroups
 }
@@ -2577,6 +2637,20 @@ export interface QueryPerformanceAIExplanationButtonClickedEvent {
 }
 
 /**
+ * Source/location where AI assistant actions originate from.
+ */
+export type AiAssistantSource =
+  | 'explain_visualizer'
+  | 'query_performance'
+  | 'sql_debug'
+  | 'lint_detail'
+  | 'advisor_section'
+  | 'advisor_widget'
+  | 'branch_review'
+  | 'log_explorer'
+  | 'error_code'
+
+/**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
  * This allows users to paste the prompt into external AI tools (Cursor, Claude, etc.)
  *
@@ -2589,14 +2663,45 @@ export interface AiPromptCopiedEvent {
     /**
      * Source/location where the prompt was copied from
      */
-    source:
-      | 'explain_visualizer'
-      | 'query_performance'
-      | 'sql_debug'
-      | 'lint_detail'
-      | 'advisor_section'
-      | 'advisor_widget'
-      | 'branch_review'
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the main AI assistant button in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiAssistantDropdownButtonClickedEvent {
+  action: 'ai_assistant_dropdown_button_clicked'
+  properties: {
+    /**
+     * Source/location where the button was clicked
+     */
+    source: AiAssistantSource
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked an external AI tool link (ChatGPT or Claude) in the dropdown.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AiExternalToolClickedEvent {
+  action: 'ai_external_tool_clicked'
+  properties: {
+    /**
+     * Source/location where the link was clicked
+     */
+    source: AiAssistantSource
+    /**
+     * Which external AI tool was selected
+     */
+    tool: 'chatgpt' | 'claude'
   }
   groups: TelemetryGroups
 }
@@ -2613,7 +2718,7 @@ export interface RequestUpgradeModalOpenedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
     /** Feature context driving the upgrade request */
@@ -2634,7 +2739,7 @@ export interface RequestUpgradeSubmittedEvent {
     /** Target plan being requested */
     requestedPlan: 'Pro' | 'Team' | 'Enterprise'
     /** Addon being requested, if applicable */
-    addon?: 'pitr' | 'customDomain' | 'spendCap' | 'computeSize'
+    addon?: 'pitr' | 'customDomain' | 'ipv4' | 'spendCap' | 'computeSize'
     /** Current organization plan */
     currentPlan?: string
   }
@@ -2643,7 +2748,7 @@ export interface RequestUpgradeSubmittedEvent {
 
 /**
  * Triggered when a Studio error UI element is displayed (mounted).
- * This includes error Admonitions and Toast notifications.
+ * This includes error Admonitions, Toast notifications, and ErrorDisplay components.
  *
  * @group Events
  * @source studio
@@ -2654,7 +2759,69 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Source of the error
      */
-    source?: 'admonition' | 'toast'
+    source?: 'admonition' | 'toast' | 'error_display'
+    /**
+     * Type of error matched (for error_display source)
+     */
+    errorType?: string
+    /**
+     * Whether troubleshooting steps are available (for error_display source)
+     */
+    hasTroubleshooting?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when the inline error troubleshooter is shown to the user.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterExposedEvent {
+  action: 'inline_error_troubleshooter_exposed'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user opens or closes a troubleshooting accordion step.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterStepClickedEvent {
+  action: 'inline_error_troubleshooter_step_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Step number that was clicked (1, 2, 3, ...) — null when a step is collapsed */
+    step: number | null
+    /** Title of the step that was clicked */
+    stepTitle?: string
+    /** Whether the step was opened (true) or closed (false) */
+    expanded: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a user clicks an action within the inline error troubleshooter.
+ * Covers all CTAs including the contact support link.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface InlineErrorTroubleshooterActionClickedEvent {
+  action: 'inline_error_troubleshooter_action_clicked'
+  properties: {
+    /** ID of the matched error mapping */
+    errorType: string
+    /** Which CTA was clicked */
+    ctaType: 'restart_db' | 'troubleshooting_guide' | 'ask_ai' | 'contact_support'
   }
   groups: TelemetryGroups
 }
@@ -2764,27 +2931,6 @@ export interface RlsEventTriggerBannerCreateButtonClickedEvent {
 }
 
 /**
- * User was exposed to the pricing calculator experiment on the /pricing page.
- *
- * @group Events
- * @source www
- * @page /pricing
- */
-export interface PricingCalculatorExperimentExposedEvent {
-  action: 'pricing_calculator_experiment_exposed'
-  properties: {
-    /**
-     * Experiment identifier for tracking
-     */
-    experiment_id: 'pricingCalculatorExperiment'
-    /**
-     * Experiment variant: 'control' (existing compute section) or 'test' (new compute section)
-     */
-    variant: 'control' | 'test'
-  }
-}
-
-/**
  * User clicked the Run button in the log explorer.
  *
  * @group Events
@@ -2800,6 +2946,109 @@ export interface LogExplorerQueryRunButtonClickedEvent {
     is_saved_query: boolean
   }
   groups: TelemetryGroups
+}
+
+/**
+ * User clicked an upgrade CTA inside the compute badge hover card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ComputeBadgeUpgradeClickedEvent {
+  action: 'compute_badge_upgrade_clicked'
+  properties: {
+    computeSize: string
+    planId: string
+    upgradeType: 'pro_upgrade' | 'free_micro_upgrade' | 'compute_upgrade'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerDismissedEvent {
+  action: 'free_micro_upgrade_banner_dismissed'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA on the free Micro upgrade banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FreeMicroUpgradeBannerCtaClickedEvent {
+  action: 'free_micro_upgrade_banner_cta_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Navigate action in the storage explorer header.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateClickedEvent {
+  action: 'storage_explorer_navigate_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User submitted a folder path from the storage explorer Navigate action.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageExplorerNavigateSubmittedEvent {
+  action: 'storage_explorer_navigate_submitted'
+  groups: TelemetryGroups
+}
+
+/**
+ * User was exposed to the pricing value/flexibility experiment on the /pricing page.
+ *
+ * @group Events
+ * @source www
+ * @page /pricing
+ */
+export interface PricingPageExperimentExposedEvent {
+  action: 'pricing_page_experiment_exposed'
+  properties: {
+    /**
+     * Experiment identifier for tracking
+     */
+    experiment_id: 'pricingPageExperiment'
+    /**
+     * Experiment variant.
+     * GROWTH-694: flexibility (section), flexibility_card (on card), hourly_rate (on card)
+     * GROWTH-697: multi_project (on card), estimate_cta (on card)
+     */
+    variant:
+      | 'control'
+      | 'flexibility'
+      | 'flexibility_card'
+      | 'hourly_rate'
+      | 'multi_project'
+      | 'estimate_cta'
+  }
+}
+
+/**
+ * User clicked the "Upgrade to Pro" CTA in the dashboard header.
+ * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface HeaderUpgradeCtaClickedEvent {
+  action: 'header_upgrade_cta_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -2824,6 +3073,7 @@ export type TelemetryEvent =
   | ProjectCreationRlsOptionExperimentExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | TableApiAccessToggleClickedEvent
   | ProjectCreationInitialStepPromptIntendedEvent
   | ProjectCreationInitialStepSubmittedEvent
   | ProjectCreationSecondStepPromptIntendedEvent
@@ -2849,6 +3099,8 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
+  | CopyAsMarkdownEvent
+  | AskAIEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
@@ -2873,6 +3125,8 @@ export type TelemetryEvent =
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
   | LogExplorerQueryRunButtonClickedEvent
+  | StorageExplorerNavigateClickedEvent
+  | StorageExplorerNavigateSubmittedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -2911,11 +3165,10 @@ export type TelemetryEvent =
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
   | DpaPdfOpenedEvent
-  | HomeGettingStartedWorkflowClickedEvent
-  | HomeGettingStartedStepClickedEvent
-  | HomeGettingStartedClosedEvent
-  | HomeGettingStartedSectionExposedEvent
   | HomeNewExperimentExposedEvent
+  | HomeConnectSectionExposedEvent
+  | HomeConnectActionClickedEvent
+  | ConnectSheetOpenedEvent
   | HomeSectionRowsMovedEvent
   | HomeActivityStatClickedEvent
   | HomeProjectUsageServiceClickedEvent
@@ -2935,9 +3188,11 @@ export type TelemetryEvent =
   | TableCreateGeneratePoliciesExperimentConvertedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
+  | CommandMenuClosedEvent
   | CommandMenuSearchSubmittedEvent
   | CommandMenuCommandClickedEvent
   | InlineEditorSettingClickedEvent
+  | QueueOperationsSettingClickedEvent
   | SidebarOpenedEvent
   | LogDrainSaveButtonClickedEvent
   | LogDrainConfirmButtonSubmittedEvent
@@ -2945,9 +3200,14 @@ export type TelemetryEvent =
   | AdvisorAssistantButtonClickedEvent
   | QueryPerformanceAIExplanationButtonClickedEvent
   | AiPromptCopiedEvent
+  | AiAssistantDropdownButtonClickedEvent
+  | AiExternalToolClickedEvent
   | RequestUpgradeModalOpenedEvent
   | RequestUpgradeSubmittedEvent
   | DashboardErrorCreatedEvent
+  | InlineErrorTroubleshooterExposedEvent
+  | InlineErrorTroubleshooterStepClickedEvent
+  | InlineErrorTroubleshooterActionClickedEvent
   | IntegrationInstallCompletedEvent
   | IntegrationInstallSubmittedEvent
   | IntegrationUninstallSubmittedEvent
@@ -2957,4 +3217,8 @@ export type TelemetryEvent =
   | OrgSubmenuOpenedEvent
   | OrgMenuBackClickedEvent
   | OrgMenuItemClickedEvent
-  | PricingCalculatorExperimentExposedEvent
+  | ComputeBadgeUpgradeClickedEvent
+  | FreeMicroUpgradeBannerDismissedEvent
+  | FreeMicroUpgradeBannerCtaClickedEvent
+  | PricingPageExperimentExposedEvent
+  | HeaderUpgradeCtaClickedEvent

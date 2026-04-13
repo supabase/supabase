@@ -1,11 +1,12 @@
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import { Plug } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export function useConnectCommands() {
   const setIsOpen = useSetCommandMenuOpen()

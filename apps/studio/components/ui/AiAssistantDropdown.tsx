@@ -1,9 +1,7 @@
-import { AiPromptCopiedEvent } from 'common/telemetry-constants'
+import { AiAssistantSource } from 'common/telemetry-constants'
 import { Chatgpt, Claude } from 'icons'
-import { useTrack } from 'lib/telemetry/track'
 import { Check, ChevronDown, Copy } from 'lucide-react'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
-
 import {
   AiIconAnimation,
   Button,
@@ -19,11 +17,25 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-type TelemetrySource = AiPromptCopiedEvent['properties']['source']
+import { useTrack } from '@/lib/telemetry/track'
+
+type TelemetrySource = AiAssistantSource
 
 const EXTERNAL_AI_TOOLS = [
-  { label: 'Ask ChatGPT', url: 'https://chatgpt.com/', promptParam: 'q', icon: Chatgpt },
-  { label: 'Ask Claude', url: 'https://claude.ai/new', promptParam: 'q', icon: Claude },
+  {
+    label: 'Ask ChatGPT',
+    url: 'https://chatgpt.com/',
+    promptParam: 'q',
+    icon: Chatgpt,
+    toolId: 'chatgpt' as const,
+  },
+  {
+    label: 'Ask Claude',
+    url: 'https://claude.ai/new',
+    promptParam: 'q',
+    icon: Claude,
+    toolId: 'claude' as const,
+  },
 ]
 
 export interface AiAssistantDropdownItem {
@@ -95,10 +107,18 @@ export function AiAssistantDropdown({
       '_blank',
       'noreferrer'
     )
+
+    if (telemetrySource) {
+      track('ai_external_tool_clicked', { source: telemetrySource, tool: tool.toolId })
+    }
   }
 
   const handleOpenAssistant = () => {
     onOpenAssistant()
+
+    if (telemetrySource) {
+      track('ai_assistant_dropdown_button_clicked', { source: telemetrySource })
+    }
   }
 
   const buttonContent = (
