@@ -2,7 +2,7 @@
 
 import { useEvents } from '~/app/events/context'
 import { formatHosts } from '~/lib/eventsUtils'
-import { MicIcon, Rows3Icon } from 'lucide-react'
+import { Rows3Icon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
 
@@ -67,13 +67,16 @@ export function EventList() {
                 key={`${idx}-${event.url}`}
                 className="bg-surface-100 border rounded-md p-3 flex justify-between items-start relative"
               >
-                <Link
-                  className="inset-0 absolute"
-                  href={event.url}
-                  target={event.url.startsWith('http') ? '_blank' : '_self'}
-                  title="Go to event page"
-                  aria-hidden
-                />
+                {event.url && (
+                  <Link
+                    className="inset-0 absolute"
+                    href={event.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Go to event page"
+                    aria-hidden
+                  />
+                )}
 
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-2">

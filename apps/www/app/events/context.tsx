@@ -140,7 +140,7 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
       })
     }
 
-    return filtered.sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
       return dateB - dateA

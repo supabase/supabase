@@ -23,7 +23,16 @@ import { SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 // The actual DB ID (child database inside the page)
 const NOTION_EVENTS_DB_ID_FALLBACK = '21b5004b775f8058872fe8fa81e2c7ac'
 
-// ─── Notion property helpers ────────────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function isSafeHttpUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 function getTitle(page: any): string {
   const prop = Object.values(page.properties).find((p: any) => p.type === 'title') as any
@@ -45,13 +54,13 @@ function getUrl(page: any, name: string): string {
 function getDate(page: any, name: string): string | null {
   const prop = page.properties[name]
   if (!prop || prop.type !== 'date' || !prop.date) return null
-  return prop.date.start ?? null
-}
-
-function getSelect(page: any, name: string): string | null {
-  const prop = page.properties[name]
-  if (!prop || prop.type !== 'select') return null
-  return prop.select?.name ?? null
+  const raw = prop.date.start ?? null
+  if (!raw) return null
+  // Normalize date-only strings to explicit UTC to avoid timezone shifts
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return `${raw}T00:00:00Z`
+  }
+  return raw
 }
 
 function getMultiSelect(page: any, name: string): string[] {
@@ -80,7 +89,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
       dbId,
       apiKey,
       { property: 'Publish to Web', select: { equals: 'Yes' } },
-      [{ property: 'Start Date', direction: 'descending' }]
+      [{ property: 'Start Date', direction: 'ascending' }]
     )
 
     return pages
@@ -92,10 +101,12 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
         const endDate = getDate(page, 'End Date')
         const description =
           getRichText(page, 'Publish to Web Description') || getRichText(page, 'Notes')
-        const eventUrl = getRichText(page, 'URL')
-        const meetingLink = getUrl(page, 'Book Meeting Link')
+        const rawEventUrl = getRichText(page, 'URL')
+        const eventUrl = isSafeHttpUrl(rawEventUrl) ? rawEventUrl : ''
+        const rawMeetingLink = getUrl(page, 'Book Meeting Link')
+        const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
         const location = getRichText(page, 'Location')
-        const categories = ['conference']
+        const categories = getMultiSelect(page, 'Category').map((c) => c.toLowerCase())
         const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
         const isSpeaking = speakingAnswers.includes('Yes')
 
@@ -109,7 +120,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
           thumb: '',
           cover_url: page.cover?.external?.url ?? page.cover?.file?.url ?? '',
           path: '',
-          url: eventUrl || 'https://supabase.com/events',
+          url: eventUrl,
           tags: categories,
           categories,
           timezone: '',
