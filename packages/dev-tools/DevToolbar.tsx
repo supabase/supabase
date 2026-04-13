@@ -60,9 +60,9 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation()
-    navigator.clipboard.writeText(
-      JSON.stringify({ name: event.eventName, properties: event.properties }, null, 2)
-    )
+    navigator.clipboard
+      .writeText(JSON.stringify({ name: event.eventName, properties: event.properties }, null, 2))
+      .catch((error) => console.warn('Copy failed', error))
   }
 
   return (
@@ -93,7 +93,7 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
 
           <span className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
             <span className="font-mono text-xs text-foreground-lighter shrink-0 w-20">{time}</span>
-            <span className="font-mono text-xs text-foreground-lighter shrink-0 w-28 truncate uppercase">
+            <span className="font-mono text-xs text-foreground-lighter shrink-0 w-28 truncate uppercase text-left">
               {event.eventType}
             </span>
             <span className="font-mono text-xs text-foreground truncate shrink-0">
