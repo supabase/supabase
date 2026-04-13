@@ -390,10 +390,10 @@ const Wizard: NextPageWithLayout = () => {
   }, [slug, setValue, projectName])
 
   useEffect(() => {
-    if (!getFieldState('dbRegion').isDirty && defaultRegion) {
+    if (!getFieldState('dbRegion', form.formState).isDirty && defaultRegion) {
       setValue('dbRegion', defaultRegion)
     }
-  }, [defaultRegion, getFieldState, setValue])
+  }, [defaultRegion, getFieldState, setValue, form.formState])
 
   useEffect(() => {
     if (regionError) {
@@ -404,10 +404,10 @@ const Wizard: NextPageWithLayout = () => {
   }, [regionError, resetField, defaultProvider])
 
   useEffect(() => {
-    if (!getFieldState('dbRegion').isDirty && recommendedSmartRegion) {
+    if (!getFieldState('dbRegion', form.formState).isDirty && recommendedSmartRegion) {
       setValue('dbRegion', recommendedSmartRegion)
     }
-  }, [recommendedSmartRegion, getFieldState, setValue])
+  }, [recommendedSmartRegion, getFieldState, setValue, form.formState])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
