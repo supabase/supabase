@@ -15,7 +15,7 @@ catalog:
   '@types/react-dom': ^18.3.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
-  next: ~16.1.7
+  next: 16.2.3
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -39,19 +39,12 @@ ignoredBuiltDependencies:
   - protobufjs
   - sharp
 
-minimumReleaseAge: 10080
+minimumReleaseAge: 4320
 
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
-  - defu
-  - vite
-  - '@hono/node-server'
-  - hono
-  - lodash
-  - lodash-es
 
 onlyBuiltDependencies:
   - node-pty
