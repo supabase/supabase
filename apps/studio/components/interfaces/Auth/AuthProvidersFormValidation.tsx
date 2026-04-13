@@ -1621,7 +1621,11 @@ const PROVIDER_SAML = {
     }),
     z.object({
       SAML_ENABLED: z.literal(true),
-      SAML_EXTERNAL_URL: z.string().min(1, 'SAML metadata URL is required'),
+      SAML_EXTERNAL_URL: z.string().refine((value) => {
+        // Allow empty values
+        if (value == '') return true
+        return urlRegex().test(value)
+      }, 'Must be a valid URL'),
       SAML_ALLOW_ENCRYPTED_ASSERTIONS: z.boolean().optional(),
     }),
   ]),
@@ -1649,18 +1653,10 @@ const PROVIDER_WEB3 = {
       type: 'boolean',
     },
   },
-  validationSchema: z.discriminatedUnion('EXTERNAL_WEB3_ETHEREUM_ENABLED', [
-    z.object({
-      EXTERNAL_WEB3_ETHEREUM_ENABLED: z.literal(true),
-      EXTERNAL_WEB3_ETHEREUM_CLIENT_ID: z.string().min(1, 'Client ID is required'),
-      EXTERNAL_WEB3_ETHEREUM_SECRET: z.string().min(1, 'Client Secret is required'),
-    }),
-    z.object({
-      EXTERNAL_WEB3_ETHEREUM_ENABLED: z.literal(false),
-      EXTERNAL_WEB3_ETHEREUM_CLIENT_ID: z.string().optional(),
-      EXTERNAL_WEB3_ETHEREUM_SECRET: z.string().optional(),
-    }),
-  ]),
+  validationSchema: z.object({
+    EXTERNAL_WEB3_ETHEREUM_ENABLED: z.boolean(),
+    EXTERNAL_WEB3_SOLANA_ENABLED: z.boolean(),
+  }),
   misc: {
     iconKey: 'web3-icon',
   },
