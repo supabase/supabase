@@ -163,9 +163,9 @@ async function generateSourceLlmsTxt(sourceDefn: Source) {
   await fs.writeFile(`public/${sourceDefn.relPath}`, fullText)
 }
 
-// Product overview .txt files in apps/www/public/llms/, read at build time.
+// Product overview .txt files live in apps/www/public/llms/, read at build time.
 // Order matters: homepage first, pricing last, products alphabetical in between.
-const WWW_LLM_FILES = [
+const PRODUCT_LLM_FILES = [
   'homepage.txt',
   'auth.txt',
   'database.txt',
@@ -176,15 +176,15 @@ const WWW_LLM_FILES = [
   'pricing.txt',
 ]
 
-const WWW_LLMS_DIR = path.resolve(
+const PRODUCT_LLMS_DIR = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../../../apps/www/public/llms'
 )
 
-async function readWwwLlmContent(): Promise<string> {
+async function readProductLlmContent(): Promise<string> {
   const contents = await Promise.all(
-    WWW_LLM_FILES.map(async (file) => {
-      const filePath = path.join(WWW_LLMS_DIR, file)
+    PRODUCT_LLM_FILES.map((file) => {
+      const filePath = path.join(PRODUCT_LLMS_DIR, file)
       return fs.readFile(filePath, 'utf-8')
     })
   )
@@ -195,7 +195,7 @@ async function generateFullLlmsTxt() {
   const enabledSources = SOURCES.filter((source) => source.enabled !== false)
 
   const [wwwContent, docsSections] = await Promise.all([
-    readWwwLlmContent(),
+    readProductLlmContent(),
     Promise.all(
       enabledSources.map(async (sourceDefn) => {
         const source = await sourceDefn.fetch()
@@ -225,7 +225,6 @@ async function generateFullLlmsTxt() {
   ].join('\n')
 
   await fs.writeFile('public/llms-full.txt', fullText)
-  console.log(`llms-full.txt: ${(Buffer.byteLength(fullText) / 1024 / 1024).toFixed(1)}MB`)
 }
 
 async function generateLlmsTxt() {
@@ -238,6 +237,7 @@ async function generateLlmsTxt() {
     ])
   } catch (err) {
     console.error(err)
+    throw err
   }
 }
 
