@@ -40,7 +40,7 @@ export const ProjectClaimConfirm = ({
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   const { mutateAsync: approveRequest, isPending: isApproving } =
-    useApiAuthorizationApproveMutation({ onError: () => { } })
+    useApiAuthorizationApproveMutation({ onError: () => {} })
 
   const { mutateAsync: claimProject, isPending: isClaiming } = useOrganizationProjectClaimMutation()
 
