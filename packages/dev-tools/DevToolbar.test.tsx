@@ -79,7 +79,11 @@ describe('DevToolbar', () => {
   })
 
   afterEach(() => {
-    process.env.NEXT_PUBLIC_ENVIRONMENT = originalEnv
+    if (originalEnv === undefined) {
+      delete process.env.NEXT_PUBLIC_ENVIRONMENT
+    } else {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = originalEnv
+    }
     vi.resetModules()
     vi.restoreAllMocks()
   })
