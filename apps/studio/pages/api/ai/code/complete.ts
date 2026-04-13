@@ -32,6 +32,12 @@ type SqlFetchParams = {
   headers: Record<string, string>
 }
 
+type SchemaListResult =
+  | { error: true }
+  | { error: false; queriedSchemas: string[]; otherSchemas: string[] }
+
+type SchemaDDLResult = { error: true } | { error: false; defs: string | null }
+
 async function fetchSchemas(
   includeSchema: boolean,
   { projectRef, connectionString, headers }: SqlFetchParams
@@ -53,7 +59,7 @@ async function fetchSchemas(
 async function fetchSchemaDDL(
   schemas: string[],
   { projectRef, connectionString, headers }: SqlFetchParams
-): Promise<{ error: false; defs: string | null } | { error: true }> {
+): Promise<SchemaDDLResult> {
   if (schemas.length === 0) return { error: false, defs: null }
   try {
     const { result } = await executeSql<EntityDefinitionRow[]>(
@@ -71,35 +77,34 @@ async function fetchSchemaDDL(
 
 function buildDatabaseSchemaSection({
   includeSchema,
-  schemaListError,
+  schemaListResult,
   schemaDDLResult,
-  schemasToFetch,
-  otherSchemaNames,
 }: {
   includeSchema: boolean
-  schemaListError: boolean
-  schemaDDLResult: { error: false; defs: string | null } | { error: true }
-  schemasToFetch: string[]
-  otherSchemaNames: string
+  schemaListResult: SchemaListResult
+  schemaDDLResult: SchemaDDLResult
 }): string {
   if (!includeSchema) {
     return 'Schema context is unavailable — data opt-in is not enabled for this project.'
   }
-  if (schemaListError) {
-    return "Failed to retrieve schema list due to a database error. Assume a `public` schema exists. Other schemas may be present — infer from the user's existing code."
+  const lines: string[] = []
+
+  if (schemaListResult.error) {
+    lines.push(
+      "Unable to fetch list of available database schemas. Assume `public` schema, infer others from the user's existing code."
+    )
+  } else {
+    lines.push(`Queried schemas: ${schemaListResult.queriedSchemas.join(', ')}`)
+    if (schemaListResult.otherSchemas.length > 0)
+      lines.push(
+        `Other available schemas (use getSchemaDefinitions tool): ${schemaListResult.otherSchemas.join(', ')}`
+      )
   }
 
-  const lines: string[] = []
-  if (schemasToFetch.length > 0) lines.push(`Loaded definitions for: ${schemasToFetch.join(', ')}`)
-  if (otherSchemaNames)
-    lines.push(`Other available schemas (use getSchemaDefinitions tool): ${otherSchemaNames}`)
-
   if (schemaDDLResult.error) {
-    lines.push('\nFailed to fetch table definitions due to a database error.')
-  } else if (schemaDDLResult.defs) {
-    lines.push('\n' + schemaDDLResult.defs)
+    lines.push('Failed to fetch table definitions due to a database error.')
   } else {
-    lines.push('\nNo table definitions found.')
+    lines.push(`\n${schemaDDLResult.defs ?? 'No table definitions found.'}`)
   }
 
   return lines.join('\n')
@@ -188,7 +193,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ? [
           'public',
           ...schemas
-            .filter((s) => s.name !== 'public' && lowerContext.includes(s.name.toLowerCase() + '.'))
+            .filter((s) => {
+              const lower = s.name.toLowerCase()
+              return (
+                s.name !== 'public' &&
+                (lowerContext.includes(lower + '.') || lowerContext.includes(`"${lower}".`))
+              )
+            })
             .map((s) => s.name),
         ]
       : []
@@ -200,10 +211,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const fetchedSchemaSet = new Set(schemasToFetch)
-    const otherSchemaNames = schemas
-      .filter((s) => !fetchedSchemaSet.has(s.name))
-      .map((s) => s.name)
-      .join(', ')
+    const schemaListResult: SchemaListResult = schemaListError
+      ? { error: true }
+      : {
+          error: false,
+          queriedSchemas: schemasToFetch,
+          otherSchemas: schemas.filter((s) => !fetchedSchemaSet.has(s.name)).map((s) => s.name),
+        }
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
@@ -216,7 +230,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const userMessage = source`
       ## Database Schema
 
-      ${buildDatabaseSchemaSection({ includeSchema, schemaListError, schemaDDLResult, schemasToFetch, otherSchemaNames })}
+      ${buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult })}
 
       ## Code
 
@@ -248,7 +262,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       stopWhen: stepCountIs(5),
       messages: coreMessages,
       tools:
-        includeSchema && !schemaListError
+        includeSchema && !schemaListResult.error
           ? {
               getSchemaDefinitions: tool({
                 description: 'Get table and column definitions for one or more schemas',
