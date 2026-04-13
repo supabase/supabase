@@ -303,7 +303,7 @@ export const NewPaymentMethodElement = forwardRef(
         form.setValue('tax_id_name', '')
       }
       prevCountryRef.current = addressCountry
-    }, [addressCountry])
+    }, [addressCountry, form])
 
     // Preselect tax id if there is no more than 2 available tax ids (even if there are two options, first one in the list is likely to be it)
     useEffect(() => {
