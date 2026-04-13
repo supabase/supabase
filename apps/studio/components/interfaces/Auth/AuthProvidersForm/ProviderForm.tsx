@@ -231,7 +231,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                     name={x}
                     properties={provider.properties[x]}
                     control={form.control}
-                    disabled={shouldDisableField(x) || !canUpdateConfig}
+                    readOnly={shouldDisableField(x) || !canUpdateConfig}
                     hasAccess={hasAccess}
                   />
                 )
