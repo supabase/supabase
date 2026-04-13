@@ -111,7 +111,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const INITIAL_VALUES = useMemo(() => {
     return getValuesForProvider(config)
-     
   }, [config, getValuesForProvider])
 
   const onSubmit = (values: any) => {
