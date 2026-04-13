@@ -257,11 +257,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     .array(z.string())
                     .describe('The schema names to get the definitions for'),
                 }),
-                execute: async ({ schemas: schemaNames }) => {
-                  const validSchemaNames = schemaNames.filter((name) =>
+                execute: async ({ schemas: maybeSchemas }) => {
+                  const validSchemas = maybeSchemas.filter((name) =>
                     schemas.some((s) => s.name === name)
                   )
-                  const result = await fetchSchemaDDL(validSchemaNames, {
+                  const result = await fetchSchemaDDL(validSchemas, {
                     projectRef,
                     connectionString,
                     headers,
