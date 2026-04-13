@@ -200,7 +200,8 @@ resources:
                                     principals:
                                       - any: true
                                        
-                      - match:
+                      - name: functions-v1-all
+                        match:
                           prefix: /functions/v1/
                         route:
                           cluster: functions
@@ -436,8 +437,28 @@ resources:
                     '@type': >-
                       type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
                     inline_code: |
+                      local FUNCTIONS_ROUTE = "functions-v1-all"
+                      local FUNCTIONS_PREFIX = "/functions/v1/"
+
+                      local function is_functions_request(request_handle, headers)
+                        if request_handle:streamInfo():routeName() == FUNCTIONS_ROUTE then
+                          return true
+                        end
+
+                        local path = headers:get(":path")
+                        if path == nil then
+                          return false
+                        end
+
+                        return string.sub(path, 1, string.len(FUNCTIONS_PREFIX)) == FUNCTIONS_PREFIX
+                      end
+
                       function envoy_on_request(request_handle)
                         local headers = request_handle:headers()
+                        if is_functions_request(request_handle, headers) then
+                          return
+                        end
+
                         if headers:get("apikey") ~= nil then
                           return
                         end
@@ -463,11 +484,26 @@ resources:
                     '@type': >-
                       type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
                     inline_code: |
+                      local FUNCTIONS_ROUTE = "functions-v1-all"
+                      local FUNCTIONS_PREFIX = "/functions/v1/"
                       local SECRET_KEY = "${SUPABASE_SECRET_KEY}"
                       local PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
                       local SERVICE_ROLE_JWT = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
                       local ANON_JWT = "${ANON_KEY_ASYMMETRIC}"
                       local TRANSLATION_ENABLED = SECRET_KEY ~= "" and PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_JWT ~= "" and ANON_JWT ~= ""
+
+                      local function is_functions_request(request_handle, headers)
+                        if request_handle:streamInfo():routeName() == FUNCTIONS_ROUTE then
+                          return true
+                        end
+
+                        local path = headers:get(":path")
+                        if path == nil then
+                          return false
+                        end
+
+                        return string.sub(path, 1, string.len(FUNCTIONS_PREFIX)) == FUNCTIONS_PREFIX
+                      end
 
                       local function translate_apikey(apikey)
                         if apikey == nil or apikey == "" then
@@ -542,6 +578,10 @@ resources:
 
                       function envoy_on_request(request_handle)
                         local headers = request_handle:headers()
+                        if is_functions_request(request_handle, headers) then
+                          return
+                        end
+
                         local path = headers:get(":path")
                         local apikey = extract_query_apikey(path)
                         local translated = translate_apikey(apikey)
@@ -564,11 +604,26 @@ resources:
                     '@type': >-
                       type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
                     inline_code: |
+                      local FUNCTIONS_ROUTE = "functions-v1-all"
+                      local FUNCTIONS_PREFIX = "/functions/v1/"
                       local SECRET_KEY = "${SUPABASE_SECRET_KEY}"
                       local PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
                       local SERVICE_ROLE_JWT = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
                       local ANON_JWT = "${ANON_KEY_ASYMMETRIC}"
                       local TRANSLATION_ENABLED = SECRET_KEY ~= "" and PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_JWT ~= "" and ANON_JWT ~= ""
+
+                      local function is_functions_request(request_handle, headers)
+                        if request_handle:streamInfo():routeName() == FUNCTIONS_ROUTE then
+                          return true
+                        end
+
+                        local path = headers:get(":path")
+                        if path == nil then
+                          return false
+                        end
+
+                        return string.sub(path, 1, string.len(FUNCTIONS_PREFIX)) == FUNCTIONS_PREFIX
+                      end
 
                       local function translate_apikey(apikey)
                         if apikey == nil or apikey == "" then
@@ -592,6 +647,10 @@ resources:
 
                       function envoy_on_request(request_handle)
                         local headers = request_handle:headers()
+                        if is_functions_request(request_handle, headers) then
+                          return
+                        end
+
                         local translated = translate_apikey(headers:get("apikey"))
                         if translated ~= nil and translated ~= "" then
                           headers:replace("apikey", translated)
@@ -627,6 +686,22 @@ resources:
                     '@type': >-
                       type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
                     inline_code: |
+                      local FUNCTIONS_ROUTE = "functions-v1-all"
+                      local FUNCTIONS_PREFIX = "/functions/v1/"
+
+                      local function is_functions_request(request_handle, headers)
+                        if request_handle:streamInfo():routeName() == FUNCTIONS_ROUTE then
+                          return true
+                        end
+
+                        local path = headers:get(":path")
+                        if path == nil then
+                          return false
+                        end
+
+                        return string.sub(path, 1, string.len(FUNCTIONS_PREFIX)) == FUNCTIONS_PREFIX
+                      end
+
                       local function has_real_jwt(auth_header)
                         if auth_header == nil or auth_header == "" then
                           return false
@@ -653,6 +728,10 @@ resources:
 
                       function envoy_on_request(request_handle)
                         local headers = request_handle:headers()
+                        if is_functions_request(request_handle, headers) then
+                          return
+                        end
+
                         if has_real_jwt(headers:get("authorization")) then
                           return
                         end
