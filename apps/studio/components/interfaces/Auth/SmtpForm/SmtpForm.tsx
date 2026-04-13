@@ -141,10 +141,6 @@ export const SmtpForm = () => {
   useEffect(() => {
     if (authConfig) {
       const formValues = generateFormValues(authConfig)
-      // Convert SMTP_PORT from string to number if it exists
-      if (formValues.SMTP_PORT) {
-        formValues.SMTP_PORT = Number(formValues.SMTP_PORT) as any
-      }
       form.reset({
         ...formValues,
         ENABLE_SMTP: isSmtpEnabled(authConfig),
