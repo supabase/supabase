@@ -233,9 +233,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
   const createPaymentMethod = async (): ReturnType<
     PaymentMethodElementRef['createPaymentMethod']
   > => {
-    const isValid = await validateBillingProfile()
-    if (!isValid) return undefined
-
     if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
       const paymentResult = await paymentRef.current?.createPaymentMethod()
 
@@ -259,6 +256,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
 
   useImperativeHandle(ref, () => ({
     createPaymentMethod,
+    validateBillingProfile,
   }))
 
   return (
