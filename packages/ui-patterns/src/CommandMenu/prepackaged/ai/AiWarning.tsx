@@ -1,5 +1,4 @@
 import { Microscope } from 'lucide-react'
-
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
 
 const AiWarning = ({ className }: { className?: string }) => (

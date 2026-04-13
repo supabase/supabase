@@ -32,7 +32,7 @@ scrape_configs:
     scheme: https
     basic_auth:
       username: service_role
-      password: '<service-role key or JWT>'
+      password: '<secret API key (sb_secret_...)>'
     static_configs:
       - targets:
           - '<project-ref>.supabase.co:443'
@@ -44,7 +44,7 @@ scrape_configs:
 
 - Keep the scrape interval at 60 seconds to match Supabase’s refresh cadence.
 - If you run Prometheus behind a proxy, make sure it can establish outbound HTTPS connections to `*.supabase.co`.
-- Store secrets (service role key) with your secret manager or inject them via environment variables.
+- Store secrets (Secret API key) with your secret manager or inject them via environment variables.
 
 </Admonition>
 
@@ -79,4 +79,4 @@ You now have over 200 production-ready panels covering CPU, IO, WAL, replication
 
 - **Multiple projects:** add one scrape job per project ref so you can separate metrics and labels cleanly.
 - **Right-sizing guidance:** pair the dashboards with Supabase’s [Query Performance report](/dashboard/project/_/observability/query-performance) and [Advisors](/dashboard/project/_/observability/database) to decide when to optimize vs upgrade.
-- **Security:** rotate the service role key on a regular cadence and update the Prometheus config accordingly.
+- **Security:** rotate Secret API keys on a regular cadence and update the Prometheus config accordingly.

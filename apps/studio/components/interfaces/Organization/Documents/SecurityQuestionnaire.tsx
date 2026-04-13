@@ -2,20 +2,20 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { getDocument } from 'data/documents/document-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { getDocument } from '@/data/documents/document-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()
@@ -54,46 +54,45 @@ export const SecurityQuestionnaire = () => {
   }
 
   return (
-    <>
-      <ScaffoldSection>
-        <ScaffoldSectionDetail className="sticky space-y-6 top-12">
-          <p className="text-base m-0">Standard Security Questionnaire</p>
-          <div className="space-y-2 text-sm text-foreground-light m-0">
-            <p>
-              Organizations on Team Plan or above have access to our standard security
-              questionnaire.
-            </p>
+    <ScaffoldSection className="py-12">
+      <ScaffoldSectionDetail>
+        <h4 className="mb-5">Standard Security Questionnaire</h4>
+        <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
+          <p>
+            Organizations on Team Plan or above have access to our standard security questionnaire.
+          </p>
+        </div>
+      </ScaffoldSectionDetail>
+      <ScaffoldSectionContent>
+        {isLoadingPermissions || isLoadingEntitlement ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <ShimmeringLoader className="w-24" />
           </div>
-        </ScaffoldSectionDetail>
-        <ScaffoldSectionContent>
-          {isLoadingPermissions || isLoadingEntitlement ? (
-            <div className="flex items-center justify-center h-full">
-              <ShimmeringLoader className="w-24" />
-            </div>
-          ) : !canReadSubscriptions ? (
-            <NoPermission resourceText="access our security questionnaire" />
-          ) : !hasAccessToQuestionnaire ? (
-            <div className="flex items-center justify-center h-full">
+        ) : !canReadSubscriptions ? (
+          <NoPermission resourceText="access our security questionnaire" />
+        ) : !hasAccessToQuestionnaire ? (
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button asChild type="default">
               <Link
                 href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
               >
-                <Button type="default">Upgrade to Team</Button>
+                Upgrade to Team
               </Link>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <Button
-                type="default"
-                icon={<Download />}
-                onClick={handleDownloadClick}
-                disabled={!slug}
-              >
-                Download Questionnaire
-              </Button>
-            </div>
-          )}
-        </ScaffoldSectionContent>
-      </ScaffoldSection>
-    </>
+            </Button>
+          </div>
+        ) : (
+          <div className="@lg:flex items-center justify-center h-full">
+            <Button
+              type="default"
+              icon={<Download />}
+              onClick={handleDownloadClick}
+              disabled={!slug}
+            >
+              Download Questionnaire
+            </Button>
+          </div>
+        )}
+      </ScaffoldSectionContent>
+    </ScaffoldSection>
   )
 }

@@ -1,6 +1,6 @@
-import type { Filter, ServiceError } from 'components/grid/types'
-import { isNumericalColumn } from 'components/grid/utils/types'
-import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
+import type { Filter, ServiceError } from '@/components/grid/types'
+import { isNumericalColumn } from '@/components/grid/utils/types'
+import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
 
 /**
  * temporary fix until we implement a better filter UI

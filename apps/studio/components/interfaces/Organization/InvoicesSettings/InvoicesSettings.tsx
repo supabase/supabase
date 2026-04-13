@@ -1,20 +1,7 @@
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, Download, FileText } from 'lucide-react'
+import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
-import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { getInvoice } from 'data/invoices/invoice-query'
-import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
-import { useInvoicesQuery } from 'data/invoices/invoices-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { formatCurrency } from 'lib/helpers'
-import { Organization } from 'types/base'
 import {
   Button,
   Card,
@@ -28,7 +15,21 @@ import {
   TableRow,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import InvoicePayButton from './InvoicePayButton'
+import { InvoiceStatus } from '@/components/interfaces/Billing/Invoices.types'
+import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBadge'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { getInvoice } from '@/data/invoices/invoice-query'
+import { getInvoiceReceipt } from '@/data/invoices/invoice-receipt-query'
+import { useInvoicesCountQuery } from '@/data/invoices/invoices-count-query'
+import { useInvoicesQuery } from '@/data/invoices/invoices-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { formatCurrency } from '@/lib/helpers'
+import { Organization } from '@/types/base'
 
 const PAGE_LIMIT = 5
 
@@ -84,6 +85,17 @@ export const InvoicesSettings = () => {
       if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
     } catch (error: any) {
       toast.error(`Failed to fetch the selected invoice: ${error.message}`)
+    }
+  }
+
+  const fetchReceipt = async (invoiceId: string) => {
+    if (!slug) return
+
+    try {
+      const receipt = await getInvoiceReceipt({ invoiceId, slug })
+      if (receipt?.receipt_pdf) window.open(receipt.receipt_pdf, '_blank')
+    } catch (error: any) {
+      toast.error(`Failed to fetch receipt: ${error.message}`)
     }
   }
 
@@ -190,10 +202,20 @@ export const InvoicesSettings = () => {
                         <ButtonTooltip
                           type="outline"
                           className="w-7"
-                          icon={<Download size={16} strokeWidth={1.5} />}
+                          icon={<ScrollText size={16} strokeWidth={1.5} />}
                           onClick={() => fetchInvoice(x.id)}
                           tooltip={{ content: { side: 'bottom', text: 'Download invoice' } }}
                         />
+
+                        {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
+                          <ButtonTooltip
+                            type="outline"
+                            className="w-7"
+                            icon={<Receipt size={16} strokeWidth={1.5} />}
+                            onClick={() => fetchReceipt(x.id)}
+                            tooltip={{ content: { side: 'bottom', text: 'Download receipt' } }}
+                          />
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

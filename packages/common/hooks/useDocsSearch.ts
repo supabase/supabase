@@ -16,6 +16,7 @@ enum PageType {
   Reference = 'reference',
   Integration = 'partner-integration',
   GithubDiscussion = 'github-discussions',
+  Troubleshooting = 'troubleshooting',
 }
 
 interface PageSection {

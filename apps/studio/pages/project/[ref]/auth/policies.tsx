@@ -1,39 +1,10 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import { Policies } from 'components/interfaces/Auth/Policies/Policies'
-import { PoliciesDataProvider } from 'components/interfaces/Auth/Policies/PoliciesDataContext'
-import { getGeneralPolicyTemplates } from 'components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
-import { generatePolicyUpdateSQL } from 'components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from 'components/ui/AlertError'
-import { BannerRlsEventTrigger } from 'components/ui/BannerStack/Banners/BannerRlsEventTrigger'
-import { BannerStack } from 'components/ui/BannerStack/BannerStack'
-import { BannerStackProvider, useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { useEditorPanelStateSnapshot } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -47,6 +18,33 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { Policies } from '@/components/interfaces/Auth/Policies/Policies'
+import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/PoliciesDataContext'
+import { getGeneralPolicyTemplates } from '@/components/interfaces/Auth/Policies/PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
+import { generatePolicyUpdateSQL } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import AlertError from '@/components/ui/AlertError'
+import { BannerRlsEventTrigger } from '@/components/ui/BannerStack/Banners/BannerRlsEventTrigger'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import type { NextPageWithLayout } from '@/types'
 
 /**
  * Filter tables by table name and policy name
@@ -102,6 +100,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
   const deferredSearchString = useDeferredValue(searchString)
+
+  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery({ projectRef: project?.ref })
@@ -128,23 +132,16 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   )
 
   const {
-    data: policies,
+    data: policies = [],
     isPending: isLoadingPolicies,
     isError: isPoliciesError,
+    isSuccess: isPoliciesSuccess,
     error: policiesError,
   } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const { setValue: setSelectedPolicyIdToEdit, value: selectedPolicyIdToEdit } =
-    useQueryStateWithSelect({
-      urlKey: 'edit',
-      select: (id: string) =>
-        id ? policies?.find((policy) => policy.id.toString() === id) : undefined,
-      enabled: !!policies,
-      onError: () => toast.error(`Policy not found`),
-    })
+  const selectedPolicyToEdit = policies.find((policy) => policy.id.toString() === selectedIdToEdit)
 
   const {
     data: tables,
@@ -179,7 +176,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const handleSelectCreatePolicy = useCallback(
     (table: string) => {
       setSelectedTable(table)
-      setSelectedPolicyIdToEdit(null)
+      setSelectedIdToEdit(null)
       setShowCreatePolicy(true)
 
       if (isInlineEditorEnabled) {
@@ -219,7 +216,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         setEditorPanelTemplates(templates)
         openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
       } else {
-        setSelectedPolicyIdToEdit(policy.id.toString())
+        setSelectedIdToEdit(policy.id.toString())
       }
     },
     [isInlineEditorEnabled, openSidebar]
@@ -252,7 +249,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     isRlsBannerDismissed,
   ])
 
-  const isUpdatingPolicy = !!selectedPolicyIdToEdit
+  useEffect(() => {
+    if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
+      toast(`Policy ID ${selectedIdToEdit} cannot be found`)
+      setSelectedIdToEdit(null)
+    }
+  }, [selectedIdToEdit, selectedPolicyToEdit, isPoliciesSuccess, setSelectedIdToEdit])
+
+  const isUpdatingPolicy = !!selectedIdToEdit
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -340,15 +344,15 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             )}
 
             <PolicyEditorPanel
-              visible={showCreatePolicy || isUpdatingPolicy}
+              visible={showCreatePolicy || (isUpdatingPolicy && !!selectedPolicyToEdit)}
               schema={schema}
               searchString={searchString}
               selectedTable={isUpdatingPolicy ? undefined : selectedTable}
-              selectedPolicy={isUpdatingPolicy ? selectedPolicyIdToEdit : undefined}
+              selectedPolicy={isUpdatingPolicy ? selectedPolicyToEdit : undefined}
               onSelectCancel={() => {
                 setSelectedTable(undefined)
                 if (isUpdatingPolicy) {
-                  setSelectedPolicyIdToEdit(null)
+                  setSelectedIdToEdit(null)
                 } else {
                   setShowCreatePolicy(false)
                 }
@@ -364,10 +368,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
 AuthPoliciesPage.getLayout = (page) => (
   <DefaultLayout>
-    <BannerStackProvider>
-      <AuthLayout>{page}</AuthLayout>
-      <BannerStack />
-    </BannerStackProvider>
+    <AuthLayout title="Policies">{page}</AuthLayout>
   </DefaultLayout>
 )
 

@@ -12,4 +12,15 @@ Sentry.init({
   }),
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
+  // Enable performance monitoring
+  tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
+  ignoreErrors: [
+    'NEXT_NOT_FOUND',
+    'NEXT_REDIRECT',
+    /504 Gateway Time-out/,
+    'Network request failed',
+    'Failed to fetch',
+    'AbortError',
+  ],
 })

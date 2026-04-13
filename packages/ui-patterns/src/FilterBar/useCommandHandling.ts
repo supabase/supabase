@@ -1,8 +1,13 @@
 import { useCallback } from 'react'
-import { ActiveInput } from './hooks'
-import { MenuItem } from './menuItems'
-import { FilterGroup, FilterProperty } from './types'
-import { addFilterToGroup, addGroupToGroup, findGroupByPath, isCustomOptionObject } from './utils'
+
+import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
+import {
+  addFilterToGroup,
+  addGroupToGroup,
+  findGroupByPath,
+  updateNestedOperator,
+  updateNestedValue,
+} from './utils'
 
 export function useCommandHandling({
   activeInput,
@@ -17,8 +22,8 @@ export function useCommandHandling({
   newPathRef,
   setIsCommandMenuVisible,
 }: {
-  activeInput: ActiveInput
-  setActiveInput: (input: ActiveInput) => void
+  activeInput: ActiveInputState
+  setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
   onFilterChange: (filters: FilterGroup) => void
   filterProperties: FilterProperty[]
@@ -64,7 +69,7 @@ export function useCommandHandling({
 
       const path = activeInput.path
       handleOperatorChange(path, selectedValue)
-      setActiveInput(null)
+      setActiveInput({ type: 'value', path })
     },
     [activeInput, handleOperatorChange, setActiveInput]
   )
@@ -76,7 +81,7 @@ export function useCommandHandling({
       const newPath = [...currentPath, group.conditions.length]
 
       setTimeout(() => {
-        setActiveInput({ type: 'value', path: newPath })
+        setActiveInput({ type: 'operator', path: newPath })
       }, 0)
     },
     [activeFilters, onFilterChange, setActiveInput]
@@ -96,15 +101,7 @@ export function useCommandHandling({
       const group = findGroupByPath(activeFilters, currentPath)
       if (!group) return
 
-      if (
-        selectedProperty.options &&
-        !Array.isArray(selectedProperty.options) &&
-        isCustomOptionObject(selectedProperty.options)
-      ) {
-        handlePropertySelection(selectedProperty, currentPath, group)
-      } else {
-        handlePropertySelection(selectedProperty, currentPath, group)
-      }
+      handlePropertySelection(selectedProperty, currentPath, group)
       onFreeformTextChange('')
     },
     [activeInput, filterProperties, activeFilters, onFreeformTextChange, handlePropertySelection]
@@ -137,7 +134,18 @@ export function useCommandHandling({
       if (activeInput?.type === 'value') {
         handleValueCommand(item)
       } else if (activeInput?.type === 'operator') {
-        handleOperatorCommand(selectedValue)
+        if (item.isDefaultOperator) {
+          const path = activeInput.path
+          const filtersWithOperator = updateNestedOperator(activeFilters, path, item.value)
+          onFilterChange(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
+
+          // Added minor delay to ensure the filter is updated before navigating to the group
+          setTimeout(() => {
+            setActiveInput({ type: 'group', path: path.slice(0, -1) })
+          }, 0)
+        } else {
+          handleOperatorCommand(selectedValue)
+        }
       } else if (activeInput?.type === 'group') {
         handleGroupPropertyCommand(selectedValue)
       }
@@ -151,6 +159,7 @@ export function useCommandHandling({
       handleValueCommand,
       handleOperatorCommand,
       handleGroupPropertyCommand,
+      onFilterChange,
       setIsCommandMenuVisible,
     ]
   )

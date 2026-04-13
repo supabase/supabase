@@ -6,6 +6,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/database/hardening-data-api',
+    destination: '/docs/guides/api/hardening-data-api',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/platform/compute-add-ons',
     destination: '/docs/guides/platform/compute-and-disk',
   },
@@ -2176,7 +2186,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/rate-limits',
-    destination: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
   },
   {
     permanent: true,
@@ -2206,7 +2221,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/realtime/guides/client-side-throttling',
-    destination: '/docs/guides/realtime/quotas',
+    destination: '/docs/guides/realtime/limits',
   },
   {
     permanent: true,
@@ -2643,8 +2658,13 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/storage/analytics/replication',
+    destination: '/docs/guides/database/replication/replication-setup',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/server-side-rendering',
-    destination: '/docs/guides/auth/server-side',
+    destination: '/docs/guides/auth/server-side/advanced-guide',
   },
   {
     permanent: true,
@@ -2659,7 +2679,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/passwords',
+    destination: '/docs/guides/auth/social-login',
   },
   {
     permanent: true,
@@ -2818,7 +2838,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/oauth-scopes',
-    destination: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration/oauth-scopes',
   },
   {
     permanent: true,
@@ -3057,5 +3077,34 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/fly-postgres',
     destination: '/docs/guides/database/overview',
+  },
+
+  // design
+  {
+    permanent: true,
+    source: '/:path*',
+    has: [
+      {
+        type: 'host',
+        value: 'supabase.design',
+      },
+    ],
+    destination: 'https://supabase.com/design-system/:path*',
+  },
+  {
+    permanent: true,
+    source: '/design',
+    destination: '/design-system',
+  },
+  {
+    source: '/redeem',
+    has: [
+      {
+        type: 'query',
+        key: 'code',
+      },
+    ],
+    destination: '/dashboard/redeem?code=:code',
+    permanent: false,
   },
 ]

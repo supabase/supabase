@@ -23,9 +23,9 @@ className="rounded-lg border border-foreground/10 bg-surface-100 text-foreground
     3. Authenticate with HTTP Basic Auth:
 
     - **Username**: `service_role`
-    - **Password**: a service role secret (JWT) from [**Project Settings > JWT**](/dashboard/project/_/settings/jwt) or any other Secret API key from [**Project Settings > API keys** (opens in a new tab)](/dashboard/project/_/settings/api-keys)
+    - **Password**: a **Secret API key** (`sb_secret_...`). You can create/copy it in [**Project Settings → API Keys**](/dashboard/project/_/settings/api-keys). For more context, see [Understanding API keys](/docs/guides/api/api-keys).
 
-    Testing locally is as simple as running `curl` with your service role secret:
+    Testing locally is as simple as running `curl` with your Secret API key:
 
     ```bash
     curl <project-url>/customer/v1/privileged/metrics \
@@ -35,7 +35,7 @@ className="rounded-lg border border-foreground/10 bg-surface-100 text-foreground
     You can provision long-lived automation tokens in two ways:
 
     - Create an account access token once at [**Account Settings > Access Tokens**](/dashboard/account/tokens) and reuse it wherever you configure observability tooling.
-    - **Optional**: programmatically exchange an access token for project API keys via the [Management API ](/docs/reference/api/management-projects-api-keys-retrieve').
+    - **Optional**: programmatically exchange an access token for project API keys via the [Management API](/docs/reference/api/management-projects-api-keys-retrieve).
 
     ```bash
     # (Optional) Exchange an account access token for project API keys

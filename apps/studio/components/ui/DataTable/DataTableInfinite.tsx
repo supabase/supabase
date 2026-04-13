@@ -4,12 +4,12 @@ import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Fragment, memo, ReactNode, UIEvent, useCallback, useRef } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import { Button, cn } from 'ui'
+
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table'
+import { useHotKey } from '@/hooks/ui/useHotKey'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, TMeta> {

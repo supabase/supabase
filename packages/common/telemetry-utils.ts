@@ -1,6 +1,5 @@
+import { IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
 import { isBrowser } from './helpers'
-import { IS_PROD } from './constants'
-import { LOCAL_STORAGE_KEYS } from './constants'
 
 export function getTelemetryCookieOptions() {
   if (typeof window === 'undefined') return 'path=/; SameSite=Lax'

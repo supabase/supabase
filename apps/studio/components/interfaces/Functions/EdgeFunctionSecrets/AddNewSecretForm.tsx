@@ -1,13 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { Eye, EyeOff, MinusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { useSecretsQuery } from 'data/secrets/secrets-query'
-import { Eye, EyeOff, MinusCircle } from 'lucide-react'
 import {
   Button,
   Card,
@@ -23,7 +19,11 @@ import {
   FormMessage_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import z from 'zod'
+
 import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
+import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
 
 type SecretPair = {
   name: string
@@ -89,7 +89,7 @@ const AddNewSecretForm = () => {
           const index = parseInt(indexStr)
           form.setValue(
             `secrets.${index}.${field}` as `secrets.${number}.name` | `secrets.${number}.value`,
-            text
+            text.trim()
           )
           return
         }
@@ -217,6 +217,10 @@ const AddNewSecretForm = () => {
                           <Input
                             {...field}
                             placeholder="e.g. CLIENT_KEY"
+                            data-1p-ignore
+                            data-lpignore="true"
+                            data-form-type="other"
+                            data-bwignore
                             onPaste={(e) => handlePaste(e.nativeEvent)}
                           />
                         </FormControl_Shadcn_>

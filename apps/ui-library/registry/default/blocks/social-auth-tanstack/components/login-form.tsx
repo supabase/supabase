@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -8,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/registry/default/components/ui/card'
-import { useState } from 'react'
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [error, setError] = useState<string | null>(null)

@@ -1,12 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { Plus, ShieldCheck } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -27,6 +24,9 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 const NAME_SCHEMA = z
   .string()
@@ -47,10 +47,7 @@ const SCHEMA = z.object({
 
 export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
-  const [visible, setVisible] = useQueryState(
-    'new',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [visible, setVisible] = useQueryState('new', parseAsString)
 
   const onOpenChange = (value: boolean) => {
     if (value) setVisible('secret')

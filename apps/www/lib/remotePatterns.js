@@ -1,43 +1,3 @@
-const CMS_SITE_ORIGIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? 'https://cms.supabase.com'
-    : process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL &&
-        typeof process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL === 'string'
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL?.replace('zone-www-dot-com-git-', 'cms-git-')}`
-      : 'http://localhost:3030'
-
-// Function to generate CMS remote patterns from CMS_SITE_ORIGIN
-function generateCMSRemotePatterns() {
-  const patterns = []
-
-  try {
-    const cmsUrl = new URL(CMS_SITE_ORIGIN)
-    const cmsHostname = cmsUrl.hostname
-    const cmsProtocol = cmsUrl.protocol?.replace(':', '')
-
-    // Validate hostname
-    if (!cmsHostname) {
-      console.warn('[remotePatterns] Invalid hostname extracted from CMS_SITE_ORIGIN')
-      return patterns
-    }
-
-    // Add patterns for the current CMS hostname
-    const pathPatterns = ['/media/**', '/api/media/**', '/api/media/file/**']
-
-    pathPatterns.forEach((pathname) => {
-      patterns.push({
-        protocol: cmsProtocol,
-        hostname: cmsHostname,
-        pathname,
-      })
-    })
-  } catch (error) {
-    console.warn(`[remotePatterns] Failed to parse CMS_SITE_ORIGIN: "${CMS_SITE_ORIGIN}"`, error)
-  }
-
-  return patterns
-}
-
 module.exports = [
   {
     protocol: 'https',
@@ -147,12 +107,11 @@ module.exports = [
     port: '',
     pathname: '/dms/image/**',
   },
+  // OG Edge Function
   {
     protocol: 'https',
-    hostname: 'cms.supabase.com',
+    hostname: 'zhfonblqamxferhoguzj.supabase.co',
     port: '',
-    pathname: '**',
+    pathname: '/functions/v1/generate-og',
   },
-  // Dynamically generated CMS patterns based on CMS_SITE_ORIGIN
-  ...generateCMSRemotePatterns(),
 ]

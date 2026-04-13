@@ -2,33 +2,42 @@ TEAM
 
 Supabase is 100% remote.
 
+Aaron Brooks
 Aaron Byrne
 Ada Wong
+Adam Mohammed
 Adam Mokan
+AJ Matias
 Akash Manimaran
 Alaister Young
 Alan De Los Santos
 Aleksi Immonen
+Alex Hall
 Alexander Korotkov
 Ali Waseem
 Allan S
+Amir Issaei
 Amy Q
+Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
 Anna Weihl
+Ant Evans
 Ant Wilson
 Ariuna K
 Artur Zakirov
 Artyom Borissov
 Barco Fourie
 Beng Eu
+Benjamin Coenen
 Bo Lu
 Bobbie Soedirgo
 Brendan Stephens
 Brent Newson
 Carel de Waal
 Cameron Blackwood
+Cameron Michie
 Cemal Kılıç
 Chandana Anumula
 Charis Lam
@@ -41,15 +50,24 @@ Chris Gwilliams
 Chris Martin
 Chris Stockton
 Chris Ward
+Clayton Kast
+Colin Murray
+Colum Ferry
 Craig Cannon
 Cuong Do
+Daniel Velázquez Lara
 Danny White
 Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
+David Alvarez
+David Birdsong
+David Camacho Cateura
 David Weitzman
 Deepthi Sigireddi
 Deji I
+Dennis Senn
+Dimitrios Liappis
 Div Arora
 Divit D
 Douglas Hunley
@@ -61,13 +79,19 @@ Eliot Whalan
 Emmett Folger
 Eric Kharitonashvili
 Etienne Stalmans
+Eyal Ehrlich
 Fabrizio Cataldo
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
 Felipe Stival
+Ferhat Elmas
+Firas El Rachidi
 Francesco Sansalvadore
 Garrett Crowell
+Gerardo Estaba
+Gildas Garcia
+Giuseppe Mandato
 Greg Kress
 Greg P
 Greg Richardson
@@ -75,30 +99,43 @@ Gregor Vand
 Guilherme Souza
 Hannah Bowers
 Hardik Maheshwari
+Haritabh Gupta
 Haydn Maley
 Hieu Pham
+Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
 Ivan Vasilov
+Jamie Boyd
+Jared Patterson
 Jason Farber
 Jean-Paul Argudo
 Jeezy
 Jeff Smick
 Jenny Kibiri
+Jeremias Menichelli
 Jess Shears
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joanna Michniewicz
+Joaquim Moreno
 Joel Low
+Joey Freeland
+John Fitzgerald
+Joel Martin
+Johan Bergström
 John Pena
 John Schaeffer
 Jon M
 Jonny Summers-Muir
+Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
 Julien Goux
+Kalleby Santos
 Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
@@ -108,6 +145,7 @@ Katerina Skroumpelou
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Strong-Holte
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -117,11 +155,14 @@ Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
+Lindsay Moss
 Long Hoang
 Luca Forstner
+Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
 Manan Gupta
+Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
 Marouane Souda
@@ -129,15 +170,20 @@ Matthew Hambright
 Matt Johnston
 Matt Rossman
 Matthias Luft
+Mats Kindahl
+Mert Yerekapan
+Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
 Nyannyacha
 Oli R
 Pamela Chia
+Patrick Crane
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -152,6 +198,7 @@ Rafael Chacón
 Raminder Singh
 Raúl Barroso
 Riccardo Busetti
+Rodrigo Esteves
 Rodrigo Mansueli
 Ronan Lehane
 Rory Wilding
@@ -160,10 +207,15 @@ Ruan Maia
 Sam Meech-Ward
 Sam Rome
 Sam Rose
+Samir Ketema
+Sana Cordeaux
+Sara Read
 Sean Oliver
+Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shane E
+Shreekar Shetty
 Sreyas Udayavarman
 Stanislav M
 Stephen Morgan
@@ -174,12 +226,15 @@ Szymon Mentel
 Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taha Le Bras
+Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
 Thomas E
 Thor Schaeff
 Tim Frietas
+Tim Palmer
 Timothy Lim
+Tina Ha
 Tom Ashley
 Tom G
 Tomás Pozo
@@ -187,6 +242,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

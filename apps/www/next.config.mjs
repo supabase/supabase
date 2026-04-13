@@ -1,16 +1,14 @@
+import { remarkCodeHike } from '@code-hike/mdx'
 import bundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
 import { withSentryConfig } from '@sentry/nextjs'
-
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
 import redirects from './lib/redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 import rewrites from './lib/rewrites.js'
-
-import { remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 
 const withMDX = nextMdx({
   extension: /\.mdx?$/,
@@ -51,6 +49,7 @@ const nextConfig = {
     'shared-data',
     'icons',
     'api-types',
+    'marketing',
     // needed to make the octokit packages work in /changelog
     '@octokit/plugin-paginate-graphql',
   ],
@@ -79,41 +78,6 @@ const nextConfig = {
   },
   async headers() {
     return [
-      // Allow CMS preview iframe embedding by omitting X-Frame-Options for blog routes
-      {
-        source: '/blog/:slug*',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'all',
-          },
-          // No X-Frame-Options header to allow iframe embedding
-        ],
-      },
-      {
-        source: '/api-v2/cms/preview',
-        headers: [
-          {
-            key: 'content-type',
-            value: 'text/html',
-          },
-          // No X-Frame-Options header to allow iframe embedding
-        ],
-      },
-      // Default X-Frame-Options for all other paths
-      {
-        source: '/((?!blog|api-v2/cms/preview).*)',
-        headers: [
-          {
-            key: 'X-Robots-Tag',
-            value: 'all',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-        ],
-      },
       {
         source: '/.well-known/vercel/flags',
         headers: [
@@ -136,6 +100,24 @@ const nextConfig = {
               process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
                 ? 'max-age=31536000; includeSubDomains; preload'
                 : '',
+          },
+        ],
+      },
+      {
+        source: '/(docs|blog)/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'all',
+          },
+        ],
+      },
+      {
+        source: '/dashboard/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
           },
         ],
       },

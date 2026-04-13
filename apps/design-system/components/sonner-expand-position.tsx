@@ -1,16 +1,17 @@
-import { useConfig } from '@/hooks/use-config'
 import { ComponentProps } from 'react'
 import {
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
   SelectLabel_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   SonnerToaster,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { useConfig } from '@/hooks/use-config'
 
 function SonnerPositionConfig() {
   const [config, setConfig] = useConfig()

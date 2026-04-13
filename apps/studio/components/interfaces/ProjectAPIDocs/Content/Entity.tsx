@@ -1,14 +1,14 @@
 import { useParams } from 'common'
 import { useEffect } from 'react'
 
-import Table from 'components/to-be-cleaned/Table'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import LanguageSelector from '../LanguageSelector'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 import { tempRemovePostgrestText } from './Content.utils'
+import Table from '@/components/to-be-cleaned/Table'
+import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -39,7 +39,7 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
 
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
-    definition !== undefined
+    definition?.properties !== undefined
       ? Object.entries(definition.properties).map(([id, val]: any) => ({
           ...val,
           id,

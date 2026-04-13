@@ -29,7 +29,9 @@ Prepare you database with the relevant tables:
 
 ```sql
 -- Enable the pgvector extension to work with embedding vectors
-create extension vector;
+create extension vector
+with
+  schema extensions;
 
 -- Create a table to store your documents
 create table documents (

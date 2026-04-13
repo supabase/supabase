@@ -200,7 +200,7 @@ function ParamOrTypeDetails({ paramOrType }: { paramOrType: object }) {
     'description' in paramOrType
       ? (paramOrType.description as string)
       : isFromTypespec(paramOrType)
-        ? paramOrType.comment?.shortText ?? ''
+        ? (paramOrType.comment?.shortText ?? '')
         : ''
 
   const subContent =

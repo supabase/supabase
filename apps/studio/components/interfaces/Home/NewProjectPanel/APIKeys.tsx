@@ -1,21 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { Loader } from 'lucide-react'
-
 import { useParams } from 'common'
-import { Connect } from 'components/interfaces/Connect/Connect'
-import { ConnectionIcon } from 'components/interfaces/Connect/ConnectionIcon'
-import { AlertError } from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Loader } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { ConnectionIcon } from '@/components/interfaces/Connect/ConnectionIcon'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const APIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -176,7 +176,7 @@ export const APIKeys = () => {
                       ? 'JWT secret update failed, new API key may have issues'
                       : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
                         ? 'Updating JWT secret...'
-                        : publishableKey?.api_key ?? anonKey?.api_key
+                        : (publishableKey?.api_key ?? anonKey?.api_key)
                 }
               />
             </FormItemLayout>
@@ -208,7 +208,7 @@ export const APIKeys = () => {
                 Connect to your project from a variety of frameworks, ORMs, an MCP server, or even
                 directly via connection string.
               </p>
-              <Connect />
+              <ConnectButton />
             </div>
           </CardContent>
         </>

@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 

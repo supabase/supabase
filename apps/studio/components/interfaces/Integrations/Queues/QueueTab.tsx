@@ -1,25 +1,9 @@
+import { useParams } from 'common'
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { DeleteQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
-import { PurgeQueue } from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
-import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
-import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
-import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
-import { QueueSettings } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
-import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
@@ -31,6 +15,22 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DeleteQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
+import { PurgeQueue } from '@/components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
+import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { QueueMessagesDataGrid } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
+import { QueueFilters } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
+import { QueueSettings } from '@/components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
+import { SendMessageModal } from '@/components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useQueueMessagesInfiniteQuery } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -121,6 +121,7 @@ export const QueueTab = () => {
             onClick={() => setPurgeQueueModalShown(true)}
             icon={<Paintbrush />}
             title="Purge messages"
+            aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
           />
 
@@ -130,6 +131,7 @@ export const QueueTab = () => {
             onClick={() => setDeleteQueueModalShown(true)}
             icon={<Trash2 />}
             title="Delete queue"
+            aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
           />
 

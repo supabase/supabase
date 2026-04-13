@@ -1,11 +1,7 @@
+import { IS_PLATFORM } from 'common'
 import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
-
-import { IS_PLATFORM } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
 import { logConstants } from 'shared-data'
 import {
   Badge,
@@ -21,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
@@ -28,6 +25,9 @@ import {
 } from './Logs.constants'
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
+import Table from '@/components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -81,7 +81,7 @@ const LogsQueryPanel = ({
   }, [value.from, value.to, value.text, value.isHelper])
 
   return (
-    <div className="border-b bg-surface-100">
+    <div className="flex items-center border-b bg-surface-100 h-[var(--header-height)]">
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">

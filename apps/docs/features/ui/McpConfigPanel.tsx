@@ -322,7 +322,6 @@ export function McpConfigPanel() {
             : 'Project selection is only available for the hosted platform.'}
         </p>
         <McpConfigPanelBase
-          basePath="/docs"
           className="mt-6"
           projectRef={project?.ref}
           theme={resolvedTheme as 'light' | 'dark'}

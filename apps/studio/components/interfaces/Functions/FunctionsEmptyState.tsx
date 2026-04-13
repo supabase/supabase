@@ -1,21 +1,9 @@
+import { useParams } from 'common'
 import { Code, Github, Lock, Play, Server, Terminal } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-
-import { useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ScaffoldSectionTitle } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { ResourceItem } from 'components/ui/Resource/ResourceItem'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -24,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
   cn,
-  CodeBlock,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -34,7 +21,20 @@ import {
   DialogTrigger,
   Separator,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FunctionsEmptyState = () => {
   const { ref } = useParams()
@@ -189,7 +189,7 @@ export const FunctionsEmptyState = () => {
   )
 }
 
-export const FunctionsEmptyStateLocal = () => {
+export const FunctionsInstructionsLocal = () => {
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {
     if (showStripeExample) {
@@ -321,7 +321,7 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
         <ScaffoldSectionTitle className="text-xl mt-12">Explore our templates</ScaffoldSectionTitle>
         <ResourceList>
           {templates.map((template) => (
-            <Dialog>
+            <Dialog key={template.name}>
               <DialogTrigger asChild>
                 <ResourceItem
                   key={template.name}
@@ -360,16 +360,15 @@ curl --request POST 'http://localhost:54321/functions/v1/hello-world' \\
 
 export const FunctionsSecretsEmptyStateLocal = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Managing secrets and environment variables locally</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
-        <div className="p-8">
-          <div className="flex items-center gap-2">
-            <Lock size={20} />
-            <h4 className="text-base text-foreground">Managing secrets</h4>
+    <>
+      <Card>
+        <CardHeader className="flex-row items-center justify-between">
+          Local development & CLI
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
           </div>
+        </CardHeader>
+        <CardContent>
           <div className="text-sm text-foreground-light mt-1 mb-4 max-w-3xl">
             <p>
               Local secrets and environment variables can be loaded in either of the following two
@@ -386,9 +385,50 @@ export const FunctionsSecretsEmptyStateLocal = () => {
               </li>
             </ul>
           </div>
-          <DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex-row items-center justify-between">
+          Self-Hosted Supabase
+          <div className="flex items-center gap-x-2">
+            <DocsButton href={`${DOCS_URL}/guides/self-hosting/docker#configuring-services`} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="prose [&>code]:text-xs space-x-1 text-sm max-w-full">
+            <span>Change settings in</span>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/supabase/supabase/blob/master/docker/.env.example"
+            >
+              .env file
+            </a>
+            <span>and</span>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml"
+            >
+              docker-compose.yml
+            </a>
+            <span>at</span>
+            <code>functions</code>
+            <span>service</span>
+          </p>
+          <p className="prose [&>code]:text-xs space-x-1 text-sm max-w-full">
+            <span>Secrets can also be loaded at runtime by injecting them into</span>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/supabase/supabase/blob/8bb82bb3a5aee631e8e6e6e0c8a5f6e97fb8f898/docker/volumes/functions/main/index.ts#L74"
+            >
+              main/index.ts file
+            </a>
+          </p>
+        </CardContent>
+      </Card>
+    </>
   )
 }

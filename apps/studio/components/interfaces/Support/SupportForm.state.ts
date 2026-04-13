@@ -1,5 +1,5 @@
-import { neverGuard } from 'lib/helpers'
 import type { ExtendedSupportCategories } from './Support.constants'
+import { neverGuard } from '@/lib/helpers'
 
 export type SupportFormState =
   | {

@@ -1,5 +1,6 @@
 /**
- * Semantic versioning utility for comparing version strings in the format "x.x.x"
+ * Semantic versioning utility for comparing version strings.
+ * Accepts 1-3 parts (e.g., "1", "1.5", "1.5.0"). Missing parts default to 0.
  */
 
 export interface SemverVersion {
@@ -9,7 +10,8 @@ export interface SemverVersion {
 }
 
 /**
- * Parses a semver string in the format "x.x.x" into its components
+ * Parses a semver string into its components.
+ * Accepts 1-3 parts (e.g., "1", "1.5", "1.5.0"). Missing parts default to 0.
  * @param version - The version string to parse (e.g., "1.2.3")
  * @returns The parsed version components or null if invalid
  */
@@ -20,27 +22,30 @@ export function parseSemver(version: string): SemverVersion | null {
 
   const parts = version.trim().split('.')
 
-  if (parts.length !== 3) {
+  if (parts.length === 0 || parts.length > 3) {
     return null
   }
 
-  const major = parseInt(parts[0], 10)
-  const minor = parseInt(parts[1], 10)
-  const patch = parseInt(parts[2], 10)
+  const numbers = parts.map((p) => parseInt(p, 10))
 
-  if (isNaN(major) || isNaN(minor) || isNaN(patch)) {
+  if (numbers.some(isNaN)) {
     return null
   }
 
-  if (major < 0 || minor < 0 || patch < 0) {
+  if (numbers.some((n) => n < 0)) {
     return null
   }
 
-  return { major, minor, patch }
+  return {
+    major: numbers[0],
+    minor: numbers[1] ?? 0,
+    patch: numbers[2] ?? 0,
+  }
 }
 
 /**
- * Compares two semver version strings
+ * Compares two semver version strings.
+ * Missing parts are treated as 0 (e.g., "1.5" equals "1.5.0").
  * @param a - First version string
  * @param b - Second version string
  * @returns -1 if a < b, 0 if a === b, 1 if a > b, or null if either version is invalid

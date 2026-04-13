@@ -1,8 +1,9 @@
-import { tool, type ToolSet } from 'ai'
-import { getRenderingTools } from '../tools/rendering-tools'
-import { z } from 'zod'
-import { getMcpTools } from 'lib/ai/tools/mcp-tools'
 import assert from 'node:assert'
+import { tool, type ToolSet } from 'ai'
+import { z } from 'zod'
+
+import { getStudioTools } from '../tools/studio-tools'
+import { getMcpTools } from '@/lib/ai/tools/mcp-tools'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -23,7 +24,7 @@ const listPoliciesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to get the policies for'),
 })
 
-const MOCK_TABLES_DATA = [
+export const MOCK_TABLES_DATA = [
   {
     name: 'user_documents',
     rls_enabled: false,
@@ -142,11 +143,11 @@ const MOCK_LOGS_DATA = [
   },
 ]
 
-function createMockedRenderingTools() {
-  const renderingTools = getRenderingTools()
+function createMockedStudioTools() {
+  const studioTools = getStudioTools()
 
   return Object.fromEntries(
-    Object.entries(renderingTools).map(([name, baseTool]) => {
+    Object.entries(studioTools).map(([name, baseTool]) => {
       if (typeof baseTool.execute === 'function') {
         return [name, baseTool]
       }
@@ -166,10 +167,10 @@ function createMockedRenderingTools() {
         },
       ]
     })
-  ) as typeof renderingTools
+  ) as typeof studioTools
 }
 
-function createMockListTablesTool() {
+function createMockListTablesTool(overrideData?: Record<string, typeof MOCK_TABLES_DATA>) {
   return tool({
     description: 'Lists tables and columns for the provided schemas.',
     inputSchema: listTablesInputSchema,
@@ -177,7 +178,7 @@ function createMockListTablesTool() {
       const effectiveSchemas = schemas?.length ? schemas : ['public']
       return effectiveSchemas.map((schema) => ({
         schema,
-        tables: MOCK_TABLES_DATA,
+        tables: overrideData?.[schema] ?? MOCK_TABLES_DATA,
       }))
     },
   })
@@ -293,6 +294,10 @@ function createMockListPoliciesTool() {
   })
 }
 
+export type MockToolOverrides = {
+  list_tables?: Record<string, typeof MOCK_TABLES_DATA>
+}
+
 /**
  * Deterministic mock implementations of MCP/platform tools for evals.
  * These mirror tool names used in prompts so the model can call them,
@@ -300,8 +305,8 @@ function createMockListPoliciesTool() {
  *
  * Note: search_docs uses the real implementation
  */
-export async function getMockTools() {
-  const mockedRenderingTools = createMockedRenderingTools()
+export async function getMockTools(overrides?: MockToolOverrides) {
+  const mockedStudioTools = createMockedStudioTools()
 
   const { search_docs } = await getMcpTools({
     accessToken: 'mock-access-token',
@@ -312,9 +317,9 @@ export async function getMockTools() {
   assert(search_docs, 'search_docs tool not available from MCP server')
 
   return {
-    ...mockedRenderingTools,
+    ...mockedStudioTools,
     search_docs,
-    list_tables: createMockListTablesTool(),
+    list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),
     list_edge_functions: createMockListEdgeFunctionsTool(),
     get_advisors: createMockGetAdvisorsTool(),

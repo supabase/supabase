@@ -1,15 +1,16 @@
-import { Output, generateText, stepCountIs } from 'ai'
+import { generateText, Output, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { RLS_PROMPT } from 'lib/ai/prompts'
-import { getTools } from 'lib/ai/tools'
-import apiWrapper from 'lib/api/apiWrapper'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import { RLS_PROMPT } from '@/lib/ai/prompts'
+import { getTools } from '@/lib/ai/tools'
+import apiWrapper from '@/lib/api/apiWrapper'
 
 const policySchema = z.object({
   sql: z.string().describe('The generated Postgres CREATE POLICY statement.'),
@@ -79,7 +80,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
         orgSlug,
         authorization,
-        projectRef,
       })
 
       aiOptInLevel = orgAIOptInLevel
@@ -91,9 +91,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const { model, error: modelError } = await getModel({
+    const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      routingKey: 'sql-policy',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
@@ -109,7 +109,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     })
 
     const { experimental_output } = await generateText({
-      model,
+      ...modelParams,
       stopWhen: stepCountIs(5),
       prompt: source`
         You are a Postgres RLS (Row Level Security) expert.

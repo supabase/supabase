@@ -35,7 +35,7 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
 - [Git](https://git-scm.com/)
-- [Node.js v22.x or higher](https://nodejs.org)
+- [Node.js](https://nodejs.org) version as documented in [.nvmrc](./.nvmrc)
 - [pnpm](https://pnpm.io/) version 9.x.x or higher
 - [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)

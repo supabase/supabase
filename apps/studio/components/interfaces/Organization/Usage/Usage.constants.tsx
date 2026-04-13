@@ -1,9 +1,10 @@
-import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
-import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import type { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { DOCS_URL } from 'lib/constants'
 import { Admonition } from 'ui-patterns'
+
+import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
+import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const COLOR_MAP = {
   white: { bar: 'fill-foreground', marker: 'bg-foreground' },
@@ -334,8 +335,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
-              name: 'Realtime Quotas',
-              url: `${DOCS_URL}/guides/realtime/quotas`,
+              name: 'Realtime Limits',
+              url: `${DOCS_URL}/guides/realtime/limits`,
             },
           ],
         },
@@ -353,8 +354,8 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
-              name: 'Realtime Quotas',
-              url: `${DOCS_URL}/guides/realtime/quotas`,
+              name: 'Realtime Limits',
+              url: `${DOCS_URL}/guides/realtime/limits`,
             },
           ],
         },

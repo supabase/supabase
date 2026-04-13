@@ -1,12 +1,7 @@
 import { format } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-
-import { useDebounce } from '@uidotdev/usehooks'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import type { Filter } from 'components/grid/types'
-import { useSqlFilterGenerateMutation } from 'data/ai/sql-filter-mutation'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Button, Calendar } from 'ui'
+import { Loader2 } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
   FilterBar,
@@ -17,10 +12,16 @@ import {
   SerializableFilterProperty,
   updateGroupAtPath,
 } from 'ui-patterns'
+
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
+import { useTableFilterNew } from '@/components/grid/hooks/useTableFilterNew'
+import type { Filter } from '@/components/grid/types'
+import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
   portal?: boolean
+  isRefetching?: boolean
 }
 
 // Convert Filter[] to FilterGroup
@@ -58,7 +59,10 @@ function filterGroupToFilters(group: FilterGroup): Filter[] {
 
 // Custom date picker component for the FilterBar
 function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
-  const [date, setDate] = useState<Date | undefined>(search ? new Date(search) : undefined)
+  const parsed = search ? new Date(search) : undefined
+  const [date, setDate] = useState<Date | undefined>(
+    parsed && !isNaN(parsed.getTime()) ? parsed : undefined
+  )
 
   return (
     <div className="w-[300px] space-y-4">
@@ -115,23 +119,15 @@ function serializeFilterProperties(
   }))
 }
 
-export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
-  const { filters: urlFilters, onApplyFilters } = useTableFilter()
+export const FilterPopoverNew = ({ isRefetching = false }: FilterPopoverProps) => {
+  const { filters, setFilters } = useTableFilterNew()
   const snap = useTableEditorTableStateSnapshot()
-
-  // Local state for immediate UI updates
-  const [localFilters, setLocalFilters] = useState<Filter[]>(urlFilters)
-  const debouncedLocalFilters = useDebounce(localFilters, 500)
-
-  useEffect(() => {
-    onApplyFilters(debouncedLocalFilters)
-  }, [debouncedLocalFilters, onApplyFilters])
 
   const [freeformText, setFreeformText] = useState('')
   const { mutateAsync: generateFilters, isPending: isGenerating } = useSqlFilterGenerateMutation()
 
   // Convert filters to FilterGroup for the FilterBar
-  const filterGroup = useMemo(() => filtersToFilterGroup(localFilters), [localFilters])
+  const filterGroup = useMemo(() => filtersToFilterGroup(filters), [filters])
 
   const columns = useMemo(() => snap.table?.columns ?? [], [snap.table?.columns])
 
@@ -162,11 +158,13 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
   )
 
   // Handle filter changes from FilterBar
-  const handleFilterChange = useCallback((newFilterGroup: FilterGroup) => {
-    const newFilters = filterGroupToFilters(newFilterGroup)
-    // Update local state immediately for responsive UI
-    setLocalFilters(newFilters)
-  }, [])
+  const handleFilterChange = useCallback(
+    (newFilterGroup: FilterGroup) => {
+      const newFilters = filterGroupToFilters(newFilterGroup)
+      setFilters(newFilters)
+    },
+    [setFilters]
+  )
 
   const actions = useMemo(
     () => [
@@ -195,17 +193,26 @@ export const FilterPopoverNew = ({ portal = true }: FilterPopoverProps) => {
     [generateFilters, serializableFilterProperties, handleFilterChange, setFreeformText]
   )
 
+  const icon = isGenerating ? (
+    <AiIconAnimation size={16} loading />
+  ) : isRefetching ? (
+    <Loader2 className="animate-spin text-brand h-4 w-4 shrink-0" aria-label="Loading table data" />
+  ) : null
+
   return (
-    <FilterBar
-      filterProperties={filterProperties}
-      filters={filterGroup}
-      onFilterChange={handleFilterChange}
-      freeformText={freeformText}
-      onFreeformTextChange={setFreeformText}
-      actions={actions}
-      isLoading={isGenerating}
-      variant="pill"
-      className="bg-transparent border-0"
-    />
+    <div className="flex-1 min-w-0">
+      <FilterBar
+        filterProperties={filterProperties}
+        filters={filterGroup}
+        onFilterChange={handleFilterChange}
+        freeformText={freeformText}
+        onFreeformTextChange={setFreeformText}
+        actions={actions}
+        isLoading={isGenerating}
+        variant="pill"
+        className="bg-transparent border-0 overflow-visible px-1.5"
+        icon={icon}
+      />
+    </div>
   )
 }

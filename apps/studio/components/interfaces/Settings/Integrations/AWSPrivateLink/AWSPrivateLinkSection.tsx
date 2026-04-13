@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button, Card, CardContent, cn } from 'ui'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { IntegrationImageHandler } from '../IntegrationsSettings'
+import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
+import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { ResourceList } from 'components/ui/Resource/ResourceList'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useAWSAccountDeleteMutation } from 'data/aws-accounts/aws-account-delete-mutation'
-import { useAWSAccountsQuery } from 'data/aws-accounts/aws-accounts-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { Button, Card, CardContent, cn } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
-import { IntegrationImageHandler } from '../IntegrationsSettings'
-import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
-import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
+} from '@/components/layouts/Scaffold'
+import { ResourceList } from '@/components/ui/Resource/ResourceList'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useAWSAccountDeleteMutation } from '@/data/aws-accounts/aws-account-delete-mutation'
+import { useAWSAccountsQuery } from '@/data/aws-accounts/aws-accounts-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const AWSPrivateLinkSection = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -81,7 +81,8 @@ export const AWSPrivateLinkSection = () => {
                 {promptPlanUpgrade && (
                   <div className="mb-6">
                     <UpgradeToPro
-                      primaryText="Upgrade to Team or Enterprise to use AWS PrivateLink"
+                      layout="vertical"
+                      primaryText="Only available on Team or Enterprise Plan and above"
                       secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
                       buttonText="Upgrade to Team"
                       source="aws-privatelink-integration"
@@ -92,7 +93,9 @@ export const AWSPrivateLinkSection = () => {
               <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-foreground text-sm">AWS Accounts</h3>
-                  <Button onClick={onAddAccount}>Add Account</Button>
+                  <Button type={promptPlanUpgrade ? 'default' : 'primary'} onClick={onAddAccount}>
+                    Add Account
+                  </Button>
                 </div>
                 {(accounts?.length ?? 0) > 0 ? (
                   <ResourceList>

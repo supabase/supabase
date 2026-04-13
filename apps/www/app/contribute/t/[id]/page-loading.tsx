@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-exports
 export default function PageLoading() {
   return (
-    <div className="border border-border rounded-lg p-8 bg-surface-200">
+    <div className="rounded-lg p-8 bg-surface-200">
       <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-4">

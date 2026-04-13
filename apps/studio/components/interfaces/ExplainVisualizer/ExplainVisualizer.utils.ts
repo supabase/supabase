@@ -3,10 +3,10 @@ import {
   Database,
   GitMerge,
   Hash,
+  Layers,
   ListFilter,
   SortAsc,
   Zap,
-  Layers,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -131,6 +131,12 @@ export function isExplainQuery(rows: readonly unknown[]): boolean {
   const firstRow = rows[0]
   if (typeof firstRow !== 'object' || firstRow === null) return false
   return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
+}
+
+export function isTextFormatExplain(rows: readonly unknown[]): boolean {
+  if (!isExplainQuery(rows)) return false
+  const firstRow = rows[0] as Record<string, unknown>
+  return typeof firstRow['QUERY PLAN'] === 'string'
 }
 
 export function isExplainSql(sql: string): boolean {

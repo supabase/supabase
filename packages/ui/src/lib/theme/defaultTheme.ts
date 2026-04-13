@@ -35,10 +35,11 @@ const defaults = {
   `,
   size: {
     // buttons, inputs, input labels use these sizes
+    // text-base on mobile (below md) to avoid zoom on focus
     text: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },
@@ -511,50 +512,6 @@ export default {
   },
 
   /*
-   * Input Number
-   */
-
-  inputNumber: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-sm
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-
-      appearance-none
-      bg-none
-    `,
-    variants: {
-      standard: `
-        bg-control
-        border border-strong
-      `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    disabled: 'opacity-50',
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-  },
-
-  /*
    *  Checkbox
    *
    *
@@ -867,8 +824,9 @@ export default {
       shadow-xl
     `,
     header: `
+      flex items-center
       space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6
-      border-b
+      border-b h-[var(--header-height)]
     `,
     contents: `
       relative
@@ -1062,8 +1020,8 @@ export default {
     },
     size: {
       tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },

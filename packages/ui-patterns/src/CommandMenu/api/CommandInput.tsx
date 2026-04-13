@@ -1,10 +1,9 @@
 'use client'
 
+import { useBreakpoint, useDebounce } from 'common'
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
-
-import { useBreakpoint, useDebounce } from 'common'
-import { CommandInput_Shadcn_, cn } from 'ui'
+import { cn, CommandInput_Shadcn_ } from 'ui'
 
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
@@ -125,7 +124,7 @@ const CommandInput = forwardRef<
         onCompositionStart={() => setImeComposing(true)}
         onCompositionEnd={() => setImeComposing(false)}
         className={cn(
-          'flex h-11 w-full rounded-md bg-transparent px-2 py-7 outline-none',
+          'flex h-11 w-full rounded-md bg-transparent px-2 y-4 md:py-7 outline-none',
           'focus:shadow-none focus:ring-transparent',
           'text-base text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
           className

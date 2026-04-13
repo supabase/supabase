@@ -1,7 +1,7 @@
+import { AlertTriangle } from 'lucide-react'
 import { Column } from 'react-data-grid'
 import { cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 
-import { AlertTriangle } from 'lucide-react'
 import type { LogData, PreviewLogData } from './Messages.types'
 import { RowLayout } from './MessagesFormatters'
 import { isErrorLog } from './MessagesTable'

@@ -1,35 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
   Alert_Shadcn_,
+  AlertDescription_Shadcn_,
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
-  Separator,
   Switch,
   Table,
   TableBody,
@@ -52,10 +38,22 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
 import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
+import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()

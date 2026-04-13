@@ -1,6 +1,7 @@
-import useLatest from 'hooks/misc/useLatest'
 import { useRouter } from 'next/router'
-import { type Dispatch, type SetStateAction, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, type Dispatch, type SetStateAction } from 'react'
+
+import useLatest from '@/hooks/misc/useLatest'
 
 export type UrlStateParams = {
   [k: string]: string | string[] | undefined

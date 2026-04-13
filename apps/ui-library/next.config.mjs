@@ -16,6 +16,12 @@ const nextConfig = {
             },
           ]
         : []),
+      // Add a redirect to make the custom block for tanstack-db
+      {
+        source: '/r/tanstack-db-nextjs.json',
+        destination: '/api/registry/tanstack-db',
+        permanent: true,
+      },
     ]
   },
   eslint: {
