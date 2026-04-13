@@ -53,4 +53,57 @@ test.describe('Connect', async () => {
     // Verify the URL has the showConnect query param
     await expect(page).toHaveURL(/showConnect=true/)
   })
+
+  test('MCP mode shows Cline as a selectable client', async ({ page, ref }) => {
+    // Navigate to project page with ConnectSheet open
+    await page.goto(toUrl(`/project/${ref}?showConnect=true`))
+
+    // Wait for the ConnectSheet to be visible
+    await expect(
+      page.getByRole('heading', { name: 'Connect to your project' }),
+      'ConnectSheet heading should be visible after navigation'
+    ).toBeVisible({ timeout: 30000 })
+
+    // Switch to MCP mode
+    await page.getByRole('button', { name: /MCP/i }).click()
+
+    // The Client dropdown should be visible
+    await expect(
+      page.getByText('Client'),
+      'Client label should be visible after switching to MCP mode'
+    ).toBeVisible({ timeout: 10000 })
+
+    // Open the client dropdown and search for Cline
+    // The dropdown trigger button should show the default client (Claude Code)
+    // Click to open it
+    const clientDropdownTrigger = page
+      .locator('button')
+      .filter({ hasText: /Claude Code|Cursor|Cline/ })
+      .first()
+    await clientDropdownTrigger.click()
+
+    // Search for Cline in the dropdown search
+    await page.getByPlaceholder('Search...').fill('Cline')
+
+    // Cline should appear in the dropdown options
+    await expect(
+      page.getByRole('option', { name: /Cline/ }),
+      'Cline should appear as an option in the client dropdown'
+    ).toBeVisible({ timeout: 10000 })
+
+    // Select Cline
+    await page.getByRole('option', { name: /Cline/ }).click()
+
+    // Verify the dropdown now shows Cline as selected
+    await expect(
+      clientDropdownTrigger,
+      'Client dropdown trigger should show Cline after selection'
+    ).toContainText('Cline')
+
+    // Verify the configuration display shows the .cline/mcp_settings.json config file reference
+    await expect(
+      page.getByText('.cline/mcp_settings.json'),
+      'Cline MCP config file path should be shown after selecting Cline'
+    ).toBeVisible({ timeout: 10000 })
+  })
 })
