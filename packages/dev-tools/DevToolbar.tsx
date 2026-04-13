@@ -157,10 +157,10 @@ function FlagRow({
     <div className={cn('px-4 py-3 flex flex-col gap-0.5', isOverridden && 'bg-warning/5')}>
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-col items-start gap-1">
-          <div className="flex gap-2 min-w-0">
+          <div className="flex gap-2 min-w-0 h-4">
             <span
               className={cn(
-                'font-mono text-xs truncate h-4',
+                'font-mono text-xs truncate',
                 isOverridden ? 'text-warning' : 'text-foreground'
               )}
             >

@@ -39,8 +39,6 @@ ignoredBuiltDependencies:
   - protobufjs
   - sharp
 
-minimumReleaseAge: 1
-
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
