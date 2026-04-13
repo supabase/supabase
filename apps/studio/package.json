@@ -142,7 +142,6 @@
     "use-stick-to-bottom": "^1.1.1",
     "uuid": "^9.0.1",
     "valtio": "catalog:",
-    "yup": "^1.4.0",
     "zod": "catalog:",
     "zxcvbn": "^4.4.2"
   },
