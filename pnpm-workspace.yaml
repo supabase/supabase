@@ -54,6 +54,7 @@ minimumReleaseAgeExclude:
   - lodash-es
   - next
   - '@next/*'
+  - turbo
 
 onlyBuiltDependencies:
   - node-pty
