@@ -143,7 +143,7 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
-  const { getFieldState, setValue } = form
+  const { getFieldState, resetField, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -397,9 +397,11 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (regionError) {
-      setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
+      resetField('dbRegion', {
+        defaultValue: PROVIDERS[defaultProvider].default_region.displayName,
+      })
     }
-  }, [regionError, setValue, defaultProvider])
+  }, [regionError, resetField, defaultProvider])
 
   useEffect(() => {
     if (!getFieldState('dbRegion').isDirty && recommendedSmartRegion) {
