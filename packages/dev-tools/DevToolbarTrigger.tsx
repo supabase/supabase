@@ -7,6 +7,8 @@ import { Button, cn } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
 
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: index.ts, DevToolbarContext.tsx, DevToolbar.tsx, feature-flags.tsx
 const env = process.env.NEXT_PUBLIC_ENVIRONMENT
 const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
 const POSITION_STORAGE_KEY = 'dev-telemetry-toolbar-position'

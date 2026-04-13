@@ -204,6 +204,18 @@ describe('DevToolbar', () => {
         ).toBeInTheDocument()
       })
     })
+
+    it('does not connect to SSE in staging', async () => {
+      const EventSourceSpy = vi.fn()
+      vi.stubGlobal('EventSource', EventSourceSpy)
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      expect(EventSourceSpy).not.toHaveBeenCalled()
+
+      vi.unstubAllGlobals()
+    })
   })
 
   describe('window.devTelemetry function', () => {

@@ -9,6 +9,8 @@ import type { DevTelemetryToolbarContextType } from './types'
 // The bundler replaces NEXT_PUBLIC_ENVIRONMENT at build time, making the
 // ternary static. In production builds (env === 'prod'), the implementation
 // modules are eliminated from the bundle.
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: DevToolbarContext.tsx, DevToolbar.tsx, DevToolbarTrigger.tsx, feature-flags.tsx
 const env = process.env.NEXT_PUBLIC_ENVIRONMENT
 const isToolbarEnabled = env === 'local' || env === 'staging'
 

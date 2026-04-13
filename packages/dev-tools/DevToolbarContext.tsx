@@ -18,6 +18,8 @@ import type {
 } from './types'
 import { getCookie } from './utils'
 
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: index.ts, DevToolbar.tsx, DevToolbarTrigger.tsx, feature-flags.tsx
 const env = process.env.NEXT_PUBLIC_ENVIRONMENT
 const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
 const IS_LOCAL_DEV = env === 'local'
