@@ -31,6 +31,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -130,6 +131,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
   const track = useTrack()
   const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const connectionSource = state.connectionSource
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
@@ -257,7 +259,11 @@ function DirectConnectionContent({ state }: StepContentProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-x-2">{poolerBadge && <Badge>{poolerBadge}</Badge>}</div>
+      {poolerBadge && !isHighAvailability && (
+        <div className="flex items-center gap-x-2">
+          <Badge>{poolerBadge}</Badge>
+        </div>
+      )}
       <CodeBlock
         className="[&_code]:text-foreground"
         wrapperClassName="lg:col-span-2"
@@ -268,7 +274,7 @@ function DirectConnectionContent({ state }: StepContentProps) {
       >
         {connectionString}
       </CodeBlock>
-      {projectRef && (
+      {projectRef && !isHighAvailability && (
         <div className="mt-2">
           <IPv4StatusPanel
             method={connectionMethod}

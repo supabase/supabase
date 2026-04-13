@@ -13,10 +13,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Switch,
 } from 'ui'
@@ -396,15 +396,15 @@ export const SmtpForm = () => {
                             >
                               <FormControl_Shadcn_>
                                 <InputGroup>
-                                  <InputGroupAddon align="inline-end">
-                                    <InputGroupText>seconds</InputGroupText>
-                                  </InputGroupAddon>
-                                  <InputGroupInput
+                                  <FormInputGroupInput
                                     type="number"
                                     value={field.value}
                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                     disabled={!canUpdateConfig}
                                   />
+                                  <InputGroupAddon align="inline-end">
+                                    <InputGroupText>seconds</InputGroupText>
+                                  </InputGroupAddon>
                                 </InputGroup>
                               </FormControl_Shadcn_>
                             </FormItemLayout>
