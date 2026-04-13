@@ -31,7 +31,7 @@ catalogs:
       specifier: ^18.3.0
       version: 18.3.0
     next:
-      specifier: ~16.2.3
+      specifier: 16.2.3
       version: 16.2.3
     react:
       specifier: ^18.3.0
@@ -905,7 +905,7 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@next/bundle-analyzer':
-        specifier: ~16.2.3
+        specifier: 16.2.3
         version: 16.2.3
       '@number-flow/react':
         specifier: ^0.3.2
