@@ -26,13 +26,10 @@ type ServiceData = {
   isLoading: boolean
 }
 
-type IntervalKey = '1hr' | '1day' | '7day'
-
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (serviceKey: string, logsUrl: string) => (datum: LogsBarChartDatum) => void
-  interval: IntervalKey
+  onBarClick: (serviceKey: string, logsUrl: string) => (datum: { timestamp: string }) => void
   datetimeFormat: string
 }
 
@@ -48,7 +45,7 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
 type ServiceRowProps = {
   service: ServiceConfig
   data: ServiceData
-  onBarClick: (datum: LogsBarChartDatum) => void
+  onBarClick: (datum: { timestamp: string }) => void
   datetimeFormat: string
 }
 
@@ -130,6 +127,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
               DateTimeFormat={datetimeFormat}
               onLineClick={onBarClick}
               YAxisProps={{ tickFormatter: (v: number) => `${v.toFixed(1)}%` }}
+              className="h-full"
             />
           )}
         </Loading>
