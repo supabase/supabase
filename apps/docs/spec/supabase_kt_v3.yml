@@ -30,8 +30,13 @@ functions:
 
       [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification.
 
+      OAuth sign-ins can be triggered via `supabase.auth.signInWith(Provider)` and the callback has to be handled differently on each Kotlin target.
+      OTP link verification stands for opening your app, and directly signing-in via the clicked link. This is only supported on Mobile devices & Web targets.
+
+      The following will explain how each target handles OAuth and OTP link verification, if supported.
+
       **On Desktop platforms (JVM, MacOS\*, Linux, Windows)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
-      \* If no deeplinks are being used.
+      \* If no deeplinks are being used. This works as-is, by default.
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
@@ -396,7 +401,7 @@ functions:
               .select {
                   count(Count.EXACT)
               }
-              .count()!!
+              .countOrNull() ?: 0
           ```
       - id: querying-json-data
         name: Querying JSON data
@@ -640,7 +645,7 @@ functions:
           val count = supabase.from("users").upsert(toUpsert) {
               count(Count.EXACT)
               onConflict = "username"
-          }.count()
+          }.countOrNull() ?: 0
           ```
 
   - id: delete
@@ -3203,6 +3208,9 @@ functions:
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+      - The `signInWith(Provider)` method can be called anywhere, you can treat it like any other suspending function. 
+      - This method will not wait for the OAuth response and will return after the corresponding platform implementation was called, which is by default opening the system browser.
+      - The callback will happen differently on the targets. On Mobile devices it will be handled via `handleDeeplinks()`, if set up. On Desktop and JS devices it will be automatically handled.
     params:
       - name: provider
         isOptional: false
@@ -3649,6 +3657,15 @@ functions:
           //Example:
           supabase.auth.linkIdentity(Google)
           ```
+      - id: link-identity-idtoken
+        name: Link an identity to a user via an id token
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.linkIdentityWithIdToken(Google, idToken = "receivedToken")
+          ```
+          
+
   - id: unlink-identity
     title: 'unlinkIdentity()'
     $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
@@ -5007,14 +5024,6 @@ functions:
     title: 'Overview'
     notes: |
       This section contains methods for working with File Buckets.
-  # - id: analytics-buckets
-  #   title: 'Overview'
-  #   notes: |
-  #     This section contains methods for working with Analytics Buckets.
-  # - id: vector-buckets
-  #   title: 'Overview'
-  #   notes: |
-  #     This section contains methods for working with Vector Buckets.
   - id: list-buckets
     title: listBuckets()
     $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
@@ -5166,6 +5175,594 @@ functions:
         code: |
           ```kotlin
           supabase.storage.deleteBucket(bucketId = "icons")
+          ```
+
+  - id: analytics-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+      - Analytics buckets are accessed via the `supabase.storage.analytics` namespace.
+      - Analytics buckets are used for storing and querying analytics data.
+
+  - id: storageanalytics-createbucket
+    title: 'analytics.createBucket()'
+    description: |
+      Creates a new Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Analytics buckets are used for storing and querying analytics data.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the analytics bucket to create.
+    examples:
+      - id: create-analytics-bucket
+        name: Create analytics bucket
+        code: |
+          ```kotlin
+          val bucket = supabase.storage.analytics.createBucket("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "name": "analytics-bucket",
+            "type": "ANALYTICS",
+            "created_at": "2024-12-03T18:00:00.000Z",
+            "updated_at": "2024-12-03T18:00:00.000Z"
+          }
+          ```
+
+  - id: storageanalytics-listbuckets
+    title: 'analytics.listBuckets()'
+    description: |
+      Lists all Analytics buckets with optional filtering and sorting.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: filter
+        isOptional: true
+        type: StorageListFilter.Buckets.() -> Unit
+        description: Filter block for the operation.
+        subContent:
+          - name: limit
+            isOptional: true
+            type: Int
+            description: Maximum number of buckets to return.
+          - name: offset
+            isOptional: true
+            type: Int
+            description: Number of buckets to skip.
+          - name: sortColumn
+            isOptional: true
+            type: BucketSortColumn
+            description: 'Column to sort by. Options: `BucketSortColumn.ID`, `BucketSortColumn.NAME`, `BucketSortColumn.CREATED_AT`, `BucketSortColumn.UPDATED_AT`.'
+          - name: sortOrder
+            isOptional: true
+            type: SortOrder
+            description: 'Sort order. Options: `SortOrder.ASC`, `SortOrder.DESC`.'
+          - name: search
+            isOptional: true
+            type: String
+            description: Search term to filter buckets by name.
+    examples:
+      - id: list-analytics-buckets
+        name: List analytics buckets
+        code: |
+          ```kotlin
+          val buckets = supabase.storage.analytics.listBuckets {
+              limit = 50
+              offset = 2
+              search = "myString"
+              sortBy(BucketSortColumn.ID, SortOrder.ASC)
+          }
+          ```
+        response: |
+          ```json
+          [
+            {
+              "name": "analytics-bucket",
+              "type": "ANALYTICS",
+              "created_at": "2024-12-03T18:00:00.000Z",
+              "updated_at": "2024-12-03T18:00:00.000Z"
+            }
+          ]
+          ```
+
+  - id: storageanalytics-deletebucket
+    title: 'analytics.deleteBucket()'
+    description: |
+      Deletes an Analytics bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the analytics bucket to delete.
+    examples:
+      - id: delete-analytics-bucket
+        name: Delete analytics bucket
+        code: |
+          ```kotlin
+          val responseMessage = supabase.storage.analytics.deleteBucket("analytics-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "message": "Successfully deleted"
+          }
+          ```
+
+  - id: vector-buckets
+    title: 'Overview'
+    notes: |
+      This section contains methods for working with Vector Buckets.
+
+  - id: storagevectors-create-bucket
+    title: 'vectors.createBucket()'
+    description: |
+      Creates a new Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Vector buckets are used for storing and querying vector embeddings.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the vector bucket to create.
+    examples:
+      - id: create-vector-bucket
+        name: Create vector bucket
+        code: |
+          ```kotlin
+          supabase.storage.vectors.createBucket("vectors-bucket")
+          ```
+
+  - id: storagevectors-get-bucket
+    title: 'vectors.getBucket()'
+    description: |
+      Retrieves details of a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the vector bucket to retrieve.
+    examples:
+      - id: get-vector-bucket
+        name: Get vector bucket
+        code: |
+          ```kotlin
+          val bucket = supabase.storage.vectors.getBucket("vectors-bucket")
+          ```
+        response: |
+          ```json
+          {
+            "vectorBucket": {
+              "vectorBucketName": "vectors-bucket",
+              "creationTime": "2024-12-03T18:00:00.000Z"
+            }
+          }
+          ```
+
+  - id: storagevectors-list-buckets
+    title: 'vectors.listBuckets()'
+    description: |
+      Lists all Vector buckets with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: filter
+        isOptional: true
+        type: VectorBucketFilter.() -> Unit
+        description: Optional filter block for the operation.
+        subContent:
+          - name: prefix
+            isOptional: true
+            type: String
+            description: Filter buckets by name prefix.
+          - name: maxResults
+            isOptional: true
+            type: Int
+            description: Maximum number of buckets to return.
+          - name: nextToken
+            isOptional: true
+            type: String
+            description: Token for pagination.
+    examples:
+      - id: list-vector-buckets
+        name: List vector buckets
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors.listBuckets {
+              prefix = "myPrefix"
+              maxResults = 20
+              nextToken = "nextToken"
+          }
+          println(response.vectorBuckets)
+          ```
+        response: |
+          ```json
+          {
+            "vectorBuckets": [
+              {
+                "vectorBucketName": "vectors-bucket"
+              }
+            ],
+            "nextToken": null
+          }
+          ```
+
+  - id: storagevectors-delete-bucket
+    title: 'vectors.deleteBucket()'
+    description: |
+      Deletes a Vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: name
+        isOptional: false
+        type: String
+        description: The name of the vector bucket to delete.
+    examples:
+      - id: delete-vector-bucket
+        name: Delete vector bucket
+        code: |
+          ```kotlin
+          supabase.storage.vectors.deleteBucket("vectors-bucket")
+          ```
+
+  - id: vectorbucket-createindex
+    title: 'vectors.from().createIndex()'
+    description: |
+      Creates a new vector index in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: CreateIndexOptions.() -> Unit
+        description: Configuration block for the operation.
+        subContent:
+          - name: indexName
+            isOptional: false
+            type: String
+            description: The name of the index to create.
+          - name: dimension
+            isOptional: false
+            type: Int
+            description: The dimension of the vectors in this index.
+          - name: distanceMetric
+            isOptional: false
+            type: DistanceMetric
+            description: 'The distance metric to use. Options: `DistanceMetric.COSINE`, `DistanceMetric.EUCLIDEAN`.'
+          - name: dataType
+            isOptional: false
+            type: VectorDataType
+            description: The data type of the vectors.
+          - name: metadataConfiguration
+            isOptional: true
+            type: MetadataConfiguration
+            description: Optional metadata configuration for the index.
+    examples:
+      - id: create-vector-index
+        name: Create vector index
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+            .from("vectors-bucket")
+            .createIndex {
+              indexName = "my-index"
+              dimension = 128
+              distanceMetric = DistanceMetric.COSINE
+              dataType = VectorDataType.FLOAT32
+            }
+          ```
+
+  - id: vectorbucket-getindex
+    title: 'vectors.from().getIndex()'
+    description: |
+      Retrieves details of a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: indexName
+        isOptional: false
+        type: String
+        description: The name of the index to retrieve.
+    examples:
+      - id: get-vector-index
+        name: Get vector index
+        code: |
+          ```kotlin
+          val index = supabase.storage.vectors
+              .from("vectors-bucket")
+              .getIndex("index-name")
+          ```
+
+  - id: vectorbucket-listindexes
+    title: 'vectors.from().listIndexes()'
+    description: |
+      Lists all indexes in a vector bucket.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: ListIndexesOptions.() -> Unit
+        description: Configuration block for the operation.
+        subContent:
+          - name: nextToken
+            isOptional: true
+            type: String
+            description: Token for pagination.
+          - name: maxResults
+            isOptional: true
+            type: Int
+            description: Maximum number of indexes to return.
+          - name: prefix
+            isOptional: true
+            type: String
+            description: Filter indexes by name prefix.
+    examples:
+      - id: list-vector-indexes
+        name: List vector indexes
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors
+            .from("vectors-bucket")
+            .listIndexes { 
+                maxResults = 20
+                prefix = "myPrefix"
+                nextToken = "nextToken"
+            }
+          println(response.indexes)
+          ```
+
+  - id: vectorbucket-deleteindex
+    title: 'vectors.from().deleteIndex()'
+    description: |
+      Deletes a vector index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: indexName
+        isOptional: false
+        type: String
+        description: The name of the index to delete.
+    examples:
+      - id: delete-vector-index
+        name: Delete vector index
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+            .from("vectors-bucket")
+            .deleteIndex("index-name")
+          ```
+
+  - id: vectorindex-putvectors
+    title: 'vectors.from().index().putVectors()'
+    description: |
+      Inserts or updates vectors in an index.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: vectors
+        isOptional: false
+        type: List<VectorObject>
+        description: List of vector objects to insert or update.
+    examples:
+      - id: put-vectors
+        name: Put vectors
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+            .from("vectors-bucket")
+            .index("index-name")
+            .putVectors(listOf(
+                VectorObject("vector-1", VectorData(floatArrayOf(2.0f, 3.0f, 4.0f)), buildJsonObject { put("meta", true) })
+            ))
+          ```
+
+  - id: vectorindex-getvectors
+    title: 'vectors.from().index().getVectors()'
+    description: |
+      Retrieves vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: GetVectorOptions.() -> Unit
+        description: Configuration block for the operation.
+        subContent:
+          - name: keys
+            isOptional: false
+            type: List<String>
+            description: List of vector keys to retrieve.
+          - name: returnData
+            isOptional: true
+            type: Boolean
+            description: Whether to return vector data. Defaults to `true`.
+          - name: returnMetadata
+            isOptional: true
+            type: Boolean
+            description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: get-vectors
+        name: Get vectors
+        code: |
+          ```kotlin
+          val vectors = supabase.storage.vectors
+              .from("vectors-bucket")
+              .index("index-name")
+              .getVectors {
+                  keys.add("vector-1")
+              }
+          ```
+
+  - id: vectorindex-listvectors
+    title: 'vectors.from().index().listVectors()'
+    description: |
+      Lists vectors in an index with optional pagination.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: true
+        type: ListVectorsOptions.() -> Unit
+        description: Optional configuration block for the operation. If omitted, default pagination and response settings are used.
+        subContent:
+          - name: maxResults
+            isOptional: true
+            type: Int
+            description: Maximum number of vectors to return.
+          - name: nextToken
+            isOptional: true
+            type: String
+            description: Token for pagination.
+          - name: returnData
+            isOptional: true
+            type: Boolean
+            description: Whether to return vector data. Defaults to `true`.
+          - name: returnMetadata
+            isOptional: true
+            type: Boolean
+            description: Whether to return metadata. Defaults to `true`.
+          - name: segmentCount
+            isOptional: true
+            type: Int
+            description: Number of segments for distributed queries.
+          - name: segmentIndex
+            isOptional: true
+            type: Int
+            description: Segment index for distributed queries.
+    examples:
+      - id: list-vectors
+        name: List vectors
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors
+            .from("vectors-bucket")
+            .index("index-name")
+            .listVectors()
+          println(response.vectors)
+          ```
+
+  - id: vectorindex-queryvectors
+    title: 'vectors.from().index().queryVectors()'
+    description: |
+      Queries vectors using a query vector to find similar vectors.
+    notes: |
+      - This is an alpha feature and may change in the future.
+    params:
+      - name: options
+        isOptional: false
+        type: QueryVectorsOptions.() -> Unit
+        description: Configuration block for the query.
+        subContent:
+          - name: queryVector
+            isOptional: false
+            type: VectorData
+            description: The query vector to search with.
+          - name: topK
+            isOptional: true
+            type: Int
+            description: Number of results to return.
+          - name: filter
+            isOptional: true
+            type: VectorFilter
+            description: Optional filter to apply to the query.
+          - name: returnDistance
+            isOptional: true
+            type: Boolean
+            description: Whether to return distance scores. Defaults to `true`.
+          - name: returnMetadata
+            isOptional: true
+            type: Boolean
+            description: Whether to return metadata. Defaults to `true`.
+    examples:
+      - id: query-vectors
+        name: Query vectors
+        code: |
+          ```kotlin
+          val response = supabase.storage.vectors
+              .from("vectors-bucket")
+              .index("index-name")
+              .queryVectors {
+                  queryVector = VectorData(floatArrayOf(3.0f, 4.0f, 1.0f))
+                  topK = 10
+              }
+          println(response.vectors)
+          ```
+
+  - id: vectorindex-deletevectors
+    title: 'vectors.from().index().deleteVectors()'
+    description: |
+      Deletes vectors by their keys.
+    notes: |
+      - This is an alpha feature and may change in the future.
+      - Keys batch size must be between 1 and 500.
+    params:
+      - name: bucketName
+        isOptional: false
+        type: String
+        description: The name of the vector bucket.
+      - name: indexName
+        isOptional: false
+        type: String
+        description: The name of the index.
+      - name: keys
+        isOptional: false
+        type: List<String>
+        description: List of vector keys to delete. Must contain between 1 and 500 keys.
+    examples:
+      - id: delete-vectors
+        name: Delete vectors
+        code: |
+          ```kotlin
+          supabase.storage.vectors
+              .from("vectors-bucket")
+              .index("index-name")
+              .deleteVectors(listOf("vector-1", "vector-2"))
+          ```
+
+  - id: storagefile-exists
+    title: 'storage.from().exists()'
+    description: |
+      Checks the existence of a file.
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the file name. For example `folder/image.png`.
+    examples:
+      - id: check-file-existence
+        name: Check file existence
+        code: |
+          ```kotlin
+          val exists = supabase.storage.from("avatars").exists("folder/avatar1.png")
+          ```
+
+  - id: storagefile-info
+    title: 'storage.from().info()'
+    description: |
+      Retrieves the details of an existing file.
+      Returns detailed file metadata including size, content type, and timestamps.
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the file name. For example `folder/image.png`.
+    examples:
+      - id: get-file-info
+        name: Get file info
+        code: |
+          ```kotlin
+          val file = supabase.storage.from("avatars").info("folder/avatar1.png")
+          println(file.size)
           ```
 
   - id: from-upload

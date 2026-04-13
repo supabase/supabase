@@ -28,8 +28,8 @@ services:
       analytics:
         condition: service_healthy
     environment:
-      # Binds nestjs listener to both IPv4 and IPv6 network interfaces
-      HOSTNAME: "::"
+      #  Listen on all IPv4 interfaces
+      HOSTNAME: "0.0.0.0"
 
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PORT: ${POSTGRES_PORT}
