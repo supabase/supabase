@@ -169,7 +169,8 @@ export const FeatureFlagProvider = ({
       }
       const flagValues = ccResult.status === 'fulfilled' ? ccResult.value : []
 
-      const isLocalDev = process.env.NODE_ENV === 'development'
+      const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+      const isLocalDev = env === 'local' || env === 'staging'
 
       const safeParse = (value: string | undefined): Record<string, boolean | number | string> => {
         if (!value) return {}

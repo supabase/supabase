@@ -1,14 +1,14 @@
 'use client'
 
-import { type ClientTelemetryEvent, ensurePlatformSuffix, posthogClient } from 'common'
+import { ensurePlatformSuffix, posthogClient, type ClientTelemetryEvent } from 'common'
 import {
-  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
+  type ReactNode,
 } from 'react'
 
 import type {

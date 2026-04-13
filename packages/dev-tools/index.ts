@@ -21,18 +21,18 @@ const noopContext: DevTelemetryToolbarContextType = {
   dismissToolbar: () => {},
 }
 
-export const DevToolbarProvider =
-  !isToolbarEnabled
-    ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
-    : DevToolbarContextModule.DevToolbarProvider
+export const DevToolbarProvider = !isToolbarEnabled
+  ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
+  : DevToolbarContextModule.DevToolbarProvider
 
-export const useDevToolbar =
-  !isToolbarEnabled ? () => noopContext : DevToolbarContextModule.useDevToolbar
+export const useDevToolbar = !isToolbarEnabled
+  ? () => noopContext
+  : DevToolbarContextModule.useDevToolbar
 
-export const DevToolbar =
-  !isToolbarEnabled ? () => null : DevToolbarModule.DevToolbar
+export const DevToolbar = !isToolbarEnabled ? () => null : DevToolbarModule.DevToolbar
 
-export const DevToolbarTrigger =
-  !isToolbarEnabled ? () => null : DevToolbarTriggerModule.DevToolbarTrigger
+export const DevToolbarTrigger = !isToolbarEnabled
+  ? () => null
+  : DevToolbarTriggerModule.DevToolbarTrigger
 
 export type { DevTelemetryEvent, DevToolbarConfig } from './types'
