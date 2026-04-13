@@ -604,11 +604,6 @@ const nextConfig = {
     maxInactiveAge: 24 * 60 * 60 * 1000,
     pagesBufferLength: 100,
   },
-  typescript: {
-    // Typechecking is run via GitHub Action only for efficiency
-    // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
-    ignoreBuildErrors: true,
-  },
 }
 
 // Make sure adding Sentry options is the last code to run before exporting, to
