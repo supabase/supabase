@@ -164,9 +164,7 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 
 ### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
 
-If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-been-leaked-or-compromised).
-
-If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. This will prevent downtime for your application.
+If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. This will prevent downtime for your application.
 
 ### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
 
