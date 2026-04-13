@@ -959,8 +959,8 @@ importers:
         specifier: 'catalog:'
         version: 2.103.0
       '@supabase/shared-types':
-        specifier: 0.1.84
-        version: 0.1.84
+        specifier: 0.1.88
+        version: 0.1.88
       '@supabase/sql-to-rest':
         specifier: ^0.1.6
         version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
@@ -8773,8 +8773,8 @@ packages:
     resolution: {integrity: sha512-gcPtXzZ6izyyBVf2of7K3dEt8CScPJn8VcSlQq6oWL9QoE1kqfQl0oFrOMHd5qrcADewxI7OxxosLB8W4XqtIQ==}
     engines: {node: '>=20.0.0'}
 
-  '@supabase/shared-types@0.1.84':
-    resolution: {integrity: sha512-0bcV8Il0r5zybdY6gIWEmbJ/5VGGw60p9SOZ8tUe3x7iKxW/2H+CmPezyqQHuwYURxF4Gf18zJfENlaDyn+g8w==}
+  '@supabase/shared-types@0.1.88':
+    resolution: {integrity: sha512-9LYy+pD6cD2o8ZSxeUeJ1nrHPigeoP1kzhd2+k6MmzrwBHwxwUhWjywQJVjpU6fLNQxdkoNqxPfI7UQgOjG7Lg==}
 
   '@supabase/sql-to-rest@0.1.6':
     resolution: {integrity: sha512-06KgjeINtc6405XQvfnchBE1azEsU8G2NElfadmvVHKmHa5l2bFzjbtFbpaYgpgTzccHlcDmBaCgedVf2Gyl8Q==}
@@ -26414,7 +26414,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/shared-types@0.1.84': {}
+  '@supabase/shared-types@0.1.88': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
     dependencies:
