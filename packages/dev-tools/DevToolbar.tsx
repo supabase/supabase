@@ -378,8 +378,7 @@ export function DevToolbar() {
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
-                <Badge variant="warning">Local Only</Badge>
-                <Tooltip>
+<Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       type="text"
@@ -388,7 +387,7 @@ export function DevToolbar() {
                       className="text-foreground-light hover:text-foreground p-1"
                     />
                   </TooltipTrigger>
-                  <TooltipContent side="top">Hide toolbar</TooltipContent>
+                  <TooltipContent side="top">Hide Dev Toolbar</TooltipContent>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>

@@ -145,8 +145,8 @@ export const FeatureFlagProvider = ({
 
       let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
 
-      // Run both async operations in parallel
-      const [flags, flagValues] = await Promise.all([
+      // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
+      const [phResult, ccResult] = await Promise.allSettled([
         loadPHFlags
           ? (async () => {
               await ensureGroupContext()
@@ -162,6 +162,9 @@ export const FeatureFlagProvider = ({
             : getDefaultConfigCatFlags(userEmail)
           : Promise.resolve([]),
       ])
+
+      const flags = phResult.status === 'fulfilled' ? phResult.value : {}
+      const flagValues = ccResult.status === 'fulfilled' ? ccResult.value : []
 
       const isLocalDev = process.env.NODE_ENV === 'development'
 
