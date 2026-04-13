@@ -56,7 +56,7 @@ Instead of `https://project-id.supabase.co` use `https://project-id.storage.supa
                     bucketName: bucketName,
                     objectName: fileName,
                     contentType: 'image/png',
-                    cacheControl: 3600,
+                    cacheControl: '3600',
                     metadata: JSON.stringify({ // custom metadata passed to the user_metadata column
                        yourCustomMetadata: true,
                     }),

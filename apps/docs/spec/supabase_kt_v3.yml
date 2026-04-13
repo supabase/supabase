@@ -218,6 +218,10 @@ functions:
           `customUrl` - Custom url for the PostgREST API. Can be safely ignored when using Supabase. Default: `null`
 
           `jwtToken` - Plugin specific JWT Token. Can be ignored when using the Auth plugin. Default: `null`
+
+          `urlLengthLimit` - The maximum URL length for requests. When exceeded, the request is automatically sent as POST with query parameters in the body. Default: `null` (unlimited)
+
+          `timeout` - The timeout for PostgREST requests. Default: `30.seconds`
       - id: configure-storage
         name: Configure Storage module
         code: |
@@ -3569,6 +3573,10 @@ functions:
             isOptional: true
             type: JsonObject
             description: The new user data.
+          - name: currentPassword
+            isOptional: true
+            type: String?
+            description: The current password. Required when reauthentication is needed to change the password.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -4621,6 +4629,27 @@ functions:
           ```
         description: |
           The return type of the invoking methods is an `HttpResponse`. You can access the response body via `response.body<T>()`, where `T` can be any serializable type.
+      - id: invoke-with-streaming
+        name: Invoke with streaming (SSE)
+        description: |
+          You can invoke edge functions that return Server-Sent Events (SSE) and consume them as a Kotlin Flow.
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val function = supabase.functions.buildEdgeFunction("streaming-function")
+
+          // Collect SSE events as a Flow
+          function.collectAsFlow(
+              body = buildJsonObject {
+                  put("prompt", "Hello!")
+              }
+          ).collect { event ->
+              println("Event: ${event.event}")
+              println("Data: ${event.data}")
+              // Decode typed data
+              val response = event.decodeAs<MyResponse>()
+          }
+          ```
       - id: reuse-function
         name: Reuse function by saving it to a variable
         isSpotlight: true

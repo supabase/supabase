@@ -7001,6 +7001,10 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       NIMBUS_OAUTH_CLIENT_ID: string | null
+      PASSKEY_ENABLED: boolean
+      WEBAUTHN_RP_DISPLAY_NAME: string
+      WEBAUTHN_RP_ID: string
+      WEBAUTHN_RP_ORIGINS: string
       NIMBUS_OAUTH_CLIENT_SECRET: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
       OAUTH_SERVER_AUTHORIZATION_PATH: string | null
@@ -10330,6 +10334,10 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
       NIMBUS_OAUTH_CLIENT_ID?: string | null
+      PASSKEY_ENABLED?: boolean | null
+      WEBAUTHN_RP_DISPLAY_NAME?: string | null
+      WEBAUTHN_RP_ID?: string | null
+      WEBAUTHN_RP_ORIGINS?: string | null
       NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
       OAUTH_SERVER_AUTHORIZATION_PATH?: string | null
