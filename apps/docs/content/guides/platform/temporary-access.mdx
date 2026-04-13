@@ -9,7 +9,7 @@ Enabling temporary access only applies to connections to Postgres and Supavisor 
 
 <Admonition type="note">
 
-Projects need to be at least on Postgres 17.4.0 to enable temporary access. You can find the Postgres version of your project on the [infrastructure settings](/dashboard/project/_/settings/infrastructure) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/migrating-and-upgrading-projects#upgrade-your-project) to use this feature.
+Projects need to be at least on Postgres 17.4.0 to enable temporary access. You can find the Postgres version of your project on the [infrastructure settings](/dashboard/project/_/settings/infrastructure) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
 
 </Admonition>
 
@@ -82,16 +82,16 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "user_id": "0000-1111-12345678-1111-0000",
-        "user_roles": [
-          {
-            "role": "postgres",
-            "allowed_networks": {
-              "allowed_cidrs": [{ "cidr": '176.1.12.1/32' }],
-            },
-            "expires_at": 1758721065775,
-          },
-        ],
+    "user_id": "00000000-1111-2222-3333-444444444444",
+    "user_roles": [
+      {
+        "role": "postgres",
+        "allowed_networks": {
+          "allowed_cidrs": [{ "cidr": "176.1.12.1/32" }]
+        },
+        "expires_at": 1758721065775
+      }
+    ]
   }'
 ```
 
@@ -102,7 +102,7 @@ To log in to the database using temporary access, existing connection strings ca
 For example, if a user has been authorized to assume the `postgres` role:
 
 ```
-psql 'postgres://postgres:sbp_111222333aaabbbccc@db.ref.supabase.co/postgres'
+psql 'postgres://postgres:sbp_111222333aaabbbccc@db.{project-ref}.supabase.co/postgres'
 ```
 
 Since Supabase API tokens can be used, it is also possible to generate API tokens for services you don't want to share your Postgres role password with (for example a GitHub Action). The API token can be configured with an expiry time and temporary access-specific restrictions can also be applied.
