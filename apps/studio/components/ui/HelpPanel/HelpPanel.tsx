@@ -8,7 +8,7 @@ import { Button } from 'ui'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
-import { SupportForm, SupportFormStatusButton } from '@/components/interfaces/Support/SupportFormPage'
+import { SupportForm, SupportFormStatusButton } from '@/components/interfaces/Support/SupportSidebarForm'
 import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -58,7 +58,7 @@ export const HelpPanel = ({
       </div>
       <div className="flex-1 overflow-hidden">
         {isSupportView ? (
-          <SupportForm layout="sidebar" initialParams={supportLinkQueryParams} />
+          <SupportForm initialParams={supportLinkQueryParams} />
         ) : (
           <div className="flex h-full flex-col overflow-y-auto pb-5">
             <HelpSection

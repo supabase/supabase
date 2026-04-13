@@ -1,10 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useReducer, type Dispatch, type PropsWithChildren } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
+import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
@@ -18,12 +20,16 @@ import {
   type SupportFormActions,
   type SupportFormState,
 } from './SupportForm.state'
-import type { SupportFormUrlKeys } from './SupportForm.utils'
+import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
+import CopyButton from '@/components/ui/CopyButton'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+
+export { SupportForm, SupportFormStatusButton } from './SupportSidebarForm'
 
 function useSupportFormTelemetry() {
   const { mutate: sendEvent } = useSendEventMutation()
@@ -53,17 +59,12 @@ function useSupportFormTelemetry() {
 }
 
 export function SupportFormPage() {
-  return <SupportForm />
+  return <SupportFormPageContent />
 }
 
-interface SupportFormProps {
-  initialParams?: Partial<SupportFormUrlKeys>
-  layout?: 'page' | 'sidebar'
-}
-
-export function SupportForm({ initialParams, layout = 'page' }: SupportFormProps) {
+function SupportFormPageContent() {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
-  const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch, initialParams)
+  const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
 
   const {
     data: allStatusPageEvents,
@@ -91,9 +92,13 @@ export function SupportForm({ initialParams, layout = 'page' }: SupportFormProps
   })
 
   const isSuccess = state.type === 'success'
-  const mainContent = (
-    <>
-      {/* Only show AI Assistant and Discord CTAs if there are no active incidents  and the user is still filling out the support form*/}
+
+  return (
+    <SupportFormWrapper>
+      <SupportFormHeader />
+
+      <IncidentAdmonition isActive={hasActiveIncidents} />
+
       {!isSuccess && !hasActiveIncidents && (
         <div className="flex flex-col gap-y-4">
           <AIAssistantOption projectRef={projectRef} organizationSlug={orgSlug} />
@@ -107,89 +112,134 @@ export function SupportForm({ initialParams, layout = 'page' }: SupportFormProps
         dispatch={dispatch}
         initialError={initialError}
         selectedProjectRef={projectRef}
-        layout={layout}
       />
-    </>
-  )
-
-  return (
-    <SupportFormWrapper layout={layout}>
-      {layout === 'sidebar' ? (
-        <>
-          <IncidentAdmonition
-            isActive={hasActiveIncidents}
-            className="rounded-none border-x-0 shadow-none"
-          />
-          <div className="px-5 pt-5">
-            <div className="flex flex-col gap-y-8">{mainContent}</div>
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col gap-y-8">
-          <IncidentAdmonition isActive={hasActiveIncidents} />
-          {mainContent}
-        </div>
-      )}
+      {!isSuccess && <SupportFormDirectEmailInfo projectRef={projectRef} />}
     </SupportFormWrapper>
   )
 }
 
-function SupportFormWrapper({
-  children,
-  layout,
-}: PropsWithChildren<{ layout: SupportFormProps['layout'] }>) {
+function SupportFormWrapper({ children }: PropsWithChildren) {
   return (
-    <div className="relative h-full overflow-y-auto overflow-x-hidden">
-      <div
-        className={cn(
-          'w-full',
-          layout === 'page' ? 'mx-auto my-16 max-w-2xl px-4 lg:px-6' : 'min-h-full'
-        )}
-      >
-        {children}
+    <div className="relative overflow-y-auto overflow-x-hidden">
+      <div className="mx-auto my-16 max-w-2xl w-full px-4 lg:px-6">
+        <div className="flex flex-col gap-y-8">{children}</div>
       </div>
     </div>
   )
 }
 
-export function SupportFormStatusButton() {
+function SupportFormHeader() {
   const { data: allStatusPageEvents, isPending: isLoading, isError } = useIncidentStatusQuery()
   const { incidents = [], maintenanceEvents = [] } = allStatusPageEvents ?? {}
   const isMaintenance = maintenanceEvents.length > 0
   const isIncident = incidents.length > 0
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          asChild
-          type="default"
-          size="tiny"
-          icon={
-            isLoading ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              <div className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')} />
-            )
-          }
-        >
-          <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-            {isLoading
-              ? 'Checking status'
-              : isError
-                ? 'Failed to check status'
-                : isIncident
-                  ? 'Active incident ongoing'
-                  : isMaintenance
-                    ? 'Scheduled maintenance'
-                    : 'All systems operational'}
+    <div className="flex flex-col items-start justify-between gap-y-2 sm:flex-row sm:items-center">
+      <div className="flex items-center space-x-3">
+        <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
+        <h3 className="m-0 text-lg">Supabase support</h3>
+      </div>
+
+      <div className="flex items-center gap-x-3">
+        <Button asChild type="default" icon={<Wrench />}>
+          <Link
+            href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Troubleshooting
           </Link>
         </Button>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" align="center">
-        Check the Supabase status page
-      </TooltipContent>
-    </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              asChild
+              type="default"
+              icon={
+                isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  <div
+                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                  />
+                )
+              }
+            >
+              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
+                {isLoading
+                  ? 'Checking status'
+                  : isError
+                    ? 'Failed to check status'
+                    : isIncident
+                      ? 'Active incident ongoing'
+                      : isMaintenance
+                        ? 'Scheduled maintenance'
+                        : 'All systems operational'}
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" align="center">
+            Check the Supabase status page
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  )
+}
+
+interface SupportFormDirectEmailInfoProps {
+  projectRef: string | null
+}
+
+function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoProps) {
+  const hasProjectRef = projectRef && projectRef !== NO_PROJECT_MARKER
+
+  return (
+    <Admonition
+      type="default"
+      title="Having trouble submitting the form?"
+      description={
+        <>
+          <p className="!mb-2.5">
+            Please email us directly. Include your project ID and as much information as possible.
+          </p>
+          <p className="flex items-center gap-x-1.5 flex-wrap">
+            Email:{' '}
+            <span className="inline-flex items-center gap-x-1">
+              <a
+                href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
+                className="hover:text-foreground transition-colors duration-100"
+              >
+                <code className="text-code-inline !text-foreground-light underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                  support@supabase.com
+                </code>
+              </a>
+              <CopyButton
+                type="text"
+                text="support@supabase.com"
+                iconOnly
+                onClick={() => toast.success('Copied email address to clipboard')}
+              />
+            </span>
+          </p>
+          {hasProjectRef && (
+            <p className="flex items-center gap-x-1.5 flex-wrap">
+              Project ID:{' '}
+              <span className="inline-flex items-center gap-x-1">
+                <code className="text-code-inline !text-foreground-light">{projectRef}</code>
+                <CopyButton
+                  iconOnly
+                  type="text"
+                  text={projectRef}
+                  onClick={() => toast.success('Copied project ID to clipboard')}
+                />
+              </span>
+            </p>
+          )}
+        </>
+      }
+    />
   )
 }
 
@@ -199,7 +249,6 @@ interface SupportFromBodyProps {
   dispatch: Dispatch<SupportFormActions>
   initialError: string | null
   selectedProjectRef: string | null
-  layout: SupportFormProps['layout']
 }
 
 function SupportFormBody({
@@ -208,35 +257,13 @@ function SupportFormBody({
   dispatch,
   initialError,
   selectedProjectRef,
-  layout,
 }: SupportFromBodyProps) {
   const isSuccess = state.type === 'success'
-
-  if (layout === 'sidebar') {
-    return isSuccess ? (
-      <div className="pt-2">
-        <Success
-          selectedProject={selectedProjectRef ?? undefined}
-          sentCategory={state.sentCategory}
-        />
-      </div>
-    ) : (
-      <SupportFormV2
-        form={form}
-        initialError={initialError}
-        state={state}
-        dispatch={dispatch}
-        layout={layout}
-        selectedProjectRef={selectedProjectRef}
-      />
-    )
-  }
 
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 border bg-panel-body-light',
-        layout === 'page' ? 'rounded shadow-md' : 'rounded shadow-sm',
+        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md',
         `${isSuccess ? 'pt-8' : 'py-8'}`,
         'border-default'
       )}
@@ -247,14 +274,7 @@ function SupportFormBody({
           sentCategory={state.sentCategory}
         />
       ) : (
-        <SupportFormV2
-          form={form}
-          initialError={initialError}
-          state={state}
-          dispatch={dispatch}
-          layout={layout}
-          selectedProjectRef={selectedProjectRef}
-        />
+        <SupportFormV2 form={form} initialError={initialError} state={state} dispatch={dispatch} />
       )}
     </div>
   )

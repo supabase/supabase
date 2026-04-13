@@ -520,7 +520,7 @@ describe('SupportFormPage', () => {
   })
 
   test('loading with initial params prefills the organization and project', async () => {
-    renderSupportForm({ initialParams: { projectRef: 'project-3' }, layout: 'sidebar' })
+    renderSupportForm({ initialParams: { projectRef: 'project-3' } })
 
     await waitFor(() => {
       expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
