@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
 import { DeleteProjectModal } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -65,6 +66,10 @@ export const PauseFailedState = () => {
                   Please contact support for assistance.
                 </p>
               </div>
+            </div>
+
+            <div className="border-t border-overlay px-8 py-4">
+              <LogicalBackupCliInstructions />
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">

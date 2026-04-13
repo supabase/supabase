@@ -81,8 +81,10 @@ export const LogicalBackupCliInstructions = ({
         <p className="text-sm text-foreground-light mt-1">
           Use your direct connection string (replace {DB_PASSWORD_PLACEHOLDER} with your database
           password). If your password contains special characters such as <code>@</code>,{' '}
-          <code>#</code>, or <code>:</code>, percent-encode them first (e.g. <code>@</code> →{' '}
-          <code>%40</code>).{' '}
+          <code>#</code>, <code>:</code>, or <code>'</code>, percent-encode them first (e.g.{' '}
+          <code>@</code> → <code>%40</code>, <code>'</code> → <code>%27</code>). If your password
+          contains <code>%</code>, encode it as <code>%25</code> before encoding any other
+          characters.{' '}
           <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Backup documentation</InlineLink>
           .
         </p>
