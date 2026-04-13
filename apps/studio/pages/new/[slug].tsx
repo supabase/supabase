@@ -143,6 +143,7 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
+  const { getValues, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -384,43 +385,43 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
-    if (slug && slug !== '_') form.setValue('organization', slug)
-    if (projectName) form.setValue('projectName', projectName || '')
-  }, [slug])
+    if (slug && slug !== '_') setValue('organization', slug)
+    if (projectName) setValue('projectName', projectName || '')
+  }, [slug, setValue, projectName])
 
   useEffect(() => {
-    if (form.getValues('dbRegion') === undefined && defaultRegion) {
-      form.setValue('dbRegion', defaultRegion)
+    if (getValues('dbRegion') === undefined && defaultRegion) {
+      setValue('dbRegion', defaultRegion)
     }
-  }, [defaultRegion])
+  }, [defaultRegion, getValues, setValue])
 
   useEffect(() => {
     if (regionError) {
-      form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
+      setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
     }
-  }, [regionError])
+  }, [regionError, setValue, defaultProvider])
 
   useEffect(() => {
-    if (recommendedSmartRegion) {
-      form.setValue('dbRegion', recommendedSmartRegion)
+    if (getValues('dbRegion') === undefined && recommendedSmartRegion) {
+      setValue('dbRegion', recommendedSmartRegion)
     }
-  }, [recommendedSmartRegion])
+  }, [recommendedSmartRegion, getValues, setValue])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      form.setValue('cloudProvider', 'AWS_K8S')
+      setValue('cloudProvider', 'AWS_K8S')
     }
-  }, [highAvailability, cloudProvider, form])
+  }, [highAvailability, cloudProvider, setValue])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
-      form.setValue('instanceSize', instanceSize, {
+      setValue('instanceSize', instanceSize, {
         shouldDirty: false,
         shouldValidate: false,
         shouldTouch: false,
       })
     }
-  }, [instanceSize, watchedInstanceSize, form])
+  }, [instanceSize, watchedInstanceSize, setValue])
 
   return (
     <>
