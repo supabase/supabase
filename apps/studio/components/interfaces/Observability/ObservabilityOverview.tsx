@@ -114,7 +114,7 @@ export const ObservabilityOverview = () => {
 
   // Navigate to the log view scoped to the clicked bar's bucket window
   const handleBarClick = useCallback(
-    (serviceKey: string, logsUrl: string) => (datum: any) => {
+    (logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
       // datum.timestamp is already the UTC-truncated bucket boundary from timestamp_trunc(),

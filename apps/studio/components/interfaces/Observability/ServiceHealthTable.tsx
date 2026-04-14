@@ -28,7 +28,7 @@ type ServiceData = {
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (serviceKey: string, logsUrl: string) => (datum: { timestamp: string }) => void
+  onBarClick: (logsUrl: string) => (datum: { timestamp: string }) => void
   datetimeFormat: string
 }
 
@@ -166,7 +166,7 @@ export const ServiceHealthTable = ({
                 key={service.key}
                 service={service}
                 data={data}
-                onBarClick={onBarClick(service.key, service.logsUrl)}
+                onBarClick={onBarClick(service.logsUrl)}
                 datetimeFormat={datetimeFormat}
               />
             )
