@@ -31,6 +31,12 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import {
+  buildProjectPayload,
+  buildSsoPayload,
+  categorizeInviteEmails,
+  parseEmails,
+} from './InviteMemberButton.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -49,13 +55,6 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
-
-function parseEmails(value: string): string[] {
-  return value
-    .split(',')
-    .map((e) => e.trim())
-    .filter(Boolean)
-}
 
 export const InviteMemberButton = () => {
   const { slug } = useParams()
@@ -159,22 +158,10 @@ export const InviteMemberButton = () => {
     if (profile?.id === undefined) return console.error('Profile ID required')
     const emails = parseEmails(values.email).map((e) => e.toLowerCase())
 
-    const alreadyInvited: string[] = []
-    const alreadyMembers: string[] = []
-    const toInvite: string[] = []
-
-    for (const emailAddress of emails) {
-      const existingMember = (members ?? []).find((member) => member.primary_email === emailAddress)
-      if (existingMember !== undefined) {
-        if (existingMember.invited_id) {
-          alreadyInvited.push(emailAddress)
-        } else {
-          alreadyMembers.push(emailAddress)
-        }
-      } else {
-        toInvite.push(emailAddress)
-      }
-    }
+    const { alreadyInvited, alreadyMembers, toInvite } = categorizeInviteEmails(
+      emails,
+      members ?? []
+    )
 
     if (alreadyInvited.length > 0) {
       toast.error(
@@ -194,47 +181,23 @@ export const InviteMemberButton = () => {
       if (toInvite.length === 0) return
     }
 
-    const projectPayload =
-      !values.applyToOrg && values.projectRef ? { projects: [values.projectRef] } : {}
+    const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRef)
+    const ssoPayload = buildSsoPayload(values.requireSso)
 
-    // Transform SSO preference to backend format
-    const ssoPayload =
-      values.requireSso === 'sso'
-        ? { requireSso: true }
-        : values.requireSso === 'non-sso'
-          ? { requireSso: false }
-          : {} // 'auto' - let backend use automatic behavior
+    await inviteMemberAsync({
+      slug,
+      emails: toInvite,
+      roleId: Number(values.role),
+      ...projectPayload,
+      ...ssoPayload,
+    })
 
-    const results = await Promise.allSettled(
-      toInvite.map((emailAddress) =>
-        inviteMemberAsync({
-          slug,
-          email: emailAddress,
-          roleId: Number(values.role),
-          ...projectPayload,
-          ...ssoPayload,
-        })
-      )
+    toast.success(
+      toInvite.length === 1
+        ? 'Successfully sent invitation to new member'
+        : `Successfully sent invitations to ${toInvite.length} new members`
     )
-
-    const successCount = results.filter((r) => r.status === 'fulfilled').length
-    const failedEmails = toInvite.filter((_, i) => results[i].status === 'rejected')
-
-    if (successCount > 0) {
-      toast.success(
-        successCount === 1
-          ? 'Successfully sent invitation to new member'
-          : `Successfully sent invitations to ${successCount} new members`
-      )
-      closeInviteDialog()
-    }
-    if (failedEmails.length > 0) {
-      toast.error(
-        failedEmails.length === 1
-          ? `Failed to send invitation to ${failedEmails[0]}`
-          : `Failed to send invitations to ${failedEmails.length} emails`
-      )
-    }
+    closeInviteDialog()
   }
 
   useEffect(() => {

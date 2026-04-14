@@ -4954,7 +4954,8 @@ export interface components {
       workdir: string
     }
     CreateInvitationBody: {
-      email: string
+      email?: string
+      emails?: string[]
       require_sso?: boolean
       role_id: number
       role_scoped_projects?: string[]
