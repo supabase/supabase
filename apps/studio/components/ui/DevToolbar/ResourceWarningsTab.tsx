@@ -7,6 +7,7 @@ import { cn } from 'ui'
 
 import { usageKeys } from '@/data/usage/keys'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 type Severity = 'warning' | 'critical' | null
 
@@ -31,6 +32,8 @@ const INITIAL_STATE: Record<WarningKey, Severity> = {
 export const ResourceWarningsTab = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const orgSlug = selectedOrg?.slug
   const [isReadOnly, setIsReadOnly] = useState(false)
   const [severities, setSeverities] = useState<Record<WarningKey, Severity>>(INITIAL_STATE)
 
@@ -46,7 +49,10 @@ export const ResourceWarningsTab = () => {
       auth_restricted_email_sending: null,
       need_pitr: null,
     }
+    // Write to both cache keys: ref-based (ResourceExhaustionWarningBanner) and
+    // slug-based (ProjectLayout, TopSection, ProjectList) consumers.
     queryClient.setQueryData(usageKeys.resourceWarnings(undefined, ref), [mockWarning])
+    queryClient.setQueryData(usageKeys.resourceWarnings(orgSlug, undefined), [mockWarning])
   }
 
   const handleSeverityChange = (key: WarningKey, value: Severity) => {
@@ -64,6 +70,7 @@ export const ResourceWarningsTab = () => {
     setSeverities(INITIAL_STATE)
     setIsReadOnly(false)
     queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
+    queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
   }
 
   return (
