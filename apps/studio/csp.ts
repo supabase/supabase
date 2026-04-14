@@ -80,7 +80,7 @@ const PUSHER_URL_WS = 'wss://*.pusher.com'
 
 const GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com'
 
-module.exports.getCSP = function getCSP() {
+export function getCSP() {
   const DEFAULT_SRC_URLS = [
     API_URL,
     SUPABASE_URL,
