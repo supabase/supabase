@@ -153,7 +153,7 @@ exports.onExecutePostLogin = async (event, api) => {
 }
 ```
 
-If you are using **access tokens** instead, you must use a namespaced claim because [Auth0 strips non-namespaced custom claims from access tokens](https://auth0.com/docs/troubleshoot/product-lifecycle/past-migrations/custom-claims-migration):
+For **access tokens**, you must use a namespaced claim because [Auth0 strips non-namespaced custom claims](https://auth0.com/docs/troubleshoot/product-lifecycle/past-migrations/custom-claims-migration):
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
