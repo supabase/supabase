@@ -3,17 +3,17 @@ import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import { deletedDiscussions } from '~/lib/changelog.utils'
+import mdxComponents from '~/lib/mdx/mdxComponents'
+import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import dayjs from 'dayjs'
 import { GitCommit } from 'lucide-react'
 import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import { deletedDiscussions } from '~/lib/changelog.utils'
-import mdxComponents from '~/lib/mdx/mdxComponents'
-import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 
 export type Discussion = {
   id: string
@@ -269,6 +269,8 @@ interface ChangelogPageProps {
 function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
   const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
 
+  console.log(pageInfo, changelog)
+
   const TITLE = 'Changelog'
   const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
@@ -285,46 +287,49 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
       <DefaultLayout>
         <div
           className="
-            container mx-auto flex flex-col
-            gap-20
+            container mx-auto max-w-5xl flex flex-col
+            gap-8
             px-4 py-10 sm:px-16
             xl:px-20
           "
         >
-          <div className="py-10">
+          <div className="pb-4">
             <h1 className="h1">Changelog</h1>
             <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           {/* Content */}
-          <div className="grid gap-12 lg:gap-36">
+          <div className="grid">
             {changelog.length > 0 &&
               changelog
                 .filter((entry: Entry) => !entry.title.includes('[d]'))
                 .map((entry: Entry, i: number) => {
                   return (
-                    <div key={i} className="border-muted grid border-l lg:grid-cols-12 lg:gap-8">
+                    <div
+                      key={i}
+                      className="border-muted grid lg:border-l lg:grid-cols-12 lg:gap-8 pb-12 lg:pb-36"
+                    >
                       <div
                         className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
                       >
-                        <div className="flex w-full items-baseline gap-6">
-                          <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                        <div className="flex w-full items-baseline border-b lg:border-none pb-4 lg:pb-0 lg:gap-4">
+                          <div className="hidden lg:flex bg-border border-muted text-foreground-lighter -ml-2.5 h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
                             <GitCommit size={14} strokeWidth={1.5} />
                           </div>
                           <div className="flex w-full flex-col gap-1">
                             {entry.title && (
                               <Link href={entry.url}>
-                                <h3 className="text-foreground text-2xl">{entry.title}</h3>{' '}
+                                <h3 className="text-foreground text-lg">{entry.title}</h3>{' '}
                               </Link>
                             )}
-                            <p className="text-muted text-lg">
+                            <p className="text-foreground-lighter text-xs font-mono">
                               {dayjs(entry.created_at).format('MMM D, YYYY')}
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
+                      <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
                         <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
                           <MDXRemote {...entry.source} components={mdxComponents('blog')} />
                         </article>
