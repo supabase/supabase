@@ -1,7 +1,7 @@
 // Reference: https://usehooks.com/useLocalStorage/
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
