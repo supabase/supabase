@@ -21,9 +21,9 @@ Auth0 can be used as a third-party authentication provider alongside Supabase Au
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
-import Auth0Client from '@auth0/auth0-spa-js'
+import { createAuth0Client } from '@auth0/auth0-spa-js'
 
-const auth0 = new Auth0Client({
+const auth0 = await createAuth0Client({
   domain: '<AUTH0_DOMAIN>',
   clientId: '<AUTH0_CLIENT_ID>',
   authorizationParams: {
@@ -36,12 +36,10 @@ const supabase = createClient(
   'SUPABASE_PUBLISHABLE_KEY',
   {
     accessToken: async () => {
-      const accessToken = await auth0.getTokenSilently()
-
-      // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
-      // use an ID token instead.
-
-      return accessToken
+      // Use the ID token which reliably includes custom claims.
+      const idToken = (await auth0.getIdTokenClaims())?.__raw
+      if (!idToken) throw new Error('Missing ID token')
+      return idToken
     },
   }
 )
@@ -145,13 +143,29 @@ Your Supabase project inspects the `role` claim present in all JWTs sent to it, 
 
 By default, Auth0 JWTs (both access token and ID token) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
-A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim:
+A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim.
+
+If you are using **ID tokens** (recommended for the TypeScript SPA example above):
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
-  api.accessToken.setCustomClaim('role', 'authenticated')
+  api.idToken.setCustomClaim('role', 'authenticated')
 }
 ```
+
+If you are using **access tokens** instead, you must use a namespaced claim because [Auth0 strips non-namespaced custom claims from access tokens](https://auth0.com/docs/troubleshoot/product-lifecycle/past-migrations/custom-claims-migration):
+
+```javascript
+exports.onExecutePostLogin = async (event, api) => {
+  api.accessToken.setCustomClaim('https://your-app.com/role', 'authenticated')
+}
+```
+
+<Admonition type="caution">
+
+Using `api.accessToken.setCustomClaim('role', 'authenticated')` without a namespace may appear to work but Auth0 can silently strip the claim. Use ID tokens or namespaced access token claims to avoid this issue.
+
+</Admonition>
 
 ## Limitations
 
