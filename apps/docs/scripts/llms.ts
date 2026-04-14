@@ -1,6 +1,6 @@
 import './utils/dotenv.js'
-
 import 'dotenv/config'
+
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -219,9 +219,7 @@ async function generateLlmsTxt() {
           '',
           '## Documentation',
           '',
-          fetchedSources
-            .map(({ defn, text }) => `# ${defn.title}\n\n${text}`)
-            .join('\n\n---\n\n'),
+          fetchedSources.map(({ defn, text }) => `# ${defn.title}\n\n${text}`).join('\n\n---\n\n'),
         ].join('\n')
       ),
     ])

@@ -13,11 +13,11 @@
  * (Uses tsx for TypeScript imports, falling back to inlined data if unavailable)
  */
 
+import { execSync } from 'child_process'
 import { promises as fs } from 'fs'
 import os from 'os'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { execSync } from 'child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '../../..')
@@ -45,15 +45,9 @@ const loadTsData = async (tsFile, exportName) => {
   }
 }
 
-const plans = await loadTsData(
-  path.join(repoRoot, 'packages/shared-data/plans.ts'),
-  'plans'
-)
+const plans = await loadTsData(path.join(repoRoot, 'packages/shared-data/plans.ts'), 'plans')
 
-const pricing = await loadTsData(
-  path.join(repoRoot, 'packages/shared-data/pricing.ts'),
-  'pricing'
-)
+const pricing = await loadTsData(path.join(repoRoot, 'packages/shared-data/pricing.ts'), 'pricing')
 
 const addOnTablePath = path.join(__dirname, '../data/PricingAddOnTable.json')
 const addOnTable = JSON.parse(await fs.readFile(addOnTablePath, 'utf8'))
@@ -95,7 +89,8 @@ const formatPlanValue = (val) => {
 
 const getVal = (row, key) => {
   const col = row.columns.find((c) => c.key === key)
-  if (!col) throw new Error(`Missing column "${key}" in compute add-on row "${row.title || 'unknown'}"`)
+  if (!col)
+    throw new Error(`Missing column "${key}" in compute add-on row "${row.title || 'unknown'}"`)
   return col.value
 }
 
@@ -154,16 +149,17 @@ const buildComputeSection = () => {
     colWidths.plan = Math.max(colWidths.plan, String(getVal(row, 'plan')).length)
     colWidths.price = Math.max(colWidths.price, String(getVal(row, 'pricing')).length)
     colWidths.cpu = Math.max(colWidths.cpu, String(getVal(row, 'cpu')).length)
-    colWidths.dedicated = Math.max(colWidths.dedicated, getVal(row, 'dedicated') ? 'Yes'.length : 'No'.length)
+    colWidths.dedicated = Math.max(
+      colWidths.dedicated,
+      getVal(row, 'dedicated') ? 'Yes'.length : 'No'.length
+    )
     colWidths.memory = Math.max(colWidths.memory, String(getVal(row, 'memory')).length)
     colWidths.direct = Math.max(colWidths.direct, String(getVal(row, 'directConnections')).length)
     colWidths.pooler = Math.max(colWidths.pooler, String(getVal(row, 'poolerConnections')).length)
   }
 
-  const header =
-    `| ${pad('Size', colWidths.plan)} | ${pad('$/month', colWidths.price)} | ${pad('CPU', colWidths.cpu)} | ${pad('Dedicated', colWidths.dedicated)} | ${pad('RAM', colWidths.memory)} | ${pad('Direct Connections', colWidths.direct)} | ${pad('Pooler Connections', colWidths.pooler)} |`
-  const separator =
-    `| ${'-'.repeat(colWidths.plan)} | ${'-'.repeat(colWidths.price)} | ${'-'.repeat(colWidths.cpu)} | ${'-'.repeat(colWidths.dedicated)} | ${'-'.repeat(colWidths.memory)} | ${'-'.repeat(colWidths.direct)} | ${'-'.repeat(colWidths.pooler)} |`
+  const header = `| ${pad('Size', colWidths.plan)} | ${pad('$/month', colWidths.price)} | ${pad('CPU', colWidths.cpu)} | ${pad('Dedicated', colWidths.dedicated)} | ${pad('RAM', colWidths.memory)} | ${pad('Direct Connections', colWidths.direct)} | ${pad('Pooler Connections', colWidths.pooler)} |`
+  const separator = `| ${'-'.repeat(colWidths.plan)} | ${'-'.repeat(colWidths.price)} | ${'-'.repeat(colWidths.cpu)} | ${'-'.repeat(colWidths.dedicated)} | ${'-'.repeat(colWidths.memory)} | ${'-'.repeat(colWidths.direct)} | ${'-'.repeat(colWidths.pooler)} |`
 
   const dataRows = rows.map((row) => {
     const plan = String(getVal(row, 'plan'))
@@ -223,13 +219,25 @@ const findFeature = (category, key) => {
 
 const buildAddOnsSection = () => {
   const addOns = [
-    ['Point-in-Time Recovery (PITR)', formatPlanValue(findFeature('database', 'database.pitr').plans.pro)],
+    [
+      'Point-in-Time Recovery (PITR)',
+      formatPlanValue(findFeature('database', 'database.pitr').plans.pro),
+    ],
     ['Custom Domain', formatPlanValue(findFeature('security', 'security.customDomains').plans.pro)],
-    ['Database Branching', formatPlanValue(findFeature('database', 'database.branching').plans.pro)],
-    ['Advanced MFA (Phone)', formatPlanValue(findFeature('auth', 'auth.advancedMFAPhone').plans.pro)],
+    [
+      'Database Branching',
+      formatPlanValue(findFeature('database', 'database.branching').plans.pro),
+    ],
+    [
+      'Advanced MFA (Phone)',
+      formatPlanValue(findFeature('auth', 'auth.advancedMFAPhone').plans.pro),
+    ],
     ['SAML/SSO Auth', formatPlanValue(findFeature('auth', 'auth.saml').plans.pro)],
     ['Log Drains', formatPlanValue(findFeature('security', 'security.logDrain').plans.pro)],
-    ['Image Transformations', formatPlanValue(findFeature('storage', 'storage.transformations').plans.pro)],
+    [
+      'Image Transformations',
+      formatPlanValue(findFeature('storage', 'storage.transformations').plans.pro),
+    ],
   ]
 
   const nameWidth = Math.max('Add-on'.length, ...addOns.map(([n]) => n.length))
@@ -237,7 +245,9 @@ const buildAddOnsSection = () => {
 
   const header = `| ${pad('Add-on', nameWidth)} | ${pad('Price', priceWidth)} |`
   const separator = `| ${'-'.repeat(nameWidth)} | ${'-'.repeat(priceWidth)} |`
-  const dataRows = addOns.map(([name, price]) => `| ${pad(name, nameWidth)} | ${pad(price, priceWidth)} |`)
+  const dataRows = addOns.map(
+    ([name, price]) => `| ${pad(name, nameWidth)} | ${pad(price, priceWidth)} |`
+  )
 
   return ['## Add-Ons', '', header, separator, ...dataRows, ''].join('\n')
 }
@@ -264,10 +274,8 @@ const buildFeatureComparisonSection = () => {
       )
     }
 
-    const headerRow =
-      `| ${pad('Feature', nameWidth)} | ${planIds.map((p) => pad(planLabels[p], planWidths[p])).join(' | ')} |`
-    const separatorRow =
-      `| ${'-'.repeat(nameWidth)} | ${planIds.map((p) => '-'.repeat(planWidths[p])).join(' | ')} |`
+    const headerRow = `| ${pad('Feature', nameWidth)} | ${planIds.map((p) => pad(planLabels[p], planWidths[p])).join(' | ')} |`
+    const separatorRow = `| ${'-'.repeat(nameWidth)} | ${planIds.map((p) => '-'.repeat(planWidths[p])).join(' | ')} |`
 
     lines.push(headerRow, separatorRow)
 
