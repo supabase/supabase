@@ -1,5 +1,3 @@
-import { ident } from '@supabase/pg-meta/src/pg-format'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Box,
   Clock,
@@ -14,104 +12,11 @@ import {
   User,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { toast } from 'sonner'
 import { Badge, Button } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { LINTER_LEVELS, LintInfo } from '@/components/interfaces/Linter/Linter.constants'
-import { databasePoliciesKeys } from '@/data/database-policies/keys'
-import { lintKeys } from '@/data/lint/keys'
 import { Lint, LINT_TYPES } from '@/data/lint/lint-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-
-function DropBucketListingPoliciesAction({
-  projectRef,
-  metadata,
-}: {
-  projectRef: string
-  metadata: Lint['metadata']
-}) {
-  const queryClient = useQueryClient()
-  const { data: project } = useSelectedProjectQuery()
-  const [showModal, setShowModal] = useState(false)
-
-  const policyNames = (metadata?.policy_names as string[] | undefined) ?? []
-  const policyToRemove = policyNames[0]
-  const remainingCount = policyNames.length - 1
-
-  const sql = policyToRemove
-    ? `DROP POLICY IF EXISTS ${ident(policyToRemove)} ON storage.objects;`
-    : ''
-
-  const { mutate: removePolicy, isPending } = useMutation({
-    mutationFn: async () => {
-      await executeSql({ projectRef, connectionString: project?.connectionString, sql })
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-        queryClient.invalidateQueries({
-          queryKey: databasePoliciesKeys.list(projectRef, 'storage'),
-        }),
-      ])
-      setShowModal(false)
-      toast.success(
-        remainingCount > 0
-          ? `Policy removed. ${remainingCount} matching ${remainingCount === 1 ? 'policy' : 'policies'} remaining.`
-          : 'Policy removed successfully.'
-      )
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to remove policy: ${error.message}`)
-    },
-  })
-
-  if (!policyToRemove) return null
-
-  return (
-    <>
-      <Button type="danger" onClick={() => setShowModal(true)}>
-        Remove policy
-      </Button>
-      <ConfirmationModal
-        visible={showModal}
-        variant="destructive"
-        title={
-          remainingCount > 0
-            ? `Remove SELECT policy (1 of ${policyNames.length})`
-            : 'Remove SELECT policy'
-        }
-        confirmLabel="Remove policy"
-        loading={isPending}
-        onCancel={() => setShowModal(false)}
-        onConfirm={() => removePolicy()}
-      >
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-foreground-light">
-            This will drop {remainingCount > 0 ? 'one' : 'the'} <code>SELECT</code> policy that
-            makes the bucket&apos;s contents listable. Object URLs will continue to work.
-            {remainingCount > 0
-              ? ` ${remainingCount} matching ${remainingCount === 1 ? 'policy' : 'policies'} will remain after this.`
-              : null}
-          </p>
-          <div className="-mx-4 md:-mx-5 -mb-4 border-t">
-            <CodeBlock
-              hideLineNumbers
-              language="sql"
-              value={sql}
-              wrapperClassName="[&_pre]:px-4 [&_pre]:py-3 [&>pre]:rounded-none [&>pre]:border-0 [&_pre>*]:!whitespace-pre-wrap"
-              className="[&_code]:text-foreground"
-            />
-          </div>
-        </div>
-      </ConfirmationModal>
-    </>
-  )
-}
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -426,7 +331,6 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View bucket',
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0025_public_bucket_allows_listing`,
     category: 'security',
-    Action: DropBucketListingPoliciesAction,
   },
 ]
 
@@ -449,14 +353,11 @@ export const LintCTA = ({
   const linkText = lintInfo.linkText
 
   return (
-    <>
-      {lintInfo.Action && <lintInfo.Action projectRef={projectRef} metadata={metadata} />}
-      <Button asChild type="default">
-        <Link href={link} rel="noreferrer" className="no-underline">
-          {linkText}
-        </Link>
-      </Button>
-    </>
+    <Button asChild type="default">
+      <Link href={link} rel="noreferrer" className="no-underline">
+        {linkText}
+      </Link>
+    </Button>
   )
 }
 
