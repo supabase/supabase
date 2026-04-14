@@ -82,7 +82,7 @@
     "@types/react": "catalog:",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
-    "@vitest/coverage-v8": "^3.2.0",
+    "@vitest/coverage-v8": "^4.1.4",
     "config": "workspace:*",
     "glob": "^8.1.0",
     "style-dictionary": "^3.7.1",

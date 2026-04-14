@@ -74,7 +74,7 @@
     "@types/d3-geo": "^3.1.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@vercel/functions": "^2.1.0",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.0.1",
     "@xyflow/react": "^12.10.1",
     "@zip.js/zip.js": "^2.7.29",
     "ai": "^6.0.116",
@@ -179,8 +179,8 @@
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
     "@typescript-eslint/utils": "8.48.0",
-    "@vitest/coverage-v8": "^3.2.0",
-    "@vitest/ui": "^3.2.0",
+    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/ui": "^4.1.4",
     "api-types": "workspace:*",
     "autoevals": "^0.0.132",
     "braintrust": "^3.4.0",
@@ -205,7 +205,7 @@
     "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-tsconfig-paths": "^4.3.2",
+    "vite-tsconfig-paths": "^6.1.1",
     "vitest": "catalog:"
   }
 }
