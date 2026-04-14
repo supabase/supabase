@@ -35,20 +35,20 @@ export const TableReplicationRow = ({
   const isErrorState = table.state.name === 'error'
   const statusConfig = getStatusConfig(table.state as TableState['state'])
 
-  const isMuted = !isPipelineRunning && !isRestarting
+  const isInactive = !isPipelineRunning && !isRestarting
+  const inactiveContentClassName = isInactive ? 'text-foreground-light opacity-50' : undefined
+  const inactiveStatusClassName = isInactive ? 'opacity-50 grayscale' : undefined
 
   return (
     <TableRow>
       <TableCell className="align-top">
         <div className="flex items-center gap-x-2">
-          <p className={cn((isRestarting || isMuted) && 'text-foreground-light')}>
-            {table.table_name}
-          </p>
+          <p className={cn(inactiveContentClassName)}>{table.table_name}</p>
 
           <ButtonTooltip
             asChild
             type="text"
-            className="px-1.5"
+            className={cn('px-1.5', inactiveContentClassName)}
             icon={<ExternalLink />}
             tooltip={{
               content: { side: 'bottom', text: 'Open in Table Editor' },
@@ -67,7 +67,7 @@ export const TableReplicationRow = ({
         {isRestarting ? (
           <Badge variant="default">Restarting</Badge>
         ) : (
-          <div className={cn(isMuted && 'opacity-40 grayscale')}>{statusConfig.badge}</div>
+          <div className={cn(inactiveStatusClassName)}>{statusConfig.badge}</div>
         )}
       </TableCell>
 
@@ -78,7 +78,7 @@ export const TableReplicationRow = ({
           </p>
         ) : (
           <div className="flex flex-col gap-y-3">
-            <div className={cn('text-sm text-foreground', isMuted && 'opacity-40')}>
+            <div className={cn('text-sm text-foreground', inactiveContentClassName)}>
               {statusConfig.description}{' '}
               {isErrorState && 'reason' in table.state && (
                 <button className={InlineLinkClassName} onClick={() => onSelectShowError()}>
