@@ -15,6 +15,7 @@ interface TableReplicationRowProps {
   config: ReturnType<typeof getDisabledStateConfig>
   isRestarting: boolean
   showDisabledState: boolean
+  isAnyRestartInProgress: boolean
   isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
@@ -25,6 +26,7 @@ export const TableReplicationRow = ({
   config,
   isRestarting,
   showDisabledState,
+  isAnyRestartInProgress,
   isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
@@ -103,7 +105,7 @@ export const TableReplicationRow = ({
                 type="default"
                 className="w-7"
                 icon={<RotateCcw />}
-                disabled={showDisabledState || isRestarting}
+                disabled={showDisabledState || isRestarting || isAnyRestartInProgress}
                 aria-label={`Restart replication for ${table.table_name}`}
                 onClick={onSelectRestart}
               />

@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { PipelineStatusName } from './Replication.constants'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
 interface RestartTableDialogProps {
@@ -18,7 +19,7 @@ interface RestartTableDialogProps {
   onOpenChange: (open: boolean) => void
   tableId: number
   tableName: string
-  pipelineStatusName?: string
+  pipelineStatusName?: PipelineStatusName
   onRestartStart?: () => void
   onRestartComplete?: () => void
 }

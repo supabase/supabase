@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { PipelineStatusName } from './Replication.constants'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
@@ -22,7 +23,7 @@ interface BatchRestartDialogProps {
   totalTables: number
   erroredTablesCount: number
   tables: ReplicationPipelineTableStatus[]
-  pipelineStatusName?: string
+  pipelineStatusName?: PipelineStatusName
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void
 }

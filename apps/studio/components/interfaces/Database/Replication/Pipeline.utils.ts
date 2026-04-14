@@ -1,8 +1,5 @@
 import { PipelineStatusName } from './Replication.constants'
-import {
-  ReplicationPipelineStatus,
-  ReplicationPipelineStatusData,
-} from '@/data/replication/pipeline-status-query'
+import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
 export const PIPELINE_ERROR_MESSAGES = {
@@ -19,16 +16,29 @@ export const PIPELINE_ERROR_MESSAGES = {
 
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
-): ReplicationPipelineStatusData['status']['name'] | undefined => {
+): PipelineStatusName | undefined => {
   if (status && typeof status === 'object' && 'name' in status) {
-    return status.name
+    const statusName = status.name
+    if (
+      typeof statusName === 'string' &&
+      (Object.values(PipelineStatusName) as string[]).includes(statusName)
+    ) {
+      return statusName as PipelineStatusName
+    }
   }
   return undefined
 }
 
-export const PIPELINE_ENABLE_ALLOWED_FROM = ['stopped'] as const
-export const PIPELINE_DISABLE_ALLOWED_FROM = ['started', 'failed'] as const
-export const PIPELINE_ACTIONABLE_STATES = ['failed', 'started', 'stopped'] as PipelineStatusName[]
+export const PIPELINE_ENABLE_ALLOWED_FROM: PipelineStatusName[] = [PipelineStatusName.STOPPED]
+export const PIPELINE_DISABLE_ALLOWED_FROM: PipelineStatusName[] = [
+  PipelineStatusName.STARTED,
+  PipelineStatusName.FAILED,
+]
+export const PIPELINE_ACTIONABLE_STATES: PipelineStatusName[] = [
+  PipelineStatusName.FAILED,
+  PipelineStatusName.STARTED,
+  PipelineStatusName.STOPPED,
+]
 
 const PIPELINE_STATE_MESSAGES = {
   enabling: {
@@ -85,7 +95,7 @@ const PIPELINE_STATE_MESSAGES = {
 
 export const getPipelineStateMessages = (
   requestStatus?: PipelineStatusRequestStatus,
-  statusName?: ReplicationPipelineStatus
+  statusName?: PipelineStatusName
 ) => {
   // Reflect optimistic request intent immediately after click
   if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {

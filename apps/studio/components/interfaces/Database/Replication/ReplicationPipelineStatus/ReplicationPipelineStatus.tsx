@@ -185,11 +185,15 @@ export const ReplicationPipelineStatus = () => {
   const isAnyRestartInProgress = restartingTableIds.size > 0
 
   const hasTableData = tableStatuses.length > 0
+  const isPipelineActionable =
+    statusName === PipelineStatusName.STARTED ||
+    statusName === PipelineStatusName.STOPPED ||
+    statusName === PipelineStatusName.FAILED
   const isEnablingDisabling =
     requestStatus === PipelineStatusRequestStatus.StartRequested ||
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const showDisabledState = isEnablingDisabling
+  const showDisabledState = isEnablingDisabling || !isPipelineActionable
   const refreshIntervalLabel =
     STATUS_REFRESH_FREQUENCY_MS >= 1000
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
@@ -200,20 +204,20 @@ export const ReplicationPipelineStatus = () => {
   }`
 
   const label =
-    statusName === 'stopped'
+    statusName === PipelineStatusName.STOPPED
       ? 'Start'
-      : statusName === 'started'
+      : statusName === PipelineStatusName.STARTED
         ? 'Stop'
-        : statusName === 'failed'
+        : statusName === PipelineStatusName.FAILED
           ? 'Restart'
           : statusName
 
   const icon =
-    statusName === 'stopped' ? (
+    statusName === PipelineStatusName.STOPPED ? (
       <Play />
-    ) : statusName === 'started' ? (
+    ) : statusName === PipelineStatusName.STARTED ? (
       <Pause />
-    ) : statusName === 'failed' ? (
+    ) : statusName === PipelineStatusName.FAILED ? (
       <RotateCcw />
     ) : (
       <Ban />
@@ -224,13 +228,13 @@ export const ReplicationPipelineStatus = () => {
     if (!pipeline) return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
 
     try {
-      if (statusName === 'stopped') {
+      if (statusName === PipelineStatusName.STOPPED) {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StartRequested, statusName)
         await startPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (statusName === 'started') {
+      } else if (statusName === PipelineStatusName.STARTED) {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.StopRequested, statusName)
         await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      } else if (statusName === 'failed') {
+      } else if (statusName === PipelineStatusName.FAILED) {
         setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
         await restartPipeline({ projectRef, pipelineId: pipeline.id })
       }
@@ -281,7 +285,7 @@ export const ReplicationPipelineStatus = () => {
             </Button>
 
             <Button
-              type={statusName === 'stopped' ? 'primary' : 'default'}
+              type={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
               onClick={onPrimaryAction}
               loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
               disabled={
@@ -401,7 +405,9 @@ export const ReplicationPipelineStatus = () => {
                   type="default"
                   className="rounded-r-none hover:z-[2]"
                   icon={<RotateCcw />}
-                  disabled={isAnyRestartInProgress || isEnablingDisabling || isPipelineError}
+                  disabled={
+                    isAnyRestartInProgress || showDisabledState || isPipelineError || !hasTableData
+                  }
                   loading={isAnyRestartInProgress}
                   onClick={() => {
                     setBatchRestartMode('all')
@@ -416,7 +422,7 @@ export const ReplicationPipelineStatus = () => {
                       type="default"
                       icon={<ChevronDown />}
                       className="w-7 rounded-l-none -ml-[1px]"
-                      disabled={isEnablingDisabling || isPipelineError}
+                      disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-44">
@@ -424,7 +430,9 @@ export const ReplicationPipelineStatus = () => {
                       <TooltipTrigger asChild>
                         <span>
                           <DropdownMenuItem
-                            disabled={!hasErroredTables || isAnyRestartInProgress}
+                            disabled={
+                              !hasErroredTables || isAnyRestartInProgress || showDisabledState
+                            }
                             onClick={() => {
                               setBatchRestartMode('errored')
                               setShowBatchRestartDialog(true)
@@ -472,7 +480,8 @@ export const ReplicationPipelineStatus = () => {
                             config={config}
                             isRestarting={isRestarting}
                             showDisabledState={showDisabledState}
-                            isPipelineStopped={statusName === 'stopped'}
+                            isAnyRestartInProgress={isAnyRestartInProgress}
+                            isPipelineStopped={statusName === PipelineStatusName.STOPPED}
                             onSelectRestart={() => {
                               setSelectedTableForRestart({
                                 tableId: table.table_id,
@@ -513,23 +522,23 @@ export const ReplicationPipelineStatus = () => {
                 <h4 className="text-lg font-semibold text-foreground">
                   {showDisabledState
                     ? config.title
-                    : statusName === 'stopped'
+                    : statusName === PipelineStatusName.STOPPED
                       ? 'Pipeline stopped'
-                      : statusName === 'failed'
+                      : statusName === PipelineStatusName.FAILED
                         ? 'Pipeline failed'
                         : 'No table data yet'}
                 </h4>
                 <p className="text-sm text-foreground-light leading-relaxed">
                   {showDisabledState
                     ? config.message
-                    : statusName === 'stopped'
+                    : statusName === PipelineStatusName.STOPPED
                       ? 'Start the pipeline to begin replication.'
-                      : statusName === 'failed'
+                      : statusName === PipelineStatusName.FAILED
                         ? 'The pipeline encountered an error. Restart it or reset your tables to recover.'
                         : 'Table status will appear here once replication begins.'}
                 </p>
               </div>
-              {statusName !== 'stopped' && (
+              {statusName !== PipelineStatusName.STOPPED && (
                 <p className="text-xs text-foreground-lighter">
                   Data refreshes every {refreshIntervalLabel}
                 </p>

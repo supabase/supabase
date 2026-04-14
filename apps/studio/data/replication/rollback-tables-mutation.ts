@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { replicationKeys } from './keys'
 import { useRestartPipelineHelper } from './restart-pipeline-helper'
 import { useStartPipelineMutation } from './start-pipeline-mutation'
+import { PipelineStatusName } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -19,7 +20,7 @@ type RollbackTablesParams = {
   pipelineId: number
   target: RollbackTablesTarget
   rollbackType: RollbackType
-  pipelineStatusName?: string
+  pipelineStatusName?: PipelineStatusName
 }
 
 type RolledBackTable = {
@@ -74,17 +75,47 @@ export const useRollbackTablesMutation = ({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId, pipelineStatusName } = variables
+      let action: 'starting' | 'restarting' | 'unknown' = 'unknown'
 
       // Start or restart the pipeline after rollback.
       // Stopped pipelines only need a start (already stopped, no need to stop first).
       try {
-        if (pipelineStatusName === 'stopped') {
+        const canStartPipeline = pipelineStatusName === PipelineStatusName.STOPPED
+        const canRestartPipeline =
+          pipelineStatusName === PipelineStatusName.STARTED ||
+          pipelineStatusName === PipelineStatusName.FAILED
+
+        const postRollbackAction = canStartPipeline
+          ? 'start'
+          : canRestartPipeline
+            ? 'restart'
+            : 'unknown'
+
+        action =
+          postRollbackAction === 'start'
+            ? 'starting'
+            : postRollbackAction === 'restart'
+              ? 'restarting'
+              : 'unknown'
+
+        if (postRollbackAction === 'unknown') {
+          throw new Error(
+            `Cannot apply rollback while pipeline status is ${
+              pipelineStatusName || 'unknown'
+            }. Retry once the pipeline status is started, failed, or stopped.`
+          )
+        }
+
+        if (postRollbackAction === 'start') {
           await startPipeline({ projectRef, pipelineId })
         } else {
           await restartPipeline({ projectRef, pipelineId })
         }
       } catch (error: any) {
-        toast.error(`Rollback succeeded but failed to start pipeline: ${error.message}`)
+        const actionText = action === 'unknown' ? 'resume' : action
+        toast.error(
+          `Rollback completed, but failed to ${actionText} the pipeline: ${error.message}`
+        )
         throw error
       }
 
