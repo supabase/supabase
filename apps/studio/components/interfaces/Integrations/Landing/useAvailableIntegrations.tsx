@@ -39,94 +39,103 @@ export const useAvailableIntegrations = () => {
 
   // [Joshen] Format marketplace integrations into existing ones for now
   // Likely that we might need to change, but can look into separately
-  const marketplaceIntegrations: IntegrationDefinition[] = (data ?? [])?.map((integration) => {
-    const {
-      id: listingId,
-      slug,
-      categories,
-      title,
-      description,
-      documentation_url: docsUrl,
-      website_url: siteUrl,
-      installation_url: installUrl,
-      installation_url_type: installUrlType,
-      installation_identification_method: installMethod,
-      secret_key_prefix: secretKeyPrefix,
-      images,
-      content,
-      partner_name: authorName,
-      listing_logo: listingLogo,
-    } = integration
+  const marketplaceIntegrations: IntegrationDefinition[] = useMemo(
+    () =>
+      (data ?? [])?.map((integration) => {
+        const {
+          id: listingId,
+          slug,
+          categories,
+          title,
+          description,
+          documentation_url: docsUrl,
+          website_url: siteUrl,
+          installation_url: installUrl,
+          installation_url_type: installUrlType,
+          installation_identification_method: installMethod,
+          secret_key_prefix: secretKeyPrefix,
+          images,
+          content,
+          partner_name: authorName,
+          listing_logo: listingLogo,
+        } = integration
 
-    const status = undefined
-    const author = { name: authorName ?? '', websiteUrl: '' }
+        const status = undefined
+        const author = { name: authorName ?? '', websiteUrl: '' }
 
-    return {
-      id: slug ?? '',
-      name: title ?? '',
-      status,
-      type: 'oauth' as const, // Currently marketplace only supports oauth apps
-      categories: Array.isArray(categories)
-        ? (categories as Array<{ slug: string }>).map((x) => x.slug)
-        : [],
-      content,
-      files: images?.map((image) => fullImageUrl(image)),
-      description,
-      docsUrl,
-      siteUrl,
-      installUrl,
-      installUrlType: installUrlType ?? undefined,
-      installIdentificationMethod: installMethod ?? undefined,
-      secretKeyPrefix: secretKeyPrefix ?? undefined,
-      listingId: listingId ?? undefined,
-      author,
-      requiredExtensions: [],
-      icon: ({ className, ...props } = {}) => (
-        <div className="relative w-full h-full">
-          {listingLogo ? (
-            <Image
-              fill
-              src={fullImageUrl(listingLogo)}
-              alt=""
-              className={cn('p-2', className)}
-              {...props}
-            />
-          ) : (
-            <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
-          )}
-        </div>
-      ),
-      navigation: [
-        {
-          route: 'overview',
-          label: 'Overview',
-        },
-      ],
-      navigate: ({ pageId = 'overview' }) => {
-        switch (pageId) {
-          case 'overview':
-            return dynamic(
-              () =>
-                import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
-                  (mod) => mod.IntegrationOverviewTabV2
-                ),
-              {
-                loading: Loading,
-              }
-            )
-          case 'secrets':
-            return dynamic(
-              () =>
-                import('../Vault/Secrets/SecretsManagement').then((mod) => mod.SecretsManagement),
-              {
-                loading: Loading,
-              }
-            )
+        return {
+          id: slug ?? '',
+          name: title ?? '',
+          status,
+          type: 'oauth' as const, // Currently marketplace only supports oauth apps
+          categories: Array.isArray(categories)
+            ? (categories as Array<{ slug: string }>).map((x) => x.slug)
+            : [],
+          content,
+          files: images?.map((image) => fullImageUrl(image)),
+          description,
+          docsUrl,
+          siteUrl,
+          installUrl,
+          installUrlType: installUrlType ?? undefined,
+          installIdentificationMethod: installMethod ?? undefined,
+          secretKeyPrefix: secretKeyPrefix ?? undefined,
+          listingId: listingId ?? undefined,
+          author,
+          requiredExtensions: [],
+          icon: ({ className, ...props } = {}) => (
+            <div className="relative w-full h-full">
+              {listingLogo ? (
+                <Image
+                  fill
+                  src={fullImageUrl(listingLogo)}
+                  alt=""
+                  className={cn('p-2', className)}
+                  {...props}
+                />
+              ) : (
+                <Boxes
+                  className={cn('inset-0 p-2 text-black w-full h-full', className)}
+                  {...props}
+                />
+              )}
+            </div>
+          ),
+          navigation: [
+            {
+              route: 'overview',
+              label: 'Overview',
+            },
+          ],
+          navigate: ({ pageId = 'overview' }) => {
+            switch (pageId) {
+              case 'overview':
+                return dynamic(
+                  () =>
+                    import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/index').then(
+                      (mod) => mod.IntegrationOverviewTabV2
+                    ),
+                  {
+                    loading: Loading,
+                  }
+                )
+              case 'secrets':
+                return dynamic(
+                  () =>
+                    import('../Vault/Secrets/SecretsManagement').then(
+                      (mod) => mod.SecretsManagement
+                    ),
+                  {
+                    loading: Loading,
+                  }
+                )
+            }
+            return null
+          },
         }
-        return null
-      },
-    }
-  })
+      }),
+    [data]
+  )
 
   // [Joshen] Existing integrations that are defined within studio
   // Available integrations are all integrations that can be installed. If an integration can't be installed (needed
@@ -153,8 +162,13 @@ export const useAvailableIntegrations = () => {
     [allIntegrations]
   )
 
+  const dataWithMarketplace = useMemo(
+    () => [...marketplaceIntegrations, ...availableIntegrations],
+    [marketplaceIntegrations, availableIntegrations]
+  )
+
   return {
-    data: [...marketplaceIntegrations, ...availableIntegrations],
+    data: dataWithMarketplace,
     error,
     isPending,
     isSuccess,
