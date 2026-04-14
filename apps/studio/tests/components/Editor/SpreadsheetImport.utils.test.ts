@@ -1,4 +1,5 @@
-import { describe, expect, test } from 'vitest'
+import { getUpdateIdentitySequenceSQL, getUpdateSerialSequenceSQL } from '@supabase/pg-meta'
+import { describe, expect, it, test } from 'vitest'
 
 import {
   inferColumnType,
@@ -112,5 +113,51 @@ describe('SpreadsheetImport.utils: parseSpreadsheetText', () => {
       emptyStringAsNullHeaders: undefined,
     })
     expect(headers).toEqual(['name', 'age'])
+  })
+})
+
+describe('getUpdateSerialSequenceSQL', () => {
+  it('generates setval with pg_get_serial_sequence for a basic serial column', () => {
+    const sql = getUpdateSerialSequenceSQL({
+      schema: 'public',
+      table: 'users',
+      column: 'id',
+    })
+    expect(sql).toContain('pg_get_serial_sequence')
+    expect(sql).toContain('setval')
+    expect(sql).toContain('"id"')
+  })
+
+  it('uses CASE to distinguish empty vs non-empty tables', () => {
+    const sql = getUpdateSerialSequenceSQL({
+      schema: 'public',
+      table: 'orders',
+      column: 'order_id',
+    })
+    // 3-arg setval: is_called=false for empty, is_called=true for non-empty
+    expect(sql).toContain('IS NULL')
+    expect(sql).toContain('false')
+    expect(sql).toContain('true')
+  })
+
+  it('safely handles schema/table names that contain single quotes', () => {
+    // literal() should escape these — no raw single quotes in output
+    const sql = getUpdateSerialSequenceSQL({
+      schema: "o'reilly",
+      table: "user's_data",
+      column: 'id',
+    })
+    // The raw unescaped quote should NOT appear (would cause SQL injection)
+    expect(sql).not.toMatch(/pg_get_serial_sequence\('[^']*'[^']*',/)
+  })
+
+  it('handles non-public schemas correctly', () => {
+    const sql = getUpdateSerialSequenceSQL({
+      schema: 'myschema',
+      table: 'products',
+      column: 'product_id',
+    })
+    expect(sql).toContain('"product_id"')
+    expect(sql).toContain('"myschema"."products"')
   })
 })

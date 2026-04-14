@@ -1,4 +1,6 @@
+// AFTER — add these two imports:
 import * as Sentry from '@sentry/nextjs'
+import { getUpdateIdentitySequenceSQL, getUpdateSerialSequenceSQL } from '@supabase/pg-meta'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -50,6 +52,7 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { lintKeys } from '@/data/lint/keys'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
+import { executeSql } from '@/data/sql/execute-sql-query'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
@@ -901,6 +904,52 @@ export const SidePanelEditor = ({
       }
     }
 
+    // Reset sequences for identity and serial columns to avoid unique key
+    // violations on subsequent inserts (fixes #43993).
+    // selectedTable.columns uses snake_case (RetrieveTableResult shape).
+    const identityColumns = (selectedTable.columns ?? []).filter((col) => col.is_identity)
+    const serialColumns = (selectedTable.columns ?? []).filter(
+      (col) =>
+        !col.is_identity &&
+        typeof col.default_value === 'string' &&
+        col.default_value.startsWith('nextval(')
+    )
+
+    const sequenceSQLStatements = [
+      ...identityColumns.map((col) =>
+        getUpdateIdentitySequenceSQL({
+          schema: selectedTable.schema,
+          table: selectedTable.name,
+          column: col.name,
+        })
+      ),
+      ...serialColumns.map((col) =>
+        getUpdateSerialSequenceSQL({
+          schema: selectedTable.schema,
+          table: selectedTable.name,
+          column: col.name,
+        })
+      ),
+    ]
+
+    if (sequenceSQLStatements.length > 0) {
+      try {
+        await executeSql({
+          projectRef: project.ref,
+          connectionString: project.connectionString,
+          sql: sequenceSQLStatements.join(';\n'),
+          queryKey: ['sequences', 'update-batch'],
+        })
+      } catch (error) {
+        console.warn('Failed to update sequences after CSV import:', error)
+        toast.warning(
+          'Data imported successfully, but sequences could not be updated. ' +
+            'New inserts may fail until sequences are manually reset.',
+          { id: toastId }
+        )
+      }
+    }
+
     await queryClient.invalidateQueries({
       queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
     })
@@ -909,105 +958,105 @@ export const SidePanelEditor = ({
     })
     resolve()
     snap.closeSidePanel()
-  }
 
-  const onClosePanel = confirmOnClose
+    const onClosePanel = confirmOnClose
 
-  return (
-    <>
-      {!isUndefined(selectedTable) && (
-        <RowEditor
-          row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
-          selectedTable={selectedTable}
-          visible={snap.sidePanel?.type === 'row'}
-          editable={editable}
-          closePanel={onClosePanel}
-          saveChanges={saveRow}
-          updateEditorDirty={() => setIsEdited(true)}
-        />
-      )}
-      {!isUndefined(selectedTable) && (
-        <ColumnEditor
-          column={
-            snap.sidePanel?.type === 'column'
-              ? (snap.sidePanel.column as unknown as PostgresColumn)
+    return (
+      <>
+        {!isUndefined(selectedTable) && (
+          <RowEditor
+            row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
+            selectedTable={selectedTable}
+            visible={snap.sidePanel?.type === 'row'}
+            editable={editable}
+            closePanel={onClosePanel}
+            saveChanges={saveRow}
+            updateEditorDirty={() => setIsEdited(true)}
+          />
+        )}
+        {!isUndefined(selectedTable) && (
+          <ColumnEditor
+            column={
+              snap.sidePanel?.type === 'column'
+                ? (snap.sidePanel.column as unknown as PostgresColumn)
+                : undefined
+            }
+            selectedTable={selectedTable}
+            visible={snap.sidePanel?.type === 'column'}
+            closePanel={onClosePanel}
+            saveChanges={saveColumn}
+            updateEditorDirty={() => setIsEdited(true)}
+          />
+        )}
+        <TableEditor
+          table={
+            snap.sidePanel?.type === 'table' &&
+            (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
+              ? selectedTable
               : undefined
           }
-          selectedTable={selectedTable}
-          visible={snap.sidePanel?.type === 'column'}
+          isDuplicating={isDuplicating}
+          templateData={
+            snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
+              ? {
+                  ...snap.sidePanel.templateData,
+                  columns: snap.sidePanel.templateData.columns
+                    ? [...snap.sidePanel.templateData.columns]
+                    : undefined,
+                }
+              : undefined
+          }
+          visible={snap.sidePanel?.type === 'table'}
           closePanel={onClosePanel}
-          saveChanges={saveColumn}
+          saveChanges={saveTable}
           updateEditorDirty={() => setIsEdited(true)}
+          apiAccessToggleHandler={apiAccessToggleHandler}
         />
-      )}
-      <TableEditor
-        table={
-          snap.sidePanel?.type === 'table' &&
-          (snap.sidePanel.mode === 'edit' || snap.sidePanel.mode === 'duplicate')
-            ? selectedTable
-            : undefined
-        }
-        isDuplicating={isDuplicating}
-        templateData={
-          snap.sidePanel?.type === 'table' && snap.sidePanel.templateData
-            ? {
-                ...snap.sidePanel.templateData,
-                columns: snap.sidePanel.templateData.columns
-                  ? [...snap.sidePanel.templateData.columns]
-                  : undefined,
-              }
-            : undefined
-        }
-        visible={snap.sidePanel?.type === 'table'}
-        closePanel={onClosePanel}
-        saveChanges={saveTable}
-        updateEditorDirty={() => setIsEdited(true)}
-        apiAccessToggleHandler={apiAccessToggleHandler}
-      />
-      <SchemaEditor
-        visible={snap.sidePanel?.type === 'schema'}
-        onSuccess={onClosePanel}
-        closePanel={onClosePanel}
-      />
-      <JsonEditor
-        visible={snap.sidePanel?.type === 'json'}
-        row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}
-        column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
-        backButtonLabel="Cancel"
-        applyButtonLabel={isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'}
-        readOnly={!editable}
-        closePanel={onClosePanel}
-        onSaveJSON={onSaveColumnValue}
-      />
-      <TextEditor
-        visible={snap.sidePanel?.type === 'cell'}
-        column={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.column) || ''}
-        row={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.row) || {}}
-        closePanel={onClosePanel}
-        onSaveField={onSaveColumnValue}
-      />
-      <ForeignRowSelector
-        visible={snap.sidePanel?.type === 'foreign-row-selector'}
-        // @ts-ignore
-        foreignKey={
-          snap.sidePanel?.type === 'foreign-row-selector'
-            ? snap.sidePanel.foreignKey.foreignKey
-            : undefined
-        }
-        isSaving={isEditPending}
-        closePanel={onClosePanel}
-        onSelect={onSaveForeignRow}
-      />
-      <SpreadsheetImport
-        key={csvImportKey}
-        visible={snap.sidePanel?.type === 'csv-import'}
-        selectedTable={selectedTable}
-        saveContent={onImportData}
-        closePanel={onClosePanel}
-        updateEditorDirty={setIsEdited}
-      />
-      <OperationQueueSidePanel />
-      <DiscardChangesConfirmationDialog {...modalProps} />
-    </>
-  )
+        <SchemaEditor
+          visible={snap.sidePanel?.type === 'schema'}
+          onSuccess={onClosePanel}
+          closePanel={onClosePanel}
+        />
+        <JsonEditor
+          visible={snap.sidePanel?.type === 'json'}
+          row={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.row) || {}}
+          column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
+          backButtonLabel="Cancel"
+          applyButtonLabel={isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'}
+          readOnly={!editable}
+          closePanel={onClosePanel}
+          onSaveJSON={onSaveColumnValue}
+        />
+        <TextEditor
+          visible={snap.sidePanel?.type === 'cell'}
+          column={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.column) || ''}
+          row={(snap.sidePanel?.type === 'cell' && snap.sidePanel.value?.row) || {}}
+          closePanel={onClosePanel}
+          onSaveField={onSaveColumnValue}
+        />
+        <ForeignRowSelector
+          visible={snap.sidePanel?.type === 'foreign-row-selector'}
+          // @ts-ignore
+          foreignKey={
+            snap.sidePanel?.type === 'foreign-row-selector'
+              ? snap.sidePanel.foreignKey.foreignKey
+              : undefined
+          }
+          isSaving={isEditPending}
+          closePanel={onClosePanel}
+          onSelect={onSaveForeignRow}
+        />
+        <SpreadsheetImport
+          key={csvImportKey}
+          visible={snap.sidePanel?.type === 'csv-import'}
+          selectedTable={selectedTable}
+          saveContent={onImportData}
+          closePanel={onClosePanel}
+          updateEditorDirty={setIsEdited}
+        />
+        <OperationQueueSidePanel />
+        <DiscardChangesConfirmationDialog {...modalProps} />
+      </>
+    )
+  }
 }
