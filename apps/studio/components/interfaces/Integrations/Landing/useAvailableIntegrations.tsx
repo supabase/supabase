@@ -82,13 +82,19 @@ export const useAvailableIntegrations = () => {
       author,
       requiredExtensions: [],
       icon: ({ className, ...props } = {}) => (
-        <>
+        <div className="relative w-full h-full">
           {listingLogo ? (
-            <Image src={fullImageUrl(listingLogo ?? '')} alt="" width={22} height={22} />
+            <Image
+              fill
+              src={fullImageUrl(listingLogo)}
+              alt=""
+              className={cn('p-2', className)}
+              {...props}
+            />
           ) : (
             <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
           )}
-        </>
+        </div>
       ),
       navigation: [
         {
