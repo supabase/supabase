@@ -79,6 +79,7 @@ export interface ChartLineProps {
   }
   strokeWidth?: number
   referenceLines?: ChartReferenceLine[]
+  sharedStackId?: string
 }
 
 export const ChartLine = ({
@@ -104,6 +105,7 @@ export const ChartLine = ({
   YAxisProps,
   strokeWidth = 1.5,
   referenceLines,
+  sharedStackId,
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const { resolvedTheme } = useTheme()
@@ -293,7 +295,7 @@ export const ChartLine = ({
                 fillOpacity={fillOpacity}
                 stroke={lineColor}
                 strokeWidth={strokeWidth}
-                stackId={`stack-${key}`}
+                stackId={sharedStackId ?? `stack-${key}`}
               />
             )
           })}

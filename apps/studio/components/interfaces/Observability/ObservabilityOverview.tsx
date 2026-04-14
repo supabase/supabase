@@ -112,25 +112,23 @@ export const ObservabilityOverview = () => {
 
   const dbServiceData = overviewData.services.db
 
-  // Creates a 1-hour time window for the clicked bar for log filtering
+  // Navigate to the log view scoped to the clicked bar's bucket window
   const handleBarClick = useCallback(
     (serviceKey: string, logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
       const datumTimestamp = dayjs(datum.timestamp)
-      // Round down to the start of the hour
-      const start = datumTimestamp.startOf('hour').toISOString()
-      // Add 1 hour to get the end of the hour
-      const end = datumTimestamp.startOf('hour').add(1, 'hour').toISOString()
+      // 7-day view uses daily buckets; everything else uses hourly
+      const isDailyBucket = interval === '7day'
+      const start = datumTimestamp.startOf(isDailyBucket ? 'day' : 'hour').toISOString()
+      const end = dayjs(start)
+        .add(isDailyBucket ? 1 : 1, isDailyBucket ? 'day' : 'hour')
+        .toISOString()
 
-      const queryParams = new URLSearchParams({
-        its: start,
-        ite: end,
-      })
-
+      const queryParams = new URLSearchParams({ its: start, ite: end })
       router.push(`${logsUrl}?${queryParams.toString()}`)
     },
-    [router]
+    [router, interval]
   )
 
   return (
