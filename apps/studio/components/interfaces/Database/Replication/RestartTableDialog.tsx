@@ -41,13 +41,13 @@ export const RestartTableDialog = ({
       toast.success(
         `Restarting replication for "${tableName}". Pipeline will restart automatically.`
       )
+    },
+    onSettled: () => {
       onRestartComplete?.()
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      onRestartComplete?.()
-      onOpenChange(false)
     },
   })
 

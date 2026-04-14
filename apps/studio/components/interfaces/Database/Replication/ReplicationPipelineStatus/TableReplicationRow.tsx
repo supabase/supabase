@@ -14,6 +14,7 @@ interface TableReplicationRowProps {
   table: ReplicationPipelineTableStatus
   isRestarting: boolean
   showDisabledState: boolean
+  disabledStateMessage: string
   isAnyRestartInProgress: boolean
   isPipelineRunning: boolean
   isPipelineFailed: boolean
@@ -26,6 +27,7 @@ export const TableReplicationRow = ({
   table,
   isRestarting,
   showDisabledState,
+  disabledStateMessage,
   isAnyRestartInProgress,
   isPipelineRunning,
   isPipelineFailed,
@@ -68,6 +70,8 @@ export const TableReplicationRow = ({
       <TableCell className="align-top">
         {isRestarting ? (
           <Badge variant="default">Restarting</Badge>
+        ) : showDisabledState ? (
+          <Badge variant="default">Not Available</Badge>
         ) : (
           <div className={cn(inactiveStatusClassName)}>{statusConfig.badge}</div>
         )}
@@ -78,6 +82,8 @@ export const TableReplicationRow = ({
           <p className="text-sm text-foreground-lighter">
             Replication is being restarted for this table. The pipeline will restart automatically.
           </p>
+        ) : showDisabledState ? (
+          <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : (
           <div className="flex flex-col gap-y-3">
             <div className={cn('text-sm text-foreground', inactiveContentClassName)}>

@@ -6,6 +6,10 @@ export interface RestartPipelineParams {
   pipelineId: number
 }
 
+interface UseRestartPipelineHelperOptions {
+  suppressChildErrorToasts?: boolean
+}
+
 /**
  * Helper hook that provides a restart function which properly stops and then starts a pipeline.
  *
@@ -16,9 +20,12 @@ export interface RestartPipelineParams {
  * because crash looping pods are not restarted if the resource is patched. We will try to find a better
  * solution for this in the future.
  */
-export const useRestartPipelineHelper = () => {
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+export const useRestartPipelineHelper = ({
+  suppressChildErrorToasts = false,
+}: UseRestartPipelineHelperOptions = {}) => {
+  const mutationOptions = suppressChildErrorToasts ? { onError: () => {} } : undefined
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation(mutationOptions)
+  const { mutateAsync: startPipeline } = useStartPipelineMutation(mutationOptions)
 
   const restartPipeline = async ({ projectRef, pipelineId }: RestartPipelineParams) => {
     // Step 1: Stop the pipeline to ensure pods are fully terminated

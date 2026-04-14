@@ -68,14 +68,14 @@ export const useRollbackTablesMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { restartPipeline } = useRestartPipelineHelper()
-  const { mutateAsync: startPipeline } = useStartPipelineMutation()
+  const { restartPipeline } = useRestartPipelineHelper({ suppressChildErrorToasts: true })
+  const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
 
   return useMutation<RollbackTablesData, ResponseError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId, pipelineStatusName } = variables
-      let action: 'starting' | 'restarting' | 'unknown' = 'unknown'
+      let action: 'start' | 'restart' | 'resume' = 'resume'
       let resumeError: Error | null = null
 
       // Start or restart the pipeline after rollback.
@@ -92,12 +92,7 @@ export const useRollbackTablesMutation = ({
             ? 'restart'
             : 'unknown'
 
-        action =
-          postRollbackAction === 'start'
-            ? 'starting'
-            : postRollbackAction === 'restart'
-              ? 'restarting'
-              : 'unknown'
+        action = postRollbackAction === 'unknown' ? 'resume' : postRollbackAction
 
         if (postRollbackAction === 'unknown') {
           throw new Error(
@@ -114,7 +109,7 @@ export const useRollbackTablesMutation = ({
         }
       } catch (error: any) {
         resumeError = error instanceof Error ? error : new Error(String(error))
-        if (action === 'unknown') {
+        if (action === 'resume') {
           toast.error(
             'Rollback completed, but the pipeline state changed before it could be resumed. Refresh the page and try again.'
           )
@@ -136,7 +131,9 @@ export const useRollbackTablesMutation = ({
         ])
       }
 
-      await onSuccess?.(data, variables, context)
+      if (resumeError === null) {
+        await onSuccess?.(data, variables, context)
+      }
     },
     async onError(data, variables, context) {
       if (onError === undefined) {

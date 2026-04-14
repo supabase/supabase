@@ -63,13 +63,13 @@ export const BatchRestartDialog = ({
       toast.success(
         `Restarting replication for ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
       )
+    },
+    onSettled: () => {
       onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      onRestartComplete?.(affectedTableIds)
-      onOpenChange(false)
     },
   })
 
