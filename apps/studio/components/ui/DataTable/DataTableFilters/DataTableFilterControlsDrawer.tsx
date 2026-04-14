@@ -1,8 +1,6 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { FilterIcon } from 'lucide-react'
 import { useRef } from 'react'
-
-import { useHotKey } from 'hooks/ui/useHotKey'
 import {
   Button,
   Drawer,
@@ -17,9 +15,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import { useMediaQuery } from '../hooks/useMediaQuery'
 import { Kbd } from '../primitives/Kbd'
 import { DataTableFilterControls } from './DataTableFilterControls'
+import { useHotKey } from '@/hooks/ui/useHotKey'
 
 export function DataTableFilterControlsDrawer() {
   const triggerButtonRef = useRef<HTMLButtonElement>(null)

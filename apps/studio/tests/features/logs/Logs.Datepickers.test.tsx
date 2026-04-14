@@ -1,19 +1,20 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {
-  LogsDatePicker,
-  parseCustomInput,
-  generateDynamicHelper,
-  generateDynamicHelpers,
-  generateHelpersFromInput,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs/Logs.constants'
-import { DatetimeHelper } from 'components/interfaces/Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { describe, expect, test, vi } from 'vitest'
+
 import { render } from '../../helpers'
+import { PREVIEWER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import {
+  generateDynamicHelper,
+  generateDynamicHelpers,
+  generateHelpersFromInput,
+  LogsDatePicker,
+  parseCustomInput,
+} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)

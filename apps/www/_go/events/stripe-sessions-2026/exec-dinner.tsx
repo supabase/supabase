@@ -147,7 +147,7 @@ const page: GoPageInput = {
         },
       ],
       submitLabel: 'Confirm RSVP',
-      successRedirect: '/go/stripe/exec-dinner/thank-you',
+      successRedirect: '/go/exec-dinner-april-2026/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {

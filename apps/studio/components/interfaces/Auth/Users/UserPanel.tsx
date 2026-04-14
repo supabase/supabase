@@ -1,6 +1,3 @@
-import { useUserQuery } from 'data/auth/user-query'
-import { User } from 'data/auth/users-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -10,17 +7,20 @@ import {
   Input_Shadcn_,
   ResizableHandle,
   ResizablePanel,
-  SimpleCodeBlock,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
+import { useUserQuery } from '@/data/auth/user-query'
+import { User } from '@/data/auth/users-infinite-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()

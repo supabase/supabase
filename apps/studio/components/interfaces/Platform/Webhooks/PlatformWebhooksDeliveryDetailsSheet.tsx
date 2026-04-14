@@ -1,5 +1,3 @@
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Copy, RotateCcw } from 'lucide-react'
 import {
   AlertDialog,
@@ -23,6 +21,8 @@ import { TimestampInfo } from 'ui-patterns'
 
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
+import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
   deliveryAttempt: number | null

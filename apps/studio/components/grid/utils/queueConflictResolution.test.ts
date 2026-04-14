@@ -7,11 +7,11 @@ import {
   upsertOperation,
 } from './queueConflictResolution'
 import {
+  QueuedOperation,
+  QueuedOperationType,
   type NewAddRowOperation,
   type NewDeleteRowOperation,
   type NewEditCellContentOperation,
-  QueuedOperation,
-  QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 
 describe('operationMatchesRow', () => {

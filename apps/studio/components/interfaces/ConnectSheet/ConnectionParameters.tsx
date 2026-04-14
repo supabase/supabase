@@ -9,9 +9,10 @@ interface Parameter {
 
 interface ConnectionParametersProps {
   parameters: Parameter[]
+  onCopy?: (paramKey: string) => void
 }
 
-export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) => {
+export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParametersProps) => {
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
 
   return (
@@ -25,6 +26,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
               onClick={() => {
                 copyToClipboard(param.value, () => {
                   setCopiedMap((prev) => ({ ...prev, [param.key]: true }))
+                  onCopy?.(param.key)
                   setTimeout(() => {
                     setCopiedMap((prev) => ({ ...prev, [param.key]: false }))
                   }, 1000)

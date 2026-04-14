@@ -1,15 +1,7 @@
 import { IS_PLATFORM } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ASSISTANT_SUGGESTIONS } from 'components/ui/HelpPanel/HelpPanel.constants'
-import { getSupportLinkQueryParams } from 'components/ui/HelpPanel/HelpPanel.utils'
-import { HelpSection } from 'components/ui/HelpPanel/HelpSection'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   Popover_Shadcn_,
@@ -19,6 +11,14 @@ import {
 } from 'ui'
 
 import { FeedbackWidget } from './FeedbackWidget'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ASSISTANT_SUGGESTIONS } from '@/components/ui/HelpPanel/HelpPanel.constants'
+import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
+import { HelpSection } from '@/components/ui/HelpPanel/HelpSection'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
   const router = useRouter()

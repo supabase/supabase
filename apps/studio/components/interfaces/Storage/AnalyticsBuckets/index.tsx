@@ -1,15 +1,9 @@
+import { useParams } from 'common'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
-import { createNavigationHandler } from 'lib/navigation'
 import {
   Card,
   Table,
@@ -27,9 +21,15 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
+import AlertError from '@/components/ui/AlertError'
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
+import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()

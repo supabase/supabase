@@ -16,22 +16,6 @@ import { useEffect, useMemo, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import {
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  useIsAwsCloudProvider,
-  useIsOrioleDb,
-  useSelectedProjectQuery,
-} from 'hooks/misc/useSelectedProject'
-import { timeout } from 'lib/helpers'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -51,6 +35,22 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import {
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  useIsAwsCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { timeout } from '@/lib/helpers'
 
 interface InstanceConfigurationUIProps {
   diagramOnly?: boolean
@@ -236,8 +236,6 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
         }`}
       >
-        {/* Sometimes the read replicas are loaded before the project info and causes  read replicas to be shown on Fly deploys.
-            You can replicate this to going to this page and refresh. This isLoadingProject flag fixes that. */}
         {(isLoading || isLoadingProject) && (
           <Loader2 className="animate-spin text-foreground-light" />
         )}

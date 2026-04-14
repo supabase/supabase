@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PropsWithChildren } from 'react'
-import { SimpleCodeBlock } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
 import { Markdown } from '../Markdown'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface ContentSnippetProps {
   apikey?: string

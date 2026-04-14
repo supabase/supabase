@@ -1,7 +1,8 @@
-import { NO_REQUIRED_CHARACTERS, urlRegex } from 'components/interfaces/Auth/Auth.constants'
-import { ProjectAuthConfigData } from 'data/auth/auth-config-query'
-import { DOCS_URL } from 'lib/constants'
 import { boolean, number, object, string } from 'yup'
+
+import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/Auth.constants'
+import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { DOCS_URL } from '@/lib/constants'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -31,6 +32,12 @@ const PROVIDER_EMAIL = {
       description: `Users will need to be recently logged in to change their password without requiring reauthentication. (A user is considered recently logged in if the session was created within the last 24 hours.)
       If disabled, a user can change their password at any time.`,
       type: 'boolean',
+    },
+    SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: {
+      title: 'Require current password when updating',
+      description: `Requires that the user supplies their current password when changing their password. [Learn more](${DOCS_URL}/guides/auth/password-security#require-current-password-when-changing).`,
+      type: 'boolean',
+      isPaid: false,
     },
     PASSWORD_HIBP_ENABLED: {
       title: 'Prevent use of leaked passwords',
@@ -69,7 +76,6 @@ const PROVIDER_EMAIL = {
         },
       ],
     },
-
     MAILER_OTP_EXP: {
       title: 'Email OTP expiration',
       type: 'number',
@@ -80,7 +86,7 @@ const PROVIDER_EMAIL = {
       title: 'Email OTP length',
       type: 'number',
       description: 'Number of digits in the email OTP.',
-      units: 'number',
+      units: 'digits',
     },
   },
   validationSchema: object().shape({
@@ -471,69 +477,56 @@ const EXTERNAL_PROVIDER_APPLE = {
   },
   validationSchema: object().shape({
     EXTERNAL_APPLE_ENABLED: boolean().required(),
-    EXTERNAL_APPLE_SECRET: string()
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !!EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema
-            .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
-            .test({
-              message: 'Secret key is not a correctly generated JWT.',
-              test: (value?: string): boolean => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const header = JSON.parse(parts[0])
-                  const body = JSON.parse(parts[1])
-                  return (
-                    typeof header === 'object' &&
-                    typeof body === 'object' &&
-                    header &&
-                    body &&
-                    header.alg === 'ES256' &&
-                    body.aud === 'https://appleid.apple.com'
-                  )
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
-
+    EXTERNAL_APPLE_SECRET: string().when('EXTERNAL_APPLE_ENABLED', {
+      is: true,
+      then: (schema) =>
+        schema
+          .matches(/^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i, 'Secret key should be a JWT.')
+          .test({
+            message: 'Secret key is not a correctly generated JWT.',
+            test: (value?: string): boolean => {
+              if (!value) {
                 return true
-              },
-            })
-            .test({
-              message: 'Secret key expires in less than 7 days!',
-              test: (value?: string) => {
-                if (!value) {
-                  return true
-                }
-                try {
-                  const parts = value.split('.').map((value) => parseBase64URL(value))
-                  const body = JSON.parse(parts[1])
-                  return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
-                } catch (e: any) {
-                  console.log(e)
-                  return false
-                }
+              }
+              try {
+                const parts = value.split('.').map((value) => parseBase64URL(value))
+                const header = JSON.parse(parts[0])
+                const body = JSON.parse(parts[1])
+                return (
+                  typeof header === 'object' &&
+                  typeof body === 'object' &&
+                  header &&
+                  body &&
+                  header.alg === 'ES256' &&
+                  body.aud === 'https://appleid.apple.com'
+                )
+              } catch (e: any) {
+                console.log(e)
+                return false
+              }
 
+              return true
+            },
+          })
+          .test({
+            message: 'Secret key expires in less than 7 days!',
+            test: (value?: string) => {
+              if (!value) {
                 return true
-              },
-            }),
-      })
-      .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
-        is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
-          return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
-        },
-        then: (schema) =>
-          schema.matches(
-            /^$/,
-            'Secret Key should only be set if Service ID for OAuth is provided.'
-          ),
-      }),
+              }
+              try {
+                const parts = value.split('.').map((value) => parseBase64URL(value))
+                const body = JSON.parse(parts[1])
+                return Date.now() > body.exp - 7 * 24 * 60 * 60 * 1000
+              } catch (e: any) {
+                console.log(e)
+                return false
+              }
+
+              return true
+            },
+          }),
+    }),
     EXTERNAL_APPLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
@@ -1568,7 +1561,9 @@ const PROVIDER_SAML = {
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
+    SAML_EXTERNAL_URL: string()
+      .matches(urlRegex(), { message: 'Must be a valid URL', excludeEmptyString: true })
+      .optional(),
     SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {

@@ -27,10 +27,12 @@ if (!projectId && process.env.IS_BRAINTRUST_PUSH)
   throw new Error('BRAINTRUST_PROJECT_ID is not set')
 
 // When running in CI, prefix scorers with the branch name to avoid collisions between PRs
-// in the staging project. GITHUB_HEAD_REF is set on PR events, GITHUB_REF_NAME on push/dispatch.
+// in the staging project. GITHUB_HEAD_REF is only set on PR events, not push events (e.g. master).
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
-const prefix = branch ? `${branch.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-` : ''
 const prNumber = process.env.GITHUB_PR_NUMBER ? Number(process.env.GITHUB_PR_NUMBER) : undefined
+const prefix = process.env.GITHUB_HEAD_REF
+  ? `${process.env.GITHUB_HEAD_REF.replace(/[^a-z0-9-]/gi, '-').toLowerCase()}-`
+  : ''
 const metadata = branch ? { gitBranch: branch, ...(prNumber && { prNumber }) } : undefined
 const description = prNumber && branch ? `#${prNumber} · ${branch}` : branch
 

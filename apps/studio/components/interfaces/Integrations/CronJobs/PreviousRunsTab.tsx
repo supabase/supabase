@@ -1,20 +1,21 @@
 import { useParams } from 'common'
-import {
-  CronJobRun,
-  useCronJobRunsInfiniteQuery,
-} from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import dayjs from 'dayjs'
-import { useInfiniteScroll } from 'hooks/misc/useInfiniteScroll'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { CircleCheck, CircleX, Loader } from 'lucide-react'
 import { useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
-import { cn, CodeBlock, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { calculateDuration, formatDate } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
+import {
+  CronJobRun,
+  useCronJobRunsInfiniteQuery,
+} from '@/data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const cronJobColumns = [
   {

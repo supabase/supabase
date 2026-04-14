@@ -1,14 +1,14 @@
 import { useFlag, useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { SubMenu } from 'components/ui/ProductMenu/SubMenu'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { getPathnameWithoutQuery } from 'lib/pathname.utils'
 import { useRouter } from 'next/router'
 
 import {
   generateOrganizationSettingsSections,
   normalizeOrganizationSettingsPath,
 } from './OrganizationSettingsLayout'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { SubMenu } from '@/components/ui/ProductMenu/SubMenu'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { getPathnameWithoutQuery } from '@/lib/pathname.utils'
 
 export interface OrganizationSettingsMenuProps {
   onCloseSheet?: () => void

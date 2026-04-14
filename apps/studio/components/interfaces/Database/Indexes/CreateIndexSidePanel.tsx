@@ -1,11 +1,3 @@
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabaseIndexCreateMutation } from 'data/database-indexes/index-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTableColumnsQuery } from 'data/database/table-columns-query'
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
@@ -37,6 +29,14 @@ import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { INDEX_TYPES } from './Indexes.constants'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseIndexCreateMutation } from '@/data/database-indexes/index-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useTableColumnsQuery } from '@/data/database/table-columns-query'
+import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface CreateIndexSidePanelProps {
   visible: boolean

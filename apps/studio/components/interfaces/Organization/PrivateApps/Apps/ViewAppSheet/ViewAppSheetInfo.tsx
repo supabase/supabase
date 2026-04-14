@@ -6,14 +6,15 @@ import {
   Badge,
   Card,
   CardContent,
+  copyToClipboard,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  copyToClipboard,
 } from 'ui'
+
 import type { Installation, PrivateApp } from '../../PrivateAppsContext'
 
 interface ViewAppSheetInfoProps {

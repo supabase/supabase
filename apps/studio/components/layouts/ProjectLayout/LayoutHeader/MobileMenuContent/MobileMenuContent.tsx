@@ -1,22 +1,7 @@
 'use client'
 
 import { useFlag, useParams } from 'common'
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useUnifiedLogsPreview,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ICON_SIZE, ICON_STROKE_WIDTH } from 'components/interfaces/Sidebar'
-import {
-  generateOtherRoutes,
-  generateProductRoutes,
-  generateSettingsRoutes,
-  generateToolRoutes,
-} from 'components/layouts/Navigation/NavigationBar/NavigationBar.utils'
-import type { Route } from 'components/ui/ui.types'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
-import { getPathnameWithoutQuery, getPathSegment } from 'lib/pathname.utils'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
@@ -27,6 +12,18 @@ import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
 import { TopLevelRouteItem } from './TopLevelRouteItem'
 import { routeHasSubmenu, useMobileMenuNavigation } from './useMobileMenuNavigation'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
+import {
+  generateOtherRoutes,
+  generateProductRoutes,
+  generateSettingsRoutes,
+  generateToolRoutes,
+} from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import type { Route } from '@/components/ui/ui.types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getPathnameWithoutQuery, getPathSegment } from '@/lib/pathname.utils'
 
 export interface MobileMenuContentProps {
   currentProductMenu: React.ReactNode
@@ -67,7 +64,6 @@ export function MobileMenuContent({
   ])
   const authOverviewPageEnabled = useFlag('authOverviewPage')
   const showReports = useIsFeatureEnabled('reports:all')
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
@@ -95,9 +91,8 @@ export function MobileMenuContent({
       generateOtherRoutes(ref, project, {
         unifiedLogs: isUnifiedLogsEnabled,
         showReports,
-        apiDocsSidePanel: isNewAPIDocsEnabled,
       }),
-    [ref, project, isUnifiedLogsEnabled, showReports, isNewAPIDocsEnabled]
+    [ref, project, isUnifiedLogsEnabled, showReports]
   )
   const settingsRoutes = useMemo(() => generateSettingsRoutes(ref), [ref])
 

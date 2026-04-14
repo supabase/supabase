@@ -1,18 +1,18 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
+import { Badge, cn, HoverCard, HoverCardContent, HoverCardTrigger, Input } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import CardButton from 'components/ui/CardButton'
-import CopyButton from 'components/ui/CopyButton'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { SimpleCodeBlock } from 'ui'
 import {
   getGeneralPolicyTemplates,
   getQueuePolicyTemplates,
   getRealtimePolicyTemplates,
 } from '../PolicyEditorModal/PolicyEditorModal.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import CardButton from '@/components/ui/CardButton'
+import CopyButton from '@/components/ui/CopyButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
 
 interface PolicyTemplatesProps {
   schema: string

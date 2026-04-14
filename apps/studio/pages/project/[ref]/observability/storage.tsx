@@ -7,30 +7,30 @@ import {
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
+} from '@/components/interfaces/Reports/renderers/ApiRenderers'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
-} from 'components/interfaces/Reports/renderers/StorageRenderers'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+} from '@/components/interfaces/Reports/renderers/StorageRenderers'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import {
   DatePickerValue,
   LogsDatePicker,
-} from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useStorageReport } from 'data/reports/storage-report-query'
-import { useReportDateRange, useRefreshHandler } from 'hooks/misc/useReportDateRange'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { useStorageReport } from '@/data/reports/storage-report-query'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()

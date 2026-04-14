@@ -1,4 +1,4 @@
-import type { DatabaseEventTrigger } from 'data/database-event-triggers/database-event-triggers-query'
+import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 
 const ensureSemicolon = (statement: string) => {
   const trimmed = statement.trim()

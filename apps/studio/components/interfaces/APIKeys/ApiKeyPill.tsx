@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { InputVariants } from '@ui/components/shadcn/ui/input'
-import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { useAPIKeyIdQuery } from 'data/api-keys/api-key-id-query'
-import { APIKeysData } from 'data/api-keys/api-keys-query'
-import { apiKeysKeys } from 'data/api-keys/keys'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import CopyButton from '@/components/ui/CopyButton'
+import { useAPIKeyIdQuery } from '@/data/api-keys/api-key-id-query'
+import { APIKeysData } from '@/data/api-keys/api-keys-query'
+import { apiKeysKeys } from '@/data/api-keys/keys'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export function ApiKeyPill({
   apiKey,

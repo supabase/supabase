@@ -1,5 +1,6 @@
-import { DatePickerToFrom } from 'components/interfaces/Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
+
+import { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Logs.types'
 
 // [Joshen] Mainly to handle if a single date is selected - currently just for Audit Logs as
 // i'm on the fence if this logic should be within the DatePicker component itself

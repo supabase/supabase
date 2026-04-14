@@ -13,9 +13,7 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
   cn,
-  CodeBlock,
   copyToClipboard,
   CriticalIcon,
   Form_Shadcn_,
@@ -27,6 +25,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'

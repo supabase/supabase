@@ -1,20 +1,21 @@
 import { useQueryClient } from '@tanstack/react-query'
-import {
-  NewPaymentMethodElement,
-  type PaymentMethodElementRef,
-} from 'components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
-import { organizationKeys } from 'data/organizations/keys'
-import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
-import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useOrganizationPaymentMethodMarkAsDefaultMutation } from 'data/organizations/organization-payment-method-default-mutation'
-import { useOrganizationTaxIdQuery } from 'data/organizations/organization-tax-id-query'
-import { useOrganizationTaxIdUpdateMutation } from 'data/organizations/organization-tax-id-update-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { isEqual } from 'lodash'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Checkbox_Shadcn_, Label_Shadcn_, Modal } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import {
+  NewPaymentMethodElement,
+  type PaymentMethodElementRef,
+} from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { organizationKeys } from '@/data/organizations/keys'
+import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useOrganizationPaymentMethodMarkAsDefaultMutation } from '@/data/organizations/organization-payment-method-default-mutation'
+import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useOrganizationTaxIdUpdateMutation } from '@/data/organizations/organization-tax-id-update-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface AddPaymentMethodFormProps {
   returnUrl: string

@@ -4,7 +4,6 @@ import React from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import styleHandler from '../../lib/theme/styleHandler'
-import { useFormContext } from '../Form/FormContext'
 import CheckboxStyles from './Checkbox.module.css'
 import { CheckboxContext } from './CheckboxContext'
 
@@ -109,16 +108,12 @@ export function Checkbox({
   afterLabel,
   beforeLabel,
   description,
-  checked,
   value,
   onChange,
-  onBlur,
   size = 'medium',
   disabled = false,
   ...props
 }: InputProps) {
-  const { formContextOnChange, values, handleBlur } = useFormContext()
-
   const __styles = styleHandler('checkbox')
 
   return (
@@ -143,12 +138,6 @@ export function Checkbox({
         // if that fails, use the id
         const markupName = name ? name : markupId
 
-        // check if checkbox checked is true or false
-        // if neither true or false the checkbox will rely on native control
-        let active = checked ?? undefined
-
-        // if (values && !value) value = values[id || name]
-
         let containerClasses = [__styles.container]
 
         function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -156,22 +145,9 @@ export function Checkbox({
           if (parentCallback) parentCallback(e)
           // '`onChange` callback for this component
           if (onChange) onChange(e)
-          // update form
-          if (formContextOnChange) formContextOnChange(e)
         }
 
         if (className) containerClasses.push(className)
-
-        if (values && checked === undefined) active = values[id || name]
-
-        function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-          if (handleBlur) {
-            setTimeout(() => {
-              handleBlur(e)
-            }, 100)
-          }
-          if (onBlur) onBlur(e)
-        }
 
         return (
           <div className={containerClasses.join(' ')}>
@@ -181,8 +157,6 @@ export function Checkbox({
               type="checkbox"
               className={[__styles.base, __styles.size[size]].join(' ')}
               onChange={onInputChange}
-              onBlur={handleBlurEvent}
-              checked={active}
               value={value ? value : markupId}
               disabled={disabled}
               {...props}

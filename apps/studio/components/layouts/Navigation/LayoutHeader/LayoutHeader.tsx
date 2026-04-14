@@ -1,30 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  useIsBranching2Enabled,
-  useIsFloatingMobileToolbarEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Connect } from 'components/interfaces/Connect/Connect'
-import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
-import { ConnectSheet } from 'components/interfaces/ConnectSheet/ConnectSheet'
-import { LocalDropdown } from 'components/interfaces/LocalDropdown'
-import { UserDropdown } from 'components/interfaces/UserDropdown'
-import { AdvisorButton } from 'components/layouts/AppLayout/AdvisorButton'
-import { AssistantButton } from 'components/layouts/AppLayout/AssistantButton'
-import { BranchDropdown } from 'components/layouts/AppLayout/BranchDropdown'
-import { InlineEditorButton } from 'components/layouts/AppLayout/InlineEditorButton'
-import { OrganizationDropdown } from 'components/layouts/AppLayout/OrganizationDropdown'
-import { ProjectDropdown } from 'components/layouts/AppLayout/ProjectDropdown'
-import { HelpButton } from 'components/ui/HelpPanel/HelpButton'
-import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import dayjs from 'dayjs'
-import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePHFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -34,10 +10,28 @@ import { CommandMenuTriggerInput } from 'ui-patterns'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
+import { HeaderUpgradeButton } from './HeaderUpgradeButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
-import type { ConnectSectionVariant } from '@/components/interfaces/ProjectHome/ConnectSection.config'
+import { useIsFloatingMobileToolbarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
+import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
+import { UserDropdown } from '@/components/interfaces/UserDropdown'
+import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
+import { AssistantButton } from '@/components/layouts/AppLayout/AssistantButton'
+import { BranchDropdown } from '@/components/layouts/AppLayout/BranchDropdown'
+import { InlineEditorButton } from '@/components/layouts/AppLayout/InlineEditorButton'
+import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
+import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
+import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
+import { getResourcesExceededLimitsOrg } from '@/components/ui/OveragesBanner/OveragesBanner.utils'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -75,12 +69,8 @@ export const LayoutHeader = ({
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
-  const connectSectionVariant = usePHFlag<ConnectSectionVariant | false>('connectSection')
-  const isConnectSheetEnabled = connectSectionVariant === 'connect'
-
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
 
   const isAccountPage = router.pathname.startsWith('/account')
@@ -222,7 +212,7 @@ export const LayoutHeader = ({
                     ease: 'easeOut',
                   }}
                 >
-                  {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
+                  {IS_PLATFORM && <MergeRequestButton />}
                   <ConnectButton buttonType={connectButtonType} />
                 </motion.div>
               )}
@@ -233,7 +223,6 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
-                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-1 md:gap-2">
@@ -242,10 +231,11 @@ export const LayoutHeader = ({
                     placeholder="Search..."
                     className={cn(
                       'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
-                      '[&_.command-shortcut>div]:border-none',
-                      '[&_.command-shortcut>div]:pr-2',
-                      '[&_.command-shortcut>div]:bg-transparent',
-                      '[&_.command-shortcut>div]:text-foreground-lighter'
+                      '[&_.command-shortcut]:border-none',
+                      '[&_.command-shortcut]:pr-2',
+                      '[&_.command-shortcut]:bg-transparent',
+                      '[&_.command-shortcut]:text-foreground-lighter',
+                      '[&_.command-shortcut]:shadow-none'
                     )}
                   />
                   <HelpButton />
@@ -259,6 +249,7 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
+                <HeaderUpgradeButton className="hidden md:flex" />
                 <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (
@@ -268,10 +259,11 @@ export const LayoutHeader = ({
                   <CommandMenuTriggerInput
                     placeholder="Search..."
                     className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                        [&_.command-shortcut>div]:border-none
-                        [&_.command-shortcut>div]:pr-2
-                        [&_.command-shortcut>div]:bg-transparent
-                        [&_.command-shortcut>div]:text-foreground-lighter
+                        [&_.command-shortcut]:border-none
+                        [&_.command-shortcut]:pr-2
+                        [&_.command-shortcut]:bg-transparent
+                        [&_.command-shortcut]:text-foreground-lighter
+                        [&_.command-shortcut]:shadow-none
                       "
                   />
                   <HelpButton />
@@ -292,7 +284,7 @@ export const LayoutHeader = ({
         </div>
       </header>
 
-      {isConnectSheetEnabled ? <ConnectSheet /> : <Connect />}
+      <ConnectSheet />
     </>
   )
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { cronPattern, secondsPattern } from './CronJobs.constants'
 import { formatCronJobColumns, parseCronJobCommand } from './CronJobs.utils'
 
@@ -237,6 +238,19 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should parse a POST body without swallowing later quoted arguments', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', body:='{"payload":"ok"}'::jsonb, headers:='{"Authorization":"Bearer demo"}'::jsonb, timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Authorization', value: 'Bearer demo' }],
+      httpBody: '{"payload":"ok"}',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
   it('should return SQL snippet type if the command is an HTTP request that cannot be parsed properly due to positional notation', () => {
     const command = `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
@@ -270,7 +284,22 @@ describe('parseCronJobCommand', () => {
     { description: 'every weekend at 10 AM', command: '0 10 * * 0,6' },
     { description: 'every quarter hour', command: '*/15 * * * *' },
     { description: 'twice daily at 8 AM and 8 PM', command: '0 8,20 * * *' },
+    { description: 'last day of every month at midnight (pg_cron $ syntax)', command: '0 0 $ * *' },
+    { description: 'last day of every month at noon (pg_cron $ syntax)', command: '0 12 $ * *' },
   ]
+
+  const cronPatternRejectTests = [
+    { description: '$ in minute field', command: '$ * * * *' },
+    { description: '$ in hour field', command: '* $ * * *' },
+    { description: '$ in month field', command: '* * * $ *' },
+    { description: '$ in day-of-week field', command: '* * * * $' },
+  ]
+
+  cronPatternRejectTests.forEach(({ description, command }) => {
+    it(`should not match the regex for a cronPattern with "${description}"`, () => {
+      expect(command).not.toMatch(cronPattern)
+    })
+  })
 
   // Replace the single cronPattern test with forEach
   cronPatternTests.forEach(({ description, command }) => {

@@ -1,20 +1,20 @@
 import { Check, GitMerge, Shield } from 'lucide-react'
 import { useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Branch } from 'data/branches/branches-query'
 import {
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Branch } from '@/data/branches/branches-query'
 
 interface BranchSelectorProps {
   branches: Branch[]
@@ -22,6 +22,7 @@ interface BranchSelectorProps {
   disabled?: boolean
   isUpdating?: boolean
   type?: 'primary' | 'outline'
+  align?: 'end' | 'center'
 }
 
 export const BranchSelector = ({
@@ -30,14 +31,12 @@ export const BranchSelector = ({
   disabled = false,
   isUpdating = false,
   type = 'primary',
+  align = 'end',
 }: BranchSelectorProps) => {
   const [open, setOpen] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
 
-  // Filter out branches that are already ready for review or linked to a github branch
-  const availableBranches = branches.filter(
-    (branch) => !branch.is_default && !branch.review_requested_at && !branch.git_branch
-  )
+  const availableBranches = branches.filter((branch) => !branch.is_default)
 
   const handleBranchSelect = (branch: Branch) => {
     setSelectedBranch(branch)
@@ -51,16 +50,17 @@ export const BranchSelector = ({
         <ButtonTooltip
           icon={<GitMerge size={14} strokeWidth={1.5} />}
           type={type}
-          disabled={disabled || availableBranches.length === 0 || isUpdating}
+          disabled={
+            disabled || isUpdating || branches.length === 0 || availableBranches.length === 0
+          }
           tooltip={{
             content: {
               side: 'bottom',
+              align,
               text:
-                branches.length === 0
+                branches.length === 0 || availableBranches.length === 0
                   ? 'Create a branch first to start a merge request'
-                  : availableBranches.length === 0
-                    ? 'All branches currently have merge requests'
-                    : undefined,
+                  : undefined,
             },
           }}
         >
@@ -80,7 +80,7 @@ export const BranchSelector = ({
                     value={branch.name.replaceAll('"', '')}
                     className="cursor-pointer w-full flex items-center justify-between"
                     onSelect={() => handleBranchSelect(branch)}
-                    disabled={isUpdating}
+                    disabled={isUpdating || !!branch.git_branch || !!branch.review_requested_at}
                   >
                     <div className="flex items-center gap-2">
                       {branch.is_default && <Shield size={14} className="text-amber-900" />}
@@ -91,6 +91,8 @@ export const BranchSelector = ({
                     {selectedBranch?.id === branch.id && (
                       <Check size={14} strokeWidth={1.5} className="text-brand" />
                     )}
+                    {branch.git_branch && <span>Synced to a Git branch</span>}
+                    {branch.review_requested_at && <span>Merge request opened</span>}
                   </CommandItem_Shadcn_>
                 ))}
               </ScrollArea>
