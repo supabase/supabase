@@ -596,8 +596,10 @@ const EXTERNAL_PROVIDER_APPLE = {
       EXTERNAL_APPLE_ENABLED: z.literal(true),
       EXTERNAL_APPLE_SECRET: z
         .string()
-        .min(1, 'Secret key is required')
-        .regex(/^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i, 'Secret key should be a JWT.')
+        .refine(
+          (value) => !value || /^([a-z0-9_-]+([.][a-z0-9_-]+){2})?$/i.test(value),
+          'Secret key should be a JWT.'
+        )
         .refine((value) => {
           try {
             const parts = value.split('.').map((value) => parseBase64URL(value))
