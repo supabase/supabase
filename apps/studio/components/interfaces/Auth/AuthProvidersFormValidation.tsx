@@ -600,6 +600,7 @@ const EXTERNAL_PROVIDER_APPLE = {
           'Secret key should be a JWT.'
         )
         .refine((value) => {
+          if (!value) return true
           try {
             const parts = value.split('.').map((value) => parseBase64URL(value))
             const header = JSON.parse(parts[0])
@@ -619,6 +620,7 @@ const EXTERNAL_PROVIDER_APPLE = {
           }
         }, 'Secret key is not a correctly generated JWT.')
         .refine((value) => {
+          if (!value) return true
           try {
             const parts = value.split('.').map((value) => parseBase64URL(value))
             const body = JSON.parse(parts[1])
