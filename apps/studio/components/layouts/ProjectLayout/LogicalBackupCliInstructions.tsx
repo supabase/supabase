@@ -34,11 +34,13 @@ function buildLogicalBackupShellScript(connectionUri: string) {
 export type LogicalBackupCliInstructionsProps = {
   enabled?: boolean
   className?: string
+  showResetPassword?: boolean
 }
 
 export const LogicalBackupCliInstructions = ({
   enabled = true,
   className,
+  showResetPassword = true,
 }: LogicalBackupCliInstructionsProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -76,45 +78,57 @@ export const LogicalBackupCliInstructions = ({
 
   return (
     <div className={cn('space-y-3', className)}>
-      <div>
+      <div className="space-y-1">
         <h4 className="text-sm font-medium">Back up your database with the Supabase CLI</h4>
-        <p className="text-sm text-foreground-light mt-1">
-          Use your direct connection string (replace {DB_PASSWORD_PLACEHOLDER} with your database
-          password). If your password contains special characters such as <code>@</code>,{' '}
-          <code>#</code>, <code>:</code>, or <code>'</code>, percent-encode them first (e.g.{' '}
-          <code>@</code> → <code>%40</code>, <code>'</code> → <code>%27</code>). If your password
-          contains <code>%</code>, encode it as <code>%25</code> before encoding any other
-          characters.{' '}
+        <p className="text-sm text-foreground-light">
+          Use your direct connection string — replace {DB_PASSWORD_PLACEHOLDER} with your database
+          password.{' '}
           <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Backup documentation</InlineLink>
           .
         </p>
+        <p className="text-sm text-foreground-light">
+          Any reserved character in your password must be percent-encoded in the URL (e.g.{' '}
+          <code>@</code>&nbsp;→&nbsp;<code>%40</code>,{' '}
+          <code>:</code>&nbsp;→&nbsp;<code>%3A</code>,{' '}
+          <code>/</code>&nbsp;→&nbsp;<code>%2F</code>,{' '}
+          <code>#</code>&nbsp;→&nbsp;<code>%23</code>). Encode <code>%</code> as{' '}
+          <code>%25</code> first.
+        </p>
       </div>
 
-      <ButtonTooltip
-        type="default"
-        disabled={resetDisabled}
-        onClick={() => {
-          if (!resetDisabled && ref) {
-            void router.push(`/project/${ref}/database/settings#database-password`)
-          }
-        }}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: !canResetDbPassword
-              ? 'You need additional permissions to reset the database password'
-              : undefined,
-          },
-        }}
-      >
-        Reset database password
-      </ButtonTooltip>
+      {showResetPassword && (
+        <ButtonTooltip
+          type="default"
+          disabled={resetDisabled}
+          onClick={() => {
+            if (!resetDisabled && ref) {
+              void router.push(`/project/${ref}/database/settings#database-password`)
+            }
+          }}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canResetDbPassword
+                ? 'You need additional permissions to reset the database password'
+                : undefined,
+            },
+          }}
+        >
+          Reset database password
+        </ButtonTooltip>
+      )}
 
       {isError && (
         <p className="text-sm text-foreground-light">
-          Could not load connection details. Open{' '}
-          <InlineLink href={resetPasswordHref}>Database settings</InlineLink> to copy your
-          connection string manually.
+          Could not load connection details.{' '}
+          {showResetPassword ? (
+            <>
+              Open <InlineLink href={resetPasswordHref}>Database settings</InlineLink> to copy your
+              connection string manually.
+            </>
+          ) : (
+            'Please contact support for assistance.'
+          )}
         </p>
       )}
 
