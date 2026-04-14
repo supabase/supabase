@@ -16,6 +16,7 @@ interface TableReplicationRowProps {
   showDisabledState: boolean
   isAnyRestartInProgress: boolean
   isPipelineRunning: boolean
+  isPipelineFailed: boolean
   isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
@@ -27,6 +28,7 @@ export const TableReplicationRow = ({
   showDisabledState,
   isAnyRestartInProgress,
   isPipelineRunning,
+  isPipelineFailed,
   isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
@@ -35,7 +37,7 @@ export const TableReplicationRow = ({
   const isErrorState = table.state.name === 'error'
   const statusConfig = getStatusConfig(table.state as TableState['state'])
 
-  const isInactive = !isPipelineRunning && !isRestarting
+  const isInactive = !isPipelineRunning && !isPipelineFailed && !isRestarting
   const inactiveContentClassName = isInactive ? 'text-foreground-light opacity-50' : undefined
   const inactiveStatusClassName = isInactive ? 'opacity-50 grayscale' : undefined
 

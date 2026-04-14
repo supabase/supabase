@@ -76,6 +76,7 @@ export const useRollbackTablesMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId, pipelineStatusName } = variables
       let action: 'starting' | 'restarting' | 'unknown' = 'unknown'
+      let resumeError: Error | null = null
 
       // Start or restart the pipeline after rollback.
       // Stopped pipelines only need a start (already stopped, no need to stop first).
@@ -112,22 +113,28 @@ export const useRollbackTablesMutation = ({
           await restartPipeline({ projectRef, pipelineId })
         }
       } catch (error: any) {
-        const actionText = action === 'unknown' ? 'resume' : action
-        toast.error(
-          `Rollback completed, but failed to ${actionText} the pipeline: ${error.message}`
-        )
-        throw error
+        resumeError = error instanceof Error ? error : new Error(String(error))
+        if (action === 'unknown') {
+          toast.error(
+            'Rollback completed, but the pipeline state changed before it could be resumed. Refresh the page and try again.'
+          )
+        } else {
+          toast.error(
+            `Rollback completed, but failed to ${action} the pipeline: ${resumeError.message}`
+          )
+        }
+      } finally {
+        // Always refresh the pipeline + table status after a successful rollback, even if
+        // the follow-up pipeline action failed, so the UI does not stay on stale table state.
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
+          }),
+        ])
       }
-
-      // Invalidate queries after restart to get the latest state
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
-        }),
-      ])
 
       await onSuccess?.(data, variables, context)
     },

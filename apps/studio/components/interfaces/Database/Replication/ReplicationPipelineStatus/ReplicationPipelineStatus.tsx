@@ -492,6 +492,7 @@ export const ReplicationPipelineStatus = () => {
                             showDisabledState={showDisabledState}
                             isAnyRestartInProgress={isAnyRestartInProgress}
                             isPipelineRunning={statusName === PipelineStatusName.STARTED}
+                            isPipelineFailed={statusName === PipelineStatusName.FAILED}
                             isPipelineStopped={statusName === PipelineStatusName.STOPPED}
                             onSelectRestart={() => {
                               setSelectedTableForRestart({
@@ -523,7 +524,7 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
 
-        {!isStatusLoading && tableStatuses.length === 0 && (
+        {!isPipelineLoading && !isStatusLoading && tableStatuses.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 px-4 border rounded-lg border-dashed">
             <div className="w-full max-w-sm mx-auto text-center space-y-4">
               <div className="w-16 h-16 bg-surface-200 rounded-full flex items-center justify-center mx-auto">
