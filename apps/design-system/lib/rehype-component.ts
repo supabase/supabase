@@ -55,9 +55,6 @@ export function rehypeComponent() {
               src = srcPath
             } else {
               const component = Index[style.name][name]
-              if (!component) {
-                continue
-              }
               // console.log('got to ELSE STATEMENT')
               // console.log('filename', fileName)
               // console.log('name', name)
@@ -127,9 +124,6 @@ export function rehypeComponent() {
         try {
           for (const style of styles) {
             const component = Index[style.name][name]
-            if (!component) {
-              continue
-            }
             // console.log('GOT HERE')
             const src = component.files[0]
 
@@ -182,9 +176,6 @@ export function rehypeComponent() {
         try {
           for (const style of styles) {
             const component = Index[style.name][name]
-            if (!component) {
-              continue
-            }
             // console.log('GOT HERE')
             const src = component.files[0]
 
