@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -224,7 +223,6 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
-                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-1 md:gap-2">
