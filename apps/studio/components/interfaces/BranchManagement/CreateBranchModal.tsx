@@ -71,7 +71,7 @@ export const CreateBranchModal = () => {
 
   const allowDataBranching = useFlag('allowDataBranching')
 
-  const [isGitBranchValid, setIsGitBranchValid] = useState(true)
+  const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
   const { can: canCreateBranch } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -130,11 +130,10 @@ export const CreateBranchModal = () => {
     { enabled: showCreateBranchModal }
   )
   const computeAddon = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
-  const computeSize = !!computeAddon
+  const computeSize = computeAddon
     ? (computeAddon.variant.identifier.split('ci_')[1] as DesiredInstanceSize)
     : undefined
-  const hasPitrEnabled =
-    (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
+  const hasPitrEnabled = (addons?.selected_addons ?? []).some((addon) => addon.type === 'pitr')
 
   const {
     data: disk,
@@ -167,15 +166,13 @@ export const CreateBranchModal = () => {
     onSuccess: async (data) => {
       toast.success(`Successfully created preview branch "${data.name}"`)
       if (projectRef) {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) }),
-        ])
+        await queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectRef) })
       }
       sendEvent({
         action: 'branch_create_button_clicked',
         properties: {
           branchType: data.persistent ? 'persistent' : 'preview',
-          gitlessBranching: !!data.git_branch,
+          gitlessBranching: !data.git_branch,
         },
         groups: {
           project: ref ?? 'Unknown',
@@ -201,7 +198,7 @@ export const CreateBranchModal = () => {
     !isFormValid ||
     !canCreateBranch ||
     !isSuccessAddons ||
-    !isSuccessConnections ||
+    (!!gitBranchName && !isSuccessConnections) ||
     isLoadingEntitlement ||
     !hasAccessToBranching ||
     isCreatingBranch ||
@@ -271,22 +268,16 @@ export const CreateBranchModal = () => {
   }
 
   useEffect(() => {
-    if (form && showCreateBranchModal) {
-      form.reset()
-    }
+    if (showCreateBranchModal) form.reset()
   }, [form, showCreateBranchModal])
 
   useEffect(() => {
-    if (!githubConnection || !debouncedGitBranchName) {
-      return form.clearErrors('gitBranchName')
-    }
-
     form.clearErrors('gitBranchName')
-    validateGitBranchName(debouncedGitBranchName)
+    if (githubConnection && debouncedGitBranchName) validateGitBranchName(debouncedGitBranchName)
   }, [debouncedGitBranchName, validateGitBranchName, form, githubConnection])
 
   return (
-    <Dialog open={showCreateBranchModal} onOpenChange={(open) => setShowCreateBranchModal(open)}>
+    <Dialog open={showCreateBranchModal} onOpenChange={setShowCreateBranchModal}>
       <DialogContent
         size="large"
         hideClose
@@ -334,88 +325,86 @@ export const CreateBranchModal = () => {
                 )}
               />
 
-              {githubConnection && (
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="gitBranchName"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span className="flex-1">Sync with Git branch</span>
-                          <div className="flex items-center gap-2 text-sm">
-                            <Image
-                              className={cn('dark:invert')}
-                              src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                              width={16}
-                              height={16}
-                              alt={`GitHub icon`}
+              {isSuccessConnections &&
+                (githubConnection ? (
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="gitBranchName"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label={
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span className="flex-1">Sync with Git branch</span>
+                            <div className="flex items-center gap-2 text-sm">
+                              <Image
+                                className={cn('dark:invert')}
+                                src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                                width={16}
+                                height={16}
+                                alt={`GitHub icon`}
+                              />
+                              <Link
+                                href={`https://github.com/${repoOwner}/${repoName}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-foreground hover:underline"
+                              >
+                                {repoOwner}/{repoName}
+                              </Link>
+                            </div>
+                          </div>
+                        }
+                        labelOptional="Optional"
+                        description="Automatically deploy changes on every commit"
+                      >
+                        <div className="relative w-full">
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              placeholder="e.g. main, feat/some-feature"
+                              autoComplete="off"
+                              onChange={(e) => {
+                                field.onChange(e)
+                                setIsGitBranchValid(false)
+                              }}
                             />
-                            <Link
-                              href={`https://github.com/${repoOwner}/${repoName}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-foreground hover:underline"
-                            >
-                              {repoOwner}/{repoName}
-                            </Link>
+                          </FormControl_Shadcn_>
+                          <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                            {field.value ? (
+                              isCheckingGHBranchValidity ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : isGitBranchValid ? (
+                                <Check size={14} className="text-brand" strokeWidth={2} />
+                              ) : null
+                            ) : null}
                           </div>
                         </div>
-                      }
-                      labelOptional="Optional"
-                      description="Automatically deploy changes on every commit"
-                    >
-                      <div className="relative w-full">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="e.g. main, feat/some-feature"
-                            autoComplete="off"
-                            onChange={(e) => {
-                              field.onChange(e)
-                              setIsGitBranchValid(false)
-                            }}
-                          />
-                        </FormControl_Shadcn_>
-                        <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                          {field.value ? (
-                            isCheckingGHBranchValidity ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : isGitBranchValid ? (
-                              <Check size={14} className="text-brand" strokeWidth={2} />
-                            ) : null
-                          ) : null}
-                        </div>
-                      </div>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
+                      </FormItemLayout>
+                    )}
+                  />
+                ) : (
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex flex-col gap-1">
+                      <Label>Sync with a GitHub branch</Label>
+                      <p className="text-sm text-foreground-lighter">
+                        Keep this preview branch in sync with a chosen GitHub branch
+                      </p>
+                    </div>
+                    <Button type="default" icon={<Github />} onClick={handleGitHubClick}>
+                      Configure
+                    </Button>
+                  </div>
+                ))}
 
               {isLoadingConnections && <GenericSkeletonLoader />}
+
               {isErrorConnections && (
                 <AlertError
                   error={connectionsError}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
-              {isSuccessConnections && (
-                <>
-                  {!githubConnection && (
-                    <div className="flex items-center gap-2 justify-between">
-                      <div className="flex flex-col gap-1">
-                        <Label>Sync with a GitHub branch</Label>
-                        <p className="text-sm text-foreground-lighter">
-                          Keep this preview branch in sync with a chosen GitHub branch
-                        </p>
-                      </div>
-                      <Button type="default" icon={<Github />} onClick={handleGitHubClick}>
-                        Configure
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
+
               {allowDataBranching && (
                 <FormField_Shadcn_
                   control={form.control}
@@ -511,7 +500,7 @@ export const CreateBranchModal = () => {
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-x-2">
-                                    <p className="w-24">Targer disk size:</p>
+                                    <p className="w-24">Target disk size:</p>
                                     <p className="w-16">{branchDiskAttributes.size_gb} GB</p>
                                     <p>(${estimatedDiskCost.size.toFixed(2)})</p>
                                   </div>
