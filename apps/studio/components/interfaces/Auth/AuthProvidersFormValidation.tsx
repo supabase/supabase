@@ -217,6 +217,7 @@ const smsProviderDisabledSchema = z
   })
   .merge(smsProviderBaseSchema.partial())
   .merge(smsOtpPhoneProviderSchema.partial())
+  .merge(twilioPhoneProviderSchema.partial())
   .merge(twilioVerifyPhoneProviderSchema.partial())
   .merge(messagebirdPhoneProviderSchema.partial())
   .merge(vonagePhoneProviderSchema.partial())
