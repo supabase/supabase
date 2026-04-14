@@ -228,22 +228,16 @@ const buildAddOnsSection = () => {
   const addOns = [
     [
       'Point-in-Time Recovery (PITR)',
-      formatPlanValue(findFeature('database', 'database.pitr').plans.pro),
+      getPlanValue(findFeature('database', 'database.pitr'), 'pro'),
     ],
-    ['Custom Domain', formatPlanValue(findFeature('security', 'security.customDomains').plans.pro)],
-    [
-      'Database Branching',
-      formatPlanValue(findFeature('database', 'database.branching').plans.pro),
-    ],
-    [
-      'Advanced MFA (Phone)',
-      formatPlanValue(findFeature('auth', 'auth.advancedMFAPhone').plans.pro),
-    ],
-    ['SAML/SSO Auth', formatPlanValue(findFeature('auth', 'auth.saml').plans.pro)],
-    ['Log Drains', formatPlanValue(findFeature('security', 'security.logDrain').plans.pro)],
+    ['Custom Domain', getPlanValue(findFeature('security', 'security.customDomains'), 'pro')],
+    ['Database Branching', getPlanValue(findFeature('database', 'database.branching'), 'pro')],
+    ['Advanced MFA (Phone)', getPlanValue(findFeature('auth', 'auth.advancedMFAPhone'), 'pro')],
+    ['SAML/SSO Auth', getPlanValue(findFeature('auth', 'auth.saml'), 'pro')],
+    ['Log Drains', getPlanValue(findFeature('security', 'security.logDrain'), 'pro')],
     [
       'Image Transformations',
-      formatPlanValue(findFeature('storage', 'storage.transformations').plans.pro),
+      getPlanValue(findFeature('storage', 'storage.transformations'), 'pro'),
     ],
   ]
 
