@@ -116,7 +116,7 @@ const PROVIDER_EMAIL = {
           .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
           .min(6, 'Must be greater or equal to 6')
       ),
-      PASSWORD_REQUIRED_CHARACTERS: z.string().min(1, 'This is required'),
+      PASSWORD_REQUIRED_CHARACTERS: z.string(),
     }),
     z.object({
       EXTERNAL_EMAIL_ENABLED: z.literal(false),
