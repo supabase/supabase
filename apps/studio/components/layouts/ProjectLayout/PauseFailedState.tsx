@@ -2,7 +2,18 @@ import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/
 import { useParams } from 'common'
 import { Download, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
-import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import {
+  Button,
+  CriticalIcon,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'ui'
 
 import { DeleteProjectModal } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -19,6 +30,7 @@ export const PauseFailedState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
+  const [showCliBackup, setShowCliBackup] = useState(false)
 
   const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: { project_id: project?.id },
@@ -42,7 +54,7 @@ export const PauseFailedState = () => {
 
   const onClickDownloadBackup = () => {
     if (!ref) return console.error('Project ref is required')
-    if (backups.length === 0) return console.error('No available backups to download')
+    if (backups.length === 0) return setShowCliBackup(true)
     downloadBackup({ ref, backup: backups[0] })
   }
 
@@ -68,10 +80,6 @@ export const PauseFailedState = () => {
               </div>
             </div>
 
-            <div className="border-t border-overlay px-8 py-4">
-              <LogicalBackupCliInstructions />
-            </div>
-
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
               <Button asChild type="default">
                 <SupportLink
@@ -88,18 +96,6 @@ export const PauseFailedState = () => {
                 type="default"
                 icon={<Download />}
                 loading={isDownloading}
-                disabled={backups.length === 0}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text:
-                      data?.status === 'physical-backups-enabled'
-                        ? 'No available backups to download as project is on physical backups'
-                        : backups.length === 0
-                          ? 'No available backups to download'
-                          : undefined,
-                  },
-                }}
                 onClick={onClickDownloadBackup}
               >
                 Download backup
@@ -138,6 +134,18 @@ export const PauseFailedState = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
+        <DialogContent size="medium">
+          <DialogHeader>
+            <DialogTitle>Back up your database</DialogTitle>
+          </DialogHeader>
+          <DialogSection>
+            <LogicalBackupCliInstructions showResetPassword={false} />
+          </DialogSection>
+        </DialogContent>
+      </Dialog>
+
       <DeleteProjectModal visible={visible} onClose={() => setVisible(false)} />
     </>
   )
