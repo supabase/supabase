@@ -1,6 +1,9 @@
-const config = require('config/tailwind.config')
+/* eslint-disable no-restricted-exports */
 
-module.exports = config({
+import containerQueries from '@tailwindcss/container-queries'
+import tailwindConfig from 'config/tailwind.config'
+
+export default tailwindConfig({
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -8,7 +11,7 @@ module.exports = config({
     './../../packages/ui/src/**/*.{tsx,ts,js}',
     './../../packages/ui-patterns/src/**/*.{tsx,ts,js}',
   ],
-  plugins: [require('@tailwindcss/container-queries')],
+  plugins: [containerQueries],
   theme: {
     extend: {
       fontSize: {

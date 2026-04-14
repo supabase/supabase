@@ -2,6 +2,7 @@
   "name": "studio",
   "version": "0.0.9",
   "private": true,
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev -p ${STUDIO_PORT:-8082}",
