@@ -96,6 +96,7 @@ export const PauseFailedState = () => {
                 type="default"
                 icon={<Download />}
                 loading={isDownloading}
+                tooltip={{ content: {} }}
                 onClick={onClickDownloadBackup}
               >
                 Download backup

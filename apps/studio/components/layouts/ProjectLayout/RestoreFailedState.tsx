@@ -97,6 +97,7 @@ export const RestoreFailedState = () => {
                 type="default"
                 icon={<Download />}
                 loading={isDownloading}
+                tooltip={{ content: {} }}
                 onClick={onClickDownloadBackup}
               >
                 Download backup
