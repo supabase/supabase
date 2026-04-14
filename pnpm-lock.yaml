@@ -2253,6 +2253,9 @@ importers:
       lucide-react:
         specifier: '*'
         version: 0.511.0(react@18.3.1)
+      next:
+        specifier: 'catalog:'
+        version: 16.2.3(@babel/core@7.29.0(supports-color@8.1.1))(@opentelemetry/api@1.9.0)(@playwright/test@1.56.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.77.4)
       react:
         specifier: 'catalog:'
         version: 18.3.1
