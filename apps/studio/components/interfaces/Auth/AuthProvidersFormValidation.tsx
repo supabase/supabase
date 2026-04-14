@@ -683,7 +683,9 @@ const EXTERNAL_PROVIDER_AZURE = {
       EXTERNAL_AZURE_ENABLED: z.literal(true),
       EXTERNAL_AZURE_CLIENT_ID: z.string().min(1, 'Application (client) ID is required'),
       EXTERNAL_AZURE_SECRET: z.string().min(1, 'Secret Value is required'),
-      EXTERNAL_AZURE_URL: z.string().regex(urlRegex(), 'Must be a valid URL').optional(),
+      EXTERNAL_AZURE_URL: z
+        .string()
+        .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL'),
       EXTERNAL_AZURE_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
     z.object({
@@ -975,7 +977,10 @@ const EXTERNAL_PROVIDER_GITLAB = {
       EXTERNAL_GITLAB_ENABLED: z.literal(true),
       EXTERNAL_GITLAB_CLIENT_ID: z.string().min(1, 'Client ID is required'),
       EXTERNAL_GITLAB_SECRET: z.string().min(1, 'Client Secret is required'),
-      EXTERNAL_GITLAB_URL: z.string().regex(urlRegex(), 'Must be a valid URL').optional(),
+      EXTERNAL_GITLAB_URL: z
+        .string()
+        .refine((value) => !value || urlRegex().test(value), 'Must be a valid URL')
+        .optional(),
       EXTERNAL_GITLAB_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
   ]),
