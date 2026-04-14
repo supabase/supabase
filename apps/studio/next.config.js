@@ -26,6 +26,10 @@ function getAssetPrefix() {
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
 }
 
+const marketplaceApiUrl = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_MARKETPLACE_API_URL)
+  : null
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -572,6 +576,16 @@ const nextConfig = {
         port: '',
         pathname: '**',
       },
+      ...(marketplaceApiUrl
+        ? [
+            {
+              protocol: marketplaceApiUrl.protocol.replace(':', ''),
+              hostname: marketplaceApiUrl.hostname,
+              port: marketplaceApiUrl.port,
+              pathname: '**',
+            },
+          ]
+        : []),
     ],
   },
   transpilePackages: [
