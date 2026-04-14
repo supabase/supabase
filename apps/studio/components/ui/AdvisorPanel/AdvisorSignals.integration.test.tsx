@@ -54,6 +54,11 @@ vi.mock('@/data/notifications/notifications-v2-update-mutation', () => ({
   useNotificationsV2UpdateMutation: mockUseNotificationsV2UpdateMutation,
 }))
 
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  IS_PLATFORM: true,
+}))
+
 vi.mock('@/lib/telemetry/track', () => ({
   useTrack: mockUseTrack,
 }))
@@ -253,5 +258,23 @@ describe('Advisor signals integration', () => {
     expect(screen.getByText('Advisor found 5 issues')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'View 1 more issue in Advisor' })).toBeInTheDocument()
     expect(screen.queryByText('Banned IP address')).not.toBeInTheDocument()
+  })
+
+  it('keeps the homepage in a loading state while signal items are pending', () => {
+    mockUseProjectLintsQuery.mockReturnValue({
+      data: [],
+      isPending: false,
+      isError: false,
+    })
+    mockUseBannedIPsQuery.mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isError: false,
+    })
+
+    render(<AdvisorSection />)
+
+    expect(screen.queryByText('Advisor found no issues')).not.toBeInTheDocument()
+    expect(screen.queryByText('No security or performance issues found')).not.toBeInTheDocument()
   })
 })

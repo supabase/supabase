@@ -44,6 +44,7 @@ export const AdvisorPanel = () => {
   const markedRead = useRef<string[]>([])
   const hasProjectRef = !!project?.ref
   const shouldLoadProjectAdvisorData = isSidebarOpen && hasProjectRef && activeTab !== 'messages'
+  const shouldLoadProjectAdvisorSignals = shouldLoadProjectAdvisorData && IS_PLATFORM
 
   const {
     data: lintData,
@@ -53,7 +54,7 @@ export const AdvisorPanel = () => {
 
   const { data: signalItems, dismissSignal } = useAdvisorSignals({
     projectRef: project?.ref,
-    enabled: shouldLoadProjectAdvisorData,
+    enabled: shouldLoadProjectAdvisorSignals,
   })
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)

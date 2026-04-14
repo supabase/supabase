@@ -71,4 +71,38 @@ describe('useAdvisorSignalDismissals', () => {
       ])
     })
   })
+
+  it('prunes dismissed signals that are no longer active', async () => {
+    const wrapper = createWrapper()
+    const { result } = renderHook(() => useAdvisorSignalDismissals('project-a'), {
+      wrapper,
+    })
+
+    act(() => {
+      result.current.dismissSignal('signal:banned-ip:203.0.113.10:v1')
+    })
+
+    await waitFor(() => {
+      expect(result.current.dismissedFingerprints).toEqual(['signal:banned-ip:203.0.113.10:v1'])
+    })
+
+    act(() => {
+      result.current.dismissSignal('signal:banned-ip:203.0.113.11:v1')
+    })
+
+    await waitFor(() => {
+      expect(result.current.dismissedFingerprints).toEqual([
+        'signal:banned-ip:203.0.113.10:v1',
+        'signal:banned-ip:203.0.113.11:v1',
+      ])
+    })
+
+    act(() => {
+      result.current.pruneDismissedSignals(['signal:banned-ip:203.0.113.11:v1'])
+    })
+
+    await waitFor(() => {
+      expect(result.current.dismissedFingerprints).toEqual(['signal:banned-ip:203.0.113.11:v1'])
+    })
+  })
 })

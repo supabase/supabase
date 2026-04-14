@@ -7,6 +7,7 @@ import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignal
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useNotificationsV2Query } from '@/data/notifications/notifications-v2-query'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
@@ -15,7 +16,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({
     projectRef,
-    enabled: Boolean(projectRef),
+    enabled: IS_PLATFORM && Boolean(projectRef),
   })
 
   const { data: notificationsData } = useNotificationsV2Query({

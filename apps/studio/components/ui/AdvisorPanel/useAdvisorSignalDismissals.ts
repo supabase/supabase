@@ -29,9 +29,30 @@ export const useAdvisorSignalDismissals = (projectRef?: string) => {
     [setDismissedFingerprints]
   )
 
+  const pruneDismissedSignals = useCallback(
+    (
+      activeFingerprints: string[],
+      shouldPruneFingerprint: (fingerprint: string) => boolean = () => true
+    ) => {
+      const activeFingerprintSet = new Set(activeFingerprints)
+
+      setDismissedFingerprints((currentDismissals) => {
+        const nextDismissals = currentDismissals.filter((fingerprint) =>
+          shouldPruneFingerprint(fingerprint) ? activeFingerprintSet.has(fingerprint) : true
+        )
+
+        return nextDismissals.length === currentDismissals.length
+          ? currentDismissals
+          : nextDismissals
+      })
+    },
+    [setDismissedFingerprints]
+  )
+
   return {
     dismissedFingerprints,
     dismissedFingerprintSet,
     dismissSignal,
+    pruneDismissedSignals,
   }
 }

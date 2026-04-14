@@ -21,6 +21,7 @@ import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.u
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAdvisorStateSnapshot } from '@/state/advisor-state'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -36,9 +37,10 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       enabled: !showEmptyState,
     }
   )
-  const { data: signalItems } = useAdvisorSignals({
+  const shouldLoadSignals = IS_PLATFORM && !showEmptyState
+  const { data: signalItems, isPending: isLoadingSignals } = useAdvisorSignals({
     projectRef,
-    enabled: !showEmptyState,
+    enabled: shouldLoadSignals,
   })
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
@@ -60,6 +62,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   const totalIssues = advisorItems.length
   const hiddenIssuesCount = totalIssues - visibleAdvisorItems.length
+  const isLoadingAdvisorItems = isLoadingLints || (shouldLoadSignals && isLoadingSignals)
 
   const titleContent = useMemo(() => {
     if (totalIssues === 0) return <h2>Advisor found no issues</h2>
@@ -120,7 +123,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   return (
     <div>
-      {isLoadingLints ? (
+      {isLoadingAdvisorItems ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">
@@ -130,7 +133,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           </Button>
         </div>
       )}
-      {isLoadingLints ? (
+      {isLoadingAdvisorItems ? (
         <div className="flex flex-col p-4 gap-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />

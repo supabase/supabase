@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { createAdvisorSignalItems } from './AdvisorPanel.utils'
 import { useAdvisorSignalDismissals } from './useAdvisorSignalDismissals'
@@ -19,16 +19,30 @@ export const useAdvisorSignals = ({
       enabled,
     }
   )
-  const { dismissSignal, dismissedFingerprintSet } = useAdvisorSignalDismissals(projectRef)
+  const { dismissSignal, dismissedFingerprintSet, pruneDismissedSignals } =
+    useAdvisorSignalDismissals(projectRef)
+
+  const signalItems = useMemo(
+    () =>
+      createAdvisorSignalItems({
+        projectRef,
+        bannedIPsData: bannedIPsQuery.data,
+      }),
+    [projectRef, bannedIPsQuery.data]
+  )
+
+  useEffect(() => {
+    if (!bannedIPsQuery.data) return
+
+    pruneDismissedSignals(
+      signalItems.map((item) => item.fingerprint),
+      (fingerprint) => fingerprint.startsWith('signal:banned-ip:')
+    )
+  }, [bannedIPsQuery.data, pruneDismissedSignals, signalItems])
 
   const data = useMemo(() => {
-    const items = createAdvisorSignalItems({
-      projectRef,
-      bannedIPsData: bannedIPsQuery.data,
-    })
-
-    return items.filter((item) => !dismissedFingerprintSet.has(item.fingerprint))
-  }, [projectRef, bannedIPsQuery.data, dismissedFingerprintSet])
+    return signalItems.filter((item) => !dismissedFingerprintSet.has(item.fingerprint))
+  }, [signalItems, dismissedFingerprintSet])
 
   return {
     data,

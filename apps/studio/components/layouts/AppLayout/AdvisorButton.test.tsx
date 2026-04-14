@@ -28,6 +28,11 @@ vi.mock('@/components/ui/AdvisorPanel/useAdvisorSignals', () => ({
   useAdvisorSignals: mockUseAdvisorSignals,
 }))
 
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  IS_PLATFORM: true,
+}))
+
 vi.mock('@/state/sidebar-manager-state', () => ({
   useSidebarManagerSnapshot: () => ({
     toggleSidebar: mockToggleSidebar,
