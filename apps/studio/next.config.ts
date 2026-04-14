@@ -33,6 +33,13 @@ const marketplaceApiUrl = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL
   ? new URL(process.env.NEXT_PUBLIC_MARKETPLACE_API_URL)
   : null
 
+const marketplaceApiProtocol: 'http' | 'https' | null =
+  marketplaceApiUrl?.protocol === 'https:'
+    ? 'https'
+    : marketplaceApiUrl?.protocol === 'http:'
+      ? 'http'
+      : null
+
 const nextConfig: NextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
@@ -579,7 +586,7 @@ const nextConfig: NextConfig = {
       ...(marketplaceApiUrl
         ? [
             {
-              protocol: marketplaceApiUrl.protocol.replace(':', ''),
+              ...(marketplaceApiProtocol ? { protocol: marketplaceApiProtocol } : {}),
               hostname: marketplaceApiUrl.hostname,
               port: marketplaceApiUrl.port,
               pathname: '**',
