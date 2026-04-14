@@ -21,6 +21,7 @@ const PauseProjectButton = () => {
   const { setProjectStatus } = useSetProjectStatus()
 
   const isProjectActive = useIsProjectActive()
+  const isProjectUnhealthy = project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const projectRef = project?.ref ?? ''
@@ -75,13 +76,15 @@ const PauseProjectButton = () => {
               ? 'Your project is already paused'
               : !canPauseProject
                 ? 'You need additional permissions to pause this project'
-                : !isProjectActive
-                  ? 'Unable to pause project as project is not active'
-                  : isBranch
-                    ? 'Branch projects cannot be paused'
-                    : !projectPausingAllowedInOrg && !isFreePlan
-                      ? 'Projects on a paid plan will always be running'
-                      : undefined,
+                : isProjectUnhealthy
+                  ? 'Your project is unhealthy — restart it instead to restore normal operation'
+                  : !isProjectActive
+                    ? 'Unable to pause project as project is not active'
+                    : isBranch
+                      ? 'Branch projects cannot be paused'
+                      : !projectPausingAllowedInOrg && !isFreePlan
+                        ? 'Projects on a paid plan will always be running'
+                        : undefined,
           },
         }}
       >
