@@ -79,6 +79,10 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/llms/:path*.txt',
+        headers: [{ key: 'content-type', value: 'text/markdown; charset=utf-8' }],
+      },
+      {
         source: '/.well-known/vercel/flags',
         headers: [
           {
