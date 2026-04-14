@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { ExternalLink, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
-import { Badge, Button, cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, Button, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ErroredTableDetails } from '../ErroredTableDetails'
 import { TableState } from './ReplicationPipelineStatus.types'
@@ -16,8 +16,6 @@ interface TableReplicationRowProps {
   showDisabledState: boolean
   disabledStateMessage: string
   isAnyRestartInProgress: boolean
-  isPipelineRunning: boolean
-  isPipelineFailed: boolean
   isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
@@ -29,8 +27,6 @@ export const TableReplicationRow = ({
   showDisabledState,
   disabledStateMessage,
   isAnyRestartInProgress,
-  isPipelineRunning,
-  isPipelineFailed,
   isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
@@ -39,20 +35,16 @@ export const TableReplicationRow = ({
   const isErrorState = table.state.name === 'error'
   const statusConfig = getStatusConfig(table.state as TableState['state'])
 
-  const isInactive = !isPipelineRunning && !isPipelineFailed && !isRestarting
-  const inactiveContentClassName = isInactive ? 'text-foreground-light opacity-50' : undefined
-  const inactiveStatusClassName = isInactive ? 'opacity-50 grayscale' : undefined
-
   return (
     <TableRow>
       <TableCell className="align-top">
         <div className="flex items-center gap-x-2">
-          <p className={cn(inactiveContentClassName)}>{table.table_name}</p>
+          <p>{table.table_name}</p>
 
           <ButtonTooltip
             asChild
             type="text"
-            className={cn('px-1.5', inactiveContentClassName)}
+            className="px-1.5"
             icon={<ExternalLink />}
             tooltip={{
               content: { side: 'bottom', text: 'Open in Table Editor' },
@@ -73,7 +65,7 @@ export const TableReplicationRow = ({
         ) : showDisabledState ? (
           <Badge variant="default">Not Available</Badge>
         ) : (
-          <div className={cn(inactiveStatusClassName)}>{statusConfig.badge}</div>
+          statusConfig.badge
         )}
       </TableCell>
 
@@ -86,7 +78,7 @@ export const TableReplicationRow = ({
           <p className="text-sm text-foreground-lighter">{disabledStateMessage}</p>
         ) : (
           <div className="flex flex-col gap-y-3">
-            <div className={cn('text-sm text-foreground', inactiveContentClassName)}>
+            <div className="text-sm text-foreground">
               {statusConfig.description}{' '}
               {isErrorState && 'reason' in table.state && (
                 <button className={InlineLinkClassName} onClick={() => onSelectShowError()}>

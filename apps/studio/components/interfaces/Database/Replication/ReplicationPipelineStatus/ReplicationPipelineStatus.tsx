@@ -197,6 +197,12 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.RestartRequested
   const isPipelineBusy = isEnablingDisabling || isAnyRestartInProgress
   const showDisabledState = isPipelineBusy || !isPipelineActionable
+  const lastKnownStateMessage =
+    statusName === PipelineStatusName.STOPPED
+      ? 'Showing the last known table state before the pipeline was stopped.'
+      : statusName === PipelineStatusName.FAILED
+        ? 'Showing the last reported table state before the pipeline failed.'
+        : null
   const refreshIntervalLabel =
     STATUS_REFRESH_FREQUENCY_MS >= 1000
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
@@ -457,6 +463,13 @@ export const ReplicationPipelineStatus = () => {
               </div>
             </div>
 
+            {lastKnownStateMessage !== null && !showDisabledState && (
+              <div className="flex items-start gap-2 rounded-md border border-default/50 bg-surface-200/60 px-3 py-2 text-xs text-foreground-light">
+                <Info size={14} className="mt-0.5" />
+                <span>{lastKnownStateMessage}</span>
+              </div>
+            )}
+
             <Card>
               <CardContent className="p-0">
                 <Table>
@@ -484,8 +497,6 @@ export const ReplicationPipelineStatus = () => {
                           showDisabledState={showDisabledState}
                           disabledStateMessage={config.message}
                           isAnyRestartInProgress={isAnyRestartInProgress}
-                          isPipelineRunning={statusName === PipelineStatusName.STARTED}
-                          isPipelineFailed={statusName === PipelineStatusName.FAILED}
                           isPipelineStopped={statusName === PipelineStatusName.STOPPED}
                           onSelectRestart={() => {
                             setSelectedTableForRestart({
