@@ -32,15 +32,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isDefaultOptIn: false,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
-      name: 'Branching via dashboard',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-      enabled: true,
-      isNew: false,
-      isPlatformOnly: true,
-      isDefaultOptIn: false,
-    },
-    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
       name: 'Disable Advisor rules',
       discussionsUrl: undefined,

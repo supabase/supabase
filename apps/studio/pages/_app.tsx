@@ -36,7 +36,7 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { DevToolbar, DevToolbarProvider } from 'dev-tools'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger } from 'dev-tools'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, type ComponentProps } from 'react'
@@ -191,6 +191,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
                           <DevToolbar />
+                          <DevToolbarTrigger />
                         </DevToolbarProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
