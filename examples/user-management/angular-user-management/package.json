@@ -17,7 +17,7 @@
     "@angular/forms": "^21.1.1",
     "@angular/platform-browser": "^21.1.1",
     "@angular/platform-browser-dynamic": "^21.1.1",
-    "@supabase/supabase-js": "^2.93.1",
+    "@supabase/supabase-js": "^2",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1",
     "zone.js": "~0.16.0"
