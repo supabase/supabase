@@ -6,7 +6,7 @@ import { DataGridHandle } from 'react-data-grid'
 import { Shortcuts } from './components/common/Shortcuts'
 import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
-import { HeaderNew, HeaderProps } from './components/header/HeaderNew'
+import { Header, HeaderProps } from './components/header/Header'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
@@ -87,7 +87,7 @@ export const SupabaseGrid = ({
 
   return (
     <div className="sb-grid h-full flex flex-col">
-      <HeaderNew
+      <Header
         customHeader={customHeader}
         isRefetching={isRefetching}
         tableQueriesEnabled={tableQueriesEnabled}

@@ -23,7 +23,7 @@ import {
 } from 'ui'
 
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'

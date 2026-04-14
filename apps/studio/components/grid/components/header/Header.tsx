@@ -50,11 +50,7 @@ export type HeaderProps = {
   tableQueriesEnabled?: boolean
 }
 
-export const HeaderNew = ({
-  customHeader,
-  isRefetching,
-  tableQueriesEnabled = true,
-}: HeaderProps) => {
+export const Header = ({ customHeader, isRefetching, tableQueriesEnabled = true }: HeaderProps) => {
   useInitializeFiltersFromUrl()
 
   useSyncFiltersToUrl()

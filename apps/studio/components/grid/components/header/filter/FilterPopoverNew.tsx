@@ -14,7 +14,7 @@ import {
 } from 'ui-patterns'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Filter } from '@/components/grid/types'
 import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'

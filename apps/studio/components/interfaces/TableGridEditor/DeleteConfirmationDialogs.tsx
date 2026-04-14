@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { SupaRow } from '@/components/grid/types'
 import { useDatabaseColumnDeleteMutation } from '@/data/database-columns/database-column-delete-mutation'
 import { TableLike } from '@/data/table-editor/table-editor-types'

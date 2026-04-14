@@ -29,7 +29,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Sort } from '@/components/grid/types'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'

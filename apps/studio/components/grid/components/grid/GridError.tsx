@@ -5,7 +5,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 import { isFilterRelatedError } from './GridError.utils'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import AlertError from '@/components/ui/AlertError'
 import { HighCostError } from '@/components/ui/HighQueryCost'
