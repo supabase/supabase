@@ -290,6 +290,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                   })
                   if (result.error)
                     return 'Failed to fetch schema definitions due to a database error.'
+                  if (result.sqlDefinitions.length === 0) return 'No table definitions found.'
                   return result.sqlDefinitions.join('\n\n')
                 },
               }),
