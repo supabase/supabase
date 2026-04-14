@@ -57,6 +57,9 @@ catalogs:
     vite:
       specifier: ^8.0.8
       version: 8.0.8
+    vite-tsconfig-paths:
+      specifier: ^6.1.1
+      version: 6.1.1
     vitest:
       specifier: ^4.1.4
       version: 4.1.4
@@ -681,7 +684,7 @@ importers:
         specifier: 'catalog:'
         version: 8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3)
       vite-tsconfig-paths:
-        specifier: ^6.1.1
+        specifier: 'catalog:'
         version: 6.1.1(supports-color@8.1.1)(typescript@6.0.2)(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
       vitest:
         specifier: 'catalog:'
@@ -836,7 +839,7 @@ importers:
         specifier: ^7.3.2
         version: 7.3.2(@types/node@22.13.14)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3)
       vite-tsconfig-paths:
-        specifier: ^6.1.1
+        specifier: 'catalog:'
         version: 6.1.1(supports-color@8.1.1)(typescript@6.0.2)(vite@7.3.2(@types/node@22.13.14)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
 
   apps/studio:
@@ -1359,7 +1362,7 @@ importers:
         specifier: 'catalog:'
         version: 8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3)
       vite-tsconfig-paths:
-        specifier: ^6.1.1
+        specifier: 'catalog:'
         version: 6.1.1(supports-color@8.1.1)(typescript@6.0.2)(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
       vitest:
         specifier: 'catalog:'
@@ -1955,7 +1958,7 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       vite-tsconfig-paths:
-        specifier: ^6.1.1
+        specifier: 'catalog:'
         version: 6.1.1(supports-color@8.1.1)(typescript@6.0.2)(vite@8.0.8(@types/node@22.13.14)(esbuild@0.25.2)(jiti@2.6.1)(sass@1.77.4)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.3))
       vitest:
         specifier: 'catalog:'

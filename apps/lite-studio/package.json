@@ -31,6 +31,6 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "vite": "^7.3.2",
-    "vite-tsconfig-paths": "^6.1.1"
+    "vite-tsconfig-paths": "catalog:"
   }
 }
