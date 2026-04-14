@@ -29,7 +29,11 @@ function getAssetPrefix() {
   return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
 }
 
-const nextConfig: NextConfig = {
+// Use `satisfies` instead of `: NextConfig` so TypeScript preserves narrow
+// inferred types (e.g. async headers → Promise). This avoids TS2345 when
+// wrapper functions (bundle-analyzer, sentry) resolve their `next` peer
+// types to a different major version than studio's own next dependency.
+const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
   output: 'standalone',
@@ -41,7 +45,7 @@ const nextConfig: NextConfig = {
       {
         source: `/.well-known/vercel/flags`,
         destination: `https://supabase.com/.well-known/vercel/flags`,
-        basePath: false,
+        basePath: false as const,
       },
     ]
   },
@@ -609,7 +613,7 @@ const nextConfig: NextConfig = {
     // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
-}
+} satisfies NextConfig
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
