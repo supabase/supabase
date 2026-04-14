@@ -118,8 +118,8 @@ export const ObservabilityOverview = () => {
       if (!datum?.timestamp) return
 
       const datumTimestamp = dayjs(datum.timestamp)
-      // Match bucket granularity: 1hr→minute, 1day→hour, 7day→day
-      const unit = interval === '7day' ? 'day' : interval === '1hr' ? 'minute' : 'hour'
+      // Match bucket granularity: 1hr→minute, 1day+7day→hour (calcChartStart never produces day buckets)
+      const unit = interval === '1hr' ? 'minute' : 'hour'
       const start = datumTimestamp.startOf(unit).toISOString()
       const end = dayjs(start).add(1, unit).toISOString()
 
