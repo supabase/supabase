@@ -573,9 +573,9 @@ export const PROVIDER_PHONE = {
       title: 'Test OTPs Valid Until',
       description:
         "Test phone number and OTP combinations won't be active past this date and time (local time zone).",
-      // show: {
-      //   key: 'SMS_TEST_OTP',
-      // },
+      show: {
+        key: 'SMS_TEST_OTP',
+      },
     },
   },
   validationSchema: null,
