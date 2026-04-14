@@ -1,9 +1,9 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -31,7 +31,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { boolean, number, object, string } from 'yup'
+import * as z from 'zod'
 
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import AlertError from '@/components/ui/AlertError'
@@ -47,30 +47,64 @@ const CAPTCHA_PROVIDERS = [
   { key: 'turnstile', label: 'Turnstile by Cloudflare' },
 ]
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
-  SECURITY_CAPTCHA_ENABLED: boolean().required(),
-  SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) => schema.required('Must have a Captcha secret'),
-  }),
-  SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) =>
-      schema
-        .oneOf(['hcaptcha', 'turnstile'])
-        .required('Captcha provider must be either hcaptcha or turnstile'),
-  }),
-  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: boolean(),
-  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
-  PASSWORD_REQUIRED_CHARACTERS: string(),
-  PASSWORD_HIBP_ENABLED: boolean(),
+type CaptchaProviders = 'hcaptcha' | 'turnstile'
+
+const baseSchema = z.object({
+  DISABLE_SIGNUP: z.boolean(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+  SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+  SITE_URL: z.string().min(1, 'Must have a Site URL'),
+  SESSIONS_TIMEBOX: z
+    .preprocess(
+      (val) => (val === '' || val == null ? undefined : val),
+      z.coerce
+        .number({
+          required_error: 'Must have a sessions timebox',
+          invalid_type_error: 'Must have a sessions timebox',
+        })
+        .min(0, 'Must be greater than or equal to 0.')
+    )
+    .optional(),
+  SESSIONS_INACTIVITY_TIMEOUT: z.number().min(0, 'Must be greater than or equal to 0').optional(),
+  SESSIONS_SINGLE_PER_USER: z.boolean().optional(),
+  PASSWORD_MIN_LENGTH: z
+    .preprocess(
+      (val) => (val === '' || val == null ? undefined : val),
+      z.coerce
+        .number({
+          required_error: 'Must have a password min length',
+          invalid_type_error: 'Must have a password min length',
+        })
+        .min(6, 'Must be greater or equal to 6.')
+    )
+    .optional(),
+  PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
+  PASSWORD_HIBP_ENABLED: z.boolean().optional(),
 })
+
+const captchaEnabledSchema = z
+  .object({
+    SECURITY_CAPTCHA_ENABLED: z.literal(true),
+    SECURITY_CAPTCHA_SECRET: z.string().min(1, 'Must have a Captcha secret'),
+    SECURITY_CAPTCHA_PROVIDER: z.enum(['hcaptcha', 'turnstile'], {
+      required_error: 'Captcha provider must be either hcaptcha or turnstile',
+    }),
+  })
+  .merge(baseSchema)
+
+const captchaDisabledSchema = z
+  .object({
+    SECURITY_CAPTCHA_ENABLED: z.literal(false),
+    SECURITY_CAPTCHA_SECRET: z.string().optional(),
+    SECURITY_CAPTCHA_PROVIDER: z.string().optional(),
+  })
+  .merge(baseSchema)
+
+const formSchema = z.discriminatedUnion('SECURITY_CAPTCHA_ENABLED', [
+  captchaEnabledSchema,
+  captchaDisabledSchema,
+])
+type FormSchema = z.infer<typeof formSchema>
 
 export const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -98,8 +132,8 @@ export const ProtectionAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const protectionForm = useForm({
-    resolver: yupResolver(schema),
+  const protectionForm = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -117,24 +151,48 @@ export const ProtectionAuthSettingsForm = () => {
     },
   })
 
+  const { isDirty } = protectionForm.formState
+
   useEffect(() => {
     if (authConfig && !isUpdatingConfig) {
-      protectionForm.reset({
-        DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
-        EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
-        SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-        SITE_URL: authConfig.SITE_URL || '',
-        SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED || false,
-        SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
-        SECURITY_CAPTCHA_PROVIDER: authConfig.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-        SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
-        SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
-        SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
-        PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
-        PASSWORD_REQUIRED_CHARACTERS:
-          authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
-        PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
-      })
+      const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
+        'hcaptcha') as CaptchaProviders
+
+      if (authConfig.SECURITY_CAPTCHA_ENABLED) {
+        protectionForm.reset({
+          DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
+          EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
+          SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
+          SITE_URL: authConfig.SITE_URL || '',
+          SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
+          SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
+          SECURITY_CAPTCHA_PROVIDER,
+          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
+          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
+          SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
+          PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
+          PASSWORD_REQUIRED_CHARACTERS:
+            authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+          PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
+        })
+      } else {
+        protectionForm.reset({
+          DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
+          EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
+          SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
+          SITE_URL: authConfig.SITE_URL || '',
+          SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
+          SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
+          SECURITY_CAPTCHA_PROVIDER,
+          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
+          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
+          SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
+          PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
+          PASSWORD_REQUIRED_CHARACTERS:
+            authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+          PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
+        })
+      }
     }
   }, [authConfig, isUpdatingConfig])
 
@@ -148,6 +206,11 @@ export const ProtectionAuthSettingsForm = () => {
 
     updateAuthConfig({ projectRef: projectRef!, config: payload })
   }
+
+  const SECURITY_CAPTCHA_ENABLED = useWatch({
+    name: 'SECURITY_CAPTCHA_ENABLED',
+    control: protectionForm.control,
+  })
 
   if (isError) {
     return (
@@ -212,7 +275,7 @@ export const ProtectionAuthSettingsForm = () => {
                 />
               </CardContent>
 
-              {protectionForm.watch('SECURITY_CAPTCHA_ENABLED') && (
+              {SECURITY_CAPTCHA_ENABLED && (
                 <>
                   <CardContent>
                     <FormField_Shadcn_
@@ -304,7 +367,7 @@ export const ProtectionAuthSettingsForm = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {protectionForm.formState.isDirty && (
+                {isDirty && (
                   <Button type="default" onClick={() => protectionForm.reset()}>
                     Cancel
                   </Button>
@@ -312,9 +375,7 @@ export const ProtectionAuthSettingsForm = () => {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isUpdatingConfig || !protectionForm.formState.isDirty
-                  }
+                  disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >
                   Save changes

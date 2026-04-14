@@ -145,8 +145,8 @@ export const FeatureFlagProvider = ({
 
       let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
 
-      // Run both async operations in parallel
-      const [flags, flagValues] = await Promise.all([
+      // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
+      const [phResult, ccResult] = await Promise.allSettled([
         loadPHFlags
           ? (async () => {
               await ensureGroupContext()
@@ -163,7 +163,17 @@ export const FeatureFlagProvider = ({
           : Promise.resolve([]),
       ])
 
-      const isLocalDev = process.env.NODE_ENV === 'development'
+      const flags = phResult.status === 'fulfilled' ? phResult.value : {}
+      if (phResult.status === 'rejected') {
+        console.warn('[FeatureFlags] PostHog flags failed', phResult.reason)
+      }
+      const flagValues = ccResult.status === 'fulfilled' ? ccResult.value : []
+
+      // Dev toolbar flag overrides are available in local dev and staging.
+      // Duplicated for tree-shaking — bundler must see literal process.env reference.
+      // Keep in sync: dev-tools/index.ts, DevToolbarContext.tsx, DevToolbar.tsx, DevToolbarTrigger.tsx
+      const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+      const isDevToolsEnabled = env === 'local' || env === 'staging'
 
       const safeParse = (value: string | undefined): Record<string, boolean | number | string> => {
         if (!value) return {}
@@ -176,8 +186,8 @@ export const FeatureFlagProvider = ({
 
       // Process PostHog flags if loaded
       if (Object.keys(flags).length > 0) {
-        // Apply local dev overrides for PostHog flags
-        if (isLocalDev) {
+        // Apply dev toolbar overrides for PostHog flags
+        if (isDevToolsEnabled) {
           try {
             const cookies = getCookies()
             const phOverrides = safeParse(cookies['x-ph-flag-overrides'])
@@ -196,10 +206,10 @@ export const FeatureFlagProvider = ({
 
         try {
           const cookies = getCookies()
-          // Merge overrides: vercel-flag-overrides first, then x-cc-flag-overrides (local only)
-          // x-cc-flag-overrides takes precedence in local dev
+          // Merge overrides: vercel-flag-overrides first, then x-cc-flag-overrides (dev toolbar only)
+          // x-cc-flag-overrides takes precedence when dev tools are enabled
           const vercelOverrides = safeParse(cookies['vercel-flag-overrides'])
-          const ccOverrides = isLocalDev ? safeParse(cookies['x-cc-flag-overrides']) : {}
+          const ccOverrides = isDevToolsEnabled ? safeParse(cookies['x-cc-flag-overrides']) : {}
 
           overridesCookieValue = {
             ...vercelOverrides,

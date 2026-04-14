@@ -29,7 +29,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { z } from 'zod'
+import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import { slugifyTitle } from './EmailTemplates.utils'

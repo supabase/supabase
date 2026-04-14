@@ -5,10 +5,14 @@ import * as DevToolbarContextModule from './DevToolbarContext'
 import * as DevToolbarTriggerModule from './DevToolbarTrigger'
 import type { DevTelemetryToolbarContextType } from './types'
 
-// Tree-shaking pattern: conditionally export stubs in production
-// The bundler replaces process.env.NODE_ENV at build time, making the
-// ternary static. Combined with sideEffects: false, the implementation
-// modules are eliminated from the production bundle.
+// Tree-shaking pattern: conditionally export stubs outside local/staging.
+// The bundler replaces NEXT_PUBLIC_ENVIRONMENT at build time, making the
+// ternary static. In production builds (env === 'prod'), the implementation
+// modules are eliminated from the bundle.
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: DevToolbarContext.tsx, DevToolbar.tsx, DevToolbarTrigger.tsx, feature-flags.tsx
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const isToolbarEnabled = env === 'local' || env === 'staging'
 
 const noopContext: DevTelemetryToolbarContextType = {
   isEnabled: false,
@@ -19,18 +23,18 @@ const noopContext: DevTelemetryToolbarContextType = {
   dismissToolbar: () => {},
 }
 
-export const DevToolbarProvider =
-  process.env.NODE_ENV !== 'development'
-    ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
-    : DevToolbarContextModule.DevToolbarProvider
+export const DevToolbarProvider = !isToolbarEnabled
+  ? ({ children }: { children: ReactNode; apiUrl?: string }) => children
+  : DevToolbarContextModule.DevToolbarProvider
 
-export const useDevToolbar =
-  process.env.NODE_ENV !== 'development' ? () => noopContext : DevToolbarContextModule.useDevToolbar
+export const useDevToolbar = !isToolbarEnabled
+  ? () => noopContext
+  : DevToolbarContextModule.useDevToolbar
 
-export const DevToolbar =
-  process.env.NODE_ENV !== 'development' ? () => null : DevToolbarModule.DevToolbar
+export const DevToolbar = !isToolbarEnabled ? () => null : DevToolbarModule.DevToolbar
 
-export const DevToolbarTrigger =
-  process.env.NODE_ENV !== 'development' ? () => null : DevToolbarTriggerModule.DevToolbarTrigger
+export const DevToolbarTrigger = !isToolbarEnabled
+  ? () => null
+  : DevToolbarTriggerModule.DevToolbarTrigger
 
 export type { DevTelemetryEvent, DevToolbarConfig } from './types'

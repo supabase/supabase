@@ -1,6 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { DevToolbarTrigger } from 'dev-tools'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -15,10 +14,7 @@ import { HeaderUpgradeButton } from './HeaderUpgradeButton'
 import { HomeIcon } from './HomeIcon'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
-import {
-  useIsBranching2Enabled,
-  useIsFloatingMobileToolbarEnabled,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsFloatingMobileToolbarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { ConnectSheet } from '@/components/interfaces/ConnectSheet/ConnectSheet'
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
@@ -73,7 +69,6 @@ export const LayoutHeader = ({
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
   const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
@@ -217,7 +212,7 @@ export const LayoutHeader = ({
                     ease: 'easeOut',
                   }}
                 >
-                  {IS_PLATFORM && gitlessBranching && <MergeRequestButton />}
+                  {IS_PLATFORM && <MergeRequestButton />}
                   <ConnectButton buttonType={connectButtonType} />
                 </motion.div>
               )}
@@ -228,7 +223,6 @@ export const LayoutHeader = ({
             {customHeaderComponents && customHeaderComponents}
             {IS_PLATFORM ? (
               <>
-                <DevToolbarTrigger />
                 <FeedbackDropdown />
 
                 <div className="flex items-center gap-1 md:gap-2">
