@@ -38,9 +38,7 @@ const page: GoPageInput = {
           <p className="text-foreground-light text-lg">Choose either path. Both qualify.</p>
 
           <div className="flex flex-col gap-3 w-full">
-            <h3 className="text-foreground font-semibold text-lg">
-              Option 1: Via Stripe Projects
-            </h3>
+            <h3 className="text-foreground font-semibold text-lg">Option 1: Via Stripe Projects</h3>
             <p className="text-foreground-light">
               Provision a full Supabase backend from your terminal without opening a dashboard.
             </p>
