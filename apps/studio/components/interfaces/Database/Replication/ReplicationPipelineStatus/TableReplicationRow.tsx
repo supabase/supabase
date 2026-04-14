@@ -67,7 +67,7 @@ export const TableReplicationRow = ({
         ) : showDisabledState ? (
           <Badge variant="default">Not Available</Badge>
         ) : (
-          <div className={cn(isMuted && 'opacity-60')}>{statusConfig.badge}</div>
+          <div className={cn(isMuted && 'opacity-40 grayscale')}>{statusConfig.badge}</div>
         )}
       </TableCell>
 
@@ -81,8 +81,8 @@ export const TableReplicationRow = ({
             Status unavailable while pipeline is {config.badge.toLowerCase()}
           </p>
         ) : (
-          <div className={cn('flex flex-col gap-y-3', isMuted && 'opacity-60')}>
-            <div className="text-sm text-foreground">
+          <div className="flex flex-col gap-y-3">
+            <div className={cn('text-sm text-foreground', isMuted && 'opacity-40')}>
               {statusConfig.description}{' '}
               {isErrorState && 'reason' in table.state && (
                 <button className={InlineLinkClassName} onClick={() => onSelectShowError()}>
@@ -109,7 +109,7 @@ export const TableReplicationRow = ({
               />
             </TooltipTrigger>
             <TooltipContent side="bottom" align="center">
-              Restart table replication
+              {isPipelineStopped ? 'Reset table and start pipeline' : 'Reset and restart pipeline'}
             </TooltipContent>
           </Tooltip>
         </div>

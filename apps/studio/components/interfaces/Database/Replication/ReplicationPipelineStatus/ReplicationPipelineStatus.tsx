@@ -30,6 +30,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -417,15 +420,24 @@ export const ReplicationPipelineStatus = () => {
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-44">
-                    <DropdownMenuItem
-                      disabled={!hasErroredTables || isAnyRestartInProgress}
-                      onClick={() => {
-                        setBatchRestartMode('errored')
-                        setShowBatchRestartDialog(true)
-                      }}
-                    >
-                      Restart failed tables only
-                    </DropdownMenuItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <DropdownMenuItem
+                            disabled={!hasErroredTables || isAnyRestartInProgress}
+                            onClick={() => {
+                              setBatchRestartMode('errored')
+                              setShowBatchRestartDialog(true)
+                            }}
+                          >
+                            Restart failed tables only
+                          </DropdownMenuItem>
+                        </span>
+                      </TooltipTrigger>
+                      {!hasErroredTables && (
+                        <TooltipContent side="left">No tables require manual retry</TooltipContent>
+                      )}
+                    </Tooltip>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
