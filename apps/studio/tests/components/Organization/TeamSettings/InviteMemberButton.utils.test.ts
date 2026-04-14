@@ -35,10 +35,8 @@ describe('parseEmails', () => {
     ])
   })
 
-    test('removes duplicate email addresses', () => {
-    expect(parseEmails('a@example.com,a@example.com')).toStrictEqual([
-      'a@example.com',
-    ])
+  test('removes duplicate email addresses', () => {
+    expect(parseEmails('a@example.com,a@example.com')).toStrictEqual(['a@example.com'])
   })
 
   test('returns an empty array for an empty string', () => {
