@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, IS_PLATFORM, useFlag } from 'common'
+import { Boxes } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useContext, useMemo } from 'react'
+import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
 import { marketplaceIntegrationsQueryOptions } from '@/data/marketplace/integrations-query'
@@ -80,7 +82,13 @@ export const useAvailableIntegrations = () => {
       author,
       requiredExtensions: [],
       icon: ({ className, ...props } = {}) => (
-        <Image src={fullImageUrl(listingLogo ?? '')} alt="" width={22} height={22} />
+        <>
+          {listingLogo ? (
+            <Image src={fullImageUrl(listingLogo ?? '')} alt="" width={22} height={22} />
+          ) : (
+            <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+          )}
+        </>
       ),
       navigation: [
         {
