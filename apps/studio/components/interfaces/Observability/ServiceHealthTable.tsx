@@ -63,14 +63,16 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
           timestamp: d.timestamp,
           error_rate: total > 0 ? (d.error_count / total) * 100 : 0,
           warning_rate: total > 0 ? (d.warning_count / total) * 100 : 0,
+          ok_rate: total > 0 ? (d.ok_count / total) * 100 : 0,
         }
       }),
     [data.eventChartData]
   )
 
   const chartConfig: ChartConfig = {
-    warning_rate: { label: 'Warning rate', color: 'hsl(var(--warning-default))' },
     error_rate: { label: 'Error rate', color: 'hsl(var(--destructive-default))' },
+    warning_rate: { label: 'Warning rate', color: 'hsl(var(--warning-default))' },
+    ok_rate: { label: 'Success rate', color: 'hsl(var(--brand-default))' },
   }
 
   return (
@@ -122,7 +124,9 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
             <ChartLine
               data={rateData}
               dataKey="error_rate"
-              dataKeys={['warning_rate', 'error_rate']}
+              dataKeys={['error_rate', 'warning_rate', 'ok_rate']}
+              sharedStackId="stack"
+              strokeKeys={['ok_rate']}
               config={chartConfig}
               DateTimeFormat={datetimeFormat}
               onLineClick={onBarClick}
