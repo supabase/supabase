@@ -105,7 +105,7 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   }, [appendEvent, isEnabled])
 
   useEffect(() => {
-    if (!isEnabled || typeof EventSource === 'undefined') return
+    if (!IS_LOCAL_DEV || !isEnabled || typeof EventSource === 'undefined') return
 
     let eventSource: EventSource | null = null
     let isMounted = true
