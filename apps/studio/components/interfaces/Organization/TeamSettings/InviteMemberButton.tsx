@@ -184,13 +184,17 @@ export const InviteMemberButton = () => {
     const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRef)
     const ssoPayload = buildSsoPayload(values.requireSso)
 
-    await inviteMemberAsync({
-      slug,
-      emails: toInvite,
-      roleId: Number(values.role),
-      ...projectPayload,
-      ...ssoPayload,
-    })
+    try {
+      await inviteMemberAsync({
+        slug,
+        emails: toInvite,
+        roleId: Number(values.role),
+        ...projectPayload,
+        ...ssoPayload,
+      })
+    } catch {
+      return // onError callback already showed the toast
+    }
 
     toast.success(
       toInvite.length === 1
