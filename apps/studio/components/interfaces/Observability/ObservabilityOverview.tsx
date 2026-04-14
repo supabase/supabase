@@ -117,11 +117,11 @@ export const ObservabilityOverview = () => {
     (serviceKey: string, logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
-      const datumTimestamp = dayjs(datum.timestamp)
-      // Match bucket granularity: 1hr→minute, 1day+7day→hour (calcChartStart never produces day buckets)
+      // datum.timestamp is already the UTC-truncated bucket boundary from timestamp_trunc(),
+      // so use it directly to avoid local-timezone startOf() misalignment (e.g. UTC+5:30).
       const unit = interval === '1hr' ? 'minute' : 'hour'
-      const start = datumTimestamp.startOf(unit).toISOString()
-      const end = dayjs(start).add(1, unit).toISOString()
+      const start = datum.timestamp
+      const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
       const queryParams = new URLSearchParams({ its: start, ite: end })
       router.push(`${logsUrl}?${queryParams.toString()}`)
