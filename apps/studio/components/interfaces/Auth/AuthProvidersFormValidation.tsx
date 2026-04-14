@@ -1040,7 +1040,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
           /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
           'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
         ),
-      EXTERNAL_GOOGLE_SECRET: z.string().min(1, 'Client Secret is required'),
+      EXTERNAL_GOOGLE_SECRET: z.string().optional(),
       EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: z.boolean().optional(),
       EXTERNAL_GOOGLE_EMAIL_OPTIONAL: z.boolean().optional(),
     }),
