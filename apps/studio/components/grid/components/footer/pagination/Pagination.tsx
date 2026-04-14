@@ -9,7 +9,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isForeignTable, isTable } from '@/data/table-editor/table-editor-types'

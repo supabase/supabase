@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilterNew'
 import type { SupaRow } from '@/components/grid/types'
 import { useDatabaseColumnDeleteMutation } from '@/data/database-columns/database-column-delete-mutation'
 import { TableLike } from '@/data/table-editor/table-editor-types'
@@ -27,7 +27,7 @@ const DeleteConfirmationDialogs = ({
 }: DeleteConfirmationDialogsProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
-  const { filters, onApplyFilters } = useTableFilter()
+  const { filters, setFilters } = useTableFilter()
 
   const removeDeletedColumnFromFiltersAndSorts = ({
     columnName,
@@ -37,7 +37,7 @@ const DeleteConfirmationDialogs = ({
     schema?: string
     columnName: string
   }) => {
-    onApplyFilters(filters.filter((filter) => filter.column !== columnName))
+    setFilters(filters.filter((filter) => filter.column !== columnName))
   }
 
   const { mutate: deleteColumn } = useDatabaseColumnDeleteMutation({
