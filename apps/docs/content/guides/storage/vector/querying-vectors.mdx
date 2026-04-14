@@ -31,7 +31,7 @@ Vector buckets and any [Foreign Data Wrappers (FDW)](/docs/guides/database/exten
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
+const supabase = createClient('https://your-project-id.supabase.co', 'your-service-key')
 
 const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
 
@@ -63,7 +63,7 @@ if (error) {
 ```python
 from supabase import create_client
 
-supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+supabase = create_client('https://your-project-id.supabase.co', 'your-service-key')
 
 index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
 

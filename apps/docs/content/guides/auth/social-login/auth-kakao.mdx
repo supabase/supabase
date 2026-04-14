@@ -105,7 +105,7 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('<your-project-url>', '<sb_publishable_... key>')
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithKakao() {

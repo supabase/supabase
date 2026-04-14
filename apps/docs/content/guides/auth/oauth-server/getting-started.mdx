@@ -334,6 +334,7 @@ export async function POST(request: Request) {
 // src/pages/OAuthConsent.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+
 import { supabase } from './supabaseClient'
 
 export function OAuthConsent() {
@@ -525,7 +526,7 @@ You can register clients programmatically using the SDK admin endpoints or by ca
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://your-project.supabase.co',
+  'https://your-project-id.supabase.co',
   'your-service-role-key' // Use service_role key for admin operations
 )
 
@@ -555,7 +556,7 @@ if (error) {
 from supabase import create_client
 
 supabase = create_client(
-    'https://your-project.supabase.co',
+    'https://your-project-id.supabase.co',
     'your-service-role-key'  # Use service_role key for admin operations
 )
 

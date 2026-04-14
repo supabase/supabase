@@ -23,7 +23,7 @@ If you prefer to handle retries yourself, you can disable the built-in retry beh
 ```javascript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://your-supabase-url.supabase.co', 'your-anon-key', {
+const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key', {
   db: {
     retry: false,
   },
@@ -54,7 +54,7 @@ import fetchRetry from 'fetch-retry'
 const fetchWithRetry = fetchRetry(fetch)
 
 // Create a Supabase client instance with the custom fetch
-const supabase = createClient('https://your-supabase-url.supabase.co', 'sb_publishable_...', {
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...', {
   global: {
     fetch: fetchWithRetry,
   },
