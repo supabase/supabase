@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { isEmpty } from 'lodash'
 import { AlertCircle, ChevronDown, Copy, Download, LoaderCircle, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 import {
@@ -128,13 +127,10 @@ export const PreviewPane = () => {
   if (!file) return null
 
   const width = 450
-  const isOpen = !isEmpty(file)
   const size = file.metadata ? formatBytes(file.metadata.size) : null
   const mimeType = file.metadata ? file.metadata.mimetype : undefined
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
-
-  if (!isOpen) return null
 
   return (
     <div
