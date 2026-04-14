@@ -38,6 +38,11 @@ export function InstallOAuthIntegrationButton({
     if (!integration || !projectRef) return
 
     if (integration.installUrlType === 'post') {
+      if (!integration.listingId) {
+        toast.error('Failed to start integration installation')
+        return
+      }
+
       setIsInstalling(true)
       try {
         const response = await fetchPost<{ redirectUrl: string }>(
