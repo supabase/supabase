@@ -227,7 +227,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
           </div>
         </CardContent>
 
-        {isPauseStatusSuccess && !isRestoreDisabled && (
+        {!isRestoreDisabled && (
           <div className="border-t px-6 py-4">
             <LogicalBackupCliInstructions />
           </div>
