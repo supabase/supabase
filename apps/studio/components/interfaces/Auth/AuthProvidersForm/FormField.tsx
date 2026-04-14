@@ -233,7 +233,9 @@ const FormField = ({
                           {...field}
                           id={name}
                           type="number"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
                         />
                         <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -246,7 +248,9 @@ const FormField = ({
                         {...field}
                         id={name}
                         type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
                       />
                     )}
                   </FormControl_Shadcn_>
