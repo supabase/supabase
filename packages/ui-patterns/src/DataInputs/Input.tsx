@@ -88,7 +88,11 @@ const Input = forwardRef<
         />
         {icon && <InputGroupAddon align="inline-start">{icon}</InputGroupAddon>}
         {copy || actions ? (
-          <InputGroupAddon align="inline-end">
+          <InputGroupAddon
+            align="inline-end"
+            // Override defaults
+            className="pr-1 has-[>button]:mr-0 has-[>kbd]:mr-0"
+          >
             {copy && !(reveal && hidden) ? (
               <InputGroupButton
                 size="tiny"

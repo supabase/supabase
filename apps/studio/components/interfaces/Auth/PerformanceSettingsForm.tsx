@@ -11,9 +11,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Select_Shadcn_,
   SelectContent_Shadcn_,
@@ -226,22 +226,22 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <div className="flex flex-col gap-2">
-                        <FormControl_Shadcn_>
-                          <div className="relative">
+                        <div className="relative">
+                          <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>seconds</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 type="number"
                                 min={5}
                                 max={30}
                                 {...field}
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
-                          </div>
-                        </FormControl_Shadcn_>
+                          </FormControl_Shadcn_>
+                        </div>
 
                         <p className="text-xs text-right text-foreground-muted">
                           10+ seconds recommended
@@ -368,16 +368,11 @@ export const PerformanceSettingsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
-                        <div className="flex flex-col gap-2">
-                          <div className="relative">
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <FormControl_Shadcn_>
                             <InputGroup>
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>
-                                  {chosenUnit === 'percent' ? '%' : 'connections'}
-                                </InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput
+                              <FormInputGroupInput
                                 type="number"
                                 {...field}
                                 min={3}
@@ -388,24 +383,29 @@ export const PerformanceSettingsForm = () => {
                                 }
                                 disabled={!canUpdateConfig || promptUpgrade}
                               />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>
+                                  {chosenUnit === 'percent' ? '%' : 'connections'}
+                                </InputGroupText>
+                              </InputGroupAddon>
                             </InputGroup>
-                          </div>
-                          {isLoadingMaxConns ? (
-                            <ShimmeringLoader className="py-2 w-16 ml-auto" />
-                          ) : (
-                            <p className="text-xs text-right text-foreground-muted">
-                              <span className="text-foreground-light">
-                                {chosenUnit === 'percent'
-                                  ? Math.floor(
-                                      maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                    ).toString()
-                                  : Math.min(maxConnectionLimit, field.value!)}
-                              </span>{' '}
-                              / {maxConnectionLimit}
-                            </p>
-                          )}
+                          </FormControl_Shadcn_>
                         </div>
-                      </FormControl_Shadcn_>
+                        {isLoadingMaxConns ? (
+                          <ShimmeringLoader className="py-2 w-16 ml-auto" />
+                        ) : (
+                          <p className="text-xs text-right text-foreground-muted">
+                            <span className="text-foreground-light">
+                              {chosenUnit === 'percent'
+                                ? Math.floor(
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                  ).toString()
+                                : Math.min(maxConnectionLimit, field.value!)}
+                            </span>{' '}
+                            / {maxConnectionLimit}
+                          </p>
+                        )}
+                      </div>
                     </FormItemLayout>
                   )}
                 />

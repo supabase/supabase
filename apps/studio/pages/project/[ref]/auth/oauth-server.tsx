@@ -33,11 +33,7 @@ const ProvidersPage: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="default">
-        <PageSection>
-          <PageSectionContent>
-            <OAuthServerSettingsForm />
-          </PageSectionContent>
-        </PageSection>
+        <OAuthServerSettingsForm />
       </PageContainer>
     </>
   )

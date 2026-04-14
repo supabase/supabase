@@ -75,7 +75,6 @@ export const DashboardSettingsToggles = () => {
           name="queueOperationsEnabled"
           label="Queue table operations"
           description="Review and batch table edits in Table Editor before saving them to your database."
-          discussionsUrl="https://github.com/orgs/supabase/discussions/42460"
           onToggle={handleQueueOperationsToggle}
           isLast
         />

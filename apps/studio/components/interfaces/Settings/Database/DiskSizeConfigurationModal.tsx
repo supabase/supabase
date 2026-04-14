@@ -15,10 +15,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InfoIcon,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Modal,
   WarningIcon,
@@ -195,19 +195,19 @@ const DiskSizeConfigurationModal = ({
                           layout="vertical"
                           label="New disk size"
                         >
-                          <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>GB</InputGroupText>
-                            </InputGroupAddon>
-                            <FormControl_Shadcn_>
-                              <InputGroupInput
+                          <FormControl_Shadcn_>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 id="new-disk-size"
                                 type="number"
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
-                            </FormControl_Shadcn_>
-                          </InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>GB</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
                     />

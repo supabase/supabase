@@ -7,10 +7,10 @@ import {
   Calendar,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -229,17 +229,17 @@ const FormField = ({
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
-                        <InputGroupAddon align="inline-end">
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {properties.units}
-                          </ReactMarkdown>
-                        </InputGroupAddon>
-                        <InputGroupInput
+                        <FormInputGroupInput
                           {...field}
                           id={name}
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
+                        <InputGroupAddon align="inline-end">
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {properties.units}
+                          </ReactMarkdown>
+                        </InputGroupAddon>
                       </InputGroup>
                     ) : (
                       <Input_Shadcn_
