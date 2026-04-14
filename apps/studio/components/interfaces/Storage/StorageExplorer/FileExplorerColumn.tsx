@@ -1,5 +1,5 @@
-import { Transition } from '@headlessui/react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AnimatePresence, motion } from 'framer-motion'
 import { get, noop, sum, uniqBy } from 'lodash'
 import { ChevronsDown, ChevronsUp, Copy, Eye, FolderPlus, Upload } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -37,35 +37,36 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
   return (
-    <Transition
-      show={isOpen}
-      enter="transition ease-out duration-100"
-      enterFrom="transform opacity-0"
-      enterTo="transform opacity-100"
-      leave="transition ease-in duration-75"
-      leaveFrom="transform opacity-100"
-      leaveTo="transform opacity-0"
-      className="h-full w-full absolute top-0"
-    >
-      <div
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
-        className="absolute top-0 flex h-full w-full items-center justify-center"
-        style={{ backgroundColor: folderIsEmpty ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}
-      >
-        {!folderIsEmpty && (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1, ease: 'easeOut' }}
+          className="h-full w-full absolute top-0"
+        >
           <div
-            className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
-            style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+            className="absolute top-0 flex h-full w-full items-center justify-center"
+            style={{ backgroundColor: folderIsEmpty ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}
           >
-            <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
-            <p className="text-center text-sm  text-white mt-2 pointer-events-none">
-              Drop your files to upload to this folder
-            </p>
+            {!folderIsEmpty && (
+              <div
+                className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
+                style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+              >
+                <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+                <p className="text-center text-sm  text-white mt-2 pointer-events-none">
+                  Drop your files to upload to this folder
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </Transition>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
