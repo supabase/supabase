@@ -18,6 +18,7 @@ interface RestartTableDialogProps {
   onOpenChange: (open: boolean) => void
   tableId: number
   tableName: string
+  pipelineStatusName?: string
   onRestartStart?: () => void
   onRestartComplete?: () => void
 }
@@ -27,6 +28,7 @@ export const RestartTableDialog = ({
   onOpenChange,
   tableId,
   tableName,
+  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: RestartTableDialogProps) => {
@@ -58,6 +60,7 @@ export const RestartTableDialog = ({
       pipelineId,
       target: { type: 'single_table', table_id: tableId },
       rollbackType: 'full',
+      pipelineStatusName,
     })
   }
 

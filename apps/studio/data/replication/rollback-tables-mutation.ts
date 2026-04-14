@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { useRestartPipelineHelper } from './restart-pipeline-helper'
+import { useStartPipelineMutation } from './start-pipeline-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -18,6 +19,7 @@ type RollbackTablesParams = {
   pipelineId: number
   target: RollbackTablesTarget
   rollbackType: RollbackType
+  pipelineStatusName?: string
 }
 
 type RolledBackTable = {
@@ -66,17 +68,23 @@ export const useRollbackTablesMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   const { restartPipeline } = useRestartPipelineHelper()
+  const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
   return useMutation<RollbackTablesData, ResponseError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, pipelineId } = variables
+      const { projectRef, pipelineId, pipelineStatusName } = variables
 
-      // Restart the pipeline (stop + start)
+      // Start or restart the pipeline after rollback.
+      // Stopped pipelines only need a start (already stopped, no need to stop first).
       try {
-        await restartPipeline({ projectRef, pipelineId })
+        if (pipelineStatusName === 'stopped') {
+          await startPipeline({ projectRef, pipelineId })
+        } else {
+          await restartPipeline({ projectRef, pipelineId })
+        }
       } catch (error: any) {
-        toast.error(`Rollback succeeded but failed to restart pipeline: ${error.message}`)
+        toast.error(`Rollback succeeded but failed to start pipeline: ${error.message}`)
         throw error
       }
 

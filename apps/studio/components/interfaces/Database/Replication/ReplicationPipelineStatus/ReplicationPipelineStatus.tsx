@@ -181,13 +181,12 @@ export const ReplicationPipelineStatus = () => {
   const hasErroredTables = erroredTables.length > 0
   const isAnyRestartInProgress = restartingTableIds.size > 0
 
-  const isPipelineRunning = statusName === 'started'
   const hasTableData = tableStatuses.length > 0
   const isEnablingDisabling =
     requestStatus === PipelineStatusRequestStatus.StartRequested ||
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const showDisabledState = !isPipelineRunning || isEnablingDisabling
+  const showDisabledState = isEnablingDisabling
   const refreshIntervalLabel =
     STATUS_REFRESH_FREQUENCY_MS >= 1000
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
@@ -366,121 +365,128 @@ export const ReplicationPipelineStatus = () => {
           </div>
         )}
 
-        {hasTableData && (
+        {!isPipelineLoading && !isStatusLoading && (
           <div className="flex flex-col gap-y-3">
             <div className="flex items-center justify-between">
-              <Input
-                icon={<Search />}
-                size="tiny"
-                className="text-xs w-52"
-                placeholder="Search for tables"
-                value={searchString}
-                disabled={isPipelineError}
-                onChange={(e) => setSearchString(e.target.value)}
-                actions={
-                  searchString.length > 0 && [
-                    <X
-                      key="close"
-                      className="mx-2 cursor-pointer text-foreground"
-                      size={14}
-                      strokeWidth={1.5}
-                      onClick={() => setSearchString('')}
-                    />,
-                  ]
-                }
-              />
-              {!showDisabledState && (
-                <div className="flex items-center">
-                  <Button
-                    size="tiny"
-                    type="default"
-                    className="rounded-r-none hover:z-[2]"
-                    icon={<RotateCcw />}
-                    disabled={tableStatuses.length === 0 || isAnyRestartInProgress}
-                    loading={isAnyRestartInProgress}
-                    onClick={() => {
-                      setBatchRestartMode('all')
-                      setShowBatchRestartDialog(true)
-                    }}
-                  >
-                    Restart all tables
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="default"
-                        icon={<ChevronDown />}
-                        className="w-7 rounded-l-none -ml-[1px]"
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44">
-                      <DropdownMenuItem
-                        disabled={!hasErroredTables || isAnyRestartInProgress}
-                        onClick={() => {
-                          setBatchRestartMode('errored')
-                          setShowBatchRestartDialog(true)
-                        }}
-                      >
-                        Restart failed tables only
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+              {hasTableData ? (
+                <Input
+                  icon={<Search />}
+                  size="tiny"
+                  className="text-xs w-52"
+                  placeholder="Search for tables"
+                  value={searchString}
+                  disabled={isPipelineError}
+                  onChange={(e) => setSearchString(e.target.value)}
+                  actions={
+                    searchString.length > 0 && [
+                      <X
+                        key="close"
+                        className="mx-2 cursor-pointer text-foreground"
+                        size={14}
+                        strokeWidth={1.5}
+                        onClick={() => setSearchString('')}
+                      />,
+                    ]
+                  }
+                />
+              ) : (
+                <div />
               )}
+              <div className="flex items-center">
+                <Button
+                  size="tiny"
+                  type="default"
+                  className="rounded-r-none hover:z-[2]"
+                  icon={<RotateCcw />}
+                  disabled={isAnyRestartInProgress || isEnablingDisabling || isPipelineError}
+                  loading={isAnyRestartInProgress}
+                  onClick={() => {
+                    setBatchRestartMode('all')
+                    setShowBatchRestartDialog(true)
+                  }}
+                >
+                  Restart all tables
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="default"
+                      icon={<ChevronDown />}
+                      className="w-7 rounded-l-none -ml-[1px]"
+                      disabled={isEnablingDisabling || isPipelineError}
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44">
+                    <DropdownMenuItem
+                      disabled={!hasErroredTables || isAnyRestartInProgress}
+                      onClick={() => {
+                        setBatchRestartMode('errored')
+                        setShowBatchRestartDialog(true)
+                      }}
+                    >
+                      Restart failed tables only
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead key="table">Table</TableHead>
-                      <TableHead key="status">Status</TableHead>
-                      <TableHead key="details">Details</TableHead>
-                      <TableHead key="actions" />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTableStatuses.map((table) => {
-                      const isRestarting = restartingTableIds.has(table.table_id)
-                      const isErrorState = table.state.name === 'error'
-                      const errorReason =
-                        isErrorState && 'reason' in table.state ? table.state.reason : undefined
-                      const errorSolution =
-                        isErrorState && 'solution' in table.state ? table.state.solution : undefined
-                      return (
-                        <TableReplicationRow
-                          key={table.table_id}
-                          table={table}
-                          config={config}
-                          isRestarting={isRestarting}
-                          showDisabledState={showDisabledState}
-                          onSelectRestart={() => {
-                            setSelectedTableForRestart({
-                              tableId: table.table_id,
-                              tableName: table.table_name,
-                            })
-                            setShowRestartDialog(true)
-                          }}
-                          onSelectShowError={
-                            isErrorState && errorReason
-                              ? () => {
-                                  setSelectedTableError({
-                                    tableName: table.table_name,
-                                    reason: errorReason,
-                                    solution: errorSolution,
-                                  })
-                                  setShowErrorDialog(true)
-                                }
-                              : () => {}
-                          }
-                        />
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            {hasTableData && (
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead key="table">Table</TableHead>
+                        <TableHead key="status">Status</TableHead>
+                        <TableHead key="details">Details</TableHead>
+                        <TableHead key="actions" />
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredTableStatuses.map((table) => {
+                        const isRestarting = restartingTableIds.has(table.table_id)
+                        const isErrorState = table.state.name === 'error'
+                        const errorReason =
+                          isErrorState && 'reason' in table.state ? table.state.reason : undefined
+                        const errorSolution =
+                          isErrorState && 'solution' in table.state
+                            ? table.state.solution
+                            : undefined
+                        return (
+                          <TableReplicationRow
+                            key={table.table_id}
+                            table={table}
+                            config={config}
+                            isRestarting={isRestarting}
+                            showDisabledState={showDisabledState}
+                            onSelectRestart={() => {
+                              setSelectedTableForRestart({
+                                tableId: table.table_id,
+                                tableName: table.table_name,
+                              })
+                              setShowRestartDialog(true)
+                            }}
+                            onSelectShowError={
+                              isErrorState && errorReason
+                                ? () => {
+                                    setSelectedTableError({
+                                      tableName: table.table_name,
+                                      reason: errorReason,
+                                      solution: errorSolution,
+                                    })
+                                    setShowErrorDialog(true)
+                                  }
+                                : () => {}
+                            }
+                          />
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
 
@@ -492,18 +498,29 @@ export const ReplicationPipelineStatus = () => {
               </div>
               <div className="space-y-2">
                 <h4 className="text-lg font-semibold text-foreground">
-                  {showDisabledState ? 'Pipeline not running' : 'No table status information'}
+                  {showDisabledState
+                    ? config.title
+                    : statusName === 'stopped'
+                      ? 'Pipeline stopped'
+                      : statusName === 'failed'
+                        ? 'Pipeline failed'
+                        : 'No table data yet'}
                 </h4>
                 <p className="text-sm text-foreground-light leading-relaxed">
                   {showDisabledState
-                    ? `The replication pipeline is currently ${statusName || 'not active'}. Table status
-                information is not available while the pipeline is in this state.`
-                    : `This pipeline doesn't have any table replication status data available yet. The status will appear here once replication begins.`}
+                    ? config.message
+                    : statusName === 'stopped'
+                      ? 'Start the pipeline to begin replication.'
+                      : statusName === 'failed'
+                        ? 'The pipeline encountered an error. Restart it or reset your tables to recover.'
+                        : 'Table status will appear here once replication begins.'}
                 </p>
               </div>
-              <p className="text-xs text-foreground-lighter">
-                Data refreshes automatically every 2 seconds
-              </p>
+              {statusName !== 'stopped' && (
+                <p className="text-xs text-foreground-lighter">
+                  Data refreshes every {refreshIntervalLabel}
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -527,6 +544,7 @@ export const ReplicationPipelineStatus = () => {
           onOpenChange={setShowRestartDialog}
           tableId={selectedTableForRestart.tableId}
           tableName={selectedTableForRestart.tableName}
+          pipelineStatusName={statusName}
           onRestartStart={() => {
             setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.tableId))
           }}
@@ -560,6 +578,7 @@ export const ReplicationPipelineStatus = () => {
           totalTables={tableStatuses.length}
           erroredTablesCount={erroredTables.length}
           tables={tableStatuses}
+          pipelineStatusName={statusName}
           onRestartStart={(tableIds) => {
             setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))
           }}
