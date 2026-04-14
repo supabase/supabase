@@ -156,7 +156,11 @@ const smsProviderBaseSchema = z.object({
       if (!value) return true
       return /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g.test(value)
     }, 'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'),
-  SMS_TEST_OTP_VALID_UNTIL: z.string().datetime({ offset: true }).optional(),
+  SMS_TEST_OTP_VALID_UNTIL: z.string().refine((value) => {
+    if (!value) return true
+    const date = new Date(value)
+    return !isNaN(date.getTime())
+  }, 'Must be a valid date and time'),
   SMS_AUTOCONFIRM: z.boolean().optional(),
 })
 
@@ -232,21 +236,6 @@ const makeProviderOptionalWhenSMSHookEnabled = (
   schema: z.ZodObject<z.ZodRawShape>
 ) => {
   return config.HOOK_SEND_SMS_ENABLED ? schema.partial() : schema
-}
-
-const validateSmsTestOtp = <
-  T extends {
-    SMS_TEST_OTP?: unknown | string | undefined
-    SMS_TEST_OTP_VALID_UNTIL?: unknown | string | undefined
-  },
->({
-  SMS_TEST_OTP,
-  SMS_TEST_OTP_VALID_UNTIL,
-}: T) => {
-  if (!SMS_TEST_OTP || (SMS_TEST_OTP as string).length === 0) {
-    return true
-  }
-  return SMS_TEST_OTP_VALID_UNTIL != null && (SMS_TEST_OTP_VALID_UNTIL as string).length > 0
 }
 
 // getPhoneProviderValidationSchema generate the validation schema for the SMS providers
@@ -333,7 +322,15 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
       vonageSchema,
       textlocalSchema,
     ])
-    .refine(validateSmsTestOtp, 'You must provide a valid until date.')
+    .superRefine((values, ctx) => {
+      if (values.SMS_TEST_OTP && !values.SMS_TEST_OTP_VALID_UNTIL) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'You must provide a valid until date.',
+          path: ['SMS_TEST_OTP_VALID_UNTIL'],
+        })
+      }
+    })
 
   return z
     .discriminatedUnion('EXTERNAL_PHONE_ENABLED', [
@@ -544,9 +541,9 @@ export const PROVIDER_PHONE = {
       title: 'Test OTPs Valid Until',
       description:
         "Test phone number and OTP combinations won't be active past this date and time (local time zone).",
-      show: {
-        key: 'SMS_TEST_OTP',
-      },
+      // show: {
+      //   key: 'SMS_TEST_OTP',
+      // },
     },
   },
   validationSchema: null,
