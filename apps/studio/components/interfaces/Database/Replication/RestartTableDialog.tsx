@@ -39,7 +39,7 @@ export const RestartTableDialog = ({
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
-        `Restarting replication for "${tableName}". Pipeline will restart automatically.`
+        `Restarting replication for "${tableName}". Pipeline will ${pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'} automatically.`
       )
     },
     onSettled: () => {

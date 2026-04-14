@@ -1,13 +1,9 @@
 import { useStartPipelineMutation } from './start-pipeline-mutation'
 import { useStopPipelineMutation } from './stop-pipeline-mutation'
 
-export interface RestartPipelineParams {
+interface RestartPipelineParams {
   projectRef: string
   pipelineId: number
-}
-
-interface UseRestartPipelineHelperOptions {
-  suppressChildErrorToasts?: boolean
 }
 
 /**
@@ -20,12 +16,9 @@ interface UseRestartPipelineHelperOptions {
  * because crash looping pods are not restarted if the resource is patched. We will try to find a better
  * solution for this in the future.
  */
-export const useRestartPipelineHelper = ({
-  suppressChildErrorToasts = false,
-}: UseRestartPipelineHelperOptions = {}) => {
-  const mutationOptions = suppressChildErrorToasts ? { onError: () => {} } : undefined
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation(mutationOptions)
-  const { mutateAsync: startPipeline } = useStartPipelineMutation(mutationOptions)
+export const useRestartPipelineHelper = () => {
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
+  const { mutateAsync: startPipeline } = useStartPipelineMutation()
 
   const restartPipeline = async ({ projectRef, pipelineId }: RestartPipelineParams) => {
     // Step 1: Stop the pipeline to ensure pods are fully terminated

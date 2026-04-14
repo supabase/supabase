@@ -47,8 +47,7 @@ export type PipelineDisplayStateKey =
   | 'running'
   | 'unknown'
 
-export type PipelineDisplayTone = 'failure' | 'loading' | 'success' | 'idle'
-export type PipelineDisplayAccent = 'brand' | 'warning' | 'danger' | 'neutral' | 'success'
+export type PipelineDisplayType = 'failure' | 'loading' | 'success' | 'idle'
 
 export interface PipelineDisplayState {
   key: PipelineDisplayStateKey
@@ -56,8 +55,7 @@ export interface PipelineDisplayState {
   title: string
   message: string
   badge: string
-  tone: PipelineDisplayTone
-  accent: PipelineDisplayAccent
+  type: PipelineDisplayType
 }
 
 const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplayState> = {
@@ -67,8 +65,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Starting pipeline',
     message: 'Starting the pipeline. Replication will resume once running.',
     badge: 'Starting',
-    tone: 'loading',
-    accent: 'brand',
+    type: 'loading',
   },
   stopping: {
     key: 'stopping',
@@ -76,8 +73,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Stopping pipeline',
     message: 'Stopping replication. Data transfer will be paused once stopped.',
     badge: 'Stopping',
-    tone: 'loading',
-    accent: 'warning',
+    type: 'loading',
   },
   restarting: {
     key: 'restarting',
@@ -85,8 +81,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Restarting pipeline',
     message: 'Applying settings and restarting the pipeline.',
     badge: 'Restarting',
-    tone: 'loading',
-    accent: 'brand',
+    type: 'loading',
   },
   failed: {
     key: 'failed',
@@ -94,8 +89,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Pipeline failed',
     message: 'Replication has encountered an error.',
     badge: 'Failed',
-    tone: 'failure',
-    accent: 'danger',
+    type: 'failure',
   },
   stopped: {
     key: 'stopped',
@@ -103,8 +97,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Pipeline stopped',
     message: 'Replication is paused. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
-    tone: 'idle',
-    accent: 'neutral',
+    type: 'idle',
   },
   running: {
     key: 'running',
@@ -112,8 +105,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Pipeline running',
     message: 'Replication is active and processing changes.',
     badge: 'Running',
-    tone: 'success',
-    accent: 'success',
+    type: 'success',
   },
   unknown: {
     key: 'unknown',
@@ -121,8 +113,7 @@ const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplaySt
     title: 'Pipeline status unknown',
     message: 'Unable to determine pipeline status.',
     badge: 'Unknown',
-    tone: 'idle',
-    accent: 'warning',
+    type: 'idle',
   },
 }
 

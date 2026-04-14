@@ -94,9 +94,9 @@ export const BatchRestartDialog = ({
           description: (
             <div className="space-y-3 text-sm">
               <p>
-                This will restart replication for{' '}
-                <strong>{totalTables > 0 ? `all ${totalTables} tables` : 'all tables'}</strong> in
-                this pipeline from scratch:
+                This will restart replication for all
+                {totalTables === 0 ? '' : totalTables} table{totalTables > 1 ? 's' : ''} in this
+                pipeline from scratch:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 <li>

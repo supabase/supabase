@@ -23,16 +23,12 @@ import {
   CardContent,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -53,7 +49,8 @@ import { SlotLagMetrics } from './ReplicationPipelineStatus.types'
 import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
 import { SlotLagMetricsInline, SlotLagMetricsList } from './SlotLagMetrics'
 import { TableReplicationRow } from './TableReplicationRow'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -300,7 +297,7 @@ export const ReplicationPipelineStatus = () => {
               onClick={onPrimaryAction}
               loading={
                 isPipelineError ||
-                displayState.tone === 'loading' ||
+                displayState.type === 'loading' ||
                 isEnablingDisabling ||
                 isStartingPipeline ||
                 isStoppingPipeline ||
@@ -438,26 +435,21 @@ export const ReplicationPipelineStatus = () => {
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-44">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span>
-                          <DropdownMenuItem
-                            disabled={
-                              !hasErroredTables || isAnyRestartInProgress || showDisabledState
-                            }
-                            onClick={() => {
-                              setBatchRestartMode('errored')
-                              setShowBatchRestartDialog(true)
-                            }}
-                          >
-                            Restart failed tables only
-                          </DropdownMenuItem>
-                        </span>
-                      </TooltipTrigger>
-                      {!hasErroredTables && (
-                        <TooltipContent side="left">No tables require manual retry</TooltipContent>
-                      )}
-                    </Tooltip>
+                    <DropdownMenuItemTooltip
+                      disabled={!hasErroredTables || isAnyRestartInProgress || showDisabledState}
+                      onClick={() => {
+                        setBatchRestartMode('errored')
+                        setShowBatchRestartDialog(true)
+                      }}
+                      tooltip={{
+                        content: {
+                          side: 'left',
+                          text: hasErroredTables ? 'No tables require manual retry' : undefined,
+                        },
+                      }}
+                    >
+                      Restart failed tables only
+                    </DropdownMenuItemTooltip>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

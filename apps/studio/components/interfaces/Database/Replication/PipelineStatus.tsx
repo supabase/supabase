@@ -33,13 +33,17 @@ export const PipelineStatus = ({
 
   const statusName = getStatusName(pipelineStatus)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
-  const { tone: type, message: tooltip, label } = displayState
+  const { type, message, label } = displayState
 
   const pipelineLogsUrl = pipelineId
     ? `/project/${ref}/logs/replication-logs?f=${encodeURIComponent(
         JSON.stringify({ pipeline_id: pipelineId })
       )}`
     : `/project/${ref}/logs/replication-logs`
+
+  const showLogsCTA = [PipelineStatusName.UNKNOWN, PipelineStatusName.FAILED].includes(
+    statusName as PipelineStatusName
+  )
 
   return (
     <>
@@ -71,10 +75,8 @@ export const PipelineStatus = ({
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {tooltip}{' '}
-            {[PipelineStatusName.UNKNOWN, PipelineStatusName.FAILED].includes(
-              statusName as PipelineStatusName
-            ) && (
+            {message}{' '}
+            {showLogsCTA && (
               <>
                 Check the <InlineLink href={pipelineLogsUrl}>logs</InlineLink> for more information.
               </>
