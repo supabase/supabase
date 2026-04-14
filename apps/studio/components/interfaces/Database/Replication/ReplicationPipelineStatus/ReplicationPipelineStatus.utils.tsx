@@ -2,7 +2,8 @@ import dayjs from 'dayjs'
 import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
 import { Badge } from 'ui'
 
-import { getPipelineStateMessages } from '../Pipeline.utils'
+import { getPipelineStateMessages, normalizePipelineStatusName } from '../Pipeline.utils'
+import { PipelineStatusName } from '../Replication.constants'
 import { RetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { formatBytes } from '@/lib/helpers'
@@ -64,7 +65,8 @@ export const getDisabledStateConfig = ({
   requestStatus: PipelineStatusRequestStatus
   statusName?: ReplicationPipelineStatusData['status']['name']
 }) => {
-  const { title, message, badge } = getPipelineStateMessages(requestStatus, statusName)
+  const normalizedStatusName = normalizePipelineStatusName(statusName)
+  const { title, message, badge } = getPipelineStateMessages(requestStatus, normalizedStatusName)
 
   // Get icon and colors based on current state
   const isEnabling = requestStatus === PipelineStatusRequestStatus.StartRequested
@@ -74,11 +76,11 @@ export const getDisabledStateConfig = ({
 
   const icon = isTransitioning ? (
     <Loader2 className="w-6 h-6 animate-spin" />
-  ) : statusName === 'failed' ? (
+  ) : normalizedStatusName === PipelineStatusName.FAILED ? (
     <XCircle className="w-6 h-6" />
-  ) : statusName === 'starting' ? (
+  ) : normalizedStatusName === PipelineStatusName.STARTING ? (
     <Clock className="w-6 h-6" />
-  ) : statusName === 'unknown' ? (
+  ) : normalizedStatusName === PipelineStatusName.UNKNOWN ? (
     <HelpCircle className="w-6 h-6" />
   ) : (
     <Activity className="w-6 h-6" />
@@ -93,7 +95,9 @@ export const getDisabledStateConfig = ({
           iconBg: 'bg-brand-600',
           icon: 'text-white dark:text-black',
         }
-      : isDisabling || statusName === 'starting' || statusName === 'unknown'
+      : isDisabling ||
+          normalizedStatusName === PipelineStatusName.STARTING ||
+          normalizedStatusName === PipelineStatusName.UNKNOWN
         ? {
             bg: 'bg-warning-50',
             text: 'text-warning-900',
@@ -101,7 +105,7 @@ export const getDisabledStateConfig = ({
             iconBg: 'bg-warning-600',
             icon: 'text-white dark:text-black',
           }
-        : statusName === 'failed'
+        : normalizedStatusName === PipelineStatusName.FAILED
           ? {
               bg: 'bg-destructive-50',
               text: 'text-destructive-900',

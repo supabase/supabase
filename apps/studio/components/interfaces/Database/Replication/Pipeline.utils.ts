@@ -17,17 +17,15 @@ export const PIPELINE_ERROR_MESSAGES = {
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
 ): PipelineStatusName | undefined => {
-  if (status && typeof status === 'object' && 'name' in status) {
-    const statusName = status.name
-    if (
-      typeof statusName === 'string' &&
-      (Object.values(PipelineStatusName) as string[]).includes(statusName)
-    ) {
-      return statusName as PipelineStatusName
-    }
-  }
-  return undefined
+  if (!status || typeof status !== 'object' || !('name' in status)) return undefined
+  return normalizePipelineStatusName(status.name)
 }
+
+export const normalizePipelineStatusName = (statusName?: string): PipelineStatusName | undefined =>
+  typeof statusName === 'string' &&
+  (Object.values(PipelineStatusName) as string[]).includes(statusName)
+    ? (statusName as PipelineStatusName)
+    : undefined
 
 export const PIPELINE_ENABLE_ALLOWED_FROM: PipelineStatusName[] = [PipelineStatusName.STOPPED]
 export const PIPELINE_DISABLE_ALLOWED_FROM: PipelineStatusName[] = [
@@ -110,17 +108,17 @@ export const getPipelineStateMessages = (
 
   // Fall back to steady states
   switch (statusName) {
-    case 'starting':
+    case PipelineStatusName.STARTING:
       return PIPELINE_STATE_MESSAGES.starting
-    case 'failed':
+    case PipelineStatusName.FAILED:
       return PIPELINE_STATE_MESSAGES.failed
-    case 'stopped':
+    case PipelineStatusName.STOPPED:
       return PIPELINE_STATE_MESSAGES.stopped
-    case 'started':
+    case PipelineStatusName.STARTED:
       return PIPELINE_STATE_MESSAGES.running
-    case 'stopping':
+    case PipelineStatusName.STOPPING:
       return PIPELINE_STATE_MESSAGES.stopping
-    case 'unknown':
+    case PipelineStatusName.UNKNOWN:
       return PIPELINE_STATE_MESSAGES.unknown
     default:
       return PIPELINE_STATE_MESSAGES.notRunning

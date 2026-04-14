@@ -193,7 +193,8 @@ export const ReplicationPipelineStatus = () => {
     requestStatus === PipelineStatusRequestStatus.StartRequested ||
     requestStatus === PipelineStatusRequestStatus.StopRequested ||
     requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const showDisabledState = isEnablingDisabling || !isPipelineActionable
+  const isPipelineBusy = isEnablingDisabling || isAnyRestartInProgress
+  const showDisabledState = isPipelineBusy || !isPipelineActionable
   const refreshIntervalLabel =
     STATUS_REFRESH_FREQUENCY_MS >= 1000
       ? `${Math.round(STATUS_REFRESH_FREQUENCY_MS / 1000)}s`
@@ -287,9 +288,14 @@ export const ReplicationPipelineStatus = () => {
             <Button
               type={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
               onClick={onPrimaryAction}
-              loading={isPipelineError || isStartingPipeline || isStoppingPipeline}
+              loading={
+                isPipelineError ||
+                isStartingPipeline ||
+                isStoppingPipeline ||
+                isAnyRestartInProgress
+              }
               disabled={
-                isEnablingDisabling ||
+                isPipelineBusy ||
                 !PIPELINE_ACTIONABLE_STATES.includes(statusName as PipelineStatusName)
               }
               icon={icon}

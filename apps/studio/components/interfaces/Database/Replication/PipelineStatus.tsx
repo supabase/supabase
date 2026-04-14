@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getPipelineStateMessages } from './Pipeline.utils'
+import { getPipelineStateMessages, getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
@@ -37,10 +37,7 @@ export const PipelineStatus = ({
     type?: 'failure' | 'warning' | 'loading' | 'success' | 'idle'
     tooltip: string
   } => {
-    const statusName =
-      pipelineStatus && typeof pipelineStatus === 'object' && 'name' in pipelineStatus
-        ? pipelineStatus.name
-        : undefined
+    const statusName = getStatusName(pipelineStatus)
 
     // Get consistent tooltip message using the same logic as other components
     const stateMessages = getPipelineStateMessages(requestStatus, statusName)
@@ -125,7 +122,9 @@ export const PipelineStatus = ({
           </TooltipTrigger>
           <TooltipContent side="bottom">
             {tooltip}{' '}
-            {['unknown', 'failed'].includes(pipelineStatus?.name ?? '') && (
+            {[PipelineStatusName.UNKNOWN, PipelineStatusName.FAILED].includes(
+              getStatusName(pipelineStatus) as PipelineStatusName
+            ) && (
               <>
                 Check the <InlineLink href={pipelineLogsUrl}>logs</InlineLink> for more information.
               </>
