@@ -94,6 +94,7 @@ const PROVIDER_EMAIL = {
       EXTERNAL_EMAIL_ENABLED: z.literal(true),
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: z.boolean(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean(),
       PASSWORD_HIBP_ENABLED: z.boolean(),
       MAILER_OTP_EXP: z.preprocess(
         (val) => (val === '' || val == null ? undefined : val),
@@ -122,6 +123,7 @@ const PROVIDER_EMAIL = {
       MAILER_SECURE_EMAIL_CHANGE_ENABLED: z.boolean().optional(),
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: z.boolean().optional(),
       PASSWORD_HIBP_ENABLED: z.boolean().optional(),
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: z.boolean().optional(),
       MAILER_OTP_EXP: z.preprocess(
         (val) => (val === '' || val == null ? undefined : val),
         z.coerce.number().optional()
