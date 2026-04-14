@@ -79,6 +79,19 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/',
+        headers: [
+          {
+            key: 'Link',
+            value: '</.well-known/api-catalog>; rel="api-catalog"',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [{ key: 'content-type', value: 'application/linkset+json' }],
+      },
+      {
         source: '/.well-known/vercel/flags',
         headers: [
           {
