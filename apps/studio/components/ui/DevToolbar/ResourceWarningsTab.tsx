@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 import { usageKeys } from '@/data/usage/keys'
@@ -37,23 +37,42 @@ export const ResourceWarningsTab = () => {
   const [isReadOnly, setIsReadOnly] = useState(false)
   const [severities, setSeverities] = useState<Record<WarningKey, Severity>>(INITIAL_STATE)
 
+  // Track latest ref/orgSlug so the unmount cleanup always invalidates the
+  // correct cache keys, even when orgSlug was still loading at mount time.
+  const latestValues = useRef({ ref, orgSlug })
+  useEffect(() => {
+    latestValues.current = { ref, orgSlug }
+  })
+
   // Invalidate both cache keys on unmount so banners revert to real data
   // when the toolbar sheet closes (which unmounts this component).
   useEffect(() => {
     return () => {
-      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
-      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
+      const { ref: latestRef, orgSlug: latestOrgSlug } = latestValues.current
+      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, latestRef) })
+      if (latestOrgSlug) {
+        queryClient.invalidateQueries({
+          queryKey: usageKeys.resourceWarnings(latestOrgSlug, undefined),
+        })
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Reset state when the user navigates to a different project so project A's
+  // overrides don't carry over to project B (this component never unmounts).
+  useEffect(() => {
+    setSeverities(INITIAL_STATE)
+    setIsReadOnly(false)
+  }, [ref])
 
   const applyOverrides = (
     nextSeverities: Record<WarningKey, Severity>,
     nextIsReadOnly: boolean
   ) => {
-    if (!orgSlug) return
+    if (!orgSlug || !ref) return
     const mockWarning: ResourceWarning = {
-      project: ref ?? '',
+      project: ref,
       is_readonly_mode_enabled: nextIsReadOnly,
       ...nextSeverities,
       auth_email_offender: null,
@@ -81,10 +100,14 @@ export const ResourceWarningsTab = () => {
     setSeverities(INITIAL_STATE)
     setIsReadOnly(false)
     queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
-    queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
+    if (orgSlug) {
+      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
+    }
   }
 
-  const isDisabled = isOrgLoading || !orgSlug
+  // Disabled when org is loading, org slug is unavailable, or we're not on a
+  // project page (ref is undefined on org-level pages like /org/[slug]/settings).
+  const isDisabled = isOrgLoading || !orgSlug || !ref
 
   return (
     <div className="p-6 space-y-4">
@@ -101,7 +124,11 @@ export const ResourceWarningsTab = () => {
         </button>
       </div>
 
-      {isDisabled && <p className="text-xs text-foreground-muted">Loading org context...</p>}
+      {isDisabled && (
+        <p className="text-xs text-foreground-muted">
+          {!ref ? 'Navigate to a project page to use this tab.' : 'Loading org context...'}
+        </p>
+      )}
 
       <div className={cn('space-y-3', isDisabled && 'opacity-50 pointer-events-none')}>
         <div className="flex items-center justify-between py-2 border-b border-overlay">
