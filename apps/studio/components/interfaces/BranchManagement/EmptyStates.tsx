@@ -44,6 +44,7 @@ export const PullRequestsEmptyState = ({
         )}
         <BranchSelector
           type="outline"
+          align="center"
           branches={branches}
           onBranchSelected={onBranchSelected}
           isUpdating={isUpdating}
