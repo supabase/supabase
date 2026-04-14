@@ -27,11 +27,12 @@ export function InstallOAuthIntegrationButton({
     integration.installIdentificationMethod === 'secret_key_prefix' && isApiKeysLoading
 
   const isIntegrationInstalled = useMemo(() => {
-    if (!apiKeys || !integration) return false
+    if (!integration) return false
     const prefix = integration.secretKeyPrefix
     if (integration.installIdentificationMethod !== 'secret_key_prefix' || !prefix) return false
+    if (isApiKeysLoading || !apiKeys) return false
     return apiKeys.some((k) => k.type === 'secret' && k.name.startsWith(prefix))
-  }, [apiKeys, integration])
+  }, [apiKeys, integration, isApiKeysLoading])
 
   const handleInstallClick = useCallback(async () => {
     if (!integration || !projectRef) return
