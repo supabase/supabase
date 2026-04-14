@@ -260,7 +260,7 @@ describe('Advisor signals integration', () => {
     expect(screen.queryByText('Banned IP address')).not.toBeInTheDocument()
   })
 
-  it('keeps the homepage in a loading state while signal items are pending', () => {
+  it('does not block the homepage while signal items are pending', () => {
     mockUseProjectLintsQuery.mockReturnValue({
       data: [],
       isPending: false,
@@ -274,7 +274,7 @@ describe('Advisor signals integration', () => {
 
     render(<AdvisorSection />)
 
-    expect(screen.queryByText('Advisor found no issues')).not.toBeInTheDocument()
-    expect(screen.queryByText('No security or performance issues found')).not.toBeInTheDocument()
+    expect(screen.getByText('Advisor found no issues')).toBeInTheDocument()
+    expect(screen.getByText('No security or performance issues found')).toBeInTheDocument()
   })
 })

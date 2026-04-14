@@ -11,12 +11,25 @@ export type BannedIPVariables = {
 export type BannedIPsData = BannedIPVariables[]
 export type BannedIPsError = ResponseError
 
+const BANNED_IPS_QUERY_TIMEOUT_MS = 5_000
+
+function getBannedIPsAbortSignal(signal?: AbortSignal) {
+  const timeoutSignal = AbortSignal.timeout(BANNED_IPS_QUERY_TIMEOUT_MS)
+
+  if (!signal) return timeoutSignal
+  if (typeof AbortSignal.any === 'function') {
+    return AbortSignal.any([signal, timeoutSignal])
+  }
+
+  return signal
+}
+
 export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
     params: { path: { ref: projectRef } },
-    signal,
+    signal: getBannedIPsAbortSignal(signal),
   })
 
   if (error) handleError(error)
@@ -34,5 +47,8 @@ export const useBannedIPsQuery = <TData = IPData>(
     queryKey: BannedIPKeys.list(projectRef),
     queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 60_000,
     ...options,
   })

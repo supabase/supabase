@@ -38,7 +38,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     }
   )
   const shouldLoadSignals = IS_PLATFORM && !showEmptyState
-  const { data: signalItems, isPending: isLoadingSignals } = useAdvisorSignals({
+  const { data: signalItems } = useAdvisorSignals({
     projectRef,
     enabled: shouldLoadSignals,
   })
@@ -62,7 +62,6 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   const totalIssues = advisorItems.length
   const hiddenIssuesCount = totalIssues - visibleAdvisorItems.length
-  const isLoadingAdvisorItems = isLoadingLints || (shouldLoadSignals && isLoadingSignals)
 
   const titleContent = useMemo(() => {
     if (totalIssues === 0) return <h2>Advisor found no issues</h2>
@@ -123,7 +122,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   return (
     <div>
-      {isLoadingAdvisorItems ? (
+      {isLoadingLints ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">
@@ -133,7 +132,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           </Button>
         </div>
       )}
-      {isLoadingAdvisorItems ? (
+      {isLoadingLints ? (
         <div className="flex flex-col p-4 gap-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
