@@ -150,19 +150,6 @@ async function generateMainLlmsTxt() {
   await fs.writeFile('public/llms.txt', fullText)
 }
 
-async function generateSourceLlmsTxt(sourceDefn: Source) {
-  const source = await sourceDefn.fetch()
-  const sourceText = source
-    .map((section) => {
-      section.process()
-      return section.extractIndexedContent()
-    })
-    .join('\n\n')
-  const fullText = sourceDefn.title + '\n\n' + sourceText
-
-  await fs.writeFile(`public/${sourceDefn.relPath}`, fullText)
-}
-
 // Product overview .txt files live in apps/www/public/llms/, read at build time.
 // Order matters: homepage first, pricing last, products alphabetical in between.
 const PRODUCT_LLM_FILES = [
@@ -191,13 +178,16 @@ async function readProductLlmContent(): Promise<string> {
   return contents.join('\n\n---\n\n')
 }
 
-async function generateFullLlmsTxt() {
-  const enabledSources = SOURCES.filter((source) => source.enabled !== false)
+async function generateLlmsTxt() {
+  try {
+    await fs.mkdir('public/llms', { recursive: true })
 
-  const [wwwContent, docsSections] = await Promise.all([
-    readProductLlmContent(),
-    Promise.all(
-      enabledSources.map(async (sourceDefn) => {
+    const enabledSources = SOURCES.filter((source) => source.enabled !== false)
+
+    // Fetch all sources once, reuse for both per-SDK files and llms-full.txt
+    const [productContent, ...fetchedSources] = await Promise.all([
+      readProductLlmContent(),
+      ...enabledSources.map(async (sourceDefn) => {
         const source = await sourceDefn.fetch()
         const sourceText = source
           .map((section) => {
@@ -205,35 +195,35 @@ async function generateFullLlmsTxt() {
             return section.extractIndexedContent()
           })
           .join('\n\n')
-        return `# ${sourceDefn.title}\n\n${sourceText}`
-      })
-    ),
-  ])
+        return { defn: sourceDefn, text: sourceText }
+      }),
+    ])
 
-  const fullText = [
-    '# Supabase',
-    '',
-    '## Product Overview',
-    '',
-    wwwContent,
-    '',
-    '---',
-    '',
-    '## Documentation',
-    '',
-    docsSections.join('\n\n---\n\n'),
-  ].join('\n')
-
-  await fs.writeFile('public/llms-full.txt', fullText)
-}
-
-async function generateLlmsTxt() {
-  try {
-    await fs.mkdir('public/llms', { recursive: true })
     await Promise.all([
       generateMainLlmsTxt(),
-      generateFullLlmsTxt(),
-      ...SOURCES.filter((source) => source.enabled !== false).map(generateSourceLlmsTxt),
+      // Per-SDK files
+      ...fetchedSources.map(({ defn, text }) =>
+        fs.writeFile(`public/${defn.relPath}`, `${defn.title}\n\n${text}`)
+      ),
+      // Combined file: product overview + all docs
+      fs.writeFile(
+        'public/llms-full.txt',
+        [
+          '# Supabase',
+          '',
+          '## Product Overview',
+          '',
+          productContent,
+          '',
+          '---',
+          '',
+          '## Documentation',
+          '',
+          fetchedSources
+            .map(({ defn, text }) => `# ${defn.title}\n\n${text}`)
+            .join('\n\n---\n\n'),
+        ].join('\n')
+      ),
     ])
   } catch (err) {
     console.error(err)
