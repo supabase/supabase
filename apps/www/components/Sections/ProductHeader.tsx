@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import ProductIcon from '../ProductIcon'
 import { BookOpen } from 'lucide-react'
+import { DASHBOARD_SIGNUP_URL } from '~/lib/constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type subheader = string
@@ -51,8 +52,8 @@ const ProductHeader = (props: Types) => {
           <div className="flex flex-row md:flex-row md:items-center">
             <Button asChild size="medium">
               <Link
-                href="https://supabase.com/dashboard"
-                as="https://supabase.com/dashboard"
+                href={DASHBOARD_SIGNUP_URL}
+                as={DASHBOARD_SIGNUP_URL}
                 onClick={() =>
                   sendTelemetryEvent({
                     action: 'start_project_button_clicked',

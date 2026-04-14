@@ -32,6 +32,9 @@ export const SITE_ORIGIN =
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
       : 'http://localhost:3000'
 
+export const DASHBOARD_URL = process.env.NEXT_PUBLIC_STUDIO_URL ?? 'https://supabase.com/dashboard'
+export const DASHBOARD_SIGNUP_URL = `${DASHBOARD_URL}/sign-up`
+
 export const LW_URL = `${SITE_ORIGIN}/launch-week`
 
 export const LW12_DATE = 'August 12-16 / 7am PT'

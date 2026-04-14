@@ -1,4 +1,5 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { DASHBOARD_SIGNUP_URL } from '~/lib/constants'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import AnnouncementBadge from 'components/Announcement/Badge'
 import Link from 'next/link'
@@ -34,8 +35,8 @@ const Hero = () => {
                 <div className="flex items-center gap-2">
                   <Button asChild size="medium">
                     <Link
-                      href="https://supabase.com/dashboard"
-                      as="https://supabase.com/dashboard"
+                      href={DASHBOARD_SIGNUP_URL}
+                      as={DASHBOARD_SIGNUP_URL}
                       onClick={() =>
                         sendTelemetryEvent({
                           action: 'start_project_button_clicked',
