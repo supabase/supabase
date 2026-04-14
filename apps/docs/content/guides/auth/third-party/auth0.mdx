@@ -145,7 +145,7 @@ By default, Auth0 JWTs (both access token and ID token) do not contain a `role` 
 
 A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim.
 
-If you are using **ID tokens** (recommended for the TypeScript SPA example above):
+If you are using **ID tokens** from the example above:
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
