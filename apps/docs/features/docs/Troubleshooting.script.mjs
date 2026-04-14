@@ -65,8 +65,8 @@ function octokit() {
 export function supabaseAdmin() {
   if (!supabaseAdminClient) {
     supabaseAdminClient = createClient(
-      /** @type {string} */ (process.env.NEXT_PUBLIC_SUPABASE_URL),
-      /** @type {string} */ (process.env.SUPABASE_SECRET_KEY)
+      /** @type {string} */(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      /** @type {string} */(process.env.SUPABASE_SECRET_KEY)
     )
   }
 
@@ -480,6 +480,7 @@ async function updateFileId(entry, id) {
     engines: { toml: parse },
   })
   data.database_id = id
+  data.github_url = entry.data.github_url
 
   const newFrontmatter = stringify(data)
   const newContent = `---\n${newFrontmatter}\n---\n${content}`
