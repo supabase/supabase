@@ -163,7 +163,7 @@ exports.onExecutePostLogin = async (event, api) => {
 
 <Admonition type="caution">
 
-Using `api.accessToken.setCustomClaim('role', 'authenticated')` without a namespace may appear to work but Auth0 can silently strip the claim. Use ID tokens or namespaced access token claims to avoid this issue.
+Auth0 can silently strip claims without a namespace when using `api.accessToken.setCustomClaim`. We recommend ID tokens or namespaced access token claims to avoid this issue.
 
 </Admonition>
 
