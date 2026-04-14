@@ -110,10 +110,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         </div>
       </div>
 
-      <div
-        className="h-16 rounded-sm bg-brand/5"
-        onClick={(e) => e.preventDefault()}
-      >
+      <div className="h-16 rounded-sm bg-brand/5" onClick={(e) => e.preventDefault()}>
         <Loading active={data.isLoading} isFullHeight>
           {data.isLoading ? (
             <div />
