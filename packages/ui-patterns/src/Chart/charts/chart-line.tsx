@@ -80,6 +80,8 @@ export interface ChartLineProps {
   strokeWidth?: number
   referenceLines?: ChartReferenceLine[]
   sharedStackId?: string
+  /** Only draw the stroke line for these specific dataKeys; others get fill only. */
+  strokeKeys?: string[]
 }
 
 export const ChartLine = ({
@@ -106,6 +108,7 @@ export const ChartLine = ({
   strokeWidth = 1.5,
   referenceLines,
   sharedStackId,
+  strokeKeys,
 }: ChartLineProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const { resolvedTheme } = useTheme()
@@ -293,7 +296,7 @@ export const ChartLine = ({
                 dataKey={key}
                 fill={lineColor}
                 fillOpacity={fillOpacity}
-                stroke={lineColor}
+                stroke={strokeKeys && !strokeKeys.includes(key) ? 'transparent' : lineColor}
                 strokeWidth={strokeWidth}
                 stackId={sharedStackId ?? `stack-${key}`}
               />
