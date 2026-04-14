@@ -147,11 +147,15 @@ const PROVIDER_EMAIL = {
 }
 
 const smsProviderBaseSchema = z.object({
-  SMS_TEST_OTP: z.string().refine((value) => {
-    // This ensure users can empty the SMS_TEST_OTP field
-    if (!value) return true
-    return /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g.test(value)
-  }, 'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'),
+  SMS_TEST_OTP: z
+    .string()
+    .trim()
+    .transform((value: string) => value.replace(/\s+/g, ''))
+    .refine((value) => {
+      // This ensure users can empty the SMS_TEST_OTP field
+      if (!value) return true
+      return /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g.test(value)
+    }, 'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'),
   SMS_TEST_OTP_VALID_UNTIL: z.string().datetime({ offset: true }).optional(),
 })
 
