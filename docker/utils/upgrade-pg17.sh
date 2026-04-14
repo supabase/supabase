@@ -302,7 +302,12 @@ build_tarball() {
         "$PG17_UPGRADE_IMAGE" \
         -c '
             set -euo pipefail
-            mkdir -p /export/17/bin /export/17/lib /export/17/share
+
+            # Build everything in /tmp to avoid bind-mount issues (read-only
+            # nix store permissions, hardlink failures on overlayfs mounts).
+            # Only the final tarball is written to /export.
+            BUILD=/tmp/build
+            mkdir -p $BUILD/17/bin $BUILD/17/lib $BUILD/17/share/postgresql
 
             echo "  Copying binaries..."
             # Binaries in the nix profile are either ELF binaries or shell
@@ -317,14 +322,14 @@ build_tarball() {
 
                 # Check for ELF
                 if [ -x "$f" ] && file -b "$f" | grep -q "ELF .* executable"; then
-                    cp "$f" /export/17/bin/"$name"
+                    cp "$f" $BUILD/17/bin/"$name"
                 else
                     # Shell wrapper - extract the real .xxx-wrapped ELF path
                     wrapped=$(grep -o "/nix/store/[^ \"]*-wrapped" "$f" 2>/dev/null | head -n 1 || true)
                     if [ -n "$wrapped" ] && [ -f "$wrapped" ]; then
-                        cp "$wrapped" /export/17/bin/"$name"
+                        cp "$wrapped" $BUILD/17/bin/"$name"
                     else
-                        cp "$f" /export/17/bin/"$name"
+                        cp "$f" $BUILD/17/bin/"$name"
                     fi
                 fi
             done
@@ -335,35 +340,31 @@ build_tarball() {
             # These paths may overlap (PKGLIBDIR and LIBDIR often point to the
             # same nix store path). Use cp -Lf to handle overwrites from
             # read-only nix store source files.
-            cp -Lf "$PKGLIBDIR"/*.so /export/17/lib/ || echo "  Warning: cp from $PKGLIBDIR failed" >&2
-            cp -Lf "$LIBDIR"/*.so* /export/17/lib/ || echo "  Warning: cp from $LIBDIR failed" >&2
-            cp -Lf /nix/var/nix/profiles/default/lib/*.so* /export/17/lib/ || echo "  Warning: cp from nix profile lib failed" >&2
+            cp -Lf "$PKGLIBDIR"/*.so $BUILD/17/lib/ || echo "  Warning: cp from $PKGLIBDIR failed" >&2
+            cp -Lf "$LIBDIR"/*.so* $BUILD/17/lib/ || echo "  Warning: cp from $LIBDIR failed" >&2
+            cp -Lf /nix/var/nix/profiles/default/lib/*.so* $BUILD/17/lib/ || echo "  Warning: cp from nix profile lib failed" >&2
 
             echo "  Copying share data..."
-            # Nix-built binaries resolve share dir relative to their location:
-            #   <bindir>/../share/postgresql/
-            # so we need share/postgresql/ not just share/
-            mkdir -p /export/17/share/postgresql
-            # Use tar instead of cp -rL for more reliable copying through the
-            # nix symlink farm. Remove the cyclic symlink at timezonesets/
-            # timezonesets first (-L follows symlinks, which would loop).
+            # Use tar to copy through the nix symlink farm. Remove the cyclic
+            # symlink at timezonesets/timezonesets first (--dereference would loop).
             rm -f /usr/share/postgresql/timezonesets/timezonesets 2>/dev/null || true
-            tar -cLf - -C /usr/share/postgresql . | tar -xf - -C /export/17/share/postgresql/
+            tar --dereference --hard-dereference -cf - -C /usr/share/postgresql . \
+                | tar --no-same-permissions -xf - -C $BUILD/17/share/postgresql/
 
             # initiate.sh copies .control/.sql from PGLIBNEW to PGSHARENEW/extension/
             echo "  Copying extension definitions to lib..."
             SHAREDIR=$(pg_config --sharedir)
-            cp "$SHAREDIR"/extension/*.control /export/17/lib/ || echo "  Warning: cp .control from $SHAREDIR/extension failed" >&2
-            cp "$SHAREDIR"/extension/*.sql /export/17/lib/ || echo "  Warning: cp .sql from $SHAREDIR/extension failed" >&2
+            cp "$SHAREDIR"/extension/*.control $BUILD/17/lib/ || echo "  Warning: cp .control from $SHAREDIR/extension failed" >&2
+            cp "$SHAREDIR"/extension/*.sql $BUILD/17/lib/ || echo "  Warning: cp .sql from $SHAREDIR/extension failed" >&2
 
             # Verify critical files before creating tarball
             echo "  Checking for key files..."
-            [ -f /export/17/bin/postgres ] || { echo "Error: bin/postgres missing"; exit 1; }
-            [ -f /export/17/share/postgresql/timezonesets/Default ] || { echo "Error: timezonesets/Default missing"; exit 1; }
-            ls /export/17/lib/*.so >/dev/null 2>&1 || { echo "Error: no .so files in lib/"; exit 1; }
+            [ -f $BUILD/17/bin/postgres ] || { echo "Error: bin/postgres missing"; exit 1; }
+            [ -f $BUILD/17/share/postgresql/timezonesets/Default ] || { echo "Error: timezonesets/Default missing"; exit 1; }
+            ls $BUILD/17/lib/*.so >/dev/null 2>&1 || { echo "Error: no .so files in lib/"; exit 1; }
 
             echo "  Creating tarball (this may take several minutes)..."
-            cd /export && tar czf pg_upgrade_bin.tar.gz 17/
+            cd $BUILD && tar czf /export/pg_upgrade_bin.tar.gz 17/
 
             echo "  Tarball: $(du -sh /export/pg_upgrade_bin.tar.gz | cut -f1)"
         '
