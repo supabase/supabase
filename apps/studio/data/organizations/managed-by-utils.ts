@@ -1,4 +1,4 @@
-import { MANAGED_BY, type ManagedBy } from 'lib/constants/infrastructure'
+import { MANAGED_BY, type ManagedBy } from '@/lib/constants/infrastructure'
 
 type OrganizationPartner = string | null | undefined
 

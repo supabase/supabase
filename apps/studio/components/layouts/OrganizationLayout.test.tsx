@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 

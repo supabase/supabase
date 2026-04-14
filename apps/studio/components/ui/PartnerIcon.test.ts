@@ -1,6 +1,6 @@
-import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { render } from 'tests/helpers'
-import type { Organization } from 'types'
+import type { Organization } from '@/types'
 import { describe, expect, it } from 'vitest'
 
 import PartnerIcon, { getDefaultPartnerTooltipText, getPartnerTooltipText } from './PartnerIcon'

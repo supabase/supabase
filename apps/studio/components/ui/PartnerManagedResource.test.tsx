@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
