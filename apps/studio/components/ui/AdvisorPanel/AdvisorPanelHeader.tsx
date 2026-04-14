@@ -19,10 +19,17 @@ interface AdvisorPanelHeaderProps {
 
 export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPanelHeaderProps) => {
   const displayTitle = selectedItem ? getAdvisorPanelItemDisplayTitle(selectedItem) : undefined
+  const secondaryText = selectedItem ? getAdvisorItemSecondaryText(selectedItem) : undefined
   const metadataText = selectedItem
-    ? (getAdvisorItemSecondaryText(selectedItem) ??
+    ? (secondaryText ??
       (selectedItem.createdAt ? formatItemDate(selectedItem.createdAt) : undefined))
     : undefined
+  // Only capitalize date strings (e.g. "a few seconds ago"); entity strings
+  // like "public.users" must not be case-altered.
+  const metadataCapitalize =
+    selectedItem !== undefined &&
+    secondaryText === undefined &&
+    selectedItem.createdAt !== undefined
 
   return (
     <div className="border-b px-4 py-3 flex items-center gap-3">
@@ -37,7 +44,9 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
         <div className="flex-1 flex flex-col">
           <span className="heading-default">{displayTitle}</span>
           {metadataText && (
-            <span className="text-xs text-foreground-light capitalize-sentence">
+            <span
+              className={`text-xs text-foreground-light${metadataCapitalize ? ' capitalize-sentence' : ''}`}
+            >
               {metadataText}
             </span>
           )}

@@ -93,7 +93,12 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
       queryClient.setQueryData(queryKey, valueToStore)
       queryClient.invalidateQueries({ queryKey })
     },
-    [key, queryKey, queryClient, initialValue]
+    // initialValue is intentionally excluded: the function body reads the
+    // current value via queryClient.getQueryData so it doesn't close over
+    // initialValue reactively — including it would cause a new function
+    // reference every render when callers pass an inline literal (e.g. []).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key, queryKey, queryClient]
   )
 
   return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const
