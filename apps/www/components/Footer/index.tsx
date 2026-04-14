@@ -162,7 +162,12 @@ const Footer = (props: Props) => {
             </div>
             <div className="mt-8">
               {newsletterStatus === 'success' ? (
-                <p className="text-brand-link text-sm">Thanks for subscribing!</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-brand-link text-sm">Thanks for subscribing!</p>
+                  <p className="text-foreground-lighter text-xs">
+                    You'll hear from us when we publish our next newsletter issue.
+                  </p>
+                </div>
               ) : (
                 <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2">
                   <p className="text-foreground-lighter text-sm">
