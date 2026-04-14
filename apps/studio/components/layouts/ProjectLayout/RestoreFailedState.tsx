@@ -97,7 +97,17 @@ export const RestoreFailedState = () => {
                 type="default"
                 icon={<Download />}
                 loading={isDownloading}
-                tooltip={{ content: {} }}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      data?.status === 'physical-backups-enabled'
+                        ? 'Project uses physical backups — click to see CLI backup instructions'
+                        : backups.length === 0
+                          ? 'No downloadable backup available — click to see CLI backup instructions'
+                          : undefined,
+                  },
+                }}
                 onClick={onClickDownloadBackup}
               >
                 Download backup
