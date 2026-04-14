@@ -37,4 +37,4 @@ export const DevToolbarTrigger = !isToolbarEnabled
   ? () => null
   : DevToolbarTriggerModule.DevToolbarTrigger
 
-export type { DevTelemetryEvent, DevToolbarConfig } from './types'
+export type { DevTelemetryEvent, DevToolbarConfig, ExtraTab } from './types'
