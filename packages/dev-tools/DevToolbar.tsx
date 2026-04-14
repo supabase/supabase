@@ -46,7 +46,11 @@ import {
   writeOriginals,
 } from './utils'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: index.ts, DevToolbarContext.tsx, DevToolbarTrigger.tsx, feature-flags.tsx
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+const IS_LOCAL_DEV = env === 'local'
 
 function EventRow({ event }: { event: DevTelemetryEvent }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -346,7 +350,7 @@ export function DevToolbar() {
   const ccOverrideCount = Object.keys(ccFlagOverrides).length
   const totalOverrideCount = phOverrideCount + ccOverrideCount
 
-  if (!IS_LOCAL_DEV || !isEnabled) return null
+  if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -443,6 +447,12 @@ export function DevToolbar() {
                     Clear all
                   </Button>
                 </div>
+
+                {!IS_LOCAL_DEV && (
+                  <div className="px-6 py-2 text-xs text-foreground-muted border-b bg-surface-100">
+                    Server-side events are only visible when using the toolbar in local development
+                  </div>
+                )}
 
                 <div className="flex-1 min-h-0 overflow-y-auto pb-4">
                   {filteredEvents.length === 0 ? (

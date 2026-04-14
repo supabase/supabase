@@ -7,7 +7,10 @@ import { Button, cn } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
 
-const IS_LOCAL_DEV = process.env.NODE_ENV === 'development'
+// Duplicated for tree-shaking — bundler must see literal process.env reference.
+// Keep in sync: index.ts, DevToolbarContext.tsx, DevToolbar.tsx, feature-flags.tsx
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
 const POSITION_STORAGE_KEY = 'dev-telemetry-toolbar-position'
 const DRAG_THRESHOLD = 4
 const MARGIN = 24
@@ -158,7 +161,7 @@ export function DevToolbarTrigger() {
     setReleasedAt(null)
   }, [])
 
-  if (!IS_LOCAL_DEV || !isEnabled) return null
+  if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
   const eventCount = events.length
   const isDragging = dragPos !== null
