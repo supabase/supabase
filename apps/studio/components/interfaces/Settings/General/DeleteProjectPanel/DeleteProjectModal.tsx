@@ -134,7 +134,7 @@ export const DeleteProjectModal = ({
       }}
     >
       <div className="space-y-6">
-        <LogicalBackupCliInstructions enabled={visible} />
+        <LogicalBackupCliInstructions enabled={visible} showResetPassword={false} />
         {/* 
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
