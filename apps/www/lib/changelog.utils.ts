@@ -120,3 +120,37 @@ export const deletedDiscussions = [
     createdAt: '2021-05-05T05:17:27Z',
   },
 ]
+
+export function discussionDisplayDate(item: { title: string; createdAt: string }) {
+  const dateRewrite = deletedDiscussions.find(
+    (rewrite) => item.title && rewrite.title && item.title.includes(rewrite.title)
+  )
+  return dateRewrite ? dateRewrite.createdAt : item.createdAt
+}
+
+/** 6-char hex for CSS (GitHub GraphQL returns hex without `#`, sometimes RRGGBBAA). */
+export function githubLabelHex(color: string) {
+  const c = color.replace(/^#/, '').toLowerCase()
+  if (c.length === 3 && /^[0-9a-f]{3}$/.test(c)) {
+    return c
+      .split('')
+      .map((ch) => ch + ch)
+      .join('')
+  }
+  if (/^[0-9a-f]{6}/.test(c)) {
+    return c.slice(0, 6)
+  }
+  if (/^[0-9a-f]{8}/.test(c)) {
+    return c.slice(0, 6)
+  }
+  return '6b7280'
+}
+
+const GITHUB_CHANGELOG_DISCUSSIONS_BASE =
+  'https://github.com/orgs/supabase/discussions/categories/changelog'
+
+/** GitHub discussions list filtered by Changelog category and a single label (matches GitHub UI query shape). */
+export function githubChangelogLabelFilterUrl(labelName: string) {
+  const discussions_q = `label%3A${encodeURIComponent(labelName)}+category%3AChangelog`
+  return `${GITHUB_CHANGELOG_DISCUSSIONS_BASE}?discussions_q=${discussions_q}`
+}

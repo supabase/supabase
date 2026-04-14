@@ -5,11 +5,7 @@ import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
-import {
-  discussionDisplayDate,
-  githubChangelogLabelFilterUrl,
-  githubLabelHex,
-} from '~/lib/changelog.utils'
+import { discussionDisplayDate, githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import dayjs from 'dayjs'
@@ -18,19 +14,19 @@ import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { Badge } from 'ui'
 
-export type Discussion = {
-  id: string
-  updatedAt: string
-  url: string
-  title: string
-  body: string
-  labels?: {
-    nodes: Array<{ name: string; color: string }>
-  }
-}
+const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
 
 type ChangelogLabel = { name: string; color: string }
+
+type DiscussionMetadata = {
+  id: string
+  title: string
+  publishedAt: string | null
+  createdAt: string
+  url: string
+}
 
 type Entry = {
   id: string
@@ -42,27 +38,43 @@ type Entry = {
   labels?: ChangelogLabel[]
 }
 
-export type DiscussionsResponse = {
+type DiscussionsPageResponse = {
   repository: {
     discussions: {
       totalCount: number
-      nodes: Discussion[]
-      pageInfo: any
+      nodes: Array<
+        DiscussionMetadata & {
+          body: string
+          labels?: {
+            nodes: ChangelogLabel[]
+          }
+        }
+      >
+      pageInfo: {
+        hasPreviousPage: boolean
+        hasNextPage: boolean
+        startCursor: string | null
+        endCursor: string | null
+      }
     }
   }
 }
 
-// uses the graphql api
-async function fetchDiscussions(
-  owner: string,
-  repo: string,
-  categoryId: string,
-  cursor: string | null = null
-) {
-  const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-  type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+type DiscussionsMetadataResponse = {
+  repository: {
+    discussions: {
+      nodes: DiscussionMetadata[]
+      pageInfo: {
+        hasNextPage: boolean
+        endCursor: string | null
+      }
+    }
+  }
+}
 
-  const octokit = new ExtendedOctokit({
+function createChangelogOctokit() {
+  const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+  return new ExtendedOctokit({
     authStrategy: createAppAuth,
     auth: {
       appId: process.env.GITHUB_CHANGELOG_APP_ID,
@@ -70,11 +82,79 @@ async function fetchDiscussions(
       privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
     },
   })
+}
 
+async function fetchAllDiscussionMetadata(
+  octokit: ReturnType<typeof createChangelogOctokit>,
+  owner: string,
+  repo: string,
+  categoryId: string
+): Promise<DiscussionMetadata[]> {
   const query = `
-    query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+    query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
       repository(owner: $owner, name: $repo) {
-        discussions(first: 10, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+        discussions(
+          first: 100
+          after: $cursor
+          categoryId: $categoryId
+          orderBy: { field: CREATED_AT, direction: DESC }
+        ) {
+          nodes {
+            id
+            title
+            publishedAt
+            createdAt
+            url
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  `
+
+  const collected: DiscussionMetadata[] = []
+  let cursor: string | null = null
+  let hasNextPage = true
+
+  while (hasNextPage) {
+    const {
+      repository: {
+        discussions: { nodes, pageInfo },
+      },
+    } = await octokit.graphql<DiscussionsMetadataResponse>(query, {
+      owner,
+      repo,
+      categoryId,
+      cursor,
+    })
+
+    collected.push(...nodes)
+    hasNextPage = pageInfo.hasNextPage
+    cursor = pageInfo.endCursor
+  }
+
+  return collected
+}
+
+async function fetchDiscussionsPage(
+  octokit: ReturnType<typeof createChangelogOctokit>,
+  owner: string,
+  repo: string,
+  categoryId: string,
+  cursor: string | null = null
+) {
+  const query = `
+    query changelogDiscussionsPage($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+      repository(owner: $owner, name: $repo) {
+        discussions(
+          first: 10
+          after: $cursor
+          categoryId: $categoryId
+          orderBy: { field: CREATED_AT, direction: DESC }
+        ) {
           totalCount
           pageInfo {
             hasPreviousPage
@@ -100,19 +180,17 @@ async function fetchDiscussions(
       }
     }
   `
-  const queryVars = {
-    owner,
-    repo,
-    categoryId,
-    cursor,
-  }
 
-  // fetch discussions
   const {
     repository: {
       discussions: { nodes: discussions, pageInfo },
     },
-  } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
+  } = await octokit.graphql<DiscussionsPageResponse>(query, {
+    owner,
+    repo,
+    categoryId,
+    cursor,
+  })
 
   return { discussions, pageInfo }
 }
@@ -122,38 +200,26 @@ function isEncoded(uri: string | null | undefined) {
   return uri !== decodeURIComponent(uri)
 }
 
-// Decodes a URI if it is encoded
 const recursiveDecodeURI = (uri: string | null) => {
   if (!uri) {
     return uri
   }
   let tries = 0
-  while (isEncoded(uri)) {
-    uri = decodeURIComponent(uri)
+  let decoded = uri
+  while (isEncoded(decoded)) {
+    decoded = decodeURIComponent(decoded)
     tries++
     if (tries > 10) {
       break
     }
   }
 
-  return uri
+  return decoded
 }
 
-/**
- * [Terry]
- * this page powers supabase.com/changelog
- * this page used to just be a feed of the releases endpoint
- * (https://api.github.com/repos/supabase/supabase/releases) (rest api)
- * but is now a blend of that legacy relases and the new Changelog category of the Discussions
- * https://github.com/orgs/supabase/discussions/categories/changelog (graphql api)
- * We should use the Changelog Discussions category for all future changelog entries and stop using releases
- */
-
 export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
-  // refresh every 15 minutes
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
   const encodedNext = (query.next ?? null) as string | null
-  // in some cases the next cursor is encoded twice or more times due to the user pasting the url, so we need to decode it multiple times.
   const next = recursiveDecodeURI(encodedNext)
   const restPage = query.restPage ? Number(query.restPage) : 1
 
@@ -161,7 +227,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     auth: process.env.GITHUB_CHANGELOG_APP_REST_KEY,
   })
 
-  // uses the rest api
   async function fetchGitHubReleases() {
     try {
       const response = await octokitRest.repos.listReleases({
@@ -178,11 +243,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     }
   }
 
-  // Process as of Feb. 2024:
-  // create a Release each month and create a corresponding changelog discussion
-  // — we don't want to pull in both the changelog entry and the release entry
-  // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
-  // — so we have this list of old releases that we want to show
   const oldReleases = [
     40981345, 39091930, 37212777, 35927141, 34612423, 33383788, 32302703, 30830915, 29357247,
     28108378,
@@ -192,12 +252,12 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     (release) => release.id && oldReleases.includes(release.id)
   )
 
-  const { discussions, pageInfo } = await fetchDiscussions(
-    'supabase',
-    'supabase',
-    'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
-    next
-  )
+  const octokit = createChangelogOctokit()
+
+  const [discussionIndex, { discussions, pageInfo }] = await Promise.all([
+    fetchAllDiscussionMetadata(octokit, 'supabase', 'supabase', CHANGELOG_CATEGORY_ID),
+    fetchDiscussionsPage(octokit, 'supabase', 'supabase', CHANGELOG_CATEGORY_ID, next),
+  ])
 
   if (!discussions) {
     return {
@@ -207,25 +267,32 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     }
   }
 
-  // Process discussions
+  const indexWithDates = discussionIndex
+    .map((item) => ({
+      ...item,
+      sortDate: discussionDisplayDate(item),
+    }))
+    .sort((a, b) => dayjs(b.sortDate).diff(dayjs(a.sortDate)))
+
   const formattedDiscussions = await Promise.all(
-    discussions.map(async (item: any): Promise<any> => {
+    discussions.map(async (item): Promise<Entry | undefined> => {
       try {
         const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
         const created_at = discussionDisplayDate(item)
 
         const labels =
-          item.labels?.nodes?.map((l: ChangelogLabel) => ({
+          item.labels?.nodes?.map((l) => ({
             name: l.name,
             color: (l.color || '6b7280').replace(/^#/, ''),
           })) ?? []
 
         return {
-          ...item,
+          id: item.id,
+          title: item.title,
+          url: item.url,
           source: discussionsMdxSource,
           type: 'discussion',
           created_at,
-          url: item.url,
           labels,
         }
       } catch (err) {
@@ -234,19 +301,18 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     })
   )
 
-  // Process releases
   const formattedReleases = await Promise.all(
-    releases.map(async (item: any): Promise<any> => {
+    releases.map(async (item: any): Promise<Entry | undefined> => {
       try {
         const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
         return {
-          ...item,
+          id: String(item.id),
+          title: item.name ?? '',
+          url: item.html_url ?? '',
           source: releasesMdxSource,
           type: 'release',
           created_at: item.created_at,
-          title: item.name ?? '',
-          url: item.html_url ?? '',
         }
       } catch (err) {
         console.error(`Problem processing discussion MDX: ${err}`)
@@ -254,10 +320,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     })
   )
 
-  // Combine discussions and releases into a single array of entries
-  const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
+  const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean) as Entry[]
 
-  const sortedCombinedEntries = combinedEntries.sort((a: any, b: any) => {
+  const sortedCombinedEntries = combinedEntries.sort((a, b) => {
     const dateA = dayjs(a.created_at)
     const dateB = dayjs(b.created_at)
 
@@ -270,6 +335,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
 
   return {
     props: {
+      changelogIndex: indexWithDates,
       changelog: sortedCombinedEntries,
       pageInfo: pageInfo,
       restPage: Number(restPage),
@@ -277,17 +343,26 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   }
 }
 
-interface ChangelogPageProps {
+interface ChangelogV2PageProps {
+  changelogIndex: Array<DiscussionMetadata & { sortDate: string }>
   changelog: Entry[]
-  pageInfo: any
+  pageInfo: {
+    hasPreviousPage: boolean
+    hasNextPage: boolean
+    startCursor: string | null
+    endCursor: string | null
+  }
   restPage: number
 }
 
-function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
+function ChangelogV2Page({ changelogIndex, changelog, pageInfo, restPage }: ChangelogV2PageProps) {
   const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
 
-  const TITLE = 'Changelog'
+  const TITLE = 'Changelog (v2 experiment)'
   const DESCRIPTION = 'New updates and improvements to Supabase'
+
+  const visibleIndex = changelogIndex.filter((item) => !item.title.includes('[d]'))
+
   return (
     <>
       <NextSeo
@@ -295,7 +370,7 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: `https://supabase.com/changelog`,
+          url: `https://supabase.com/changelog-v2`,
           type: 'article',
         }}
       />
@@ -310,10 +385,37 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
         >
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
-            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+            <p className="text-foreground-lighter text-lg">
+              New updates and product improvements{' '}
+              <span className="text-foreground font-mono text-sm">(v2 — full index)</span>
+            </p>
           </div>
 
-          {/* Content */}
+          <section
+            aria-label="All changelog entries"
+            className="border-muted bg-surface-100 rounded-lg border p-4"
+          >
+            <h2 className="text-foreground mb-3 text-sm font-medium">All entries</h2>
+            <ul className="border-muted max-h-64 list-none space-y-0 overflow-y-auto overscroll-contain border-t pt-3 sm:max-h-80">
+              {visibleIndex.map((item) => (
+                <li
+                  key={item.id}
+                  className="border-muted hover:bg-surface-200 -mx-2 rounded border-b px-2 py-2 last:border-b-0"
+                >
+                  <Link
+                    href={item.url}
+                    className="flex flex-col gap-0.5 no-underline sm:flex-row sm:items-baseline sm:gap-3"
+                  >
+                    <span className="text-foreground shrink-0 text-sm">{item.title}</span>
+                    <span className="text-foreground-lighter font-mono text-xs whitespace-nowrap">
+                      {dayjs(item.sortDate).format('MMM D, YYYY')}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
           <div className="grid">
             {changelog.length > 0 &&
               changelog
@@ -338,27 +440,22 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                                 <h3 className="text-foreground text-lg">{entry.title}</h3>{' '}
                               </Link>
                             )}
-                            <p className="text-foreground-lighter text-xs font-mono">
+                            <p className="text-foreground-lighter leading-4 text-xs font-mono">
                               {dayjs(entry.created_at).format('MMM D, YYYY')}
                             </p>
                             {entry.labels && entry.labels.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 pt-1.5">
+                              <div className="flex flex-wrap gap-1 pt-1.5">
                                 {entry.labels.map((label) => (
                                   <a
                                     key={`${entry.id}-${label.name}`}
                                     href={githubChangelogLabelFilterUrl(label.name)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                                    className="inline-flex no-underline focus-visible:ring-brand-default rounded-full focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                                   >
-                                    <span
-                                      className="border-default bg-surface-200 text-foreground-light rounded-md border border-l-[3px] px-1.5 py-px text-[11px] font-medium leading-tight"
-                                      style={{
-                                        borderLeftColor: `#${githubLabelHex(label.color)}`,
-                                      }}
-                                    >
+                                    <Badge className="!text-[11px] lowercase py-1 px-2 !tracking-normal text-foreground-lighter">
                                       {label.name}
-                                    </span>
+                                    </Badge>
                                   </a>
                                 ))}
                               </div>
@@ -377,13 +474,13 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
           </div>
           <div className="my-8 flex items-center gap-4">
             {hasPreviousPage && (
-              <Link href={`/changelog`} className="flex items-center gap-2">
+              <Link href={`/changelog-v2`} className="flex items-center gap-2">
                 <ArrowLeftIcon width={14} /> Previous
               </Link>
             )}
             {hasNextPage && (
               <Link
-                href={`/changelog?next=${end}&restPage=${restPage + 1}`}
+                href={`/changelog-v2?next=${end}&restPage=${restPage + 1}`}
                 className="flex items-center gap-2"
               >
                 Next <ArrowRightIcon width={14} />
@@ -398,4 +495,4 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
   )
 }
 
-export default ChangelogPage
+export default ChangelogV2Page
