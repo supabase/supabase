@@ -88,11 +88,9 @@ export const LogicalBackupCliInstructions = ({
         </p>
         <p className="text-sm text-foreground-light">
           Any reserved character in your password must be percent-encoded in the URL (e.g.{' '}
-          <code>@</code>&nbsp;→&nbsp;<code>%40</code>,{' '}
-          <code>:</code>&nbsp;→&nbsp;<code>%3A</code>,{' '}
-          <code>/</code>&nbsp;→&nbsp;<code>%2F</code>,{' '}
-          <code>#</code>&nbsp;→&nbsp;<code>%23</code>). Encode <code>%</code> as{' '}
-          <code>%25</code> first.
+          <code>@</code>&nbsp;→&nbsp;<code>%40</code>, <code>:</code>&nbsp;→&nbsp;<code>%3A</code>,{' '}
+          <code>/</code>&nbsp;→&nbsp;<code>%2F</code>, <code>#</code>&nbsp;→&nbsp;<code>%23</code>).
+          Encode <code>%</code> as <code>%25</code> first.
         </p>
       </div>
 
