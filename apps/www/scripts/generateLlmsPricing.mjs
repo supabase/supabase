@@ -96,6 +96,13 @@ const getVal = (row, key) => {
 
 const pad = (str, len) => String(str).padEnd(len)
 
+const getPlanValue = (feature, planId) => {
+  if (!(planId in feature.plans)) {
+    throw new Error(`Missing plan value for "${planId}" in feature "${feature.key}"`)
+  }
+  return formatPlanValue(feature.plans[planId])
+}
+
 // ---------------------------------------------------------------------------
 // Plan Tiers section
 // ---------------------------------------------------------------------------
@@ -270,7 +277,7 @@ const buildFeatureComparisonSection = () => {
     for (const planId of planIds) {
       planWidths[planId] = Math.max(
         planLabels[planId].length,
-        ...category.features.map((f) => formatPlanValue(f.plans[planId]).length)
+        ...category.features.map((f) => getPlanValue(f, planId).length)
       )
     }
 
@@ -280,7 +287,7 @@ const buildFeatureComparisonSection = () => {
     lines.push(headerRow, separatorRow)
 
     for (const feature of category.features) {
-      const cells = planIds.map((p) => pad(formatPlanValue(feature.plans[p]), planWidths[p]))
+      const cells = planIds.map((p) => pad(getPlanValue(feature, p), planWidths[p]))
       lines.push(`| ${pad(feature.title, nameWidth)} | ${cells.join(' | ')} |`)
     }
 
