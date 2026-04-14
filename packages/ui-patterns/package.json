@@ -843,7 +843,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "tsx": "catalog:",

@@ -23,6 +23,9 @@ catalog:
   tsx: 4.20.3
   typescript: ~6.0.0
   valtio: ^1.12.0
+  '@vitejs/plugin-react': ^6.0.1
+  '@vitest/coverage-v8': ^4.1.4
+  '@vitest/ui': ^4.1.4
   vite: ^8.0.8
   vite-tsconfig-paths: ^6.1.1
   vitest: ^4.1.4

@@ -30,8 +30,8 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitest/coverage-v8": "^4.1.4",
-    "@vitest/ui": "^4.1.4",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
