@@ -54,6 +54,11 @@ export const useIsOrioleDbInAws = () => {
   return isOrioleDbInAws
 }
 
+export const useIsHighAvailability = () => {
+  const { data: project } = useSelectedProjectQuery()
+  return project?.high_availability ?? false
+}
+
 export const useIsProjectActive = () => {
   const { data: project } = useSelectedProjectQuery()
   return project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
