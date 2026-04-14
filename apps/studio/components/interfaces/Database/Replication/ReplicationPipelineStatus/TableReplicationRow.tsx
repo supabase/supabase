@@ -15,6 +15,7 @@ interface TableReplicationRowProps {
   config: ReturnType<typeof getDisabledStateConfig>
   isRestarting: boolean
   showDisabledState: boolean
+  isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
 }
@@ -24,6 +25,7 @@ export const TableReplicationRow = ({
   config,
   isRestarting,
   showDisabledState,
+  isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
 }: TableReplicationRowProps) => {
@@ -31,11 +33,15 @@ export const TableReplicationRow = ({
   const isErrorState = table.state.name === 'error'
   const statusConfig = getStatusConfig(table.state as TableState['state'])
 
+  const isMuted = isPipelineStopped && !isRestarting && !showDisabledState
+
   return (
     <TableRow>
       <TableCell className="align-top">
         <div className="flex items-center gap-x-2">
-          <p className={cn(isRestarting && 'text-foreground-light')}>{table.table_name}</p>
+          <p className={cn((isRestarting || isMuted) && 'text-foreground-light')}>
+            {table.table_name}
+          </p>
 
           <ButtonTooltip
             asChild
@@ -61,7 +67,7 @@ export const TableReplicationRow = ({
         ) : showDisabledState ? (
           <Badge variant="default">Not Available</Badge>
         ) : (
-          statusConfig.badge
+          <div className={cn(isMuted && 'opacity-60')}>{statusConfig.badge}</div>
         )}
       </TableCell>
 
@@ -75,7 +81,7 @@ export const TableReplicationRow = ({
             Status unavailable while pipeline is {config.badge.toLowerCase()}
           </p>
         ) : (
-          <div className="flex flex-col gap-y-3">
+          <div className={cn('flex flex-col gap-y-3', isMuted && 'opacity-60')}>
             <div className="text-sm text-foreground">
               {statusConfig.description}{' '}
               {isErrorState && 'reason' in table.state && (

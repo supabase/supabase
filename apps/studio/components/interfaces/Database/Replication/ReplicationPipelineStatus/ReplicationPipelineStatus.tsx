@@ -460,6 +460,7 @@ export const ReplicationPipelineStatus = () => {
                             config={config}
                             isRestarting={isRestarting}
                             showDisabledState={showDisabledState}
+                            isPipelineStopped={statusName === 'stopped'}
                             onSelectRestart={() => {
                               setSelectedTableForRestart({
                                 tableId: table.table_id,
