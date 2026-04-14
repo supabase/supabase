@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 import { usageKeys } from '@/data/usage/keys'
@@ -32,15 +32,26 @@ const INITIAL_STATE: Record<WarningKey, Severity> = {
 export const ResourceWarningsTab = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const { data: selectedOrg, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const orgSlug = selectedOrg?.slug
   const [isReadOnly, setIsReadOnly] = useState(false)
   const [severities, setSeverities] = useState<Record<WarningKey, Severity>>(INITIAL_STATE)
+
+  // Invalidate both cache keys on unmount so banners revert to real data
+  // when the toolbar sheet closes (which unmounts this component).
+  useEffect(() => {
+    return () => {
+      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
+      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const applyOverrides = (
     nextSeverities: Record<WarningKey, Severity>,
     nextIsReadOnly: boolean
   ) => {
+    if (!orgSlug) return
     const mockWarning: ResourceWarning = {
       project: ref ?? '',
       is_readonly_mode_enabled: nextIsReadOnly,
@@ -73,6 +84,8 @@ export const ResourceWarningsTab = () => {
     queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
   }
 
+  const isDisabled = isOrgLoading || !orgSlug
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -81,13 +94,16 @@ export const ResourceWarningsTab = () => {
         </p>
         <button
           onClick={handleReset}
-          className="text-xs text-foreground-lighter hover:text-foreground transition underline"
+          disabled={isDisabled}
+          className="text-xs text-foreground-lighter hover:text-foreground transition underline disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Reset to real data
         </button>
       </div>
 
-      <div className="space-y-3">
+      {isDisabled && <p className="text-xs text-foreground-muted">Loading org context...</p>}
+
+      <div className={cn('space-y-3', isDisabled && 'opacity-50 pointer-events-none')}>
         <div className="flex items-center justify-between py-2 border-b border-overlay">
           <span className="text-sm font-medium">Read-only mode</span>
           <div className="flex gap-1">
