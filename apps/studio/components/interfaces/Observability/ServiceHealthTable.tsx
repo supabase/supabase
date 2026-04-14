@@ -126,6 +126,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
               dataKey="error_rate"
               dataKeys={['error_rate', 'warning_rate', 'ok_rate']}
               sharedStackId="stack"
+              strokeWidth={0}
               config={chartConfig}
               DateTimeFormat={datetimeFormat}
               onLineClick={onBarClick}
