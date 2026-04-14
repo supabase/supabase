@@ -5,17 +5,17 @@ import { Badge, Button, cn, TableCell, TableRow, Tooltip, TooltipContent, Toolti
 
 import { ErroredTableDetails } from '../ErroredTableDetails'
 import { TableState } from './ReplicationPipelineStatus.types'
-import { getDisabledStateConfig, getStatusConfig } from './ReplicationPipelineStatus.utils'
+import { getStatusConfig } from './ReplicationPipelineStatus.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
   table: ReplicationPipelineTableStatus
-  config: ReturnType<typeof getDisabledStateConfig>
   isRestarting: boolean
   showDisabledState: boolean
   isAnyRestartInProgress: boolean
+  isPipelineRunning: boolean
   isPipelineStopped: boolean
   onSelectRestart: () => void
   onSelectShowError: () => void
@@ -23,10 +23,10 @@ interface TableReplicationRowProps {
 
 export const TableReplicationRow = ({
   table,
-  config,
   isRestarting,
   showDisabledState,
   isAnyRestartInProgress,
+  isPipelineRunning,
   isPipelineStopped,
   onSelectRestart,
   onSelectShowError,
@@ -35,7 +35,7 @@ export const TableReplicationRow = ({
   const isErrorState = table.state.name === 'error'
   const statusConfig = getStatusConfig(table.state as TableState['state'])
 
-  const isMuted = isPipelineStopped && !isRestarting && !showDisabledState
+  const isMuted = !isPipelineRunning && !isRestarting
 
   return (
     <TableRow>
@@ -66,8 +66,6 @@ export const TableReplicationRow = ({
       <TableCell className="align-top">
         {isRestarting ? (
           <Badge variant="default">Restarting</Badge>
-        ) : showDisabledState ? (
-          <Badge variant="default">Not Available</Badge>
         ) : (
           <div className={cn(isMuted && 'opacity-40 grayscale')}>{statusConfig.badge}</div>
         )}
@@ -77,10 +75,6 @@ export const TableReplicationRow = ({
         {isRestarting ? (
           <p className="text-sm text-foreground-lighter">
             Replication is being restarted for this table. The pipeline will restart automatically.
-          </p>
-        ) : showDisabledState ? (
-          <p className="text-sm text-foreground-lighter">
-            Status unavailable while pipeline is {config.badge.toLowerCase()}
           </p>
         ) : (
           <div className="flex flex-col gap-y-3">

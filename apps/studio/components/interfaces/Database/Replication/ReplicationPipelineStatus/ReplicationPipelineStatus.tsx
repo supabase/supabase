@@ -483,10 +483,10 @@ export const ReplicationPipelineStatus = () => {
                           <TableReplicationRow
                             key={table.table_id}
                             table={table}
-                            config={config}
                             isRestarting={isRestarting}
                             showDisabledState={showDisabledState}
                             isAnyRestartInProgress={isAnyRestartInProgress}
+                            isPipelineRunning={statusName === PipelineStatusName.STARTED}
                             isPipelineStopped={statusName === PipelineStatusName.STOPPED}
                             onSelectRestart={() => {
                               setSelectedTableForRestart({
