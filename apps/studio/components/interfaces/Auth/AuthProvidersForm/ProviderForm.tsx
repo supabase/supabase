@@ -89,6 +89,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
+        if (key === 'PASSWORD_REQUIRED_CHARACTERS' && config.PASSWORD_REQUIRED_CHARACTERS === '') {
+          values[key] = NO_REQUIRED_CHARACTERS
+          return
+        }
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
