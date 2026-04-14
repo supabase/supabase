@@ -86,6 +86,7 @@ export const NewPaymentMethodElement = forwardRef(
       currentTaxId,
       customerName,
       onAddressChange,
+      onAddressIncomplete,
       onTaxIdChange,
     }: {
       email?: string | null | undefined
@@ -94,6 +95,7 @@ export const NewPaymentMethodElement = forwardRef(
       currentTaxId?: CustomerTaxId | null
       customerName?: string | undefined
       onAddressChange?: (address: CustomerAddress) => void
+      onAddressIncomplete?: () => void
       onTaxIdChange?: (taxId: CustomerTaxId | null) => void
     },
     ref
@@ -304,11 +306,13 @@ export const NewPaymentMethodElement = forwardRef(
           key={`address-elements-${purchasingAsBusiness}`}
           onChange={(evt) => {
             setStripeAddress(evt.value)
-            if (onAddressChange && evt.complete) {
-              onAddressChange({
+            if (evt.complete) {
+              onAddressChange?.({
                 ...evt.value.address,
                 line2: evt.value.address.line2 || undefined,
               })
+            } else {
+              onAddressIncomplete?.()
             }
           }}
           onReady={() => setFullyLoaded(true)}
