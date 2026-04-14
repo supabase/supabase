@@ -12,7 +12,7 @@
     "build:studio:docker": "docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --no-cache",
     "build:design-system": "turbo run build --filter=design-system",
     "build:docs": "turbo run build --filter=docs",
-    "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
+    "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml} .turbo/cache",
     "dev": "turbo run dev --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:studio-local": "pnpm setup:cli && NODE_ENV=test pnpm --prefix ./apps/studio dev",
