@@ -317,7 +317,7 @@ export const StorageSettings = () => {
                                     disabled={
                                       !hasAccessToImageTransformations || !canUpdateStorageSettings
                                     }
-                                    checked={field.value}
+                                    checked={hasAccessToImageTransformations && field.value}
                                     onCheckedChange={field.onChange}
                                   />
                                 </FormControl_Shadcn_>

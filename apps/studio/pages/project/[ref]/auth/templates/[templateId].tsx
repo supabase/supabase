@@ -42,7 +42,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui/src/components/shadcn/ui/breadcrumb'
-import { z } from 'zod'
+import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
 import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
