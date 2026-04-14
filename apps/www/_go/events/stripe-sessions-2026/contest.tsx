@@ -7,7 +7,7 @@ const page: GoPageInput = {
   metadata: {
     title: 'Win an iPhone 17 Pro Max | Supabase at Stripe Sessions',
     description:
-      'Create a Supabase account and load data for a 1-in-10 chance to win an iPhone 17 Pro Max. Stripe Sessions 2026.',
+      'Enter for a 1-in-10 chance to win an iPhone 17 Pro Max at Stripe Sessions 2026.',
   },
   hero: {
     title: 'Win an iPhone 17 Pro Max',
