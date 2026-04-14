@@ -29,6 +29,7 @@ yarn-error.log*
 public/sitemap.xml
 # llms.txt (generated)
 public/llms.txt
+public/llms-full.txt
 public/llms/
 # Generated guide markdown files
 public/docs/
