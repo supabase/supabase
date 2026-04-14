@@ -11,25 +11,11 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-
-const DB_PASSWORD_PLACEHOLDER = '[YOUR-PASSWORD]'
-
-function buildDirectPostgresConnectionUri(settings: {
-  db_user: string
-  db_host: string
-  db_port: number
-  db_name: string
-}) {
-  return `postgresql://${settings.db_user}:${DB_PASSWORD_PLACEHOLDER}@${settings.db_host}:${settings.db_port}/${settings.db_name}`
-}
-
-function buildLogicalBackupShellScript(connectionUri: string) {
-  return [
-    `npx supabase db dump --db-url '${connectionUri}' -f roles.sql --role-only`,
-    `npx supabase db dump --db-url '${connectionUri}' -f schema.sql`,
-    `npx supabase db dump --db-url '${connectionUri}' -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"`,
-  ].join('\n')
-}
+import {
+  DB_PASSWORD_PLACEHOLDER,
+  buildDirectPostgresConnectionUri,
+  buildLogicalBackupShellScript,
+} from './LogicalBackupCliInstructions.utils'
 
 export type LogicalBackupCliInstructionsProps = {
   enabled?: boolean
