@@ -102,6 +102,9 @@ export const AdvisorPanelBody = ({
           const secondaryText = getAdvisorItemSecondaryText(item)
           const metadataText =
             secondaryText ?? (item.createdAt ? formatItemDate(item.createdAt) : undefined)
+          // Date strings (e.g. "a few seconds ago") come from formatItemDate and
+          // need sentence-case capitalisation; entity strings (lint / signal) don't.
+          const metadataCapitalize = secondaryText === undefined && item.createdAt !== undefined
 
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">
@@ -124,7 +127,11 @@ export const AdvisorPanelBody = ({
                       <div className="truncate">{primaryText}</div>
                       {metadataText && (
                         <div className="flex items-center gap-1 text-xs text-foreground-light">
-                          <span className="truncate">{metadataText}</span>
+                          <span
+                            className={cn('truncate', metadataCapitalize && 'capitalize-sentence')}
+                          >
+                            {metadataText}
+                          </span>
                         </div>
                       )}
                     </div>

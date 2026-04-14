@@ -21,7 +21,10 @@ function getBannedIPsAbortSignal(signal?: AbortSignal) {
     return AbortSignal.any([signal, timeoutSignal])
   }
 
-  return signal
+  // AbortSignal.any unavailable (older browsers): prefer the timeout signal so
+  // the 5 s cap is always enforced, even at the cost of losing React Query's
+  // own cancellation signal on this path.
+  return timeoutSignal
 }
 
 export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: AbortSignal) {

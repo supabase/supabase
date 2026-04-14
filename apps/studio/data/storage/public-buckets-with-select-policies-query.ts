@@ -18,6 +18,7 @@ export type PublicBucketSelectPolicy = {
   bucket_name: string
   policyname: string
 }
+
 /**
  * For the given public bucket, checks whether any SELECT policy on storage.objects
  * references this bucket's ID in its qual expression. This combination means anyone
@@ -49,10 +50,12 @@ async function getPublicBucketsWithSelectPolicies({
 
   return result
 }
+
 export type PublicBucketsWithSelectPoliciesData = Awaited<
   ReturnType<typeof getPublicBucketsWithSelectPolicies>
 >
 export type PublicBucketsWithSelectPoliciesError = ResponseError
+
 export const usePublicBucketsWithSelectPoliciesQuery = <
   TData = PublicBucketsWithSelectPoliciesData,
 >(

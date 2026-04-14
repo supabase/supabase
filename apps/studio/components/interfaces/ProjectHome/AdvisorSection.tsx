@@ -144,7 +144,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
             {visibleAdvisorItems.map((item) => {
               const isLint = item.source === 'lint'
               const categoryLabel = item.tab === 'performance' ? 'PERFORMANCE' : 'SECURITY'
-              const title = item.source === 'signal' ? item.title : getAdvisorItemDisplayTitle(item)
+              const title = getAdvisorItemDisplayTitle(item)
               const description =
                 item.source === 'signal' ? item.description : isLint ? item.original.detail : ''
               const cardClasses =
