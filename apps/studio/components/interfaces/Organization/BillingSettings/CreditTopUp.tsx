@@ -49,8 +49,8 @@ const FORM_ID = 'credit-top-up'
 const FormSchema = z.object({
   amount: z.coerce
     .number()
-    .gte(100, 'Amount must be between $100 - $2000.')
-    .lte(2000, 'Amount must be between $100 - $2000.')
+    .gte(300, 'Amount must be between $300 - $2000.')
+    .lte(2000, 'Amount must be between $300 - $2000.')
     .int('Amount must be a whole number.'),
   paymentMethod: z.string(),
 })
@@ -78,7 +78,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const form = useForm<CreditTopUpForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      amount: 100,
+      amount: 300,
       paymentMethod: '',
     },
   })
@@ -268,7 +268,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 name="amount"
                 render={({ field }) => (
                   <FormItemLayout label="Amount (USD)" className="gap-1">
-                    <Input_Shadcn_ {...field} type="number" placeholder="100" />
+                    <Input_Shadcn_ {...field} type="number" placeholder="300" />
                   </FormItemLayout>
                 )}
               />

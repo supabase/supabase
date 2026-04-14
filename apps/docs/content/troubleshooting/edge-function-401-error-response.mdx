@@ -17,10 +17,10 @@ A 401 response from an Edge Function means either:
 
 Check the response body returned by the request
 
-### Case 1: `"Invalid JWT"` or `"Missing authorization header"`
+### Case 1: `"Invalid Token"` or `"Missing authorization header"`
 
 ```json
-{ "code": 401, "message": "Invalid JWT" }
+{ "code": 401, "message": "Invalid Token or Protected Header formatting" }
 ```
 
 ```json
