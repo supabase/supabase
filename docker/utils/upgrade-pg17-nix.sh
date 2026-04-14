@@ -11,10 +11,10 @@
 # Uses Supabase's pg_upgrade scripts (initiate.sh + complete.sh) inside a
 # temporary PG15 container, then swaps data directories and starts Postgres 17.
 #
-# Usage:
+# Usage (must be run as root or with sudo):
 #   cd docker/
-#   bash utils/upgrade-pg17-nix.sh          # Interactive (prompts for confirmation)
-#   bash utils/upgrade-pg17-nix.sh --yes    # Non-interactive (skip all prompts)
+#   sudo bash utils/upgrade-pg17-nix.sh          # Interactive (prompts for confirmation)
+#   sudo bash utils/upgrade-pg17-nix.sh --yes    # Non-interactive (skip all prompts)
 #
 # Requirements:
 #   - Docker with Docker Compose (docker compose, not docker-compose)
@@ -28,12 +28,19 @@
 #   DO NOT DELETE it until you have verified the upgrade was successful.
 #
 # Rollback (if the upgrade fails or you want to revert):
-#   1. docker compose down
+#   1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down
 #   2. rm -rf ./volumes/db/data
 #   3. mv ./volumes/db/data.bak.pg15 ./volumes/db/data
 #   4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/
 #   5. docker compose up -d
 #
+
+# Ensure we're running under bash (not sh/zsh/dash).
+# Check that $BASH ends with /bash (not /sh, /zsh, etc.).
+case "${BASH:-}" in
+    */bash) ;;
+    *) echo "Error: This script requires bash. Run it with: sudo bash $0" >&2; exit 1 ;;
+esac
 
 set -euo pipefail
 
@@ -78,6 +85,7 @@ staging_dir=""
 pg_password=""
 current_image=""
 drop_extensions=""
+db_config_vol=""
 # Remove leftover containers and staging dir on exit.
 # Uses an alpine container for rm because files may be root-owned.
 cleanup() {
@@ -93,8 +101,7 @@ trap cleanup EXIT
 on_interrupt() {
     echo ""
     warn "Interrupted. Cleaning up..."
-    local db_config_vol
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' 2>/dev/null | head -1)
+    # If db-config was chowned to PG17, restore for PG15 rollback
     if [ -n "$db_config_vol" ] && [ -n "$current_image" ]; then
         docker run --rm -v "${db_config_vol}:/vol" "$current_image" \
             chown -R postgres:postgres /vol/ 2>/dev/null || true
@@ -141,13 +148,22 @@ wait_for_healthy() {
 preflight() {
     info "Running pre-flight checks"
 
+    if [ "$(id -u)" -ne 0 ]; then
+        die "This script must be run as root (e.g. sudo bash $0)."
+    fi
+
     docker compose version >/dev/null 2>&1 || die "Docker Compose not found."
     command -v curl >/dev/null 2>&1 || die "curl is required (for downloading upgrade scripts)."
     [ -f docker-compose.yml ] || die "Run this script from the docker/ directory."
     [ -f docker-compose.pg17.yml ] || die "Missing docker-compose.pg17.yml."
     [ -f .env ] || die "Missing .env file."
 
-    pg_password=$(grep '^POSTGRES_PASSWORD=' .env | cut -d '=' -f 2-)
+    # Resolve db-config volume (exact match on _db-config suffix or bare db-config)
+    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' \
+        | grep -E '^db-config$|_db-config$' | head -n 1)
+    [ -n "$db_config_vol" ] || die "Could not find db-config volume. Is Supabase running?"
+
+    pg_password=$(grep '^POSTGRES_PASSWORD=' .env | cut -d '=' -f 2- | sed "s/^['\"]//;s/['\"]$//" | head -n 1)
     [ -n "$pg_password" ] || die "POSTGRES_PASSWORD not set in .env."
 
     docker inspect "$DB_CONTAINER" >/dev/null 2>&1 \
@@ -169,7 +185,7 @@ preflight() {
         warn "Backup directory already exists: $BACKUP_DIR"
         warn "This is likely from a previous upgrade attempt."
         warn "If you haven't verified that previous upgrade, roll back first:"
-        warn "  1. docker compose down"
+        warn "  1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down"
         warn "  2. rm -rf $DATA_DIR"
         warn "  3. mv $BACKUP_DIR $DATA_DIR"
         warn "  4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
@@ -186,8 +202,10 @@ preflight() {
     # Disk space
     local data_size_kb data_size_mb avail_kb avail_mb needed_mb
     data_size_kb=$(du -sk "$DATA_DIR" 2>/dev/null | cut -f1)
+    [ -n "$data_size_kb" ] || die "Could not calculate data size for $DATA_DIR"
     data_size_mb=$((data_size_kb / 1024))
-    avail_kb=$(df -k "$(dirname "$DATA_DIR")" | awk 'NR==2{print $4}')
+    avail_kb=$(df -k "$(dirname "$DATA_DIR")" | awk 'NR==2 { print $4 }')
+    [ -n "$avail_kb" ] || die "Could not calculate available disk space for $(dirname "$DATA_DIR")"
     avail_mb=$((avail_kb / 1024))
     needed_mb=$((data_size_mb * 2 + 2000))
     echo "  Data size:       ${data_size_mb} MB"
@@ -195,7 +213,7 @@ preflight() {
     echo "  Estimated need:  ${needed_mb} MB"
     if [ "$avail_mb" -lt "$needed_mb" ]; then
         warn "Disk space may be insufficient."
-        warn "pg_upgrade copies data; need ~2x data size + ~2 GB for nix store."
+        warn "pg_upgrade copies data; need ~2x data size + ~2 GB for nix binaries."
         confirm "Continue anyway?"
     fi
 
@@ -252,6 +270,9 @@ pull_image() {
 prepare_staging() {
     local tmpbase="${TMPDIR:-/tmp}"
     staging_dir=$(mktemp -d "${tmpbase%/}/supabase-pg17-upgrade.XXXXXX")
+    # World-writable so Docker containers can access bind mounts on macOS,
+    # where the VM's root user has no special access to host directories.
+    chmod 777 "$staging_dir"
     echo "  Staging directory: $staging_dir"
 
     # Download upgrade scripts from the supabase/postgres repo
@@ -295,15 +316,11 @@ drop_incompatible_extensions() {
 
 stop_and_backup() {
     info "Backing up pgsodium root key"
-    local db_config_vol
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -1)
-    if [ -n "$db_config_vol" ]; then
-        docker run --rm -v "${db_config_vol}:/src:ro" -v "$staging_dir:/dst" \
-            alpine sh -c 'cp /src/pgsodium_root.key /dst/pgsodium_root.key.bak 2>/dev/null || echo "  (no pgsodium key found)"'
-        if [ -f "$staging_dir/pgsodium_root.key.bak" ]; then
-            echo "  Saved to: $staging_dir/pgsodium_root.key.bak"
-        fi
-    fi
+    local key_backup="./volumes/db/pgsodium_root.key.bak.pg15"
+    docker run --rm -v "${db_config_vol}:/src:ro" -v "$(pwd)/volumes/db:/dst" \
+        alpine cp /src/pgsodium_root.key /dst/pgsodium_root.key.bak.pg15 \
+        || die "Failed to back up pgsodium root key from db-config volume."
+    echo "  Saved to: $key_backup"
 
     info "Stopping all Supabase services"
     docker compose down
@@ -321,12 +338,10 @@ stop_and_backup() {
 # from the public Supabase nix binary cache.
 
 run_upgrade() {
-    local db_config_vol abs_data_dir abs_migration_dir
-
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -1)
-    [ -n "$db_config_vol" ] || die "Could not find db-config volume."
+    local abs_data_dir abs_migration_dir
 
     mkdir -p "$MIGRATION_DIR"
+    chmod 777 "$MIGRATION_DIR"
     abs_data_dir=$(cd "$DATA_DIR" && pwd)
     abs_migration_dir=$(cd "$MIGRATION_DIR" && pwd)
 
@@ -336,7 +351,7 @@ run_upgrade() {
         -v "${abs_data_dir}:/mnt/host-pgdata" \
         -v "${abs_migration_dir}:/mnt/host-migration" \
         -v "${db_config_vol}:/etc/postgresql-custom" \
-        -v "${staging_dir}:/tmp/staging:ro" \
+        -v "${staging_dir}:/tmp/staging" \
         -e PGPASSWORD="$pg_password" \
         "$current_image" \
         infinity
@@ -435,10 +450,8 @@ SETUP
 # where the binaries are native.
 
 run_complete() {
-    local db_config_vol abs_migration_dir
+    local abs_migration_dir
 
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -1)
-    [ -n "$db_config_vol" ] || die "Could not find db-config volume."
     abs_migration_dir=$(cd "$MIGRATION_DIR" && pwd)
 
     info "Starting PG17 container for complete.sh"
@@ -446,7 +459,7 @@ run_complete() {
         --entrypoint sleep \
         -v "${abs_migration_dir}:/mnt/host-migration" \
         -v "${db_config_vol}:/etc/postgresql-custom" \
-        -v "${staging_dir}:/tmp/staging:ro" \
+        -v "${staging_dir}:/tmp/staging" \
         -e PGPASSWORD="$pg_password" \
         "$PG17_IMAGE" \
         infinity
@@ -553,6 +566,7 @@ swap_data() {
 
     echo "  $MIGRATION_DIR/pgdata -> $DATA_DIR"
     mv "$MIGRATION_DIR/pgdata" "$DATA_DIR"
+    rm -rf "$MIGRATION_DIR"
 }
 
 # --- Step 8: Start Postgres 17 ---------------------------------------------
@@ -561,14 +575,10 @@ start_pg17() {
     info "Starting Supabase with Postgres 17"
 
     # Ensure db-config volume has correct ownership and structure for PG17.
-    local db_config_vol
-    db_config_vol=$(docker volume ls --filter "name=db-config" --format '{{.Name}}' | head -1)
-    if [ -n "$db_config_vol" ]; then
-        docker run --rm -v "${db_config_vol}:/vol" "$PG17_IMAGE" sh -c '
-            mkdir -p /vol/conf.d
-            chown -R postgres:postgres /vol/
-        '
-    fi
+    docker run --rm -v "${db_config_vol}:/vol" "$PG17_IMAGE" sh -c '
+        mkdir -p /vol/conf.d
+        chown -R postgres:postgres /vol/
+    '
 
     docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
 
@@ -584,7 +594,7 @@ start_pg17() {
     [ $retries -gt 0 ] || die "Postgres 17 did not start within 120 seconds."
 
     local new_version
-    new_version=$(run_sql_on "$DB_CONTAINER" -A -t -c "SHOW server_version;" 2>/dev/null | head -1)
+    new_version=$(run_sql_on "$DB_CONTAINER" -A -t -c "SHOW server_version;" 2>/dev/null | head -n 1)
     echo "  Postgres version: $new_version"
     case "$new_version" in
         17.*) ;;
@@ -644,7 +654,7 @@ apply_role_migrations() {
         docker exec -i \
             -e PGPASSWORD="$pg_password" \
             "$DB_CONTAINER" \
-            psql -h localhost -U supabase_admin -d postgres \
+            psql -h localhost -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \
                 -f "${migration_dir}/${m}" || warn "  $m failed (non-fatal)"
     done
 }
@@ -655,7 +665,7 @@ verify() {
     info "Verification"
 
     local version
-    version=$(run_sql_on "$DB_CONTAINER" -A -t -c "SELECT version();" 2>/dev/null | head -1)
+    version=$(run_sql_on "$DB_CONTAINER" -A -t -c "SELECT version();" 2>/dev/null | head -n 1)
     echo "  $version"
 
     echo ""
@@ -669,12 +679,13 @@ verify() {
     echo "  To use Postgres 17 going forward, always include the override:"
     echo "    docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d"
     echo ""
-    echo "  Postgres 15 backup: $BACKUP_DIR"
+    echo "  Postgres 15 backup:  $BACKUP_DIR"
+    echo "  pgsodium key backup: ./volumes/db/pgsodium_root.key.bak.pg15"
     echo "  Once satisfied, you can reclaim space:"
-    echo "    rm -rf $BACKUP_DIR $MIGRATION_DIR"
+    echo "    rm -rf $BACKUP_DIR"
     echo ""
     echo "  Rollback (if needed):"
-    echo "    1. docker compose down"
+    echo "    1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down"
     echo "    2. rm -rf $DATA_DIR"
     echo "    3. mv $BACKUP_DIR $DATA_DIR"
     echo "    4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
