@@ -1,13 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -20,17 +13,27 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as yup from 'yup'
 
 import { urlRegex } from '../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface SmtpFormValues {
   SMTP_ADMIN_EMAIL?: string
@@ -49,7 +52,6 @@ export const SmtpForm = () => {
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
-  const [hidden, setHidden] = useState(true)
 
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -189,7 +191,6 @@ export const SmtpForm = () => {
           toast.error(`Failed to update settings: ${error.message}`)
         },
         onSuccess: () => {
-          setHidden(true)
           toast.success('Successfully updated settings')
         },
       }
@@ -394,14 +395,17 @@ export const SmtpForm = () => {
                               description="The minimum time in seconds between emails before another email can be sent to the same user."
                             >
                               <FormControl_Shadcn_>
-                                <PrePostTab postTab="seconds">
-                                  <Input_Shadcn_
+                                <InputGroup>
+                                  <FormInputGroupInput
                                     type="number"
                                     value={field.value}
                                     onChange={(e) => field.onChange(Number(e.target.value))}
                                     disabled={!canUpdateConfig}
                                   />
-                                </PrePostTab>
+                                  <InputGroupAddon align="inline-end">
+                                    <InputGroupText>seconds</InputGroupText>
+                                  </InputGroupAddon>
+                                </InputGroup>
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}
@@ -435,25 +439,7 @@ export const SmtpForm = () => {
                               description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
                             >
                               <FormControl_Shadcn_>
-                                <PrePostTab
-                                  postTab={
-                                    <Button
-                                      type="text"
-                                      className="p-0"
-                                      onClick={() => setHidden(!hidden)}
-                                      icon={hidden ? <Eye /> : <EyeOff />}
-                                    />
-                                  }
-                                >
-                                  <Input_Shadcn_
-                                    {...field}
-                                    type={hidden ? 'password' : 'text'}
-                                    placeholder={
-                                      authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'
-                                    }
-                                    disabled={!canUpdateConfig}
-                                  />
-                                </PrePostTab>
+                                <Input {...field} reveal copy disabled={!canUpdateConfig} />
                               </FormControl_Shadcn_>
                             </FormItemLayout>
                           )}

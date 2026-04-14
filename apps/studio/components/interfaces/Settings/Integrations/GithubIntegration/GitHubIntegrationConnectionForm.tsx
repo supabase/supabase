@@ -65,12 +65,10 @@ const GITHUB_ICON = (
 )
 
 interface GitHubIntegrationConnectionFormProps {
-  disabled?: boolean
   connection?: GitHubConnection
 }
 
 export const GitHubIntegrationConnectionForm = ({
-  disabled = false,
   connection,
 }: GitHubIntegrationConnectionFormProps) => {
   const { data: selectedProject } = useSelectedProjectQuery()
@@ -761,7 +759,7 @@ export const GitHubIntegrationConnectionForm = ({
                         <Button
                           type="outline"
                           onClick={handleRemoveIntegration}
-                          disabled={isDeletingConnection}
+                          disabled={isDeletingConnection || isCheckingBranch}
                           loading={isDeletingConnection}
                         >
                           Disable integration
@@ -773,7 +771,7 @@ export const GitHubIntegrationConnectionForm = ({
                         <Button
                           type="default"
                           onClick={() => githubSettingsForm.reset()}
-                          disabled={!canUpdateGitHubConnection}
+                          disabled={!canUpdateGitHubConnection || isCheckingBranch}
                         >
                           Cancel
                         </Button>
@@ -790,7 +788,7 @@ export const GitHubIntegrationConnectionForm = ({
                           (!connection && !githubSettingsForm.getValues().repositoryId) ||
                           (connection && !githubSettingsForm.formState.isDirty)
                         }
-                        loading={isCheckingBranch || isLoading}
+                        loading={isLoading}
                       >
                         {connection ? 'Save changes' : 'Enable integration'}
                       </Button>

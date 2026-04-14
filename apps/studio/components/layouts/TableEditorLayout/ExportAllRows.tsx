@@ -1,23 +1,10 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
 import Papa from 'papaparse'
 import { useCallback, useState, type ReactNode } from 'react'
-
-import { IS_PLATFORM } from 'common'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import type { Filter, Sort, SupaTable } from 'components/grid/types'
-import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
-import { InlineLink } from 'components/ui/InlineLink'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-types-infinite-query'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { getTableEditor, type TableEditorData } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
-import { DOCS_URL } from 'lib/constants'
-import type { RoleImpersonationState } from 'lib/role-impersonation'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import {
   BlobCreationError,
   DownloadSaveError,
@@ -31,6 +18,19 @@ import {
   type ExportAllRowsErrorFamily,
 } from './ExportAllRows.errors'
 import { useProgressToasts } from './ExportAllRows.progress'
+import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
+import type { Filter, Sort, SupaTable } from '@/components/grid/types'
+import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { getTableEditor, type TableEditorData } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { fetchAllTableRows } from '@/data/table-rows/table-rows-query'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { DOCS_URL } from '@/lib/constants'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before

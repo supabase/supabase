@@ -553,7 +553,10 @@ testRunner('table editor', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     // Copy the column name
-    await page.getByRole('columnheader', { name: colName }).getByRole('button').nth(1).click()
+    await page
+      .getByRole('columnheader', { name: colName })
+      .getByRole('button', { name: `Column ${colName} actions` })
+      .click()
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
 
     await expectClipboardValue({
@@ -1232,6 +1235,57 @@ testRunner('table editor', () => {
       'Table should show 3 records after drag and drop import'
     ).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'drag drop value 1' })).toBeVisible()
+  })
+
+  test('CSV import with extra column succeeds after deselecting incompatible header', async ({
+    page,
+    ref,
+  }) => {
+    const tableName = 'pw_table_csv_extra_col'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTableWithRLS(tableName, 'pw_column')
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    // Upload a CSV that has an extra column not in the table
+    const csvFilePath = path.join(
+      import.meta.dirname,
+      'files',
+      'table-editor-import-extra-column.csv'
+    )
+    await page.getByRole('button', { name: 'Import data from CSV' }).click()
+    await page.getByRole('tab', { name: 'Upload CSV' }).click()
+    await page.setInputFiles('input[type="file"]', csvFilePath)
+
+    // The "Data incompatible" badge should be visible because of the extra column
+    await expect(page.getByText('Data incompatible')).toBeVisible()
+
+    // Expand the configuration section and deselect the extra column
+    await page.getByRole('button', { name: 'Toggle import configuration' }).click()
+    await expect(page.getByText('Select which columns to import')).toBeVisible()
+    await page.getByRole('button', { name: 'Toggle column extra_column' }).click()
+
+    // After deselecting, the incompatible badge should disappear
+    await expect(page.getByText('Data incompatible')).not.toBeVisible()
+
+    // Import should succeed now
+    const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
+    await page.getByRole('button', { name: 'Import data' }).click()
+    await waitForCsvInsert
+    await waitForGridDataToLoad(page, ref)
+
+    await expect(page.getByText('3 records')).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'value 1' })).toBeVisible()
   })
 
   test('row insert via side panel saves immediately', async ({ page, ref }) => {

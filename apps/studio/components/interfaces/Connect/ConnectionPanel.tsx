@@ -1,10 +1,7 @@
 import { useParams } from 'common'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { ChevronRight, FileCode, X } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -18,6 +15,9 @@ import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import { ConnectionParameters } from './ConnectionParameters'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'

@@ -3,11 +3,6 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthError } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useSignOut } from 'lib/auth'
-import { getReturnToPath } from 'lib/gotrue'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,6 +14,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { SupportLink } from '../Support/SupportLink'
+import AlertError from '@/components/ui/AlertError'
+import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useSignOut } from '@/lib/auth'
+import { getReturnToPath } from '@/lib/gotrue'
 
 const schema = z.object({
   code: z.string().min(1, 'MFA Code is required'),

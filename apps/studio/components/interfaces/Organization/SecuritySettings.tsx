@@ -1,23 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
-import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   Card,
@@ -33,6 +19,20 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
+
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
+import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
 
 const schema = z.object({
   enforceMfa: z.boolean(),

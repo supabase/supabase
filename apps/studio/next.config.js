@@ -613,9 +613,12 @@ const nextConfig = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
+const platformConfig =
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? withBundleAnalyzer(nextConfig) : nextConfig
+
 module.exports =
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(withBundleAnalyzer(nextConfig), {
+  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+    ? withSentryConfig(platformConfig, {
         silent: true,
 
         // For all available options, see:
@@ -647,4 +650,4 @@ module.exports =
           applicationKey: 'supabase-studio',
         },
       })
-    : nextConfig
+    : platformConfig

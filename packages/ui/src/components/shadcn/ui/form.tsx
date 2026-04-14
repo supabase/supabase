@@ -15,7 +15,10 @@ import {
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
+import type { InputProps } from './input'
+import { InputGroupInput, InputGroupTextarea } from './input-group'
 import { Label } from './label'
+import type { TextareaProps } from './textarea'
 
 const Form = FormProvider
 
@@ -179,6 +182,32 @@ const FormMessage = React.forwardRef<
 
 FormMessage.displayName = 'FormMessage'
 
+function FormInputGroupInput(props: InputProps) {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  return (
+    <InputGroupInput
+      id={formItemId}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
+}
+
+function FormInputGroupTextArea(props: TextareaProps) {
+  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+
+  return (
+    <InputGroupTextarea
+      id={formItemId}
+      aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
+      aria-invalid={!!error}
+      {...props}
+    />
+  )
+}
+
 export {
   Form,
   FormControl,
@@ -188,5 +217,7 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
+  FormInputGroupInput,
+  FormInputGroupTextArea,
   useWatch,
 }

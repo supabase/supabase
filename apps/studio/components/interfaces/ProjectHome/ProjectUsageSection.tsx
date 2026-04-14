@@ -1,24 +1,25 @@
 import { useParams } from 'common'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
-import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
-import {
-  ProjectLogStatsVariables,
-  UsageApiCounts,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, Loading } from 'ui'
 import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
+import {
+  ProjectLogStatsVariables,
+  UsageApiCounts,
+  useProjectLogStatsQuery,
+} from '@/data/analytics/project-log-stats-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 type LogsBarChartDatum = {
   timestamp: string

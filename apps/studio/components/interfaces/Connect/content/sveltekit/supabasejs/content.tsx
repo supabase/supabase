@@ -24,7 +24,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
             `PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
             projectKeys?.publishableKey
-              ? `PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+              ? `PUBLIC_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
               : `PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
             '',
           ].join('\n')}
@@ -35,10 +35,10 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
         <SimpleCodeBlock className="js" parentClassName="min-h-72">
           {`
 import { createClient } from "@supabase/supabase-js";
-import { PUBLIC_SUPABASE_URL, ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'PUBLIC_SUPABASE_ANON_KEY'} } from "$env/static/public"
+import { PUBLIC_SUPABASE_URL, ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_KEY' : 'PUBLIC_SUPABASE_ANON_KEY'} } from "$env/static/public"
 
 const supabaseUrl = PUBLIC_SUPABASE_URL;
-const supabaseKey = ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'PUBLIC_SUPABASE_ANON_KEY'};
+const supabaseKey = ${projectKeys.publishableKey ? 'PUBLIC_SUPABASE_PUBLISHABLE_KEY' : 'PUBLIC_SUPABASE_ANON_KEY'};
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}

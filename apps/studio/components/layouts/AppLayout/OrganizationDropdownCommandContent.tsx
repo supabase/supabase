@@ -1,7 +1,5 @@
-import PartnerIcon from 'components/ui/PartnerIcon'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import type { Organization } from 'types'
 import {
   Button,
   cn,
@@ -16,6 +14,8 @@ import {
 } from 'ui'
 
 import { OrgCommandItem } from './OrgCommandItem'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import type { Organization } from '@/types'
 
 export interface OrganizationDropdownCommandContentProps {
   embedded: boolean

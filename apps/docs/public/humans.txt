@@ -51,6 +51,7 @@ Chris Martin
 Chris Stockton
 Chris Ward
 Clayton Kast
+Colin Murray
 Colum Ferry
 Craig Cannon
 Cuong Do
@@ -66,6 +67,7 @@ David Weitzman
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dimitrios Liappis
 Div Arora
 Divit D
 Douglas Hunley
@@ -174,6 +176,7 @@ Michal Kleczek
 Miles Thomas
 Monica Khoury
 Mykhailo Mischa Lieibenson
+Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
@@ -239,6 +242,7 @@ Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
+Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova

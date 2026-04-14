@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError, put } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { organizationKeys } from './keys'
 import { invalidateOrganizationsQuery } from './organizations-query'
+import { del, handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationTaxIdUpdateVariables = {
   slug?: string

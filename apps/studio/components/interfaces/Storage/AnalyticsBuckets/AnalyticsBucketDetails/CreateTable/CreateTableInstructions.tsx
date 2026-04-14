@@ -1,16 +1,4 @@
 import { useParams } from 'common'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import {
-  getDecryptedValues,
-  useVaultSecretDecryptedValueQuery,
-} from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Eye, EyeOff } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
@@ -27,6 +15,18 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 import { getPyicebergSnippet } from './CreateTableInstructions.constants'
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import {
+  getDecryptedValues,
+  useVaultSecretDecryptedValueQuery,
+} from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const CreateTableInstructions = ({
   hideHeader = false,

@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { LOGS_TABLES } from 'components/interfaces/Settings/Logs/Logs.constants'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { Clock, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -9,6 +7,8 @@ import { Admonition, TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
+import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
 
 interface EdgeFunctionRecentInvocationsProps {
   functionId: string

@@ -1,5 +1,5 @@
-import type { Branch } from 'data/branches/branches-query'
-import type { Organization } from 'types'
+import type { Branch } from '@/data/branches/branches-query'
+import type { Organization } from '@/types'
 
 export interface ProjectBranchSelectorState {
   selectedBranch: Branch | undefined

@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Handle, Node, NodeProps } from '@xyflow/react'
-import { buildTableEditorUrl } from 'components/grid/SupabaseGrid.utils'
 import { TableEditor } from 'icons'
 import {
   Copy,
@@ -29,6 +28,7 @@ import {
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
 import { TableNodeData } from './Schemas.constants'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 

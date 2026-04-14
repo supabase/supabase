@@ -11,9 +11,12 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input,
   Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Separator,
@@ -111,7 +114,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
   const { ref: projectRef } = useParams()
-  const { data: endpointData } = useProjectApiUrl({ projectRef })
+  const { hostEndpoint: endpointData } = useProjectApiUrl({ projectRef })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
@@ -289,8 +292,11 @@ export const CreateOrUpdateCustomProviderSheet = ({
                     description="Lowercase letters, numbers, and hyphens only. Used in SDK: signInWithOAuth({ provider: 'custom:my-company' })"
                   >
                     <FormControl_Shadcn_>
-                      <PrePostTab preTab="custom:" className="w-full">
-                        <Input_Shadcn_
+                      <InputGroup>
+                        <InputGroupAddon align="inline-start">
+                          <InputGroupText>custom:</InputGroupText>
+                        </InputGroupAddon>
+                        <FormInputGroupInput
                           {...field}
                           placeholder="my-company"
                           disabled={isEditMode}
@@ -300,7 +306,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                             field.onChange(userValue)
                           }}
                         />
-                      </PrePostTab>
+                      </InputGroup>
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}

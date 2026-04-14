@@ -1,12 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import { organizationKeys } from 'data/organizations/keys'
-import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
-import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
-import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -15,6 +9,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
+
+import InformationBox from '@/components/ui/InformationBox'
+import { organizationKeys } from '@/data/organizations/keys'
+import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
+import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
+import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
 

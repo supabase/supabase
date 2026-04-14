@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useLogsGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()

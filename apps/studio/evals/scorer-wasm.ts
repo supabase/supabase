@@ -1,8 +1,8 @@
 import { EvalScorer } from 'braintrust'
-import { extractIdentifiers, isQuotedInSql, needsQuoting } from 'lib/sql-identifier-quoting'
 import { parse } from 'libpg-query'
 
 import { AssistantEvalInput, AssistantEvalOutput, Expected } from './scorer'
+import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
 export const sqlSyntaxScorer: EvalScorer<
   AssistantEvalInput,

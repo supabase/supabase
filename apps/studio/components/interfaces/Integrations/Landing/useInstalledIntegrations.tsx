@@ -1,9 +1,3 @@
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
 import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
@@ -13,6 +7,12 @@ import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()

@@ -1,27 +1,27 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import {
+  Button,
+  InfoIcon,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
 import {
   ProjectServiceStatus as APIProjectServiceStatus,
   ServiceHealthResponse,
   useProjectServiceStatusQuery,
-} from 'data/service-status/service-status-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import {
-  Button,
-  InfoIcon,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+} from '@/data/service-status/service-status-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 

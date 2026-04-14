@@ -1,18 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsProjectActive, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
 import { Pause } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 const PauseProjectButton = () => {
   const router = useRouter()

@@ -1,17 +1,17 @@
 import { keepPreviousData } from '@tanstack/react-query'
-import { useCronJobsCountEstimateQuery } from 'data/database-cron-jobs/database-cron-jobs-count-estimate-query'
-import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
-import {
-  CronJob,
-  useCronJobsInfiniteQuery,
-} from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useMemo } from 'react'
-import type { ResponseError } from 'types'
 
 import { CRON_JOBS_THRESHOLD } from './CronJobsTab.constants'
 import type { ConnectionVars } from '@/data/common.types'
+import { useCronJobsCountEstimateQuery } from '@/data/database-cron-jobs/database-cron-jobs-count-estimate-query'
+import { useCronJobsCountQuery } from '@/data/database-cron-jobs/database-cron-jobs-count-query'
+import {
+  CronJob,
+  useCronJobsInfiniteQuery,
+} from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useCronJobsMinimalInfiniteQuery } from '@/data/database-cron-jobs/database-cron-jobs-minimal-infinite-query'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import type { ResponseError } from '@/types'
 
 // =============================================================================
 // Input types

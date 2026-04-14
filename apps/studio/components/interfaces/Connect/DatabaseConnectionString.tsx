@@ -1,21 +1,7 @@
 import { useParams } from 'common'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import AlertError from 'components/ui/AlertError'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { InlineLink } from 'components/ui/InlineLink'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import { pluckObjectFields } from 'lib/helpers'
 import { BookOpen, ChevronDown, ExternalLink } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -46,6 +32,20 @@ import {
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings } from './DatabaseSettings.utils'
 import { examples, type Example } from './DirectConnectionExamples'
+import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import AlertError from '@/components/ui/AlertError'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { pluckObjectFields } from '@/lib/helpers'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const StepLabel = ({
   number,

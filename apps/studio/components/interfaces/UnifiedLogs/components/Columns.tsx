@@ -1,6 +1,4 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
@@ -9,6 +7,8 @@ import { AuthUserHoverCard } from './AuthUserHoverCard'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
 import { TextWithTooltip } from './TextWithTooltip'
+import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 /**
  * Determines if a column should be hidden based on its values in the data.

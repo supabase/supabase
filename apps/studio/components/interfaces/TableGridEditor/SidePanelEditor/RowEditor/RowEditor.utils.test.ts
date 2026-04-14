@@ -1,12 +1,13 @@
-import { RowField } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import { describe, expect, it, vi } from 'vitest'
+
+import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   convertByteaToHex,
   generateRowObjectFromFields,
   isValueTruncated,
   parseValue,
   validateFields,
-} from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { describe, expect, it, vi } from 'vitest'
+} from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 
 describe('parseValue', () => {
   it('should return null when originalValue is null', () => {

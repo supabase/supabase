@@ -1,17 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoPermission from 'components/ui/NoPermission'
-import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { IntegrationOverviewTabV2 } from '../Integration/IntegrationOverviewTabV2'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import NoPermission from '@/components/ui/NoPermission'
+import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const WebhooksOverviewTab = () => {
   const { ref: projectRef } = useParams()
