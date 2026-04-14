@@ -61,7 +61,6 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         const total = d.error_count + d.ok_count + d.warning_count
         return {
           timestamp: d.timestamp,
-          ok_rate: total > 0 ? (d.ok_count / total) * 100 : 0,
           error_rate: total > 0 ? (d.error_count / total) * 100 : 0,
           warning_rate: total > 0 ? (d.warning_count / total) * 100 : 0,
         }
@@ -70,7 +69,6 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
   )
 
   const chartConfig: ChartConfig = {
-    ok_rate: { label: 'Success rate', color: 'hsl(var(--brand-default))' },
     warning_rate: { label: 'Warning rate', color: 'hsl(var(--warning-default))' },
     error_rate: { label: 'Error rate', color: 'hsl(var(--destructive-default))' },
   }
@@ -112,7 +110,10 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         </div>
       </div>
 
-      <div className="h-16" onClick={(e) => e.preventDefault()}>
+      <div
+        className="h-16 rounded-sm bg-brand/5"
+        onClick={(e) => e.preventDefault()}
+      >
         <Loading active={data.isLoading} isFullHeight>
           {data.isLoading ? (
             <div />
@@ -124,9 +125,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
             <ChartLine
               data={rateData}
               dataKey="error_rate"
-              dataKeys={['error_rate', 'warning_rate', 'ok_rate']}
-              sharedStackId="stack"
-              strokeKeys={['ok_rate']}
+              dataKeys={['warning_rate', 'error_rate']}
               config={chartConfig}
               DateTimeFormat={datetimeFormat}
               onLineClick={onBarClick}
