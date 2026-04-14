@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -207,6 +207,11 @@ export const ProtectionAuthSettingsForm = () => {
     updateAuthConfig({ projectRef: projectRef!, config: payload })
   }
 
+  const SECURITY_CAPTCHA_ENABLED = useWatch({
+    name: 'SECURITY_CAPTCHA_ENABLED',
+    control: protectionForm.control,
+  })
+
   if (isError) {
     return (
       <PageSection>
@@ -270,7 +275,7 @@ export const ProtectionAuthSettingsForm = () => {
                 />
               </CardContent>
 
-              {protectionForm.watch('SECURITY_CAPTCHA_ENABLED') && (
+              {SECURITY_CAPTCHA_ENABLED && (
                 <>
                   <CardContent>
                     <FormField_Shadcn_
