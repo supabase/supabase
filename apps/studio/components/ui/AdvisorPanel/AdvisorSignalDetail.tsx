@@ -74,6 +74,7 @@ export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProp
           label="Ask Assistant"
           buildPrompt={() => buildSignalAssistantPrompt(item)}
           onOpenAssistant={handleAskAssistant}
+          telemetrySource="advisor_signal_detail"
         />
         {item.actions.map((action) => (
           <Button key={`${item.fingerprint}-${action.href}`} type="default" asChild>
