@@ -118,12 +118,10 @@ export const ObservabilityOverview = () => {
       if (!datum?.timestamp) return
 
       const datumTimestamp = dayjs(datum.timestamp)
-      // 7-day view uses daily buckets; everything else uses hourly
-      const isDailyBucket = interval === '7day'
-      const start = datumTimestamp.startOf(isDailyBucket ? 'day' : 'hour').toISOString()
-      const end = dayjs(start)
-        .add(isDailyBucket ? 1 : 1, isDailyBucket ? 'day' : 'hour')
-        .toISOString()
+      // Match bucket granularity: 1hr→minute, 1day→hour, 7day→day
+      const unit = interval === '7day' ? 'day' : interval === '1hr' ? 'minute' : 'hour'
+      const start = datumTimestamp.startOf(unit).toISOString()
+      const end = dayjs(start).add(1, unit).toISOString()
 
       const queryParams = new URLSearchParams({ its: start, ite: end })
       router.push(`${logsUrl}?${queryParams.toString()}`)
