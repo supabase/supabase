@@ -91,7 +91,7 @@ Future<void> main() async {
     anonKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final credentials = await auth0.credentialsManager.credentials();
-      return credentials.accessToken;
+      return credentials.idToken;
     },
   );
   runApp(const MyApp());
@@ -114,7 +114,7 @@ val supabase = createSupabaseClient(
 ) {
     accessToken = {
         val credentials: Credentials = ...; // Get credentials from Auth0
-        credentials.accessToken
+        credentials.idToken
     }
 }
 ```
@@ -143,9 +143,7 @@ Your Supabase project inspects the `role` claim present in all JWTs sent to it, 
 
 By default, Auth0 JWTs (both access token and ID token) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
-A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim.
-
-If you are using **ID tokens** from the example above:
+Configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) to add the custom claim to **ID tokens**:
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
@@ -153,17 +151,9 @@ exports.onExecutePostLogin = async (event, api) => {
 }
 ```
 
-For **access tokens**, you must use a namespaced claim because [Auth0 strips non-namespaced custom claims](https://auth0.com/docs/troubleshoot/product-lifecycle/past-migrations/custom-claims-migration):
-
-```javascript
-exports.onExecutePostLogin = async (event, api) => {
-  api.accessToken.setCustomClaim('https://your-app.com/role', 'authenticated')
-}
-```
-
 <Admonition type="caution">
 
-Auth0 can silently strip claims without a namespace when using `api.accessToken.setCustomClaim`. We recommend ID tokens or namespaced access token claims to avoid this issue.
+Supabase requires the literal `role` claim key in the JWT. Auth0 [silently strips non-namespaced custom claims from access tokens](https://auth0.com/docs/troubleshoot/product-lifecycle/past-migrations/custom-claims-migration), so `api.accessToken.setCustomClaim('role', 'authenticated')` does not work. Use `api.idToken.setCustomClaim` and pass the ID token to Supabase as shown in the examples above.
 
 </Admonition>
 
