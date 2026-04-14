@@ -18,10 +18,13 @@ export function InstallOAuthIntegrationButton({
 }: InstallOAuthIntegrationButtonProps) {
   const [isInstalling, setIsInstalling] = useState(false)
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeys, isLoading: isApiKeysLoading } = useAPIKeysQuery(
     { projectRef, reveal: false },
     { enabled: !!projectRef }
   )
+
+  const isLoading =
+    integration.installIdentificationMethod === 'secret_key_prefix' && isApiKeysLoading
 
   const isIntegrationInstalled = useMemo(() => {
     if (!apiKeys || !integration) return false
@@ -65,7 +68,8 @@ export function InstallOAuthIntegrationButton({
         <Button
           type="primary"
           className="shrink-0"
-          loading={isInstalling}
+          loading={isInstalling || isLoading}
+          disabled={isLoading}
           onClick={handleInstallClick}
         >
           Install integration
