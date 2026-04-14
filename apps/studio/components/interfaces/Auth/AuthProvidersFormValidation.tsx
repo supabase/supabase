@@ -157,6 +157,7 @@ const smsProviderBaseSchema = z.object({
       return /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g.test(value)
     }, 'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'),
   SMS_TEST_OTP_VALID_UNTIL: z.string().datetime({ offset: true }).optional(),
+  SMS_AUTOCONFIRM: z.boolean().optional(),
 })
 
 const smsOtpPhoneProviderSchema = z.object({
@@ -214,6 +215,7 @@ const smsProviderEnabledSchema = z
 const smsProviderDisabledSchema = z
   .object({
     EXTERNAL_PHONE_ENABLED: z.literal(false),
+    SMS_PROVIDER: z.string().optional(),
   })
   .merge(smsProviderBaseSchema.partial())
   .merge(smsOtpPhoneProviderSchema.partial())
