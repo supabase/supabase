@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
 import { AlertCircle, ChevronDown, Copy, Download, LoaderCircle, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
@@ -135,146 +134,140 @@ export const PreviewPane = () => {
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
+  if (!isOpen) return null
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15, ease: 'easeOut' }}
-          className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
-          style={{ width }}
-        >
-          {/* Preview Header */}
-          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-            <X
-              className="cursor-pointer"
-              size={14}
-              strokeWidth={2}
-              onClick={() => setSelectedFilePreview(undefined)}
-            />
+    <div
+      className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
+      style={{ width }}
+    >
+      {/* Preview Header */}
+      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+        <X
+          className="cursor-pointer"
+          size={14}
+          strokeWidth={2}
+          onClick={() => setSelectedFilePreview(undefined)}
+        />
+      </div>
+
+      {/* Preview Thumbnail*/}
+      <div className="my-4 border border-overlay">
+        <div className="flex h-56 w-full items-center 2xl:h-72">
+          <PreviewFile item={file} />
+        </div>
+      </div>
+
+      <div className="w-full space-y-6">
+        {/* Preview Information */}
+        <div className="space-y-1">
+          <h5 className="break-words text-base text-foreground">{file.name}</h5>
+          {file.isCorrupted && (
+            <div className="flex items-center space-x-2">
+              <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+              <p className="text-sm text-foreground-light">
+                File is corrupted, please delete and reupload this file again
+              </p>
+            </div>
+          )}
+          {mimeType && (
+            <p className="text-sm text-foreground-light">
+              {mimeType}
+              {size && <span> - {size}</span>}
+            </p>
+          )}
+        </div>
+
+        {/* Preview Metadata */}
+        <div className="space-y-2">
+          <div>
+            <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
+            <p className="text-sm text-foreground-light">{createdAt}</p>
           </div>
-
-          {/* Preview Thumbnail*/}
-          <div className="my-4 border border-overlay">
-            <div className="flex h-56 w-full items-center 2xl:h-72">
-              <PreviewFile item={file} />
-            </div>
+          <div>
+            <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
+            <p className="text-sm text-foreground-light">{updatedAt}</p>
           </div>
+        </div>
 
-          <div className="w-full space-y-6">
-            {/* Preview Information */}
-            <div className="space-y-1">
-              <h5 className="break-words text-base text-foreground">{file.name}</h5>
-              {file.isCorrupted && (
-                <div className="flex items-center space-x-2">
-                  <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
-                  <p className="text-sm text-foreground-light">
-                    File is corrupted, please delete and reupload this file again
-                  </p>
-                </div>
-              )}
-              {mimeType && (
-                <p className="text-sm text-foreground-light">
-                  {mimeType}
-                  {size && <span> - {size}</span>}
-                </p>
-              )}
-            </div>
-
-            {/* Preview Metadata */}
-            <div className="space-y-2">
-              <div>
-                <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
-                <p className="text-sm text-foreground-light">{createdAt}</p>
-              </div>
-              <div>
-                <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
-                <p className="text-sm text-foreground-light">{updatedAt}</p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex space-x-2 border-b border-overlay pb-4">
-              <Button
-                type="default"
-                icon={<Download />}
-                disabled={file.isCorrupted}
-                onClick={() => downloadFile(file)}
-              >
-                Download
-              </Button>
-              {selectedBucket.public ? (
+        {/* Actions */}
+        <div className="flex space-x-2 border-b border-overlay pb-4">
+          <Button
+            type="default"
+            icon={<Download />}
+            disabled={file.isCorrupted}
+            onClick={() => downloadFile(file)}
+          >
+            Download
+          </Button>
+          {selectedBucket.public ? (
+            <Button
+              type="outline"
+              icon={<Copy />}
+              onClick={() => onCopyUrl(file.path!)}
+              disabled={file.isCorrupted}
+            >
+              Get URL
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button
                   type="outline"
                   icon={<Copy />}
-                  onClick={() => onCopyUrl(file.path!)}
+                  iconRight={<ChevronDown />}
                   disabled={file.isCorrupted}
                 >
                   Get URL
                 </Button>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="outline"
-                      icon={<Copy />}
-                      iconRight={<ChevronDown />}
-                      disabled={file.isCorrupted}
-                    >
-                      Get URL
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="bottom" align="center">
-                    <DropdownMenuItem
-                      key="expires-one-week"
-                      onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}
-                    >
-                      Expire in 1 week
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      key="expires-one-month"
-                      onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}
-                    >
-                      Expire in 1 month
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      key="expires-one-year"
-                      onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}
-                    >
-                      Expire in 1 year
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      key="custom-expiry"
-                      onClick={() => setSelectedFileCustomExpiry(file)}
-                    >
-                      Custom expiry
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-            <ButtonTooltip
-              type="outline"
-              disabled={!canUpdateFiles}
-              size="tiny"
-              icon={<Trash2 strokeWidth={2} />}
-              onClick={() => setSelectedItemsToDelete([file])}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canUpdateFiles
-                    ? 'You need additional permissions to delete this file'
-                    : undefined,
-                },
-              }}
-            >
-              Delete file
-            </ButtonTooltip>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="bottom" align="center">
+                <DropdownMenuItem
+                  key="expires-one-week"
+                  onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}
+                >
+                  Expire in 1 week
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="expires-one-month"
+                  onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}
+                >
+                  Expire in 1 month
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="expires-one-year"
+                  onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}
+                >
+                  Expire in 1 year
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="custom-expiry"
+                  onClick={() => setSelectedFileCustomExpiry(file)}
+                >
+                  Custom expiry
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+        <ButtonTooltip
+          type="outline"
+          disabled={!canUpdateFiles}
+          size="tiny"
+          icon={<Trash2 strokeWidth={2} />}
+          onClick={() => setSelectedItemsToDelete([file])}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateFiles
+                ? 'You need additional permissions to delete this file'
+                : undefined,
+            },
+          }}
+        >
+          Delete file
+        </ButtonTooltip>
+      </div>
+    </div>
   )
 }
