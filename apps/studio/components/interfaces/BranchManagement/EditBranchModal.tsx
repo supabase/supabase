@@ -24,7 +24,7 @@ import {
   Label_Shadcn_ as Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -234,81 +234,88 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 )}
               />
 
-              {githubConnection && (
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="gitBranchName"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span className="flex-1">Sync with Git branch</span>
-                          <div className="flex items-center gap-2 text-sm">
-                            <Image
-                              className={cn('dark:invert')}
-                              src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                              width={16}
-                              height={16}
-                              alt={`GitHub icon`}
-                            />
-                            <InlineLink href={`https://github.com/${repoOwner}/${repoName}`}>
-                              {repoOwner}/{repoName}
-                            </InlineLink>
-                          </div>
-                        </div>
-                      }
-                      labelOptional="Optional"
-                      description="Automatically deploy changes on every commit"
-                    >
-                      <div className="relative">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="e.g. main, feat/some-feature"
-                            autoComplete="off"
-                            onChange={(e) => {
-                              field.onChange(e)
-                              setIsGitBranchValid(false)
-                            }}
-                          />
-                        </FormControl_Shadcn_>
-                        <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                          {field.value ? (
-                            isChecking ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : isGitBranchValid ? (
-                              <Check size={14} className="text-brand" strokeWidth={2} />
-                            ) : null
-                          ) : null}
-                        </div>
-                      </div>
-                    </FormItemLayout>
-                  )}
-                />
+              {isLoadingConnections && (
+                <div className="flex flex-col gap-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
               )}
-              {isLoadingConnections && <GenericSkeletonLoader />}
+
               {isErrorConnections && (
                 <AlertError
                   error={connectionsError}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
-              {isSuccessConnections && !githubConnection && (
-                <div className="flex items-center gap-2 justify-between">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <Label>Sync with a GitHub branch</Label>
+
+              {isSuccessConnections &&
+                (githubConnection ? (
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="gitBranchName"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label={
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span className="flex-1">Sync with Git branch</span>
+                            <div className="flex items-center gap-2 text-sm">
+                              <Image
+                                className={cn('dark:invert')}
+                                src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                                width={16}
+                                height={16}
+                                alt={`GitHub icon`}
+                              />
+                              <InlineLink href={`https://github.com/${repoOwner}/${repoName}`}>
+                                {repoOwner}/{repoName}
+                              </InlineLink>
+                            </div>
+                          </div>
+                        }
+                        labelOptional="Optional"
+                        description="Automatically deploy changes on every commit"
+                      >
+                        <div className="relative">
+                          <FormControl_Shadcn_>
+                            <Input_Shadcn_
+                              {...field}
+                              placeholder="e.g. main, feat/some-feature"
+                              autoComplete="off"
+                              onChange={(e) => {
+                                field.onChange(e)
+                                setIsGitBranchValid(false)
+                              }}
+                            />
+                          </FormControl_Shadcn_>
+                          <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                            {field.value ? (
+                              isChecking ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : isGitBranchValid ? (
+                                <Check size={14} className="text-brand" strokeWidth={2} />
+                              ) : null
+                            ) : null}
+                          </div>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                ) : (
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <Label>Sync with a GitHub branch</Label>
+                      </div>
+                      <p className="text-sm text-foreground-light">
+                        Optionally connect to a GitHub repository to manage migrations automatically
+                        for this branch.
+                      </p>
                     </div>
-                    <p className="text-sm text-foreground-light">
-                      Optionally connect to a GitHub repository to manage migrations automatically
-                      for this branch.
-                    </p>
+                    <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                      Connect to GitHub
+                    </Button>
                   </div>
-                  <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                    Connect to GitHub
-                  </Button>
-                </div>
-              )}
+                ))}
             </DialogSection>
 
             <DialogFooter padding="medium">
@@ -317,7 +324,12 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
               </Button>
               <Button
                 form={formId}
-                disabled={!isSuccessConnections || isUpdating || !canSubmit || isChecking}
+                disabled={
+                  (!!gitBranchName && !isSuccessConnections) ||
+                  isUpdating ||
+                  !canSubmit ||
+                  isChecking
+                }
                 loading={isUpdating}
                 type="primary"
                 htmlType="submit"
