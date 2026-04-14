@@ -41,7 +41,11 @@ export function buildProjectPayload(
   applyToOrg: boolean,
   projectRef: string
 ): { projects: string[] } | Record<string, never> {
-  return !applyToOrg && projectRef ? { projects: [projectRef] } : {}
+  if (applyToOrg) return {}
+  if (!projectRef) {
+    throw new Error('projectRef is required when applyToOrg is false')
+  }
+  return { projects: [projectRef] }
 }
 
 export function buildSsoPayload(

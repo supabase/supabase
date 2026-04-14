@@ -136,8 +136,10 @@ describe('buildProjectPayload', () => {
     expect(buildProjectPayload(true, 'ref_abc')).toStrictEqual({})
   })
 
-  test('returns empty object when applyToOrg is false but projectRef is empty', () => {
-    expect(buildProjectPayload(false, '')).toStrictEqual({})
+  test('throws an error when applyToOrg is false but projectRef is empty', () => {
+    expect(() => buildProjectPayload(false, '')).toThrowError(
+      'projectRef is required when applyToOrg is false'
+    )
   })
 
   test('returns projects array when applyToOrg is false and projectRef is set', () => {
