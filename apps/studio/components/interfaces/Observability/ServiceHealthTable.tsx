@@ -113,6 +113,7 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
               config={CHART_CONFIG}
               DateTimeFormat={datetimeFormat}
               onLineClick={onBarClick}
+              cursor="pointer"
               className="h-full"
             />
           )}
