@@ -168,7 +168,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
               View definition
             </AccordionTrigger_Shadcn_>
           </div>
-          <AccordionContent_Shadcn_ className="pb-0">
+          <AccordionContent_Shadcn_ className="[&>div]:pb-0">
             <div className="mt-4 h-64 border border-default">
               <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
             </div>
