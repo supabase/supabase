@@ -3040,6 +3040,66 @@ export interface PricingPageExperimentExposedEvent {
 }
 
 /**
+ * Triggered when a classic access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreatedEvent {
+  action: 'access_token_created'
+  properties: {
+    /** The selected expiry preset, e.g. 'hour', 'day', 'week', 'month', 'never', 'custom' */
+    expiryPreset: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when a classic access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenRemovedEvent {
+  action: 'access_token_removed'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when a scoped access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens/scoped
+ */
+export interface ScopedAccessTokenCreatedEvent {
+  action: 'scoped_access_token_created'
+  properties: {
+    /** The selected expiry preset, e.g. 'hour', 'day', 'week', 'month', 'never', 'custom' */
+    expiryPreset: string
+    /** The resource access scope selected for the token */
+    resourceAccess: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    /** Number of permission rows configured on the token */
+    permissionCount: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when a scoped access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens/scoped
+ */
+export interface ScopedAccessTokenRemovedEvent {
+  action: 'scoped_access_token_removed'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the "Upgrade to Pro" CTA in the dashboard header.
  * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
  *
@@ -3222,3 +3282,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerCtaClickedEvent
   | PricingPageExperimentExposedEvent
   | HeaderUpgradeCtaClickedEvent
+  | AccessTokenCreatedEvent
+  | AccessTokenRemovedEvent
+  | ScopedAccessTokenCreatedEvent
+  | ScopedAccessTokenRemovedEvent
