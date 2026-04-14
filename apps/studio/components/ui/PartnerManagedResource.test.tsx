@@ -1,7 +1,9 @@
 import { screen } from '@testing-library/react'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import PartnerManagedResource from './PartnerManagedResource'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 const { mockUseAwsRedirectQuery, mockUseVercelRedirectQuery } = vi.hoisted(() => ({
   mockUseAwsRedirectQuery: vi.fn(),
@@ -19,8 +21,6 @@ vi.mock('data/integrations/aws-redirect-query', () => ({
 vi.mock('./PartnerIcon', () => ({
   default: () => <div data-testid="partner-icon" />,
 }))
-
-import PartnerManagedResource from './PartnerManagedResource'
 
 describe('PartnerManagedResource', () => {
   beforeEach(() => {

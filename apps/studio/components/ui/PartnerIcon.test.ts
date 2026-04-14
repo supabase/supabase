@@ -1,9 +1,9 @@
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { render } from 'tests/helpers'
-import type { Organization } from '@/types'
 import { describe, expect, it } from 'vitest'
 
 import PartnerIcon, { getDefaultPartnerTooltipText, getPartnerTooltipText } from './PartnerIcon'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import type { Organization } from '@/types'
 
 describe('PartnerIcon tooltip copy', () => {
   it('returns provider-specific default tooltip copy for AWS, Vercel, and Stripe', () => {

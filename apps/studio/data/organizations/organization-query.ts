@@ -13,10 +13,13 @@ export type OrganizationPlanID = OrganizationDetail['plan']['id']
 function castOrganizationSlugResponseToOrganization(
   org: components['schemas']['OrganizationSlugResponse']
 ) {
+  const forcedBillingPartner = 'stripe_projects' as any // temporary DEPR-425 override
+
   return {
     ...org,
+    billing_partner: forcedBillingPartner,
     billing_email: org.billing_email ?? 'Unknown',
-    managed_by: getManagedByFromOrganizationPartner(org.billing_partner),
+    managed_by: getManagedByFromOrganizationPartner(forcedBillingPartner),
     partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }

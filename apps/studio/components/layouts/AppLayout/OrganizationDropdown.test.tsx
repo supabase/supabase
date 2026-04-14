@@ -1,7 +1,9 @@
 import { screen, within } from '@testing-library/react'
-import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { OrganizationDropdown } from './OrganizationDropdown'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 const { mockUseIsFeatureEnabled, mockUseOrganizationsQuery, mockUseSelectedOrganizationQuery } =
   vi.hoisted(() => ({
@@ -26,8 +28,6 @@ vi.mock('components/ui/PartnerIcon', () => ({
   default: ({ organization }: { organization: { managed_by: string } }) =>
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
-
-import { OrganizationDropdown } from './OrganizationDropdown'
 
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
