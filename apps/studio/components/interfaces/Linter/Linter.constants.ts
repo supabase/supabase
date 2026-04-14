@@ -1,3 +1,5 @@
+import type React from 'react'
+
 import { Lint } from '@/data/lint/lint-query'
 
 export enum LINTER_LEVELS {
@@ -14,6 +16,7 @@ export type LintInfo = {
   linkText: string
   docsLink: string
   category: 'security' | 'performance'
+  Action?: React.FC<{ projectRef: string; metadata: Lint['metadata'] }>
 }
 
 export const LINT_TABS = [
