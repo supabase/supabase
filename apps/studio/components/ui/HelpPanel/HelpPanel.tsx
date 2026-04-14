@@ -32,7 +32,7 @@ export const HelpPanel = ({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex h-[var(--header-height)] items-center justify-between gap-2 border-b pl-3 pr-3">
+      <div className="flex h-[var(--header-height)] items-center justify-between gap-2 border-b pl-4 pr-3">
         <div className="flex min-w-0 items-center gap-1.5 text-xs">
           {isSupportView && (
             <ButtonTooltip
