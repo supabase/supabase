@@ -59,12 +59,13 @@ PG17_SCRIPTS_REF="17.6.1.084"
 # Git commit hash for the PG17 tag - written to nix_flake_version in the
 # tarball so initiate.sh takes the nix code path.
 PG17_NIX_FLAKE_VERSION="f183a83f0bd0122c9dcc438f17a106533435c963"
-# Nix store path for the PG17 postgresql-and-plugins package.
+# Nix store paths for the PG17 postgresql-and-plugins package (per architecture).
 # initiate.sh normally resolves this via an internal S3 catalog (not accessible
 # to self-hosted). We provide it directly and patch initiate.sh to skip the
 # S3 lookup. Get this from: docker run --rm $PG17_IMAGE bash -c \
 #   'dirname $(dirname $(readlink -f /usr/lib/postgresql/bin/postgres))'
-PG17_NIX_STORE_PATH="/nix/store/dvxsqdc71wm6d6apf937dp17zl5diia3-postgresql-and-plugins-17.6"
+PG17_NIX_STORE_PATH_AMD64="/nix/store/992v0l3lsxxmb84cif0870kya1dyvq2c-postgresql-and-plugins-17.6"
+PG17_NIX_STORE_PATH_ARM64="/nix/store/dvxsqdc71wm6d6apf937dp17zl5diia3-postgresql-and-plugins-17.6"
 DB_CONTAINER="supabase-db"
 UPGRADE_CONTAINER="supabase-pg-upgrade"
 COMPLETE_CONTAINER="supabase-pg-complete"
@@ -389,16 +390,20 @@ SETUP
     # (aws s3 cp + jq). Self-hosted can't access that S3 bucket. We provide
     # fake "aws" and "jq" scripts that return our known store path, so
     # initiate.sh's existing code works unmodified.
-    local arch
+    local arch store_path
     arch=$(docker exec "$UPGRADE_CONTAINER" uname -m)
     local system="x86_64-linux"
-    [ "$arch" = "aarch64" ] && system="aarch64-linux"
+    store_path="$PG17_NIX_STORE_PATH_AMD64"
+    if [ "$arch" = "aarch64" ]; then
+        system="aarch64-linux"
+        store_path="$PG17_NIX_STORE_PATH_ARM64"
+    fi
 
     # Fake "aws" - writes a catalog JSON with the known store path
     # initiate.sh calls: aws s3 cp <src> <dst> --region ...
     # $4 is the destination file
     printf '#!/bin/sh\ncat > "$4" <<EOF\n{"%s": "%s"}\nEOF\n' \
-        "$system" "$PG17_NIX_STORE_PATH" \
+        "$system" "$store_path" \
         | docker exec -i "$UPGRADE_CONTAINER" tee /usr/local/bin/aws >/dev/null
     docker exec "$UPGRADE_CONTAINER" chmod +x /usr/local/bin/aws
 
