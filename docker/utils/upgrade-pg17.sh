@@ -344,12 +344,11 @@ build_tarball() {
             #   <bindir>/../share/postgresql/
             # so we need share/postgresql/ not just share/
             mkdir -p /export/17/share/postgresql
-            # Remove the cyclic symlink at timezonesets/timezonesets before copying.
-            # Without this, cp -rL may abort partway through, leaving files like
-            # timezonesets/Default uncopied. initdb then fails with:
-            #   FATAL: invalid value for parameter "timezone_abbreviations": "Default"
+            # Use tar instead of cp -rL for more reliable copying through the
+            # nix symlink farm. Remove the cyclic symlink at timezonesets/
+            # timezonesets first (-L follows symlinks, which would loop).
             rm -f /usr/share/postgresql/timezonesets/timezonesets 2>/dev/null || true
-            cp -rL /usr/share/postgresql/* /export/17/share/postgresql/
+            tar -cLf - -C /usr/share/postgresql . | tar -xf - -C /export/17/share/postgresql/
 
             # initiate.sh copies .control/.sql from PGLIBNEW to PGSHARENEW/extension/
             echo "  Copying extension definitions to lib..."
