@@ -1,6 +1,5 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import type { ChartConfig } from 'ui'
 import { Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
@@ -42,6 +41,12 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   postgrest: 'Auto-generated REST API for your database',
 }
 
+const CHART_CONFIG: ChartConfig = {
+  error_count: { label: 'Errors', color: 'hsl(var(--destructive-default))' },
+  warning_count: { label: 'Warnings', color: 'hsl(var(--warning-default))' },
+  ok_count: { label: 'Ok', color: 'hsl(var(--brand-default))' },
+}
+
 type ServiceRowProps = {
   service: ServiceConfig
   data: ServiceData
@@ -54,26 +59,6 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
   const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
 
   const reportUrl = service.reportUrl || service.logsUrl
-
-  const rateData = useMemo(
-    () =>
-      data.eventChartData.map((d) => {
-        const total = d.error_count + d.ok_count + d.warning_count
-        return {
-          timestamp: d.timestamp,
-          error_rate: total > 0 ? (d.error_count / total) * 100 : 0,
-          warning_rate: total > 0 ? (d.warning_count / total) * 100 : 0,
-          ok_rate: total > 0 ? (d.ok_count / total) * 100 : 0,
-        }
-      }),
-    [data.eventChartData]
-  )
-
-  const chartConfig: ChartConfig = {
-    error_rate: { label: 'Error rate', color: 'hsl(var(--destructive-default))' },
-    warning_rate: { label: 'Warning rate', color: 'hsl(var(--warning-default))' },
-    ok_rate: { label: 'Success rate', color: 'hsl(var(--brand-default))' },
-  }
 
   return (
     <Link
@@ -112,25 +97,22 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
         </div>
       </div>
 
-      <div className="h-16 rounded-sm bg-brand/5" onClick={(e) => e.preventDefault()}>
+      <div className="h-16" onClick={(e) => e.preventDefault()}>
         <Loading active={data.isLoading} isFullHeight>
           {data.isLoading ? (
             <div />
-          ) : rateData.length === 0 ? (
+          ) : data.eventChartData.length === 0 ? (
             <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
               No data
             </div>
           ) : (
             <ChartLine
-              data={rateData}
-              dataKey="error_rate"
-              dataKeys={['error_rate', 'warning_rate', 'ok_rate']}
-              sharedStackId="stack"
-              strokeKeys={['ok_rate']}
-              config={chartConfig}
+              data={data.eventChartData}
+              dataKey="error_count"
+              dataKeys={['ok_count', 'warning_count', 'error_count']}
+              config={CHART_CONFIG}
               DateTimeFormat={datetimeFormat}
               onLineClick={onBarClick}
-              YAxisProps={{ tickFormatter: (v: number) => `${v.toFixed(1)}%` }}
               className="h-full"
             />
           )}
