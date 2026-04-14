@@ -325,6 +325,20 @@ export const CreateBranchModal = () => {
                 )}
               />
 
+              {isLoadingConnections && (
+                <div className="flex flex-col gap-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
+              )}
+
+              {isErrorConnections && (
+                <AlertError
+                  error={connectionsError}
+                  subject="Failed to retrieve GitHub connection information"
+                />
+              )}
+
               {isSuccessConnections &&
                 (githubConnection ? (
                   <FormField_Shadcn_
@@ -395,15 +409,6 @@ export const CreateBranchModal = () => {
                     </Button>
                   </div>
                 ))}
-
-              {isLoadingConnections && <GenericSkeletonLoader />}
-
-              {isErrorConnections && (
-                <AlertError
-                  error={connectionsError}
-                  subject="Failed to retrieve GitHub connection information"
-                />
-              )}
 
               {allowDataBranching && (
                 <FormField_Shadcn_
