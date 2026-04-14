@@ -4764,10 +4764,7 @@ export interface components {
       payment_intent_id: string
       size?: string
     }
-    ConfirmRequestDto: {
-      organization_id?: number
-      organization_name?: string
-    }
+    ConfirmRequestDto: Record<string, never>
     ConfirmResponseDto: {
       organization_slug: string
       success: boolean
@@ -5139,12 +5136,7 @@ export interface components {
       | {
           billing_email: string | null
           /** @enum {string|null} */
-          billing_partner:
-            | 'fly'
-            | 'aws_marketplace'
-            | 'vercel_marketplace'
-            | 'stripe_projects'
-            | null
+          billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
           id: number
           is_owner: boolean
           name: string
@@ -6636,7 +6628,7 @@ export interface components {
       }[]
       billing_cycle_anchor: number
       /** @enum {string} */
-      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects'
+      billing_partner?: 'fly' | 'aws_marketplace' | 'vercel_marketplace'
       billing_via_partner: boolean
       current_period_end: number
       current_period_start: number
@@ -7009,6 +7001,10 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       NIMBUS_OAUTH_CLIENT_ID: string | null
+      PASSKEY_ENABLED: boolean
+      WEBAUTHN_RP_DISPLAY_NAME: string
+      WEBAUTHN_RP_ID: string
+      WEBAUTHN_RP_ORIGINS: string
       NIMBUS_OAUTH_CLIENT_SECRET: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
       OAUTH_SERVER_AUTHORIZATION_PATH: string | null
@@ -7683,7 +7679,7 @@ export interface components {
     OrganizationResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       id: number
       is_owner: boolean
       name: string
@@ -7753,7 +7749,7 @@ export interface components {
     OrganizationSlugResponse: {
       billing_email: string | null
       /** @enum {string|null} */
-      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | 'stripe_projects' | null
+      billing_partner: 'fly' | 'aws_marketplace' | 'vercel_marketplace' | null
       has_oriole_project: boolean
       id: number
       name: string
@@ -10338,6 +10334,10 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
       NIMBUS_OAUTH_CLIENT_ID?: string | null
+      PASSKEY_ENABLED?: boolean | null
+      WEBAUTHN_RP_DISPLAY_NAME?: string | null
+      WEBAUTHN_RP_ID?: string | null
+      WEBAUTHN_RP_ORIGINS?: string | null
       NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
       OAUTH_SERVER_AUTHORIZATION_PATH?: string | null

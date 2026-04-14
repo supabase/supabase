@@ -19,7 +19,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-  UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
   UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
@@ -119,6 +118,8 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
+  STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
+    `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
   PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
 
   /**
@@ -163,7 +164,6 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
 ]

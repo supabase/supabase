@@ -2,7 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
-import { useRestartPipelineHelper } from './restart-pipeline-helper'
+import { startPipeline } from './start-pipeline-mutation'
+import { stopPipeline } from './stop-pipeline-mutation'
+import { PipelineStatusName } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -18,6 +20,7 @@ type RollbackTablesParams = {
   pipelineId: number
   target: RollbackTablesTarget
   rollbackType: RollbackType
+  pipelineStatusName?: PipelineStatusName
 }
 
 type RolledBackTable = {
@@ -34,7 +37,7 @@ type RollbackTablesResponse = {
 }
 
 async function rollbackTables(
-  { projectRef, pipelineId, target, rollbackType }: RollbackTablesParams,
+  { projectRef, pipelineId, target, rollbackType, pipelineStatusName }: RollbackTablesParams,
   signal?: AbortSignal
 ): Promise<RollbackTablesResponse> {
   if (!projectRef) throw new Error('Project reference is required')
@@ -49,8 +52,42 @@ async function rollbackTables(
       signal,
     }
   )
-
   if (error) handleError(error)
+
+  // Logic for starting the pipeline back up after a successfull rollback
+  if (pipelineStatusName) {
+    const shouldStartPipelineAfterRollback = [
+      PipelineStatusName.STOPPED,
+      PipelineStatusName.STARTED,
+      PipelineStatusName.FAILED,
+    ].includes(pipelineStatusName)
+
+    try {
+      if (pipelineStatusName === PipelineStatusName.STOPPED) {
+        await startPipeline({ projectRef, pipelineId })
+      } else if (
+        pipelineStatusName === PipelineStatusName.STARTED ||
+        pipelineStatusName === PipelineStatusName.FAILED
+      ) {
+        await stopPipeline({ projectRef, pipelineId })
+        await startPipeline({ projectRef, pipelineId })
+      } else {
+        // [Joshen] This error sounds misleading as though the rollback failed?
+        throw new Error(
+          `Cannot apply rollback while pipeline status is ${
+            pipelineStatusName || 'unknown'
+          }. Retry once the pipeline status is started, failed, or stopped.`
+        )
+      }
+    } catch (error) {
+      if (shouldStartPipelineAfterRollback) {
+        throw new Error('RESTART_FAILED', { cause: error })
+      } else {
+        throw new Error('RESTART_SKIPPED')
+      }
+    }
+  }
+
   return data
 }
 
@@ -65,22 +102,11 @@ export const useRollbackTablesMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { restartPipeline } = useRestartPipelineHelper()
 
   return useMutation<RollbackTablesData, ResponseError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, pipelineId } = variables
-
-      // Restart the pipeline (stop + start)
-      try {
-        await restartPipeline({ projectRef, pipelineId })
-      } catch (error: any) {
-        toast.error(`Rollback succeeded but failed to restart pipeline: ${error.message}`)
-        throw error
-      }
-
-      // Invalidate queries after restart to get the latest state
+      const { projectRef, pipelineId, pipelineStatusName } = variables
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
@@ -89,12 +115,23 @@ export const useRollbackTablesMutation = ({
           queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
         }),
       ])
-
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to rollback tables: ${data.message}`)
+        if (data.message === 'RESTART_FAILED') {
+          const cause = (data as Error).cause
+          const causeMessage = cause instanceof Error ? cause.message : undefined
+          toast.error(
+            `Rollback completed, but failed to start the pipeline${causeMessage ? `: ${causeMessage}` : ''}`
+          )
+        } else if (data.message === 'RESTART_SKIPPED') {
+          toast(
+            'Rollback completed, but the pipeline state changed before it could be resumed. Refresh the page and try again.'
+          )
+        } else {
+          toast.error(`Failed to rollback tables: ${data.message}`)
+        }
       } else {
         onError(data, variables, context)
       }

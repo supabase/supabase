@@ -224,9 +224,22 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               (x) =>
                 ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
-            const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
-              x.toLowerCase().endsWith('_enabled')
-            )
+            const enabledProperty =
+              provider.name.toLowerCase() === 'web3'
+                ? (
+                    {
+                      solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
+                      ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
+                    } as const
+                  )[
+                    (
+                      (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
+                        ?.chain ?? ''
+                    ).toLowerCase() as 'solana' | 'ethereum'
+                  ]
+                : Object.keys(providerMeta?.properties ?? {}).find((x) =>
+                    x.toLowerCase().endsWith('_enabled')
+                  )
             const providerName =
               provider.name === 'email'
                 ? provider.name.toLowerCase()

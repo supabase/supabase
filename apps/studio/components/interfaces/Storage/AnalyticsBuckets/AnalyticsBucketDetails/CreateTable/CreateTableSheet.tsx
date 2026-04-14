@@ -10,10 +10,10 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
@@ -256,14 +256,16 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                   control={form.control}
                                   name={`columns.${idx}.name`}
                                   render={({ field }) => (
-                                    <FormControl_Shadcn_>
-                                      <Input_Shadcn_
-                                        {...field}
-                                        placeholder="Provide a column name"
-                                        disabled={isCreating}
-                                        className="h-auto"
-                                      />
-                                    </FormControl_Shadcn_>
+                                    <FormItemLayout>
+                                      <FormControl_Shadcn_>
+                                        <Input_Shadcn_
+                                          {...field}
+                                          placeholder="Provide a column name"
+                                          disabled={isCreating}
+                                          className="h-auto"
+                                        />
+                                      </FormControl_Shadcn_>
+                                    </FormItemLayout>
                                   )}
                                 />
                                 <FormField_Shadcn_
@@ -308,26 +310,28 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                                           key={`columns.${idx}.${x.name}`}
                                           name={`columns.${idx}.${x.name}` as any}
                                           render={({ field }) => (
-                                            <InputGroup>
-                                              <InputGroupAddon align="inline-start">
-                                                {x.name}
-                                              </InputGroupAddon>
+                                            <FormItemLayout>
                                               <FormControl_Shadcn_>
-                                                <InputGroupInput
-                                                  {...field}
-                                                  type={x.type === 'number' ? 'number' : 'text'}
-                                                  disabled={isCreating}
-                                                  className="h-[34px] rounded-l-none"
-                                                  onChange={(event) =>
-                                                    field.onChange(
-                                                      isNaN(event.target.valueAsNumber)
-                                                        ? null
-                                                        : event.target.valueAsNumber
-                                                    )
-                                                  }
-                                                />
+                                                <InputGroup>
+                                                  <InputGroupAddon align="inline-start">
+                                                    {x.name}
+                                                  </InputGroupAddon>
+                                                  <FormInputGroupInput
+                                                    {...field}
+                                                    type={x.type === 'number' ? 'number' : 'text'}
+                                                    disabled={isCreating}
+                                                    className="h-[34px] rounded-l-none"
+                                                    onChange={(event) =>
+                                                      field.onChange(
+                                                        isNaN(event.target.valueAsNumber)
+                                                          ? null
+                                                          : event.target.valueAsNumber
+                                                      )
+                                                    }
+                                                  />
+                                                </InputGroup>
                                               </FormControl_Shadcn_>
-                                            </InputGroup>
+                                            </FormItemLayout>
                                           )}
                                         />
                                       ))}

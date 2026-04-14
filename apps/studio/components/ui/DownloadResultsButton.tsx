@@ -143,7 +143,7 @@ export const DownloadResultsButton = ({
         )}
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
           <Copy size={14} />
-          <p>Copy as markdown</p>
+          <p>Copy as Markdown</p>
           <span className="ml-auto">
             <KeyboardShortcut keys={['Shift', 'Meta', 'm']} />
           </span>

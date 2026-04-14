@@ -70,7 +70,16 @@ const rewrites = [
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
   },
   {
-    source: '/llms/:path(.*\\.txt$)',
+    source: '/llms-full.txt',
+    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms-full.txt`,
+  },
+  // Docs-generated LLM source files. Scoped to known doc slugs so that
+  // marketing .txt files in www/public/llms/ (e.g. database.txt, auth.txt)
+  // are served directly from public/ without being proxied to the docs app.
+  // Update this list when adding new SDK sources in apps/docs/scripts/llms.ts.
+  // Current slugs: guides, js, dart, swift, kotlin, python, csharp, cli
+  {
+    source: '/llms/:path((?:guides|js|dart|swift|kotlin|python|csharp|cli)\\.txt)',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms/:path`,
   },
   { source: '/feed.xml', destination: `/rss.xml` },
