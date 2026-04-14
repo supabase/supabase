@@ -1,4 +1,4 @@
-import { object, string } from 'yup'
+import * as z from 'zod'
 
 import type { FormSchema } from '@/types'
 
@@ -19,9 +19,9 @@ const CONFIRMATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .ConfirmationURL }}\` : URL to confirm the email address for the new account
-- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .Token }}\` : The 6-digit numeric email OTP
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
@@ -30,8 +30,8 @@ const CONFIRMATION: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_CONFIRMATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_CONFIRMATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -53,9 +53,9 @@ const INVITE: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .ConfirmationURL }}\` : URL to accept the invitation to create an account
-- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .Token }}\` : The 6-digit numeric email OTP
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
@@ -64,8 +64,8 @@ const INVITE: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_INVITE: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_INVITE: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -87,9 +87,9 @@ const MAGIC_LINK: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .ConfirmationURL }}\` : URL for a one-time login to the user's account
-- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .Token }}\` : The 6-digit numeric email OTP
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
@@ -98,8 +98,8 @@ const MAGIC_LINK: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_MAGIC_LINK: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_MAGIC_LINK: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -121,9 +121,9 @@ const EMAIL_CHANGE: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .ConfirmationURL }}\` : URL to confirm the email change
-- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .Token }}\` : The 6-digit numeric email OTP
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The original user's email address
@@ -133,8 +133,8 @@ const EMAIL_CHANGE: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_EMAIL_CHANGE: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_EMAIL_CHANGE: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -156,9 +156,9 @@ const RECOVERY: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .ConfirmationURL }}\` : URL to confirm the password reset
-- \`{{ .Token }}\` : The 6-digit numeric email OTP 
+- \`{{ .Token }}\` : The 6-digit numeric email OTP
 - \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
@@ -167,8 +167,8 @@ const RECOVERY: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_RECOVERY: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_RECOVERY: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -197,8 +197,8 @@ const REAUTHENTICATION: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_REAUTHENTICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_REAUTHENTICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'authentication',
@@ -221,14 +221,14 @@ const PASSWORD_CHANGED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -250,15 +250,15 @@ const EMAIL_CHANGED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's new email address
 - \`{{ .OldEmail }}\` : The user's old email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -280,7 +280,7 @@ const PHONE_CHANGED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Phone }}\` : The user's new phone number
 - \`{{ .OldPhone }}\` : The user's old phone number
@@ -288,8 +288,8 @@ const PHONE_CHANGED_NOTIFICATION: FormSchema = {
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -311,15 +311,15 @@ const IDENTITY_LINKED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Provider }}\` : The provider of the newly linked identity
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -341,15 +341,15 @@ const IDENTITY_UNLINKED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Provider }}\` : The provider of the unlinked identity
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -372,15 +372,15 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .FactorType }}\` : The type of the newly enrolled MFA factor
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',
@@ -403,15 +403,15 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: FormSchema = {
       title: 'Body',
       descriptionOptional: 'HTML body of your email',
       type: 'code',
-      description: ` 
+      description: `
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .FactorType }}\` : The type of the newly enrolled MFA factor
 - \`{{ .Data }}\` : The user's \`user_metadata\`
 `,
     },
   },
-  validationSchema: object().shape({
-    MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: string().required('Subject is required.'),
+  validationSchema: z.object({
+    MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
   misc: {
     emailTemplateType: 'security',

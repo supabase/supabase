@@ -1,11 +1,14 @@
-const { withSentryConfig } = require('@sentry/nextjs')
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+/* eslint-disable no-restricted-exports */
+
+import bundleAnalyzer from '@next/bundle-analyzer'
+import { withSentryConfig } from '@sentry/nextjs'
+import type { NextConfig } from 'next'
+
+import { getCSP } from './csp'
+
+const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
-const { getCSP } = require('./csp')
-
-// Required for nextjs standalone build
-const path = require('path')
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN
@@ -23,12 +26,13 @@ function getAssetPrefix() {
       ? 'https://frontend-assets.supabase.green'
       : 'https://frontend-assets.supabase.com'
 
-  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 12)}`
+  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
 }
 
-/**
- * @type {import('next').NextConfig}
- */
+// Use `satisfies` instead of `: NextConfig` so TypeScript preserves narrow
+// inferred types (e.g. async headers → Promise). This avoids TS2345 when
+// wrapper functions (bundle-analyzer, sentry) resolve their `next` peer
+// types to a different major version than studio's own next dependency.
 const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: getAssetPrefix(),
@@ -41,7 +45,7 @@ const nextConfig = {
       {
         source: `/.well-known/vercel/flags`,
         destination: `https://supabase.com/.well-known/vercel/flags`,
-        basePath: false,
+        basePath: false as const,
       },
     ]
   },
@@ -53,7 +57,7 @@ const nextConfig = {
               source: '/',
               has: [
                 {
-                  type: 'query',
+                  type: 'query' as const,
                   key: 'next',
                   value: 'new-project',
                 },
@@ -468,7 +472,7 @@ const nextConfig = {
             {
               source: '/',
               destination: process.env.NEXT_PUBLIC_BASE_PATH,
-              basePath: false,
+              basePath: false as const,
               permanent: false,
             },
           ]
@@ -609,45 +613,41 @@ const nextConfig = {
     // For production, we run typechecks separate from the build command (pnpm typecheck && pnpm build)
     ignoreBuildErrors: true,
   },
-}
+} satisfies NextConfig
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 const platformConfig =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? withBundleAnalyzer(nextConfig) : nextConfig
 
-module.exports =
-  process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
-    ? withSentryConfig(platformConfig, {
-        silent: true,
+export default process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' && process.env.VERCEL === '1'
+  ? withSentryConfig(platformConfig, {
+      silent: true,
 
-        // For all available options, see:
-        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-        // Upload a larger set of source maps for prettier stack traces (increases build time)
-        widenClientFileUpload: true,
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
-        // Automatically annotate React components to show their full name in breadcrumbs and session replay
-        reactComponentAnnotation: {
-          enabled: true,
-        },
+      // Automatically annotate React components to show their full name in breadcrumbs and session replay
+      reactComponentAnnotation: {
+        enabled: true,
+      },
 
-        // Hides source maps from generated client bundles
-        hideSourceMaps: true,
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
 
-        // Automatically tree-shake Sentry logger statements to reduce bundle size
-        disableLogger: true,
+      // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+      // See the following for more information:
+      // https://docs.sentry.io/product/crons/
+      // https://vercel.com/docs/cron-jobs
+      automaticVercelMonitors: true,
 
-        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-        // See the following for more information:
-        // https://docs.sentry.io/product/crons/
-        // https://vercel.com/docs/cron-jobs
-        automaticVercelMonitors: true,
-
-        // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
-        // distinguish our code from browser extensions / injected scripts at runtime.
-        unstable_sentryWebpackPluginOptions: {
-          applicationKey: 'supabase-studio',
-        },
-      })
-    : platformConfig
+      // Annotate bundles at build time so thirdPartyErrorFilterIntegration can
+      // distinguish our code from browser extensions / injected scripts at runtime.
+      unstable_sentryWebpackPluginOptions: {
+        applicationKey: 'supabase-studio',
+      },
+    })
+  : platformConfig
