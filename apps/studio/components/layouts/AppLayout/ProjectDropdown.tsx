@@ -12,11 +12,13 @@ import { sanitizeRoute } from './ProjectDropdown.utils'
 import { ProjectRowLink } from './ProjectRowLink'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 // --- Sub-components ---
 
@@ -90,6 +92,8 @@ function ProjectDropdownPlatformView({
   projectName,
   selectorProps,
 }: ProjectDropdownPlatformViewProps) {
+  const projectLevelMockPartner = { managed_by: MANAGED_BY.STRIPE_PROJECTS } // temporary DEPR-425 override
+
   return (
     <div className="flex items-center flex-shrink-0">
       <Link
@@ -100,6 +104,7 @@ function ProjectDropdownPlatformView({
         <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
           {projectName}
         </span>
+        <PartnerIcon organization={projectLevelMockPartner} />
       </Link>
 
       <OrganizationProjectSelector
