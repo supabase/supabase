@@ -74,7 +74,7 @@ export const useAvailableIntegrations = () => {
       siteUrl,
       installUrl,
       installUrlType: installUrlType ?? undefined,
-      installMethod: installMethod ?? undefined,
+      installIdentificationMethod: installMethod ?? undefined,
       secretKeyPrefix: secretKeyPrefix ?? undefined,
       listingId: listingId ?? undefined,
       author,
