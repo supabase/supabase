@@ -34,10 +34,13 @@ export function getEditorSelectionParts(
   const startLineIndex = selection.startLineNumber - 1
   const endLineIndex = selection.endLineNumber
 
+  const beforeLines = allLines.slice(0, startLineIndex)
+  const afterLines = allLines.slice(endLineIndex)
+
   return {
     selection: allLines.slice(startLineIndex, endLineIndex).join('\n'),
-    beforeSelection: allLines.slice(0, startLineIndex).join('\n') + '\n',
-    afterSelection: '\n' + allLines.slice(endLineIndex).join('\n'),
+    beforeSelection: beforeLines.length > 0 ? beforeLines.join('\n') + '\n' : '',
+    afterSelection: afterLines.length > 0 ? '\n' + afterLines.join('\n') : '',
     startLineNumber: selection.startLineNumber,
     endLineNumber: selection.endLineNumber,
   }

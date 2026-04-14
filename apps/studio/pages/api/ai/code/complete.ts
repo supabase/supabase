@@ -36,7 +36,7 @@ type SchemaListResult =
   | { error: true }
   | { error: false; queriedSchemas: string[]; otherSchemas: string[] }
 
-type SchemaDDLResult = { error: true } | { error: false; defs: string | null }
+type SchemaDDLResult = { error: true } | { error: false; sqlDefinitions: string[] }
 
 async function fetchSchemas(
   includeSchema: boolean,
@@ -60,7 +60,7 @@ async function fetchSchemaDDL(
   schemas: string[],
   { projectRef, connectionString, headers }: SqlFetchParams
 ): Promise<SchemaDDLResult> {
-  if (schemas.length === 0) return { error: false, defs: null }
+  if (schemas.length === 0) return { error: false, sqlDefinitions: [] }
   try {
     const { result } = await executeSql<EntityDefinitionRow[]>(
       { projectRef, connectionString, sql: getEntityDefinitionsSql({ schemas }) },
@@ -68,8 +68,11 @@ async function fetchSchemaDDL(
       headers,
       IS_PLATFORM ? undefined : executeQuery
     )
-    const defs = result?.[0]?.data?.definitions?.map((d) => d.sql).join('\n\n') ?? null
-    return { error: false, defs }
+    const definitions = result?.[0]?.data?.definitions ?? []
+    return {
+      error: false,
+      sqlDefinitions: definitions.map((d) => d.sql),
+    }
   } catch {
     return { error: true }
   }
@@ -104,7 +107,11 @@ function buildDatabaseSchemaSection({
   if (schemaDDLResult.error) {
     lines.push('Failed to fetch table definitions due to a database error.')
   } else {
-    lines.push(`\n${schemaDDLResult.defs ?? 'No table definitions found.'}`)
+    const defsText =
+      schemaDDLResult.sqlDefinitions.length > 0
+        ? schemaDDLResult.sqlDefinitions.join('\n\n')
+        : 'No table definitions found.'
+    lines.push(`\n${defsText}`)
   }
 
   return lines.join('\n')
@@ -283,7 +290,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                   })
                   if (result.error)
                     return 'Failed to fetch schema definitions due to a database error.'
-                  return result.defs ?? ''
+                  return result.sqlDefinitions.join('\n\n')
                 },
               }),
             }
