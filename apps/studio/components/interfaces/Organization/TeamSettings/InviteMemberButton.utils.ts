@@ -1,10 +1,11 @@
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 
 export function parseEmails(value: string): string[] {
-  return value
+  const emails = value
     .split(',')
     .map((e) => e.trim())
     .filter(Boolean)
+  return [...new Set(emails)]
 }
 
 export type CategorizedEmails = {
