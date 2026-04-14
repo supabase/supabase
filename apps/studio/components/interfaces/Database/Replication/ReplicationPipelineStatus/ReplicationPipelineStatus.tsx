@@ -40,6 +40,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
 import {
+  getPipelineDisplayState,
   getStatusName,
   PIPELINE_ACTIONABLE_STATES,
   PIPELINE_ERROR_MESSAGES,
@@ -141,6 +142,7 @@ export const ReplicationPipelineStatus = () => {
 
   const destinationName = pipeline?.destination_name
   const statusName = getStatusName(pipelineStatusData?.status)
+  const displayState = getPipelineDisplayState(requestStatus, statusName)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
   // Sort tables by name for consistent ordering (memoized)
@@ -204,14 +206,15 @@ export const ReplicationPipelineStatus = () => {
     pipelineId ? `?f=${encodeURIComponent(JSON.stringify({ pipeline_id: pipelineId }))}` : ''
   }`
 
-  const label =
-    statusName === PipelineStatusName.STOPPED
+  const label = isEnablingDisabling
+    ? displayState.label
+    : statusName === PipelineStatusName.STOPPED
       ? 'Start'
       : statusName === PipelineStatusName.STARTED
         ? 'Stop'
         : statusName === PipelineStatusName.FAILED
           ? 'Restart'
-          : statusName
+          : displayState.label
 
   const icon =
     statusName === PipelineStatusName.STOPPED ? (
@@ -290,6 +293,8 @@ export const ReplicationPipelineStatus = () => {
               onClick={onPrimaryAction}
               loading={
                 isPipelineError ||
+                displayState.tone === 'loading' ||
+                isEnablingDisabling ||
                 isStartingPipeline ||
                 isStoppingPipeline ||
                 isAnyRestartInProgress

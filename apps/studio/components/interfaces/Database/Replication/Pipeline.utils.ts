@@ -38,89 +38,121 @@ export const PIPELINE_ACTIONABLE_STATES: PipelineStatusName[] = [
   PipelineStatusName.STOPPED,
 ]
 
-const PIPELINE_STATE_MESSAGES = {
-  enabling: {
+export type PipelineDisplayStateKey =
+  | 'starting'
+  | 'stopping'
+  | 'restarting'
+  | 'failed'
+  | 'stopped'
+  | 'running'
+  | 'unknown'
+
+export type PipelineDisplayTone = 'failure' | 'loading' | 'success' | 'idle'
+export type PipelineDisplayAccent = 'brand' | 'warning' | 'danger' | 'neutral' | 'success'
+
+export interface PipelineDisplayState {
+  key: PipelineDisplayStateKey
+  label: string
+  title: string
+  message: string
+  badge: string
+  tone: PipelineDisplayTone
+  accent: PipelineDisplayAccent
+}
+
+const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplayState> = {
+  starting: {
+    key: 'starting',
+    label: 'Starting',
     title: 'Starting pipeline',
     message: 'Starting the pipeline. Replication will resume once running.',
     badge: 'Starting',
+    tone: 'loading',
+    accent: 'brand',
   },
-  disabling: {
+  stopping: {
+    key: 'stopping',
+    label: 'Stopping',
     title: 'Stopping pipeline',
-    message: 'Stopping the pipeline. Replication will be paused once stopped.',
+    message: 'Stopping replication. Data transfer will be paused once stopped.',
     badge: 'Stopping',
+    tone: 'loading',
+    accent: 'warning',
   },
   restarting: {
+    key: 'restarting',
+    label: 'Restarting',
     title: 'Restarting pipeline',
     message: 'Applying settings and restarting the pipeline.',
     badge: 'Restarting',
+    tone: 'loading',
+    accent: 'brand',
   },
   failed: {
+    key: 'failed',
+    label: 'Failed',
     title: 'Pipeline failed',
     message: 'Replication has encountered an error.',
     badge: 'Failed',
+    tone: 'failure',
+    accent: 'danger',
   },
   stopped: {
+    key: 'stopped',
+    label: 'Stopped',
     title: 'Pipeline stopped',
     message: 'Replication is paused. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
-  },
-  starting: {
-    title: 'Pipeline starting',
-    message: 'Initializing replication. Table status will be available once running.',
-    badge: 'Starting',
-  },
-  stopping: {
-    title: 'Pipeline stopping',
-    message: 'Stopping replication. Data transfer will be paused once stopped',
-    badge: 'Stopping',
+    tone: 'idle',
+    accent: 'neutral',
   },
   running: {
+    key: 'running',
+    label: 'Running',
     title: 'Pipeline running',
-    message: 'Replication is active and processing changes',
+    message: 'Replication is active and processing changes.',
     badge: 'Running',
+    tone: 'success',
+    accent: 'success',
   },
   unknown: {
+    key: 'unknown',
+    label: 'Unknown',
     title: 'Pipeline status unknown',
     message: 'Unable to determine pipeline status.',
     badge: 'Unknown',
+    tone: 'idle',
+    accent: 'warning',
   },
-  notRunning: {
-    title: 'Pipeline not running',
-    message: 'Replication is not active. Start the pipeline to begin data synchronization.',
-    badge: 'Stopped',
-  },
-} as const
+}
 
-export const getPipelineStateMessages = (
+export const getPipelineDisplayState = (
   requestStatus?: PipelineStatusRequestStatus,
   statusName?: PipelineStatusName
-) => {
-  // Reflect optimistic request intent immediately after click
+): PipelineDisplayState => {
   if (requestStatus === PipelineStatusRequestStatus.RestartRequested) {
-    return PIPELINE_STATE_MESSAGES.restarting
+    return PIPELINE_DISPLAY_STATES.restarting
   }
   if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
-    return PIPELINE_STATE_MESSAGES.enabling
+    return PIPELINE_DISPLAY_STATES.starting
   }
   if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
-    return PIPELINE_STATE_MESSAGES.disabling
+    return PIPELINE_DISPLAY_STATES.stopping
   }
 
-  // Fall back to steady states
   switch (statusName) {
     case PipelineStatusName.STARTING:
-      return PIPELINE_STATE_MESSAGES.starting
+      return PIPELINE_DISPLAY_STATES.starting
     case PipelineStatusName.FAILED:
-      return PIPELINE_STATE_MESSAGES.failed
+      return PIPELINE_DISPLAY_STATES.failed
     case PipelineStatusName.STOPPED:
-      return PIPELINE_STATE_MESSAGES.stopped
+      return PIPELINE_DISPLAY_STATES.stopped
     case PipelineStatusName.STARTED:
-      return PIPELINE_STATE_MESSAGES.running
+      return PIPELINE_DISPLAY_STATES.running
     case PipelineStatusName.STOPPING:
-      return PIPELINE_STATE_MESSAGES.stopping
+      return PIPELINE_DISPLAY_STATES.stopping
     case PipelineStatusName.UNKNOWN:
-      return PIPELINE_STATE_MESSAGES.unknown
     default:
-      return PIPELINE_STATE_MESSAGES.notRunning
+      return PIPELINE_DISPLAY_STATES.unknown
   }
 }
