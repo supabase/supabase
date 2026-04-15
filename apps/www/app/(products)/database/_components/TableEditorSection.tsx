@@ -3,36 +3,44 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { FileDown, Link2, Table, TableProperties } from 'lucide-react'
 import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { cn } from 'ui'
+import { SpreadsheetIllustration } from './Illustrations/SpreadsheetIllustration'
 
 const ICONS = { TableProperties, Table, Link2, FileDown } as const
 
 type IconName = keyof typeof ICONS
 
-const TABS = [
+type Tab = {
+  icon: IconName
+  label: string
+  description: string
+  image: string | ReactNode
+}
+
+const TABS: Tab[] = [
   {
-    icon: 'TableProperties' as IconName,
+    icon: 'TableProperties',
     label: 'Spreadsheet editing',
     description: 'Add, edit, and update your data with the simplicity of a no-code tool.',
-    image: '/images/product/database/table-view/spreadsheet-interface.png',
+    image: <SpreadsheetIllustration />,
   },
   {
-    icon: 'Table' as IconName,
+    icon: 'Table',
     label: 'Create tables',
     description:
       'Add tables, columns and rows right in the dashboard. Without a single line of SQL.',
     image: '/images/product/database/table-view/create-table.png',
   },
   {
-    icon: 'Link2' as IconName,
+    icon: 'Link2',
     label: 'Foreign keys',
     description: 'Build connections across tables with the full power of relational data.',
     image: '/images/product/database/table-view/foreign-keys.png',
   },
   {
-    icon: 'FileDown' as IconName,
+    icon: 'FileDown',
     label: 'Export to CSV',
     description: 'Pick the rows you want and export them into a CSV.',
     image: '/images/product/database/table-view/export.png',
@@ -141,15 +149,25 @@ export function TableEditorSection() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.05 } }}
                   exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                  className="absolute inset-0 flex items-end justify-center px-6"
+                  className={`absolute inset-0 ${
+                    typeof active.image === 'string'
+                      ? 'flex items-end justify-center px-6'
+                      : 'flex items-end justify-end'
+                  }`}
                 >
-                  <Image
-                    src={active.image}
-                    alt={active.label}
-                    width={600}
-                    height={400}
-                    className="rounded-lg object-contain -mb-4"
-                  />
+                  {typeof active.image === 'string' ? (
+                    <Image
+                      src={active.image}
+                      alt={active.label}
+                      width={600}
+                      height={400}
+                      className="rounded-lg object-contain -mb-4"
+                    />
+                  ) : (
+                    <div className="w-[115%] translate-x-[8%] translate-y-[12%]">
+                      {active.image}
+                    </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
