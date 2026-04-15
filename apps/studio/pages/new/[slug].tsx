@@ -38,6 +38,10 @@ import { ProjectCreationFooter } from '@/components/interfaces/ProjectCreation/P
 import { ProjectNameInput } from '@/components/interfaces/ProjectCreation/ProjectNameInput'
 import { RegionSelector } from '@/components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from '@/components/interfaces/ProjectCreation/SecurityOptions'
+import {
+  GitHubRepositoryField,
+  useGitHubRepositoryOptions,
+} from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from '@/components/layouts/WizardLayout'
 import Panel from '@/components/ui/Panel'
@@ -58,6 +62,7 @@ import {
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -94,7 +99,14 @@ const Wizard: NextPageWithLayout = () => {
     ''
   )
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
+  )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+  const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
+    'integrations.github_connections'
+  )
 
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -136,6 +148,9 @@ const Wizard: NextPageWithLayout = () => {
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
       dbRegion: undefined,
+      githubRepositoryId: '',
+      githubInstallationId: undefined,
+      githubRepositoryName: '',
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
       enableRlsEventTrigger: false,
@@ -148,7 +163,9 @@ const Wizard: NextPageWithLayout = () => {
     instanceSize: watchedInstanceSize,
     cloudProvider,
     dbRegion,
+    githubRepositoryName,
     organization,
+    projectName: watchedProjectName,
     highAvailability,
   } = useWatch_Shadcn_({ control: form.control })
 
@@ -237,6 +254,8 @@ const Wizard: NextPageWithLayout = () => {
         : _defaultRegion
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
+  const canConfigureGitHubOnCreate =
+    canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
   const dbRegionExact = smartRegionToExactRegion(dbRegion ?? '')
 
@@ -256,6 +275,14 @@ const Wizard: NextPageWithLayout = () => {
       )
     : false
   const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
+  const {
+    gitHubAuthorization,
+    githubRepos,
+    hasPartialResponseDueToSSO,
+    isLoadingGitHubAuthorization,
+    isLoadingGitHubRepos,
+    refetchGitHubAuthorizationAndRepositories,
+  } = useGitHubRepositoryOptions()
 
   const {
     mutate: createProject,
@@ -426,6 +453,16 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [instanceSize, watchedInstanceSize, setValue])
 
+  useEffect(() => {
+    if (!githubRepositoryName) return
+    if ((watchedProjectName ?? '').trim().length > 0) return
+
+    const repoName = githubRepositoryName.split('/').at(-1) ?? githubRepositoryName
+    setValue('projectName', repoName.trim(), {
+      shouldValidate: true,
+    })
+  }, [githubRepositoryName, watchedProjectName, setValue])
+
   return (
     <>
       {/* Wizard layouts set the visual header but not the browser tab title. */}
@@ -466,6 +503,41 @@ const Wizard: NextPageWithLayout = () => {
 
                   {canCreateProject && (
                     <>
+                      {canConfigureGitHubOnCreate && (
+                        <Panel.Content>
+                          <GitHubRepositoryField
+                            form={form}
+                            name="githubRepositoryId"
+                            installationIdField="githubInstallationId"
+                            repositoryNameField="githubRepositoryName"
+                            label="GitHub repo"
+                            description={
+                              <>
+                                Optional. Ideal for agent-first workflows: update your schema in
+                                code, push it to GitHub, and Supabase deploys the changes
+                                automatically.{' '}
+                                <a
+                                  href="https://supabase.com/docs/guides/deployment/branching/github-integration"
+                                  target="_blank"
+                                  rel="noreferrer noopener"
+                                  className="text-link"
+                                >
+                                  Learn more
+                                </a>
+                              </>
+                            }
+                            disabled={isCreatingNewProject}
+                            repositories={githubRepos}
+                            gitHubAuthorization={gitHubAuthorization}
+                            hasPartialResponseDueToSSO={hasPartialResponseDueToSSO}
+                            isLoadingGitHubAuthorization={isLoadingGitHubAuthorization}
+                            isLoadingGitHubRepos={isLoadingGitHubRepos}
+                            refetchGitHubAuthorizationAndRepositories={
+                              refetchGitHubAuthorizationAndRepositories
+                            }
+                          />
+                        </Panel.Content>
+                      )}
                       <ProjectNameInput form={form} />
                       <HighAvailabilityInput form={form} />
 
