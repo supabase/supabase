@@ -327,13 +327,11 @@ const FormField = ({
                   label={properties.title}
                   description={
                     description ? (
-                      <ReactMarkdown
-                        unwrapDisallowed
-                        disallowedElements={['p']}
-                        className="form-field-markdown"
-                      >
-                        {description}
-                      </ReactMarkdown>
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
                     ) : null
                   }
                 >
