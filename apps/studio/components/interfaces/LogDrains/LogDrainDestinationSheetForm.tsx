@@ -46,10 +46,10 @@ import {
 import {
   getDefaultHeadersByType,
   getHeadersSectionDescription as getHeadersDescription,
+  HEADER_REDACTED_VALUE,
   headerRecordToRows,
   headerRowsToRecord,
   logDrainHeaderEntriesSchema,
-  omitRedactedHeaders,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
@@ -421,21 +421,26 @@ export function LogDrainDestinationSheetForm({
                       }
 
                     if ('headers' in submitValues) {
-                      // When updating, filter header values equal to REDACTED — those
-                      // are server-side placeholders for secrets we can't read back.
-                      // Sending the literal string would overwrite the real secret.
-                      // PATCH only updates what we send, so omitting keeps the
-                      // original value intact. But if the user cleared the list
-                      // intentionally, preserve the empty object to signal deletion.
                       const { headers, ...rest } = submitValuesWithHeaders
-                      const filteredHeaders = headers ? omitRedactedHeaders(headers) : undefined
-                      submitValues = (
-                        filteredHeaders
-                          ? { ...rest, headers: filteredHeaders }
-                          : explicitlyClearedHeaders
-                            ? { ...rest, headers: {} }
-                            : rest
-                      ) as LogDrainDestinationSubmitValues
+
+                      // If any header value is the REDACTED sentinel, the server's
+                      // stored value for that key is hidden from us. The PATCH endpoint
+                      // replaces the entire headers object (no per-key merging), so
+                      // sending a partial set would silently remove the hidden values
+                      // (e.g. an existing Authorization token). Omit headers from the
+                      // payload entirely — the server preserves whatever is stored.
+                      const hasRedactedValues =
+                        !!headers && Object.values(headers).some((v) => v === HEADER_REDACTED_VALUE)
+
+                      if (hasRedactedValues) {
+                        submitValues = rest as LogDrainDestinationSubmitValues
+                      } else if (explicitlyClearedHeaders) {
+                        submitValues = { ...rest, headers: {} } as LogDrainDestinationSubmitValues
+                      } else {
+                        submitValues = (
+                          headers && Object.keys(headers).length > 0 ? { ...rest, headers } : rest
+                        ) as LogDrainDestinationSubmitValues
+                      }
                     } else if (explicitlyClearedHeaders) {
                       // headers was absent (webhook/otlp with empty list) — still
                       // need to signal clearing to the server.
