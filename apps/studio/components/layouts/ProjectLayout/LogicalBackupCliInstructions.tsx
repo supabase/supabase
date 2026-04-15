@@ -5,17 +5,17 @@ import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  buildDirectPostgresConnectionUri,
+  buildLogicalBackupShellScript,
+  DB_PASSWORD_PLACEHOLDER,
+} from './LogicalBackupCliInstructions.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import {
-  DB_PASSWORD_PLACEHOLDER,
-  buildDirectPostgresConnectionUri,
-  buildLogicalBackupShellScript,
-} from './LogicalBackupCliInstructions.utils'
 
 export type LogicalBackupCliInstructionsProps = {
   enabled?: boolean

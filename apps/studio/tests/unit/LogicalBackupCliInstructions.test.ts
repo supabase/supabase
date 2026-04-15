@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import {
-  DB_PASSWORD_PLACEHOLDER,
   buildDirectPostgresConnectionUri,
   buildLogicalBackupShellScript,
+  DB_PASSWORD_PLACEHOLDER,
 } from '../../components/layouts/ProjectLayout/LogicalBackupCliInstructions.utils'
 
 describe('buildDirectPostgresConnectionUri', () => {
