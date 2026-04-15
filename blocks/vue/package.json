@@ -15,7 +15,7 @@
     "@vueuse/core": "^14.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "h3": "^1.15.10",
+    "h3": "^1.15.11",
     "lucide-vue-next": "^0.562.0",
     "nuxt": "^4.4.0",
     "tailwind-merge": "^3.3.1",
