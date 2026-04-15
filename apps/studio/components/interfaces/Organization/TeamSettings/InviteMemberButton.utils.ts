@@ -36,7 +36,7 @@ export const emailSchema = z
 export function parseEmails(value: string): string[] {
   const emails = value
     .split(',')
-    .map((e) => e.trim())
+    .map((e) => e.trim().toLowerCase())
     .filter(Boolean)
   return [...new Set(emails)]
 }
