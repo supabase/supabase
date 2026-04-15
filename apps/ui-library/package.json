@@ -72,7 +72,7 @@
     "openapi-fetch": "0.12.4",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-hook-form": "^7.45.0",
+    "react-hook-form": "^7.71.2",
     "react-markdown": "^10.1.0",
     "react-wrap-balancer": "^1.1.0",
     "recharts": "catalog:",
