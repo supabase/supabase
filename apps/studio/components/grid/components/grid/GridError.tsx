@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback } from 'react'
 import { Button } from 'ui'
@@ -13,6 +14,7 @@ import { HighCostError } from '@/components/ui/HighQueryCost'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { tableRowKeys } from '@/data/table-rows/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -22,6 +24,8 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
   const newFilterBarEnabled = useIsTableFilterBarEnabled()
   const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
   const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
@@ -37,6 +41,17 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
       clearOldFilters()
     }
   }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
+
+  const handleLoadData = useCallback(() => {
+    if (!!tableId) {
+      tableEditorSnap.setTableToIgnorePreflightCheck(tableId)
+
+      // Remove the cached error so useQuery re-fetches on the next render.
+      queryClient.removeQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(project?.ref, tableId),
+      })
+    }
+  }, [tableEditorSnap, tableId, queryClient, project?.ref])
 
   if (!error) return null
 
@@ -63,9 +78,7 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
           'Remove any sorts or filters on unindexed columns, or',
           'Create indexes for columns that you want to filter or sort on',
         ]}
-        onSelectLoadData={() => {
-          if (!!tableId) tableEditorSnap.setTableToIgnorePreflightCheck(tableId)
-        }}
+        onSelectLoadData={handleLoadData}
       />
     )
   } else if (isForeignTableMissingVaultKeyError) {

@@ -101,6 +101,7 @@ export const SubscriptionPlanUpdateDialog = ({
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+    validateBillingProfile: () => Promise<boolean>
   }>(null)
 
   const billingViaPartner = subscription?.billing_via_partner === true
@@ -179,6 +180,14 @@ export const SubscriptionPlanUpdateDialog = ({
     if (!selectedTier) return console.error('Selected plan is required')
 
     setPaymentConfirmationLoading(true)
+
+    if (paymentMethodSelectionRef.current) {
+      const isValid = await paymentMethodSelectionRef.current.validateBillingProfile()
+      if (!isValid) {
+        setPaymentConfirmationLoading(false)
+        return
+      }
+    }
 
     const result = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (result) {

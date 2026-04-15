@@ -143,6 +143,7 @@ const Wizard: NextPageWithLayout = () => {
       useOrioleDb: false,
     },
   })
+  const { getFieldState, resetField, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -157,7 +158,6 @@ const Wizard: NextPageWithLayout = () => {
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
-
   const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
     { slug },
     { enabled: isFreePlan }
@@ -223,7 +223,8 @@ const Wizard: NextPageWithLayout = () => {
     )
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
-    : undefined
+    : ''
+
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
@@ -384,43 +385,46 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
-    if (slug && slug !== '_') form.setValue('organization', slug)
-    if (projectName) form.setValue('projectName', projectName || '')
-  }, [slug])
+    if (slug && slug !== '_') setValue('organization', slug)
+    if (projectName) setValue('projectName', projectName || '')
+  }, [slug, setValue, projectName])
 
+  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
   useEffect(() => {
-    if (form.getValues('dbRegion') === undefined && defaultRegion) {
-      form.setValue('dbRegion', defaultRegion)
+    if (!isDbRegionDirty && defaultRegion) {
+      setValue('dbRegion', defaultRegion)
     }
-  }, [defaultRegion])
+  }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
     if (regionError) {
-      form.setValue('dbRegion', PROVIDERS[defaultProvider].default_region.displayName)
+      resetField('dbRegion', {
+        defaultValue: PROVIDERS[defaultProvider].default_region.displayName,
+      })
     }
-  }, [regionError])
+  }, [regionError, resetField, defaultProvider])
 
   useEffect(() => {
-    if (recommendedSmartRegion) {
-      form.setValue('dbRegion', recommendedSmartRegion)
+    if (!isDbRegionDirty && recommendedSmartRegion) {
+      setValue('dbRegion', recommendedSmartRegion)
     }
-  }, [recommendedSmartRegion])
+  }, [recommendedSmartRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      form.setValue('cloudProvider', 'AWS_K8S')
+      setValue('cloudProvider', 'AWS_K8S')
     }
-  }, [highAvailability, cloudProvider, form])
+  }, [highAvailability, cloudProvider, setValue])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
-      form.setValue('instanceSize', instanceSize, {
+      setValue('instanceSize', instanceSize, {
         shouldDirty: false,
         shouldValidate: false,
         shouldTouch: false,
       })
     }
-  }, [instanceSize, watchedInstanceSize, form])
+  }, [instanceSize, watchedInstanceSize, setValue])
 
   return (
     <>

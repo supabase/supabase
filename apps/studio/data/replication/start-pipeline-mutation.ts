@@ -10,7 +10,7 @@ export type StartPipelineParams = {
   pipelineId: number
 }
 
-async function startPipeline(
+export async function startPipeline(
   { projectRef, pipelineId }: StartPipelineParams,
   signal?: AbortSignal
 ) {
