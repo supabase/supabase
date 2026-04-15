@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertTriangle, BookOpen, ChevronDown, Wrench } from 'lucide-react'
+import { AlertTriangle, BookOpen, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
@@ -19,6 +19,7 @@ import { getWarningContent } from './ResourceExhaustionWarningBanner.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -35,6 +36,7 @@ export const ResourceExhaustionWarningBanner = () => {
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const track = useTrack()
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -151,6 +153,10 @@ export const ResourceExhaustionWarningBanner = () => {
           ?.aiPrompt
 
   const handleAskAI = () => {
+    track('resource_exhaustion_banner_ai_assistant_clicked', {
+      warningTypes: activeWarnings,
+      isFreePlan,
+    })
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialInput: aiPrompt })
   }
@@ -160,11 +166,16 @@ export const ResourceExhaustionWarningBanner = () => {
     warningContent === undefined || (!warningContent?.title && !warningContent?.description)
   const isUsageOrInfraPage =
     router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
+  // Compute warnings now link to compute-and-disk, so they should remain visible on infrastructure
   const onUsageOrInfraAndNotInReadOnlyMode =
-    isUsageOrInfraPage && !activeWarnings.includes('is_readonly_mode_enabled')
+    isUsageOrInfraPage &&
+    !activeWarnings.includes('is_readonly_mode_enabled') &&
+    !isComputeUpgradeMetric
+  // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
+  // compute-and-disk; free-plan links to billing instead, so we keep the banner visible for them.
   const onDatabaseSettingsAndInReadOnlyMode =
     router.pathname.endsWith('settings/compute-and-disk') &&
-    activeWarnings.includes('is_readonly_mode_enabled')
+    (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
   const activeWarning =
@@ -237,6 +248,7 @@ export const ResourceExhaustionWarningBanner = () => {
                 className="flex items-center gap-x-2 cursor-pointer"
                 onClick={handleAskAI}
               >
+                <Sparkles size={14} />
                 Ask AI Assistant
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -253,7 +265,18 @@ export const ResourceExhaustionWarningBanner = () => {
           </Button>
         ) : null}
         {correctionUrl !== undefined && (
-          <Button asChild type="primary" disabled={isOrgLoading}>
+          <Button
+            asChild
+            type="primary"
+            disabled={isComputeUpgradeMetric && isOrgLoading}
+            onClick={() =>
+              track('resource_exhaustion_banner_upgrade_clicked', {
+                warningTypes: activeWarnings,
+                isFreePlan,
+                destination: correctionUrl,
+              })
+            }
+          >
             <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
           </Button>
         )}

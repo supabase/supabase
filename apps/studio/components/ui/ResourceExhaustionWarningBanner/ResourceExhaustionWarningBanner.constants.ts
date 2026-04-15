@@ -18,7 +18,7 @@ interface ResourceWarningMessage {
   metric: string | null
 }
 
-export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
+export const RESOURCE_WARNING_MESSAGES: Record = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -54,12 +54,12 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         title:
           'Your project is about to deplete its Disk IO Budget, and may become unresponsive once fully exhausted',
         description:
-          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
+          'Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
       critical: {
         title: 'Your project has depleted its Disk IO Budget, and may become unresponsive',
         description:
-          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
+          'Upgrade your compute or use the AI Assistant to identify and optimize disk-intensive queries.',
       },
     },
     cardContent: {
@@ -111,12 +111,12 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       warning: {
         title: 'Your project is currently facing high CPU usage, and its performance is affected',
         description:
-          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
+          'Upgrade your compute or use the AI Assistant to identify and optimize CPU-intensive queries.',
       },
       critical: {
         title: "Your project's CPU usage is at 100% and its performance is affected",
         description:
-          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
+          'Upgrade your compute or use the AI Assistant to identify and optimize CPU-intensive queries.',
       },
     },
     cardContent: {
@@ -141,12 +141,12 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         title:
           'Your project is currently facing high memory usage, and its performance is affected',
         description:
-          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
+          'Upgrade your compute or use the AI Assistant to identify and optimize memory-intensive queries.',
       },
       critical: {
         title: "Your project's memory usage is at 100%, and its performance is affected",
         description:
-          'You will need to optimize your performance or upgrade your compute. Check the usage page for more recent and detailed statistics.',
+          'Upgrade your compute or use the AI Assistant to identify and optimize memory-intensive queries.',
       },
     },
     cardContent: {
@@ -199,12 +199,12 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
         title:
           'Your project is currently exhausting multiple resources, and its performance is affected',
         description:
-          "Check which resources are reaching their threshold on your project's usage page.",
+          'Upgrade your compute or use the AI Assistant to identify and optimize the most expensive queries.',
       },
       critical: {
         title: 'Your project has exhausted multiple resources, and its performance is affected',
         description:
-          "Check which resources have reached their threshold on your project's usage page.",
+          'Upgrade your compute or use the AI Assistant to identify and optimize the most expensive queries.',
       },
     },
     cardContent: {
