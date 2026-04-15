@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
+
 import { generatePricingContent } from '@/lib/llms'
 
 export const dynamic = 'force-dynamic'

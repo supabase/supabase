@@ -28,10 +28,7 @@ function pad(str: string, len: number): string {
   return str.padEnd(len)
 }
 
-function getColumnValue(
-  row: { columns: { key: string; value: unknown }[] },
-  key: string
-): unknown {
+function getColumnValue(row: { columns: { key: string; value: unknown }[] }, key: string): unknown {
   const col = row.columns.find((c) => c.key === key)
   if (!col) throw new Error(`Missing column "${key}"`)
   return col.value
@@ -76,8 +73,24 @@ function buildPlanTiersSection(): string {
 function buildComputeSection(): string {
   const rows = addOnTable.database.rows
 
-  const headers = ['Size', '$/month', 'CPU', 'Dedicated', 'RAM', 'Direct Connections', 'Pooler Connections']
-  const keys = ['plan', 'pricing', 'cpu', 'dedicated', 'memory', 'directConnections', 'poolerConnections']
+  const headers = [
+    'Size',
+    '$/month',
+    'CPU',
+    'Dedicated',
+    'RAM',
+    'Direct Connections',
+    'Pooler Connections',
+  ]
+  const keys = [
+    'plan',
+    'pricing',
+    'cpu',
+    'dedicated',
+    'memory',
+    'directConnections',
+    'poolerConnections',
+  ]
 
   const dataRows = rows.map((row) =>
     keys.map((key) => {
@@ -87,9 +100,7 @@ function buildComputeSection(): string {
     })
   )
 
-  const widths = headers.map((h, i) =>
-    Math.max(h.length, ...dataRows.map((r) => r[i].length))
-  )
+  const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
 
   const headerRow = `| ${headers.map((h, i) => pad(h, widths[i])).join(' | ')} |`
   const separator = `| ${widths.map((w) => '-'.repeat(w)).join(' | ')} |`
@@ -163,13 +174,25 @@ function findFeature(categoryKey: string, featureKey: string) {
 
 function buildAddOnsSection(): string {
   const addOns = [
-    ['Point-in-Time Recovery (PITR)', formatPlanValue(findFeature('database', 'database.pitr').plans.pro)],
+    [
+      'Point-in-Time Recovery (PITR)',
+      formatPlanValue(findFeature('database', 'database.pitr').plans.pro),
+    ],
     ['Custom Domain', formatPlanValue(findFeature('security', 'security.customDomains').plans.pro)],
-    ['Database Branching', formatPlanValue(findFeature('database', 'database.branching').plans.pro)],
-    ['Advanced MFA (Phone)', formatPlanValue(findFeature('auth', 'auth.advancedMFAPhone').plans.pro)],
+    [
+      'Database Branching',
+      formatPlanValue(findFeature('database', 'database.branching').plans.pro),
+    ],
+    [
+      'Advanced MFA (Phone)',
+      formatPlanValue(findFeature('auth', 'auth.advancedMFAPhone').plans.pro),
+    ],
     ['SAML/SSO Auth', formatPlanValue(findFeature('auth', 'auth.saml').plans.pro)],
     ['Log Drains', formatPlanValue(findFeature('security', 'security.logDrain').plans.pro)],
-    ['Image Transformations', formatPlanValue(findFeature('storage', 'storage.transformations').plans.pro)],
+    [
+      'Image Transformations',
+      formatPlanValue(findFeature('storage', 'storage.transformations').plans.pro),
+    ],
   ]
 
   const nameWidth = Math.max('Add-on'.length, ...addOns.map(([n]) => n.length))
