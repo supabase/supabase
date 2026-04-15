@@ -236,11 +236,9 @@ const getVonagePhoneProviderSchema = (optional = false) =>
     SMS_VONAGE_FROM: optional ? z.string() : z.string().min(1, 'Vonage From is required'),
   })
 
-const smsProviderEnabledSchema = z
-  .object({
-    EXTERNAL_PHONE_ENABLED: z.literal(true),
-  })
-  .passthrough()
+const smsProviderEnabledSchema = z.object({
+  EXTERNAL_PHONE_ENABLED: z.literal(true),
+})
 
 const smsProviderDisabledSchema = z
   .object({
@@ -347,13 +345,11 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     .merge(getVonagePhoneProviderSchema(true).partial())
 
   const enabledSchema = z
-    .discriminatedUnion('SMS_PROVIDER', [
-      twilioSchema,
-      twilioVerifySchema,
-      messagebirdSchema,
-      vonageSchema,
-      textlocalSchema,
-    ])
+    .discriminatedUnion(
+      'SMS_PROVIDER',
+      [twilioSchema, twilioVerifySchema, messagebirdSchema, vonageSchema, textlocalSchema],
+      { message: 'Invalid SMS provider', invalid_type_error: 'Invalid SMS provider' }
+    )
     .superRefine((values, ctx) => {
       if (values.SMS_TEST_OTP && !values.SMS_TEST_OTP_VALID_UNTIL) {
         ctx.addIssue({
@@ -364,17 +360,28 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
       }
     })
 
-  return z
-    .discriminatedUnion('EXTERNAL_PHONE_ENABLED', [
-      smsProviderDisabledSchema,
-      smsProviderEnabledSchema,
-    ])
-    .refine((values) => {
-      if (values.EXTERNAL_PHONE_ENABLED === true) {
-        return enabledSchema.parse(values)
-      }
-      return true
-    })
+  return (
+    z
+      .discriminatedUnion('EXTERNAL_PHONE_ENABLED', [
+        smsProviderDisabledSchema,
+        // Passthrough only here to allow other values to propagate
+        // Must not be applied directly to smsProviderEnabledSchema to allow zod to transform the other values correctly
+        smsProviderEnabledSchema.passthrough(),
+      ])
+      // Trick: use superRefine to conditionally parse the enabled schema
+      .superRefine((values) => {
+        if (values.EXTERNAL_PHONE_ENABLED === true) {
+          return enabledSchema.parse(values)
+        }
+      })
+      // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true
+      .transform((values) => {
+        if (values.EXTERNAL_PHONE_ENABLED === true) {
+          return enabledSchema.parse(values)
+        }
+        return values
+      })
+  )
 }
 
 export const PROVIDER_PHONE = {
