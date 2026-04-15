@@ -1,0 +1,6 @@
+<svg width="160" height="40" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="14" fill="#7e7e7e"/>
+  <circle cx="20" cy="20" r="9" fill="#ffffff"/>
+  <circle cx="20" cy="20" r="5" fill="#7e7e7e"/>
+  <text x="40" y="27" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="600" fill="#7e7e7e">Fastshot</text>
+</svg>

@@ -2,6 +2,7 @@ import React, { FC } from 'react'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '../Panel'
+import AIBuildersPartnersGrid from './AIBuildersPartnersGrid'
 import type { Testimonials } from '~/data/solutions/solutions.utils'
 
 export type Story = {
@@ -40,6 +41,7 @@ const EnterpriseSecurity: FC<Testimonials> = (props) => {
           </div>
         </Panel>
       </ul>
+      <AIBuildersPartnersGrid className="mt-12" />
     </SectionContainer>
   )
 }

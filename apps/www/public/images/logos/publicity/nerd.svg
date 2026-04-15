@@ -1,0 +1,8 @@
+<svg width="150" height="40" viewBox="0 0 150 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#7e7e7e" stroke-width="3.2">
+    <circle cx="12" cy="20.5" r="9"/>
+    <circle cx="32.5" cy="20.5" r="7.8"/>
+    <path d="M20.7 16.2c.7-1.8 2.4-1.8 3.2 0" stroke-linecap="round"/>
+  </g>
+  <text x="47" y="28.5" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#7e7e7e">nerd</text>
+</svg>

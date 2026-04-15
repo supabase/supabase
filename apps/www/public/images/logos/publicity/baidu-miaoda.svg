@@ -1,0 +1,58 @@
+<svg width="160" height="60" viewBox="0 0 160 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#7e7e7e">
+    <!--
+      Baidu MiaoDa (秒哒) logo mark.
+      Based on the official Baidu MiaoDa branding:
+      - Large semicircular dome (right)
+      - Thinner tapered left tail
+      - Wide inner arch cutout at base of dome
+    -->
+    <!-- Left tail (thinner, tapered) -->
+    <path d="
+      M7 47
+      L7 37
+      C7 31 9 26 13 22
+      C16 18.5 20 16.5 24 16
+      C26 15.5 27.5 16 28.5 17
+      C28 19.5 26 22 23 24.5
+      C20 27 18 30 17 33.5
+      C16 37 15.5 40 15 43
+      C14.5 45 13.5 47 12.5 47
+      Z
+    "/>
+    <!-- Large dome (right side) with inner arch cutout -->
+    <path fill-rule="evenodd" d="
+      M38 11
+      C30.5 11 24 14 19.5 19
+      C15 24 13 30 13 37
+      L13 47
+      L18 47
+      L18 38
+      C18 32 20 27 24 23
+      C28 19.5 33 18 38 18
+      C43 18 47.5 20 51 23.5
+      C54.5 27 56 32 56 37.5
+      L56 47
+      L61 47
+      L61 36
+      C61 29 58.5 23 54 18.5
+      C49.5 14 44 11 38 11
+      Z
+      M38 28
+      C34 28 30.5 30.5 29 34
+      C28.5 35.5 28 37.5 28 39.5
+      L28 47
+      L34 47
+      L34 40
+      C34 37.5 35.5 36 38 36
+      C40.5 36 42 37.5 42 40
+      L42 47
+      L48 47
+      L48 39.5
+      C48 35.5 46.5 32 43.5 30
+      C42 28.5 40 28 38 28
+      Z
+    "/>
+  </g>
+  <text x="67" y="39" font-family="system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif" font-size="26" font-weight="600" fill="#7e7e7e" letter-spacing="1">秒哒</text>
+</svg>
