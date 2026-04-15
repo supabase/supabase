@@ -71,6 +71,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
 
+  // Track pending changes in a ref so the authConfig effect can read the current value
+  // without being re-run every time hasChanges flips
+  const hasChangesRef = useRef(false)
+
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
   const INITIAL_VALUES = useMemo(() => {
@@ -166,6 +170,7 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
   const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
+  hasChangesRef.current = hasChanges
 
   // Function to insert text at cursor position
   const insertTextAtCursor = (text: string) => {
@@ -195,9 +200,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     }
   }
 
-  // Update form values when authConfig changes
+  // Update form values when authConfig changes, but skip if the user has unsaved edits
+  // (e.g. saving the Configuration card refetches authConfig and would otherwise wipe the Content form)
   useEffect(() => {
-    if (authConfig) {
+    if (authConfig && !hasChangesRef.current) {
       const values: { [key: string]: string } = {}
       Object.keys(properties).forEach((key) => {
         values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
