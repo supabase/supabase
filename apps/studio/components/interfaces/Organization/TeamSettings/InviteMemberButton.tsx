@@ -115,21 +115,23 @@ export const InviteMemberButton = () => {
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
 
-  const FormSchema = z.object({
-    email: emailSchema,
-    role: z.string().min(1, 'Role is required'),
-    applyToOrg: z.boolean(),
-    projectRef: z.string(),
-    requireSso: z.enum(['auto', 'sso', 'non-sso']),
-  }).superRefine((data, ctx) => {
-    if (!data.applyToOrg && !data.projectRef) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'A project must be selected',
-        path: ['projectRef'],
-      })
-    }
-  })
+  const FormSchema = z
+    .object({
+      email: emailSchema,
+      role: z.string().min(1, 'Role is required'),
+      applyToOrg: z.boolean(),
+      projectRef: z.string(),
+      requireSso: z.enum(['auto', 'sso', 'non-sso']),
+    })
+    .superRefine((data, ctx) => {
+      if (!data.applyToOrg && !data.projectRef) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'A project must be selected',
+          path: ['projectRef'],
+        })
+      }
+    })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
