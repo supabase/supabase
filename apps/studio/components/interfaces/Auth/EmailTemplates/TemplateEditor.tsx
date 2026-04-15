@@ -74,6 +74,9 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   // Track pending changes in a ref so the authConfig effect can read the current value
   // without being re-run every time hasChanges flips
   const hasChangesRef = useRef(false)
+  // Ensure the first authConfig sync always runs, even if hasChangesRef is already true
+  // (e.g. authConfig arrives after mount when form defaults were empty)
+  const hasHydratedFromAuthConfigRef = useRef(false)
 
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
 
@@ -201,15 +204,17 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
   }
 
   // Update form values when authConfig changes, but skip if the user has unsaved edits
-  // (e.g. saving the Configuration card refetches authConfig and would otherwise wipe the Content form)
+  // (e.g. saving the Configuration card refetches authConfig and would otherwise wipe the Content form).
+  // Always run on first hydration so the form isn't left empty when authConfig arrives after mount.
   useEffect(() => {
-    if (authConfig && !hasChangesRef.current) {
+    if (authConfig && (!hasHydratedFromAuthConfigRef.current || !hasChangesRef.current)) {
       const values: { [key: string]: string } = {}
       Object.keys(properties).forEach((key) => {
         values[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
       })
       form.reset(values)
       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+      hasHydratedFromAuthConfigRef.current = true
     }
   }, [authConfig, properties, messageSlug, form])
 
