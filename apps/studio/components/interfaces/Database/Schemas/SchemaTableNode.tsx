@@ -242,50 +242,52 @@ export const TableNode = ({
                   className={cn(hiddenNodeConnector)}
                 />
               )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="text"
-                    // Use opacity to hide the button so that it remains accessible (users can tab to it)
-                    className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded"
-                  >
-                    <MoreVertical size={10} />
-                    <span className="sr-only">
-                      {data.name} {column.name} actions
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end" className="w-32">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuItem
-                        disabled={!canUpdateColumns}
-                        onClick={() => schemaGraphContext.onEditColumn(data.id, column.id)}
-                        className="space-x-2"
-                      >
-                        <Edit size={12} />
-                        <p>Edit column</p>
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    {!canUpdateColumns && (
-                      <TooltipContent side="bottom">
-                        Additional permissions required to edit column
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
+              {!schemaGraphContext.isDownloading && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="text"
+                      // Use opacity to hide the button so that it remains accessible (users can tab to it)
+                      className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded"
+                    >
+                      <MoreVertical size={10} />
+                      <span className="sr-only">
+                        {data.name} {column.name} actions
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="bottom" align="end" className="w-32">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuItem
+                          disabled={!canUpdateColumns}
+                          onClick={() => schemaGraphContext.onEditColumn(data.id, column.id)}
+                          className="space-x-2"
+                        >
+                          <Edit size={12} />
+                          <p>Edit column</p>
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      {!canUpdateColumns && (
+                        <TooltipContent side="bottom">
+                          Additional permissions required to edit column
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
 
-                  <DropdownMenuItem
-                    className="space-x-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      copyToClipboard(column.name)
-                    }}
-                  >
-                    <Copy size={12} />
-                    <span>Copy name</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuItem
+                      className="space-x-2"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        copyToClipboard(column.name)
+                      }}
+                    >
+                      <Copy size={12} />
+                      <span>Copy name</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           ))}
         </div>

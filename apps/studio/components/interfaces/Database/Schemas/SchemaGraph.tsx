@@ -11,7 +11,7 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { toPng, toSvg } from 'html-to-image'
+import { toBlob, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -167,65 +167,75 @@ export const SchemaGraph = () => {
     }
   )
 
-  const downloadImage = (format: 'png' | 'svg') => {
-    const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
+  const waitForNextPaint = () =>
+    new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    })
+
+  const downloadBlob = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.setAttribute('download', fileName)
+    a.setAttribute('href', url)
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const toErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : 'Unexpected error while exporting'
+
+  const downloadImage = async (format: 'png' | 'svg') => {
+    if (isDownloading) return
+
+    const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement | null
     if (!reactflowViewport) return
 
-    setIsDownloading(true)
-    const width = reactflowViewport.clientWidth
-    const height = reactflowViewport.clientHeight
-    const { x, y, zoom } = reactFlowInstance.getViewport()
+    try {
+      setIsDownloading(true)
 
-    if (format === 'svg') {
-      toSvg(reactflowViewport, {
+      // Let React render lightweight download UI before starting image serialization.
+      await waitForNextPaint()
+
+      const width = reactflowViewport.clientWidth
+      const height = reactflowViewport.clientHeight
+      const { x, y, zoom } = reactFlowInstance.getViewport()
+      const commonOptions = {
         backgroundColor: 'white',
         width,
         height,
+        cacheBust: true,
         style: {
           width: width.toString(),
           height: height.toString(),
           transform: `translate(${x}px, ${y}px) scale(${zoom})`,
         },
+      }
+
+      if (format === 'svg') {
+        const dataUrl = await toSvg(reactflowViewport, commonOptions)
+        const svgBlob = await fetch(dataUrl).then((response) => response.blob())
+        downloadBlob(svgBlob, `supabase-schema-${ref}.svg`)
+        toast.success('Successfully downloaded as SVG')
+        return
+      }
+
+      const pngBlob = await toBlob(reactflowViewport, {
+        ...commonOptions,
+        // Keep performance predictable for high-DPI displays and large graphs.
+        pixelRatio: 1,
       })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.svg`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as SVG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    } else if (format === 'png') {
-      toPng(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
+
+      if (!pngBlob) throw new Error('Failed to generate PNG blob')
+
+      downloadBlob(pngBlob, `supabase-schema-${ref}.png`)
+      toast.success('Successfully downloaded as PNG')
+    } catch (error) {
+      console.error('Failed to download:', error)
+      toast.error('Failed to download current view', {
+        description: toErrorMessage(error),
       })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.png`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as PNG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
+    } finally {
+      setIsDownloading(false)
     }
   }
 
@@ -427,14 +437,16 @@ export const SchemaGraph = () => {
                     variant={BackgroundVariant.Dots}
                     color={'inherit'}
                   />
-                  <MiniMap
-                    pannable
-                    zoomable
-                    nodeColor={miniMapNodeColor}
-                    maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-sm"
-                  />
-                  <SchemaGraphLegend />
+                  {!isDownloading && (
+                    <MiniMap
+                      pannable
+                      zoomable
+                      nodeColor={miniMapNodeColor}
+                      maskColor={miniMapMaskColor}
+                      className="border rounded-md shadow-sm"
+                    />
+                  )}
+                  {!isDownloading && <SchemaGraphLegend />}
                 </ReactFlow>
               </div>
             </SchemaGraphContextProvider>
