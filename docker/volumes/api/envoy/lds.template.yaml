@@ -231,6 +231,11 @@ resources:
                           cluster: storage
                           prefix_rewrite: /
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /storage/v1
+                            append: false
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -277,7 +282,7 @@ resources:
                             
                       - name: graphql-v1-protected
                         match:
-                          prefix: /graphql/v1/
+                          prefix: /graphql/v1
                         route:
                           cluster: rest
                           prefix_rewrite: /rpc/graphql
@@ -295,10 +300,10 @@ resources:
                             
                       - name: realtime-v1-api-protected
                         match:
-                          prefix: /realtime/v1/api/
+                          prefix: /realtime/v1/api
                         route:
                           cluster: realtime
-                          prefix_rewrite: /api/
+                          prefix_rewrite: /api
                           timeout: 30s
                           host_rewrite_literal: realtime-dev.supabase-realtime
                         typed_per_filter_config:
@@ -843,13 +848,13 @@ resources:
                                   prefix: /rest/v1/
                             - url_path:
                                 path:
-                                  prefix: /realtime/v1/api/
+                                  prefix: /realtime/v1/api
                             - url_path:
                                 path:
                                   prefix: /realtime/v1/
                             - url_path:
                                 path:
-                                  prefix: /graphql/v1/
+                                  prefix: /graphql/v1
                           principals:
                             - header:
                                 name: apikey
