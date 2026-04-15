@@ -31,11 +31,28 @@ await supabase.auth.signInWithOAuth({
 
 In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+If your framework requires custom response headers on redirects (for example Remix), forward all `Set-Cookie` headers produced by the server client when returning the redirect response.
+
+```ts
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import type { Provider } from '@supabase/supabase-js'
+const request = new Request('http://example.com/auth/login')
 const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+const headers = new Headers()
+const redirect = (url: string, init?: { headers?: Headers }) => {}
+
+const supabase = createServerClient('url', 'anonKey', {
+  cookies: {
+    getAll() {
+      return parseCookieHeader(request.headers.get('Cookie') ?? '')
+    },
+    setAll(cookiesToSet) {
+      cookiesToSet.forEach(({ name, value, options }) => {
+        headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+      })
+    },
+  },
+})
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithOAuth({
@@ -46,7 +63,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 
 if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+  redirect(data.url, { headers }) // include Set-Cookie headers in the redirect response
 }
 ```
 

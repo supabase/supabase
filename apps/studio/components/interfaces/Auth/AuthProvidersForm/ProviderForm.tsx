@@ -23,6 +23,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { normalizeSmsTemplateValueTyped } from './AuthProvidersForm.utils'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -91,17 +92,18 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
-          values[key] = configValue || (provider.properties[key].type === 'boolean' ? false : '')
+          values[key] = configValue ?? (provider.properties[key].type === 'boolean' ? false : '')
         } else {
           if (isDoubleNegative) {
             values[key] = !(config as any)[key]
           } else {
             const configValue = (config as any)[key]
-            values[key] = configValue
-              ? configValue
-              : provider.properties[key].type === 'boolean'
-                ? false
-                : ''
+            values[key] = normalizeSmsTemplateValueTyped(
+              key,
+              (configValue ?? (provider.properties[key].type === 'boolean' ? false : '')) as
+                | string
+                | boolean
+            )
           }
         }
       })
@@ -114,7 +116,17 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   }, [config, getValuesForProvider])
 
   const onSubmit = (values: any) => {
-    const payload = { ...values }
+    const payload = Object.entries(values).reduce(
+      (acc, [key, value]) => {
+        if (typeof value === 'string' || typeof value === 'boolean') {
+          acc[key] = normalizeSmsTemplateValueTyped(key, value)
+        } else {
+          acc[key] = value
+        }
+        return acc
+      },
+      {} as Record<string, any>
+    )
     Object.keys(values).map((x: string) => {
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
