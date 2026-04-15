@@ -76,6 +76,10 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
   const branchingComputeItems = computeItems.filter((it) => it.metadata?.is_branch)
   const replicaComputeItems = computeItems.filter((it) => it.metadata?.is_read_replica)
 
+  const branchingComputeItemsDisplay = branchingComputeItems
+    .flatMap((it) => it.breakdown)
+    .sort((a, b) => (a?.project_name ?? '').localeCompare(b?.project_name ?? ''))
+
   const otherItems =
     upcomingInvoice?.lines
       ?.filter(
@@ -170,24 +174,20 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                         <span>Branching</span>
                         <InfoTooltip className="max-w-sm">
                           <ul className="ml-6 list-disc">
-                            {branchingComputeItems
-                              .flatMap((it) => it.breakdown)
-                              .map((breakdown) => (
-                                <li key={`branching-breakdown-${breakdown!.project_ref}`}>
-                                  {breakdown!.project_name} ({breakdown!.usage} Hours)
-                                </li>
-                              ))}
+                            {branchingComputeItemsDisplay.map((breakdown) => (
+                              <li key={`branching-breakdown-${breakdown!.project_ref}`}>
+                                {breakdown!.project_name} ({breakdown!.usage} Hours)
+                              </li>
+                            ))}
                           </ul>
 
                           <p className="mt-2">
                             See{' '}
-                            <Link
-                              className="underline"
+                            <InlineLink
                               href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
-                              target="_blank"
                             >
                               docs
-                            </Link>{' '}
+                            </InlineLink>{' '}
                             on how billing for Branching works.
                           </p>
                         </InfoTooltip>
