@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 
 import { lintKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 

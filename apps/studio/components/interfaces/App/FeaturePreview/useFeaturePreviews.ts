@@ -32,15 +32,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isDefaultOptIn: false,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
-      name: 'Branching via dashboard',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/branching-2-0',
-      enabled: true,
-      isNew: false,
-      isPlatformOnly: true,
-      isDefaultOptIn: false,
-    },
-    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
       name: 'Disable Advisor rules',
       discussionsUrl: undefined,
@@ -76,15 +67,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isPlatformOnly: true,
       isDefaultOptIn: false,
       enabled: jitDbAccessEnabled,
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-      enabled: true,
-      isNew: false,
-      isPlatformOnly: false,
-      isDefaultOptIn: false,
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,

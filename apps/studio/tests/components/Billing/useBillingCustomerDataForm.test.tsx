@@ -1,9 +1,9 @@
-import { act, renderHook, waitFor } from '@testing-library/react'
 import type { StripeAddressElementChangeEvent } from '@stripe/stripe-js'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useBillingCustomerDataForm } from 'components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
-import type { CustomerAddress, CustomerTaxId } from 'data/organizations/types'
+import { useBillingCustomerDataForm } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 
 type BillingProfile = ReturnType<typeof makeCustomerProfile>
 type CustomerChangeHandler = Parameters<

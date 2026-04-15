@@ -618,6 +618,23 @@ export const examples: Registry = [
     files: ['example/input-otp-form.tsx'],
   },
   {
+    name: 'keyboard-shortcut-demo',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/keyboard-shortcut-demo.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-pill',
+    type: 'components:example',
+    files: ['example/keyboard-shortcut-pill.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-inline',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/keyboard-shortcut-inline.tsx'],
+  },
+  {
     name: 'label-demo',
     type: 'components:example',
     registryDependencies: ['label'],

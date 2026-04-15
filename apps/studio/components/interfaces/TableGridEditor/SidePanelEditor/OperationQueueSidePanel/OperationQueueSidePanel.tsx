@@ -1,5 +1,6 @@
 import {
   Button,
+  KeyboardShortcut,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -13,12 +14,10 @@ import { OperationList } from './OperationList'
 import { useOperationQueueActions } from '@/components/grid/hooks/useOperationQueueActions'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { getModKeyLabel } from '@/lib/helpers'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 
 export const OperationQueueSidePanel = () => {
-  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
 
   const visible = snap.sidePanel?.type === 'operation-queue'
@@ -53,9 +52,12 @@ export const OperationQueueSidePanel = () => {
           </SheetSection>
 
           <SheetFooter className="!justify-between">
-            <Button type="default" onClick={snap.closeSidePanel}>
+            <Button
+              type="default"
+              onClick={snap.closeSidePanel}
+              iconRight={<KeyboardShortcut keys={['Meta', '.']} variant="inline" />}
+            >
               Close
-              <span className="text-foreground/40 text-[10px] ml-1.5">{modKey}.</span>
             </Button>
             <div className="flex space-x-3">
               <Button
@@ -69,9 +71,11 @@ export const OperationQueueSidePanel = () => {
                 onClick={handleSave}
                 disabled={isSaving || operations.length === 0}
                 loading={isSaving}
+                iconRight={
+                  isSaving ? undefined : <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
+                }
               >
                 Save
-                <span className="text-foreground/40 text-[10px] ml-1.5">{modKey}S</span>
               </Button>
             </div>
           </SheetFooter>

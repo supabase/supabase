@@ -7,18 +7,18 @@ import { READ_REPLICAS_MAX_COUNT } from '@/data/read-replicas/replicas-query'
 import { customRender } from '@/tests/lib/custom-render'
 
 vi.mock(
-  'components/interfaces/Database/Replication/DestinationPanel/ReadReplicaForm/useCheckEligibilityDeployReplica'
+  '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicaForm/useCheckEligibilityDeployReplica'
 )
-vi.mock('data/projects/project-detail-query', () => ({
+vi.mock('@/data/projects/project-detail-query', () => ({
   useProjectDetailQuery: () => ({ data: undefined, isSuccess: false }),
 }))
-vi.mock('data/database/enable-physical-backups-mutation', () => ({
+vi.mock('@/data/database/enable-physical-backups-mutation', () => ({
   useEnablePhysicalBackupsMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))
-vi.mock('hooks/misc/useSelectedOrganization', () => ({
+vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: { slug: 'test-org' } }),
 }))
-vi.mock('hooks/misc/useSelectedProject', () => ({
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({ data: { dbVersion: 'supabase-postgres-15.1.0' } }),
 }))
 

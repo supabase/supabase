@@ -23,7 +23,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
             `SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
             projectKeys?.publishableKey
-              ? `SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+              ? `SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
               : `SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
             '',
           ].join('\n')}
@@ -36,7 +36,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'SUPABASE_ANON_KEY'};
+const supabaseKey = process.env.${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'};
 
 export const supabase = createClient(supabaseUrl!, supabaseKey!);
         `}

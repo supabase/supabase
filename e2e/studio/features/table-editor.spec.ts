@@ -553,7 +553,10 @@ testRunner('table editor', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     // Copy the column name
-    await page.getByRole('columnheader', { name: colName }).getByRole('button').nth(1).click()
+    await page
+      .getByRole('columnheader', { name: colName })
+      .getByRole('button', { name: `Column ${colName} actions` })
+      .click()
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
 
     await expectClipboardValue({

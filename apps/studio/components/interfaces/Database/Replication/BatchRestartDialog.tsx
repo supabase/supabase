@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { PipelineStatusName } from './Replication.constants'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
@@ -22,6 +23,7 @@ interface BatchRestartDialogProps {
   totalTables: number
   erroredTablesCount: number
   tables: ReplicationPipelineTableStatus[]
+  pipelineStatusName?: PipelineStatusName
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void
 }
@@ -33,12 +35,12 @@ export const BatchRestartDialog = ({
   totalTables,
   erroredTablesCount,
   tables,
+  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: BatchRestartDialogProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
-
   // Calculate which table IDs will be restarted based on mode (memoized)
   const affectedTableIds = useMemo(() => {
     if (mode === 'all') {
@@ -61,13 +63,13 @@ export const BatchRestartDialog = ({
       toast.success(
         `Restarting replication for ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
       )
+    },
+    onSettled: () => {
       onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      onRestartComplete?.(affectedTableIds)
-      onOpenChange(false)
     },
   })
 
@@ -81,6 +83,7 @@ export const BatchRestartDialog = ({
       pipelineId,
       target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
       rollbackType: 'full',
+      pipelineStatusName,
     })
   }
 
@@ -91,7 +94,8 @@ export const BatchRestartDialog = ({
           description: (
             <div className="space-y-3 text-sm">
               <p>
-                This will restart replication for <strong>all {totalTables} tables</strong> in this
+                This will restart replication for all
+                {totalTables === 0 ? '' : totalTables} table{totalTables > 1 ? 's' : ''} in this
                 pipeline from scratch:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">

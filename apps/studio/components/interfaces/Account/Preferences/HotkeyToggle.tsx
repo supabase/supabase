@@ -25,24 +25,19 @@ export function HotkeyToggle<T extends FieldValues>({
         control={form.control}
         name={name}
         render={({ field }) => (
-          <FormItemLayout
-            layout="flex-row-reverse"
-            label={
-              <div className="flex items-center gap-x-3">
-                <KeyboardShortcut keys={keys} />
-                <span>{label}</span>
-              </div>
-            }
-          >
-            <FormControl_Shadcn_>
-              <Switch
-                checked={field.value}
-                onCheckedChange={(value) => {
-                  field.onChange(value)
-                  onToggle(value)
-                }}
-              />
-            </FormControl_Shadcn_>
+          <FormItemLayout layout="flex-row-reverse" label={label}>
+            <div className="flex w-full items-center justify-end gap-x-3">
+              <KeyboardShortcut keys={keys} />
+              <FormControl_Shadcn_>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={(value) => {
+                    field.onChange(value)
+                    onToggle(value)
+                  }}
+                />
+              </FormControl_Shadcn_>
+            </div>
           </FormItemLayout>
         )}
       />
