@@ -21,7 +21,11 @@
       "type": "registry:lib"
     },
     {
-      "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+      "path": "registry/default/clients/nextjs/lib/supabase/server-component.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/clients/nextjs/lib/supabase/server-route.ts",
       "type": "registry:lib"
     }
   ]

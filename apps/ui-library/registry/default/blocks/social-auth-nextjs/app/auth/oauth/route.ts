@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 
-// The client you created from the Server-Side Auth instructions
-import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server'
+import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server-route'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   // if "next" is in param, use it as the redirect URL
@@ -14,22 +13,28 @@ export async function GET(request: Request) {
   }
 
   if (code) {
-    const supabase = await createClient()
+    const { supabase, response } = createClient(request)
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
       const isLocalEnv = process.env.NODE_ENV === 'development'
+
+      let redirectUrl: string
       if (isLocalEnv) {
-        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-        return NextResponse.redirect(`${origin}${next}`)
+        redirectUrl = `${origin}${next}`
       } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+        redirectUrl = `https://${forwardedHost}${next}`
       } else {
-        return NextResponse.redirect(`${origin}${next}`)
+        redirectUrl = `${origin}${next}`
       }
+
+      const redirect = NextResponse.redirect(redirectUrl)
+      redirect.cookies.setAll(response.cookies.getAll())
+      response.headers.forEach((value, key) => redirect.headers.set(key, value))
+      return redirect
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/error`)
+  return NextResponse.redirect(`${new URL(request.url).origin}/auth/error`)
 }
