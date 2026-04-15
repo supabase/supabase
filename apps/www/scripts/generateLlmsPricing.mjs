@@ -332,4 +332,10 @@ const output = [
 const outputPath = path.join(__dirname, '../public/md/pricing.md')
 await fs.writeFile(outputPath, output, 'utf8')
 
+// Format with prettier so CI doesn't fail on the generated file
+execSync(`npx prettier --config prettier.config.mjs --write "${outputPath}"`, {
+  cwd: path.join(__dirname, '../../..'),
+  stdio: 'ignore',
+})
+
 console.log(`✅ Generated ${outputPath}`)
