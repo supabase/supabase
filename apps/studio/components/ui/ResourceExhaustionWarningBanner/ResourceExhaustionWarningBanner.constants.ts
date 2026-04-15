@@ -18,7 +18,9 @@ interface ResourceWarningMessage {
   metric: string | null
 }
 
-export const RESOURCE_WARNING_MESSAGES: Record = {
+type ResourceWarningMessages = Record<string, ResourceWarningMessage>
+
+export const RESOURCE_WARNING_MESSAGES: ResourceWarningMessages = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
