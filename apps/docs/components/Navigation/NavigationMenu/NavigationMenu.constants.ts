@@ -1403,7 +1403,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/first-row-in-group' as `/${string}`,
         },
         {
-          name: 'Print PostgreSQL Version',
+          name: 'Print Postgres Version',
           url: '/guides/database/postgres/which-version-of-postgres' as `/${string}`,
         },
         {

@@ -3012,6 +3012,38 @@ export interface StorageExplorerNavigateSubmittedEvent {
 }
 
 /**
+ * User clicked the Remove policy button on the public bucket SELECT policy warning.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyRemovedEvent {
+  action: 'storage_public_bucket_select_policy_removed'
+  properties: {
+    /** The ID of the bucket whose SELECT policy was removed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the public bucket SELECT policy warning banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent {
+  action: 'storage_public_bucket_select_policy_warning_dismiss_button_clicked'
+  properties: {
+    /** The ID of the bucket whose warning was dismissed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User was exposed to the pricing value/flexibility experiment on the /pricing page.
  *
  * @group Events
@@ -3041,6 +3073,39 @@ export interface PricingPageExperimentExposedEvent {
 }
 
 /**
+ * Triggered when an access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreatedEvent {
+  action: 'access_token_created'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    expiryPreset: string
+    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    permissionCount?: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when an access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenRemovedEvent {
+  action: 'access_token_removed'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the "Upgrade to Pro" CTA in the dashboard header.
  * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
  *
@@ -3050,6 +3115,35 @@ export interface PricingPageExperimentExposedEvent {
 export interface HeaderUpgradeCtaClickedEvent {
   action: 'header_upgrade_cta_clicked'
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the primary CTA on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerUpgradeClickedEvent {
+  action: 'resource_exhaustion_banner_upgrade_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
+ * User clicked "Ask AI Assistant" on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerAiAssistantClickedEvent {
+  action: 'resource_exhaustion_banner_ai_assistant_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+  }
 }
 
 /**
@@ -3128,6 +3222,8 @@ export type TelemetryEvent =
   | LogExplorerQueryRunButtonClickedEvent
   | StorageExplorerNavigateClickedEvent
   | StorageExplorerNavigateSubmittedEvent
+  | StoragePublicBucketSelectPolicyRemovedEvent
+  | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -3223,3 +3319,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerCtaClickedEvent
   | PricingPageExperimentExposedEvent
   | HeaderUpgradeCtaClickedEvent
+  | AccessTokenCreatedEvent
+  | AccessTokenRemovedEvent
+  | ResourceExhaustionBannerUpgradeClickedEvent
+  | ResourceExhaustionBannerAiAssistantClickedEvent

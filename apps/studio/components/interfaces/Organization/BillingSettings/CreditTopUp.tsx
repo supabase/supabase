@@ -62,6 +62,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const queryClient = useQueryClient()
   const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+    validateBillingProfile: () => Promise<boolean>
   }>(null)
 
   const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -128,6 +129,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     setPaymentIntentConfirmation(undefined)
 
     const token = await initHcaptcha()
+
+    const isValid = await paymentMethodSelectionRef.current?.validateBillingProfile()
+    if (!isValid) return
 
     const paymentMethodResult = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (!paymentMethodResult) {

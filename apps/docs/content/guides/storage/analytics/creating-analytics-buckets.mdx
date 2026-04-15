@@ -35,7 +35,7 @@ You can create an analytics bucket using either the Supabase SDK or the Supabase
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
+const supabase = createClient('https://your-project-id.supabase.co', 'your-service-key')
 
 const { data, error } = await supabase.storage.analytics.createBucket('analytics-data')
 
@@ -53,7 +53,7 @@ if (error) {
 ```python
 from supabase import create_client
 
-supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+supabase = create_client('https://your-project-id.supabase.co', 'your-service-key')
 
 response = supabase.storage.analytics().create('analytics-data')
 

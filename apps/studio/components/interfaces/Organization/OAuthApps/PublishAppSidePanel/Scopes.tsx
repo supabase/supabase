@@ -117,6 +117,14 @@ export const ScopesPanel = ({
         setScopes={setScopes}
       />
       <Scope
+        title="Analytics Config"
+        description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+        readScopeName={OAuthScope.ANALYTICS_CONFIG_READ}
+        writeScopeName={OAuthScope.ANALYTICS_CONFIG_WRITE}
+        scopes={scopes}
+        setScopes={setScopes}
+      />
+      <Scope
         title="Auth"
         description={PERMISSIONS_DESCRIPTIONS.AUTH}
         readScopeName={OAuthScope.AUTH_READ}

@@ -4692,6 +4692,7 @@ export interface components {
       billing_name?: string
       /** @enum {boolean} */
       clear_tax_id?: true
+      dry_run?: boolean
       tax_id?: {
         country?: string
         type: string
@@ -4764,7 +4765,6 @@ export interface components {
       payment_intent_id: string
       size?: string
     }
-    ConfirmRequestDto: Record<string, never>
     ConfirmResponseDto: {
       organization_slug: string
       success: boolean
@@ -5057,6 +5057,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -6261,6 +6263,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -7001,10 +7005,6 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       NIMBUS_OAUTH_CLIENT_ID: string | null
-      PASSKEY_ENABLED: boolean
-      WEBAUTHN_RP_DISPLAY_NAME: string
-      WEBAUTHN_RP_ID: string
-      WEBAUTHN_RP_ORIGINS: string
       NIMBUS_OAUTH_CLIENT_SECRET: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
       OAUTH_SERVER_AUTHORIZATION_PATH: string | null
@@ -7570,6 +7570,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -9931,6 +9933,7 @@ export interface components {
           usage: number
         }[]
         description: string
+        item_name: string
         metadata?: {
           is_branch?: boolean
           is_read_replica?: boolean
@@ -10000,6 +10003,15 @@ export interface components {
         usage_original?: number
       }[]
       subscription_id: string
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
     }
     UpdateAddonBody: {
       /** @enum {string} */
@@ -10334,10 +10346,6 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
       NIMBUS_OAUTH_CLIENT_ID?: string | null
-      PASSKEY_ENABLED?: boolean | null
-      WEBAUTHN_RP_DISPLAY_NAME?: string | null
-      WEBAUTHN_RP_ID?: string | null
-      WEBAUTHN_RP_ORIGINS?: string | null
       NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
       OAUTH_SERVER_AUTHORIZATION_PATH?: string | null
@@ -26437,11 +26445,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ConfirmRequestDto']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {

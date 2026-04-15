@@ -33,6 +33,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   }
