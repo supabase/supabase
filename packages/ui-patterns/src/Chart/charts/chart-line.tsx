@@ -224,8 +224,7 @@ export const ChartLine = ({
                 formatter={(value, name, item) => {
                   const key = String(item.dataKey || name || dataKey)
                   const itemConfig = chartConfig[key]
-                  const indicatorColor =
-                    itemConfig?.color || item.payload.fill || item.color || color
+                  const indicatorColor = item.payload.fill || item.color || color
                   const detail = tooltipDetails?.(item.payload as ChartLineTick, key, value)
 
                   return (
