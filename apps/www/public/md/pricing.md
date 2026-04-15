@@ -17,6 +17,7 @@ For current pricing, visit https://supabase.com/pricing.
 ## Plan Tiers
 
 ### Free - from $0/month
+
 - Unlimited API requests
 - 50,000 monthly active users
 - 500 MB database size (Shared CPU • 500 MB RAM)
@@ -27,6 +28,7 @@ For current pricing, visit https://supabase.com/pricing.
 - Note: Free projects are paused after 1 week of inactivity. Limit of 2 active projects.
 
 ### Pro - from $25/month
+
 - 100,000 monthly active users (then $0.00325 per MAU)
 - 8 GB disk size per project (then $0.125 per GB)
 - 250 GB egress (then $0.09 per GB)
@@ -38,6 +40,7 @@ For current pricing, visit https://supabase.com/pricing.
 - Add Log Drains (additional $60 per drain, per project)
 
 ### Team - from $599/month
+
 - SOC2
 - Project-scoped and read-only access
 - HIPAA available as paid add-on
@@ -47,6 +50,7 @@ For current pricing, visit https://supabase.com/pricing.
 - 28-day log retention
 
 ### Enterprise - custom pricing
+
 - Designated Support manager
 - Uptime SLAs
 - BYO Cloud supported
@@ -77,6 +81,7 @@ Compute is billed hourly. Each project runs its own instance. Pro and Team plans
 ## Disk Storage
 
 ### General Purpose
+
 - Max size: 16 TB
 - Size: 8 GB included, then $0.125 per GB
 - IOPS: 3,000 IOPS included, then $0.024 per IOPS
@@ -84,6 +89,7 @@ Compute is billed hourly. Each project runs its own instance. Pro and Team plans
 - Durability: 99.9%
 
 ### High Performance
+
 - Max size: 60 TB
 - Size: $0.195 per GB
 - IOPS: $0.119 per IOPS
