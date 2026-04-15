@@ -156,11 +156,14 @@ const smsProviderBaseSchema = z.object({
       if (!value) return true
       return /^\s*([0-9]{1,15}=[0-9]+)(\s*,\s*[0-9]{1,15}=[0-9]+)*\s*$/g.test(value)
     }, 'Must be a comma-separated list of <phone number>=<OTP> pairs. Phone numbers should be in international format, without spaces, dashes or the + prefix. Example: 123456789=987654'),
-  SMS_TEST_OTP_VALID_UNTIL: z.string().refine((value) => {
-    if (!value) return true
-    const date = new Date(value)
-    return !isNaN(date.getTime())
-  }, 'Must be a valid date and time'),
+  SMS_TEST_OTP_VALID_UNTIL: z
+    .string()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      const date = new Date(value)
+      return !isNaN(date.getTime())
+    }, 'Must be a valid date and time'),
   SMS_AUTOCONFIRM: z.boolean().optional(),
 })
 
