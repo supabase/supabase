@@ -121,6 +121,14 @@ export const InviteMemberButton = () => {
     applyToOrg: z.boolean(),
     projectRef: z.string(),
     requireSso: z.enum(['auto', 'sso', 'non-sso']),
+  }).superRefine((data, ctx) => {
+    if (!data.applyToOrg && !data.projectRef) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'A project must be selected',
+        path: ['projectRef'],
+      })
+    }
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
