@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/pg": "^8.11.11",
-    "@vitest/coverage-v8": "^3.2.0",
+    "@vitest/coverage-v8": "catalog:",
     "npm-run-all": "^4.1.5",
     "pg": "^8.13.1",
     "postgres-array": "^3.0.2",

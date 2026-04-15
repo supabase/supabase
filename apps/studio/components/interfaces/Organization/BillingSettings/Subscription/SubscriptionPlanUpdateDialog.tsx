@@ -662,7 +662,7 @@ export const SubscriptionPlanUpdateDialog = ({
                 (it) =>
                   it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
                   it.status === PROJECT_STATUS.COMING_UP
-              ).length === 5 &&
+              ).length === 0 &&
                 subscriptionPreview?.plan_change_type !== 'downgrade' && (
                   <div className="pb-2">
                     <Admonition title="Empty organization" type="warning">
