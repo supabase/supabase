@@ -3081,13 +3081,9 @@ export interface PricingPageExperimentExposedEvent {
 export interface AccessTokenCreatedEvent {
   action: 'access_token_created'
   properties: {
-    /** Whether this is a classic or scoped token */
     tokenType: 'classic' | 'scoped'
-    /** The selected expiry preset, e.g. 'hour', 'day', 'week', 'month', 'never', 'custom' */
     expiryPreset: string
-    /** The resource access scope selected for the token (scoped tokens only) */
     resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
-    /** Number of expanded FGA permissions on the token (scoped tokens only) */
     permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
@@ -3103,7 +3099,6 @@ export interface AccessTokenCreatedEvent {
 export interface AccessTokenRemovedEvent {
   action: 'access_token_removed'
   properties: {
-    /** Whether this is a classic or scoped token */
     tokenType: 'classic' | 'scoped'
   }
   groups: Omit<TelemetryGroups, 'project'>
