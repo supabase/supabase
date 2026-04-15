@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -253,23 +252,19 @@ export const PasskeysSettingsForm = () => {
     'custom_config_gotrue'
   )
 
+  const formValues =
+    isSuccess && authConfig ? buildPasskeysFormValues(authConfig, project) : undefined
+
   const form = useForm<PasskeysSettings>({
     resolver: zodResolver(schema),
-    defaultValues: {
+    defaultValues: formValues ?? {
       PASSKEY_ENABLED: false,
       WEBAUTHN_RP_ID: '',
       WEBAUTHN_RP_DISPLAY_NAME: '',
       WEBAUTHN_RP_ORIGINS: '',
     },
+    values: formValues,
   })
-
-  useEffect(() => {
-    if (isSuccess && authConfig) {
-      form.reset(buildPasskeysFormValues(authConfig, project))
-    }
-    // form.reset is stable; authConfig/project drive when to sync from server
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, authConfig, project])
 
   const onSubmit = (values: PasskeysSettings) => {
     if (!projectRef) return

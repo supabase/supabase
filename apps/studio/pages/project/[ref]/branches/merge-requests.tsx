@@ -15,7 +15,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useIsBranching2Enabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   BranchManagementSection,
   BranchRow,
@@ -44,7 +43,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -68,7 +66,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     error: branchesError,
     isPending: isLoadingBranches,
     isError: isErrorBranches,
-    isSuccess: isSuccessBranches,
   } = useBranchesQuery({ projectRef })
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
@@ -190,30 +187,26 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
                 {!isError && (
                   <div className="space-y-4">
-                    {gitlessBranching && (
-                      <>
-                        {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
-                          <div className="rounded border rounded-lg bg-background px-6 py-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2 text-sm text-foreground-light">
-                                <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
-                                <span className="text-foreground">{currentBranch.name}</span>
-                                last viewed
-                              </div>
-                              <Button
-                                type="primary"
-                                size="tiny"
-                                loading={currentBranch && isUpdating}
-                                onClick={() =>
-                                  currentBranch && handleMarkBranchForReview(currentBranch)
-                                }
-                              >
-                                Create merge request
-                              </Button>
-                            </div>
+                    {isBranch && !isCurrentBranchReadyForReview && currentBranch && (
+                      <div className="rounded border rounded-lg bg-background px-6 py-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-foreground-light">
+                            <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
+                            <span className="text-foreground">{currentBranch.name}</span>
+                            last viewed
                           </div>
-                        )}
-                      </>
+                          <Button
+                            type="primary"
+                            size="tiny"
+                            loading={currentBranch && isUpdating}
+                            onClick={() =>
+                              currentBranch && handleMarkBranchForReview(currentBranch)
+                            }
+                          >
+                            Create merge request
+                          </Button>
+                        </div>
+                      </div>
                     )}
                     <BranchManagementSection
                       header={`${mergeRequestBranches.length} merge requests`}
@@ -297,12 +290,11 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                       ) : (
                         <PullRequestsEmptyState
                           url={generateCreatePullRequestURL()}
-                          gitlessBranching={gitlessBranching}
                           projectRef={projectRef ?? '_'}
                           branches={previewBranches}
                           onBranchSelected={handleMarkBranchForReview}
                           isUpdating={isUpdating}
-                          githubConnection={githubConnection}
+                          hasGithubConnection={!!githubConnection}
                         />
                       )}
                     </BranchManagementSection>
@@ -322,7 +314,6 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -373,36 +364,36 @@ const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  const primaryActions = gitlessBranching ? (
-    <BranchSelector
-      branches={previewBranches}
-      onBranchSelected={handleMarkBranchForReview}
-      disabled={!projectRef}
-      isUpdating={isUpdating}
-    />
-  ) : null
-
-  const secondaryActions = (
-    <div className="flex items-center gap-x-2">
-      <Button asChild type="text" icon={<MessageCircle className="text-muted" strokeWidth={1} />}>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://github.com/orgs/supabase/discussions/18937"
-        >
-          Branching feedback
-        </a>
-      </Button>
-      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-    </div>
-  )
-
   return (
     <PageLayout
       title="Merge requests"
       subtitle="Review and merge changes from one branch into another"
-      primaryActions={primaryActions}
-      secondaryActions={secondaryActions}
+      primaryActions={
+        <BranchSelector
+          branches={previewBranches}
+          onBranchSelected={handleMarkBranchForReview}
+          disabled={!projectRef}
+          isUpdating={isUpdating}
+        />
+      }
+      secondaryActions={
+        <div className="flex items-center gap-x-2">
+          <Button
+            asChild
+            type="text"
+            icon={<MessageCircle className="text-muted" strokeWidth={1} />}
+          >
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://github.com/orgs/supabase/discussions/18937"
+            >
+              Branching feedback
+            </a>
+          </Button>
+          <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
+        </div>
+      }
     >
       {children}
     </PageLayout>

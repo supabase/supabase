@@ -19,7 +19,6 @@
     "test:report": "open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.17",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.0.3",

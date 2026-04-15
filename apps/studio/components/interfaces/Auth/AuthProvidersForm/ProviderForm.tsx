@@ -110,8 +110,12 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   )
 
   const INITIAL_VALUES = useMemo(() => {
+    // This check will always be true but let us avoid adding an eslint disable comment on unused memo dependencies
+    // which could hide real issues in the future.
+    // Adding the provider in the memo dependencies ensures the INITIAL_VALUES is properly applied
+    if (!provider) return
     return getValuesForProvider(config)
-  }, [config, getValuesForProvider])
+  }, [config, getValuesForProvider, provider])
 
   const onSubmit = (values: any) => {
     const payload = { ...values }
@@ -230,7 +234,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                     name={x}
                     properties={provider.properties[x]}
                     control={form.control}
-                    disabled={shouldDisableField(x) || !canUpdateConfig}
+                    readOnly={shouldDisableField(x) || !canUpdateConfig}
                     hasAccess={hasAccess}
                   />
                 )

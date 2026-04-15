@@ -6912,7 +6912,7 @@
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
-        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_read"] }],
         "summary": "Get entitlements for an organization",
         "tags": ["Organizations"],
         "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
@@ -7146,7 +7146,9 @@
         "security": [{ "bearer": [] }, { "fga_permissions": ["organization_projects_read"] }],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"]
+        "x-badges": [{ "name": "OAuth scope: projects:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "projects:read"
       }
     }
   },

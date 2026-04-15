@@ -62,12 +62,12 @@ const data: () => {
 
   return {
     metadata: {
-      metaTitle: 'Supabase for Startups',
+      metaTitle: 'Supabase is for Startups',
       metaDescription: 'Build fast. Scale easily. Trust your stack.',
     },
     heroSection: {
       id: 'hero',
-      title: 'Supabase for Startups',
+      title: 'Supabase is for Startups',
       h1: (
         <>
           <span className="block text-foreground">Build fast. Scale easily.</span>
@@ -84,7 +84,7 @@ const data: () => {
       image: undefined,
       ctas: [
         {
-          label: 'Start your company',
+          label: 'Get started with Supabase',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
           onClick: () =>

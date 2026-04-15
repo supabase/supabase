@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "2.44.0",
+    "@supabase/supabase-js": "^2",
     "autoprefixer": "10.4.17",
     "geist": "^1.2.1",
     "next": "latest",
