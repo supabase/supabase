@@ -40,6 +40,7 @@ interface FormFieldProps {
   control: Control
   hasAccess: boolean
   disabled?: boolean
+  readOnly?: boolean
 }
 
 const FormField = ({
@@ -50,6 +51,7 @@ const FormField = ({
   control,
   hasAccess,
   disabled: disabledProp,
+  readOnly,
 }: FormFieldProps) => {
   const { description: originalDescription } = properties
   let description = originalDescription
@@ -95,7 +97,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -160,9 +162,16 @@ const FormField = ({
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.isSecret ? (
-                      <DataInput {...field} id={name} size="small" copy reveal />
+                      <DataInput
+                        {...field}
+                        id={name}
+                        size="small"
+                        copy
+                        reveal
+                        readOnly={readOnly}
+                      />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} />
+                      <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
                     )}
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -198,6 +207,7 @@ const FormField = ({
                       rows={4}
                       placeholder="Enter multi-line text"
                       className="resize-none"
+                      readOnly={readOnly}
                     />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -234,6 +244,7 @@ const FormField = ({
                           id={name}
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
+                          readOnly={readOnly}
                         />
                         <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -246,6 +257,7 @@ const FormField = ({
                         {...field}
                         id={name}
                         type="number"
+                        readOnly={readOnly}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     )}
@@ -265,7 +277,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -308,7 +320,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"

@@ -87,7 +87,7 @@ The platform-specific examples below demonstrate how to implement this pattern f
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
-    const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+    const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
     // ---cut---
     supabase.auth.signInWithOAuth({

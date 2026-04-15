@@ -31,10 +31,12 @@ export const useDevToolbar = !isToolbarEnabled
   ? () => noopContext
   : DevToolbarContextModule.useDevToolbar
 
-export const DevToolbar = !isToolbarEnabled ? () => null : DevToolbarModule.DevToolbar
+export const DevToolbar = !isToolbarEnabled
+  ? (_props: { extraTabs?: import('./types').ExtraTab[] }) => null
+  : DevToolbarModule.DevToolbar
 
 export const DevToolbarTrigger = !isToolbarEnabled
   ? () => null
   : DevToolbarTriggerModule.DevToolbarTrigger
 
-export type { DevTelemetryEvent, DevToolbarConfig } from './types'
+export type { DevTelemetryEvent, DevToolbarConfig, ExtraTab } from './types'

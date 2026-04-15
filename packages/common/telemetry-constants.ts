@@ -3072,6 +3072,39 @@ export interface PricingPageExperimentExposedEvent {
 }
 
 /**
+ * Triggered when an access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreatedEvent {
+  action: 'access_token_created'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    expiryPreset: string
+    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    permissionCount?: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when an access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenRemovedEvent {
+  action: 'access_token_removed'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the "Upgrade to Pro" CTA in the dashboard header.
  * GROWTH-615: always-visible upgrade button in dashboard header for free-plan users.
  *
@@ -3081,6 +3114,35 @@ export interface PricingPageExperimentExposedEvent {
 export interface HeaderUpgradeCtaClickedEvent {
   action: 'header_upgrade_cta_clicked'
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the primary CTA on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerUpgradeClickedEvent {
+  action: 'resource_exhaustion_banner_upgrade_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
+ * User clicked "Ask AI Assistant" on a resource exhaustion warning banner.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerAiAssistantClickedEvent {
+  action: 'resource_exhaustion_banner_ai_assistant_clicked'
+  groups: TelemetryGroups
+  properties: {
+    warningTypes: string[]
+  }
 }
 
 /**
@@ -3256,3 +3318,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerCtaClickedEvent
   | PricingPageExperimentExposedEvent
   | HeaderUpgradeCtaClickedEvent
+  | AccessTokenCreatedEvent
+  | AccessTokenRemovedEvent
+  | ResourceExhaustionBannerUpgradeClickedEvent
+  | ResourceExhaustionBannerAiAssistantClickedEvent
