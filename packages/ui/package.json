@@ -53,7 +53,7 @@
     "cmdk": "^1.1.1",
     "color": "^4.2.3",
     "date-fns": "^2.30.0",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^11.18.2",
     "input-otp": "^1.2.3",
     "lodash": "catalog:",
     "lucide-react": "^0.436.0",

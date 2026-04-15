@@ -49,7 +49,7 @@
     "dayjs": "^1.11.12",
     "dev-tools": "workspace:*",
     "eslint-config-supabase": "workspace:*",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^11.18.2",
     "globby": "^13.2.2",
     "gray-matter": "^4.0.3",
     "gsap": "^3.13.0",
