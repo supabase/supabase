@@ -1,25 +1,13 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import { MD_PAGES } from '~/lib/constants'
 import { NextResponse } from 'next/server'
-
-const ALLOWED_SLUGS = new Set([
-  'homepage',
-  'pricing',
-  'auth',
-  'database',
-  'edge-functions',
-  'realtime',
-  'storage',
-  'vector',
-  'modules/cron',
-  'modules/queues',
-])
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params
   const slugPath = slug.join('/')
 
-  if (!ALLOWED_SLUGS.has(slugPath)) {
+  if (!MD_PAGES.has(slugPath)) {
     return new NextResponse('Not found', { status: 404 })
   }
 

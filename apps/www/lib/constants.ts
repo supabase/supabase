@@ -56,3 +56,19 @@ export const LW15_URL = `${SITE_ORIGIN}/launch-week`
 export const SITE_NAME = 'Supabase'
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+// Pages that have a .md equivalent in public/md/.
+// Used by middleware (rewrite) and the API route handler (whitelist).
+// Update this set when adding new .md files.
+export const MD_PAGES = new Set([
+  'homepage',
+  'pricing',
+  'auth',
+  'database',
+  'edge-functions',
+  'realtime',
+  'storage',
+  'vector',
+  'modules/cron',
+  'modules/queues',
+])

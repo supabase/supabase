@@ -1,20 +1,7 @@
 import { stampFirstReferrerCookie } from 'common/first-referrer-cookie'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Pages that have a .md equivalent in public/md/.
-// Update this set when adding new .md files.
-const MD_PAGES = new Set([
-  'homepage',
-  'pricing',
-  'auth',
-  'database',
-  'edge-functions',
-  'realtime',
-  'storage',
-  'vector',
-  'modules/cron',
-  'modules/queues',
-])
+import { MD_PAGES } from './lib/constants'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
