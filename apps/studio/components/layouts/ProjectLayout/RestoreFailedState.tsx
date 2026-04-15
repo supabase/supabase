@@ -59,6 +59,14 @@ export const RestoreFailedState = () => {
     downloadBackup({ ref, backup: backups[0] })
   }
 
+  const downloadBackupTooltipText = isLoadingBackups
+    ? undefined
+    : data?.status === 'physical-backups-enabled'
+      ? 'Project uses physical backups — click to see CLI backup instructions'
+      : backups.length === 0
+        ? 'No downloadable backup available — click to see CLI backup instructions'
+        : undefined
+
   return (
     <>
       <div className="flex items-center justify-center h-full">
@@ -102,13 +110,7 @@ export const RestoreFailedState = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: isLoadingBackups
-                      ? undefined
-                      : data?.status === 'physical-backups-enabled'
-                        ? 'Project uses physical backups — click to see CLI backup instructions'
-                        : backups.length === 0
-                          ? 'No downloadable backup available — click to see CLI backup instructions'
-                          : undefined,
+                    text: downloadBackupTooltipText,
                   },
                 }}
                 onClick={onClickDownloadBackup}
