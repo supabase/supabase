@@ -20,8 +20,9 @@ const WARNING_TYPES = [
 ] as const
 
 type WarningKey = (typeof WARNING_TYPES)[number]['key']
+type WarningState = Record<WarningKey, Severity>
 
-const INITIAL_STATE: Record = {
+const INITIAL_STATE: WarningState = {
   disk_io_exhaustion: null,
   cpu_exhaustion: null,
   memory_and_swap_exhaustion: null,
@@ -35,7 +36,7 @@ export const ResourceWarningsTab = () => {
   const { data: selectedOrg, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const orgSlug = selectedOrg?.slug
   const [isReadOnly, setIsReadOnly] = useState(false)
-  const [severities, setSeverities] = useState<Record>(INITIAL_STATE)
+  const [severities, setSeverities] = useState<WarningState>(INITIAL_STATE)
 
   // Track latest ref/orgSlug so the unmount cleanup always invalidates the
   // correct cache keys, even when orgSlug was still loading at mount time.
@@ -86,7 +87,7 @@ export const ResourceWarningsTab = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 
-  const applyOverrides = (nextSeverities: Record, nextIsReadOnly: boolean) => {
+  const applyOverrides = (nextSeverities: WarningState, nextIsReadOnly: boolean) => {
     if (!orgSlug || !ref) return
     const mockWarning: ResourceWarning = {
       project: ref,
