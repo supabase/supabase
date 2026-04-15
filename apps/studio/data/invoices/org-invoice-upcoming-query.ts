@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
+import { components } from 'api-types'
 
 import { invoicesKeys } from './keys'
-import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -9,46 +9,7 @@ export type UpcomingInvoiceVariables = {
   orgSlug?: string
 }
 
-export type UpcomingInvoiceResponse = {
-  amount_projected: number | null
-  amount_total: number
-  currency: string
-  customer_balance: number
-  subscription_id: string
-  billing_cycle_end: string
-  billing_cycle_start: string
-  tax_status: 'calculated' | 'not_applicable' | 'failed'
-  tax: {
-    tax_amount: number
-    tax_rate_percentage: number
-    total_amount_excluding_tax: number
-    total_amount_including_tax: number
-    currency: string
-  } | null
-  lines: {
-    amount: number
-    amount_before_discount: number
-    description: string
-    proration: boolean
-    period: { start: string; end: string }
-    quantity?: number
-    unit_price: number
-    unit_price_desc: string
-    usage_based: boolean
-    usage_metric?: PricingMetric
-    usage_original?: number
-    breakdown?: {
-      project_ref: string
-      project_name: string
-      usage: number
-      amount?: number
-    }[]
-    metadata?: {
-      is_branch: boolean
-      is_read_replica: boolean
-    }
-  }[]
-}
+export type UpcomingInvoiceResponse = components['schemas']['UpcomingInvoice']
 
 export async function getUpcomingInvoice(
   { orgSlug }: UpcomingInvoiceVariables,
@@ -58,15 +19,12 @@ export async function getUpcomingInvoice(
 
   const { data, error } = await get(`/platform/organizations/{slug}/billing/invoices/upcoming`, {
     params: { path: { slug: orgSlug } },
-    headers: {
-      Version: '2',
-    },
+    headers: { Version: '2' },
     signal,
   })
 
   if (error) handleError(error)
-
-  return data as unknown as UpcomingInvoiceResponse
+  return data as UpcomingInvoiceResponse
 }
 
 export type UpcomingInvoiceData = Awaited<ReturnType<typeof getUpcomingInvoice>>
