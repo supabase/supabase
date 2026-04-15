@@ -36,7 +36,7 @@ export const RestoreFailedState = () => {
     resource: { project_id: project?.id },
   })
 
-  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
@@ -54,7 +54,8 @@ export const RestoreFailedState = () => {
 
   const onClickDownloadBackup = () => {
     if (!ref) return console.error('Project ref is required')
-    if (backups.length === 0) return setShowCliBackup(true)
+    if (backups.length === 0 || data?.status === 'physical-backups-enabled')
+      return setShowCliBackup(true)
     downloadBackup({ ref, backup: backups[0] })
   }
 
@@ -96,12 +97,14 @@ export const RestoreFailedState = () => {
               <ButtonTooltip
                 type="default"
                 icon={<Download />}
-                loading={isDownloading}
+                disabled={isLoadingBackups}
+                loading={isDownloading || isLoadingBackups}
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text:
-                      data?.status === 'physical-backups-enabled'
+                    text: isLoadingBackups
+                      ? undefined
+                      : data?.status === 'physical-backups-enabled'
                         ? 'Project uses physical backups — click to see CLI backup instructions'
                         : backups.length === 0
                           ? 'No downloadable backup available — click to see CLI backup instructions'

@@ -229,7 +229,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
         {!isRestoreDisabled && (
           <div className="border-t px-6 py-4">
-            <LogicalBackupCliInstructions />
+            <LogicalBackupCliInstructions note="Your project must be resumed before running these commands." />
           </div>
         )}
 

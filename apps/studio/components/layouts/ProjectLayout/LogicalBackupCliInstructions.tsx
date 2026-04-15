@@ -21,12 +21,14 @@ export type LogicalBackupCliInstructionsProps = {
   enabled?: boolean
   className?: string
   showResetPassword?: boolean
+  note?: string
 }
 
 export const LogicalBackupCliInstructions = ({
   enabled = true,
   className,
   showResetPassword = true,
+  note,
 }: LogicalBackupCliInstructionsProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -102,17 +104,13 @@ export const LogicalBackupCliInstructions = ({
         </ButtonTooltip>
       )}
 
+      {note && <p className="text-sm text-foreground-light">{note}</p>}
+
       {isError && (
         <p className="text-sm text-foreground-light">
-          Could not load connection details.{' '}
-          {showResetPassword ? (
-            <>
-              Open <InlineLink href={resetPasswordHref}>Database settings</InlineLink> to copy your
-              connection string manually.
-            </>
-          ) : (
-            'Please contact support for assistance.'
-          )}
+          Could not load connection details. Open{' '}
+          <InlineLink href={resetPasswordHref}>Database settings</InlineLink> to copy your
+          connection string manually.
         </p>
       )}
 
