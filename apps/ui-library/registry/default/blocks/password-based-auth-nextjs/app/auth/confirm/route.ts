@@ -19,12 +19,12 @@ export async function GET(request: NextRequest) {
     })
     if (!error) {
       const redirect = NextResponse.redirect(`${origin}${next}`)
-      redirect.cookies.setAll(response.cookies.getAll())
+      response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
       response.headers.forEach((value, key) => redirect.headers.set(key, value))
       return redirect
     } else {
       const redirect = NextResponse.redirect(`${origin}/auth/error?error=${error?.message}`)
-      redirect.cookies.setAll(response.cookies.getAll())
+      response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
       response.headers.forEach((value, key) => redirect.headers.set(key, value))
       return redirect
     }

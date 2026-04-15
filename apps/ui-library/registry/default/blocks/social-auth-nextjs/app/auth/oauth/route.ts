@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       }
 
       const redirect = NextResponse.redirect(redirectUrl)
-      redirect.cookies.setAll(response.cookies.getAll())
+      response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie))
       response.headers.forEach((value, key) => redirect.headers.set(key, value))
       return redirect
     }
