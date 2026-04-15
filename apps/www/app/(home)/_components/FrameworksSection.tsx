@@ -1,4 +1,5 @@
 import { createHighlighter, type ThemeRegistration } from 'shiki'
+
 import { FrameworksSectionClient } from './FrameworksSectionClient'
 
 // ── Shiki themes ────────────────────────────────────────────────────────────
@@ -11,10 +12,32 @@ const supabaseDark: ThemeRegistration = {
     'editor.foreground': '#ffffff',
   },
   tokenColors: [
-    { scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'], settings: { foreground: '#bda4ff' } },
-    { scope: ['entity.name.function', 'support.function', 'entity.name.tag', 'support.class.component'], settings: { foreground: '#3ecf8e' } },
-    { scope: ['constant', 'variable.other.constant', 'support.constant'], settings: { foreground: '#3ecf8e' } },
-    { scope: ['variable.other.property', 'support.type.property-name', 'meta.object-literal.key', 'entity.other.attribute-name'], settings: { foreground: '#3ecf8e' } },
+    {
+      scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'],
+      settings: { foreground: '#bda4ff' },
+    },
+    {
+      scope: [
+        'entity.name.function',
+        'support.function',
+        'entity.name.tag',
+        'support.class.component',
+      ],
+      settings: { foreground: '#3ecf8e' },
+    },
+    {
+      scope: ['constant', 'variable.other.constant', 'support.constant'],
+      settings: { foreground: '#3ecf8e' },
+    },
+    {
+      scope: [
+        'variable.other.property',
+        'support.type.property-name',
+        'meta.object-literal.key',
+        'entity.other.attribute-name',
+      ],
+      settings: { foreground: '#3ecf8e' },
+    },
     { scope: ['string', 'string.quoted'], settings: { foreground: '#ffcda1' } },
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#7e7e7e' } },
     { scope: ['variable.parameter'], settings: { foreground: '#ffffff' } },
@@ -34,10 +57,32 @@ const supabaseLight: ThemeRegistration = {
     'editor.foreground': '#525252',
   },
   tokenColors: [
-    { scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'], settings: { foreground: '#6b35dc' } },
-    { scope: ['entity.name.function', 'support.function', 'entity.name.tag', 'support.class.component'], settings: { foreground: '#15593b' } },
-    { scope: ['constant', 'variable.other.constant', 'support.constant'], settings: { foreground: '#15593b' } },
-    { scope: ['variable.other.property', 'support.type.property-name', 'meta.object-literal.key', 'entity.other.attribute-name'], settings: { foreground: '#15593b' } },
+    {
+      scope: ['keyword', 'storage', 'storage.type', 'storage.modifier'],
+      settings: { foreground: '#6b35dc' },
+    },
+    {
+      scope: [
+        'entity.name.function',
+        'support.function',
+        'entity.name.tag',
+        'support.class.component',
+      ],
+      settings: { foreground: '#15593b' },
+    },
+    {
+      scope: ['constant', 'variable.other.constant', 'support.constant'],
+      settings: { foreground: '#15593b' },
+    },
+    {
+      scope: [
+        'variable.other.property',
+        'support.type.property-name',
+        'meta.object-literal.key',
+        'entity.other.attribute-name',
+      ],
+      settings: { foreground: '#15593b' },
+    },
     { scope: ['string', 'string.quoted'], settings: { foreground: '#f1a10d' } },
     { scope: ['comment', 'punctuation.definition.comment'], settings: { foreground: '#7e7e7e' } },
     { scope: ['variable.parameter'], settings: { foreground: '#525252' } },
@@ -192,30 +237,93 @@ const { data: todos } = await useAsyncData(
 
 // ── Example links per framework ──────────────────────────────────────────────
 
-const frameworkExamples: Record<string, { title: string; description: string; url: string }[]> = {
+const frameworkExamples: Record<
+  string,
+  { title: string; description: string; url: string; icon: string }[]
+> = {
   React: [
-    { title: 'Todo List', description: 'CRUD app with real-time and RLS.', url: '/docs/guides/getting-started/tutorials/with-react' },
-    { title: 'Auth & User Management', description: 'Email, social login, and user profiles.', url: '/docs/guides/auth/quickstarts/react' },
+    {
+      title: 'Todo List',
+      description: 'CRUD app with real-time and RLS.',
+      url: '/docs/guides/getting-started/tutorials/with-react',
+      icon: 'ListChecks',
+    },
+    {
+      title: 'Auth & User Management',
+      description: 'Email, social login, and user profiles.',
+      url: '/docs/guides/auth/quickstarts/react',
+      icon: 'Users',
+    },
   ],
   'Next.js': [
-    { title: 'App Router Quickstart', description: 'Server Components with SSR auth.', url: '/docs/guides/getting-started/quickstarts/nextjs' },
-    { title: 'Auth with PKCE', description: 'Secure auth flow with middleware.', url: '/docs/guides/auth/server-side/nextjs' },
+    {
+      title: 'App Router Quickstart',
+      description: 'Server Components with SSR auth.',
+      url: '/docs/guides/getting-started/quickstarts/nextjs',
+      icon: 'Rocket',
+    },
+    {
+      title: 'Auth with PKCE',
+      description: 'Secure auth flow with middleware.',
+      url: '/docs/guides/auth/server-side/nextjs',
+      icon: 'KeyRound',
+    },
   ],
   Flutter: [
-    { title: 'User Management', description: 'Auth and profile management.', url: '/docs/guides/getting-started/tutorials/with-flutter' },
-    { title: 'Deep Linking', description: 'OAuth and magic link for mobile.', url: '/docs/guides/auth/native-mobile-deep-linking' },
+    {
+      title: 'User Management',
+      description: 'Auth and profile management.',
+      url: '/docs/guides/getting-started/tutorials/with-flutter',
+      icon: 'Users',
+    },
+    {
+      title: 'Deep Linking',
+      description: 'OAuth and magic link for mobile.',
+      url: '/docs/guides/auth/native-mobile-deep-linking',
+      icon: 'Link2',
+    },
   ],
   Svelte: [
-    { title: 'Todo List', description: 'Server-side auth and real-time data.', url: '/docs/guides/getting-started/tutorials/with-svelte' },
-    { title: 'Auth Helpers', description: 'Sessions and protected routes.', url: '/docs/guides/auth/server-side/sveltekit' },
+    {
+      title: 'Todo List',
+      description: 'Server-side auth and real-time data.',
+      url: '/docs/guides/getting-started/tutorials/with-svelte',
+      icon: 'ListChecks',
+    },
+    {
+      title: 'Auth Helpers',
+      description: 'Sessions and protected routes.',
+      url: '/docs/guides/auth/server-side/sveltekit',
+      icon: 'ShieldCheck',
+    },
   ],
   Vue: [
-    { title: 'Todo List', description: 'CRUD with Vue 3 Composition API.', url: '/docs/guides/getting-started/tutorials/with-vue-3' },
-    { title: 'Auth with Vue', description: 'Email and OAuth authentication.', url: '/docs/guides/getting-started/quickstarts/vuejs' },
+    {
+      title: 'Todo List',
+      description: 'CRUD with Vue 3 Composition API.',
+      url: '/docs/guides/getting-started/tutorials/with-vue-3',
+      icon: 'ListChecks',
+    },
+    {
+      title: 'Auth with Vue',
+      description: 'Email and OAuth authentication.',
+      url: '/docs/guides/getting-started/quickstarts/vuejs',
+      icon: 'KeyRound',
+    },
   ],
   Nuxt: [
-    { title: 'Nuxt Module', description: 'Auto-configured auth and client.', url: '/docs/guides/getting-started/quickstarts/nuxtjs' },
-    { title: 'Server Routes', description: 'Service role access from server.', url: '/docs/guides/auth/server-side/nuxt' },
+    {
+      title: 'Nuxt Module',
+      description: 'Auto-configured auth and client.',
+      url: '/docs/guides/getting-started/quickstarts/nuxtjs',
+      icon: 'Blocks',
+    },
+    {
+      title: 'Server Routes',
+      description: 'Service role access from server.',
+      url: '/docs/guides/auth/server-side/nuxt',
+      icon: 'Server',
+    },
   ],
 }
 

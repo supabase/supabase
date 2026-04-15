@@ -3,9 +3,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { FileDown, Link2, Table, TableProperties } from 'lucide-react'
 import Image from 'next/image'
-import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { cn } from 'ui'
+
 import { SpreadsheetIllustration } from './Illustrations/SpreadsheetIllustration'
 
 const ICONS = { TableProperties, Table, Link2, FileDown } as const
@@ -141,7 +142,7 @@ export function TableEditorSection() {
           </div>
 
           {/* Right: image + footer */}
-          <div className="flex flex-col border border-border rounded-md overflow-clip">
+          <div className="flex flex-col border border-border rounded-md overflow-clip bg-surface-75">
             <div className="relative h-[400px] shrink-0 overflow-hidden flex items-end justify-center">
               <AnimatePresence mode="wait">
                 <motion.div

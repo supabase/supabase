@@ -26,7 +26,7 @@ export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNod
       <section>
         <Hero />
       </section>
-      <SectionBlock className="border-t border-b-0 border-border relative">
+      <SectionBlock className="border-b-0 relative">
         <div className="-translate-y-16">
           <Products {...content.productsSection} />
         </div>

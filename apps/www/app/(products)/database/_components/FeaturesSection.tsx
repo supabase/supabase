@@ -452,7 +452,7 @@ function RealtimeSkeleton() {
           </table>
           <div
             ref={tableScrollRef}
-            className="max-h-[72px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="max-h-[58px] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <table className="w-full border-collapse text-sm !mt-0 table-fixed">
               <colgroup>

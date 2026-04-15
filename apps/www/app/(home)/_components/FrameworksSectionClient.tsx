@@ -1,9 +1,31 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
+import {
+  Blocks,
+  KeyRound,
+  Link2,
+  ListChecks,
+  Rocket,
+  Server,
+  ShieldCheck,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { cn } from 'ui'
+
+const EXAMPLE_ICONS: Record<string, LucideIcon> = {
+  ListChecks,
+  Users,
+  Rocket,
+  KeyRound,
+  Link2,
+  ShieldCheck,
+  Blocks,
+  Server,
+}
 
 type Framework = {
   name: string
@@ -11,7 +33,7 @@ type Framework = {
   docsUrl: string
   darkHtml: string
   lightHtml: string
-  examples: { title: string; description: string; url: string }[]
+  examples: { title: string; description: string; url: string; icon: string }[]
 }
 
 export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[] }) {
@@ -71,20 +93,21 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
                       transition: { duration: 0.1 },
                     }),
                   }}
-                  className="flex flex-col gap-2.5 md:max-w-sm"
+                  className="flex flex-col gap-1 md:max-w-sm"
                 >
-                  {active.examples.map((example) => (
-                    <Link
-                      key={example.url}
-                      href={example.url}
-                      className="group block border border-border rounded-lg px-2.5 py-2 hover:bg-surface-200 transition-colors"
-                    >
-                      <span className="text-sm font-medium text-foreground">{example.title}</span>
-                      <span className="block text-xs text-foreground-lighter mt-0.5 truncate">
-                        {example.description}
-                      </span>
-                    </Link>
-                  ))}
+                  {active.examples.map((example) => {
+                    const Icon = EXAMPLE_ICONS[example.icon]
+                    return (
+                      <Link
+                        key={example.url}
+                        href={example.url}
+                        className="flex items-center gap-3 py-2 text-2xl font-medium text-foreground-light"
+                      >
+                        {Icon && <Icon size={22} strokeWidth={1.5} />}
+                        {example.title}
+                      </Link>
+                    )
+                  })}
                 </motion.div>
               </AnimatePresence>
             )}
