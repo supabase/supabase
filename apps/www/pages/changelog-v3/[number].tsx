@@ -11,6 +11,7 @@ import { discussionDisplayDate } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import dayjs from 'dayjs'
+import { ArrowUpRightIcon, Github } from 'lucide-react'
 import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
@@ -111,33 +112,32 @@ function ChangelogV3DetailPage({
         }}
       />
       <DefaultLayout>
-        <div className="container mx-auto max-w-3xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-20">
+        <div className="container mx-auto max-w-3xl flex flex-col gap-4 px-4 py-10 sm:px-16 xl:px-20">
           <nav
             aria-label="Breadcrumb"
             className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
           >
-            <Link href="/changelog-v3" className="text-brand-link hover:underline">
+            <Link href="/changelog-v3" className="text-foreground-lighter hover:underline">
               Changelog
             </Link>
-            <span aria-hidden>/</span>
-            <span className="text-foreground max-w-[min(100%,48rem)] truncate font-medium">
-              {title}
-            </span>
           </nav>
 
           <header className="border-default flex flex-col gap-2 border-b pb-6">
             <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>
-            <p className="text-foreground-lighter font-mono text-xs">
-              {dayjs(created_at).format('MMM D, YYYY')}
-            </p>
-            <a
-              href={url}
-              className="text-brand-link w-fit text-sm hover:underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View discussion on GitHub
-            </a>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-foreground-lighter font-mono text-xs">
+                {dayjs(created_at).format('MMM D, YYYY')}
+              </p>
+              <Link
+                target="_blank"
+                href={url}
+                className="flex items-center gap-2 text-sm text-foreground-lighter hover:text-foreground-light"
+                rel="noreferrer"
+              >
+                View discussion on GitHub
+                <ArrowUpRightIcon size={14} />
+              </Link>
+            </div>
           </header>
 
           <article className="prose prose-docs max-w-none [overflow-wrap:break-word]">
@@ -145,22 +145,23 @@ function ChangelogV3DetailPage({
           </article>
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-            {prevNumber != null ? (
-              <Link
-                href={`/changelog-v3/${prevNumber}`}
-                className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
-              >
-                <ArrowLeftIcon className="h-4 w-4" /> Older
-              </Link>
-            ) : (
-              <span />
-            )}
             {nextNumber != null ? (
               <Link
                 href={`/changelog-v3/${nextNumber}`}
                 className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
               >
-                Newer <ArrowRightIcon className="h-4 w-4" />
+                <ArrowLeftIcon className="h-4 w-4" /> Newer
+              </Link>
+            ) : (
+              <span />
+            )}
+            {prevNumber != null ? (
+              <Link
+                href={`/changelog-v3/${prevNumber}`}
+                className="text-foreground-lighter flex items-center gap-2 text-sm hover:text-foreground"
+              >
+                Older
+                <ArrowRightIcon className="h-4 w-4" />
               </Link>
             ) : (
               <span />

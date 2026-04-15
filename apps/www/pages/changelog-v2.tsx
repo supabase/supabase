@@ -385,10 +385,7 @@ function ChangelogV2Page({ changelogIndex, changelog, pageInfo, restPage }: Chan
         >
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
-            <p className="text-foreground-lighter text-lg">
-              New updates and product improvements{' '}
-              <span className="text-foreground font-mono text-sm">(v2 — full index)</span>
-            </p>
+            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           <section

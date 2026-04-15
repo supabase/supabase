@@ -18,6 +18,7 @@ import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
+import { Badge } from 'ui'
 
 export type Discussion = {
   id: string
@@ -349,16 +350,11 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                                     href={githubChangelogLabelFilterUrl(label.name)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                                    className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                                   >
-                                    <span
-                                      className="border-default bg-surface-200 text-foreground-light rounded-md border border-l-[3px] px-1.5 py-px text-[11px] font-medium leading-tight"
-                                      style={{
-                                        borderLeftColor: `#${githubLabelHex(label.color)}`,
-                                      }}
-                                    >
+                                    <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted lowercase px-1.5 py-px text-[11px]">
                                       {label.name}
-                                    </span>
+                                    </Badge>
                                   </a>
                                 ))}
                               </div>

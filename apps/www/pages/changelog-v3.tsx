@@ -40,13 +40,7 @@ function ChangelogV3Page({ changelogIndex }: PageProps) {
         <div className="container mx-auto max-w-3xl flex flex-col gap-6 px-4 py-10 sm:px-16 xl:px-20">
           <div>
             <h1 className="h1">Changelog</h1>
-            <p className="text-foreground-lighter mt-2 text-lg">
-              List-first layout (experiment). Open an entry on this site, or try the{' '}
-              <Link href="/changelog-v3-modal" className="text-brand-link hover:underline">
-                modal variant
-              </Link>
-              .
-            </p>
+            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           <section aria-label="Changelog entries">

@@ -1,11 +1,10 @@
-import { ChangelogMonthTabExplorer } from '~/components/Changelog/ChangelogMonthTabExplorer'
+import { ChangelogV5Explorer } from '~/components/Changelog/ChangelogV5Explorer'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import type { ChangelogTimelineIndexItem } from '~/lib/changelog-github'
 import { getChangelogTimelineSortedIndex } from '~/lib/changelog-github'
 import type { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
-import Link from 'next/link'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 
 type PageProps = {
@@ -23,27 +22,29 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
   }
 }
 
-export default function ChangelogV4MonthTabsPage({ changelogIndex }: PageProps) {
+export default function ChangelogV5TimelinePage({ changelogIndex }: PageProps) {
   return (
     <>
       <NextSeo
-        title="Changelog (v4 — month tabs)"
-        description="Experimental month tabs with sticky tab strip"
+        title="Changelog"
+        description="New updates and improvements to Supabase"
         openGraph={{
-          title: 'Changelog (v4 month tabs)',
-          url: 'https://supabase.com/changelog-v4',
+          title: 'Changelog (v5 bottom timeline)',
+          url: 'https://supabase.com/changelog-v5',
           type: 'article',
         }}
       />
       <DefaultLayout>
         <NuqsAdapter>
-          <div className="container mx-auto max-w-5xl flex flex-col gap-6 px-4 py-10 sm:px-16 xl:px-20">
-            <div>
-              <h1 className="h1">Changelog</h1>
-              <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
-            </div>
-
-            <ChangelogMonthTabExplorer items={changelogIndex} />
+          <div
+            className="
+              mx-auto flex flex-col
+              gap-8
+              px-4 py-10 sm:px-16
+              xl:px-20
+            "
+          >
+            <ChangelogV5Explorer items={changelogIndex} />
           </div>
         </NuqsAdapter>
         <CTABanner />

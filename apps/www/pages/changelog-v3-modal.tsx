@@ -126,18 +126,7 @@ function ChangelogV3ModalContent({ changelogIndex }: PageProps) {
         <div className="container mx-auto max-w-3xl flex flex-col gap-6 px-4 py-10 sm:px-16 xl:px-20">
           <div>
             <h1 className="h1">Changelog</h1>
-            <p className="text-foreground-lighter mt-2 text-lg">
-              Same index as v3, but entries open in a modal (experiment). Prefer full pages?{' '}
-              <Link href="/changelog-v3" className="text-brand-link hover:underline">
-                Use the list + detail layout
-              </Link>
-              . Share or bookmark a specific entry with the GitHub discussion number in the URL,
-              e.g.{' '}
-              <code className="text-foreground-lighter bg-surface-200 rounded px-1 py-0.5 font-mono text-sm">
-                ?discussion=123
-              </code>
-              .
-            </p>
+            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           <section aria-label="Changelog entries">
@@ -166,16 +155,6 @@ function ChangelogV3ModalContent({ changelogIndex }: PageProps) {
                     <p className="font-mono text-xs">
                       {dayjs(displayDateIso).format('MMM D, YYYY')}
                     </p>
-                  )}
-                  {displayUrl && (
-                    <a
-                      href={displayUrl}
-                      className="text-brand-link text-sm hover:underline"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open on GitHub
-                    </a>
                   )}
                   {error && <span className="text-destructive-600 text-sm">{error}</span>}
                 </div>
