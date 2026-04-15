@@ -21,7 +21,7 @@ const WARNING_TYPES = [
 
 type WarningKey = (typeof WARNING_TYPES)[number]['key']
 
-const INITIAL_STATE: Record<WarningKey, Severity> = {
+const INITIAL_STATE: Record = {
   disk_io_exhaustion: null,
   cpu_exhaustion: null,
   memory_and_swap_exhaustion: null,
@@ -35,7 +35,7 @@ export const ResourceWarningsTab = () => {
   const { data: selectedOrg, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const orgSlug = selectedOrg?.slug
   const [isReadOnly, setIsReadOnly] = useState(false)
-  const [severities, setSeverities] = useState<Record<WarningKey, Severity>>(INITIAL_STATE)
+  const [severities, setSeverities] = useState<Record>(INITIAL_STATE)
 
   // Track latest ref/orgSlug so the unmount cleanup always invalidates the
   // correct cache keys, even when orgSlug was still loading at mount time.
@@ -44,10 +44,16 @@ export const ResourceWarningsTab = () => {
     latestValues.current = { ref, orgSlug }
   })
 
+  // Only invalidate on unmount if overrides were actually applied to avoid
+  // unnecessary refetches when the user opens the toolbar but never uses
+  // the Warnings tab.
+  const hasOverridesRef = useRef(false)
+
   // Invalidate both cache keys on unmount so banners revert to real data
   // when the toolbar sheet closes (which unmounts this component).
   useEffect(() => {
     return () => {
+      if (!hasOverridesRef.current) return
       const { ref: latestRef, orgSlug: latestOrgSlug } = latestValues.current
       queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, latestRef) })
       if (latestOrgSlug) {
@@ -59,17 +65,28 @@ export const ResourceWarningsTab = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Reset state when the user navigates to a different project so project A's
-  // overrides don't carry over to project B (this component never unmounts).
+  // When navigating to a different project: reset UI state and invalidate the
+  // departing project's cache keys (the cleanup closure captures the old ref).
+  // This component never unmounts during client-side navigation, so without
+  // this project A's mocked banners would linger on project B.
   useEffect(() => {
-    setSeverities(INITIAL_STATE)
-    setIsReadOnly(false)
+    return () => {
+      if (!hasOverridesRef.current) return
+      queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
+      const { orgSlug: currentOrgSlug } = latestValues.current
+      if (currentOrgSlug) {
+        queryClient.invalidateQueries({
+          queryKey: usageKeys.resourceWarnings(currentOrgSlug, undefined),
+        })
+      }
+      setSeverities(INITIAL_STATE)
+      setIsReadOnly(false)
+      hasOverridesRef.current = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 
-  const applyOverrides = (
-    nextSeverities: Record<WarningKey, Severity>,
-    nextIsReadOnly: boolean
-  ) => {
+  const applyOverrides = (nextSeverities: Record, nextIsReadOnly: boolean) => {
     if (!orgSlug || !ref) return
     const mockWarning: ResourceWarning = {
       project: ref,
@@ -83,6 +100,7 @@ export const ResourceWarningsTab = () => {
     // slug-based (ProjectLayout, TopSection, ProjectList) consumers.
     queryClient.setQueryData(usageKeys.resourceWarnings(undefined, ref), [mockWarning])
     queryClient.setQueryData(usageKeys.resourceWarnings(orgSlug, undefined), [mockWarning])
+    hasOverridesRef.current = true
   }
 
   const handleSeverityChange = (key: WarningKey, value: Severity) => {
@@ -99,6 +117,7 @@ export const ResourceWarningsTab = () => {
   const handleReset = () => {
     setSeverities(INITIAL_STATE)
     setIsReadOnly(false)
+    hasOverridesRef.current = false
     queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
     if (orgSlug) {
       queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })
