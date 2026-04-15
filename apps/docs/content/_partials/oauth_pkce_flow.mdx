@@ -29,15 +29,31 @@ await supabase.auth.signInWithOAuth({
 
 <TabPanel id="server" label="Server">
 
-In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
+In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. When using Server-Side Auth, you must use `@supabase/ssr` to ensure the PKCE flow's session cookies are preserved before redirecting.
 
 ```js
-import { createClient, type Provider } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
+import { type Provider } from '@supabase/supabase-js'
+
 const provider = 'provider' as Provider
-const redirect = (url: string) => {}
+const redirect = (url: string, options?: { headers: Headers }) => {}
 
 // ---cut---
+const headers = new Headers()
+const supabase = createServerClient('url', 'anonKey', {
+  cookies: {
+    getAll() {
+      // return cookies from the request
+      return []
+    },
+    setAll(cookiesToSet) {
+      cookiesToSet.forEach(({ name, value, options }) =>
+        headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+      )
+    },
+  },
+})
+
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
@@ -46,7 +62,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 
 if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
+  redirect(data.url, { headers }) // use the redirect API for your server framework
 }
 ```
 
