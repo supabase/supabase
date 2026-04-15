@@ -95,11 +95,6 @@ export const useUnifiedLogsPreview = () => {
   return { isEnabled, enable, disable }
 }
 
-export const useIsBranching2Enabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0]
-}
-
 export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')

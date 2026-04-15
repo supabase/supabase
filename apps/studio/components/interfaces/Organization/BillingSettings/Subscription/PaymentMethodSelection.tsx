@@ -23,6 +23,7 @@ import {
   type PaymentMethodElementRef,
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
+import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
@@ -69,7 +70,14 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     useOrganizationCustomerProfileQuery({
       slug,
     })
-  const { data: taxId, isPending: isCustomerTaxIdLoading } = useOrganizationTaxIdQuery({ slug })
+  const {
+    data: taxId,
+    isPending: isCustomerTaxIdLoading,
+    isError: isTaxIdError,
+  } = useOrganizationTaxIdQuery({ slug })
+  const { mutateAsync: updateCustomerProfile } = useOrganizationCustomerProfileUpdateMutation({
+    onError: () => {},
+  })
 
   const { data: allPaymentMethods, isPending: isLoading } = useOrganizationPaymentMethodsQuery({
     slug,
@@ -176,6 +184,51 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     }
   }, [selectedPaymentMethod, paymentMethods, onSelectPaymentMethod])
 
+  const getFormValues = async (): ReturnType<PaymentMethodElementRef['getFormValues']> => {
+    if (setupNewPaymentMethod || (paymentMethods?.data && paymentMethods.data.length === 0)) {
+      return paymentRef.current?.getFormValues()
+    } else {
+      return {
+        address: customerProfile?.address ?? ({} as CustomerAddress),
+        customerName: customerProfile?.billing_name || '',
+        taxId: taxId ?? null,
+      }
+    }
+  }
+
+  // Validate address/tax ID with a dry run before proceeding with Stripe,
+  // so validation errors (e.g. invalid tax ID) block the flow early.
+  const validateBillingProfile = async (): Promise<boolean> => {
+    if (!useAsDefaultBillingAddress) return true
+
+    if (isTaxIdError || isCustomerTaxIdLoading) {
+      toast.error(
+        isTaxIdError
+          ? 'Unable to load current tax ID. Please try again.'
+          : 'Tax ID is still loading. Please wait and try again.'
+      )
+      return false
+    }
+
+    const formValues = await getFormValues()
+    if (!formValues) return false
+
+    try {
+      await updateCustomerProfile({
+        slug,
+        address: formValues.address,
+        billing_name: formValues.customerName,
+        tax_id: formValues.taxId,
+        dry_run: true,
+      })
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to validate billing profile')
+      return false
+    }
+
+    return true
+  }
+
   // If createPaymentMethod already exists, use it. Otherwise, define it here.
   const createPaymentMethod = async (): ReturnType<
     PaymentMethodElementRef['createPaymentMethod']
@@ -203,6 +256,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
 
   useImperativeHandle(ref, () => ({
     createPaymentMethod,
+    validateBillingProfile,
   }))
 
   return (
