@@ -1,0 +1,40 @@
+---
+id: 'storage-management'
+title: 'Download Objects'
+description: 'Learn about downloading objects'
+subtitle: 'Learn about downloading objects'
+sidebar_label: 'Download Objects'
+---
+
+Supabase Storage consists of two parts that you must back up separately:
+
+- **File metadata** — stored in the `storage.objects` table in your Postgres database
+- **Actual files** — stored in Supabase's S3-compatible storage backend
+
+## Step 1: Export file metadata (via database dump)
+
+Run the following three CLI commands to dump your full database, which includes `storage.objects`:
+
+```
+supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
+supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
+supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
+```
+
+You can find your `CONNECTION_STRING` in [**Database > Settings**](/dashboard/project/_/database/settings?showConnect=true) section of the Dashboard.
+
+For full details, see the [backup restore guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
+
+## Step 2: Download actual files (via S3-compatible endpoint)
+
+1. Go to the **Storage > [S3 Configuration](/dashboard/project/_/storage/s3)** section of the Dashboard.
+2. Generate an access key + secret key pair (shown once — save it immediately)
+3. Use any S3-compatible tool (AWS CLI, rclone, Cyberduck, etc.) to sync your files locally using the endpoint and credentials from the dashboard
+
+See the [S3 authentication doc](/docs/guides/storage/s3/authentication) for connection details.
+
+<Admonition type="note">
+
+Repeat Step 2 for each bucket. Both steps are required for a complete backup. The database dump alone won't include the actual files, and the S3 sync alone won't include the metadata.
+
+</Admonition>
