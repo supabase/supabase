@@ -177,7 +177,8 @@ export const NewScopedTokenSheet = ({
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
-        track('scoped_access_token_created', {
+        track('access_token_created', {
+          tokenType: 'scoped',
           expiryPreset: values.expiresAt || 'never',
           resourceAccess: values.resourceAccess,
           permissionCount: permissionRows.length,

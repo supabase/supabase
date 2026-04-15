@@ -3040,7 +3040,7 @@ export interface PricingPageExperimentExposedEvent {
 }
 
 /**
- * Triggered when a classic access token is successfully created.
+ * Triggered when an access token is successfully created.
  *
  * @group Events
  * @source studio
@@ -3049,14 +3049,20 @@ export interface PricingPageExperimentExposedEvent {
 export interface AccessTokenCreatedEvent {
   action: 'access_token_created'
   properties: {
+    /** Whether this is a classic or scoped token */
+    tokenType: 'classic' | 'scoped'
     /** The selected expiry preset, e.g. 'hour', 'day', 'week', 'month', 'never', 'custom' */
     expiryPreset: string
+    /** The resource access scope selected for the token (scoped tokens only) */
+    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    /** Number of permission rows configured on the token (scoped tokens only) */
+    permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
- * Triggered when a classic access token is successfully deleted.
+ * Triggered when an access token is successfully deleted.
  *
  * @group Events
  * @source studio
@@ -3064,38 +3070,10 @@ export interface AccessTokenCreatedEvent {
  */
 export interface AccessTokenRemovedEvent {
   action: 'access_token_removed'
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * Triggered when a scoped access token is successfully created.
- *
- * @group Events
- * @source studio
- * @page /account/tokens/scoped
- */
-export interface ScopedAccessTokenCreatedEvent {
-  action: 'scoped_access_token_created'
   properties: {
-    /** The selected expiry preset, e.g. 'hour', 'day', 'week', 'month', 'never', 'custom' */
-    expiryPreset: string
-    /** The resource access scope selected for the token */
-    resourceAccess: 'all-orgs' | 'selected-orgs' | 'selected-projects'
-    /** Number of permission rows configured on the token */
-    permissionCount: number
+    /** Whether this is a classic or scoped token */
+    tokenType: 'classic' | 'scoped'
   }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * Triggered when a scoped access token is successfully deleted.
- *
- * @group Events
- * @source studio
- * @page /account/tokens/scoped
- */
-export interface ScopedAccessTokenRemovedEvent {
-  action: 'scoped_access_token_removed'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -3284,5 +3262,3 @@ export type TelemetryEvent =
   | HeaderUpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
-  | ScopedAccessTokenCreatedEvent
-  | ScopedAccessTokenRemovedEvent

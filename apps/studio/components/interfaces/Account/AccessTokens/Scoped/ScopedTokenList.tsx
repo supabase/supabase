@@ -52,7 +52,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
 
   const { mutate: deleteToken } = useScopedAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
-      track('scoped_access_token_removed')
+      track('access_token_removed', { tokenType: 'scoped' })
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)

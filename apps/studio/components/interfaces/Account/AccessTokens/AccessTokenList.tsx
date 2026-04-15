@@ -44,7 +44,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
 
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
-      track('access_token_removed')
+      track('access_token_removed', { tokenType: 'classic' })
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)

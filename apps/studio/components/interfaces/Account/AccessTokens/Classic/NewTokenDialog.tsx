@@ -88,7 +88,10 @@ export const NewTokenDialog = ({
       { name: values.tokenName, scope: tokenScope, expires_at: expiresAt },
       {
         onSuccess: (data) => {
-          track('access_token_created', { expiryPreset: values.expiresAt || 'never' })
+          track('access_token_created', {
+            tokenType: 'classic',
+            expiryPreset: values.expiresAt || 'never',
+          })
           toast.success('Access token created successfully')
           onCreateToken(data)
           handleClose()
