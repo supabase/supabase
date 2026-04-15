@@ -28,6 +28,8 @@ const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
+// When updating page content, also update public/llms/auth.txt
+
 function AuthPage() {
   const isMobile = useBreakpoint(768)
   const { basePath } = useRouter()

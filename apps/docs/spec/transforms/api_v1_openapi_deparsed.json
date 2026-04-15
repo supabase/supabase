@@ -21722,7 +21722,7 @@
             "bearer": []
           },
           {
-            "fga_permissions": ["organization_projects_read"]
+            "fga_permissions": ["organization_admin_read"]
           }
         ],
         "summary": "Get entitlements for an organization",
@@ -22375,7 +22375,14 @@
         ],
         "summary": "Gets all projects for the given organization",
         "tags": ["Projects"],
-        "x-endpoint-owners": ["management-api"]
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:read",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "projects:read"
       }
     }
   },

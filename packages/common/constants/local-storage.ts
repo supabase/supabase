@@ -50,10 +50,6 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
 
-  // Key to track if the user has acknowledged the security notifications preview
-  SECURITY_NOTIFICATIONS_ACKNOWLEDGED: (ref: string) =>
-    `security-notifications-acknowledged-${ref}`,
-
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
@@ -118,6 +114,8 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
+  STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
+    `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
   PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
 
   /**
