@@ -19,7 +19,7 @@ const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSe
 const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
 const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
 
-// When updating page content, also update public/llms/vector.txt
+// When updating page content, also update public/md/vector.md
 
 function VectorPage() {
   // base path for images

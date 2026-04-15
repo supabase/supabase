@@ -37,7 +37,7 @@ const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
-// When updating page content, also update public/llms/database.txt
+// When updating page content, also update public/md/database.md
 
 function Database() {
   // base path for images

@@ -1,7 +1,7 @@
 // @ts-check
 
 /**
- * Generates apps/www/public/llms/pricing.txt from structured pricing data.
+ * Generates apps/www/public/md/pricing.md from structured pricing data.
  *
  * Source data:
  *   - packages/shared-data/plans.ts   (plan tiers, features, cta copy)
@@ -329,7 +329,7 @@ const output = [
 // Write output
 // ---------------------------------------------------------------------------
 
-const outputPath = path.join(__dirname, '../public/llms/pricing.txt')
+const outputPath = path.join(__dirname, '../public/md/pricing.md')
 await fs.writeFile(outputPath, output, 'utf8')
 
 console.log(`✅ Generated ${outputPath}`)

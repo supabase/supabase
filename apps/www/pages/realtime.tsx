@@ -23,7 +23,7 @@ import { PRODUCT_NAMES } from 'shared-data/products'
 
 const SingleQuote = dynamic(() => import('~/components/Sections/SingleQuote'))
 
-// When updating page content, also update public/llms/realtime.txt
+// When updating page content, also update public/md/realtime.md
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (

@@ -115,17 +115,19 @@ const SOURCES: Source[] = [
   },
 ]
 
-// Product overview .txt files are hand-curated and live in apps/www/public/llms/.
+// Product overview .md files are hand-curated and live in apps/www/public/md/.
 // These links always point to production since llms.txt is only meaningful in prod.
 const PRODUCT_OVERVIEW_LINKS = [
-  '- [Supabase Overview](https://supabase.com/llms/homepage.txt)',
-  '- [Supabase Database](https://supabase.com/llms/database.txt)',
-  '- [Supabase Auth](https://supabase.com/llms/auth.txt)',
-  '- [Supabase Storage](https://supabase.com/llms/storage.txt)',
-  '- [Supabase Edge Functions](https://supabase.com/llms/edge-functions.txt)',
-  '- [Supabase Realtime](https://supabase.com/llms/realtime.txt)',
-  '- [Supabase Vector](https://supabase.com/llms/vector.txt)',
-  '- [Supabase Pricing](https://supabase.com/llms/pricing.txt)',
+  '- [Supabase Overview](https://supabase.com/homepage.md)',
+  '- [Supabase Database](https://supabase.com/database.md)',
+  '- [Supabase Auth](https://supabase.com/auth.md)',
+  '- [Supabase Storage](https://supabase.com/storage.md)',
+  '- [Supabase Edge Functions](https://supabase.com/edge-functions.md)',
+  '- [Supabase Realtime](https://supabase.com/realtime.md)',
+  '- [Supabase Vector](https://supabase.com/vector.md)',
+  '- [Supabase Cron](https://supabase.com/modules/cron.md)',
+  '- [Supabase Queues](https://supabase.com/modules/queues.md)',
+  '- [Supabase Pricing](https://supabase.com/pricing.md)',
 ].join('\n')
 
 async function generateMainLlmsTxt() {
@@ -150,22 +152,24 @@ async function generateMainLlmsTxt() {
   await fs.writeFile('public/llms.txt', fullText)
 }
 
-// Product overview .txt files live in apps/www/public/llms/, read at build time.
+// Product overview .md files live in apps/www/public/md/, read at build time.
 // Order matters: homepage first, pricing last, products alphabetical in between.
 const PRODUCT_LLM_FILES = [
-  'homepage.txt',
-  'auth.txt',
-  'database.txt',
-  'edge-functions.txt',
-  'realtime.txt',
-  'storage.txt',
-  'vector.txt',
-  'pricing.txt',
+  'homepage.md',
+  'auth.md',
+  'database.md',
+  'edge-functions.md',
+  'realtime.md',
+  'storage.md',
+  'vector.md',
+  'pricing.md',
+  'modules/cron.md',
+  'modules/queues.md',
 ]
 
 const PRODUCT_LLMS_DIR = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../../../apps/www/public/llms'
+  '../../../apps/www/public/md'
 )
 
 async function readProductLlmContent(): Promise<string> {

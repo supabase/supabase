@@ -1,3 +1,4 @@
+// When updating page content, also update public/md/modules/cron.md
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 
