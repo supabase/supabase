@@ -1,17 +1,16 @@
 'use client'
 
-import type { ChangelogTimelineIndexItem } from '~/lib/changelog-github'
-import { githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
-import mdxComponents from '~/lib/mdx/mdxComponents'
+import { GitHubIcon } from '~/components/Contribute/Icons'
 import dayjs from 'dayjs'
 import { ChevronsUpDown } from 'lucide-react'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
+import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import {
   Badge,
+  Button,
   cn,
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
@@ -24,6 +23,11 @@ import {
   PopoverTrigger_Shadcn_,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { ChangelogRssButton } from '@/components/Changelog/ChangelogRssButton'
+import type { ChangelogTimelineIndexItem } from '@/lib/changelog-github'
+import { githubChangelogLabelFilterUrl } from '@/lib/changelog.utils'
+import mdxComponents from '@/lib/mdx/mdxComponents'
 
 import 'ui-patterns/ShimmeringLoader/index.css'
 
@@ -287,7 +291,7 @@ export function ChangelogV6Explorer({ items }: Props) {
         {loadingDoc && <GenericSkeletonLoader />}
 
         {!loadingDoc && doc && (
-          <div className="flex flex-col gap-6 pb-12">
+          <div className="flex flex-col items-start gap-6 pb-12">
             {labels.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-1.5">
                 {labels.map((label) => (
@@ -313,6 +317,11 @@ export function ChangelogV6Explorer({ items }: Props) {
             ) : (
               !doc.error && <p className="text-foreground-lighter text-sm">No content.</p>
             )}
+            <div className="flex flex-col gap-1">
+              <Button asChild type="text" icon={<GitHubIcon className="w-4 h-4" />}>
+                <Link href={selectedItem?.url ?? ''}>View on GitHub</Link>
+              </Button>
+            </div>
           </div>
         )}
       </section>
