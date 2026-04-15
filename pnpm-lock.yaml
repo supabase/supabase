@@ -164,7 +164,7 @@ importers:
     dependencies:
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
+        version: 3.3.1(react-hook-form@7.72.1(react@18.3.1))
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -214,8 +214,8 @@ importers:
         specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       react-inlinesvg:
         specifier: ^4.0.4
         version: 4.0.4(react@18.3.1)
@@ -318,7 +318,7 @@ importers:
         version: 2.2.0
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
+        version: 3.3.1(react-hook-form@7.72.1(react@18.3.1))
       '@mdx-js/loader':
         specifier: ^3.0.0
         version: 3.1.1(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.25.2))
@@ -497,8 +497,8 @@ importers:
         specifier: ^4.0.12
         version: 4.0.13(react@18.3.1)
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       react-intersection-observer:
         specifier: ^9.5.3
         version: 9.8.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -906,7 +906,7 @@ importers:
         version: 2.1.3(react@18.3.1)
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
+        version: 3.3.1(react-hook-form@7.72.1(react@18.3.1))
       '@mjackson/multipart-parser':
         specifier: ^0.10.1
         version: 0.10.1
@@ -1124,8 +1124,8 @@ importers:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       react-inlinesvg:
         specifier: ^4.0.4
         version: 4.0.4(react@18.3.1)
@@ -1381,7 +1381,7 @@ importers:
     dependencies:
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
+        version: 3.3.1(react-hook-form@7.72.1(react@18.3.1))
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1545,8 +1545,8 @@ importers:
         specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@18.3.3)(react@18.3.1)(supports-color@8.1.1)
@@ -1908,7 +1908,7 @@ importers:
         version: 7.29.0(supports-color@8.1.1)
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
+        version: 3.3.1(react-hook-form@7.72.1(react@18.3.1))
       '@types/animejs':
         specifier: ^3.1.12
         version: 3.1.12
@@ -1952,8 +1952,8 @@ importers:
         specifier: ^8.5.3
         version: 8.5.8
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       tailwindcss:
         specifier: ^3.4.1
         version: 3.4.1(ts-node@10.9.2(@types/node@22.13.14)(typescript@6.0.2))
@@ -2585,8 +2585,8 @@ importers:
         specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       react-intersection-observer:
         specifier: ^9.8.2
         version: 9.8.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2662,7 +2662,7 @@ importers:
     dependencies:
       '@hookform/resolvers':
         specifier: ^3.1.1
-        version: 3.3.1(react-hook-form@7.47.0(react@18.3.1))
+        version: 3.3.1(react-hook-form@7.72.1(react@18.3.1))
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.52.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2757,8 +2757,8 @@ importers:
         specifier: ^4.0.12
         version: 4.0.13(react@18.3.1)
       react-hook-form:
-        specifier: ^7.45.0
-        version: 7.47.0(react@18.3.1)
+        specifier: ^7.71.2
+        version: 7.72.1(react@18.3.1)
       react-intersection-observer:
         specifier: ^9.8.2
         version: 9.8.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -16337,11 +16337,11 @@ packages:
       react: '>= 16.3.0'
       react-dom: '>= 16.3.0'
 
-  react-hook-form@7.47.0:
-    resolution: {integrity: sha512-F/TroLjTICipmHeFlMrLtNLceO2xr1jU3CyiNla5zdwsGUGu2UOxxR4UyJgLlhMwLW/Wzp4cpJ7CPfgJIeKdSg==}
-    engines: {node: '>=12.22.0'}
+  react-hook-form@7.72.1:
+    resolution: {integrity: sha512-RhwBoy2ygeVZje+C+bwJ8g0NjTdBmDlJvAUHTxRjTmSUKPYsKfMphkS2sgEMotsY03bP358yEYlnUeZy//D9Ig==}
+    engines: {node: '>=18.0.0'}
     peerDependencies:
-      react: ^16.8.0 || ^17 || ^18
+      react: ^16.8.0 || ^17 || ^18 || ^19
 
   react-inlinesvg@4.0.4:
     resolution: {integrity: sha512-OnXi+IHoY2zj6rt+kLmXQth9HZ3rS1TDtDwjFbELcCZngAJC32nXp2ZzLp4FpijzISDe7YfHI3SFs9qALWv+xw==}
@@ -21465,9 +21465,9 @@ snapshots:
     dependencies:
       hono: 4.12.12
 
-  '@hookform/resolvers@3.3.1(react-hook-form@7.47.0(react@18.3.1))':
+  '@hookform/resolvers@3.3.1(react-hook-form@7.72.1(react@18.3.1))':
     dependencies:
-      react-hook-form: 7.47.0(react@18.3.1)
+      react-hook-form: 7.72.1(react@18.3.1)
 
   '@humanfs/core@0.19.1': {}
 
@@ -35595,7 +35595,7 @@ snapshots:
       react-resizable: 3.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       resize-observer-polyfill: 1.5.1
 
-  react-hook-form@7.47.0(react@18.3.1):
+  react-hook-form@7.72.1(react@18.3.1):
     dependencies:
       react: 18.3.1
 

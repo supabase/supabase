@@ -119,7 +119,7 @@
     "react-dom": "catalog:",
     "react-error-boundary": "^4.0.13",
     "react-grid-layout": "^1.4.2",
-    "react-hook-form": "^7.45.0",
+    "react-hook-form": "^7.71.2",
     "react-inlinesvg": "^4.0.4",
     "react-intersection-observer": "^9.5.3",
     "react-markdown": "^8.0.3",
