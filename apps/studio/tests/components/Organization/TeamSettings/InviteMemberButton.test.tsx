@@ -75,7 +75,7 @@ vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', 
   useGetRolesManagementPermissions: () => ({ rolesAddable: [1], rolesRemovable: [1] }),
 }))
 
-const mockInvite = vi.fn().mockResolvedValue({})
+const mockInvite = vi.fn().mockResolvedValue({ succeeded: [], failed: [] })
 vi.mock('@/data/organization-members/organization-invitation-create-mutation', () => ({
   useOrganizationCreateInvitationMutation: () => ({
     mutateAsync: mockInvite,
@@ -111,7 +111,7 @@ async function submitForm(emailValue: string) {
 describe('InviteMemberButton', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockInvite.mockResolvedValue({})
+    mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
   })
 
   it('renders an enabled Invite members button', () => {
@@ -193,6 +193,61 @@ describe('InviteMemberButton', () => {
       expect(toast.error).toHaveBeenCalled()
       expect(mockInvite).toHaveBeenCalledWith(
         expect.objectContaining({ emails: ['new@example.com'] })
+      )
+    })
+  })
+
+  it('shows a success toast for a single email in succeeded', async () => {
+    mockInvite.mockResolvedValueOnce({ succeeded: ['new@example.com'], failed: [] })
+    customRender(<InviteMemberButton />)
+    await submitForm('new@example.com')
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully sent invitation to new member')
+    })
+  })
+
+  it('shows a plural success toast when multiple emails succeeded', async () => {
+    mockInvite.mockResolvedValueOnce({
+      succeeded: ['alice@example.com', 'bob@example.com'],
+      failed: [],
+    })
+    customRender(<InviteMemberButton />)
+    await submitForm('alice@example.com, bob@example.com')
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully sent invitations to 2 new members')
+    })
+  })
+
+  it('shows an error toast with the server error for each failed email', async () => {
+    mockInvite.mockResolvedValueOnce({
+      succeeded: [],
+      failed: [{ email: 'new@example.com', error: 'Domain not allowed' }],
+    })
+    customRender(<InviteMemberButton />)
+    await submitForm('new@example.com')
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to invite new@example.com: Domain not allowed'
+      )
+    })
+    expect(toast.success).not.toHaveBeenCalled()
+  })
+
+  it('shows both success and error toasts for a partial batch result', async () => {
+    mockInvite.mockResolvedValueOnce({
+      succeeded: ['alice@example.com'],
+      failed: [{ email: 'bob@example.com', error: 'Domain not allowed' }],
+    })
+    customRender(<InviteMemberButton />)
+    await submitForm('alice@example.com, bob@example.com')
+
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully sent invitation to new member')
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to invite bob@example.com: Domain not allowed'
       )
     })
   })

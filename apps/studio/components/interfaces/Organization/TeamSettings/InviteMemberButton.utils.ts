@@ -47,6 +47,16 @@ export type CategorizedEmails = {
   toInvite: string[]
 }
 
+export type BatchInvitationFailure = {
+  email: string
+  error: string
+}
+
+export type BatchInvitationResult = {
+  succeeded: string[]
+  failed: BatchInvitationFailure[]
+}
+
 export function categorizeInviteEmails(
   emails: string[],
   members: OrganizationMember[]

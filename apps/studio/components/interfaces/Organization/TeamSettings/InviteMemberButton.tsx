@@ -32,6 +32,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
+  BatchInvitationResult,
   buildProjectPayload,
   buildSsoPayload,
   categorizeInviteEmails,
@@ -175,24 +176,36 @@ export const InviteMemberButton = () => {
     const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRef)
     const ssoPayload = buildSsoPayload(values.requireSso)
 
+    let result: BatchInvitationResult
     try {
-      await inviteMemberAsync({
+      result = (await inviteMemberAsync({
         slug,
         emails: toInvite,
         roleId: Number(values.role),
         ...projectPayload,
         ...ssoPayload,
-      })
+      })) as BatchInvitationResult
     } catch {
       return // onError callback already showed the toast
     }
 
-    toast.success(
-      toInvite.length === 1
-        ? 'Successfully sent invitation to new member'
-        : `Successfully sent invitations to ${toInvite.length} new members`
-    )
-    closeInviteDialog()
+    const { succeeded, failed } = result
+
+    if (succeeded.length > 0) {
+      toast.success(
+        succeeded.length === 1
+          ? 'Successfully sent invitation to new member'
+          : `Successfully sent invitations to ${succeeded.length} new members`
+      )
+    }
+
+    for (const { email, error } of failed) {
+      toast.error(`Failed to invite ${email}: ${error}`)
+    }
+
+    if (succeeded.length > 0) {
+      closeInviteDialog()
+    }
   }
 
   useEffect(() => {
