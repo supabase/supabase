@@ -74,6 +74,7 @@ overrides:
   'terser-webpack-plugin>serialize-javascript': ^7.0.5
   tmp: ^0.2.4
   webpack: ^5.104.1
+  unhead: ^2.1.13
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch
