@@ -89,7 +89,10 @@ const nextConfig = {
       },
       {
         source: '/.well-known/api-catalog',
-        headers: [{ key: 'content-type', value: 'application/linkset+json' }],
+        headers: [
+          { key: 'content-type', value: 'application/linkset+json' },
+          { key: 'access-control-allow-origin', value: '*' },
+        ],
       },
       {
         source: '/.well-known/vercel/flags',
