@@ -26,6 +26,7 @@ Anna Weihl
 Ant Evans
 Ant Wilson
 Ariuna K
+Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
 Barco Fourie
@@ -152,6 +153,7 @@ Krishna Sai Vandavasi
 Lakshan Perera
 Laura C
 Laurence Isla
+Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago

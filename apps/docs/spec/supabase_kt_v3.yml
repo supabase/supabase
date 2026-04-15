@@ -3672,7 +3672,6 @@ functions:
           ```kotlin
           supabase.auth.linkIdentityWithIdToken(Google, idToken = "receivedToken")
           ```
-          
 
   - id: unlink-identity
     title: 'unlinkIdentity()'

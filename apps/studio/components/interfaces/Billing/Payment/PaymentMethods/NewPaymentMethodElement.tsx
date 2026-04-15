@@ -75,6 +75,14 @@ export type PaymentMethodElementRef = {
       }
     | undefined
   >
+  getFormValues: () => Promise<
+    | {
+        address: CustomerAddress
+        customerName: string
+        taxId: CustomerTaxId | null
+      }
+    | undefined
+  >
 }
 
 export const NewPaymentMethodElement = forwardRef(
@@ -162,9 +170,13 @@ export const NewPaymentMethodElement = forwardRef(
       PaymentMethodElementRef['createPaymentMethod']
     > => {
       if (!stripe || !elements) return
-      await form.trigger()
+      const isValid = await form.trigger()
 
-      if (purchasingAsBusiness && availableTaxIds.length > 0 && !form.getValues('tax_id_value')) {
+      if (
+        purchasingAsBusiness &&
+        availableTaxIds.length > 0 &&
+        (!isValid || !form.getValues('tax_id_value'))
+      ) {
         return
       }
 
@@ -192,7 +204,8 @@ export const NewPaymentMethodElement = forwardRef(
     }
 
     function getConfiguredTaxId(): CustomerTaxId | null {
-      return purchasingAsBusiness && selectedTaxId
+      const isValidForCountry = selectedTaxId && availableTaxIds.includes(selectedTaxId)
+      return purchasingAsBusiness && isValidForCountry
         ? {
             country: getEffectiveTaxCountry(selectedTaxId),
             type: selectedTaxId.type,
@@ -229,9 +242,37 @@ export const NewPaymentMethodElement = forwardRef(
       }
     }
 
+    const getFormValues = async (): ReturnType<PaymentMethodElementRef['getFormValues']> => {
+      if (!elements) return
+
+      const isValid = await form.trigger()
+      if (
+        purchasingAsBusiness &&
+        availableTaxIds.length > 0 &&
+        (!isValid || !form.getValues('tax_id_value'))
+      ) {
+        return
+      }
+
+      const { error: submitError } = await elements.submit()
+      if (submitError) return
+
+      const addressElement = await elements.getElement('address')!.getValue()
+
+      return {
+        address: {
+          ...addressElement.value.address,
+          line2: addressElement.value.address.line2 || undefined,
+        },
+        customerName: addressElement.value.name,
+        taxId: getConfiguredTaxId(),
+      }
+    }
+
     useImperativeHandle(ref, () => ({
       createPaymentMethod,
       confirmSetup,
+      getFormValues,
     }))
 
     const addressOptions: StripeAddressElementOptions = useMemo(
@@ -254,10 +295,11 @@ export const NewPaymentMethodElement = forwardRef(
       [purchasingAsBusiness]
     )
 
-    // Preselect tax id when the country changes (if there are available tax ids for that country)
+    // Reset tax ID fields when the billing country changes and preselect the
+    // first available tax ID for the new country.
     const prevCountryRef = useRef(addressCountry)
     useEffect(() => {
-      if (!availableTaxIds.length || !addressCountry) return
+      if (!addressCountry) return
 
       const isCountryChange =
         prevCountryRef.current !== undefined && prevCountryRef.current !== addressCountry
@@ -266,12 +308,18 @@ export const NewPaymentMethodElement = forwardRef(
       // On country change: always reset to the new country's default
       // On initial load: only preselect if there's no existing tax id
       if (isCountryChange || !currentTaxId) {
-        const taxIdOption = availableTaxIds[0]
-        form.setValue('tax_id_type', taxIdOption.type)
-        form.setValue('tax_id_value', '')
-        form.setValue('tax_id_name', taxIdOption.name)
+        if (availableTaxIds.length) {
+          const taxIdOption = availableTaxIds[0]
+          form.setValue('tax_id_type', taxIdOption.type)
+          form.setValue('tax_id_value', '')
+          form.setValue('tax_id_name', taxIdOption.name)
+        } else {
+          form.setValue('tax_id_type', '')
+          form.setValue('tax_id_value', '')
+          form.setValue('tax_id_name', '')
+        }
       }
-    }, [availableTaxIds, addressCountry, currentTaxId])
+    }, [availableTaxIds, addressCountry, currentTaxId, form])
 
     return (
       <div className="space-y-2">

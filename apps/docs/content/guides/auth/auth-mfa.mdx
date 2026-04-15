@@ -226,7 +226,7 @@ create policy "Policy name."
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
   timestamp prior to 12th December 2022 at 00:00 UTC, but will only accept
   `aal2` for all other timestamps.
-- The `<@` operator is PostgreSQL's ["contained in"
+- The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
@@ -256,7 +256,7 @@ create policy "Policy name."
 - The policy will only accept only `aal2` when the user has at least one MFA
   factor verified.
 - Otherwise, it will accept both `aal1` and `aal2`.
-- The `<@` operator is PostgreSQL's ["contained in"
+- The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
