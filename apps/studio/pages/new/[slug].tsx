@@ -535,6 +535,7 @@ const Wizard: NextPageWithLayout = () => {
                             refetchGitHubAuthorizationAndRepositories={
                               refetchGitHubAuthorizationAndRepositories
                             }
+                            onConnectClick={() => track('project_creation_github_connect_clicked')}
                           />
                         </Panel.Content>
                       )}

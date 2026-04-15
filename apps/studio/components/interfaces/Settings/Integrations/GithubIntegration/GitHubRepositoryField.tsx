@@ -102,6 +102,7 @@ interface GitHubRepositoryFieldProps<TFormValues extends FieldValues> {
   isLoadingGitHubRepos?: boolean
   placeholder?: string
   refetchGitHubAuthorizationAndRepositories: () => void
+  onConnectClick?: () => void
   onRepositorySelect?: (repo: GitHubRepository) => void
 }
 
@@ -122,6 +123,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
   isLoadingGitHubRepos = false,
   placeholder = 'Choose GitHub repository',
   refetchGitHubAuthorizationAndRepositories,
+  onConnectClick,
   onRepositorySelect,
 }: GitHubRepositoryFieldProps<TFormValues>) => {
   const [isRepoSelectorOpen, setIsRepoSelectorOpen] = useState(false)
@@ -142,12 +144,13 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                 size="small"
                 htmlType="button"
                 disabled={disabled}
-                onClick={() =>
+                onClick={() => {
+                  onConnectClick?.()
                   openInstallGitHubIntegrationWindow(
                     'authorize',
                     refetchGitHubAuthorizationAndRepositories
                   )
-                }
+                }}
                 icon={GITHUB_ICON}
               >
                 Connect GitHub
