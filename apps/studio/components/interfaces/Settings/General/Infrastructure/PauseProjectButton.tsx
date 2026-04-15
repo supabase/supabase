@@ -61,6 +61,18 @@ const PauseProjectButton = () => {
     !canPauseProject ||
     !isProjectActive
 
+  function getTooltipText() {
+    if (isPaused) return 'Your project is already paused'
+    if (!canPauseProject) return 'You need additional permissions to pause this project'
+    if (isProjectUnhealthy)
+      return 'Your project is unhealthy — restart it instead to restore normal operation'
+    if (!isProjectActive) return 'Unable to pause project as project is not active'
+    if (isBranch) return 'Branch projects cannot be paused'
+    if (!projectPausingAllowedInOrg && !isFreePlan)
+      return 'Projects on a paid plan will always be running'
+    return undefined
+  }
+
   return (
     <>
       <ButtonTooltip
@@ -72,19 +84,7 @@ const PauseProjectButton = () => {
         tooltip={{
           content: {
             side: 'bottom',
-            text: isPaused
-              ? 'Your project is already paused'
-              : !canPauseProject
-                ? 'You need additional permissions to pause this project'
-                : isProjectUnhealthy
-                  ? 'Your project is unhealthy — restart it instead to restore normal operation'
-                  : !isProjectActive
-                    ? 'Unable to pause project as project is not active'
-                    : isBranch
-                      ? 'Branch projects cannot be paused'
-                      : !projectPausingAllowedInOrg && !isFreePlan
-                        ? 'Projects on a paid plan will always be running'
-                        : undefined,
+            text: getTooltipText(),
           },
         }}
       >
