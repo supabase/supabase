@@ -22,6 +22,7 @@ const HotkeySchema = z.object({
   inlineEditorEnabled: z.boolean(),
   copyMarkdownEnabled: z.boolean(),
   copyJsonEnabled: z.boolean(),
+  copyCsvEnabled: z.boolean(),
   downloadCsvEnabled: z.boolean(),
 })
 
@@ -46,6 +47,10 @@ export const HotkeySettings = () => {
     LOCAL_STORAGE_KEYS.HOTKEY_COPY_JSON,
     true
   )
+  const [copyCsvEnabled, setCopyCsvEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.HOTKEY_COPY_CSV,
+    true
+  )
   const [downloadCsvEnabled, setDownloadCsvEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.HOTKEY_DOWNLOAD_CSV,
     true
@@ -59,6 +64,7 @@ export const HotkeySettings = () => {
       inlineEditorEnabled: inlineEditorEnabled ?? true,
       copyMarkdownEnabled: copyMarkdownEnabled ?? true,
       copyJsonEnabled: copyJsonEnabled ?? true,
+      copyCsvEnabled: copyCsvEnabled ?? true,
       downloadCsvEnabled: downloadCsvEnabled ?? true,
     },
   })
@@ -110,6 +116,13 @@ export const HotkeySettings = () => {
               keys={['Shift', 'Meta', 'j']}
               label="Copy results as JSON"
               onToggle={setCopyJsonEnabled}
+            />
+            <HotkeyToggle
+              form={form}
+              name="copyCsvEnabled"
+              keys={['Shift', 'Meta', 'c']}
+              label="Copy results as CSV"
+              onToggle={setCopyCsvEnabled}
             />
             <HotkeyToggle
               form={form}

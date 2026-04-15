@@ -96,6 +96,7 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_COPY_MARKDOWN: 'supabase-dashboard-hotkey-copy-markdown',
   HOTKEY_COPY_JSON: 'supabase-dashboard-hotkey-copy-json',
+  HOTKEY_COPY_CSV: 'supabase-dashboard-hotkey-copy-csv',
   HOTKEY_DOWNLOAD_CSV: 'supabase-dashboard-hotkey-download-csv',
 
   // Index Advisor notice dismissed
