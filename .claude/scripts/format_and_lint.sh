@@ -17,7 +17,10 @@ fi
 case "$file_path" in
   *apps/studio/*)
     cd "$CLAUDE_PROJECT_DIR"
-    pnpm exec prettier --config prettier.config.mjs --write "$file_path"
+    # Use absolute path to the project's prettier binary to avoid picking up
+    # a globally-installed version (e.g. from a different Node version) that
+    # may mangle TypeScript generic type parameters.
+    "$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier" --config prettier.config.mjs --write "$file_path"
 
     # ESLint only for JS/TS files
     case "$file_path" in

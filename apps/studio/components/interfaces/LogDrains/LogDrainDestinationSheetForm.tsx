@@ -49,6 +49,7 @@ import {
   headerRecordToRows,
   headerRowsToRecord,
   logDrainHeaderEntriesSchema,
+  omitRedactedHeaders,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
@@ -397,7 +398,23 @@ export function LogDrainDestinationSheetForm({
                   return
                 }
 
-                form.handleSubmit((values) => onSubmit(toSubmitValues(values)))(e)
+                form.handleSubmit((values) => {
+                  let submitValues = toSubmitValues(values)
+
+                  // When updating, omit headers whose value is REDACTED — those are
+                  // server-side placeholders for secrets we can't read back. Sending
+                  // the literal string would overwrite the real secret. PATCH only
+                  // updates what we send, so omitting keeps the original value intact.
+                  if (mode === 'update' && 'headers' in submitValues) {
+                    const { headers, ...rest } = submitValues as any
+                    const filteredHeaders = headers ? omitRedactedHeaders(headers) : undefined
+                    submitValues = (
+                      filteredHeaders ? { ...rest, headers: filteredHeaders } : rest
+                    ) as LogDrainDestinationSubmitValues
+                  }
+
+                  onSubmit(submitValues)
+                })(e)
                 track('log_drain_save_button_clicked', {
                   destination: form.getValues('type'),
                 })

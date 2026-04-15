@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
-import { handleError, put } from '@/data/fetchers'
+import { handleError, patch } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type LogDrainUpdateVariables = {
@@ -20,7 +20,7 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
     throw new Error('Token is required')
   }
 
-  const { data, error } = await put('/platform/projects/{ref}/analytics/log-drains/{token}', {
+  const { data, error } = await patch('/platform/projects/{ref}/analytics/log-drains/{token}', {
     params: { path: { ref: payload.projectRef, token: payload.token } },
     body: {
       name: payload.name,
