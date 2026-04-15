@@ -195,6 +195,7 @@ const getTwilioPhoneProviderSchema = (optional = false) =>
     SMS_TWILIO_MESSAGE_SERVICE_SID: optional
       ? z.string()
       : z.string().min(1, 'Twilio Message Service SID is required'),
+    SMS_TWILIO_CONTENT_SID: z.string().optional(),
   })
 
 const getTwilioVerifyPhoneProviderSchema = (optional = false) =>
