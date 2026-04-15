@@ -181,7 +181,7 @@ export const NewScopedTokenSheet = ({
           tokenType: 'scoped',
           expiryPreset: values.expiresAt || 'never',
           resourceAccess: values.resourceAccess,
-          permissionCount: permissionRows.length,
+          permissionCount: permissions.length,
         })
         toast.success('Access token created successfully')
         onCreateToken(data)

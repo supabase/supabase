@@ -3055,7 +3055,7 @@ export interface AccessTokenCreatedEvent {
     expiryPreset: string
     /** The resource access scope selected for the token (scoped tokens only) */
     resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
-    /** Number of permission rows configured on the token (scoped tokens only) */
+    /** Number of expanded FGA permissions on the token (scoped tokens only) */
     permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
