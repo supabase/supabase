@@ -415,9 +415,10 @@ export function LogDrainDestinationSheetForm({
 
                     // Cast to a type that surfaces the optional headers field present
                     // on the webhook / loki / otlp submit schema variants.
-                    const submitValuesWithHeaders = submitValues as LogDrainDestinationSubmitValues & {
-                      headers?: Record<string, string>
-                    }
+                    const submitValuesWithHeaders =
+                      submitValues as LogDrainDestinationSubmitValues & {
+                        headers?: Record<string, string>
+                      }
 
                     if ('headers' in submitValues) {
                       // When updating, filter header values equal to REDACTED — those
