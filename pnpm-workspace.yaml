@@ -45,6 +45,9 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  # The following packages are excluded from the minimum release age check because they had a vulneralibity
+  # Delete them the next time you update this list
+  - follow-redirects
 
 onlyBuiltDependencies:
   - node-pty
