@@ -15,15 +15,14 @@ const TABS = [
   {
     icon: 'Code' as IconName,
     label: 'Full SQL',
-    description:
-      'Create tables, functions, join tables — a full SQL editor built into the dashboard.',
+    description: 'A full SQL editor built right into the dashboard.',
     image: '/images/product/database/sql-view/sql-editor.png',
   },
   {
     icon: 'MousePointerClick' as IconName,
     label: 'Monaco editor',
     description: 'Built-in Monaco editor, with rich validation and autocomplete.',
-    image: '/images/product/database/sql-view/manaco-editor.png',
+    image: '/images/product/database/sql-view/monaco-editor.png',
   },
   {
     icon: 'Heart' as IconName,
@@ -90,7 +89,7 @@ export function SqlEditorSection() {
   }
 
   return (
-    <div ref={inViewRef} className="py-24 flex flex-col gap-16">
+    <div ref={inViewRef} className="py-24 flex flex-col gap-24">
       {/* Header */}
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
@@ -133,8 +132,8 @@ export function SqlEditorSection() {
           </div>
 
           {/* Right: image + footer */}
-          <div className="flex flex-col border border-border rounded-md overflow-clip">
-            <div className="relative h-[400px] shrink-0 overflow-hidden flex items-end justify-center">
+          <div className="flex flex-col border border-border rounded-md overflow-clip bg-surface-75">
+            <div className="relative aspect-[16/7.5] shrink-0 overflow-hidden flex items-end justify-center relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.label}
@@ -143,12 +142,11 @@ export function SqlEditorSection() {
                   exit={{ opacity: 0, transition: { duration: 0.1 } }}
                   className="absolute inset-0 flex items-end justify-center px-6"
                 >
-                  <Image
+                  <img
                     src={active.image}
                     alt={active.label}
-                    width={600}
-                    height={400}
-                    className="rounded-lg object-contain -mb-4"
+                    // fill
+                    className="absolute inset-0 rounded-lg object-cover pointer-events-none"
                   />
                 </motion.div>
               </AnimatePresence>

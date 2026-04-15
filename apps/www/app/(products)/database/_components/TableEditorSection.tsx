@@ -25,14 +25,13 @@ const TABS: Tab[] = [
     icon: 'TableProperties',
     label: 'Spreadsheet editing',
     description: 'Add, edit, and update your data with the simplicity of a no-code tool.',
-    image: <SpreadsheetIllustration />,
+    image: '/images/product/database/table-view/spreadsheet.png',
   },
   {
     icon: 'Table',
     label: 'Create tables',
-    description:
-      'Add tables, columns and rows right in the dashboard. Without a single line of SQL.',
-    image: '/images/product/database/table-view/create-table.png',
+    description: 'Add tables, columns and rows without writing SQL.',
+    image: '/images/product/database/table-view/create-tables.png',
   },
   {
     icon: 'Link2',
@@ -44,7 +43,7 @@ const TABS: Tab[] = [
     icon: 'FileDown',
     label: 'Export to CSV',
     description: 'Pick the rows you want and export them into a CSV.',
-    image: '/images/product/database/table-view/export.png',
+    image: '/images/product/database/table-view/export-csv.png',
   },
 ]
 
@@ -99,7 +98,7 @@ export function TableEditorSection() {
   }
 
   return (
-    <div ref={inViewRef} className="py-24 flex flex-col gap-16">
+    <div ref={inViewRef} className="py-24 flex flex-col gap-24">
       {/* Header */}
       <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
@@ -143,7 +142,7 @@ export function TableEditorSection() {
 
           {/* Right: image + footer */}
           <div className="flex flex-col border border-border rounded-md overflow-clip bg-surface-75">
-            <div className="relative h-[400px] shrink-0 overflow-hidden flex items-end justify-center">
+            <div className="relative aspect-[16/7.5] shrink-0 overflow-hidden flex items-end justify-center relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.label}
@@ -156,19 +155,11 @@ export function TableEditorSection() {
                       : 'flex items-end justify-end'
                   }`}
                 >
-                  {typeof active.image === 'string' ? (
-                    <Image
-                      src={active.image}
-                      alt={active.label}
-                      width={600}
-                      height={400}
-                      className="rounded-lg object-contain -mb-4"
-                    />
-                  ) : (
-                    <div className="w-[115%] translate-x-[8%] translate-y-[12%]">
-                      {active.image}
-                    </div>
-                  )}
+                  <img
+                    src={active.image}
+                    alt={active.label}
+                    className="absolute inset-0 rounded-lg object-cover pointer-events-none"
+                  />
                 </motion.div>
               </AnimatePresence>
             </div>
