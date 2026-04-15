@@ -119,8 +119,7 @@ export const useIsJitDbAccessEnabled = () => {
 }
 
 export const useIsTableFilterBarEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR]
+  return true
 }
 
 export const useIsFloatingMobileToolbarEnabled = () => {
