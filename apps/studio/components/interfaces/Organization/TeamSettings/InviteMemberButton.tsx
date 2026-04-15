@@ -35,6 +35,7 @@ import {
   buildProjectPayload,
   buildSsoPayload,
   categorizeInviteEmails,
+  emailSchema,
   parseEmails,
 } from './InviteMemberButton.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
@@ -113,26 +114,6 @@ export const InviteMemberButton = () => {
 
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
-
-  const emailSchema = z
-    .string()
-    .min(1, 'At least one email address is required')
-    .refine(
-      (val) => {
-        const emails = parseEmails(val)
-        if (emails.length === 0) return false
-        return emails.every((e) => z.string().email().safeParse(e).success)
-      },
-      (val) => {
-        const emails = parseEmails(val)
-        const invalid = emails.find((e) => !z.string().email().safeParse(e).success)
-        return {
-          message: invalid
-            ? `Invalid email address: ${invalid}`
-            : 'At least one email address is required',
-        }
-      }
-    )
 
   const FormSchema = z.object({
     email: emailSchema,

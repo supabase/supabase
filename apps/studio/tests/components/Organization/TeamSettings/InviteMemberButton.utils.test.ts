@@ -4,6 +4,8 @@ import {
   buildProjectPayload,
   buildSsoPayload,
   categorizeInviteEmails,
+  emailSchema,
+  MAX_BATCH_INVITE_SIZE,
   parseEmails,
 } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton.utils'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
@@ -168,5 +170,52 @@ describe('buildSsoPayload', () => {
 
   test('returns { requireSso: false } for "non-sso"', () => {
     expect(buildSsoPayload('non-sso')).toStrictEqual({ requireSso: false })
+  })
+})
+
+function makeEmailList(count: number): string {
+  return Array.from({ length: count }, (_, i) => `user${i + 1}@example.com`).join(', ')
+}
+
+describe('emailSchema', () => {
+  test('accepts a single valid email', () => {
+    expect(emailSchema.safeParse('user@example.com').success).toBe(true)
+  })
+
+  test('accepts exactly 50 emails', () => {
+    expect(emailSchema.safeParse(makeEmailList(MAX_BATCH_INVITE_SIZE)).success).toBe(true)
+  })
+
+  test('rejects 51 emails with the correct error message', () => {
+    const result = emailSchema.safeParse(makeEmailList(51))
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        'Up to 50 members can be invited at once. You are trying to invite 51 members. Please remove 1 and try again.'
+      )
+    }
+  })
+
+  test('reports the correct overage for 99 emails', () => {
+    const result = emailSchema.safeParse(makeEmailList(99))
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        'Up to 50 members can be invited at once. You are trying to invite 99 members. Please remove 49 and try again.'
+      )
+    }
+  })
+
+  test('rejects an empty string', () => {
+    const result = emailSchema.safeParse('')
+    expect(result.success).toBe(false)
+  })
+
+  test('rejects an invalid email address and names it', () => {
+    const result = emailSchema.safeParse('notanemail')
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe('Invalid email address: notanemail')
+    }
   })
 })

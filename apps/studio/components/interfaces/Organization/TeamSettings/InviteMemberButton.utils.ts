@@ -1,4 +1,37 @@
+import * as z from 'zod'
+
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
+
+export const MAX_BATCH_INVITE_SIZE = 50
+
+export const emailSchema = z
+  .string()
+  .min(1, 'At least one email address is required')
+  .refine(
+    (val) => {
+      const emails = parseEmails(val)
+      if (emails.length === 0) return false
+      return emails.every((e) => z.string().email().safeParse(e).success)
+    },
+    (val) => {
+      const emails = parseEmails(val)
+      const invalid = emails.find((e) => !z.string().email().safeParse(e).success)
+      return {
+        message: invalid
+          ? `Invalid email address: ${invalid}`
+          : 'At least one email address is required',
+      }
+    }
+  )
+  .refine(
+    (val) => parseEmails(val).length <= MAX_BATCH_INVITE_SIZE,
+    (val) => {
+      const count = parseEmails(val).length
+      return {
+        message: `Up to ${MAX_BATCH_INVITE_SIZE} members can be invited at once. You are trying to invite ${count} members. Please remove ${count - MAX_BATCH_INVITE_SIZE} and try again.`,
+      }
+    }
+  )
 
 export function parseEmails(value: string): string[] {
   const emails = value
