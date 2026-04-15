@@ -71,9 +71,6 @@ const nextConfig = {
       'public/**/*',
     ],
   },
-  outputFileTracingIncludes: {
-    '/api-v2/md/**/*': ['./content/md/**/*'],
-  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
