@@ -405,10 +405,19 @@ export function LogDrainDestinationSheetForm({
                     // If the user explicitly cleared all header rows, we must send
                     // headers: {} so the server removes them. An empty headerEntries
                     // array means the user deleted every row.
+                    const valuesWithHeaders = values as LogDrainDestinationFormValues & {
+                      headerEntries?: LogDrainHeaderRow[]
+                    }
                     const explicitlyClearedHeaders =
                       'headerEntries' in values &&
-                      Array.isArray((values as any).headerEntries) &&
-                      (values as any).headerEntries.length === 0
+                      Array.isArray(valuesWithHeaders.headerEntries) &&
+                      valuesWithHeaders.headerEntries.length === 0
+
+                    // Cast to a type that surfaces the optional headers field present
+                    // on the webhook / loki / otlp submit schema variants.
+                    const submitValuesWithHeaders = submitValues as LogDrainDestinationSubmitValues & {
+                      headers?: Record<string, string>
+                    }
 
                     if ('headers' in submitValues) {
                       // When updating, filter header values equal to REDACTED — those
@@ -417,7 +426,7 @@ export function LogDrainDestinationSheetForm({
                       // PATCH only updates what we send, so omitting keeps the
                       // original value intact. But if the user cleared the list
                       // intentionally, preserve the empty object to signal deletion.
-                      const { headers, ...rest } = submitValues as any
+                      const { headers, ...rest } = submitValuesWithHeaders
                       const filteredHeaders = headers ? omitRedactedHeaders(headers) : undefined
                       submitValues = (
                         filteredHeaders
@@ -430,7 +439,7 @@ export function LogDrainDestinationSheetForm({
                       // headers was absent (webhook/otlp with empty list) — still
                       // need to signal clearing to the server.
                       submitValues = {
-                        ...(submitValues as any),
+                        ...submitValuesWithHeaders,
                         headers: {},
                       } as LogDrainDestinationSubmitValues
                     }
