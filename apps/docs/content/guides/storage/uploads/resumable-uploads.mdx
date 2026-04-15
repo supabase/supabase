@@ -305,6 +305,7 @@ Uppy has integrations with different frameworks:
 ### Presigned uploads
 
 Resumable uploads also supports using signed upload tokens to created time-limited URLs that you can share to your users by invoking the `createSignedUploadUrl` method on the SDK and including the returned token in the `x-signature` header of the resumable upload.
+The endpoint URL must also end with `/sign` so the TUS server knows to look for the `x-signature` header, e.g. `{host}/storage/v1/upload/resumable/sign`.
 
 <Tabs
   scrollable
