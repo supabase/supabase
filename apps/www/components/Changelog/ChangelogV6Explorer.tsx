@@ -7,9 +7,9 @@ import dayjs from 'dayjs'
 import { ChevronsUpDown } from 'lucide-react'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
-import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import {
   Badge,
   cn,
@@ -174,7 +174,10 @@ export function ChangelogV6Explorer({ items }: Props) {
     <>
       <div className="pb-4">
         <h1 className="h1">Changelog</h1>
-        <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+        <div className="flex flex-wrap items-center gap-2 justify-between">
+          <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+          <ChangelogRssButton />
+        </div>
       </div>
 
       {/* Sticky combobox navigator */}

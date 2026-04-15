@@ -124,6 +124,10 @@ const footerData = [
         text: 'RSS',
         url: '/rss.xml',
       },
+      {
+        text: 'Changelog RSS',
+        url: '/changelog-rss.xml',
+      },
     ],
   },
   {

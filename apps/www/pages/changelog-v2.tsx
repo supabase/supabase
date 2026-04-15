@@ -3,6 +3,7 @@ import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
 import { Octokit as OctokitRest } from '@octokit/rest'
+import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { discussionDisplayDate, githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
@@ -385,7 +386,10 @@ function ChangelogV2Page({ changelogIndex, changelog, pageInfo, restPage }: Chan
         >
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
-            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+              <ChangelogRssButton />
+            </div>
           </div>
 
           <section

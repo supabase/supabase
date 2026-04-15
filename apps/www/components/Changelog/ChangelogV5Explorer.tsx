@@ -1,5 +1,6 @@
 'use client'
 
+import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import type { ChangelogTimelineIndexItem } from '~/lib/changelog-github'
 import { githubChangelogLabelFilterUrl } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
@@ -313,7 +314,10 @@ export function ChangelogV5Explorer({ items }: Props) {
     <>
       <div className="pb-4 container mx-auto max-w-xl">
         <h1 className="h1">Changelog</h1>
-        <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
+          <ChangelogRssButton />
+        </div>
       </div>
 
       <section className="relative flex w-full flex-col">
@@ -324,7 +328,7 @@ export function ChangelogV5Explorer({ items }: Props) {
             <div className="flex flex-col gap-6 pb-12">
               <div
                 className={cn(
-                  'sticky top-16 z-20 md:-mx-4 md:w-[calc(100%+4rem)] flex flex-col gap-1 border-default border-b md:px-4 py-3',
+                  'sticky top-16 z-20 md:-mx-4 md:w-[calc(100%+2rem)] flex flex-col gap-1 border-default border-b md:px-4 py-3',
                   'bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/95'
                 )}
               >

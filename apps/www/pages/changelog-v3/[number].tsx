@@ -1,4 +1,5 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import { ChangelogRssButton } from '~/components/Changelog/ChangelogRssButton'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import {
@@ -113,14 +114,17 @@ function ChangelogV3DetailPage({
       />
       <DefaultLayout>
         <div className="container mx-auto max-w-3xl flex flex-col gap-4 px-4 py-10 sm:px-16 xl:px-20">
-          <nav
-            aria-label="Breadcrumb"
-            className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
-          >
-            <Link href="/changelog-v3" className="text-foreground-lighter hover:underline">
-              Changelog
-            </Link>
-          </nav>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <nav
+              aria-label="Breadcrumb"
+              className="text-foreground-lighter flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
+            >
+              <Link href="/changelog-v3" className="text-foreground-lighter hover:underline">
+                Changelog
+              </Link>
+            </nav>
+            <ChangelogRssButton />
+          </div>
 
           <header className="border-default flex flex-col gap-2 border-b pb-6">
             <h1 className="h1 text-2xl sm:text-3xl">{title}</h1>

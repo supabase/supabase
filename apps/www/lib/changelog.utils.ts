@@ -1,6 +1,9 @@
 // hackery to fix Terry accidentally deleting
 // a bunch of releases and their associted discussions in Dec 2023
 // checks if titles match and grabs this original createdAt timestamp
+//
+// When editing entries with `createdAt`, also sync `scripts/data/changelog-deleted-discussions.json`
+// (title + createdAt only) — used by generateStaticContent.mjs for changelog-rss.xml.
 export const deletedDiscussions = [
   {
     title: 'Platform updates: October 2023',
