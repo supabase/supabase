@@ -73,7 +73,11 @@ export async function getFlags(userEmail: string = '', customAttributes?: Record
 
   if (!client) {
     return []
-  } else if (userEmail) {
+  }
+
+  await client.waitForReady()
+
+  if (userEmail) {
     return client.getAllValuesAsync(
       new configcat.User(userEmail, undefined, undefined, _customAttributes)
     )

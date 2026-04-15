@@ -96,7 +96,7 @@
     "@babel/core": "*",
     "@react-router/dev": "^7.9.0",
     "@shikijs/compat": "^1.1.7",
-    "@supabase/ssr": "^0.7.0",
+    "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-router": "^1.150.0",
     "@tanstack/react-start": "^1.150.0",

@@ -61,7 +61,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     import { createClient } from '@supabase/supabase-js'
 
     const SUPABASE_URL = 'https://<project>.supabase.co'
-    const SUPABASE_KEY = '<sb_publishable_... or anon key>'
+    const SUPABASE_KEY = '<sb_publishable_... key>'
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
     ```
@@ -76,7 +76,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     void main() async {
       Supabase.initialize(
         url: 'https://<project>.supabase.co',
-        anonKey: '<sb_publishable_... or anon key>',
+        anonKey: '<sb_publishable_... key>',
       );
       runApp(MyApp());
     }
@@ -93,7 +93,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     import Supabase
 
     let SUPABASE_URL = "https://<project>.supabase.co"
-    let SUPABASE_KEY = "<sb_publishable_... or anon key>"
+    let SUPABASE_KEY = "<sb_publishable_... key>"
 
     let supabase = SupabaseClient(supabaseURL: URL(string: SUPABASE_URL)!, supabaseKey: SUPABASE_KEY)
     ```
@@ -105,7 +105,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
 
     ```kotlin
     val supabaseUrl = "https://<project>.supabase.co"
-    val supabaseKey = "<sb_publishable_... or anon key>"
+    val supabaseKey = "<sb_publishable_... key>"
     val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
         install(Realtime)
     }
@@ -121,7 +121,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
     from supabase import acreate_client
 
     URL = "https://<project>.supabase.co"
-    KEY = "<sb_publishable_... or anon key>"
+    KEY = "<sb_publishable_... key>"
 
     async def create_supabase():
       supabase = await acreate_client(URL, KEY)
@@ -149,7 +149,7 @@ You can receive Broadcast messages by providing a callback to the channel.
     ```js
     // @noImplicitAny: false
     import { createClient } from '@supabase/supabase-js'
-    const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... or anon key>')
+    const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_... key>')
 
     // ---cut---
     // Join a room/topic. Can be anything except for 'realtime'.

@@ -26,6 +26,10 @@ export const organizationKeys = {
     ['organizations', slug, 'project-claim', token] as const,
   availableRegions: (slug: string | undefined, cloudProvider: string, size?: string) =>
     ['organizations', slug, 'available-regions', cloudProvider, size] as const,
+  creationPreview: (
+    tier: string | undefined,
+    params?: { address?: Record<string, unknown>; taxId?: Record<string, unknown> }
+  ) => ['organizations', 'creation-preview', tier, params] as const,
   previewCreditCode: (slug: string | undefined, code: string) =>
     ['organizations', slug, 'preview-credit-code', code] as const,
 }

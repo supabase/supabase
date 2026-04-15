@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
@@ -80,7 +81,10 @@ export const TemplateEditor = ({ template }: TemplateEditorProps) => {
     return result
   }, [authConfig, properties])
 
-  const form = useForm({ defaultValues: INITIAL_VALUES })
+  const form = useForm({
+    defaultValues: INITIAL_VALUES,
+    resolver: zodResolver(template.validationSchema),
+  })
 
   const onSubmit = (values: any) => {
     if (!projectRef) return console.error('Project ref is required')

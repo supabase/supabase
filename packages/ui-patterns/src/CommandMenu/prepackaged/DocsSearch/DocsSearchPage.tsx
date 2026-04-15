@@ -1,14 +1,14 @@
 'use client'
 
 import {
-  type DocsSearchResult as Page,
-  type DocsSearchResultSection as PageSection,
   DocsSearchResultType as PageType,
   useDocsSearch,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
+import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_ } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
@@ -19,8 +19,8 @@ import {
   escapeAttributeSelector,
   generateCommandClassNames,
   TextHighlighter,
-  useCrossCompatRouter,
   useCommandMenuTelemetryContext,
+  useCrossCompatRouter,
   useQuery,
   useSetCommandMenuOpen,
   useSetQuery,
@@ -100,36 +100,42 @@ const DocsSearchPage = () => {
   )
 
   async function openLink(pageType: PageType, link: string) {
+    // A simple way to achieve opening links in new tab but room for improvement including support for middle clicks
+    let openInNewTab =
+      (window.event as KeyboardEvent)?.metaKey || (window.event as KeyboardEvent)?.ctrlKey
+    let finalLink: string = link
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
       case PageType.Troubleshooting:
         if (BASE_PATH === '/docs') {
-          router.push(link)
-          setIsOpen(false)
+          if (openInNewTab) {
+            finalLink = `/docs${link}`
+          }
         } else if (!BASE_PATH) {
-          router.push(`/docs${link}`)
-          setIsOpen(false)
+          finalLink = `/docs${link}`
         } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank', 'noreferrer,noopener')
-          setIsOpen(false)
+          finalLink = `https://supabase.com/docs${link}`
+          openInNewTab = true
         }
         break
       case PageType.Integration:
-        if (!BASE_PATH) {
-          router.push(link)
-          setIsOpen(false)
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank', 'noreferrer,noopener')
-          setIsOpen(false)
+        if (BASE_PATH) {
+          openInNewTab = true
+          finalLink = `https://supabase.com${link}`
         }
         break
       case PageType.GithubDiscussion:
-        window.open(link, '_blank', 'noreferrer,noopener')
-        setIsOpen(false)
+        openInNewTab = true
         break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
+    }
+    if (openInNewTab) {
+      window.open(finalLink, '_blank', 'noreferrer,noopener')
+    } else {
+      router.push(finalLink)
+      setIsOpen(false)
     }
   }
 

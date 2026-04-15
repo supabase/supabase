@@ -3011,6 +3011,38 @@ export interface StorageExplorerNavigateSubmittedEvent {
 }
 
 /**
+ * User clicked the Remove policy button on the public bucket SELECT policy warning.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyRemovedEvent {
+  action: 'storage_public_bucket_select_policy_removed'
+  properties: {
+    /** The ID of the bucket whose SELECT policy was removed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User dismissed the public bucket SELECT policy warning banner.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent {
+  action: 'storage_public_bucket_select_policy_warning_dismiss_button_clicked'
+  properties: {
+    /** The ID of the bucket whose warning was dismissed */
+    bucketId: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User was exposed to the pricing value/flexibility experiment on the /pricing page.
  *
  * @group Events
@@ -3037,6 +3069,39 @@ export interface PricingPageExperimentExposedEvent {
       | 'multi_project'
       | 'estimate_cta'
   }
+}
+
+/**
+ * Triggered when an access token is successfully created.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreatedEvent {
+  action: 'access_token_created'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    expiryPreset: string
+    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    permissionCount?: number
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when an access token is successfully deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenRemovedEvent {
+  action: 'access_token_removed'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
 }
 
 /**
@@ -3156,6 +3221,8 @@ export type TelemetryEvent =
   | LogExplorerQueryRunButtonClickedEvent
   | StorageExplorerNavigateClickedEvent
   | StorageExplorerNavigateSubmittedEvent
+  | StoragePublicBucketSelectPolicyRemovedEvent
+  | StoragePublicBucketSelectPolicyWarningDismissButtonClickedEvent
   | StudioPricingPlanCtaClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
@@ -3251,5 +3318,7 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerCtaClickedEvent
   | PricingPageExperimentExposedEvent
   | HeaderUpgradeCtaClickedEvent
+  | AccessTokenCreatedEvent
+  | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent

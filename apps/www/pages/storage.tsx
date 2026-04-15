@@ -27,6 +27,8 @@ const SplitCodeBlockCarousel = dynamic(
 )
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
+// When updating page content, also update public/llms/storage.txt
+
 function StoragePage() {
   // base path for images
   const { basePath } = useRouter()

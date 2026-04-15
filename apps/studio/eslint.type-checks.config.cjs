@@ -9,7 +9,7 @@
 
 const { defineConfig } = require('eslint/config')
 const tsparser = require('@typescript-eslint/parser')
-const requireSafeSqlFragment = require('./eslint-rules/require-safe-sql-fragment')
+const requireSafeSqlFragment = require('./eslint-rules/require-safe-sql-fragment.cjs')
 
 const studioPlugin = {
   rules: {
