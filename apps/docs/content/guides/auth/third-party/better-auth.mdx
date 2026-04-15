@@ -1,50 +1,88 @@
 ---
 id: 'auth-third-party-better-auth'
 title: 'Better Auth'
-subtitle: 'Use Better Auth as your authentication layer with your Supabase Postgres database'
+subtitle: 'Use Better Auth for authentication with your Supabase database'
 ---
 
-Better Auth can be used as a standalone authentication layer that connects directly to your Supabase Postgres database, replacing Supabase Auth entirely.
+Better Auth is an authentication framework that runs in your application and can be used alongside or instead of Supabase Auth.
 
-# Getting started
+## What this guide covers
 
-Getting started with BetterAuth is simple. See the full [Better Auth installation](https://better-auth.com/docs/installation) and follow the steps for your tech stack, selecting Postgres as the database.
+1. Installing Better Auth and its Postgres adapter for your framework.
+2. Connecting Better Auth to your Supabase database.
+3. Running Better Auth's initial migrations to create the required auth tables.
+4. (Optional) Generating a signed JWT so Better Auth users can access Supabase APIs protected by RLS.
 
-The `DATABASE_URL` should use Supabase's direct connection string (port 5432), not
-the transaction pooler (port 6543).
+## Configure Better Auth to use your Supabase database
 
-You can find your connection string in `connect` tab at the top of your project dashboard.
+You can find your project's connection string in the [Connect](https://supabase.com/dashboard/project/_?showConnect=true) tab at the top of your project dashboard.
 
-# Configuring for local development and self-hosting
+Use the direct connection string as the `DATABASE_URL`:
 
-To use Better Auth locally you will need to update your `DATABASE_URL` to point to your local supabase in the `.env` file and run the migration commands again.
-
+```bash
+DATABASE_URL="postgresql://..."
 ```
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+Better Auth migrations and schema management require a direct Postgres connection. Transaction poolers (like Supavisor in transaction mode) may not support all migration operations.
+
+## Set up the Better Auth server instance
+
+Create your Better Auth configuration and connect it to your database. This is the core Better Auth setup that will handle authentication requests in your application.
+
+```typescript
+import { betterAuth } from 'better-auth'
+import { Pool } from 'pg'
+
+export const auth = betterAuth({
+  database: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+})
 ```
 
-# Plugins
+Next, expose `auth` using your framework's routing or handler system so your application can send authentication requests to Better Auth. See the [Better Auth installation guide](https://better-auth.com/docs/installation) for the recommended routing setup for your framework (Next.js, Remix, etc).
 
-Better Auth makes use of plugins to extend the functionality for different types of auth. The full list of plugins can be found [here](https://better-auth.com/docs/plugins).
+## Run Better Auth migrations
 
-NOTE: If you add a new plugin you will have to run the migration commands again to produce the neccesary tables
+Better Auth needs its own database tables to manage users, sessions, accounts, and other authentication data.
+
+Generate the schema and apply it to your database:
+
+```bash
+npx auth@latest generate
+npx auth@latest migrate
+```
+
+## Local development and self-hosting
+
+If you're developing locally with the Supabase CLI, point Better Auth to your local database and rerun migrations.
+
+```bash
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+```
+
+## Plugins
+
+Better Auth uses plugins to add features and providers. See [Better Auth plugins](https://better-auth.com/docs/plugins).
+
+If you add a new plugin, rerun the migration commands to create any additional tables that the plugin needs.
 
 ## Set up the Better Auth client instance
 
-Create a `lib/auth-client.ts` file. This can be used client side to call the auth server and perform operations
+Your frontend needs a way to communicate with Better Auth. Create a `lib/auth-client.ts` file to handle authentication requests from the client.
 
 ```typescript
 import { createAuthClient } from 'better-auth/react'
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000',
-  // only required if auth server is on a different domain than your frontend
+  // Only required if the auth server is on a different domain than your frontend.
 })
 ```
 
-# Example Usage
+## Example usage
 
-Signing up
+Sign up:
 
 ```typescript
 const { data, error } = await authClient.signUp.email({
@@ -54,87 +92,95 @@ const { data, error } = await authClient.signUp.email({
 })
 ```
 
-Signing in
+Sign in:
 
 ```typescript
 const { data, error } = await authClient.signIn.email({
   email: 'user@example.com',
   password: 'password',
 })
+```
+
+Sign out:
+
+```typescript
 await authClient.signOut()
 ```
 
-# Using RLS policies
-To use Better Auth with RLS you will need to create a signed JWT on the server side using a private JSON Web Token signing key.
+## Use RLS with Better Auth (signed JWTs)
 
-## Create key
+This section is only required if your Better Auth users need to call Supabase APIs protected by RLS (Data API, Storage, Realtime).
 
-To create a new JSON Web Token signing key, run the following commands on shell:
+To use RLS with Supabase APIs, you need to generate a signed JWT on your server and provide it to your Supabase client.
 
-Generate the JWK
+### Create a JWT signing key
+
+Generate an EC P-256 private key in JWK format:
+
 ```bash
 node -e "
-const { generateKeyPairSync } = require('crypto');
+const { generateKeyPairSync, randomUUID } = require('crypto');
 const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
 const jwk = privateKey.export({ format: 'jwk' });
-jwk.kid = require('crypto').randomUUID();
+jwk.kid = randomUUID();
 jwk.key_ops = ['sign', 'verify'];
 console.log(JSON.stringify(jwk, null, 2));
 "
 ```
-This will produce a JSON output that looks much like:
 
-```
-{
-  "kty": "EC",
-  "x": "R0d-ANIqQDRYDrD4MS76ThBRMmySdI7F7h1TcUJDz4Q",
-  "y": "NVzTpKSJE0cEoZTjE84qTjXsdkGltufexH3hVWPVZ6w",
-  "crv": "P-256",
-  "d": "voGFcEsa6AG087wivVf_0oS4f392VjK6nmhVwYXMCjg",
-  "kid": "00cbfcf0-d926-4891-b84b-27d2f9361046",
-  "key_ops": [
-    "sign",
-    "verify"
-  ]
-}
-```
-## Import key
-You can then head to Project Settings > JWT Keys > JWT Signing Keys > Create Standby Key > import an existing private key and add your JWK from above > Set key to be active
+### Import the key into Supabase
 
-## Create Route for producing signed JWT
+In the dashboard, go to **Project Settings** → **JWT Keys** → **JWT Signing Keys** and import the private JWK you generated. Set it as the active signing key.
 
-On your server side application, ensure you have `jose` installed and then run
+### Create a server route that issues a Supabase JWT
+
+Install `jose` in your server app and create an endpoint that:
+
+- Validates the Better Auth session.
+- Signs a JWT with at least `sub` and `role: 'authenticated'`.
+- Returns the token to the frontend.
 
 ```typescript
- import { SignJWT, importJWK } from 'jose'
- const session = await auth.api.getSession({ headers: request.headers })
- if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+import { importJWK, SignJWT } from 'jose'
+
+const session = await auth.api.getSession({ headers: request.headers })
+if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
 try {
   // jose's importJWK rejects keys with key_ops set
   const { key_ops, ...jwk } = JSON.parse(process.env.SUPABASE_PRIVATE_KEY_JWK!)
   const privateKey = await importJWK(jwk, 'ES256')
 
-  const token = await new SignJWT({ sub: session.user.id, role: 'authenticated', iss: 'supabase' })
-    .setProtectedHeader({ alg: 'ES256' })
+  const token = await new SignJWT({
+    sub: session.user.id,
+    role: 'authenticated',
+    iss: 'supabase',
+  })
+    .setProtectedHeader({ alg: 'ES256', kid: jwk.kid })
     .setExpirationTime('1h')
     .sign(privateKey)
 
   return Response.json({ token })
-  } catch (err) {
-    console.error('[supabase-token]', err)
-    return Response.json({ error: String(err) }, { status: 500 })
-  }
-  ```
-  - `auth` is your server side BetterAuth client that you created above
-  - `SUPABASE_PRIVATE_KEY_JWK` will be your JSON JWK that you created previously and imported into Supabase
+} catch (err) {
+  console.error('[supabase-token]', err)
+  return Response.json({ error: String(err) }, { status: 500 })
+}
+```
 
-  Once you have an endpoint to produce a signed JWT you can pass it back to your Supabase client on the client side:
+The environment variable `SUPABASE_PRIVATE_KEY_JWK` should contain the private JWK you imported into Supabase.
 
-## Use Signed JWT in Supabase Client
+<Admonition type="caution">
 
-  ```typescript
- import { createClient } from '@supabase/supabase-js'
+Never expose your private JWK to the client. Store it only in server-side environment variables.
+
+</Admonition>
+
+### Use the signed JWT in the Supabase client
+
+Fetch the token from your endpoint and pass it to the Supabase client via `accessToken`.
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
 
 let cachedToken: string | null = null
 let tokenExpiresAt = 0
@@ -150,6 +196,7 @@ async function getSupabaseToken(): Promise<string> {
 
   const { token } = await res.json()
   cachedToken = token
+
   // JWTs from the endpoint expire in 1h
   tokenExpiresAt = Date.now() + 60 * 60 * 1000
   return token
@@ -164,20 +211,19 @@ export const supabase = createClient(
 )
 ```
 
-## Add RLS policies
+### Add RLS policies
 
-Now all that remains is to ensure your tables have a user_id column that stores the Better Auth user ID (the sub value in the JWT). Here is an example of fetching the sub from the JWT in an RLS policy:
+Store the Better Auth user ID in your rows (for example in a `user_id` column). It must match the `session.user.id` value you used when signing the JWT (the `sub` claim).
+
+Then you can reference the claim in RLS policies using `auth.jwt()`:
 
 ```sql
 alter policy "Authenticated users can view their orders"
-on "public"."orders"
+on public.orders
 to authenticated
-using (
-  (user_id = (auth.jwt() ->> 'sub'::text))
-
-);
+using ((user_id = (auth.jwt() ->> 'sub')));
 ```
 
-- For local development, the JWT signing key configured in the cloud dashboard does not apply to your local Supabase instance.
+## Limitations
 
-
+- For local development, the JWT signing key configured in the cloud dashboard does not apply to your local Supabase instance. If you want signed JWTs to work locally, configure the same JWT signing key for your local stack (for example via `supabase/config.toml`).
