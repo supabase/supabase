@@ -186,22 +186,22 @@ describe('emailSchema', () => {
     expect(emailSchema.safeParse(makeEmailList(MAX_BATCH_INVITE_SIZE)).success).toBe(true)
   })
 
-  test('rejects 51 emails with the correct error message', () => {
+  test('rejects 51 emails — singular "address" when exactly 1 needs removing', () => {
     const result = emailSchema.safeParse(makeEmailList(51))
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues[0].message).toBe(
-        'Up to 50 members can be invited at once. You are trying to invite 51 members. Please remove 1 and try again.'
+        'You can invite up to 50 members at a time. Remove 1 email address to continue.'
       )
     }
   })
 
-  test('reports the correct overage for 99 emails', () => {
+  test('rejects 99 emails — plural "addresses" when more than 1 needs removing', () => {
     const result = emailSchema.safeParse(makeEmailList(99))
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues[0].message).toBe(
-        'Up to 50 members can be invited at once. You are trying to invite 99 members. Please remove 49 and try again.'
+        'You can invite up to 50 members at a time. Remove 49 email addresses to continue.'
       )
     }
   })

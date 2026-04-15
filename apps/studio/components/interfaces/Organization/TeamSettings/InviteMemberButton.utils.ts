@@ -28,7 +28,7 @@ export const emailSchema = z
     (val) => {
       const count = parseEmails(val).length
       return {
-        message: `Up to ${MAX_BATCH_INVITE_SIZE} members can be invited at once. You are trying to invite ${count} members. Please remove ${count - MAX_BATCH_INVITE_SIZE} and try again.`,
+        message: `You can invite up to ${MAX_BATCH_INVITE_SIZE} members at a time. Remove ${count - MAX_BATCH_INVITE_SIZE} email ${count - MAX_BATCH_INVITE_SIZE === 1 ? 'address' : 'addresses'} to continue.`,
       }
     }
   )
