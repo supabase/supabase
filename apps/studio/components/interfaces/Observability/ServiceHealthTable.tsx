@@ -1,8 +1,7 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import type { ChartConfig } from 'ui'
 import { Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ChartLine } from 'ui-patterns/Chart'
+import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import { ButtonTooltip } from '../../ui/ButtonTooltip'
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
@@ -28,7 +27,7 @@ type ServiceData = {
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (logsUrl: string) => (datum: { timestamp: string }) => void
+  onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
 }
 
@@ -41,16 +40,10 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   postgrest: 'Auto-generated REST API for your database',
 }
 
-const CHART_CONFIG: ChartConfig = {
-  error_count: { label: 'Errors', color: 'hsl(var(--destructive-default))' },
-  warning_count: { label: 'Warnings', color: 'hsl(var(--warning-default))' },
-  ok_count: { label: 'Ok', color: 'hsl(var(--brand-default))' },
-}
-
 type ServiceRowProps = {
   service: ServiceConfig
   data: ServiceData
-  onBarClick: (datum: { timestamp: string }) => void
+  onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
 }
 
@@ -98,23 +91,19 @@ const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowPro
       </div>
 
       <div className="h-16" onClick={(e) => e.preventDefault()}>
-        <Loading active={data.isLoading} isFullHeight>
+        <Loading active={data.isLoading}>
           {data.isLoading ? (
             <div />
-          ) : data.eventChartData.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
-              No data
-            </div>
           ) : (
-            <ChartLine
+            <LogsBarChart
               data={data.eventChartData}
-              dataKey="error_count"
-              dataKeys={['ok_count', 'warning_count', 'error_count']}
-              config={CHART_CONFIG}
               DateTimeFormat={datetimeFormat}
-              onLineClick={onBarClick}
-              cursor="pointer"
-              className="h-full"
+              onBarClick={onBarClick}
+              EmptyState={
+                <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
+                  No data
+                </div>
+              }
             />
           )}
         </Loading>
