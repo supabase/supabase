@@ -155,7 +155,6 @@ export const ResourceExhaustionWarningBanner = () => {
   const handleAskAI = () => {
     track('resource_exhaustion_banner_ai_assistant_clicked', {
       warningTypes: activeWarnings,
-      isFreePlan,
     })
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialInput: aiPrompt })
@@ -272,7 +271,6 @@ export const ResourceExhaustionWarningBanner = () => {
             onClick={() =>
               track('resource_exhaustion_banner_upgrade_clicked', {
                 warningTypes: activeWarnings,
-                isFreePlan,
                 destination: correctionUrl,
               })
             }

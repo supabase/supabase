@@ -3062,7 +3062,6 @@ export interface ResourceExhaustionBannerUpgradeClickedEvent {
   groups: TelemetryGroups
   properties: {
     warningTypes: string[]
-    isFreePlan: boolean
     destination: string
   }
 }
@@ -3078,7 +3077,6 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
   groups: TelemetryGroups
   properties: {
     warningTypes: string[]
-    isFreePlan: boolean
   }
 }
 
