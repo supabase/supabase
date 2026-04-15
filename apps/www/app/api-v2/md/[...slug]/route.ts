@@ -2,13 +2,32 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { NextResponse } from 'next/server'
 
+const ALLOWED_SLUGS = new Set([
+  'homepage',
+  'pricing',
+  'auth',
+  'database',
+  'edge-functions',
+  'realtime',
+  'storage',
+  'vector',
+  'modules/cron',
+  'modules/queues',
+])
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ slug: string[] }> }
 ) {
   const { slug } = await params
+  const slugPath = slug.join('/')
+
+  if (!ALLOWED_SLUGS.has(slugPath)) {
+    return new NextResponse('Not found', { status: 404 })
+  }
+
   const baseDir = path.join(process.cwd(), 'public', 'md')
-  const filePath = path.join(baseDir, `${slug.join('/')}.md`)
+  const filePath = path.join(baseDir, `${slugPath}.md`)
 
   if (!filePath.startsWith(baseDir + path.sep)) {
     return new NextResponse('Not found', { status: 404 })
@@ -23,7 +42,11 @@ export async function GET(
         Vary: 'Accept',
       },
     })
-  } catch {
-    return new NextResponse('Not found', { status: 404 })
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+      return new NextResponse('Not found', { status: 404 })
+    }
+    console.error(`[md route] Failed to read ${slugPath}.md:`, error)
+    return new NextResponse('Internal server error', { status: 500 })
   }
 }

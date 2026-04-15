@@ -30,9 +30,9 @@ export function middleware(request: NextRequest) {
   }
 
   // Content negotiation: Accept: text/markdown on known pages
-  const accept = request.headers.get('accept') ?? ''
+  const accept = (request.headers.get('accept') ?? '').toLowerCase()
   if (accept.includes('text/markdown')) {
-    const slug = pathname.slice(1) // strip leading /
+    const slug = pathname === '/' ? 'homepage' : pathname.slice(1)
     if (MD_PAGES.has(slug)) {
       const url = request.nextUrl.clone()
       url.pathname = `/api-v2/md/${slug}`
