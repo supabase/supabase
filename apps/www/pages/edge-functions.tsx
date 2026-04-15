@@ -1,18 +1,16 @@
-import React from 'react'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { NextSeo } from 'next-seo'
-import { useBreakpoint } from 'common'
-
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
-import page from '~/data/products/functions/page'
-
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductHeader from '~/components/Sections/ProductHeader2'
-import HighlightColumns from '~/components/Sections/HighlightColumns'
 import ProductsNav from '~/components/Products/ProductsNav'
+import HighlightColumns from '~/components/Sections/HighlightColumns'
+import ProductHeader from '~/components/Sections/ProductHeader2'
+import page from '~/data/products/functions/page'
+import { useBreakpoint } from 'common'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
+import React from 'react'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 
 const ExamplesCarousel = dynamic(() => import('~/components/Examples/ExamplesCarousel'))
 const GlobalPresenceSection = dynamic(
@@ -24,7 +22,7 @@ const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta2'))
 const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
 const TimedAccordionSection = dynamic(() => import('~/components/Sections/TimedAccordionSection'))
 
-// When updating page content, also update public/md/edge-functions.md
+// When updating page content, also update content/md/edge-functions.md
 
 function EdgeFunctions() {
   const { basePath } = useRouter()

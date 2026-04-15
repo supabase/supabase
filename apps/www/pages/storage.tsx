@@ -27,7 +27,7 @@ const SplitCodeBlockCarousel = dynamic(
 )
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
-// When updating page content, also update public/md/storage.md
+// When updating page content, also update content/md/storage.md
 
 function StoragePage() {
   // base path for images

@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
     return new NextResponse('Not found', { status: 404 })
   }
 
-  const baseDir = path.join(process.cwd(), 'public', 'md')
+  const baseDir = path.join(process.cwd(), 'content', 'md')
   const filePath = path.join(baseDir, `${slugPath}.md`)
 
   if (!filePath.startsWith(baseDir + path.sep)) {

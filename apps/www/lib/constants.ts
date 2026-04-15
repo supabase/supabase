@@ -57,7 +57,7 @@ export const SITE_NAME = 'Supabase'
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-// Pages that have a .md equivalent in public/md/.
+// Pages that have a .md equivalent in content/md/.
 // Used by middleware (rewrite) and the API route handler (whitelist).
 // Update this set when adding new .md files.
 export const MD_PAGES = new Set([

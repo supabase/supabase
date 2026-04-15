@@ -28,7 +28,7 @@ const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
-// When updating page content, also update public/md/auth.md
+// When updating page content, also update content/md/auth.md
 
 function AuthPage() {
   const isMobile = useBreakpoint(768)

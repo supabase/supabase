@@ -1,12 +1,11 @@
 import 'swiper/css'
 
+import DefaultLayout from '~/components/Layouts/Default'
+import ModulesNav from '~/components/Modules/ModulesNav'
+import vectorPageData from '~/data/products/modules/vector'
+import { useBreakpoint } from 'common'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import DefaultLayout from '~/components/Layouts/Default'
-
-import { useBreakpoint } from 'common'
-import vectorPageData from '~/data/products/modules/vector'
-import ModulesNav from '~/components/Modules/ModulesNav'
 import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
@@ -19,7 +18,7 @@ const TimedTabsSection = dynamic(() => import('~/components/Sections/TimedTabsSe
 const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta'))
 const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'))
 
-// When updating page content, also update public/md/vector.md
+// When updating page content, also update content/md/vector.md
 
 function VectorPage() {
   // base path for images

@@ -72,7 +72,7 @@ const nextConfig = {
     ],
   },
   outputFileTracingIncludes: {
-    '/api-v2/md/**/*': ['./public/md/**/*'],
+    '/api-v2/md/**/*': ['./content/md/**/*'],
   },
   reactStrictMode: true,
   images: {

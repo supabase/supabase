@@ -152,7 +152,7 @@ async function generateMainLlmsTxt() {
   await fs.writeFile('public/llms.txt', fullText)
 }
 
-// Product overview .md files live in apps/www/public/md/, read at build time.
+// Product overview .md files live in apps/www/content/md/, read at build time.
 // Order matters: homepage first, pricing last, products alphabetical in between.
 const PRODUCT_LLM_FILES = [
   'homepage.md',
@@ -169,7 +169,7 @@ const PRODUCT_LLM_FILES = [
 
 const PRODUCT_LLMS_DIR = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../../../apps/www/public/md'
+  '../../../apps/www/content/md'
 )
 
 async function readProductLlmContent(): Promise<string> {
