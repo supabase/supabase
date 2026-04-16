@@ -3,14 +3,12 @@ import { Fragment, useCallback } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
+import { hotkeyToKeys } from './formatShortcut'
 import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
 import { useShortcutStateSnapshot } from './state'
 import type { ShortcutOptions } from './types'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
-
-const hotkeyToKeys = (hotkey: string): string[] =>
-  hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
 
 /**
  * Subscribe to a registered keyboard shortcut.

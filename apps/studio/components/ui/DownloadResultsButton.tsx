@@ -1,9 +1,8 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
 import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useMemo } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -20,8 +19,8 @@ import {
   convertResultsToJSON,
   convertResultsToMarkdown,
 } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DownloadResultsButtonProps {
   iconOnly?: boolean
@@ -51,12 +50,6 @@ export const DownloadResultsButton = ({
   const { ref } = useParams()
   const pathname = usePathname()
   const isLogs = pathname?.includes?.('/logs') ?? false
-  const [copyMarkdownEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_MARKDOWN, true)
-  const [copyJsonEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_JSON, true)
-  const [copyCsvEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_CSV, true)
-  const [downloadCsvEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_DOWNLOAD_CSV, true)
-
-  const isEmpty = useMemo(() => results.length === 0, [results])
 
   const downloadAsCSV = () => {
     const csv = convertResultsToCSV(results)
@@ -107,41 +100,18 @@ export const DownloadResultsButton = ({
     })
   }
 
-  useHotKey(
-    (e) => {
-      e.preventDefault()
-      copyAsMarkdown()
-    },
-    'm',
-    { enabled: copyMarkdownEnabled ?? isEmpty, shift: true }
-  )
-
-  useHotKey(
-    (e) => {
-      e.preventDefault()
-      copyAsJSON()
-    },
-    'j',
-    { enabled: copyJsonEnabled ?? isEmpty, shift: true }
-  )
-
-  useHotKey(
-    (e) => {
-      e.preventDefault()
-      copyAsCSV()
-    },
-    'c',
-    { enabled: copyCsvEnabled ?? isEmpty, shift: true }
-  )
-
-  useHotKey(
-    (e) => {
-      e.preventDefault()
-      downloadAsCSV()
-    },
-    'd',
-    { enabled: downloadCsvEnabled ?? isEmpty, shift: true }
-  )
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, copyAsMarkdown, {
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, copyAsJSON, {
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, copyAsCSV, {
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {
+    registerInCommandMenu: true,
+  })
 
   return (
     <DropdownMenu>

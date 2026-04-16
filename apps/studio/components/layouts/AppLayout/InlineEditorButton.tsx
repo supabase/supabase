@@ -1,17 +1,15 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { SqlEditor } from 'icons'
 import { cn, KeyboardShortcut } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcutStateSnapshot } from '@/state/shortcuts/state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const InlineEditorKeyboardTooltip = () => {
-  const [hotkeyEnabled] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.EDITOR_PANEL),
-    true
-  )
+  const { disabled } = useShortcutStateSnapshot()
+  const hotkeyEnabled = !disabled[SHORTCUT_IDS.INLINE_EDITOR_TOGGLE]
 
   return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
 }
