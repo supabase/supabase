@@ -232,8 +232,8 @@ To learn more about Auth Hooks, see the [Auth Hooks docs](/docs/guides/auth/auth
 The custom claims you add to the JWT will be available in the `claims` property response from `supabase.auth.getClaims()`. For example, to check the user's role in your application, you can do:
 
 ```js
-const { data, error } = await supabase.auth.getClaims();
-const userRole = data?.claims?.user_role;
+const { data, error } = await supabase.auth.getClaims()
+const userRole = data?.claims?.user_role
 ```
 
 <Admonition type="note">
