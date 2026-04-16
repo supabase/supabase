@@ -66,26 +66,6 @@ export function headerRowsToRecord(rows: LogDrainHeaderRow[] = []): Record<strin
   }, {})
 }
 
-/**
- * Sentinel value returned by the API for secret header values.
- * Never send this back — it would overwrite the real secret with the literal string.
- */
-export const HEADER_REDACTED_VALUE = 'REDACTED'
-
-/**
- * Removes headers whose value is the REDACTED sentinel from a header record.
- * Use when building a PATCH payload so that undisturbed secret headers are
- * omitted rather than overwritten with the placeholder.
- */
-export function omitRedactedHeaders(
-  headers: Record<string, string>
-): Record<string, string> | undefined {
-  const filtered = Object.fromEntries(
-    Object.entries(headers).filter(([, v]) => v !== HEADER_REDACTED_VALUE)
-  )
-  return Object.keys(filtered).length > 0 ? filtered : undefined
-}
-
 export const logDrainHeaderEntriesSchema = z
   .array(
     z.object({
