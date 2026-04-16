@@ -142,7 +142,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   return (
     <>
-      <Card className="w-[40rem] mx-auto">
+      <Card className="w-full md:w-[40rem] mx-auto">
         <CardContent>
           <PauseCircle
             size={48}
