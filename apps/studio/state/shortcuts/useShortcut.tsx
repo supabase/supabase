@@ -9,14 +9,48 @@ import type { ShortcutOptions } from './types'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
 
-interface UseShortcutOptions extends ShortcutOptions {
-  registerInCommandMenu?: boolean
-}
-
 const hotkeyToKeys = (hotkey: string): string[] =>
   hotkey.split('+').map((part) => (part === 'Mod' ? 'Meta' : part))
 
-export function useShortcut(id: ShortcutId, callback: () => void, options?: UseShortcutOptions) {
+/**
+ * Subscribe to a registered keyboard shortcut.
+ *
+ * Looks up the shortcut's `sequence` and `label` from `SHORTCUT_DEFINITIONS`,
+ * wires up a global hotkey listener via `@tanstack/react-hotkeys`, and
+ * (optionally) registers the shortcut as an entry in the Cmd+P command menu
+ * under the "Shortcuts" section for as long as the hook is mounted.
+ *
+ * Option resolution priority (highest first):
+ *   1. `options` passed to this hook
+ *   2. `def.options` from the registry entry
+ *   3. Hard-coded fallbacks (`enabled: true`, `timeout: undefined`, `registerInCommandMenu: false`)
+ *
+ * `enabled` is ANDed with the user's global enable/disable preference from
+ * `shortcutState` — if the user has disabled the shortcut in Preferences, it
+ * won't fire even if the caller or registry say `enabled: true`.
+ *
+ * @param id       The registered shortcut to bind to. See `SHORTCUT_IDS`.
+ * @param callback Runs when the sequence matches. Always calls the latest
+ *                 reference — no stale closure issues.
+ * @param options  Per-mount overrides. See `ShortcutOptions`.
+ *
+ * @example
+ * useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, handleCopy)
+ *
+ * @example
+ * // Surface in Cmd+P while this component is mounted:
+ * useShortcut(SHORTCUT_IDS.SQL_EDITOR_RUN, runQuery, {
+ *   registerInCommandMenu: true,
+ * })
+ *
+ * @example
+ * // Gate on local state — disables hotkey AND hides Cmd+P entry when false:
+ * useShortcut(SHORTCUT_IDS.SAVE, handleSave, {
+ *   enabled: hasUnsavedChanges,
+ *   registerInCommandMenu: true,
+ * })
+ */
+export function useShortcut(id: ShortcutId, callback: () => void, options?: ShortcutOptions) {
   const snap = useShortcutStateSnapshot()
   const def = SHORTCUT_DEFINITIONS[id]
 
