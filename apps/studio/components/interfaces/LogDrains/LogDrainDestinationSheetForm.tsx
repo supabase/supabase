@@ -46,7 +46,6 @@ import {
 import {
   getDefaultHeadersByType,
   getHeadersSectionDescription as getHeadersDescription,
-  HEADER_REDACTED_VALUE,
   headerRecordToRows,
   headerRowsToRecord,
   logDrainHeaderEntriesSchema,
@@ -399,49 +398,7 @@ export function LogDrainDestinationSheetForm({
                 }
 
                 form.handleSubmit((values) => {
-                  let submitValues = toSubmitValues(values)
-
-                  if (mode === 'update') {
-                    const valuesWithHeaders = values as LogDrainDestinationFormValues & {
-                      headerEntries?: LogDrainHeaderRow[]
-                    }
-                    // An empty headerEntries array means the user deleted every row —
-                    // send headers: {} to signal the server to clear them.
-                    const explicitlyClearedHeaders =
-                      'headerEntries' in values &&
-                      Array.isArray(valuesWithHeaders.headerEntries) &&
-                      valuesWithHeaders.headerEntries.length === 0
-
-                    const submitValuesWithHeaders =
-                      submitValues as LogDrainDestinationSubmitValues & {
-                        headers?: Record<string, string>
-                      }
-
-                    if ('headers' in submitValues || explicitlyClearedHeaders) {
-                      const { headers, ...rest } = submitValuesWithHeaders
-
-                      if (explicitlyClearedHeaders) {
-                        submitValues = { ...rest, headers: {} } as LogDrainDestinationSubmitValues
-                      } else {
-                        // REDACTED values are server-side placeholders for hidden secrets —
-                        // not values the user set. Strip them so we send only what the user
-                        // explicitly changed. The platform is responsible for merging with
-                        // existing stored values server-side.
-                        const userChangedHeaders = Object.fromEntries(
-                          Object.entries(headers ?? {}).filter(
-                            ([, v]) => v !== HEADER_REDACTED_VALUE
-                          )
-                        )
-                        submitValues = (
-                          Object.keys(userChangedHeaders).length > 0
-                            ? { ...rest, headers: userChangedHeaders }
-                            : rest
-                        ) as LogDrainDestinationSubmitValues
-                      }
-                    }
-                  }
-
-                  onSubmit(submitValues)
+                  onSubmit(toSubmitValues(values))
                 })(e)
                 track('log_drain_save_button_clicked', {
                   destination: form.getValues('type'),
