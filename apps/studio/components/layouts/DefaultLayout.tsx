@@ -14,6 +14,7 @@ import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSideb
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -125,6 +126,7 @@ export const DefaultLayout = ({
 
               <BannerStack />
               <StudioMobileSheetNav />
+              <GlobalShortcuts />
             </BannerStackProvider>
           </MobileSheetProvider>
         </ProjectContextProvider>

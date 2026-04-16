@@ -9,6 +9,14 @@ import { ShortcutDefinition } from './types'
  */
 export const SHORTCUT_IDS = {
   RESULTS_COPY_MARKDOWN: 'results.copy-markdown',
+
+  NAV_TABLE_EDITOR: 'nav.table-editor',
+  NAV_SQL_EDITOR: 'nav.sql-editor',
+  NAV_STORAGE: 'nav.storage',
+  NAV_DATABASE: 'nav.database',
+  NAV_AUTH: 'nav.auth',
+
+  SHORTCUTS_OPEN_REFERENCE: 'shortcuts.open-reference',
 } as const
 
 /**
@@ -23,24 +31,43 @@ export type ShortcutId = (typeof SHORTCUT_IDS)[keyof typeof SHORTCUT_IDS]
  * new entry to `SHORTCUT_IDS` without a matching definition here is a type error.
  *
  * See `ShortcutDefinition` for the shape of each entry.
- *
- * @example
- * // Add a new shortcut:
- * // 1. Add to SHORTCUT_IDS:
- * //    SQL_EDITOR_RUN: 'sql-editor.run'
- * // 2. Add to SHORTCUT_DEFINITIONS:
- * //    [SHORTCUT_IDS.SQL_EDITOR_RUN]: {
- * //      id: SHORTCUT_IDS.SQL_EDITOR_RUN,
- * //      label: 'Run query',
- * //      sequence: ['Mod+Enter'],
- * //    }
- * // 3. Use in a component:
- * //    useShortcut(SHORTCUT_IDS.SQL_EDITOR_RUN, runQuery)
  */
 export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   [SHORTCUT_IDS.RESULTS_COPY_MARKDOWN]: {
     id: SHORTCUT_IDS.RESULTS_COPY_MARKDOWN,
     label: 'Copy results as Markdown',
     sequence: ['Mod+Shift+M'],
+  },
+
+  [SHORTCUT_IDS.NAV_TABLE_EDITOR]: {
+    id: SHORTCUT_IDS.NAV_TABLE_EDITOR,
+    label: 'Go to Table Editor',
+    sequence: ['G', 'T'],
+  },
+  [SHORTCUT_IDS.NAV_SQL_EDITOR]: {
+    id: SHORTCUT_IDS.NAV_SQL_EDITOR,
+    label: 'Go to SQL Editor',
+    sequence: ['G', 'E'],
+  },
+  [SHORTCUT_IDS.NAV_STORAGE]: {
+    id: SHORTCUT_IDS.NAV_STORAGE,
+    label: 'Go to Storage',
+    sequence: ['G', 'S'],
+  },
+  [SHORTCUT_IDS.NAV_DATABASE]: {
+    id: SHORTCUT_IDS.NAV_DATABASE,
+    label: 'Go to Database',
+    sequence: ['G', 'D'],
+  },
+  [SHORTCUT_IDS.NAV_AUTH]: {
+    id: SHORTCUT_IDS.NAV_AUTH,
+    label: 'Go to Authentication',
+    sequence: ['G', 'A'],
+  },
+
+  [SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE]: {
+    id: SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
+    label: 'Show all keyboard shortcuts',
+    sequence: ['Shift+A'],
   },
 }
