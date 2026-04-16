@@ -3,6 +3,7 @@ import saveAs from 'file-saver'
 import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -50,6 +51,7 @@ export const DownloadResultsButton = ({
   const { ref } = useParams()
   const pathname = usePathname()
   const isLogs = pathname?.includes?.('/logs') ?? false
+  const isEmpty = useMemo(() => results.length === 0, [results])
 
   const downloadAsCSV = () => {
     const csv = convertResultsToCSV(results)
@@ -101,15 +103,19 @@ export const DownloadResultsButton = ({
   }
 
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, copyAsMarkdown, {
+    enabled: !isEmpty,
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, copyAsJSON, {
+    enabled: !isEmpty,
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_COPY_CSV, copyAsCSV, {
+    enabled: !isEmpty,
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV, downloadAsCSV, {
+    enabled: !isEmpty,
     registerInCommandMenu: true,
   })
 
