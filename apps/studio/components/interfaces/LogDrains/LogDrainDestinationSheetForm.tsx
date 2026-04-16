@@ -44,6 +44,7 @@ import {
   OTLP_PROTOCOLS,
 } from './LogDrains.constants'
 import {
+  computePatchHeaders,
   getDefaultHeadersByType,
   getHeadersSectionDescription as getHeadersDescription,
   headerRecordToRows,
@@ -238,7 +239,10 @@ type LogDrainDestinationSubmitValues = z.infer<typeof submitSchema>
 
 const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
 
-function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinationSubmitValues {
+function toSubmitValues(
+  values: LogDrainDestinationFormValues,
+  mode: 'create' | 'update' = 'create'
+): LogDrainDestinationSubmitValues {
   if (!HEADER_ENABLED_TYPES.includes(values.type as (typeof HEADER_ENABLED_TYPES)[number])) {
     return submitSchema.parse(values)
   }
@@ -246,11 +250,13 @@ function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinat
   const { headerEntries = [], ...rest } = values as LogDrainDestinationFormValues & {
     headerEntries?: LogDrainHeaderRow[]
   }
-  const headers = headerRowsToRecord(headerEntries)
+  const rawHeaders = headerRowsToRecord(headerEntries)
+  const headers = mode === 'update' ? computePatchHeaders(rawHeaders) : rawHeaders
+
   const transformedValues =
     rest.type === 'loki'
       ? { ...rest, headers }
-      : Object.keys(headers).length > 0
+      : headers !== undefined && Object.keys(headers).length > 0
         ? { ...rest, headers }
         : rest
 
@@ -398,7 +404,7 @@ export function LogDrainDestinationSheetForm({
                 }
 
                 form.handleSubmit((values) => {
-                  onSubmit(toSubmitValues(values))
+                  onSubmit(toSubmitValues(values, mode))
                 })(e)
                 track('log_drain_save_button_clicked', {
                   destination: form.getValues('type'),

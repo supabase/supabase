@@ -231,3 +231,122 @@ describe('LogDrainDestinationSheetForm', () => {
     expect(screen.queryByText('undefined')).not.toBeInTheDocument()
   })
 })
+
+describe('LogDrainDestinationSheetForm — update mode REDACTED header handling', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+
+    useFlagMock.mockReturnValue(true)
+    useParamsMock.mockReturnValue({ ref: 'project-ref' })
+    useLogDrainsQueryMock.mockReturnValue({ data: [] })
+    useTrackMock.mockReturnValue(trackMock)
+  })
+
+  it('omits headers from the payload when all headers are REDACTED (nothing changed)', async () => {
+    const { onSubmit } = renderForm({
+      mode: 'update',
+      defaultValues: {
+        type: 'webhook',
+        name: 'My drain',
+        config: {
+          url: 'https://example.com/hook',
+          http: 'http2',
+          gzip: false,
+          headers: { Authorization: 'REDACTED' },
+        },
+      },
+    })
+
+    await screen.findByRole('dialog')
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit.mock.calls[0][0]).not.toHaveProperty('headers')
+  })
+
+  it('sends only the new header when adding one alongside a REDACTED header', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm({
+      mode: 'update',
+      defaultValues: {
+        type: 'webhook',
+        name: 'My drain',
+        config: {
+          url: 'https://example.com/hook',
+          http: 'http2',
+          gzip: false,
+          headers: { Authorization: 'REDACTED' },
+        },
+      },
+    })
+
+    await screen.findByRole('dialog')
+
+    await user.click(screen.getByRole('button', { name: 'Add a new header' }))
+
+    const headerNameInputs = screen.getAllByPlaceholderText('Header name')
+    const headerValueInputs = screen.getAllByPlaceholderText('Header value')
+    await user.type(headerNameInputs[1], 'X-Custom')
+    await user.type(headerValueInputs[1], 'my-value')
+
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ headers: { 'X-Custom': 'my-value' } })
+    )
+    // REDACTED should not be forwarded
+    expect(onSubmit.mock.calls[0][0].headers).not.toHaveProperty('Authorization')
+  })
+
+  it('sends headers: {} when the user removes all header rows', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderForm({
+      mode: 'update',
+      defaultValues: {
+        type: 'webhook',
+        name: 'My drain',
+        config: {
+          url: 'https://example.com/hook',
+          http: 'http2',
+          gzip: false,
+          headers: { Authorization: 'REDACTED' },
+        },
+      },
+    })
+
+    await screen.findByRole('dialog')
+
+    await user.click(screen.getByRole('button', { name: 'Remove header' }))
+
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ headers: {} }))
+  })
+
+  it('sends non-REDACTED headers while stripping REDACTED ones', async () => {
+    const { onSubmit } = renderForm({
+      mode: 'update',
+      defaultValues: {
+        type: 'webhook',
+        name: 'My drain',
+        config: {
+          url: 'https://example.com/hook',
+          http: 'http2',
+          gzip: false,
+          headers: { Authorization: 'REDACTED', 'Content-Type': 'application/json' },
+        },
+      },
+    })
+
+    await screen.findByRole('dialog')
+    submitForm()
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ headers: { 'Content-Type': 'application/json' } })
+    )
+    expect(onSubmit.mock.calls[0][0].headers).not.toHaveProperty('Authorization')
+  })
+})

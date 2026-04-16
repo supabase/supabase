@@ -66,6 +66,40 @@ export function headerRowsToRecord(rows: LogDrainHeaderRow[] = []): Record<strin
   }, {})
 }
 
+/**
+ * Sentinel value returned by the API for secret header values.
+ * The real value is stored server-side and hidden from API responses.
+ */
+export const REDACTED_HEADER_VALUE = 'REDACTED'
+
+/**
+ * Computes the headers payload to include in a PATCH request.
+ *
+ * Returns only what the user explicitly changed:
+ * - `undefined`            – all headers are REDACTED sentinels (nothing changed, omit field)
+ * - `{}`                   – user cleared every header row (signal server to delete them)
+ * - `Record<string,string>` – only the non-REDACTED entries (user-supplied values)
+ */
+export function computePatchHeaders(
+  headers: Record<string, string>
+): Record<string, string> | undefined {
+  const entries = Object.entries(headers)
+
+  if (entries.length === 0) {
+    // Empty record means the user deleted all rows → signal deletion
+    return {}
+  }
+
+  const changed = entries.filter(([, v]) => v !== REDACTED_HEADER_VALUE)
+
+  if (changed.length === 0) {
+    // Every header is a REDACTED sentinel → nothing the user touched changed
+    return undefined
+  }
+
+  return Object.fromEntries(changed)
+}
+
 export const logDrainHeaderEntriesSchema = z
   .array(
     z.object({

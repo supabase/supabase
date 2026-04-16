@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  computePatchHeaders,
   getDefaultHeadersByType,
   getHeadersSectionDescription,
   HEADER_VALIDATION_ERRORS,
@@ -8,6 +9,7 @@ import {
   headerRowsToRecord,
   logDrainHeaderEntriesSchema,
   otlpConfigSchema,
+  REDACTED_HEADER_VALUE,
 } from './LogDrains.utils'
 
 describe('getHeadersSectionDescription', () => {
@@ -333,5 +335,60 @@ describe('otlpConfigSchema', () => {
         expect(result.data.gzip).toBe(false)
       }
     })
+  })
+})
+
+describe('computePatchHeaders', () => {
+  it('returns undefined when all headers are REDACTED sentinels (nothing changed)', () => {
+    expect(
+      computePatchHeaders({
+        Authorization: REDACTED_HEADER_VALUE,
+        'X-Secret': REDACTED_HEADER_VALUE,
+      })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined for a single REDACTED header', () => {
+    expect(computePatchHeaders({ Authorization: REDACTED_HEADER_VALUE })).toBeUndefined()
+  })
+
+  it('returns an empty object when the input is empty (user cleared all headers)', () => {
+    expect(computePatchHeaders({})).toEqual({})
+  })
+
+  it('strips REDACTED sentinel and returns only user-supplied headers', () => {
+    expect(
+      computePatchHeaders({ Authorization: REDACTED_HEADER_VALUE, 'X-Custom': 'my-value' })
+    ).toEqual({ 'X-Custom': 'my-value' })
+  })
+
+  it('returns all headers when none are REDACTED', () => {
+    expect(
+      computePatchHeaders({ 'Content-Type': 'application/json', 'X-API-Key': 'key123' })
+    ).toEqual({ 'Content-Type': 'application/json', 'X-API-Key': 'key123' })
+  })
+
+  it('returns the single non-REDACTED header unchanged', () => {
+    expect(computePatchHeaders({ 'X-Token': 'abc' })).toEqual({ 'X-Token': 'abc' })
+  })
+
+  it('keeps multiple non-REDACTED headers alongside REDACTED ones', () => {
+    expect(
+      computePatchHeaders({
+        Authorization: REDACTED_HEADER_VALUE,
+        'Header-Two': 'header2',
+        'Header-Three': 'header3',
+      })
+    ).toEqual({ 'Header-Two': 'header2', 'Header-Three': 'header3' })
+  })
+
+  it('does not treat a value that contains REDACTED as a substring as the sentinel', () => {
+    expect(computePatchHeaders({ 'X-Info': 'NOT_REDACTED_VALUE' })).toEqual({
+      'X-Info': 'NOT_REDACTED_VALUE',
+    })
+  })
+
+  it('is case-sensitive — lowercase "redacted" is not the sentinel', () => {
+    expect(computePatchHeaders({ 'X-Info': 'redacted' })).toEqual({ 'X-Info': 'redacted' })
   })
 })
