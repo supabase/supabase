@@ -4,7 +4,6 @@ Supabase is 100% remote.
 
 Aaron Brooks
 Aaron Byrne
-Ada Wong
 Adam Mohammed
 Adam Mokan
 AJ Matias
@@ -59,7 +58,6 @@ Craig Cannon
 Cuong Do
 Daniel Velázquez Lara
 Danny White
-Darren Cunningham
 Dave Wilson
 David A. Ventimiglia
 David Alvarez
@@ -114,7 +112,6 @@ Jamie Boyd
 Jared Patterson
 Jason Farber
 Jean-Paul Argudo
-Jeezy
 Jeff Smick
 Jenny Kibiri
 Jeremias Menichelli
@@ -161,7 +158,6 @@ Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
 Long Hoang
-Luca Forstner
 Lukas Bernert
 Łukasz Niemier
 Maksym Ionutsa
@@ -169,7 +165,6 @@ Manan Gupta
 Marcus Weiner
 Margarita Sandomirskaia
 Mark Burggraf
-Marouane Souda
 Matthew Hambright
 Matt Johnston
 Matt Rossman
@@ -221,7 +216,6 @@ Sergio Cioban Filho
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman
-Stanislav M
 Stephen Morgan
 Steve Chavez
 Steven Eubank
@@ -234,7 +228,6 @@ Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
 Thomas E
-Thor Schaeff
 Tim Frietas
 Tim Palmer
 Timothy Lim
@@ -250,7 +243,6 @@ Victor Farazdagi
 Wen Bo Xie
 Yorvi Arias
 Yuliya Marinova
-Yuri Santana
 Zach Marinov
 Zsolt Pazmandy
 ____________
