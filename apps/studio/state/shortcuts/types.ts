@@ -3,6 +3,7 @@ import { HotkeySequence } from '@tanstack/react-hotkeys'
 export interface ShortcutOptions {
   enabled?: boolean
   timeout?: number
+  registerInCommandMenu?: boolean
 }
 
 export interface ShortcutDefinition {
