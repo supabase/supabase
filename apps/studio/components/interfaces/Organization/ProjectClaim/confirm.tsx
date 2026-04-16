@@ -200,6 +200,11 @@ export const ProjectClaimConfirm = ({
                     hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_WRITE)}
                   />
                   <ScopeSection
+                    description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+                    hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
+                    hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
+                  />
+                  <ScopeSection
                     description={PERMISSIONS_DESCRIPTIONS.AUTH}
                     hasReadScope={requester.scopes.includes(OAuthScope.AUTH_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.AUTH_WRITE)}

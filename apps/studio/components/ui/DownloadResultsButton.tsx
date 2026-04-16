@@ -33,6 +33,7 @@ interface DownloadResultsButtonProps {
   onDownloadAsCSV?: () => void
   onCopyAsMarkdown?: () => void
   onCopyAsJSON?: () => void
+  onCopyAsCSV?: () => void
 }
 
 export const DownloadResultsButton = ({
@@ -45,12 +46,14 @@ export const DownloadResultsButton = ({
   onDownloadAsCSV,
   onCopyAsMarkdown,
   onCopyAsJSON,
+  onCopyAsCSV,
 }: DownloadResultsButtonProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
   const isLogs = pathname?.includes?.('/logs') ?? false
   const [copyMarkdownEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_MARKDOWN, true)
   const [copyJsonEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_JSON, true)
+  const [copyCsvEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COPY_CSV, true)
   const [downloadCsvEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_DOWNLOAD_CSV, true)
 
   const isEmpty = useMemo(() => results.length === 0, [results])
@@ -92,6 +95,18 @@ export const DownloadResultsButton = ({
     })
   }
 
+  const copyAsCSV = () => {
+    const csv = convertResultsToCSV(results)
+    if (!csv) {
+      toast('Results are empty')
+      return
+    }
+    copyToClipboard(csv, () => {
+      toast.success('Copied CSV to clipboard')
+      onCopyAsCSV?.()
+    })
+  }
+
   useHotKey(
     (e) => {
       e.preventDefault()
@@ -108,6 +123,15 @@ export const DownloadResultsButton = ({
     },
     'j',
     { enabled: copyJsonEnabled ?? isEmpty, shift: true }
+  )
+
+  useHotKey(
+    (e) => {
+      e.preventDefault()
+      copyAsCSV()
+    },
+    'c',
+    { enabled: copyCsvEnabled ?? isEmpty, shift: true }
   )
 
   useHotKey(
@@ -153,6 +177,13 @@ export const DownloadResultsButton = ({
           <p>Copy as JSON</p>
           <span className="ml-auto">
             <KeyboardShortcut keys={['Shift', 'Meta', 'j']} />
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={copyAsCSV} className="gap-x-2">
+          <Copy size={14} />
+          <p>Copy as CSV</p>
+          <span className="ml-auto">
+            <KeyboardShortcut keys={['Shift', 'Meta', 'c']} />
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>

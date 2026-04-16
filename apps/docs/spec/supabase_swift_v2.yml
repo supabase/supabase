@@ -53,6 +53,25 @@ functions:
             )
           )
           ```
+      - id: initialize-client-with-retries
+        name: Initialize Client with automatic retries
+        description: |
+          PostgREST requests automatically retry on transient errors (HTTP 408, 409, 503, 504 and network failures) with exponential backoff. Retries are enabled by default and can be disabled per client.
+        code: |
+          ```swift
+          import Supabase
+
+          let supabase = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "publishable-or-anon-key",
+            options: SupabaseClientOptions(
+              db: .init(
+                // Disable automatic retries for this client
+                retryEnabled: false
+              )
+            )
+          )
+          ```
       - id: initialize-client-with-logging
         name: Initialize Client with Logging
         code: |
@@ -4393,6 +4412,7 @@ functions:
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
       - Use AsyncStream or callbacks for listening to changes.
+      - Presence and Postgres change callbacks must be registered **before** calling `subscribe()`. Attempting to add them after the channel is subscribing or subscribed will trigger a warning and the callback will be rejected.
     examples:
       - id: listen-to-broadcast
         name: Listen to broadcast messages

@@ -10,7 +10,10 @@ export type StopPipelineParams = {
   pipelineId: number
 }
 
-async function stopPipeline({ projectRef, pipelineId }: StopPipelineParams, signal?: AbortSignal) {
+export async function stopPipeline(
+  { projectRef, pipelineId }: StopPipelineParams,
+  signal?: AbortSignal
+) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/stop', {

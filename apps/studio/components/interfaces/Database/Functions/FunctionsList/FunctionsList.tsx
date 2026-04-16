@@ -1,7 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Search } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
@@ -45,8 +43,6 @@ end;
 $$;`
 
 export const FunctionsList = () => {
-  const router = useRouter()
-  const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -96,7 +92,10 @@ export const FunctionsList = () => {
     }
   }
 
-  const filterString = search ?? ''
+  const [filterString, setFilterString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
+  )
 
   // Filters
   const [returnTypeFilter, setReturnTypeFilter] = useQueryState(
@@ -107,16 +106,6 @@ export const FunctionsList = () => {
     'security',
     parseAsJson(selectFilterSchema.parse)
   )
-
-  const setFilterString = (str: string) => {
-    const url = new URL(document.URL)
-    if (str === '') {
-      url.searchParams.delete('search')
-    } else {
-      url.searchParams.set('search', str)
-    }
-    router.push(url)
-  }
 
   const { can: canCreateFunctions } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -254,10 +243,7 @@ export const FunctionsList = () => {
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
                   setFilterString('')
-                  // Wait for the filter to be cleared from the URL
-                  setTimeout(() => {
-                    setSelectedSchema(schema)
-                  }, 50)
+                  setSelectedSchema(schema)
                 }}
               />
               <Input

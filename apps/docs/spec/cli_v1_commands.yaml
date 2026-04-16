@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.88.0
+  version: 2.90.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -27,11 +27,11 @@ flags:
       - id: auto
         name: auto
         type: '[ auto | yes | no ]'
-      - id: 'yes'
-        name: 'yes'
+      - id: "yes"
+        name: "yes"
         type: '[ auto | yes | no ]'
-      - id: 'no'
-        name: 'no'
+      - id: "no"
+        name: "no"
         type: '[ auto | yes | no ]'
   - id: create-ticket
     name: --create-ticket
@@ -92,7 +92,7 @@ flags:
     name: --workdir <string>
     description: path to a Supabase project directory
     default_value: ''
-  - id: 'yes'
+  - id: "yes"
     name: --yes
     description: answer yes to all prompts
     default_value: 'false'
@@ -278,11 +278,36 @@ commands:
   - id: supabase-telemetry
     title: supabase telemetry
     summary: Manage CLI telemetry settings
-    description: |
-      The Supabase CLI collects telemetry data about general usage. Participating in this program is optional. You can opt out by running `supabase telemetry disable` or setting `SUPABASE_TELEMETRY_DISABLED=1`. Use `supabase telemetry status` to check your current setting and `supabase telemetry enable` to opt back in.
     tags:
       - local-dev
     links: []
+    subcommands:
+      - supabase-telemetry-disable
+      - supabase-telemetry-enable
+      - supabase-telemetry-status
+    flags: []
+  - id: supabase-telemetry-status
+    title: supabase telemetry status
+    summary: Show CLI telemetry status
+    tags: []
+    links: []
+    usage: supabase telemetry status
+    subcommands: []
+    flags: []
+  - id: supabase-telemetry-enable
+    title: supabase telemetry enable
+    summary: Enable CLI telemetry
+    tags: []
+    links: []
+    usage: supabase telemetry enable
+    subcommands: []
+    flags: []
+  - id: supabase-telemetry-disable
+    title: supabase telemetry disable
+    summary: Disable CLI telemetry
+    tags: []
+    links: []
+    usage: supabase telemetry disable
     subcommands: []
     flags: []
   - id: supabase-storage
@@ -2900,7 +2925,7 @@ commands:
           Reset local database to match migrations first? (local data will be lost) [y/N] y
           Resetting database...
           ...
-          Declarative schema written to supabase/declarative
+          Declarative schema written to supabase/database
           Finished supabase db schema declarative generate.
     tags: []
     links: []
