@@ -1,6 +1,7 @@
 resources:
   - '@type': type.googleapis.com/envoy.config.listener.v3.Listener
     name: supabase
+    per_connection_buffer_limit_bytes: 32768  # 32 KiB
     
     address:
       socket_address:
