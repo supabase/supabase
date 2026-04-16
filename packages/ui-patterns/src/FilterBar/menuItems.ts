@@ -1,11 +1,6 @@
 import { ActiveInput } from './hooks'
 import { FilterBarAction, FilterGroup, FilterProperty } from './types'
-import {
-  findConditionByPath,
-  isCustomOptionObject,
-  isFilterOptionObject,
-  isFilterOperatorObject,
-} from './utils'
+import { findConditionByPath, isCustomOptionObject, isFilterOptionObject, isFilterOperatorObject } from './utils'
 
 export type MenuItem = {
   value: string

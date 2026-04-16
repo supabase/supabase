@@ -61,10 +61,7 @@ export type FilterBarAction = {
   ) => void | Promise<void>
 }
 
-export type SerializableFilterProperty = Pick<
-  FilterProperty,
-  'label' | 'name' | 'type' | 'operators'
-> & {
+export type SerializableFilterProperty = Pick<FilterProperty, 'label' | 'name' | 'type' | 'operators'> & {
   options?: string[]
 }
 
