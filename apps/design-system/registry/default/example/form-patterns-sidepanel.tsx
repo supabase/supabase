@@ -10,6 +10,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
@@ -38,6 +39,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import {
   MultiSelector,
@@ -48,24 +50,40 @@ import {
 } from 'ui-patterns/multi-select'
 import * as z from 'zod'
 
-const formSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().optional(),
-  maxConnections: z.number().min(1).max(1000),
-  enableFeature: z.boolean(),
-  enableRls: z.boolean(),
-  enableNotifications: z.boolean(),
-  enableAnalytics: z.boolean(),
-  region: z.string().min(1, 'Region is required'),
-  schemas: z.array(z.string()).min(1, 'At least one schema is required'),
-  queueType: z.enum(['basic', 'partitioned']),
-  expiryDate: z.date().optional(),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  duration: z.number().min(5).max(30),
-  redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
-  httpHeaders: z.array(z.object({ key: z.string(), value: z.string() })),
-  apiKey: z.string().optional(),
-})
+const formSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    description: z.string().optional(),
+    maxConnections: z.number().min(1).max(1000),
+    enableFeature: z.boolean(),
+    enableRls: z.boolean(),
+    enableNotifications: z.boolean(),
+    enableAnalytics: z.boolean(),
+    region: z.string().min(1, 'Region is required'),
+    schemas: z.array(z.string()).min(1, 'At least one schema is required'),
+    queueType: z.enum(['basic', 'partitioned']),
+    expiryDate: z.date().optional(),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    duration: z.number().min(5).max(30),
+    redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
+    httpHeaders: z.array(z.object({ key: z.string().trim(), value: z.string().trim() })),
+    apiKey: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    getKeyValueFieldArrayValidationIssues({
+      rows: data.httpHeaders,
+      keyFieldName: 'key',
+      valueFieldName: 'value',
+      keyRequiredMessage: 'Header name is required',
+      valueRequiredMessage: 'Header value is required',
+    }).forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: issue.message,
+        path: ['httpHeaders', ...issue.path],
+      })
+    })
+  })
 
 const fakeApiKey = 'sk_live_51H3x4mpl3_4nd_53cur3_k3y_1234567890'
 
@@ -233,7 +251,7 @@ export default function FormPatternsSidePanel() {
                     >
                       <FormControl_Shadcn_ className="col-span-6">
                         <InputGroup>
-                          <InputGroupInput {...field} type="number" min={5} max={30} />
+                          <FormInputGroupInput {...field} type="number" min={5} max={30} />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>MB</InputGroupText>
                           </InputGroupAddon>

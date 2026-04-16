@@ -27,16 +27,18 @@ export function calculateImprovement(
   costBefore: number | undefined,
   costAfter: number | undefined
 ): number {
-  if (
-    costBefore === undefined ||
-    costAfter === undefined ||
-    costBefore <= 0 ||
-    costBefore <= costAfter
-  ) {
+  if (costBefore === undefined || costAfter === undefined) {
     return 0
   }
 
-  return ((costBefore - costAfter) / costBefore) * 100
+  const before = Number(costBefore)
+  const after = Number(costAfter)
+
+  if (before <= 0 || before <= after) {
+    return 0
+  }
+
+  return ((before - after) / before) * 100
 }
 
 interface CreateIndexParams {

@@ -1,4 +1,5 @@
 import { toString as CronToString } from 'cronstrue'
+import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
 import z from 'zod'
 
 import { cronPattern, secondsPattern } from '../CronJobs.constants'
@@ -15,12 +16,34 @@ const convertCronToString = (schedule: string) => {
   }
 }
 
+const httpHeadersSchema = z.array(z.object({ name: z.string().trim(), value: z.string().trim() }))
+
+const addHttpHeaderIssues = (
+  rows: z.infer<typeof httpHeadersSchema>,
+  ctx: z.RefinementCtx,
+  pathPrefix: string[]
+) => {
+  getKeyValueFieldArrayValidationIssues({
+    rows,
+    keyFieldName: 'name',
+    valueFieldName: 'value',
+    keyRequiredMessage: 'Header name is required',
+    valueRequiredMessage: 'Header value is required',
+  }).forEach((issue) => {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: issue.message,
+      path: [...pathPrefix, ...issue.path],
+    })
+  })
+}
+
 const edgeFunctionSchema = z.object({
   type: z.literal('edge_function'),
   method: z.enum(['GET', 'POST']),
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
-  httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpHeaders: httpHeadersSchema,
   httpBody: z
     .string()
     .trim()
@@ -47,7 +70,7 @@ const httpRequestSchema = z.object({
     prefixMessage: 'Please prefix your URL with http:// or https://',
   }),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
-  httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpHeaders: httpHeadersSchema,
   httpBody: z
     .string()
     .trim()
@@ -115,6 +138,10 @@ export const FormSchema = z
           path: ['schedule'],
         })
       }
+    }
+
+    if (data.values.type === 'edge_function' || data.values.type === 'http_request') {
+      addHttpHeaderIssues(data.values.httpHeaders, ctx, ['values', 'httpHeaders'])
     }
   })
 

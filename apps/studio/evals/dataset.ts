@@ -19,6 +19,7 @@ export const dataset: AssistantEvalCase[] = [
     input: { prompt: 'Create a new table "foods" with columns for "name" and "color"' },
     expected: {
       requiredTools: ['execute_sql'],
+      requiredKnowledge: ['pg_best_practices'],
     },
     metadata: { category: ['sql_generation', 'schema_design'] },
   },
@@ -29,6 +30,7 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['execute_sql'],
+      requiredKnowledge: ['pg_best_practices'],
     },
     metadata: { category: ['sql_generation'] },
   },
@@ -36,6 +38,7 @@ export const dataset: AssistantEvalCase[] = [
     input: { prompt: 'Create an index on the projects table for the name column' },
     expected: {
       requiredTools: ['execute_sql'],
+      requiredKnowledge: ['pg_best_practices'],
     },
     metadata: { category: ['sql_generation', 'database_optimization'] },
   },
@@ -87,6 +90,7 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['execute_sql'],
+      requiredKnowledge: ['pg_best_practices'],
     },
     metadata: {
       category: ['sql_generation'],
@@ -100,6 +104,7 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['execute_sql'],
+      requiredKnowledge: ['pg_best_practices'],
     },
     metadata: {
       category: ['sql_generation', 'schema_design'],
@@ -127,6 +132,34 @@ export const dataset: AssistantEvalCase[] = [
       description:
         'Verifies template URLs like https://<project-ref>.supabase.co/auth/v1/callback are excluded from URL validity scoring',
     },
+  },
+  {
+    input: { prompt: "How do I write an RLS policy to restrict access to a user's own rows?" },
+    expected: {
+      requiredTools: ['list_tables', 'list_policies', 'execute_sql'],
+      requiredKnowledge: ['rls'],
+    },
+    metadata: { category: ['rls_policies'] },
+  },
+  {
+    input: { prompt: 'Write an edge function that sends a welcome email when a user signs up' },
+    expected: {
+      requiredTools: ['deploy_edge_function'],
+      requiredKnowledge: ['edge_functions'],
+    },
+    metadata: { category: ['edge_functions'] },
+  },
+  {
+    input: { prompt: 'What indexes should I add to improve query performance?' },
+    expected: { requiredKnowledge: ['pg_best_practices'] },
+    metadata: { category: ['database_optimization'] },
+  },
+  {
+    input: { prompt: 'How do I subscribe to realtime changes on a table?' },
+    expected: {
+      requiredKnowledge: ['realtime'],
+    },
+    metadata: { category: ['general_help'] },
   },
   {
     input: {

@@ -6,16 +6,17 @@ packages:
 
 catalog:
   '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.101.0
-  '@supabase/postgrest-js': 2.101.0
-  '@supabase/realtime-js': 2.101.0
-  '@supabase/supabase-js': 2.101.0
+  '@supabase/ssr': 0.10.2
+  '@supabase/auth-js': 2.103.2
+  '@supabase/postgrest-js': 2.103.2
+  '@supabase/realtime-js': 2.103.2
+  '@supabase/supabase-js': 2.103.2
   '@types/node': ^22.0.0
   '@types/react': ^18.3.0
   '@types/react-dom': ^18.3.0
-  lodash: ^4.17.23
-  lodash-es: ^4.17.23
-  next: ^15.5.13
+  lodash: ^4.18.1
+  lodash-es: ^4.18.1
+  next: 16.2.3
   react: ^18.3.0
   react-dom: ^18.3.0
   recharts: ^2.15.4
@@ -23,8 +24,12 @@ catalog:
   tsx: 4.20.3
   typescript: ~6.0.0
   valtio: ^1.12.0
-  vite: ^7.3.1
-  vitest: ^3.2.0
+  '@vitejs/plugin-react': ^6.0.1
+  '@vitest/coverage-v8': ^4.1.4
+  '@vitest/ui': ^4.1.4
+  vite: ^8.0.8
+  vite-tsconfig-paths: ^6.1.1
+  vitest: ^4.1.4
   zod: 3.25.76
 
 ignoredBuiltDependencies:
@@ -39,16 +44,15 @@ ignoredBuiltDependencies:
   - protobufjs
   - sharp
 
-minimumReleaseAge: 10080
+minimumReleaseAge: 4320
 
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  # The following deps were added due to vulnerabilities. You can remove them after the minimum time has passed.
-  - path-to-regexp
-  - brace-expansion
-  - serialize-javascript
+  # The following packages are excluded from the minimum release age check because they had a vulneralibity
+  # Delete them the next time you update this list
+  - follow-redirects
 
 onlyBuiltDependencies:
   - node-pty
@@ -61,7 +65,6 @@ overrides:
   '@redocly/respect-core>form-data': ^4.0.4
   '@redocly/respect-core>js-yaml': ^4.1.1
   '@rollup/plugin-terser>serialize-javascript': ^7.0.5
-  '@tanstack/start-server-core': ^1.159.0
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   esbuild: ^0.25.2
@@ -76,6 +79,7 @@ overrides:
   'terser-webpack-plugin>serialize-javascript': ^7.0.5
   tmp: ^0.2.4
   webpack: ^5.104.1
+  unhead: ^2.1.13
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch

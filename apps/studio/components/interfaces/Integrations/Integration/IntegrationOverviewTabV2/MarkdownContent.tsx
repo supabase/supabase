@@ -17,7 +17,7 @@ export const MarkdownContent = ({
 
   useEffect(() => {
     if (!!integrationId && !content) {
-      import(`static-data/integrations/${integrationId}/overview.md`)
+      import(`@/static-data/integrations/${integrationId}/overview.md`)
         .then((module) => setLocalContent(String(module.default)))
         .catch((error) => console.error('Error loading markdown:', error))
     }

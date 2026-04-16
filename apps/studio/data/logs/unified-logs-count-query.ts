@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { getLogsCountQuery } from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { FacetMetadataSchema } from 'components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { handleError, post } from 'data/fetchers'
-import { ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 import { logsKeys } from './keys'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
+import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
+import { handleError, post } from '@/data/fetchers'
+import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsCount(
   { projectRef, search }: UnifiedLogsVariables,

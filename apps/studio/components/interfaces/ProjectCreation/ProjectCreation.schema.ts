@@ -38,14 +38,23 @@ export const FormSchema = z
     postgresVersionSelection: z.string(),
     useOrioleDb: z.boolean(),
   })
-  .superRefine(({ dbPassStrength, dbPassStrengthWarning }, ctx) => {
-    if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['dbPass'],
-        message: dbPassStrengthWarning || 'Password not secure enough',
-      })
+  .superRefine(
+    ({ dbPassStrength, dbPassStrengthWarning, highAvailability, cloudProvider }, ctx) => {
+      if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['dbPass'],
+          message: dbPassStrengthWarning || 'Password not secure enough',
+        })
+      }
+      if (highAvailability && cloudProvider !== 'AWS_K8S') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['cloudProvider'],
+          message: 'High availability is only supported on AWS (Revamped)',
+        })
+      }
     }
-  })
+  )
 
 export type CreateProjectForm = z.infer<typeof FormSchema>

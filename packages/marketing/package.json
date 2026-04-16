@@ -19,7 +19,7 @@
   "dependencies": {
     "@types/react": "catalog:",
     "react": "catalog:",
-    "react-markdown": "^8.0.3",
+    "react-markdown": "^10.1.0",
     "server-only": "^0.0.1",
     "shiki": "^4.0.1",
     "ui": "workspace:*",

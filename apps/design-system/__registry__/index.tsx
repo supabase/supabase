@@ -1050,6 +1050,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "keyboard-shortcut-demo": {
+      name: "keyboard-shortcut-demo",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-demo")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-pill": {
+      name: "keyboard-shortcut-pill",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-pill")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-pill.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-inline": {
+      name: "keyboard-shortcut-inline",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-inline")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-inline.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "label-demo": {
       name: "label-demo",
       type: "components:example",

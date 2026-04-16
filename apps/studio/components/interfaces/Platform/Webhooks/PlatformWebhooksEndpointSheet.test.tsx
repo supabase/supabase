@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
-import { PlatformWebhooksEndpointSheet } from './PlatformWebhooksEndpointSheet'
+import { PlatformWebhooksEndpointSheet, toEndpointPayload } from './PlatformWebhooksEndpointSheet'
 import { customRender } from '@/tests/lib/custom-render'
 
 const { generateWebhookEndpointNameMock } = vi.hoisted(() => ({
@@ -231,6 +231,42 @@ describe('PlatformWebhooksEndpointSheet', () => {
         customHeaders: [{ key: 'X-Webhook-Secret', value: 'super-secret' }],
       }),
       expect.anything()
+    )
+  })
+
+  it('blocks submit when a custom header is missing its value', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = renderEndpointSheet({
+      mode: 'edit',
+      endpoint: createEndpoint(),
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Add header' }))
+    await user.type(screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
+    submitForm()
+
+    expect(await screen.findByText('Header value is required')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('strips fully empty custom header rows from the payload', () => {
+    expect(
+      toEndpointPayload({
+        name: 'Billing events',
+        url: 'https://hooks.example.com/billing',
+        description: '',
+        enabled: true,
+        subscribeAll: false,
+        eventTypes: ['project.updated'],
+        customHeaders: [
+          { key: 'X-Webhook-Secret', value: 'super-secret' },
+          { key: '', value: '' },
+        ],
+      })
+    ).toEqual(
+      expect.objectContaining({
+        customHeaders: [{ key: 'X-Webhook-Secret', value: 'super-secret' }],
+      })
     )
   })
 })

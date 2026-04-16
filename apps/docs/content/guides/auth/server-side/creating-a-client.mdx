@@ -43,7 +43,6 @@ Create a `.env.local` file in the project root directory. In the file, set the p
 
 <ProjectConfigVariables variable="url" />
 <ProjectConfigVariables variable="publishable" />
-<ProjectConfigVariables variable="anon" />
 
 <$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
@@ -564,25 +563,29 @@ You can now use any Supabase features from your client or server code!
 <TabPanel id="react-router-loader" label="Loader">
 
 ```ts _index.tsx
-import { LoaderFunctionArgs } from 'react-router'
 import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { LoaderFunctionArgs } from 'react-router'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const responseHeaders = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      getAll() {
-        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
       },
-      setAll(cookiesToSet, cacheHeaders) {
-        cookiesToSet.forEach(({ name, value }) =>
-          responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
-        )
-        Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
-      },
-    },
-  })
+    }
+  )
 
   return new Response('...', {
     headers: responseHeaders,
@@ -601,19 +604,23 @@ import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@s
 export async function action({ request }: ActionFunctionArgs) {
   const responseHeaders = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-    cookies: {
-      getAll() {
-        return parseCookieHeader(request.headers.get('Cookie') ?? '')
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
       },
-      setAll(cookiesToSet, cacheHeaders) {
-        cookiesToSet.forEach(({ name, value }) =>
-          responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
-        )
-        Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
-      },
-    },
-  })
+    }
+  )
 
   return new Response('...', {
     headers: responseHeaders,
@@ -634,7 +641,7 @@ export async function loader({}: LoaderFunctionArgs) {
   return {
     env: {
       SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+      SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
     },
   };
 }
@@ -642,7 +649,7 @@ export async function loader({}: LoaderFunctionArgs) {
 export default function Index() {
   const { env } = useLoaderData<typeof loader>();
 
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
 
   return ...
 }

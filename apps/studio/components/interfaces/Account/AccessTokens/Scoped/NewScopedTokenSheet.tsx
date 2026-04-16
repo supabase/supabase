@@ -35,6 +35,7 @@ import {
   type NewScopedAccessToken,
   type ScopedAccessTokenCreateVariables,
 } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface NewScopedTokenSheetProps {
   visible: boolean
@@ -65,6 +66,7 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
+  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const resourceAccess = form.watch('resourceAccess')
@@ -175,6 +177,12 @@ export const NewScopedTokenSheet = ({
 
     createAccessToken(finalPayload, {
       onSuccess: (data) => {
+        track('access_token_created', {
+          tokenType: 'scoped',
+          expiryPreset: values.expiresAt || 'never',
+          resourceAccess: values.resourceAccess,
+          permissionCount: permissions.length,
+        })
         toast.success('Access token created successfully')
         onCreateToken(data)
         handleClose()

@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { PipelineStatusName } from './Replication.constants'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
 interface RestartTableDialogProps {
@@ -18,6 +19,7 @@ interface RestartTableDialogProps {
   onOpenChange: (open: boolean) => void
   tableId: number
   tableName: string
+  pipelineStatusName?: PipelineStatusName
   onRestartStart?: () => void
   onRestartComplete?: () => void
 }
@@ -27,6 +29,7 @@ export const RestartTableDialog = ({
   onOpenChange,
   tableId,
   tableName,
+  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: RestartTableDialogProps) => {
@@ -36,15 +39,15 @@ export const RestartTableDialog = ({
   const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: () => {
       toast.success(
-        `Restarting replication for "${tableName}". Pipeline will restart automatically.`
+        `Restarting replication for "${tableName}". Pipeline will ${pipelineStatusName === PipelineStatusName.STOPPED ? 'start' : 'restart'} automatically.`
       )
+    },
+    onSettled: () => {
       onRestartComplete?.()
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      onRestartComplete?.()
-      onOpenChange(false)
     },
   })
 
@@ -58,6 +61,7 @@ export const RestartTableDialog = ({
       pipelineId,
       target: { type: 'single_table', table_id: tableId },
       rollbackType: 'full',
+      pipelineStatusName,
     })
   }
 
