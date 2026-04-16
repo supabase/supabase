@@ -100,6 +100,71 @@ export function computePatchHeaders(
   return Object.fromEntries(changed)
 }
 
+type LogDrainPatchValues = {
+  name?: string
+  description?: string
+  config?: Record<string, unknown>
+}
+
+/**
+ * Computes a minimal PATCH payload by diffing submitted form values against the
+ * original log drain data. Only includes fields that actually changed.
+ *
+ * - `type` is always omitted — it cannot change on update.
+ * - `headers: undefined` in config means "all REDACTED, nothing changed" — skipped.
+ * - `headers: {}` means "user cleared all headers" — included.
+ * - Other config fields are compared by strict equality (primitives) or JSON (objects).
+ * - Returns `{}` when nothing changed — the caller should skip the API call.
+ */
+export function computePatchPayload(
+  submitted: {
+    name: string
+    description?: string
+    type: LogDrainType
+    config: Record<string, unknown>
+  },
+  original: {
+    name: string
+    description?: string
+    type: LogDrainType
+    config: Record<string, unknown>
+  }
+): LogDrainPatchValues {
+  const patchPayload: LogDrainPatchValues = {}
+
+  if (submitted.name !== original.name) {
+    patchPayload.name = submitted.name
+  }
+
+  if ((submitted.description ?? '') !== (original.description ?? '')) {
+    patchPayload.description = submitted.description ?? ''
+  }
+
+  const configPatch: Record<string, unknown> = {}
+  for (const key of Object.keys(submitted.config)) {
+    const submittedVal = submitted.config[key]
+    const originalVal = original.config[key]
+
+    // headers: undefined means computePatchHeaders determined nothing changed — skip
+    if (key === 'headers' && submittedVal === undefined) continue
+
+    const isEqual =
+      typeof submittedVal === 'object' && submittedVal !== null
+        ? JSON.stringify(submittedVal) === JSON.stringify(originalVal)
+        : submittedVal === originalVal
+
+    if (!isEqual) {
+      configPatch[key] = submittedVal
+    }
+  }
+
+  if (Object.keys(configPatch).length > 0) {
+    patchPayload.config = configPatch
+  }
+
+  return patchPayload
+}
+
 export const logDrainHeaderEntriesSchema = z
   .array(
     z.object({

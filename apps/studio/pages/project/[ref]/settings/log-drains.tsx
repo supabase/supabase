@@ -20,6 +20,7 @@ import {
   LOG_DRAIN_TYPES,
   LogDrainType,
 } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { computePatchPayload } from '@/components/interfaces/LogDrains/LogDrains.utils'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
@@ -120,25 +121,45 @@ const LogDrainsSettings: NextPageWithLayout = () => {
           }}
           isLoading={isLoading}
           onSubmit={({ name, description, type, ...values }) => {
-            const logDrainValues = {
-              name,
-              description: description || '',
-              type,
-              config: values as any, // TODO: fix generated API types from backend
-              id: selectedLogDrain?.id,
-              projectRef: ref,
-              token: selectedLogDrain?.token,
-            }
-
             if (mode === 'create') {
+              const logDrainValues = {
+                name,
+                description: description || '',
+                type,
+                config: values as any, // TODO: fix generated API types from backend
+                id: selectedLogDrain?.id,
+                projectRef: ref,
+                token: selectedLogDrain?.token,
+              }
               setPendingLogDrainValues(logDrainValues)
               setIsCreateConfirmModalOpen(true)
             } else {
-              if (!logDrainValues.id || !selectedLogDrain?.token) {
+              if (!selectedLogDrain?.id || !selectedLogDrain?.token) {
                 throw new Error('Log drain ID and token is required')
-              } else {
-                updateLogDrain(logDrainValues)
               }
+
+              const patchPayload = computePatchPayload(
+                { name, description, type, config: values as Record<string, unknown> },
+                {
+                  name: selectedLogDrain.name!,
+                  description: selectedLogDrain.description,
+                  type: selectedLogDrain.type!,
+                  config: (selectedLogDrain.config ?? {}) as Record<string, unknown>,
+                }
+              )
+
+              if (Object.keys(patchPayload).length === 0) {
+                toast.info('No changes to save')
+                setOpen(false)
+                return
+              }
+
+              updateLogDrain({
+                ...patchPayload,
+                projectRef: ref,
+                token: selectedLogDrain.token,
+                id: selectedLogDrain.id,
+              })
             }
           }}
         />

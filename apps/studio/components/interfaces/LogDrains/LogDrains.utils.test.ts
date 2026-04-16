@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   computePatchHeaders,
+  computePatchPayload,
   getDefaultHeadersByType,
   getHeadersSectionDescription,
   HEADER_VALIDATION_ERRORS,
@@ -390,5 +391,142 @@ describe('computePatchHeaders', () => {
 
   it('is case-sensitive — lowercase "redacted" is not the sentinel', () => {
     expect(computePatchHeaders({ 'X-Info': 'redacted' })).toEqual({ 'X-Info': 'redacted' })
+  })
+})
+
+describe('computePatchPayload', () => {
+  const baseOriginal = {
+    name: 'My Drain',
+    description: 'A description',
+    type: 'webhook' as const,
+    config: { url: 'https://example.com', http: 'http2', gzip: true } as Record<string, unknown>,
+  }
+
+  it('returns empty object when nothing changed', () => {
+    expect(
+      computePatchPayload(
+        {
+          name: 'My Drain',
+          description: 'A description',
+          type: 'webhook',
+          config: { url: 'https://example.com', http: 'http2', gzip: true },
+        },
+        baseOriginal
+      )
+    ).toEqual({})
+  })
+
+  it('includes name when changed', () => {
+    expect(computePatchPayload({ ...baseOriginal, name: 'New Name' }, baseOriginal)).toEqual({
+      name: 'New Name',
+    })
+  })
+
+  it('includes description when changed', () => {
+    expect(computePatchPayload({ ...baseOriginal, description: 'Updated' }, baseOriginal)).toEqual({
+      description: 'Updated',
+    })
+  })
+
+  it('never includes type even if different', () => {
+    const result = computePatchPayload({ ...baseOriginal, type: 'loki' as const }, baseOriginal)
+    expect(result).not.toHaveProperty('type')
+  })
+
+  it('includes only the changed config field', () => {
+    expect(
+      computePatchPayload(
+        { ...baseOriginal, config: { url: 'https://new-url.com', http: 'http2', gzip: true } },
+        baseOriginal
+      )
+    ).toEqual({ config: { url: 'https://new-url.com' } })
+  })
+
+  it('includes multiple changed config fields', () => {
+    expect(
+      computePatchPayload(
+        { ...baseOriginal, config: { url: 'https://new-url.com', http: 'http1', gzip: true } },
+        baseOriginal
+      )
+    ).toEqual({ config: { url: 'https://new-url.com', http: 'http1' } })
+  })
+
+  it('detects boolean toggle in config', () => {
+    expect(
+      computePatchPayload(
+        { ...baseOriginal, config: { url: 'https://example.com', http: 'http2', gzip: false } },
+        baseOriginal
+      )
+    ).toEqual({ config: { gzip: false } })
+  })
+
+  it('skips headers when undefined (all-REDACTED sentinel — nothing changed)', () => {
+    const original = {
+      ...baseOriginal,
+      config: { ...baseOriginal.config, headers: { Authorization: 'secret' } },
+    }
+    expect(
+      computePatchPayload(
+        { ...baseOriginal, config: { ...baseOriginal.config, headers: undefined } },
+        original
+      )
+    ).toEqual({})
+  })
+
+  it('includes headers: {} when user cleared all headers', () => {
+    const original = {
+      ...baseOriginal,
+      config: { ...baseOriginal.config, headers: { Authorization: 'secret' } },
+    }
+    expect(
+      computePatchPayload(
+        { ...baseOriginal, config: { ...baseOriginal.config, headers: {} } },
+        original
+      )
+    ).toEqual({ config: { headers: {} } })
+  })
+
+  it('includes new headers when user added them', () => {
+    const original = {
+      ...baseOriginal,
+      config: { ...baseOriginal.config, headers: { Authorization: 'secret' } },
+    }
+    expect(
+      computePatchPayload(
+        { ...baseOriginal, config: { ...baseOriginal.config, headers: { 'X-New': 'value' } } },
+        original
+      )
+    ).toEqual({ config: { headers: { 'X-New': 'value' } } })
+  })
+
+  it('includes both top-level and config changes', () => {
+    expect(
+      computePatchPayload(
+        {
+          name: 'Renamed',
+          description: 'A description',
+          type: 'webhook',
+          config: { url: 'https://new.com', http: 'http2', gzip: false },
+        },
+        baseOriginal
+      )
+    ).toEqual({ name: 'Renamed', config: { url: 'https://new.com', gzip: false } })
+  })
+
+  it('treats undefined and empty string description as equivalent', () => {
+    const original = { ...baseOriginal, description: undefined }
+    expect(computePatchPayload({ ...baseOriginal, description: '' }, original)).toEqual({})
+  })
+
+  it('works with non-webhook config shapes (e.g. datadog)', () => {
+    const original = {
+      name: 'DD',
+      description: '',
+      type: 'datadog' as const,
+      config: { api_key: 'key123', region: 'us1' } as Record<string, unknown>,
+    }
+    expect(
+      computePatchPayload({ ...original, config: { api_key: 'key123', region: 'eu1' } }, original)
+    ).toEqual({ config: { region: 'eu1' } })
   })
 })

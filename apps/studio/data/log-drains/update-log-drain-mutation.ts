@@ -9,10 +9,11 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type LogDrainUpdateVariables = {
   projectRef: string
   token?: string
-  name: string
+  id?: string | number
+  name?: string
   description?: string
-  type: LogDrainType
-  config: Record<string, never>
+  type?: LogDrainType
+  config?: Record<string, unknown>
 }
 
 export async function updateLogDrain(payload: LogDrainUpdateVariables) {
@@ -20,14 +21,15 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
     throw new Error('Token is required')
   }
 
+  const body: Record<string, unknown> = {}
+  if (payload.name !== undefined) body.name = payload.name
+  if (payload.description !== undefined) body.description = payload.description
+  if (payload.type !== undefined) body.type = payload.type
+  if (payload.config !== undefined) body.config = payload.config
+
   const { data, error } = await patch('/platform/projects/{ref}/analytics/log-drains/{token}', {
     params: { path: { ref: payload.projectRef, token: payload.token } },
-    body: {
-      name: payload.name,
-      description: payload.description,
-      type: payload.type,
-      config: payload.config as any,
-    },
+    body: body as any,
   })
 
   if (error) handleError(error)
