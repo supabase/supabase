@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { useIsLoggedIn, useUser } from 'common'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
@@ -91,7 +91,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     // on every page load, we can check for a 401 here and sign the user out if
     // they have a bad token.
     if (error?.code === 401) {
-      signOut().then(() => router.push('/sign-in'))
+      signOut().then(() => router?.push('/sign-in'))
     }
   }, [error, signOut, router, createProfile, isError])
 

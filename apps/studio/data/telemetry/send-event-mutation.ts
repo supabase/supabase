@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { sendTelemetryEvent } from 'common'
 import { TelemetryEvent } from 'common/telemetry-constants'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 
 import { handleError } from '@/data/fetchers'
 import { API_URL } from '@/lib/constants'
@@ -34,7 +34,7 @@ export const useSendEventMutation = ({
 
   return useMutation<SendEventData, ResponseError, TelemetryEvent>({
     mutationFn: (event) => {
-      return sendEvent({ event, pathname: router.pathname })
+      return sendEvent({ event, pathname: router?.pathname })
     },
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

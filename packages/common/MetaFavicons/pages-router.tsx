@@ -1,7 +1,7 @@
 'use client'
 
 import Head from 'next/head'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 
 export const DEFAULT_FAVICON_THEME_COLOR = '1E1E1E'
 export const DEFAULT_FAVICON_ROUTE = '/favicon'
@@ -26,7 +26,8 @@ const MetaFaviconsPagesRouter = ({
   // include browserconfig.xml
   includeMsApplicationConfig?: boolean
 }) => {
-  const { basePath } = useRouter()
+  const router = useRouter()
+  const basePath = router?.basePath ?? process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
   return (
     <Head>
