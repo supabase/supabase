@@ -77,7 +77,7 @@ function InteroperableSkeleton() {
             height="20"
             viewBox="0 0 24 24"
             fill="none"
-            className="relative z-10 text-foreground"
+            className="relative z-10 text-foreground-muted"
             strokeWidth="1.9"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -147,9 +147,7 @@ function InteroperableSkeleton() {
 
 function CDNSkeleton() {
   return (
-    <div
-      className="relative flex h-full w-full items-center justify-center [mask-image:radial-gradient(ellipse_85%_85%_at_50%_50%,black_35%,transparent_78%)] [webkit-mask-image:radial-gradient(ellipse_85%_85%_at_50%_50%,black_35%,transparent_78%)]"
-    >
+    <div className="relative flex h-full w-full items-center justify-center [mask-image:radial-gradient(ellipse_85%_85%_at_50%_50%,black_35%,transparent_78%)] [webkit-mask-image:radial-gradient(ellipse_85%_85%_at_50%_50%,black_35%,transparent_78%)]">
       <div className="absolute inset-0 z-[1] flex items-center justify-center">
         <div className="flex w-[290px] flex-col gap-0.5">
           {[-20, -10, 0, 10, 20].map((offset, i) => (
@@ -215,9 +213,24 @@ function CDNSkeleton() {
 
 function BucketsSkeleton() {
   const buckets = [
-    { name: 'Files', label: 'images, videos, docs', icon: 'folder' as const, colorClass: 'text-brand' },
-    { name: 'Analytics', label: 'Iceberg, time-series', icon: 'chart' as const, colorClass: 'text-blue-800 dark:text-blue-900' },
-    { name: 'Vectors', label: 'embeddings, RAG', icon: 'sparkles' as const, colorClass: 'text-purple-800 dark:text-purple-900' },
+    {
+      name: 'Files',
+      label: 'images, videos, docs',
+      icon: 'folder' as const,
+      colorClass: 'text-brand',
+    },
+    {
+      name: 'Analytics',
+      label: 'Iceberg, time-series',
+      icon: 'chart' as const,
+      colorClass: 'text-blue-800 dark:text-blue-900',
+    },
+    {
+      name: 'Vectors',
+      label: 'embeddings, RAG',
+      icon: 'sparkles' as const,
+      colorClass: 'text-purple-800 dark:text-purple-900',
+    },
   ]
 
   return (
@@ -255,7 +268,10 @@ function BucketsSkeleton() {
                 )}
                 {bucket.icon === 'sparkles' && (
                   <>
-                    <path d="M12 3l2.3 5.2L20 10.5l-5.7 2.3L12 18l-2.3-5.2L4 10.5l5.7-2.3L12 3z" className="stroke-current" />
+                    <path
+                      d="M12 3l2.3 5.2L20 10.5l-5.7 2.3L12 18l-2.3-5.2L4 10.5l5.7-2.3L12 3z"
+                      className="stroke-current"
+                    />
                     <path d="M19 3v4" className="stroke-current" />
                     <path d="M21 5h-4" className="stroke-current" />
                   </>

@@ -117,17 +117,17 @@ function PostgresSkeleton() {
           width="360"
           height="400"
           rx="48"
-          stroke="#3ECF8E"
+          stroke="hsl(var(--brand-default))"
           strokeWidth="0.75"
           opacity="0.4"
         />
-        <circle cx="240" cy="240" r="140" stroke="#3ECF8E" strokeWidth="0.75" opacity="0.3" />
+        <circle cx="240" cy="240" r="140" stroke="hsl(var(--brand-default))" strokeWidth="0.75" opacity="0.3" />
         <line
           x1="240"
           y1="0"
           x2="240"
           y2="480"
-          stroke="#3ECF8E"
+          stroke="hsl(var(--brand-default))"
           strokeWidth="0.75"
           opacity="0.25"
         />
@@ -136,7 +136,7 @@ function PostgresSkeleton() {
           y1="240"
           x2="480"
           y2="240"
-          stroke="#3ECF8E"
+          stroke="hsl(var(--brand-default))"
           strokeWidth="0.75"
           opacity="0.25"
         />
@@ -150,7 +150,7 @@ function PostgresSkeleton() {
           viewBox="0 0 390 430"
           className="w-80 h-80 relative z-[5]"
           style={{
-            color: hovered ? '#3ECF8E' : 'hsl(var(--foreground-muted))',
+            color: hovered ? 'hsl(var(--brand-default))' : 'hsl(var(--foreground-muted))',
             opacity: hovered ? 1 : 0.8,
             transition: 'color 0.5s, opacity 0.5s',
           }}
