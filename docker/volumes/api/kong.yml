@@ -55,6 +55,7 @@ services:
         strip_path: true
         paths:
           - /auth/v1/callback
+          - /callback
     plugins:
       - name: cors
   - name: auth-v1-open-authorize
