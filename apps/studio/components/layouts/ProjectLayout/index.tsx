@@ -35,6 +35,7 @@ import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import { RestoringState } from './RestoringState'
+import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -358,7 +359,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
   const isProjectPausing = selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
+  const isProjectUnhealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  const ignoreUnhealthyState =
+    isHomePage ||
+    router.pathname.includes('/project/[ref]/settings') ||
+    router.pathname.includes('/project/[ref]/logs')
 
   const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
@@ -397,6 +404,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isProjectPauseFailed) {
     return <PauseFailedState />
+  }
+
+  if (isProjectUnhealthy && !ignoreUnhealthyState) {
+    return <UnhealthyState />
   }
 
   if (requiresPostgrestConnection && isProjectOffline) {

@@ -82,10 +82,8 @@ When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(
-  'https://your-project-id.supabase.co',
-  'sb_publishable_... or anon key'
-)
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 supabase.auth.mfa.unenroll({ factorId: 'd30fd651-184e-4748-a928-0a4b9be1d429' })
