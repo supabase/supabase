@@ -46,6 +46,17 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
             const isMeetup = event.name.toLowerCase().includes('meetup')
             if (isMeetup) categories.push('meetup')
 
+            const rawUrl = event?.url || ''
+            let safeUrl: string | undefined
+            try {
+              const parsed = new URL(rawUrl)
+              if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                safeUrl = rawUrl
+              }
+            } catch {
+              // invalid URL
+            }
+
             return {
               slug: '',
               type: 'event',
@@ -55,7 +66,7 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
               thumb: '',
               cover_url: event?.cover_url || '',
               path: '',
-              url: event?.url || '',
+              url: safeUrl ?? '',
               tags: categories,
               categories,
               timezone: event?.timezone || 'America/Los_Angeles',
@@ -65,10 +76,7 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
               hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
               source: 'luma' as const,
               disable_page_build: true,
-              link: {
-                href: event?.url || '#',
-                target: '_blank' as const,
-              },
+              link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
             }
           })
           setLumaEvents(transformedEvents)

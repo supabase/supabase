@@ -56,9 +56,10 @@ function getDate(page: any, name: string): string | null {
   if (!prop || prop.type !== 'date' || !prop.date) return null
   const raw = prop.date.start ?? null
   if (!raw) return null
-  // Normalize date-only strings to explicit UTC to avoid timezone shifts
+  // Normalize date-only strings to noon UTC so the event day displays correctly
+  // in all timezones (T00:00:00Z rolls back to the previous day for UTC-negative zones)
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-    return `${raw}T00:00:00Z`
+    return `${raw}T12:00:00Z`
   }
   return raw
 }
@@ -138,17 +139,4 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
     console.error('Error fetching Notion events:', error)
     return []
   }
-}
-
-/**
- * Get the nearest upcoming event from an array of events.
- */
-export const getFeaturedEvent = (events: SupabaseEvent[]): SupabaseEvent | null => {
-  if (!events || events.length === 0) return null
-
-  const now = new Date()
-  const upcoming = events.filter((e) => new Date(e.end_date || e.date) >= now)
-  if (upcoming.length === 0) return null
-
-  return upcoming.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
 }

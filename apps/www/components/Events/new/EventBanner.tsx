@@ -75,35 +75,45 @@ export function EventBanner() {
 
 const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
   const eventDate = new Date(date)
+  // Date-only Notion events are normalized to noon UTC (T12:00:00Z); detect them
+  // so we can display in UTC and suppress the fabricated time component.
+  const isDateOnly = date.endsWith('T12:00:00Z')
+  const tzOption = isDateOnly ? ({ timeZone: 'UTC' } as const) : {}
 
   const formattedDate = eventDate.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
+    ...tzOption,
   })
 
   const currentYear = new Date().getFullYear()
-  const eventYear = eventDate.getFullYear()
+  const eventYear = isDateOnly
+    ? parseInt(date.slice(0, 4), 10)
+    : eventDate.getFullYear()
   const formattedDateWithYear =
     eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
 
-  // Extract start time from the date string
-  const startTime = eventDate.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  })
-
-  // If there's an end date, format it and show time range
-  let timeDisplay = startTime
-  if (endDate) {
-    const endEventDate = new Date(endDate)
-    const endTime = endEventDate.toLocaleTimeString('en-US', {
+  // Only show time for events that have a real time component
+  let timeDisplay: string | null = null
+  if (!isDateOnly) {
+    const startTime = eventDate.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
     })
-    timeDisplay = `${startTime} - ${endTime}`
+
+    if (endDate && !endDate.endsWith('T12:00:00Z')) {
+      const endEventDate = new Date(endDate)
+      const endTime = endEventDate.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+      timeDisplay = `${startTime} - ${endTime}`
+    } else {
+      timeDisplay = startTime
+    }
   }
 
   return (
@@ -114,7 +124,7 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
 
       <div className="flex flex-col gap-0">
         <p>{formattedDateWithYear}</p>
-        <p className="text-foreground-light text-sm">{timeDisplay}</p>
+        {timeDisplay && <p className="text-foreground-light text-sm">{timeDisplay}</p>}
       </div>
     </div>
   )

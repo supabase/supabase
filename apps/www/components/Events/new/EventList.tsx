@@ -30,11 +30,13 @@ export function EventList() {
   // Group events by date
   const eventsByDate = filteredEvents.reduce(
     (acc, event) => {
+      const isDateOnly = event.date.endsWith('T12:00:00Z')
       const eventDate = new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        ...(isDateOnly ? { timeZone: 'UTC' } : {}),
       })
 
       if (!acc[eventDate]) {
