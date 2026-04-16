@@ -1,15 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import type { AdvisorSignalItem } from './AdvisorPanel.types'
 import {
   createAdvisorLintItems,
   createAdvisorNotificationItems,
-  createAdvisorSignalDismissalStorageKey,
-  createAdvisorSignalItems,
-  createBannedIPSignalFingerprint,
   getAdvisorItemSecondaryText,
   sortAdvisorItems,
 } from './AdvisorPanel.utils'
-import type { IPData } from '@/data/banned-ips/banned-ips-query'
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
 
@@ -38,61 +35,26 @@ const createNotification = (overrides: Partial<Notification> = {}): Notification
     ...overrides,
   }) as Notification
 
+const createBannedIPSignalItem = (ip: string): AdvisorSignalItem => ({
+  id: `signal:banned-ip:${ip}:v1`,
+  dismissalKey: `signal:banned-ip:${ip}:v1`,
+  source: 'signal',
+  type: 'banned-ip',
+  severity: 'warning',
+  tab: 'security',
+  title: 'Banned IP address',
+  summary: `The IP address \`${ip}\` is temporarily blocked.`,
+  docsUrl: 'https://supabase.com/docs/reference/cli/supabase-network-bans',
+  actions: [],
+  sourceData: { type: 'banned-ip', ip },
+})
+
 describe('AdvisorPanel.utils', () => {
-  it('creates one signal per banned IP', () => {
-    const bannedIPsData = {
-      banned_ipv4_addresses: ['203.0.113.10'],
-    } as IPData
-
-    const result = createAdvisorSignalItems({
-      projectRef: 'project-ref',
-      bannedIPsData,
-    })
-
-    expect(result).toHaveLength(1)
-    expect(result[0]).toMatchObject({
-      source: 'signal',
-      signalType: 'banned-ip',
-      fingerprint: 'signal:banned-ip:203.0.113.10:v1',
-      title: 'Banned IP address',
-    })
-  })
-
-  it('creates multiple signals when multiple banned IPs exist', () => {
-    const result = createAdvisorSignalItems({
-      projectRef: 'project-ref',
-      bannedIPsData: {
-        banned_ipv4_addresses: ['203.0.113.10', '203.0.113.11'],
-      } as IPData,
-    })
-
-    expect(result.map((item) => item.fingerprint)).toEqual([
-      'signal:banned-ip:203.0.113.10:v1',
-      'signal:banned-ip:203.0.113.11:v1',
-    ])
-  })
-
-  it('uses database surface-area metadata and the IP address for banned IP signals', () => {
-    const [bannedIpSignal] = createAdvisorSignalItems({
-      projectRef: 'project-ref',
-      bannedIPsData: {
-        banned_ipv4_addresses: ['203.0.113.10'],
-      } as IPData,
-    })
-
-    expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
-  })
-
   it('orders mixed lint, signal and notification items by severity and recency', () => {
     const lintItems = createAdvisorLintItems([
       createLint({ cache_key: 'lint-critical', detail: 'Critical lint detail' }),
     ])
-    const signalItems = createAdvisorSignalItems({
-      projectRef: 'project-ref',
-      bannedIPsData: {
-        banned_ipv4_addresses: ['203.0.113.10'],
-      } as IPData,
-    })
+    const signalItems = [createBannedIPSignalItem('203.0.113.10')]
     const notificationItems = createAdvisorNotificationItems([
       createNotification({
         id: 'notification-info',
@@ -105,28 +67,8 @@ describe('AdvisorPanel.utils', () => {
     expect(sorted.map((item) => item.source)).toEqual(['lint', 'signal', 'notification'])
   })
 
-  it('uses exact resource fingerprints so dismissing one IP does not hide another', () => {
-    const dismissedFingerprint = createBannedIPSignalFingerprint('203.0.113.10')
-    const signals = createAdvisorSignalItems({
-      projectRef: 'project-ref',
-      bannedIPsData: {
-        banned_ipv4_addresses: ['203.0.113.10', '203.0.113.11'],
-      } as IPData,
-    })
-
-    const visibleSignals = signals.filter((item) => item.fingerprint !== dismissedFingerprint)
-
-    expect(visibleSignals.map((item) => item.fingerprint)).toEqual([
-      'signal:banned-ip:203.0.113.11:v1',
-    ])
-  })
-
-  it('builds project-scoped dismissal storage keys', () => {
-    expect(createAdvisorSignalDismissalStorageKey('project-a')).toBe(
-      'advisor-signal-dismissals:project-a'
-    )
-    expect(createAdvisorSignalDismissalStorageKey('project-b')).toBe(
-      'advisor-signal-dismissals:project-b'
-    )
+  it('uses database surface-area metadata and the IP address for banned IP signals', () => {
+    const bannedIpSignal = createBannedIPSignalItem('203.0.113.10')
+    expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
   })
 })

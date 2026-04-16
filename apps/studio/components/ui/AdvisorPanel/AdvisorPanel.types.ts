@@ -30,11 +30,11 @@ export type AdvisorNotificationItem = AdvisorBaseItem & {
 
 export type AdvisorSignalItem = AdvisorBaseItem & {
   source: 'signal'
-  signalType: AdvisorSignalType
-  fingerprint: string
-  description: string
-  detailDescription?: string
-  learnMoreHref?: string
+  type: AdvisorSignalType
+  dismissalKey: string
+  summary: string
+  description?: string
+  docsUrl?: string
   actions: AdvisorSignalAction[]
   sourceData: { type: 'banned-ip'; ip: string }
 }

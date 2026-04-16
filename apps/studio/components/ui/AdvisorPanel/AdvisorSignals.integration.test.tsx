@@ -274,7 +274,7 @@ describe('Advisor signals integration', () => {
 
     render(<AdvisorSection />)
 
-    expect(screen.getByText('Advisor found no issues')).toBeInTheDocument()
-    expect(screen.getByText('No security or performance issues found')).toBeInTheDocument()
+    // Signals still pending — should show loading skeleton, not empty state
+    expect(screen.queryByText('No security or performance issues found')).not.toBeInTheDocument()
   })
 })

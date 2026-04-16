@@ -5,7 +5,11 @@ import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitl
 import { Row } from 'ui-patterns'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { AdvisorItem } from '../../ui/AdvisorPanel/AdvisorPanel.types'
+import { Markdown } from '../Markdown'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import type { AdvisorItem } from '@/components/ui/AdvisorPanel/AdvisorPanel.types'
 import {
   createAdvisorLintItems,
   getAdvisorItemDisplayTitle,
@@ -13,12 +17,8 @@ import {
   severityBadgeVariants,
   severityColorClasses,
   sortAdvisorItems,
-} from '../../ui/AdvisorPanel/AdvisorPanel.utils'
-import { useAdvisorSignals } from '../../ui/AdvisorPanel/useAdvisorSignals'
-import { Markdown } from '../Markdown'
-import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
-import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.utils'
-import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+} from '@/components/ui/AdvisorPanel/AdvisorPanel.utils'
+import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -38,7 +38,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     }
   )
   const shouldLoadSignals = IS_PLATFORM && !showEmptyState
-  const { data: signalItems } = useAdvisorSignals({
+  const { data: signalItems, isPending: isLoadingSignals } = useAdvisorSignals({
     projectRef,
     enabled: shouldLoadSignals,
   })
@@ -99,7 +99,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
             : undefined
       const advisorType =
         item.source === 'signal'
-          ? item.signalType
+          ? item.type
           : item.source === 'lint'
             ? item.original.name
             : item.title
@@ -122,7 +122,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
 
   return (
     <div>
-      {isLoadingLints ? (
+      {isLoadingLints || (shouldLoadSignals && isLoadingSignals) ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">
@@ -132,7 +132,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           </Button>
         </div>
       )}
-      {isLoadingLints ? (
+      {isLoadingLints || (shouldLoadSignals && isLoadingSignals) ? (
         <div className="flex flex-col p-4 gap-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
@@ -146,7 +146,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
               const categoryLabel = item.tab === 'performance' ? 'PERFORMANCE' : 'SECURITY'
               const title = getAdvisorItemDisplayTitle(item)
               const description =
-                item.source === 'signal' ? item.description : isLint ? item.original.detail : ''
+                item.source === 'signal' ? item.summary : isLint ? item.original.detail : ''
               const cardClasses =
                 item.severity === 'critical'
                   ? 'border-destructive-400'

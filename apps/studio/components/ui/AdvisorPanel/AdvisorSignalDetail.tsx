@@ -11,13 +11,13 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AdvisorSignalDetailProps {
   item: AdvisorSignalItem
-  onDismiss: (fingerprint: string) => void
+  onDismiss: (dismissalKey: string) => void
 }
 
 const buildSignalAssistantPrompt = (item: AdvisorSignalItem) => {
   return [
     `I'm reviewing an Advisor signal for a banned IP address: ${item.sourceData.ip}.`,
-    item.detailDescription ?? item.description,
+    item.description ?? item.summary,
     'Help me assess whether this ban should remain in place, what I should investigate before removing it, and what the safest next step is.',
     'Please include when it is reasonable to dismiss this signal versus remove the ban.',
   ].join('\n\n')
@@ -61,9 +61,9 @@ export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProp
       <h3 className="text-sm mb-2">Issue</h3>
       <p className="text-sm text-foreground-light mb-6">
         {issueDescription}{' '}
-        {item.learnMoreHref !== undefined && (
+        {item.docsUrl !== undefined && (
           <>
-            <InlineLink href={item.learnMoreHref}>Learn more</InlineLink>.
+            <InlineLink href={item.docsUrl}>Learn more</InlineLink>.
           </>
         )}
       </p>
@@ -77,7 +77,7 @@ export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProp
           telemetrySource="advisor_signal_detail"
         />
         {item.actions.map((action) => (
-          <Button key={`${item.fingerprint}-${action.href}`} type="default" asChild>
+          <Button key={`${item.dismissalKey}-${action.href}`} type="default" asChild>
             <Link href={action.href}>
               <span className="flex items-center gap-2">{action.label}</span>
             </Link>
@@ -86,7 +86,7 @@ export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProp
         <Button
           type="default"
           icon={<EyeOff size={14} strokeWidth={1.5} />}
-          onClick={() => onDismiss(item.fingerprint)}
+          onClick={() => onDismiss(item.dismissalKey)}
         >
           Dismiss
         </Button>

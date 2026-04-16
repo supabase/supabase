@@ -56,6 +56,7 @@ export const AdvisorPanel = () => {
     data: signalItems,
     dismissSignal,
     isPending: isSignalsPending,
+    isError: isSignalsError,
   } = useAdvisorSignals({
     projectRef: project?.ref,
     enabled: shouldLoadProjectAdvisorSignals,
@@ -165,7 +166,8 @@ export const AdvisorPanel = () => {
   const isSignalsActuallyLoading = shouldLoadProjectAdvisorSignals && isSignalsPending
   const isLoading =
     isLintsActuallyLoading || isNotificationsActuallyLoading || isSignalsActuallyLoading
-  const isError = isLintsError || isNotificationsError
+  const isError =
+    isLintsError || isNotificationsError || (shouldLoadProjectAdvisorSignals && isSignalsError)
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as AdvisorTab)
@@ -204,7 +206,7 @@ export const AdvisorPanel = () => {
           : undefined
     const advisorType =
       item.source === 'signal'
-        ? item.signalType
+        ? item.type
         : item.source === 'lint'
           ? item.original.name
           : item.title

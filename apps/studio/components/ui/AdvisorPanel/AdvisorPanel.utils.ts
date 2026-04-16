@@ -2,14 +2,8 @@ import dayjs from 'dayjs'
 import { Gauge, Inbox, Shield } from 'lucide-react'
 import type { ElementType } from 'react'
 
-import type {
-  AdvisorItem,
-  AdvisorLintItem,
-  AdvisorNotificationItem,
-  AdvisorSignalItem,
-} from './AdvisorPanel.types'
+import type { AdvisorItem, AdvisorLintItem, AdvisorNotificationItem } from './AdvisorPanel.types'
 import { lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
-import type { IPData } from '@/data/banned-ips/banned-ips-query'
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification, NotificationData } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorSeverity, AdvisorTab } from '@/state/advisor-state'
@@ -45,13 +39,6 @@ export const notificationPriorityToSeverity = (
       return 'info'
   }
 }
-
-export const createAdvisorSignalDismissalStorageKey = (projectRef: string) =>
-  `advisor-signal-dismissals:${projectRef}`
-
-export const createBannedIPSignalFingerprint = (ip: string) => `signal:banned-ip:${ip}:v1`
-
-const getSignalResourceLabel = (item: AdvisorSignalItem) => item.sourceData.ip
 
 export const createAdvisorLintItems = (lintData?: Lint[]): AdvisorLintItem[] => {
   if (!lintData) return []
@@ -100,41 +87,6 @@ export const createAdvisorNotificationItems = (
   })
 }
 
-export const createAdvisorSignalItems = ({
-  projectRef,
-  bannedIPsData,
-}: {
-  projectRef?: string
-  bannedIPsData?: IPData
-}): AdvisorSignalItem[] => {
-  if (!projectRef) return []
-
-  const bannedIPs = bannedIPsData?.banned_ipv4_addresses ?? []
-
-  const bannedIpSignals = bannedIPs.map((ip) => ({
-    id: createBannedIPSignalFingerprint(ip),
-    fingerprint: createBannedIPSignalFingerprint(ip),
-    source: 'signal' as const,
-    signalType: 'banned-ip' as const,
-    severity: 'warning' as const,
-    tab: 'security' as const,
-    title: 'Banned IP address',
-    description: `The IP address \`${ip}\` is temporarily blocked because of suspicious traffic or repeated failed password attempts.`,
-    detailDescription:
-      'This IP address is temporarily blocked because of suspicious traffic or repeated failed password attempts. If this block is expected, you can dismiss this signal or remove the ban.',
-    learnMoreHref: 'https://supabase.com/docs/reference/cli/supabase-network-bans',
-    actions: [
-      {
-        label: 'Edit network bans',
-        href: `/project/${projectRef}/database/settings#banned-ips`,
-      },
-    ],
-    sourceData: { type: 'banned-ip' as const, ip },
-  }))
-
-  return bannedIpSignals
-}
-
 export const sortAdvisorItems = <T extends AdvisorItem>(items: T[]) => {
   return [...items].sort((a, b) => {
     const severityDiff = severityOrder[a.severity] - severityOrder[b.severity]
@@ -163,7 +115,7 @@ export const getAdvisorItemDisplayTitle = (item: AdvisorItem): string => {
   }
 
   if (item.source === 'signal') {
-    return `${item.title}: ${getSignalResourceLabel(item)}`
+    return `${item.title}: ${item.sourceData.ip}`
   }
 
   return item.title.replace(/[`\\]/g, '')
