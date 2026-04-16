@@ -381,7 +381,7 @@ export const SchemaGraph = () => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Close</AlertDialogCancel>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction onClick={resetLayout}>Apply</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
