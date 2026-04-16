@@ -65,11 +65,6 @@ export type IntegrationDefinition = {
   files?: string[]
   docsUrl: string | null
   siteUrl?: string | null
-  installUrl?: string | null
-  installUrlType?: InstallUrlType
-  installIdentificationMethod?: InstallIdentificationMethod
-  secretKeyPrefix?: string
-  listingId?: string
   author: {
     name: string
     websiteUrl: string
@@ -106,6 +101,13 @@ export type IntegrationDefinition = {
   inputs?: IntegrationInputs
   /** Purely visual, just to show what are the changes on the project from installing the integration */
   steps?: IntegrationStep[]
+
+  /** These are for OAuth Integrations */
+  installUrl?: string | null
+  installUrlType?: InstallUrlType
+  installIdentificationMethod?: InstallIdentificationMethod
+  secretKeyPrefix?: string
+  listingId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }

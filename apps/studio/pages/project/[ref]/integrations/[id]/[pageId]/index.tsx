@@ -208,8 +208,8 @@ const IntegrationPage: NextPageWithLayout = () => {
               <PageHeaderDescription className="truncate">{pageSubTitle}</PageHeaderDescription>
             </PageHeaderSummary>
 
-            {integration?.type === 'oauth' && ref ? (
-              <InstallOAuthIntegrationButton integration={integration} projectRef={ref} />
+            {integration?.type === 'oauth' ? (
+              <InstallOAuthIntegrationButton integration={integration} />
             ) : isMarketplaceEnabled && !!integration && !isInstalled ? (
               <InstallIntegrationSheet integration={integration} />
             ) : isMarketplaceEnabled && isInstalled ? (

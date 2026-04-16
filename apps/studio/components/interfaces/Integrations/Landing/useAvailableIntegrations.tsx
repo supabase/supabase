@@ -119,16 +119,6 @@ export const useAvailableIntegrations = () => {
                     loading: Loading,
                   }
                 )
-              case 'secrets':
-                return dynamic(
-                  () =>
-                    import('../Vault/Secrets/SecretsManagement').then(
-                      (mod) => mod.SecretsManagement
-                    ),
-                  {
-                    loading: Loading,
-                  }
-                )
             }
             return null
           },
@@ -157,15 +147,11 @@ export const useAvailableIntegrations = () => {
     })
   }, [integrationsWrappers, isCLI])
 
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    [allIntegrations]
-  )
-
-  const dataWithMarketplace = useMemo(
-    () => [...marketplaceIntegrations, ...availableIntegrations],
-    [marketplaceIntegrations, availableIntegrations]
-  )
+  const dataWithMarketplace = useMemo(() => {
+    return [...marketplaceIntegrations, ...allIntegrations].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    )
+  }, [marketplaceIntegrations, allIntegrations])
 
   return {
     data: dataWithMarketplace,

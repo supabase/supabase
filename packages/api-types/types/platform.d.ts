@@ -670,6 +670,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/integrations/partners/{ref}/{listing_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Creates a partner integration and returns the redirect URL */
+    post: operations['PartnerIntegrationsController_createIntegration']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/integrations/private-link/{slug}': {
     parameters: {
       query?: never
@@ -4692,6 +4709,7 @@ export interface components {
       billing_name?: string
       /** @enum {boolean} */
       clear_tax_id?: true
+      dry_run?: boolean
       tax_id?: {
         country?: string
         type: string
@@ -4764,7 +4782,6 @@ export interface components {
       payment_intent_id: string
       size?: string
     }
-    ConfirmRequestDto: Record<string, never>
     ConfirmResponseDto: {
       organization_slug: string
       success: boolean
@@ -5057,6 +5074,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -6261,6 +6280,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -7001,10 +7022,6 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
       MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       NIMBUS_OAUTH_CLIENT_ID: string | null
-      PASSKEY_ENABLED: boolean
-      WEBAUTHN_RP_DISPLAY_NAME: string
-      WEBAUTHN_RP_ID: string
-      WEBAUTHN_RP_ORIGINS: string
       NIMBUS_OAUTH_CLIENT_SECRET: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
       OAUTH_SERVER_AUTHORIZATION_PATH: string | null
@@ -7570,6 +7587,8 @@ export interface components {
       scopes?: (
         | 'analytics:read'
         | 'analytics:write'
+        | 'analytics_config:read'
+        | 'analytics_config:write'
         | 'auth:read'
         | 'auth:write'
         | 'database:read'
@@ -7915,6 +7934,23 @@ export interface components {
     OverdueInvoiceCount: {
       organization_id: number
       overdue_invoice_count: number
+    }
+    PartnerIntegrationsResponse: {
+      /**
+       * Format: date-time
+       * @description When the integration link expires (1 hour from creation). The user must begin the flow before this time.
+       */
+      expiresAt: string
+      /**
+       * Format: uuid
+       * @description Unique identifier for the integration record
+       */
+      integrationId: string
+      /**
+       * Format: uri
+       * @description URL to redirect the user's browser to
+       */
+      redirectUrl: string
     }
     PauseStatusResponse: {
       can_restore: boolean
@@ -9931,6 +9967,7 @@ export interface components {
           usage: number
         }[]
         description: string
+        item_name: string
         metadata?: {
           is_branch?: boolean
           is_read_replica?: boolean
@@ -10000,6 +10037,15 @@ export interface components {
         usage_original?: number
       }[]
       subscription_id: string
+      tax: {
+        currency: string
+        tax_amount: number
+        tax_rate_percentage: number
+        total_amount_excluding_tax: number
+        total_amount_including_tax: number
+      } | null
+      /** @enum {string} */
+      tax_status: 'calculated' | 'not_applicable' | 'failed'
     }
     UpdateAddonBody: {
       /** @enum {string} */
@@ -10334,10 +10380,6 @@ export interface components {
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean | null
       MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean | null
       NIMBUS_OAUTH_CLIENT_ID?: string | null
-      PASSKEY_ENABLED?: boolean | null
-      WEBAUTHN_RP_DISPLAY_NAME?: string | null
-      WEBAUTHN_RP_ID?: string | null
-      WEBAUTHN_RP_ORIGINS?: string | null
       NIMBUS_OAUTH_CLIENT_SECRET?: string | null
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION?: boolean | null
       OAUTH_SERVER_AUTHORIZATION_PATH?: string | null
@@ -13194,6 +13236,65 @@ export interface operations {
         }
       }
       /** @description Failed to get GitHub repository branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  PartnerIntegrationsController_createIntegration: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description The id of the listing in the marketplace database */
+        listing_id: string
+        /** @description Supabase project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PartnerIntegrationsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project or listing not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve listing or project, or failed to create partner integration */
       500: {
         headers: {
           [name: string]: unknown
@@ -26437,11 +26538,7 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ConfirmRequestDto']
-      }
-    }
+    requestBody?: never
     responses: {
       200: {
         headers: {
