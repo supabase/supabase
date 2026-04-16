@@ -229,6 +229,7 @@ export const Grid = memo(
         useSensor(PointerSensor, {
           activationConstraint: {
             delay: 150,
+            tolerance: 5,
           },
         })
       )
