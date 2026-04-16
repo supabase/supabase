@@ -156,6 +156,8 @@ As your database scales, you will need an index on your vector columns to mainta
 
 For larger datasets, choosing and tuning the right index is critical for maintaining fast and accurate semantic search.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ## pgvector index tuning
 
 When working with embedding datasets at scale (100k+ rows), index selection and tuning can significantly impact query latency and accuracy.
@@ -197,5 +199,3 @@ using hnsw (embedding vector_cosine_ops);
 - [Vector indexes](/docs/guides/ai/vector-indexes)
 - [Hybrid search](/docs/guides/ai/hybrid-search)
 - [Keyword search](/docs/guides/ai/keyword-search)
-
-
