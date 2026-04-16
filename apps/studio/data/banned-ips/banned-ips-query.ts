@@ -8,7 +8,6 @@ export type BannedIPVariables = {
   projectRef?: string
 }
 
-export type BannedIPsData = BannedIPVariables[]
 export type BannedIPsError = ResponseError
 
 const BANNED_IPS_QUERY_TIMEOUT_MS = 5_000
