@@ -160,7 +160,7 @@ describe('Advisor signals integration', () => {
     )
 
     expect(screen.getByText('Advisor found 2 issues')).toBeInTheDocument()
-    expect(screen.getByText('Banned IP address: 203.0.113.10')).toBeInTheDocument()
+    expect(screen.getByText('Banned IP address')).toBeInTheDocument()
     expect(screen.getAllByText('Critical lint detail').length).toBeGreaterThan(0)
     expect(
       screen.getAllByText((_, node) =>
@@ -172,7 +172,7 @@ describe('Advisor signals integration', () => {
       ).length
     ).toBeGreaterThan(0)
 
-    await userEvent.click(screen.getByText('Banned IP address: 203.0.113.10'))
+    await userEvent.click(screen.getByText('Banned IP address'))
 
     expect(screen.getByText('Entity')).toBeInTheDocument()
     expect(screen.getByText('Issue')).toBeInTheDocument()
@@ -192,12 +192,12 @@ describe('Advisor signals integration', () => {
       'https://supabase.com/docs/reference/cli/supabase-network-bans'
     )
 
-    expect(screen.getAllByText('Banned IP address: 203.0.113.10').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Banned IP address').length).toBeGreaterThan(0)
 
     await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
 
     await waitFor(() => {
-      expect(screen.queryByText('Banned IP address: 203.0.113.10')).not.toBeInTheDocument()
+      expect(screen.queryByText('Banned IP address')).not.toBeInTheDocument()
     })
 
     expect(screen.getAllByText('Critical lint detail').length).toBeGreaterThan(0)
@@ -274,7 +274,7 @@ describe('Advisor signals integration', () => {
 
     render(<AdvisorSection />)
 
-    // Signals still pending — should show loading skeleton, not empty state
-    expect(screen.queryByText('No security or performance issues found')).not.toBeInTheDocument()
+    // Lints have loaded — homepage renders without being blocked by signal loading
+    expect(screen.getByText('Advisor found no issues')).toBeInTheDocument()
   })
 })

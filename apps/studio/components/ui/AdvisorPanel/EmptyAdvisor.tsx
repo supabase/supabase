@@ -41,7 +41,7 @@ export const EmptyAdvisor = ({ activeTab, hasFilters, onClearFilters }: EmptyAdv
   }
 
   return (
-    <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+    <div className="h-full px-6 flex flex-col items-center justify-center w-full gap-y-2">
       <TextSearch className="text-foreground-muted" strokeWidth={1} />
       <div className="flex flex-col items-center gap-y-0.5 text-center">
         <h3 className="heading-default">{getHeading()}</h3>

@@ -70,10 +70,12 @@ export const AdvisorPanelBody = ({
 
   if (isError) {
     return (
-      <div className="my-8 mx-4 flex flex-col items-center gap-2">
+      <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
         <AlertTriangle className="text-destructive" />
-        <h2 className="text-base text-foreground-light">Error loading advisories</h2>
-        <p className="text-sm text-foreground-lighter">Please try again later.</p>
+        <div className="flex flex-col items-center justify-center">
+          <h4 className="text-base font-normal text-foreground-light">Error loading advisories</h4>
+          <p className="text-sm text-foreground-lighter">Please try again later.</p>
+        </div>
       </div>
     )
   }

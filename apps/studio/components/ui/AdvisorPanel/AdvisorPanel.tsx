@@ -44,7 +44,6 @@ export const AdvisorPanel = () => {
   const markedRead = useRef<string[]>([])
   const hasProjectRef = !!project?.ref
   const shouldLoadProjectAdvisorData = isSidebarOpen && hasProjectRef && activeTab !== 'messages'
-  const shouldLoadProjectAdvisorSignals = shouldLoadProjectAdvisorData && IS_PLATFORM
 
   const {
     data: lintData,
@@ -52,14 +51,9 @@ export const AdvisorPanel = () => {
     isError: isLintsError,
   } = useProjectLintsQuery({ projectRef: project?.ref }, { enabled: shouldLoadProjectAdvisorData })
 
-  const {
-    data: signalItems,
-    dismissSignal,
-    isPending: isSignalsPending,
-    isError: isSignalsError,
-  } = useAdvisorSignals({
+  const { data: signalItems, isPending: isSignalsPending } = useAdvisorSignals({
     projectRef: project?.ref,
-    enabled: shouldLoadProjectAdvisorSignals,
+    enabled: shouldLoadProjectAdvisorData,
   })
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
@@ -163,11 +157,12 @@ export const AdvisorPanel = () => {
   // Only show loading state if the query is actually enabled
   const isLintsActuallyLoading = shouldLoadProjectAdvisorData && isLintsLoading
   const isNotificationsActuallyLoading = shouldLoadNotifications && isNotificationsLoading
-  const isSignalsActuallyLoading = shouldLoadProjectAdvisorSignals && isSignalsPending
+  const isSignalsActuallyLoading = shouldLoadProjectAdvisorData && isSignalsPending
   const isLoading =
     isLintsActuallyLoading || isNotificationsActuallyLoading || isSignalsActuallyLoading
-  const isError =
-    isLintsError || isNotificationsError || (shouldLoadProjectAdvisorSignals && isSignalsError)
+
+  // [Joshen] Opting to ignore error state of advisor signals for now - render lints irregardless of banned ips
+  const isError = isLintsError || isNotificationsError
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab as AdvisorTab)
@@ -225,11 +220,6 @@ export const AdvisorPanel = () => {
     updateNotifications({ ids: [id], status })
   }
 
-  const handleDismissSignal = (fingerprint: string) => {
-    dismissSignal(fingerprint)
-    setSelectedItem(undefined)
-  }
-
   const handleClearAllFilters = () => {
     clearSeverityFilters()
     resetNotificationFilters()
@@ -252,7 +242,6 @@ export const AdvisorPanel = () => {
                 item={selectedItem}
                 projectRef={project?.ref ?? ''}
                 onUpdateNotificationStatus={handleUpdateNotificationStatus}
-                onDismissSignal={handleDismissSignal}
               />
             ) : (
               <div className="px-6 py-8">

@@ -1,17 +1,19 @@
+import { useParams } from 'common'
 import { EyeOff, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { AdvisorSignalItem } from './AdvisorPanel.types'
+import { useAdvisorSignals } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useAdvisorStateSnapshot } from '@/state/advisor-state'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AdvisorSignalDetailProps {
   item: AdvisorSignalItem
-  onDismiss: (dismissalKey: string) => void
 }
 
 const buildSignalAssistantPrompt = (item: AdvisorSignalItem) => {
@@ -23,9 +25,13 @@ const buildSignalAssistantPrompt = (item: AdvisorSignalItem) => {
   ].join('\n\n')
 }
 
-export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProps) => {
+export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
+  const { ref: projectRef } = useParams()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+
+  const { dismissSignal } = useAdvisorSignals({ projectRef })
+  const { setSelectedItem } = useAdvisorStateSnapshot()
 
   const issueDescription = (
     <>
@@ -41,6 +47,11 @@ export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProp
       name: `Review ${item.title.toLowerCase()}`,
       initialInput: buildSignalAssistantPrompt(item),
     })
+  }
+
+  const onDismissSignal = (key: string) => {
+    dismissSignal(key)
+    setSelectedItem(undefined)
   }
 
   return (
@@ -86,7 +97,7 @@ export const AdvisorSignalDetail = ({ item, onDismiss }: AdvisorSignalDetailProp
         <Button
           type="default"
           icon={<EyeOff size={14} strokeWidth={1.5} />}
-          onClick={() => onDismiss(item.dismissalKey)}
+          onClick={() => onDismissSignal(item.dismissalKey)}
         >
           Dismiss
         </Button>

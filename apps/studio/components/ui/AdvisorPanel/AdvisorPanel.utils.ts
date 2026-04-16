@@ -115,7 +115,7 @@ export const getAdvisorItemDisplayTitle = (item: AdvisorItem): string => {
   }
 
   if (item.source === 'signal') {
-    return `${item.title}: ${item.sourceData.ip}`
+    return `${item.title}`
   }
 
   return item.title.replace(/[`\\]/g, '')

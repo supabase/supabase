@@ -1,11 +1,10 @@
+import { IS_PLATFORM } from 'common'
 import { useCallback, useEffect, useMemo } from 'react'
 
 import type { AdvisorSignalItem } from './AdvisorPanel.types'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import type { IPData } from '@/data/banned-ips/banned-ips-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-
-// --- private helpers (only used in this hook) ---
 
 const createDismissalStorageKey = (projectRef: string) => `advisor-signal-dismissals:${projectRef}`
 
@@ -44,18 +43,13 @@ const createBannedIPSignalItems = ({
   }))
 }
 
-// --- hook ---
-
 interface UseAdvisorSignalsOptions {
   projectRef?: string
   enabled?: boolean
 }
 
-export const useAdvisorSignals = ({
-  projectRef,
-  enabled = true,
-}: UseAdvisorSignalsOptions = {}) => {
-  const bannedIPsQuery = useBannedIPsQuery({ projectRef }, { enabled })
+export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSignalsOptions) => {
+  const { data, isPending, isError } = useBannedIPsQuery({ projectRef }, { enabled })
 
   const storageKey = projectRef
     ? createDismissalStorageKey(projectRef)
@@ -75,13 +69,13 @@ export const useAdvisorSignals = ({
   )
 
   const signalItems = useMemo(
-    () => createBannedIPSignalItems({ projectRef, bannedIPsData: bannedIPsQuery.data }),
-    [projectRef, bannedIPsQuery.data]
+    () => createBannedIPSignalItems({ projectRef, bannedIPsData: data }),
+    [projectRef, data]
   )
 
   // Prune stale dismissals when the active signal list changes (e.g. an IP was unbanned)
   useEffect(() => {
-    if (!bannedIPsQuery.data) return
+    if (!data) return
 
     const activeKeys = new Set(signalItems.map((item) => item.dismissalKey))
 
@@ -91,17 +85,17 @@ export const useAdvisorSignals = ({
       )
       return next.length === current.length ? current : next
     })
-  }, [bannedIPsQuery.data, signalItems, setDismissedKeys])
+  }, [data, signalItems, setDismissedKeys])
 
-  const data = useMemo(
+  const formattedData = useMemo(
     () => signalItems.filter((item) => !dismissedKeySet.has(item.dismissalKey)),
     [signalItems, dismissedKeySet]
   )
 
   return {
-    data,
+    data: formattedData,
     dismissSignal,
-    isPending: bannedIPsQuery.isPending,
-    isError: bannedIPsQuery.isError,
+    isPending,
+    isError,
   }
 }

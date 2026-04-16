@@ -21,7 +21,6 @@ import {
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
-import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAdvisorStateSnapshot } from '@/state/advisor-state'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -29,23 +28,17 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
-  const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery(
-    {
-      projectRef,
-    },
-    {
-      enabled: !showEmptyState,
-    }
-  )
-  const shouldLoadSignals = IS_PLATFORM && !showEmptyState
-  const { data: signalItems, isPending: isLoadingSignals } = useAdvisorSignals({
-    projectRef,
-    enabled: shouldLoadSignals,
-  })
   const track = useTrack()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setSelectedItem } = useAdvisorStateSnapshot()
+
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery(
+    { projectRef },
+    { enabled: !showEmptyState }
+  )
+
+  const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: !showEmptyState })
 
   const advisorItems = useMemo<AdvisorItem[]>(() => {
     const criticalLintItems = createAdvisorLintItems(lints).filter(
@@ -120,9 +113,12 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
     return <EmptyState />
   }
 
+  // [Joshen] Note that we're intentionally (for now) not waiting for advisor signals to load
+  // render main content as long as the main lints have been fetched
+
   return (
     <div>
-      {isLoadingLints || (shouldLoadSignals && isLoadingSignals) ? (
+      {isLoadingLints ? (
         <ShimmeringLoader className="w-96 mb-6" />
       ) : (
         <div className="flex justify-between items-center mb-6">
@@ -132,8 +128,9 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           </Button>
         </div>
       )}
-      {isLoadingLints || (shouldLoadSignals && isLoadingSignals) ? (
-        <div className="flex flex-col p-4 gap-2">
+
+      {isLoadingLints ? (
+        <div className="flex flex-col gap-2">
           <ShimmeringLoader />
           <ShimmeringLoader className="w-3/4" />
           <ShimmeringLoader className="w-1/2" />

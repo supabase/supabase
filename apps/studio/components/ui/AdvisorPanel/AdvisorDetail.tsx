@@ -11,14 +11,12 @@ interface AdvisorDetailProps {
   item: AdvisorItem
   projectRef: string
   onUpdateNotificationStatus?: (id: string, status: 'archived' | 'seen') => void
-  onDismissSignal?: (fingerprint: string) => void
 }
 
 export const AdvisorDetail = ({
   item,
   projectRef,
   onUpdateNotificationStatus = noop,
-  onDismissSignal = noop,
 }: AdvisorDetailProps) => {
   if (item.source === 'lint') {
     const lint = item.original as Lint
@@ -32,7 +30,7 @@ export const AdvisorDetail = ({
   if (item.source === 'signal') {
     return (
       <div className="px-6 py-6">
-        <AdvisorSignalDetail item={item} onDismiss={onDismissSignal} />
+        <AdvisorSignalDetail item={item} />
       </div>
     )
   }

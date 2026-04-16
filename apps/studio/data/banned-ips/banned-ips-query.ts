@@ -1,37 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 
 import { BannedIPKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type BannedIPVariables = {
-  projectRef?: string
-}
+type BannedIPVariables = { projectRef?: string }
 
-export type BannedIPsError = ResponseError
-
-const BANNED_IPS_QUERY_TIMEOUT_MS = 5_000
-
-function getBannedIPsAbortSignal(signal?: AbortSignal) {
-  const timeoutSignal = AbortSignal.timeout(BANNED_IPS_QUERY_TIMEOUT_MS)
-
-  if (!signal) return timeoutSignal
-  if (typeof AbortSignal.any === 'function') {
-    return AbortSignal.any([signal, timeoutSignal])
-  }
-
-  // AbortSignal.any unavailable (older browsers): prefer the timeout signal so
-  // the 5 s cap is always enforced, even at the cost of losing React Query's
-  // own cancellation signal on this path.
-  return timeoutSignal
-}
-
-export async function getBannedIPs({ projectRef }: BannedIPVariables, signal?: AbortSignal) {
+export async function getBannedIPs({ projectRef }: BannedIPVariables, signal: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post(`/v1/projects/{ref}/network-bans/retrieve`, {
     params: { path: { ref: projectRef } },
-    signal: getBannedIPsAbortSignal(signal),
+    signal,
   })
 
   if (error) handleError(error)
@@ -48,7 +29,7 @@ export const useBannedIPsQuery = <TData = IPData>(
   useQuery<IPData, IPError, TData>({
     queryKey: BannedIPKeys.list(projectRef),
     queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 60_000,
