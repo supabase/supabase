@@ -88,9 +88,7 @@ const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
   })
 
   const currentYear = new Date().getFullYear()
-  const eventYear = isDateOnly
-    ? parseInt(date.slice(0, 4), 10)
-    : eventDate.getFullYear()
+  const eventYear = isDateOnly ? parseInt(date.slice(0, 4), 10) : eventDate.getFullYear()
   const formattedDateWithYear =
     eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
 
