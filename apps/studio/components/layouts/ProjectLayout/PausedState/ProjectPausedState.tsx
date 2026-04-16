@@ -36,7 +36,6 @@ import {
   extractPostgresVersionDetails,
   PostgresVersionSelector,
 } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
-import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -226,12 +225,6 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
             </div>
           </div>
         </CardContent>
-
-        {!isRestoreDisabled && (
-          <div className="border-t px-6 py-4">
-            <LogicalBackupCliInstructions note="Your project must be resumed before running these commands." />
-          </div>
-        )}
 
         {isError && (
           <AlertError
