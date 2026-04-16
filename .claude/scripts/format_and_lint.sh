@@ -27,12 +27,9 @@ fi
 cd "$CLAUDE_PROJECT_DIR"
 
 # Prettier and ESLint for supported file types
-# Use the project-local prettier binary via absolute path to avoid picking up a
-# globally-installed version (e.g. from a different Node version) that may mangle
-# TypeScript generic type parameters when prettier-plugin-sql-cst is active.
 case "$file_path" in
   *.ts|*.tsx|*.js|*.jsx|*.json|*.css|*.scss|*.md|*.mdx|*.html|*.yaml|*.yml|*.sql)
-    "$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier" --config prettier.config.mjs --write "$file_path"
+    pnpm exec prettier --config prettier.config.mjs --write "$file_path"
     ;;
 esac
 
