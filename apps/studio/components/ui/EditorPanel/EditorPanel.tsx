@@ -63,7 +63,7 @@ import { BASE_PATH } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcutStateSnapshot } from '@/state/shortcuts/state'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
@@ -108,9 +108,8 @@ export const EditorPanel = () => {
     setActiveSnippet({ ...activeSnippet, name: newName })
     setIsEditingTitle(false)
   }
-  const { disabled: disabledShortcuts } = useShortcutStateSnapshot()
-  const isInlineEditorHotkeyEnabled = !disabledShortcuts[SHORTCUT_IDS.INLINE_EDITOR_TOGGLE]
-  const isAIAssistantHotkeyEnabled = !disabledShortcuts[SHORTCUT_IDS.AI_ASSISTANT_TOGGLE]
+  const isInlineEditorHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
   const currentValue = value || ''
 

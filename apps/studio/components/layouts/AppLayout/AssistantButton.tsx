@@ -3,13 +3,12 @@ import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcutStateSnapshot } from '@/state/shortcuts/state'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AssistantButton = () => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
-  const { disabled } = useShortcutStateSnapshot()
-  const isAIAssistantHotkeyEnabled = !disabled[SHORTCUT_IDS.AI_ASSISTANT_TOGGLE]
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
 

@@ -32,7 +32,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcutStateSnapshot } from '@/state/shortcuts/state'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -72,8 +72,7 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
-  const { disabled: disabledShortcuts } = useShortcutStateSnapshot()
-  const commandMenuEnabled = !disabledShortcuts[SHORTCUT_IDS.COMMAND_MENU_OPEN]
+  const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
   const isAccountPage = router.pathname.startsWith('/account')
 

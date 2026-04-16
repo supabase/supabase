@@ -4,8 +4,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import type { ShortcutId } from '@/state/shortcuts/registry'
-import { setShortcutEnabled, useShortcutStateSnapshot } from '@/state/shortcuts/state'
+import { setShortcutEnabled } from '@/state/shortcuts/state'
 import type { ShortcutDefinition } from '@/state/shortcuts/types'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 interface HotkeyToggleProps {
   definition: ShortcutDefinition
@@ -13,8 +14,7 @@ interface HotkeyToggleProps {
 }
 
 export function HotkeyToggle({ definition, isLast }: HotkeyToggleProps) {
-  const { disabled } = useShortcutStateSnapshot()
-  const enabled = !disabled[definition.id]
+  const enabled = useIsShortcutEnabled(definition.id as ShortcutId)
 
   return (
     <CardContent className={isLast ? undefined : 'border-b'}>

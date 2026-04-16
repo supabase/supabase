@@ -4,12 +4,11 @@ import { cn, KeyboardShortcut } from 'ui'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcutStateSnapshot } from '@/state/shortcuts/state'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const InlineEditorKeyboardTooltip = () => {
-  const { disabled } = useShortcutStateSnapshot()
-  const hotkeyEnabled = !disabled[SHORTCUT_IDS.INLINE_EDITOR_TOGGLE]
+  const hotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
 
   return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
 }
