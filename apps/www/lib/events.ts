@@ -107,7 +107,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
         const rawMeetingLink = getUrl(page, 'Book Meeting Link')
         const meetingLink = isSafeHttpUrl(rawMeetingLink) ? rawMeetingLink : ''
         const location = getRichText(page, 'Location')
-        const categories = getMultiSelect(page, 'Category').map((c) => c.toLowerCase())
+        const categories = ['conference']
         const speakingAnswers = getMultiSelect(page, 'Are you speaking at this event?')
         const isSpeaking = speakingAnswers.includes('Yes')
 

@@ -47,7 +47,7 @@ export function EventBanner() {
             <LocationWidget location={featuredEvent.location} />
           </div>
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center md:justify-end gap-2">
             {featuredEvent.meetingLink && (
               <Button type="secondary" size="medium" asChild>
                 <Link href={featuredEvent.meetingLink} target="_blank" rel="noopener noreferrer">
@@ -166,7 +166,7 @@ const EventBannerSkeleton = () => {
           <div className="flex flex-row gap-6">
             {/* Date Widget Skeleton */}
             <div className="flex items-center gap-4">
-              <div className="bg-surface-200 w-10 h-10 border rounded-md animate-pulse" />
+              <div className="bg-surface-200 w-10 h-10 rounded-md animate-pulse" />
               <div className="flex flex-col gap-2">
                 <div className="h-4 w-32 bg-surface-200 rounded animate-pulse" />
                 <div className="h-3 w-20 bg-surface-200 rounded animate-pulse" />
@@ -174,7 +174,7 @@ const EventBannerSkeleton = () => {
             </div>
             {/* Location Widget Skeleton */}
             <div className="flex items-center gap-4">
-              <div className="bg-surface-200 w-10 h-10 border rounded-md animate-pulse" />
+              <div className="bg-surface-200 w-10 h-10 rounded-md animate-pulse" />
               <div className="flex flex-col gap-2">
                 <div className="h-4 w-20 bg-surface-200 rounded animate-pulse" />
                 <div className="h-3 w-24 bg-surface-200 rounded animate-pulse" />
