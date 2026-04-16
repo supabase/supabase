@@ -402,52 +402,42 @@ export function LogDrainDestinationSheetForm({
                   let submitValues = toSubmitValues(values)
 
                   if (mode === 'update') {
-                    // If the user explicitly cleared all header rows, we must send
-                    // headers: {} so the server removes them. An empty headerEntries
-                    // array means the user deleted every row.
                     const valuesWithHeaders = values as LogDrainDestinationFormValues & {
                       headerEntries?: LogDrainHeaderRow[]
                     }
+                    // An empty headerEntries array means the user deleted every row —
+                    // send headers: {} to signal the server to clear them.
                     const explicitlyClearedHeaders =
                       'headerEntries' in values &&
                       Array.isArray(valuesWithHeaders.headerEntries) &&
                       valuesWithHeaders.headerEntries.length === 0
 
-                    // Cast to a type that surfaces the optional headers field present
-                    // on the webhook / loki / otlp submit schema variants.
                     const submitValuesWithHeaders =
                       submitValues as LogDrainDestinationSubmitValues & {
                         headers?: Record<string, string>
                       }
 
-                    if ('headers' in submitValues) {
+                    if ('headers' in submitValues || explicitlyClearedHeaders) {
                       const { headers, ...rest } = submitValuesWithHeaders
 
-                      // If any header value is the REDACTED sentinel, the server's
-                      // stored value for that key is hidden from us. The PATCH endpoint
-                      // replaces the entire headers object (no per-key merging), so
-                      // sending a partial set would silently remove the hidden values
-                      // (e.g. an existing Authorization token). Omit headers from the
-                      // payload entirely — the server preserves whatever is stored.
-                      const hasRedactedValues =
-                        !!headers && Object.values(headers).some((v) => v === HEADER_REDACTED_VALUE)
-
-                      if (hasRedactedValues) {
-                        submitValues = rest as LogDrainDestinationSubmitValues
-                      } else if (explicitlyClearedHeaders) {
+                      if (explicitlyClearedHeaders) {
                         submitValues = { ...rest, headers: {} } as LogDrainDestinationSubmitValues
                       } else {
+                        // REDACTED values are server-side placeholders for hidden secrets —
+                        // not values the user set. Strip them so we send only what the user
+                        // explicitly changed. The platform is responsible for merging with
+                        // existing stored values server-side.
+                        const userChangedHeaders = Object.fromEntries(
+                          Object.entries(headers ?? {}).filter(
+                            ([, v]) => v !== HEADER_REDACTED_VALUE
+                          )
+                        )
                         submitValues = (
-                          headers && Object.keys(headers).length > 0 ? { ...rest, headers } : rest
+                          Object.keys(userChangedHeaders).length > 0
+                            ? { ...rest, headers: userChangedHeaders }
+                            : rest
                         ) as LogDrainDestinationSubmitValues
                       }
-                    } else if (explicitlyClearedHeaders) {
-                      // headers was absent (webhook/otlp with empty list) — still
-                      // need to signal clearing to the server.
-                      submitValues = {
-                        ...submitValuesWithHeaders,
-                        headers: {},
-                      } as LogDrainDestinationSubmitValues
                     }
                   }
 
