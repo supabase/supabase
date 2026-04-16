@@ -13,6 +13,13 @@ resources:
                   socket_address:
                     address: auth
                     port_value: 9999
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        http_health_check:
+          path: /health
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
@@ -34,6 +41,13 @@ resources:
                   socket_address:
                     address: rest
                     port_value: 3000
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        http_health_check:
+          path: /
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
@@ -55,6 +69,13 @@ resources:
                   socket_address:
                     address: realtime-dev.supabase-realtime
                     port_value: 4000
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        http_health_check:
+          path: /
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
@@ -76,6 +97,13 @@ resources:
                   socket_address:
                     address: storage
                     port_value: 5000
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        http_health_check:
+          path: /status
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
@@ -97,6 +125,12 @@ resources:
                   socket_address:
                     address: functions
                     port_value: 9000
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        tcp_health_check: {}
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
@@ -118,6 +152,13 @@ resources:
                   socket_address:
                     address: meta
                     port_value: 8080
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        http_health_check:
+          path: /health
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
@@ -139,6 +180,13 @@ resources:
                   socket_address:
                     address: studio
                     port_value: 3000
+    health_checks:
+      - timeout: 2s
+        interval: 5s
+        unhealthy_threshold: 3
+        healthy_threshold: 2
+        http_health_check:
+          path: /project/default
     circuit_breakers:
       thresholds:
         - priority: DEFAULT
