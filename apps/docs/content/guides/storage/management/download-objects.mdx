@@ -6,35 +6,41 @@ subtitle: 'Learn about downloading objects'
 sidebar_label: 'Download Objects'
 ---
 
-Supabase Storage consists of two parts that you must back up separately:
+Supabase Storage files can be downloaded in a variety of ways depending on your use case.
 
-- **File metadata** — stored in the `storage.objects` table in your Postgres database
-- **Actual files** — stored in Supabase's S3-compatible storage backend
+## From the Dashboard
 
-## Step 1: Export file metadata (via database dump)
+You can download individual files directly from the [Storage section](/dashboard/project/_/storage/buckets) of the Dashboard by browsing to your bucket and selecting files.
 
-Run the following three CLI commands to dump your full database, which includes `storage.objects`:
+## Using the Supabase CLI
 
-```
-supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
-supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
-supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
-```
+You can use the `supabase storage` commands to list and copy objects from your linked project.
 
-You can find your `CONNECTION_STRING` in [**Database > Settings**](/dashboard/project/_/database/settings?showConnect=true) section of the Dashboard.
+See the [CLI reference](https://supabase.com/docs/reference/cli/supabase-storage) for available commands.
 
-For full details, see the [backup restore guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
+## Using an S3-compatible client
 
-## Step 2: Download actual files (via S3-compatible endpoint)
+Supabase Storage exposes an S3-compatible endpoint, which means you can use tools like [Cyberduck](https://cyberduck.io/) (via a connection profile), AWS CLI, or rclone to browse and download your files.
 
-1. Go to the **Storage > [S3 Configuration](/dashboard/project/_/storage/s3)** section of the Dashboard.
-2. Generate an access key + secret key pair (shown once — save it immediately)
-3. Use any S3-compatible tool (AWS CLI, rclone, Cyberduck, etc.) to sync your files locally using the endpoint and credentials from the dashboard
+To connect:
 
-See the [S3 authentication doc](/docs/guides/storage/s3/authentication) for connection details.
+1. Go to **Storage > Configuration > [S3] (/dashboard/project/_/storage/s3)** in the Dashboard.
+2. Enable the S3 protocol and generate an access key + secret key pair (Save it immediately as it is shown once).
+3. Use your S3-compatible tool with the endpoint and credentials from the Dashboard.
 
-<Admonition type="note">
+See the [S3 authentication doc](/docs/guides/storage/s3/authentication) for full connection details.
 
-Repeat Step 2 for each bucket. Both steps are required for a complete backup. The database dump alone won't include the actual files, and the S3 sync alone won't include the metadata.
-
+<Admonition type="tip">
+For downloading a large number of objects, using an S3-compatible tool like rclone or Cyberduck is significantly more efficient than downloading files individually.
 </Admonition>
+
+## Using migration scripts
+
+For bulk downloads or project migrations, you can use the scripts from our migration docs:
+
+- **Node.js script** — see "Migrating storage objects" in the [migration guide](/docs/guides/platform/migrating-within-supabase/backup-restore)
+- **Google Colab script** — see "Migrate storage objects to new project's S3 storage" in the [dashboard restore guide](docs/guides/platform/migrating-within-supabase/dashboard-restore)
+
+## File metadata
+
+Note that file metadata is stored separately from the actual files. It lives in the `storage.buckets` and `storage.objects` tables in your Postgres database. If you need a complete backup (files + metadata), see the [backup and restore guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
