@@ -290,7 +290,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       className="text-sm hover:bg-selection cursor-pointer"
                                       disabled={!canAssignRole}
                                     >
-                                      {role.name}
+                                      <div className="flex flex-col gap-0.5">
+                                        <span>{role.name}</span>
+                                        {role.description && (
+                                          <span className="text-foreground-lighter text-xs">
+                                            {role.description}
+                                          </span>
+                                        )}
+                                      </div>
                                     </SelectItem_Shadcn_>
                                   )
                                 })}

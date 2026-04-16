@@ -345,7 +345,14 @@ export const InviteMemberButton = () => {
                                   className="text-sm [&>span:nth-child(2)]:w-full [&>span:nth-child(2)]:flex [&>span:nth-child(2)]:items-center [&>span:nth-child(2)]:justify-between"
                                   disabled={!canAssignRole}
                                 >
-                                  <span>{role.name}</span>
+                                  <div className="flex flex-col gap-0.5">
+                                    <span>{role.name}</span>
+                                    {role.description && (
+                                      <span className="text-foreground-lighter text-xs">
+                                        {role.description}
+                                      </span>
+                                    )}
+                                  </div>
                                   {!canAssignRole && (
                                     <span>Additional permissions required to assign role</span>
                                   )}

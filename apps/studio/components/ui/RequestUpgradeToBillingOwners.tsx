@@ -139,7 +139,10 @@ export const RequestUpgradeToBillingOwners = ({
     const roles = member.role_ids
       .map((x) => orgRoles.find((role) => role.id === x)?.name)
       .filter(Boolean)
-    return !member.invited_id && (roles.includes('Owner') || roles.includes('Administrator'))
+    return (
+      !member.invited_id &&
+      (roles.includes('Owner') || roles.includes('Administrator') || roles.includes('Billing'))
+    )
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {

@@ -5740,7 +5740,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
@@ -5755,7 +5755,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
@@ -5770,7 +5770,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
@@ -5785,7 +5785,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
@@ -6596,7 +6596,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
@@ -6611,7 +6611,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
@@ -10939,7 +10939,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
@@ -10954,7 +10954,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
@@ -10969,7 +10969,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file: string
           /** Format: uri */
@@ -10984,7 +10984,7 @@ export interface components {
           first_name_mapping?: string[]
           join_org_on_signup_enabled: boolean
           /** @enum {string} */
-          join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+          join_org_on_signup_role?: 'Administrator' | 'Billing' | 'Developer' | 'Owner' | 'Read-only'
           last_name_mapping?: string[]
           metadata_xml_file?: string
           metadata_xml_url: string
