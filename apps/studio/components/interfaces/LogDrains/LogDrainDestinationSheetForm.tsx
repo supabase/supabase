@@ -253,11 +253,13 @@ function toSubmitValues(
   const rawHeaders = headerRowsToRecord(headerEntries)
   const headers = mode === 'update' ? computePatchHeaders(rawHeaders) : rawHeaders
 
-  // In update mode: include headers whenever computePatchHeaders returned a value —
-  // even {} signals "explicitly cleared". In create mode: only include when non-empty.
+  // In update mode, computePatchHeaders returns {} to signal "clear all headers" —
+  // so any non-undefined result should be sent. In create mode, skip empty headers.
+  const isLoki = rest.type === 'loki'
+  const hasHeadersInCreateMode = !!headers && Object.keys(headers).length > 0
+  const hasHeadersInUpdateMode = headers !== undefined
   const shouldIncludeHeaders =
-    rest.type === 'loki' ||
-    (mode === 'update' ? headers !== undefined : !!headers && Object.keys(headers).length > 0)
+    isLoki || (mode === 'update' ? hasHeadersInUpdateMode : hasHeadersInCreateMode)
 
   const transformedValues = shouldIncludeHeaders ? { ...rest, headers } : rest
 
