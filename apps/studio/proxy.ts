@@ -22,6 +22,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/get-utc-time',
   '/get-deployment-commit',
   '/check-cname',
+  '/changelog-recent',
   '/edge-functions/test',
   '/edge-functions/body',
   '/generate-attachment-url',

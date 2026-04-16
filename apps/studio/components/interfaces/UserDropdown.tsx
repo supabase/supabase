@@ -1,7 +1,8 @@
-import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { FlaskConical, Loader2, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
   Button,
   cn,
@@ -21,6 +22,7 @@ import {
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import { WhatsNewChangelogSection } from '@/components/ui/HelpPanel/WhatsNewChangelogSection'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
@@ -41,8 +43,10 @@ export function UserDropdown({
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
 
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild className={cn('border flex-shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
           type="default"
@@ -106,18 +110,12 @@ export function UserDropdown({
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
-                <Link
-                  href="https://supabase.com/changelog"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Changelog
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <WhatsNewChangelogSection variant="dropdown" fetchEnabled={menuOpen} />
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
           </>
         )}
         <DropdownMenuGroup>

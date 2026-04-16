@@ -8,6 +8,7 @@ import styleHandler from 'ui/src/lib/theme/styleHandler'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
+import { WhatsNewChangelogSection } from './WhatsNewChangelogSection'
 import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -91,6 +92,14 @@ export const HelpPanel = ({
             </a>
           </div>
         </div>
+        {IS_PLATFORM && (
+          <>
+            <Separator className={cn(__styles.separator, '')} />
+            <div className="px-2">
+              <WhatsNewChangelogSection variant="inline" fetchEnabled={IS_PLATFORM} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

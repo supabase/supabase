@@ -98,6 +98,9 @@
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
         "LIVE_SUPABASE_SECRET_KEY",
+        "GITHUB_CHANGELOG_APP_ID",
+        "GITHUB_CHANGELOG_APP_INSTALLATION_ID",
+        "GITHUB_CHANGELOG_APP_PRIVATE_KEY",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
