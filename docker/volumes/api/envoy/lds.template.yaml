@@ -14,6 +14,9 @@ resources:
               '@type': >-
                 type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
               stat_prefix: ingress_http
+              normalize_path: true
+              merge_slashes: true
+              path_with_escaped_slashes_action: REJECT_REQUEST
               upgrade_configs:
                 - upgrade_type: websocket
               access_log:
