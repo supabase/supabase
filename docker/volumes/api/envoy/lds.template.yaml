@@ -17,6 +17,7 @@ resources:
               normalize_path: true
               merge_slashes: true
               path_with_escaped_slashes_action: REJECT_REQUEST
+              use_remote_address: true
               upgrade_configs:
                 - upgrade_type: websocket
               access_log:
