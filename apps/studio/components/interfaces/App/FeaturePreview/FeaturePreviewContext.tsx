@@ -119,10 +119,7 @@ export const useIsJitDbAccessEnabled = () => {
 }
 
 // [Joshen] Temporarily leaving this in, will eventually clean up this flag + old Header component completely
-export const useIsTableFilterBarEnabled = () => {
-  const value = useFlag('tableEditorNewFilterBar')
-  return value
-}
+export const useIsTableFilterBarEnabled = () => true
 
 export const useIsFloatingMobileToolbarEnabled = () => {
   const { flags } = useFeaturePreviewContext()
