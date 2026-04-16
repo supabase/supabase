@@ -1696,4 +1696,26 @@ testRunner('table editor', () => {
       exact: true,
     })
   })
+
+  test('Can double-click a column name to copy it', async ({ page, ref }) => {
+    const tableName = 'pw_table_column_click'
+
+    // create table + verify that this exists.
+    await using _ = await withSetupCleanup(
+      () => createTableWithRLS(tableName, 'pw_column'),
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByLabel(`View ${tableName}`).click()
+    await expect(page.getByRole('button', { name: 'pw_column', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'pw_column', exact: true }).dblclick()
+    await page.keyboard.press('ControlOrMeta+C')
+    await expectClipboardValue({
+      page,
+      value: 'pw_column',
+      exact: true,
+    })
+  })
 })

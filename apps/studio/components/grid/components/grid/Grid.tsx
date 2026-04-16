@@ -225,7 +225,13 @@ export const Grid = memo(
         }
       }, [rowClass])
 
-      const sensors = useSensors(useSensor(PointerSensor))
+      const sensors = useSensors(
+        useSensor(PointerSensor, {
+          activationConstraint: {
+            delay: 150,
+          },
+        })
+      )
       const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
 
       return (
