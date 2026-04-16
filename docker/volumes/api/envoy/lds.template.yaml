@@ -146,7 +146,6 @@ resources:
                           prefix: /.well-known/oauth-authorization-server
                         route:
                           cluster: auth
-                          prefix_rewrite: /.well-known/oauth-authorization-server
                           timeout: 30s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
@@ -170,7 +169,6 @@ resources:
                           prefix: /sso/saml/acs
                         route:
                           cluster: auth
-                          prefix_rewrite: /sso/saml/acs
                           timeout: 30s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
@@ -194,7 +192,6 @@ resources:
                           prefix: /sso/saml/metadata
                         route:
                           cluster: auth
-                          prefix_rewrite: /sso/saml/metadata
                           timeout: 30s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
@@ -357,7 +354,6 @@ resources:
                           prefix: /api/mcp
                         route:
                           cluster: studio
-                          prefix_rewrite: /api/mcp
                           timeout: 30s
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
