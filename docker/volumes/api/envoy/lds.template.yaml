@@ -18,6 +18,8 @@ resources:
               merge_slashes: true
               path_with_escaped_slashes_action: REJECT_REQUEST
               use_remote_address: true
+              common_http_protocol_options:
+                headers_with_underscores_action: REJECT_REQUEST
               upgrade_configs:
                 - upgrade_type: websocket
               access_log:
