@@ -29,6 +29,8 @@ export type ProjectCreateVariables = {
   postgresEngine?: PostgresEngine
   releaseChannel?: ReleaseChannel
   highAvailability?: boolean
+  githubInstallationId?: CreateProjectBody['github_installation_id']
+  githubRepositoryId?: CreateProjectBody['github_repository_id']
 }
 
 export async function createProject({
@@ -47,6 +49,8 @@ export async function createProject({
   postgresEngine,
   releaseChannel,
   highAvailability,
+  githubInstallationId,
+  githubRepositoryId,
 }: ProjectCreateVariables) {
   const body: CreateProjectBody = {
     cloud_provider: cloudProvider as CloudProvider,
@@ -66,6 +70,8 @@ export async function createProject({
     postgres_engine: postgresEngine,
     release_channel: releaseChannel,
     high_availability: highAvailability,
+    github_installation_id: githubInstallationId,
+    github_repository_id: githubRepositoryId,
   }
 
   const { data, error } = await post(`/platform/projects`, {

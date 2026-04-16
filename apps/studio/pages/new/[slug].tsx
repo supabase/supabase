@@ -340,6 +340,8 @@ const Wizard: NextPageWithLayout = () => {
       enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
+      githubInstallationId,
+      githubRepositoryId,
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
@@ -353,6 +355,10 @@ const Wizard: NextPageWithLayout = () => {
     const selectedRegion = smartRegionEnabled
       ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
+    const parsedGitHubRepositoryId =
+      githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
+    const shouldIncludeGitHubFields =
+      githubInstallationId !== undefined && Number.isFinite(parsedGitHubRepositoryId)
 
     const data: ProjectCreateVariables = {
       dbPass,
@@ -378,6 +384,12 @@ const Wizard: NextPageWithLayout = () => {
         ]
           .filter(Boolean)
           .join('\n') || undefined,
+      ...(shouldIncludeGitHubFields
+        ? {
+            githubInstallationId,
+            githubRepositoryId: parsedGitHubRepositoryId,
+          }
+        : {}),
     }
 
     if (postgresVersion) {
