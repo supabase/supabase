@@ -375,10 +375,9 @@ export const SchemaGraph = () => {
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Confirm to arrange the layout of nodes</AlertDialogTitle>
+                      <AlertDialogTitle>Confirm to rearrange all nodes</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Applying auto layout will rearrange all nodes in the graph, and this action
-                        cannot be undone.
+                        Auto layout will rearrange all nodes in the graph. This cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
