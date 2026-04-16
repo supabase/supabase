@@ -38,6 +38,13 @@ resources:
                   - name: supabase_host
                     domains:
                       - '*'
+                    cors:
+                      allow_origin_string_match:
+                        - prefix: "*"
+                      allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD,CONNECT,TRACE"
+                      allow_headers: "*"
+                      expose_headers: "*"
+                      max_age: "3600"
                     routes:
                       - match:
                           prefix: /auth/v1/verify
