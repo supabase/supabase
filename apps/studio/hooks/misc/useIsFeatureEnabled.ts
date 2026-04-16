@@ -1,5 +1,6 @@
 import { isFeatureEnabled, type Feature } from 'common'
-import { useProfile } from 'lib/profile'
+
+import { useProfile } from '@/lib/profile'
 
 function useIsFeatureEnabled<T extends Feature[]>(
   features: T

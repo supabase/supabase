@@ -1,37 +1,45 @@
+import {
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { useParams } from 'common'
 import { isEmpty, noop, partition } from 'lodash'
 import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
-  DragDropContext,
-  Draggable,
-  DraggableProvided,
-  Droppable,
-  DroppableProvided,
-} from 'react-beautiful-dnd'
-
-import { useParams } from 'common'
-import InformationBox from 'components/ui/InformationBox'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
-import {
+  Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   WarningIcon,
 } from 'ui'
+
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type { ColumnField, ExtendedPostgresRelationship } from '../SidePanelEditor.types'
-import Column from './Column'
+import { Column } from './Column'
 import type { ImportContent, TableField } from './TableEditor.types'
+import InformationBox from '@/components/ui/InformationBox'
+import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ColumnManagementProps {
   table: TableField
@@ -46,7 +54,7 @@ interface ColumnManagementProps {
   onUpdateFkRelations: (relations: ForeignKey[]) => void
 }
 
-const ColumnManagement = ({
+export const ColumnManagement = ({
   table,
   columns = [],
   relations,
@@ -114,28 +122,37 @@ const ColumnManagement = ({
     onColumnsUpdated(updatedColumns)
   }
 
-  const onSortColumns = (result: any, type: 'pks' | 'others') => {
+  const onSortColumns = (result: DragEndEvent, type: 'pks' | 'others') => {
     // Dropped outside of the list
-    if (!result.destination) {
+    if (result.over == null) {
       return
     }
 
     if (type === 'pks') {
-      const updatedPrimaryKeyColumns = primaryKeyColumns.slice()
-      const [removed] = updatedPrimaryKeyColumns.splice(result.source.index, 1)
-      updatedPrimaryKeyColumns.splice(result.destination.index, 0, removed)
+      const activeIndex = primaryKeyColumns.findIndex((item) => item.id === result.active.id)
+      const overIndex = primaryKeyColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
+      const updatedPrimaryKeyColumns = arrayMove(primaryKeyColumns, activeIndex, overIndex)
       const updatedColumns = updatedPrimaryKeyColumns.concat(otherColumns)
       return onColumnsUpdated(updatedColumns)
     }
 
     if (type === 'others') {
-      const updatedOtherColumns = otherColumns.slice()
-      const [removed] = updatedOtherColumns.splice(result.source.index, 1)
-      updatedOtherColumns.splice(result.destination.index, 0, removed)
+      const activeIndex = otherColumns.findIndex((item) => item.id === result.active.id)
+      const overIndex = otherColumns.findIndex((item) => item.id === result.over!.id)
+      if (activeIndex === -1 || overIndex === -1) return
+      const updatedOtherColumns = arrayMove(otherColumns, activeIndex, overIndex)
       const updatedColumns = primaryKeyColumns.concat(updatedOtherColumns)
       return onColumnsUpdated(updatedColumns)
     }
   }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   return (
     <>
@@ -258,89 +275,71 @@ const ColumnManagement = ({
           </div>
 
           {primaryKeyColumns.length > 0 && (
-            <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'pks')}>
-              <Droppable droppableId="pk_columns_droppable">
-                {(droppableProvided: DroppableProvided) => (
-                  <div
-                    ref={droppableProvided.innerRef}
-                    className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
-                      isNewRecord ? '' : '-mx-3'
-                    }`}
-                  >
-                    {primaryKeyColumns.map((column: ColumnField, index: number) => (
-                      <Draggable key={column.id} draggableId={column.id} index={index}>
-                        {(draggableProvided: DraggableProvided) => (
-                          <div
-                            ref={draggableProvided.innerRef}
-                            {...draggableProvided.draggableProps}
-                          >
-                            <Column
-                              column={column}
-                              relations={relations.filter((relation) => {
-                                return relation.columns.some((x) => x.source === column.name)
-                              })}
-                              enumTypes={enumTypes}
-                              hasForeignKeys={checkIfHaveForeignKeys(column)}
-                              isNewRecord={isNewRecord}
-                              hasImportContent={hasImportContent}
-                              dragHandleProps={draggableProvided.dragHandleProps}
-                              onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
-                              onRemoveColumn={() => onRemoveColumn(column)}
-                              onEditForeignKey={(fk) => {
-                                setOpen(true)
-                                setSelectedColumn(column)
-                                if (fk) setSelectedFk(fk)
-                              }}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {droppableProvided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
-
-          <DragDropContext onDragEnd={(result: any) => onSortColumns(result, 'others')}>
-            <Droppable droppableId="other_columns_droppable">
-              {(droppableProvided: DroppableProvided) => (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(result) => onSortColumns(result, 'pks')}
+            >
+              <SortableContext items={primaryKeyColumns} strategy={verticalListSortingStrategy}>
                 <div
-                  ref={droppableProvided.innerRef}
-                  className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}
+                  className={`space-y-2 rounded-md bg-surface-200 px-3 py-2 ${
+                    isNewRecord ? '' : '-mx-3'
+                  }`}
                 >
-                  {otherColumns.map((column: ColumnField, index: number) => (
-                    <Draggable key={column.id} draggableId={column.id} index={index}>
-                      {(draggableProvided: DraggableProvided) => (
-                        <div ref={draggableProvided.innerRef} {...draggableProvided.draggableProps}>
-                          <Column
-                            column={column}
-                            relations={relations.filter((relation) => {
-                              return relation.columns.some((x) => x.source === column.name)
-                            })}
-                            enumTypes={enumTypes}
-                            isNewRecord={isNewRecord}
-                            hasForeignKeys={checkIfHaveForeignKeys(column)}
-                            hasImportContent={hasImportContent}
-                            dragHandleProps={draggableProvided.dragHandleProps}
-                            onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
-                            onRemoveColumn={() => onRemoveColumn(column)}
-                            onEditForeignKey={(fk) => {
-                              setOpen(true)
-                              setSelectedColumn(column)
-                              if (fk) setSelectedFk(fk)
-                            }}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
+                  {primaryKeyColumns.map((column: ColumnField, index: number) => (
+                    <Column
+                      key={column.id}
+                      column={column}
+                      relations={relations.filter((relation) => {
+                        return relation.columns.some((x) => x.source === column.name)
+                      })}
+                      enumTypes={enumTypes}
+                      hasForeignKeys={checkIfHaveForeignKeys(column)}
+                      isNewRecord={isNewRecord}
+                      hasImportContent={hasImportContent}
+                      onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
+                      onRemoveColumn={() => onRemoveColumn(column)}
+                      onEditForeignKey={(fk) => {
+                        setOpen(true)
+                        setSelectedColumn(column)
+                        if (fk) setSelectedFk(fk)
+                      }}
+                    />
                   ))}
-                  {droppableProvided.placeholder}
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+              </SortableContext>
+            </DndContext>
+          )}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(result) => onSortColumns(result, 'others')}
+          >
+            <SortableContext items={otherColumns} strategy={verticalListSortingStrategy}>
+              <div className={`space-y-2 py-2 ${isNewRecord ? 'px-3 ' : ''}`}>
+                {otherColumns.map((column: ColumnField, index: number) => (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    relations={relations.filter((relation) => {
+                      return relation.columns.some((x) => x.source === column.name)
+                    })}
+                    enumTypes={enumTypes}
+                    isNewRecord={isNewRecord}
+                    hasForeignKeys={checkIfHaveForeignKeys(column)}
+                    hasImportContent={hasImportContent}
+                    onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
+                    onRemoveColumn={() => onRemoveColumn(column)}
+                    onEditForeignKey={(fk) => {
+                      setOpen(true)
+                      setSelectedColumn(column)
+                      if (fk) setSelectedFk(fk)
+                    }}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         {!hasImportContent && (
@@ -379,5 +378,3 @@ const ColumnManagement = ({
     </>
   )
 }
-
-export default ColumnManagement

@@ -8,6 +8,7 @@ import {
 } from '@heroicons/react/outline'
 import { Activity, Lock } from 'lucide-react'
 import Layout from '../layouts/Layout'
+import SecurityNewsletterForm from '~/components/SecurityNewsletterForm'
 
 export const meta = {
   type: 'lp',
@@ -144,6 +145,10 @@ In addition to protection at the CDN level via Cloudflare, we employ [fail2ban](
 
 </div>
 
+</div>
+
+<div className="container mx-auto px-8 sm:px-16 xl:px-20 mb-16">
+  <SecurityNewsletterForm />
 </div>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />

@@ -1,11 +1,11 @@
 import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
-import { ComponentProps, useEffect, useState } from 'react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   Bar,
   CartesianGrid,
+  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -14,11 +14,10 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-  Customized,
 } from 'recharts'
-
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
+
 import { ChartHeader } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
@@ -29,7 +28,13 @@ import {
   updateStackedChartColors,
 } from './Charts.constants'
 import { CommonChartProps, Datum } from './Charts.types'
-import { numberFormatter, useChartSize } from './Charts.utils'
+import {
+  computeYAxisDomain,
+  formatPercentage,
+  normalizeStackedSeriesData,
+  numberFormatter,
+  useChartSize,
+} from './Charts.utils'
 import {
   calculateTotalChartAggregate,
   CustomLabel,
@@ -39,6 +44,7 @@ import {
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
@@ -71,6 +77,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   sql?: string
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
+  normalizeVisibleStackToPercent?: boolean
 }
 
 interface CustomizedDotProps {
@@ -130,12 +137,12 @@ export function ComposedChart({
   highlightActions,
   titleTooltip,
   showNewBadge,
+  normalizeVisibleStackToPercent = false,
 }: ComposedChartProps) {
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
   )
-  const [_activePayload, setActivePayload] = useState<any>(null)
   const [_showMaxValue, setShowMaxValue] = useState(showMaxValue)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
@@ -173,6 +180,15 @@ export function ComposedChart({
     tick: false,
     width: 0,
   }
+  const yAxisPadding = useMemo(() => {
+    const needsTopPadding = normalizeVisibleStackToPercent && chartStyle !== 'bar'
+    if (!needsTopPadding) return _YAxisProps.padding
+
+    return {
+      ..._YAxisProps.padding,
+      top: Math.max(8, _YAxisProps.padding?.top ?? 0),
+    }
+  }, [_YAxisProps.padding, chartStyle, normalizeVisibleStackToPercent])
 
   function getHeaderLabel() {
     if (!xAxisIsDate) {
@@ -191,8 +207,29 @@ export function ComposedChart({
     )
   }
 
+  function formatHighlightedValue(value: any) {
+    if (typeof value !== 'number') {
+      return value
+    }
+
+    if (shouldFormatBytes) {
+      const bytesValue = isNetworkChart ? Math.abs(value) : value
+      const formatted = formatBytes(bytesValue, valuePrecision)
+      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
+    }
+
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
+    if (valuePrecision === 0 && value > 0 && value < 1) {
+      return '<1'
+    }
+
+    return numberFormatter(value, valuePrecision)
+  }
+
   function computeHighlightedValue() {
-    const maxAttribute = attributes.find((a) => a.isMaxValue)
     const referenceLines = attributes.filter(
       (attribute) => attribute?.provider === 'reference-line'
     )
@@ -221,8 +258,24 @@ export function ComposedChart({
       : undefined
 
     if (focusDataIndex !== null) {
+      const focusedDataPoint = data[focusDataIndex]
+        ? Object.entries(data[focusDataIndex])
+            .map(([key, value]) => ({
+              dataKey: key,
+              value: value as number,
+            }))
+            .filter(
+              (entry) =>
+                entry.dataKey !== 'timestamp' &&
+                entry.dataKey !== 'period_start' &&
+                attributes.some(
+                  (attr) => attr.attribute === entry.dataKey && attr.enabled !== false
+                )
+            )
+        : undefined
+
       return showTotal
-        ? calculateTotalChartAggregate(_activePayload, attributesToIgnoreFromTotal)
+        ? calculateTotalChartAggregate(focusedDataPoint ?? [], attributesToIgnoreFromTotal)
         : data[focusDataIndex]?.[yAxisKey]
     }
 
@@ -231,24 +284,6 @@ export function ComposedChart({
     }
 
     return highlightedValue
-  }
-
-  function formatHighlightedValue(value: any) {
-    if (typeof value !== 'number') {
-      return value
-    }
-
-    if (shouldFormatBytes) {
-      const bytesValue = isNetworkChart ? Math.abs(value) : value
-      const formatted = formatBytes(bytesValue, valuePrecision)
-      return format === 'bytes-per-second' ? `${formatted}/s` : formatted
-    }
-
-    if (valuePrecision === 0 && value > 0 && value < 1) {
-      return '<1'
-    }
-
-    return numberFormatter(value, valuePrecision)
   }
 
   const maxAttribute = attributes.find((a) => a.isMaxValue)
@@ -307,7 +342,22 @@ export function ComposedChart({
     const attribute = attributes.find((attr) => attr.attribute === att.name)
     return !attribute?.isMaxValue
   })
-  const visibleAttributes = stackedAttributes.filter((att) => !hiddenAttributes.has(att.name))
+
+  const visibleAttributes = useMemo(
+    () => stackedAttributes.filter((att) => !hiddenAttributes.has(att.name)),
+    [stackedAttributes, hiddenAttributes]
+  )
+  const displayData = useMemo(
+    () =>
+      normalizeVisibleStackToPercent
+        ? normalizeStackedSeriesData({
+            data,
+            attributeNames: visibleAttributes.map((attribute) => attribute.name),
+          })
+        : data,
+    [data, normalizeVisibleStackToPercent, visibleAttributes]
+  )
+
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
@@ -322,16 +372,32 @@ export function ComposedChart({
   const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
   const shouldFormatBytes =
     isBytesFormat || isRamChart || isDiskSpaceChart || isDBSizeChart || isNetworkChart
-  //*
-  // Set the y-axis domain
-  // to the highest value in the chart data for percentage charts
-  // to vertically zoom in on the data
-  // */
   const yMaxFromVisible = Math.max(
     0,
     ...visibleAttributes.map((att) => (typeof att.value === 'number' ? att.value : 0))
   )
-  const yDomain = [0, yMaxFromVisible]
+
+  const yAxisDomain = useMemo(
+    () =>
+      computeYAxisDomain({
+        isPercentage,
+        showMaxValue,
+        yMaxFromVisible,
+        maxAttributeKey: maxAttribute?.attribute,
+        showMaxLine: _showMaxValue,
+        data,
+        visibleAttributeNames: visibleAttributes.map((a) => a.name),
+      }),
+    [
+      isPercentage,
+      showMaxValue,
+      yMaxFromVisible,
+      maxAttribute,
+      _showMaxValue,
+      data,
+      visibleAttributes,
+    ]
+  )
 
   if (data.length === 0) {
     return (
@@ -382,30 +448,31 @@ export function ComposedChart({
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={data}
+          data={displayData}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
-          onMouseMove={({ activeLabel, activeTooltipIndex, activePayload }) => {
-            if (!activeTooltipIndex) return
+          onMouseMove={({ activeLabel, activeTooltipIndex }) => {
+            if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
 
             setIsActiveHoveredChart(true)
             if (activeTooltipIndex !== focusDataIndex) {
               setFocusDataIndex(activeTooltipIndex)
-              setActivePayload(activePayload ?? [])
             }
 
             setHover(activeTooltipIndex)
 
-            const activeTimestamp = data[activeTooltipIndex]?.timestamp
+            const activeTimestamp =
+              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
               coordinates: activeLabel,
             })
           }}
           onMouseDown={({ activeLabel, activeTooltipIndex }) => {
-            if (!activeTooltipIndex) return
+            if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
 
-            const activeTimestamp = data[activeTooltipIndex]?.timestamp
+            const activeTimestamp =
+              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
               coordinates: activeLabel,
@@ -415,7 +482,6 @@ export function ComposedChart({
           onMouseLeave={() => {
             setIsActiveHoveredChart(false)
             setFocusDataIndex(null)
-            setActivePayload(null)
 
             clearHover()
           }}
@@ -430,7 +496,8 @@ export function ComposedChart({
             hide={hideYAxis}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
-            domain={isPercentage && !showMaxValue ? yDomain : ['auto', 'auto']}
+            domain={_YAxisProps.domain ?? yAxisDomain}
+            padding={yAxisPadding}
             key={yAxisKey}
           />
           <XAxis
@@ -441,6 +508,22 @@ export function ComposedChart({
             minTickGap={3}
             key={xAxisKey}
           />
+
+          <defs>
+            {visibleAttributes.map((attribute) => (
+              <linearGradient
+                key={`gradient-${attribute.name}`}
+                id={`gradient-${attribute.name}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={attribute.color} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={isDarkMode ? '#131313' : '#FFFFFF'} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
 
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
@@ -461,10 +544,10 @@ export function ComposedChart({
             : visibleAttributes.map((attribute, i) => (
                 <Area
                   key={attribute.name}
-                  type="step"
+                  type="linear"
                   dataKey={attribute.name}
                   stackId="1"
-                  fill={attribute.fill}
+                  fill={`url(#gradient-${attribute.name})`}
                   fillOpacity={1}
                   stroke={attribute.color}
                   radius={20}
@@ -480,7 +563,7 @@ export function ComposedChart({
           {maxAttribute && _showMaxValue && (
             <Line
               key={maxAttribute.attribute}
-              type="step"
+              type="linear"
               dataKey={maxAttribute.attribute}
               stroke={CHART_COLORS.REFERENCE_LINE}
               strokeWidth={2}
@@ -528,10 +611,12 @@ export function ComposedChart({
               showTooltip && !showHighlightActions ? (
                 <CustomTooltip
                   {...props}
+                  data={data}
                   format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}
                   attributes={attributes}
+                  xAxisKey={xAxisKey}
                   valuePrecision={valuePrecision}
                   showTotal={showTotal}
                   isActiveHoveredChart={

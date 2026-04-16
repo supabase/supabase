@@ -1,8 +1,8 @@
 import { type Table as TTable } from '@tanstack/react-table'
-
-import { LEVELS } from 'components/ui/DataTable/DataTable.constants'
 import { cn } from 'ui'
+
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
+import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
 export const logEventBus = {
   listeners: new Map<string, Set<(...args: any[]) => void>>(),

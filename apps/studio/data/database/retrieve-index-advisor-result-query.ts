@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
-import { filterProtectedSchemaIndexAdvisorResult } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetIndexAdvisorResultVariables = {
   projectRef?: string
@@ -15,10 +15,22 @@ export type GetIndexAdvisorResultVariables = {
 const IndexAdvisorResultSchema = z.object({
   errors: z.array(z.string()),
   index_statements: z.array(z.string()),
-  startup_cost_before: z.number(),
-  startup_cost_after: z.number(),
-  total_cost_before: z.number(),
-  total_cost_after: z.number(),
+  startup_cost_before: z
+    .number()
+    .nullable()
+    .transform((v) => v ?? 0),
+  startup_cost_after: z
+    .number()
+    .nullable()
+    .transform((v) => v ?? 0),
+  total_cost_before: z
+    .number()
+    .nullable()
+    .transform((v) => v ?? 0),
+  total_cost_after: z
+    .number()
+    .nullable()
+    .transform((v) => v ?? 0),
 })
 
 export type GetIndexAdvisorResultResponse = z.infer<typeof IndexAdvisorResultSchema>
@@ -35,20 +47,22 @@ export async function getIndexAdvisorResult({
   const { result: results } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from index_advisor('${escapedQuery}');`,
+    sql: `set search_path to public, extensions; select * from index_advisor('${escapedQuery}');`,
   })
 
   if (!results || results.length === 0) {
-    throw new Error('Index advisor returned no results')
+    console.error('[index_advisor > getIndexAdvisorResult] No results from index_advisor')
+    return null
   }
 
   const parsed = IndexAdvisorResultSchema.safeParse(results[0])
   if (!parsed.success) {
     const firstError = parsed.error.errors[0]
     const errorPath = firstError.path.length > 0 ? ` at path: ${firstError.path.join('.')}` : ''
-    throw new Error(
+    console.error(
       `Invalid index advisor response${errorPath}: ${firstError.message}. Received: ${JSON.stringify(results[0])}`
     )
+    return null
   }
 
   return filterProtectedSchemaIndexAdvisorResult(parsed.data)
@@ -63,16 +77,20 @@ export const useGetIndexAdvisorResult = <TData = GetIndexAdvisorResultData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData> = {}
-) =>
-  useQuery<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData>({
+) => {
+  const formattedQuery = (query ?? '').trim().toLowerCase()
+  const isValidQueryForIndexing =
+    formattedQuery.startsWith('select') || formattedQuery.startsWith('with pgrst_source')
+
+  return useQuery<GetIndexAdvisorResultData, GetIndexAdvisorResultError, TData>({
     queryKey: databaseKeys.indexAdvisorFromQuery(projectRef, query),
     queryFn: () => getIndexAdvisorResult({ projectRef, connectionString, query }),
     retry: false,
     enabled:
-      (enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof query !== 'undefined' &&
-        (query.startsWith('select') || query.startsWith('SELECT'))) ||
-      (typeof query === 'string' && query.trim().toLowerCase().startsWith('with pgrst_source')),
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof query !== 'undefined' &&
+      isValidQueryForIndexing,
     ...options,
   })
+}

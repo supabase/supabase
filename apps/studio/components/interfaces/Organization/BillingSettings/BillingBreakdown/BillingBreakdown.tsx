@@ -1,23 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-
 import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { UpcomingInvoice } from './UpcomingInvoice'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import SparkBar from 'components/ui/SparkBar'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import UpcomingInvoice from './UpcomingInvoice'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import SparkBar from '@/components/ui/SparkBar'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
@@ -79,14 +79,15 @@ const BillingBreakdown = () => {
 
                 <p>
                   For a more detailed breakdown, visit the{' '}
-                  <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+                  <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
                 </p>
               </>
             ) : (
               <>
                 Your upcoming invoice (excluding credits) will continue to update until the end of
                 your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
-                breakdown, visit the <Link href={`/org/${orgSlug}/usage`}>usage page.</Link>
+                breakdown, visit the{' '}
+                <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
               </>
             )}
           </p>

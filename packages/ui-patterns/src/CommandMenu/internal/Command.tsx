@@ -1,11 +1,13 @@
 'use client'
 
-import { type PropsWithChildren, forwardRef } from 'react'
-import { CommandItem_Shadcn_, cn } from 'ui'
-import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { forwardRef, type PropsWithChildren } from 'react'
+import { cn, CommandItem_Shadcn_ } from 'ui'
+
 import { useCommandMenuTelemetryContext } from '../api/hooks/useCommandMenuTelemetryContext'
-import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
-import type { ICommand, IActionCommand, IRouteCommand } from './types'
+import { useCrossCompatRouter } from '../api/hooks/useCrossCompatRouter'
+import { useQuery } from '../api/hooks/queryHooks'
+import { useResetCommandMenu, useSetCommandMenuOpen } from '../api/hooks/viewHooks'
+import type { IActionCommand, ICommand, IRouteCommand } from './types'
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
 const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
@@ -18,7 +20,7 @@ const generateCommandClassNames = (isLink: boolean) =>
     'rounded-md',
     'text-sm',
     'group',
-    'py-3',
+    'py-2 md:py-3',
     'text-foreground-light',
     'relative',
     'flex',
@@ -53,7 +55,9 @@ const CommandItem = forwardRef<
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
+  const resetCommandMenu = useResetCommandMenu()
   const telemetryContext = useCommandMenuTelemetryContext()
+  const query = useQuery()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
@@ -66,6 +70,8 @@ const CommandItem = forwardRef<
           command_name: command.name,
           command_value: command.value,
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
+          search_query: query || undefined,
+          result_path: isRouteCommand(command) ? command.route : undefined,
           app: telemetryContext.app,
         },
         groups: {},
@@ -81,6 +87,7 @@ const CommandItem = forwardRef<
       if (command.route.startsWith('http')) {
         setIsOpen(false)
         window.open(command.route, '_blank', 'noreferrer,noopener')
+        resetCommandMenu()
       } else {
         router.push(command.route)
       }

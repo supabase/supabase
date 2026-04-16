@@ -1,30 +1,9 @@
+import { useParams } from 'common'
 import { ExternalLink, Search, X } from 'lucide-react'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import React, { useMemo } from 'react'
-
-import { useParams } from 'common'
-import { DeployEdgeFunctionButton } from 'components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
-import {
-  EDGE_FUNCTIONS_SORT_VALUES,
-  EdgeFunctionsSort,
-  EdgeFunctionsSortColumn,
-  EdgeFunctionsSortDropdown,
-  EdgeFunctionsSortOrder,
-} from 'components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
-import { EdgeFunctionsListItem } from 'components/interfaces/Functions/EdgeFunctionsListItem'
-import {
-  FunctionsEmptyState,
-  FunctionsEmptyStateLocal,
-} from 'components/interfaces/Functions/FunctionsEmptyState'
-import { TerminalInstructionsDialog } from 'components/interfaces/Functions/TerminalInstructionsDialog'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { DOCS_URL, IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -38,8 +17,40 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { DeployEdgeFunctionButton } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionButton'
+import {
+  EDGE_FUNCTIONS_SORT_VALUES,
+  EdgeFunctionsSort,
+  EdgeFunctionsSortColumn,
+  EdgeFunctionsSortDropdown,
+  EdgeFunctionsSortOrder,
+} from '@/components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
+import { EdgeFunctionsListItem } from '@/components/interfaces/Functions/EdgeFunctionsListItem'
+import {
+  FunctionsEmptyState,
+  FunctionsInstructionsLocal,
+} from '@/components/interfaces/Functions/FunctionsEmptyState'
+import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
+
 const EdgeFunctionsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
+  const showEdgeFunctionsRequestMetrics = usePHFlag<boolean>('edgeFunctionsRequestMetrics') === true
+  const showLastHourStats = IS_PLATFORM && showEdgeFunctionsRequestMetrics
+
+  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
+  const [sort, setSortQueryParam] = useQueryState(
+    'sort',
+    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
+  )
+
   const {
     data: functions,
     error,
@@ -47,12 +58,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isError,
     isSuccess,
   } = useEdgeFunctionsQuery({ projectRef: ref })
-
-  const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
-  const [sort, setSortQueryParam] = useQueryState(
-    'sort',
-    parseAsStringLiteral<EdgeFunctionsSort>(EDGE_FUNCTIONS_SORT_VALUES).withDefault('name:asc')
-  )
 
   const filteredFunctions = useMemo(() => {
     const temp = (functions ?? []).filter((x) =>
@@ -84,84 +89,102 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent>
-          {IS_PLATFORM ? (
-            <>
-              {isLoading && <GenericSkeletonLoader />}
-              {isError && <AlertError error={error} subject="Failed to retrieve edge functions" />}
-              {isSuccess && (
-                <>
-                  {hasFunctions ? (
-                    <div className="space-y-4">
+          <div className="flex flex-col gap-6">
+            {isLoading && <GenericSkeletonLoader />}
+            {isError &&
+              (IS_PLATFORM ? (
+                <AlertError error={error} subject="Failed to retrieve edge functions" />
+              ) : (
+                <Admonition type="warning" title="Failed to retrieve edge functions">
+                  <p className="prose [&>code]:text-xs text-sm">
+                    Local functions can be found at <code>supabase/functions</code> folder.
+                  </p>
+                </Admonition>
+              ))}
+            {isSuccess && (
+              <>
+                {hasFunctions ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="relative">
-                            <Input
-                              placeholder="Search function names"
-                              icon={<Search />}
-                              size="tiny"
-                              className="w-32 md:w-64"
-                              value={search}
-                              onChange={(event) => setSearch(event.target.value)}
-                              actions={[
-                                search && (
-                                  <Button
-                                    size="tiny"
-                                    type="text"
-                                    icon={<X />}
-                                    onClick={() => setSearch('')}
-                                    className="p-0 h-5 w-5"
-                                  />
-                                ),
-                              ]}
-                            />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
+                        <div className="relative">
+                          <Input
+                            placeholder="Search function names"
+                            icon={<Search />}
+                            size="tiny"
+                            className="w-32 md:w-64"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            actions={[
+                              search && (
+                                <Button
+                                  key="clear"
+                                  size="tiny"
+                                  type="text"
+                                  icon={<X />}
+                                  onClick={() => setSearch('')}
+                                  className="p-0 h-5 w-5"
+                                />
+                              ),
+                            ]}
+                          />
                         </div>
                       </div>
-                      <Card>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>URL</TableHead>
-                              <TableHead className="hidden 2xl:table-cell">Created</TableHead>
-                              <TableHead className="lg:table-cell">Updated</TableHead>
-                              <TableHead className="lg:table-cell">Deployments</TableHead>
-                            </TableRow>
-                          </TableHeader>
-
-                          <TableBody>
-                            <>
-                              {filteredFunctions.length > 0 ? (
-                                filteredFunctions.map((item) => (
-                                  <EdgeFunctionsListItem key={item.id} function={item} />
-                                ))
-                              ) : (
-                                <TableRow>
-                                  <TableCell colSpan={5}>
-                                    <p className="text-sm text-foreground">No results found</p>
-                                    <p className="text-sm text-foreground-light">
-                                      Your search for "{search}" did not return any results
-                                    </p>
-                                  </TableCell>
-                                </TableRow>
-                              )}
-                            </>
-                          </TableBody>
-                        </Table>
-                      </Card>
+                      <div className="flex items-center gap-2">
+                        <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
+                      </div>
+                      <span className="border-l border-default pl-2 text-xs text-foreground-light">
+                        {search && filteredFunctions.length !== functions.length
+                          ? `Viewing ${filteredFunctions.length} of ${functions.length} functions in total`
+                          : `Viewing ${functions.length} ${functions.length === 1 ? 'function' : 'functions'} in total`}
+                      </span>
                     </div>
-                  ) : (
-                    <FunctionsEmptyState />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <FunctionsEmptyStateLocal />
-          )}
+                    <Card>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>URL</TableHead>
+                            <TableHead className="hidden 2xl:table-cell">Created</TableHead>
+                            <TableHead className="lg:table-cell">Updated</TableHead>
+                            {showLastHourStats && (
+                              <>
+                                <TableHead className="lg:table-cell">Total requests (1h)</TableHead>
+                                <TableHead className="lg:table-cell">5xx error rate (1h)</TableHead>
+                              </>
+                            )}
+                            <TableHead className="hidden 2xl:table-cell">Deployments</TableHead>
+                          </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                          <>
+                            {filteredFunctions.length > 0 ? (
+                              filteredFunctions.map((item) => (
+                                <EdgeFunctionsListItem key={item.id} function={item} />
+                              ))
+                            ) : (
+                              <TableRow>
+                                <TableCell colSpan={showLastHourStats ? 7 : 5}>
+                                  <p className="text-sm text-foreground">No results found</p>
+                                  <p className="text-sm text-foreground-light">
+                                    Your search for "{search}" did not return any results
+                                  </p>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </>
+                        </TableBody>
+                      </Table>
+                    </Card>
+                  </div>
+                ) : (
+                  <FunctionsEmptyState />
+                )}
+              </>
+            )}
+            {!IS_PLATFORM && <FunctionsInstructionsLocal />}
+          </div>
         </PageSectionContent>
       </PageSection>
     </PageContainer>
@@ -171,7 +194,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
 EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="Edge Functions">
         <div className="w-full min-h-full flex flex-col items-stretch">
           <PageHeader size="large">
             <PageHeaderMeta>

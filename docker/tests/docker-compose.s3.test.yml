@@ -1,0 +1,13 @@
+# Test overlay: exposes the S3 backend port for direct testing.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.s3.yml \
+#     -f ./tests/docker-compose.s3.test.yml up -d
+#
+# When swapping to a different S3 backend (e.g. RustFS), update the
+# service name and internal port to match the new backend.
+
+services:
+  minio:
+    ports:
+      - "${S3_BACKEND_TEST_PORT:-9100}:9000"

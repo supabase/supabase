@@ -1,5 +1,6 @@
 import lodash from 'lodash'
 import type { RegistryItem } from 'shadcn/schema'
+
 const { uniq, uniqBy } = lodash
 
 const registryItemAppend = (item: RegistryItem, items: RegistryItem[]) => {

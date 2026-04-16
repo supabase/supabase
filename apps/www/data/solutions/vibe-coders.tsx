@@ -1,5 +1,10 @@
-import { Timer, Zap, CheckCircle, Check, Sparkles } from 'lucide-react'
-import { Button, Image } from 'ui'
+import { useBreakpoint } from 'common'
+import { Check, CheckCircle, Sparkles, Timer, Zap } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
+
+import MainProducts from '../MainProducts'
 import type {
   FeaturesSection,
   HeroSection,
@@ -7,14 +12,9 @@ import type {
   PostGridProps,
   Quotes,
 } from './solutions.utils'
-import dynamic from 'next/dynamic'
-
-import MainProducts from '../MainProducts'
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { frameworks } from 'components/Hero/HeroFrameworks'
 import { FrameworkLink, getEditors } from './solutions.utils'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-import { useBreakpoint } from 'common'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const ComputePricingCalculator = dynamic(

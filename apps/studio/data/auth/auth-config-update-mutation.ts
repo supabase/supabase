@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, patch } from 'data/fetchers'
-import { lintKeys } from 'data/lint/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { authKeys } from './keys'
+import type { components } from '@/data/api'
+import { handleError, patch } from '@/data/fetchers'
+import { lintKeys } from '@/data/lint/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type AuthConfigUpdateVariables = {
   projectRef: string
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
+  skipInvalidation?: boolean
 }
 
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
@@ -41,11 +42,16 @@ export const useAuthConfigUpdateMutation = ({
   return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
     mutationFn: (vars) => updateAuthConfig(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { projectRef, skipInvalidation = false } = variables
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
+        !skipInvalidation &&
+          queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
         queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
+      await queryClient.refetchQueries({
+        queryKey: lintKeys.lint(projectRef),
+        type: 'active',
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

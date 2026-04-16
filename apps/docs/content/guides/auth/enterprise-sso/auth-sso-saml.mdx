@@ -195,7 +195,8 @@ To initiate a sign-in request from your application's user interface (i.e. the S
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 supabase.auth.signInWithSSO({
@@ -334,7 +335,55 @@ Most SAML 2.0 identity providers use Lightweight Directory Access Protocol (LDAP
 
 The stored attributes, once mapped, show up in the access token (a JWT) of the user. If you need to look these values up in the database, you can find them in the `auth.identities` table under the `identity_data` JSON column. Identities created for SSO providers have `sso:<uuid-of-provider>` in the `provider` column, while `id` contains the unique `NameID` of the user account.
 
-Furthermore, you can find the same identity data under `raw_app_meta_data` inside `auth.users`.
+Furthermore, you can find the same identity data under `raw_user_meta_data` inside `auth.users`.
+
+**Advanced attribute mapping**
+
+If the SAML assertion contains multiple values for a key, such as the groups that the user has access to, only the first one will be picked up. To change this behavior, mark the key as an array. For example this attribute mapping:
+
+```json
+{
+  "keys": {
+    "groups": {
+      "name": "groups",
+      "array": true
+    }
+  }
+}
+```
+
+Will result in the following claims:
+
+```json
+{
+  "groups": ["group-a", "group-b", "group-c"]
+}
+```
+
+You can also specify a default value for a key that may be missing in the SAML assertion.
+
+```json
+{
+  "keys": {
+    "custom_claim": {
+      "name": "custom_claim",
+      "default": 123
+    }
+  }
+}
+```
+
+Some SAML Assertions may expose the same attribute under different names for different users. In this case instead of specifying a single name to look up the value, you can specify multiple names. These will be looked at in-order until a value is found:
+
+```json
+{
+  "keys": {
+    "custom_claim": {
+      "names": ["first-look-for-this-attribute", "then-this-one"]
+    }
+  }
+}
+```
 
 ### Remove a connection
 
@@ -439,7 +488,8 @@ Yes, also referred to as [cross-origin authentication within the same site](http
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithSSO({
@@ -458,6 +508,7 @@ When redirecting to a URL other than the Site URL, a `/callback` endpoint is nec
 
 ```ts
 import { error, redirect } from '@sveltejs/kit'
+
 import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ url, locals }) => {

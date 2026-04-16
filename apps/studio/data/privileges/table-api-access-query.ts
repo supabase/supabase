@@ -1,15 +1,15 @@
 import { useMemo } from 'react'
 
-import type { ConnectionVars } from 'data/common.types'
-import { useIsSchemaExposed } from 'hooks/misc/useIsSchemaExposed'
-import { isApiAccessRole, isApiPrivilegeType, type ApiPrivilegesByRole } from 'lib/data-api-types'
-import type { Prettify } from 'lib/type-helpers'
-import type { UseCustomQueryOptions } from 'types'
 import {
   useTablePrivilegesQuery,
   type TablePrivilegesData,
   type TablePrivilegesError,
 } from './table-privileges-query'
+import type { ConnectionVars } from '@/data/common.types'
+import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
+import { isApiAccessRole, isApiPrivilegeType, type ApiPrivilegesByRole } from '@/lib/data-api-types'
+import type { Prettify } from '@/lib/type-helpers'
+import type { UseCustomQueryOptions } from '@/types'
 
 // The contents of this array are never used, so any will allow
 // it to be used anywhere an array of any type is required.
@@ -23,6 +23,7 @@ const getApiPrivilegesByRole = (
   const privilegesByRole: ApiPrivilegesByRole = {
     anon: [],
     authenticated: [],
+    service_role: [],
   }
 
   privileges.forEach((privilege) => {
@@ -175,11 +176,17 @@ export const useTableApiAccessQuery = (
         return
       }
 
-      const tablePrivileges = tablePrivilegesByName[tableName] ?? { anon: [], authenticated: [] }
-      const hasAnonOrAuthenticatedPrivileges =
-        tablePrivileges.anon.length > 0 || tablePrivileges.authenticated.length > 0
+      const tablePrivileges = tablePrivilegesByName[tableName] ?? {
+        anon: [],
+        authenticated: [],
+        service_role: [],
+      }
+      const hasApiPrivileges =
+        tablePrivileges.anon.length > 0 ||
+        tablePrivileges.authenticated.length > 0 ||
+        tablePrivileges.service_role.length > 0
 
-      resultData[tableName] = hasAnonOrAuthenticatedPrivileges
+      resultData[tableName] = hasApiPrivileges
         ? {
             apiAccessType: 'access',
             privileges: tablePrivileges,

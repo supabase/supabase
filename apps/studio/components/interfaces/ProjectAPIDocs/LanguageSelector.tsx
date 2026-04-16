@@ -1,17 +1,18 @@
-import { BASE_PATH } from 'lib/constants'
-import { Terminal, ChevronDown } from 'lucide-react'
+import { ChevronDown, Terminal } from 'lucide-react'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  Command_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  Command_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
 } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface LanguageSelectorProps {
   /**

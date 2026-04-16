@@ -1,0 +1,31 @@
+---
+title = "'Get detailed Storage metrics with the AWS CLI'"
+topics = [ "cli", "storage", "studio" ]
+keywords = []
+database_id = "2c33968e-26c0-4613-aee1-5de36d068394"
+---
+
+Supabase Studio primarily lists the current objects within your buckets. You can use standard S3 tooling such as the AWS CLI to review your Supabase project's Storage usage, or perform operations on the bucket contents.
+
+## How to get detailed storage metrics
+
+This guide makes use of the official [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). You need to install it locally on your computer in order to follow the next steps.
+
+1.  **Retrieve Credentials:** Generate an Access Key pair (Access key ID and Secret access key) and locate the Storage endpoint in your project's [Storage Configuration](/dashboard/project/_/storage/s3). Note that the Secret Access Key is only shown when creating a new Access Key.
+2.  **Identify the Endpoint and Region**: Find your project's Storage Endpoint and Region under the Connection section in [Storage Configuration](/dashboard/project/_/storage/s3)
+3.  **Configure AWS CLI:** You can configure access credentials with environment variables on your local terminal:
+    ```bash
+    export AWS_ACCESS_KEY_ID='<access-key-id>'
+    export AWS_SECRET_ACCESS_KEY='<secret-access-key>'
+    export AWS_DEFAULT_REGION='<storage-region>'
+    ```
+4.  **List Buckets:** Confirm your setup by listing your project's buckets:
+    ```bash
+    aws s3api list-buckets --endpoint-url <storage-endpoint-url>
+    ```
+5.  **Review Bucket contents and size:** Get a detailed view and sum of a specific bucket's contents:
+    ```bash
+    aws s3 ls s3://<example-bucket>/ --endpoint-url <storage-endpoint-url> --recursive --human-readable --summarize
+    ```
+
+In the above commands make sure to replace `<example-bucket>` and `<storage-endpoint-url>` with the actual details of your bucket.

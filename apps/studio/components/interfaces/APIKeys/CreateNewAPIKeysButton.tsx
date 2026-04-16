@@ -1,8 +1,6 @@
+import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useAPIKeyCreateMutation } from 'data/api-keys/api-key-create-mutation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +12,8 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
+
+import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()

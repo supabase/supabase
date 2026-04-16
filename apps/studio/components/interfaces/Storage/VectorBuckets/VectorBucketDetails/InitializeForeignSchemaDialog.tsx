@@ -1,21 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { formatWrapperTables } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { fdwKeys } from 'data/fdw/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -31,8 +20,21 @@ import {
   Input_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { getDecryptedParameters } from '../../Storage.utils'
+import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { formatWrapperTables } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { fdwKeys } from '@/data/fdw/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { isGreaterThanOrEqual } from '@/lib/semver'
 
 // Create foreign tables for vector bucket
 export const InitializeForeignSchemaDialog = () => {
@@ -45,6 +47,10 @@ export const InitializeForeignSchemaDialog = () => {
   const [isCreating, setIsCreating] = useState(false)
 
   const { data: wrapperInstance, meta: wrapperMeta } = useS3VectorsWrapperInstance({ bucketId })
+  const { extension: wrappersExtension } = useS3VectorsWrapperExtension()
+  const updatedImportForeignSchemaSyntax = !!wrappersExtension?.installed_version
+    ? isGreaterThanOrEqual(wrappersExtension.installed_version, '0.5.7')
+    : false
 
   const FormSchema = z.object({
     schema: z
@@ -107,9 +113,9 @@ export const InitializeForeignSchemaDialog = () => {
         projectRef,
         connectionString: project?.connectionString,
         serverName: wrapperInstance.server_name,
-        sourceSchema: values.schema,
+        sourceSchema: updatedImportForeignSchemaSyntax ? bucketId : values.schema,
         targetSchema: values.schema,
-        schemaOptions: [`bucket_name '${bucketId}'`],
+        schemaOptions: updatedImportForeignSchemaSyntax ? undefined : [`bucket_name '${bucketId}'`],
       })
 
       toast.success(

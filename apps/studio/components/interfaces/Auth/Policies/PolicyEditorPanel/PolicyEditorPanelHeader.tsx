@@ -1,18 +1,17 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import { useState } from 'react'
-
 import {
+  cn,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   SheetClose,
   SheetHeader,
   SheetTitle,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 export const PolicyEditorPanelHeader = ({
@@ -119,6 +118,7 @@ export const PolicyEditorPanelHeader = ({
             ) : (
               <PanelRightClose size={19} strokeWidth={1} />
             )}
+            <span className="sr-only">{showTools ? 'Hide' : 'Show'} tools</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">{showTools ? 'Hide' : 'Show'} tools</TooltipContent>

@@ -7,7 +7,10 @@ const Home = () => {
 
   const handleLogin = async (type, username, password) => {
     try {
-      const { error, data: { user } } =
+      const {
+        error,
+        data: { user },
+      } =
         type === 'LOGIN'
           ? await supabase.auth.signInWithPassword({ email: username, password })
           : await supabase.auth.signUp({ email: username, password })

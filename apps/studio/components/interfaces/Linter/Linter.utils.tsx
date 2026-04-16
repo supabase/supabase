@@ -12,11 +12,11 @@ import {
   User,
 } from 'lucide-react'
 import Link from 'next/link'
-
-import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
-import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { DOCS_URL } from 'lib/constants'
 import { Badge, Button } from 'ui'
+
+import { LINTER_LEVELS, LintInfo } from '@/components/interfaces/Linter/Linter.constants'
+import { Lint, LINT_TYPES } from '@/data/lint/lint-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -277,7 +277,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'leaked_service_key',
     title: 'Leaked Service Key Detected',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/settings/api`,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/api-keys`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/api/api-keys#the-servicerole-key`,
     category: 'security',
@@ -318,6 +318,18 @@ export const lintInfoMap: LintInfo[] = [
       `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0024_permissive_rls_policy`,
+    category: 'security',
+  },
+  {
+    name: 'public_bucket_allows_listing',
+    title: 'Public Bucket Allows Listing',
+    icon: <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) => {
+      const bucketId = (metadata as Record<string, string | undefined> | undefined)?.bucket_id
+      return `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId ?? metadata?.name ?? '')}`
+    },
+    linkText: 'View bucket',
+    docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0025_public_bucket_allows_listing`,
     category: 'security',
   },
 ]

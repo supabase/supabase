@@ -14,7 +14,7 @@ Grafana maintains a [Supabase integration guide](https://grafana.com/docs/grafan
 
 ## Prerequisites
 
-- A Supabase project with access to the Metrics API (service role key or another secret key).
+- A Supabase project with access to the Metrics API (Secret API key `sb_secret_...`).
 - A Grafana Cloud account with Prometheus metrics enabled (Free or Pro tier).
 - A Grafana API token with the `metrics:write` and `metrics:read` scopes if you plan to push data manually.
 
@@ -31,7 +31,7 @@ Grafana maintains a [Supabase integration guide](https://grafana.com/docs/grafan
 2. Provide:
    - Your Supabase project ref (e.g. `abcd1234`).
    - The Metrics API endpoint: `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`.
-   - HTTP Basic Auth credentials (`service_role` / `service_role key`).
+   - HTTP Basic Auth credentials (`service_role` / `sb_secret_...`).
 3. Choose the scrape interval (1 minute recommended) and test the connection. Grafana Cloud will deploy an agent in the background that scrapes the Metrics API and forwards the data to Prometheus.
 
 If you prefer to reuse an existing Grafana Agent deployment, configure an [integration pipeline](https://grafana.com/docs/grafana-cloud/send-data/agent/integrations/integration-reference/integration-supabase/) with the same URL and credentials.
@@ -56,6 +56,6 @@ The [`docs/example-alerts.md`](https://github.com/supabase/supabase-grafana/blob
 
 ## 5. Troubleshooting
 
-- Metrics missing? Ensure the Grafana Cloud agent can reach `https://<project-ref>.supabase.co` and that the selected service role key is still valid.
-- 401 errors? Rotate the service role key from the [API settings page](/dashboard/project/_/settings/api-keys) and update the Grafana Cloud credentials.
+- Metrics missing? Ensure the Grafana Cloud agent can reach `https://<project-ref>.supabase.co` and that the selected Secret API key is still valid.
+- 401 errors? Create/rotate a Secret API key in [Project Settings → API Keys](/dashboard/project/_/settings/api-keys) and update the Grafana Cloud credentials.
 - Long scrape durations? Reduce label cardinality in your Grafana queries or lower the time range to focus on recent data.

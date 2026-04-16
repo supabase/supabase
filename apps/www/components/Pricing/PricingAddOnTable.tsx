@@ -1,3 +1,5 @@
+'use client'
+
 import classNames from 'classnames'
 import { Fragment, useMemo, useState } from 'react'
 import { Collapsible } from 'ui'

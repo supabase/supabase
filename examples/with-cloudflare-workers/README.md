@@ -47,7 +47,7 @@ npx wrangler secret put SUPABASE_ANON_KEY
 **Query data from Supabase**
 
 ```javascript
-const { data } = await supabase.from("articles").select("*");
+const { data } = await supabase.from('articles').select('*')
 ```
 
 **Send JSON response**
@@ -55,9 +55,9 @@ const { data } = await supabase.from("articles").select("*");
 ```javascript
 return new Response(JSON.stringify(data), {
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
-});
+})
 ```
 
 ## Resources

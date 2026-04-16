@@ -1,23 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
-import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Alert,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   Card,
   CardContent,
@@ -28,14 +25,26 @@ import {
 } from 'ui'
 import {
   PageSection,
+  PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-  PageSectionContent,
 } from 'ui-patterns'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-const SSLConfiguration = () => {
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
+import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+
+export const SSLConfiguration = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isEnforced, setIsEnforced] = useState(false)
@@ -105,7 +114,7 @@ const SSLConfiguration = () => {
     <PageSection id="ssl-configuration">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>SSL Configuration</PageSectionTitle>
+          <PageSectionTitle>SSL configuration</PageSectionTitle>
         </PageSectionSummary>
         <DocsButton href={`${DOCS_URL}/guides/platform/ssl-enforcement`} />
       </PageSectionMeta>
@@ -117,40 +126,64 @@ const SSLConfiguration = () => {
               label="Enforce SSL on incoming connections"
               description="Reject non-SSL connections to your database"
             >
-              <div className="flex items-center justify-end mt-2.5 space-x-2">
-                {(isLoading || isSubmitting) && (
-                  <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-                )}
-                {isSuccess && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                      <div>
-                        <Switch
-                          size="large"
-                          checked={isEnforced}
-                          disabled={
-                            isLoading ||
-                            isSubmitting ||
-                            !canUpdateSSLEnforcement ||
-                            !hasAccessToSSLEnforcement
-                          }
-                          onCheckedChange={toggleSSLEnforcement}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
-                      <TooltipContent side="bottom" className="w-64 text-center">
-                        {!canUpdateSSLEnforcement
-                          ? 'You need additional permissions to update SSL enforcement for your project'
-                          : !hasAccessToSSLEnforcement
-                            ? 'Your project does not have access to SSL enforcement'
-                            : undefined}
-                      </TooltipContent>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <div className="flex items-center justify-end mt-2.5 space-x-2">
+                    {(isLoading || isSubmitting) && (
+                      <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
                     )}
-                  </Tooltip>
-                )}
-              </div>
+                    {isSuccess && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                          <div>
+                            <Switch
+                              size="large"
+                              checked={isEnforced}
+                              disabled={
+                                isLoading ||
+                                isSubmitting ||
+                                !canUpdateSSLEnforcement ||
+                                !hasAccessToSSLEnforcement
+                              }
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        {(!canUpdateSSLEnforcement || !hasAccessToSSLEnforcement) && (
+                          <TooltipContent side="bottom" className="w-64 text-center">
+                            {!canUpdateSSLEnforcement
+                              ? 'You need additional permissions to update SSL enforcement for your project'
+                              : !hasAccessToSSLEnforcement
+                                ? 'Your project does not have access to SSL enforcement'
+                                : undefined}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    )}
+                  </div>
+                </AlertDialogTrigger>
+                <AlertDialogContent size="medium">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Updating SSL enforcement involves a brief downtime
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      A database restart is required for SSL enforcement changes to take place, and
+                      this involves a few minutes of downtime. Confirm to proceed now?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      variant="warning"
+                      disabled={isSubmitting}
+                      onClick={toggleSSLEnforcement}
+                    >
+                      {!isEnforced ? 'Enable SSL' : 'Disable SSL'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </FormLayout>
             {isSuccess && !sslEnforcementConfiguration?.appliedSuccessfully && (
               <Alert
@@ -198,5 +231,3 @@ const SSLConfiguration = () => {
     </PageSection>
   )
 }
-
-export default SSLConfiguration

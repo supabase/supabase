@@ -61,7 +61,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/ui-patterns/ui-patterns',
+          href: '/docs/ui-patterns/introduction',
           items: [],
           priority: true,
         },
@@ -108,7 +108,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/fragments/fragment-components',
+          href: '/docs/fragments/introduction',
           items: [],
           priority: true,
         },
@@ -168,6 +168,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Error Display',
+          href: '/docs/fragments/error-display',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
@@ -202,6 +207,21 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/confirmation-modal',
           items: [],
         },
+        {
+          title: 'Status Codes',
+          href: '/docs/fragments/status-codes',
+          items: [],
+        },
+        {
+          title: 'Key/Value Field Array',
+          href: '/docs/fragments/key-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Single Value Field Array',
+          href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
       ],
     },
     {
@@ -210,7 +230,7 @@ export const docsConfig: DocsConfig = {
       items: [
         {
           title: 'Introduction',
-          href: '/docs/components/atom-components',
+          href: '/docs/components/introduction',
           items: [],
           priority: true,
         },
@@ -490,6 +510,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Expanding Textarea',
           href: '/docs/components/expanding-textarea',
+          items: [],
+        },
+        {
+          title: 'Keyboard Shortcut',
+          href: '/docs/components/keyboard-shortcut',
           items: [],
         },
       ],

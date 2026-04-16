@@ -10,6 +10,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+
 import { clearLocalStorage } from './constants/local-storage'
 import { gotrueClient, type User } from './gotrue'
 

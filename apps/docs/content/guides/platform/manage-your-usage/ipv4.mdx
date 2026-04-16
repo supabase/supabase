@@ -9,6 +9,12 @@ You can assign a dedicated [IPv4 address](/docs/guides/platform/ipv4-address) to
 
 <Admonition type="note">
 
+IPv4 Hours are **not** covered by the [Spend Cap](/docs/guides/platform/cost-control#spend-cap).
+
+</Admonition>
+
+<Admonition type="note">
+
 If the primary database has a dedicated IPv4 address configured, its Read Replicas are also assigned one, with charges for each.
 
 </Admonition>
@@ -92,6 +98,22 @@ The project has two Read Replicas and the IPv4 add-on enabled throughout the ent
 | **Subtotal**                  |       | **<Price price="82" />** |
 | Compute Credits               |       | -<Price price="10" />    |
 | **Total**                     |       | **<Price price="72" />** |
+
+### Add-on disabled after a day
+
+Project add-ons are billed in arrears based on how many hours you used them.
+If you remove the IPv4 add-on, you are no longer billed from the time of removal onward.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| IPv4 Hours Project 1          | 24    | <Price price="0.13" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="35.13" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="25.13" />** |
 
 ## Optimize usage
 

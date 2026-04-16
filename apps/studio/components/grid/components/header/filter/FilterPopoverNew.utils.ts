@@ -1,15 +1,14 @@
 import { format } from 'date-fns'
+import type { FilterProperty, OperatorDefinition } from 'ui-patterns'
 
-import type { SupaColumn } from 'components/grid/types'
+import type { Filter, SupaColumn } from '@/components/grid/types'
 import {
   isBoolColumn,
   isDateColumn,
   isDateTimeColumn,
   isEnumColumn,
   isTimeColumn,
-} from 'components/grid/utils/types'
-import type { FilterProperty } from 'ui-patterns'
-import { FilterOperatorOptions } from './Filter.constants'
+} from '@/components/grid/utils/types'
 
 // Check if column is a date/datetime/time type
 function isDateLikeColumn(column: SupaColumn): boolean {
@@ -18,29 +17,61 @@ function isDateLikeColumn(column: SupaColumn): boolean {
   )
 }
 
-const DEFAULT_OPERATORS = FilterOperatorOptions.map((op) => ({
-  value: op.value,
-  label: op.label,
-}))
-
-const STRING_OPERATORS = [
-  { value: '~~*', label: 'ilike operator' },
-  ...DEFAULT_OPERATORS.filter((op) => op.value !== '~~*'),
+const COMPARISON_OPERATORS: OperatorDefinition[] = [
+  { value: '=', label: 'Equals', group: 'comparison' },
+  { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: '>', label: 'Greater than', group: 'comparison' },
+  { value: '<', label: 'Less than', group: 'comparison' },
+  { value: '>=', label: 'Greater or equal', group: 'comparison' },
+  { value: '<=', label: 'Less or equal', group: 'comparison' },
 ]
 
-const DATE_OPERATORS = [
-  { value: '>', label: 'greater than' },
-  { value: '>=', label: 'greater than or equal' },
-  { value: '<', label: 'less than' },
-  { value: '<=', label: 'less than or equal' },
-  { value: '=', label: 'equals' },
-  { value: '<>', label: 'not equal' },
+const PATTERN_OPERATORS: OperatorDefinition[] = [
+  { value: '~~', label: 'Like', group: 'pattern' },
+  { value: '~~*', label: 'iLike', group: 'pattern' },
 ]
 
-const BOOLEAN_OPERATORS = [
-  { value: '=', label: 'equals' },
-  { value: '<>', label: 'not equal' },
+const SET_NULL_OPERATORS: OperatorDefinition[] = [
+  { value: 'in', label: 'In list', group: 'setNull' },
+  { value: 'is', label: 'Is', group: 'setNull' },
 ]
+
+const DEFAULT_OPERATORS: OperatorDefinition[] = [
+  ...COMPARISON_OPERATORS,
+  ...PATTERN_OPERATORS,
+  ...SET_NULL_OPERATORS,
+]
+
+const STRING_OPERATORS: OperatorDefinition[] = DEFAULT_OPERATORS
+
+const DATE_OPERATORS: OperatorDefinition[] = [
+  { value: '>', label: 'Greater than', group: 'comparison' },
+  { value: '>=', label: 'Greater or equal', group: 'comparison' },
+  { value: '<', label: 'Less than', group: 'comparison' },
+  { value: '<=', label: 'Less or equal', group: 'comparison' },
+  { value: '=', label: 'Equals', group: 'comparison' },
+  { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: 'is', label: 'Is', group: 'setNull' },
+]
+
+const BOOLEAN_OPERATORS: OperatorDefinition[] = [
+  { value: '=', label: 'Equals', group: 'comparison' },
+  { value: '<>', label: 'Not equal', group: 'comparison' },
+  { value: 'is', label: 'Is', group: 'setNull' },
+]
+
+export function isComplexValue(value: unknown): boolean {
+  return value !== null && value !== undefined && typeof value === 'object'
+}
+
+export function buildFilterFromCellValue(columnKey: string, value: unknown): Filter {
+  const isNullish = value === null || value === undefined
+  return {
+    column: columnKey,
+    operator: isNullish ? 'is' : '=',
+    value: isNullish ? 'null' : String(value),
+  }
+}
 
 export function columnToFilterProperty(column: SupaColumn): FilterProperty {
   // For enum columns, use the enum values as options

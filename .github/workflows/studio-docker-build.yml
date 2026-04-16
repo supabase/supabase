@@ -1,0 +1,36 @@
+name: Studio Docker Build
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  build:
+    name: 'Studio Docker Build'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            studio:
+              - 'packages/pg-meta/**'
+              - 'apps/studio/**'
+              - 'apps/ui-library/**'
+              - 'apps/design-system/**'
+              - 'e2e/studio/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/studio-e2e-test.yml'
+      - name: Build
+        if: steps.filter.outputs.studio == 'true'
+        run: docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --no-cache

@@ -20,4 +20,4 @@ npx http-server
 
 ### How it works
 
-In index.html the `uppy.on('file-added')` hook calls the [create-upload-token](supabase/functions/create-upload-token/index.ts) function which creates a token for each added file and attaches it to that file's header config as `x-signature`. 
+In index.html the `uppy.on('file-added')` hook calls the [create-upload-token](supabase/functions/create-upload-token/index.ts) function which creates a token for each added file and attaches it to that file's header config as `x-signature`.

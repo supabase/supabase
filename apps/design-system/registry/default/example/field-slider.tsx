@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Slider } from 'ui'
-import { Field, FieldTitle, FieldDescription } from 'ui/src/components/shadcn/ui/field'
+import { Field, FieldDescription, FieldTitle } from 'ui/src/components/shadcn/ui/field'
 
 export default function FieldSlider() {
   const [value, setValue] = useState([200, 800])

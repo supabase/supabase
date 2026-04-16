@@ -1,10 +1,11 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { SqlEditor } from 'icons'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { cn, KeyboardShortcut } from 'ui'
+
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const InlineEditorKeyboardTooltip = () => {
   const [hotkeyEnabled] = useLocalStorageQuery(
@@ -45,7 +46,7 @@ export const InlineEditorButton = () => {
         },
       }}
     >
-      <SqlEditor size={18} strokeWidth={1.5} />
+      <SqlEditor size={16} strokeWidth={1.5} />
     </ButtonTooltip>
   )
 }

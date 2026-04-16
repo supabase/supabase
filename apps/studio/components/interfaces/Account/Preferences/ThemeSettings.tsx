@@ -1,11 +1,7 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { DEFAULT_SIDEBAR_BEHAVIOR } from 'components/interfaces/Sidebar'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BASE_PATH } from 'lib/constants'
 import {
   Card,
   CardContent,
@@ -30,6 +26,10 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { DEFAULT_SIDEBAR_BEHAVIOR } from '@/components/interfaces/Sidebar'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { BASE_PATH } from '@/lib/constants'
 
 export const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
