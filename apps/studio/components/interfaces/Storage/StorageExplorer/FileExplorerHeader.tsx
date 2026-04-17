@@ -47,9 +47,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 import type { StorageColumn } from '../Storage.types'
+import { useStoragePreference } from './useStoragePreference'
 import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { APIDocsButton } from '@/components/ui/APIDocsButton'
-import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
@@ -584,7 +584,7 @@ export const FileExplorerHeader = ({
               )}
             </div>
 
-            {isNewAPIDocsEnabled && !isPicker && (
+            {!isPicker && (
               <>
                 <div className="h-6 border-r border-control" />
                 <div className="mx-2">
