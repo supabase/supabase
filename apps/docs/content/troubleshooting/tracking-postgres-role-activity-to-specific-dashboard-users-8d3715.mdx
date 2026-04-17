@@ -6,7 +6,7 @@ keywords = []
 
 When team members run SQL queries from the Dashboard SQL Editor, and if that query is logged in the Postgres Logs, it's not immediately clear who executed which query. This guide shows you how to track queries back to the specific team member who ran them.
 
-### **Understanding Dashboard query Execution**
+### **Understanding Dashboard query execution**
 
 First, it helps to understand how Dashboard queries are executed. When someone runs a query from the SQL editor, it's routed through the `postgres` role at the database level. The Supabase Dashboard automatically appends metadata comments to queries, specifically `-- user: [UUID]`, `-- source: dashboard`, and `-- date`.
 
@@ -14,7 +14,7 @@ By default, that role has `log_statement` set to `ddl`, which means Postgres log
 
 So, if someone truncates a table, and you're relying on the default logging, you won't see it.
 
-### **Enabling data Modification Logging**
+### **Enabling data modification Logging**
 
 To make those operations visible, you can increase the logging level for the `postgres` role:
 
@@ -42,7 +42,7 @@ Notice that the log includes:
 
 That UUID corresponds to the team member who logged in via the Supabase Dashboard and executed queries in the [SQL Editor](/dashboard/project/_/sql/new). But at this point, it's just an ID - not yet a name or email.
 
-### **Mapping UUIDs to team Members**
+### **Mapping UUIDs to team members**
 
 To map the UUID, you'll need to query the Management API. The process looks like this:
 
@@ -72,7 +72,7 @@ The response will include entries like:
 
 Now you can directly match `user_id` values from the Postgres logs to the corresponding team members.
 
-### **Querying logs for Specific Operations**
+### **Querying logs for specific Operations**
 
 Navigate to the [Logs Explorer](/dashboard/project/_/logs/explorer) and query `postgres_logs`. Here's an example query that searches for data-modifying operations and maps user IDs to team members:
 
@@ -118,11 +118,11 @@ This query:
 
 You can further refine your search by filtering for specific commands like `TRUNCATE` or `DELETE` where `parsed.user_name = 'postgres'`.
 
-### **Tracking external Tools**
+### **Tracking external tools**
 
 For external tools like n8n or other applications connecting to your database, you can identify the source of database changes by appending `?application_name=example_app_name` to your connection string. This ensures the source is clearly identified in the logs, making it easier to distinguish between Dashboard operations and external tool operations.
 
-### **Additional logging Levels**
+### **Additional logging levels**
 
 Postgres supports these `log_statement` values:
 
