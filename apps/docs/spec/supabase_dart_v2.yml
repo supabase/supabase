@@ -1502,6 +1502,7 @@ functions:
             (data) {
               final AuthChangeEvent event = data.event;
               final Session? session = data.session;
+              // handle event
             },
             onError: (error, stackTrace) {
               // Network errors (e.g. offline) are emitted here.
