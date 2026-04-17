@@ -1,9 +1,9 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import type { ShortcutId } from './registry'
 
-const LOCAL_STORAGE_KEY = 'supabase-shortcut-preferences'
-
+const storageKey = LOCAL_STORAGE_KEYS.SHORTCUT_STORAGE_KEY
 interface ShortcutStateData {
   disabled: Record<string, boolean>
 }
@@ -11,7 +11,7 @@ interface ShortcutStateData {
 function loadDisabled(): Record<string, boolean> {
   if (typeof window === 'undefined') return {}
   try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
+    const raw = localStorage.getItem(storageKey)
     return raw ? JSON.parse(raw) : {}
   } catch {
     return {}
@@ -20,7 +20,7 @@ function loadDisabled(): Record<string, boolean> {
 
 function persistDisabled(disabled: Record<string, boolean>) {
   if (typeof window === 'undefined') return
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(disabled))
+  localStorage.setItem(storageKey, JSON.stringify(disabled))
 }
 
 function createShortcutState() {
