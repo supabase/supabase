@@ -445,6 +445,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "single-value-field-array-demo": {
+      name: "single-value-field-array-demo",
+      type: "components:example",
+      registryDependencies: ["button","form","input"],
+      component: React.lazy(() => import("@/registry/default/example/single-value-field-array-demo")),
+      source: "",
+      files: ["registry/default/example/single-value-field-array-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "checkbox-demo": {
       name: "checkbox-demo",
       type: "components:example",
@@ -731,6 +742,28 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "data-input-with-reveal-copy-editable": {
+      name: "data-input-with-reveal-copy-editable",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "data-input-with-reveal-copy-editable-empty": {
+      name: "data-input-with-reveal-copy-editable-empty",
+      type: "components:example",
+      registryDependencies: ["data-input"],
+      component: React.lazy(() => import("@/registry/default/example/data-input-with-reveal-copy-editable-empty")),
+      source: "",
+      files: ["registry/default/example/data-input-with-reveal-copy-editable-empty.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "date-picker-demo": {
       name: "date-picker-demo",
       type: "components:example",
@@ -1013,6 +1046,39 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/input-otp-form")),
       source: "",
       files: ["registry/default/example/input-otp-form.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-demo": {
+      name: "keyboard-shortcut-demo",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-demo")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-pill": {
+      name: "keyboard-shortcut-pill",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-pill")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-pill.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "keyboard-shortcut-inline": {
+      name: "keyboard-shortcut-inline",
+      type: "components:example",
+      registryDependencies: ["button"],
+      component: React.lazy(() => import("@/registry/default/example/keyboard-shortcut-inline")),
+      source: "",
+      files: ["registry/default/example/keyboard-shortcut-inline.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

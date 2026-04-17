@@ -1,18 +1,18 @@
 import { IS_PLATFORM } from 'common'
-import type { SupportFormUrlKeys } from 'components/interfaces/Support/SupportForm.utils'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { X } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { Button, cn, Separator } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
 
 import { ASSISTANT_SUGGESTIONS } from './HelpPanel.constants'
 import { HelpSection } from './HelpSection'
+import type { SupportFormUrlKeys } from '@/components/interfaces/Support/SupportForm.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const HelpPanel = ({
   onClose,

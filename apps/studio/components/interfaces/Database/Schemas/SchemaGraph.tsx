@@ -20,20 +20,17 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { tablesToSQL } from 'lib/helpers'
 import { toast } from 'sonner'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   copyToClipboard,
   DropdownMenu,
@@ -50,7 +47,19 @@ import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { tablesToSQL } from '@/lib/helpers'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -130,7 +139,7 @@ export const SchemaGraph = () => {
 
   const canAddTables = canUpdateTables && !isSchemaLocked
 
-  const resetLayout = () => {
+  const resetLayout = async () => {
     const nodes = reactFlowInstance.getNodes()
     const edges = reactFlowInstance.getEdges()
 
@@ -140,7 +149,12 @@ export const SchemaGraph = () => {
     )
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
-    setTimeout(() => reactFlowInstance.fitView({}))
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await reactFlowInstance.fitView({})
+        resolve()
+      })
+    )
     saveNodePositions()
   }
 
@@ -286,9 +300,7 @@ export const SchemaGraph = () => {
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
 
-        {isErrorSchemas && (
-          <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
-        )}
+        {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
 
         {isSuccessSchemas && (
           <>
@@ -347,18 +359,33 @@ export const SchemaGraph = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <ButtonTooltip
-                  type="default"
-                  onClick={resetLayout}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: 'Automatically arrange the layout of all nodes',
-                    },
-                  }}
-                >
-                  Auto layout
-                </ButtonTooltip>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <ButtonTooltip
+                      type="default"
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'Automatically arrange the layout of all nodes',
+                        },
+                      }}
+                    >
+                      Auto layout
+                    </ButtonTooltip>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm to rearrange all nodes</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Auto layout will rearrange all nodes in the graph. This cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={resetLayout}>Apply</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )}
           </>

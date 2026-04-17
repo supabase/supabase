@@ -1,10 +1,6 @@
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
-import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { stringToBase64URL } from 'lib/base64url'
 import {
   Badge,
   Button,
@@ -15,13 +11,17 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Label_Shadcn_,
+  Select_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
-  Select_Shadcn_,
   Textarea,
 } from 'ui'
+
+import { useJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-create-mutation'
+import { JWTAlgorithm } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
+import { stringToBase64URL } from '@/lib/base64url'
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']

@@ -1,11 +1,11 @@
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 /**
  * Menu-only component for the Realtime section. Used by the desktop sidebar and by the

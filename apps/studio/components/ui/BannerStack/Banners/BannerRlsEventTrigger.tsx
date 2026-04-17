@@ -1,21 +1,21 @@
-import { ShieldCheck } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
-import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from 'components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseEventTriggerCreateMutation } from 'data/database-event-triggers/database-event-trigger-create-mutation'
-import { useDatabaseEventTriggersQuery } from 'data/database-event-triggers/database-event-triggers-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useTrack } from 'lib/telemetry/track'
+import { ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
+
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
+import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabaseEventTriggerCreateMutation } from '@/data/database-event-triggers/database-event-trigger-create-mutation'
+import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerRlsEventTrigger = () => {
   const { ref } = useParams()

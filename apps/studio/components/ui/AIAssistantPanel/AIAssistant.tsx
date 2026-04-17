@@ -1,41 +1,19 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { Markdown } from 'components/interfaces/Markdown'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useTrack } from 'lib/telemetry/track'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
-import {
-  DEFAULT_ASSISTANT_BASE_MODEL_ID,
-  defaultAssistantModelId,
-  isAssistantBaseModelId,
-  isKnownAssistantModelId,
-} from 'lib/ai/model.utils'
-import { IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import type { AssistantModel } from 'state/ai-assistant-state'
-import { useAiAssistantState, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import AlertError from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
+import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
 import { onErrorChat } from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
@@ -47,9 +25,30 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
-import AlertError from '../AlertError'
-import { ASSISTANT_ERRORS } from './AiAssistant.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useHotKey } from '@/hooks/ui/useHotKey'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  defaultAssistantModelId,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+} from '@/lib/ai/model.utils'
+import { IS_PLATFORM } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import type { AssistantModel } from '@/state/ai-assistant-state'
+import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined

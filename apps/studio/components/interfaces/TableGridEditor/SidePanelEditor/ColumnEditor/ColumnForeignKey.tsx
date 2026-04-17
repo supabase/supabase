@@ -1,7 +1,4 @@
 import { useParams } from 'common'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useState } from 'react'
 import { Button } from 'ui'
 
@@ -10,6 +7,9 @@ import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface ColumnForeignKeyProps {
   tableId?: number

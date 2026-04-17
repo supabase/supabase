@@ -1,26 +1,11 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
-import {
-  generateOtherRoutes,
-  generateProductRoutes,
-  generateSettingsRoutes,
-  generateToolRoutes,
-} from 'components/layouts/Navigation/NavigationBar/NavigationBar.utils'
-import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
-import { useHideSidebar } from 'hooks/misc/useHideSidebar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLints } from 'hooks/misc/useLints'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -44,10 +29,24 @@ import {
 
 import { Route } from '../ui/ui.types'
 import {
-  useIsAPIDocsSidePanelEnabled,
   useIsPlatformWebhooksEnabled,
   useUnifiedLogsPreview,
 } from './App/FeaturePreview/FeaturePreviewContext'
+import {
+  generateOtherRoutes,
+  generateProductRoutes,
+  generateSettingsRoutes,
+  generateToolRoutes,
+} from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLints } from '@/hooks/misc/useLints'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -225,7 +224,6 @@ const ProjectLinks = () => {
   const showReports = useIsFeatureEnabled('reports:all')
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
@@ -256,7 +254,6 @@ const ProjectLinks = () => {
   const otherRoutes = generateOtherRoutes(ref, project, {
     unifiedLogs: isUnifiedLogsEnabled,
     showReports,
-    apiDocsSidePanel: isNewAPIDocsEnabled,
   })
   const settingsRoutes = generateSettingsRoutes(ref)
 
@@ -295,41 +292,7 @@ const ProjectLinks = () => {
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
         {otherRoutes.map((route, i) => {
-          if (route.key === 'api') {
-            const handleApiClick = () => {
-              if (isNewAPIDocsEnabled) {
-                snap.setShowProjectApiDocs(true)
-              }
-              sendEvent({
-                action: 'api_docs_opened',
-                properties: {
-                  source: 'sidebar',
-                },
-                groups: {
-                  project: ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
-              })
-            }
-
-            return (
-              <SideBarNavLink
-                key={route.key}
-                route={
-                  isNewAPIDocsEnabled
-                    ? {
-                        label: route.label,
-                        icon: route.icon,
-                        key: route.key,
-                        disabled: route.disabled,
-                      }
-                    : route
-                }
-                active={activeRoute === route.key}
-                onClick={handleApiClick}
-              />
-            )
-          } else if (route.key === 'advisors') {
+          if (route.key === 'advisors') {
             return (
               <div className="relative" key={route.key}>
                 {!route.disabled && (

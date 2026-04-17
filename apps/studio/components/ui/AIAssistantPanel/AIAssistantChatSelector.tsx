@@ -1,7 +1,5 @@
 import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
 import { useState } from 'react'
-
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
 import {
   Button,
   cn,
@@ -18,6 +16,8 @@ import {
   PopoverTrigger_Shadcn_,
   ScrollArea,
 } from 'ui'
+
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean

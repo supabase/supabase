@@ -1,11 +1,11 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { isEqual } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
 import type { ForeignKey } from './ForeignKeySelector.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 
 export interface ForeignKeyDirtyState {
   id?: number | string

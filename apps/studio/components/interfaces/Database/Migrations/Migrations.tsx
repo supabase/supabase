@@ -1,11 +1,4 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { parseMigrationVersion } from 'lib/migration-utils'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -28,6 +21,13 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migration-utils'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -119,9 +119,7 @@ const Migrations = () => {
                       {migrations.length > 0 ? (
                         migrations.map((migration) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
-                          const label = versionDayjs
-                            ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
-                            : 'Unknown'
+                          const label = formatMigrationVersionLabel(migration.version)
                           const insertedAt = versionDayjs ? versionDayjs.toISOString() : undefined
 
                           return (

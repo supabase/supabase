@@ -1,7 +1,3 @@
-import { generateUuid } from 'lib/api/snippets.browser'
-import { removeCommentsFromSql } from 'lib/helpers'
-import type { SnippetWithContent } from 'state/sql-editor-v2'
-
 import {
   alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
@@ -10,6 +6,9 @@ import {
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff } from './SQLEditor.types'
+import { generateUuid } from '@/lib/api/snippets.browser'
+import { removeCommentsFromSql } from '@/lib/helpers'
+import type { SnippetWithContent } from '@/state/sql-editor-v2'
 
 export const createSqlSnippetSkeletonV2 = ({
   name,

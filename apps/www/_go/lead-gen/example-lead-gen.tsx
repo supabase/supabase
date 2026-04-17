@@ -205,6 +205,12 @@ alter table posts enable row level security;`,
       ],
     },
     {
+      type: 'hubspot-meeting',
+      title: 'Schedule a meeting',
+      description: 'Pick a time that works for you to chat with our team.',
+      meetingSlug: 'alan-de-los-santos-rodriguez/test-scheduling-page-go-pages-testing',
+    },
+    {
       type: 'tweets',
       title: 'Loved by developers',
       description: 'Discover what our community has to say about their Supabase experience.',

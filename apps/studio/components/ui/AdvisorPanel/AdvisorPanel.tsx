@@ -1,24 +1,24 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import {
-  Notification,
-  NotificationData,
-  useNotificationsV2Query,
-} from 'data/notifications/notifications-v2-query'
-import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
 import { useMemo, useRef } from 'react'
-import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from 'state/advisor-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 
 import { AdvisorDetail } from './AdvisorDetail'
 import { AdvisorFilters } from './AdvisorFilters'
 import type { AdvisorItem } from './AdvisorPanel.types'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
+import {
+  Notification,
+  NotificationData,
+  useNotificationsV2Query,
+} from '@/data/notifications/notifications-v2-query'
+import { useNotificationsV2UpdateMutation } from '@/data/notifications/notifications-v2-update-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { AdvisorSeverity, AdvisorTab, useAdvisorStateSnapshot } from '@/state/advisor-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,

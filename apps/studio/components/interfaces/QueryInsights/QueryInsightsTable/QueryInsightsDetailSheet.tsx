@@ -1,5 +1,5 @@
-import { useRef } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useRef } from 'react'
 import {
   AiIconAnimation,
   Button,
@@ -8,19 +8,20 @@ import {
   SheetDescription,
   SheetTitle,
   Tabs_Shadcn_,
+  TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  TabsContent_Shadcn_,
 } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { ExplainVisualizer } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer'
+
 import { QueryDetail } from '../../QueryPerformance/QueryDetail'
 import { QueryIndexes } from '../../QueryPerformance/QueryIndexes'
 import { buildExplainOptimizationPrompt } from '../../QueryPerformance/QueryPerformance.ai'
-import type { QueryPlanRow } from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import type { ClassifiedQuery } from '../QueryInsightsHealth/QueryInsightsHealth.types'
+import { ExplainVisualizer } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer'
+import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface QueryInsightsDetailSheetProps {
   open: boolean

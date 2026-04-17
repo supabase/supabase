@@ -1,23 +1,24 @@
 import { useParams } from 'common'
-import { useIsFloatingMobileToolbarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ConnectButton } from 'components/interfaces/ConnectButton/ConnectButton'
-import { LocalDropdown } from 'components/interfaces/LocalDropdown'
-import { SidebarContent } from 'components/interfaces/Sidebar'
-import { UserDropdown } from 'components/interfaces/UserDropdown'
-import { FloatingMobileToolbar } from 'components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import { ChevronLeft, Menu, Search } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
 
+import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
 import { ProjectBranchSelector } from './ProjectBranchSelector'
+import { useIsFloatingMobileToolbarEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
+import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
+import { SidebarContent } from '@/components/interfaces/Sidebar'
+import { UserDropdown } from '@/components/interfaces/UserDropdown'
+import { FloatingMobileToolbar } from '@/components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -91,6 +92,7 @@ const MobileNavigationBar = ({
               </button>
             </CommandMenuTrigger>
           )}
+          {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button

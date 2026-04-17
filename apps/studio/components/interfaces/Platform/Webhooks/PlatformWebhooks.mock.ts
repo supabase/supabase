@@ -1,4 +1,160 @@
-import type { PlatformWebhooksMockSeed, WebhookScope } from './PlatformWebhooks.types'
+import type {
+  PlatformWebhooksMockSeed,
+  WebhookDelivery,
+  WebhookScope,
+} from './PlatformWebhooks.types'
+
+const createDeliveries = (
+  endpointId: string,
+  prefix: string,
+  deliveries: Array<Pick<WebhookDelivery, 'eventType' | 'status' | 'responseCode' | 'attemptAt'>>
+): WebhookDelivery[] =>
+  deliveries.map((delivery, index) => ({
+    id: `${prefix}-${index + 1}`,
+    endpointId,
+    ...delivery,
+  }))
+
+const organizationPrimaryDeliveries = createDeliveries(
+  '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
+  'org-delivery',
+  [
+    {
+      eventType: 'project.created',
+      status: 'success',
+      responseCode: 200,
+      attemptAt: '2026-02-27T08:04:00.000Z',
+    },
+    {
+      eventType: 'project.updated',
+      status: 'failure',
+      responseCode: 500,
+      attemptAt: '2026-02-27T07:56:00.000Z',
+    },
+    {
+      eventType: 'project.deleted',
+      status: 'pending',
+      attemptAt: '2026-02-27T07:45:00.000Z',
+    },
+    {
+      eventType: 'organization.member_invited',
+      status: 'success',
+      responseCode: 202,
+      attemptAt: '2026-02-27T07:37:00.000Z',
+    },
+    {
+      eventType: 'project.resumed',
+      status: 'success',
+      responseCode: 204,
+      attemptAt: '2026-02-27T07:18:00.000Z',
+    },
+    {
+      eventType: 'organization.member_removed',
+      status: 'failure',
+      responseCode: 400,
+      attemptAt: '2026-02-27T06:59:00.000Z',
+    },
+    {
+      eventType: 'organization.updated',
+      status: 'skipped',
+      attemptAt: '2026-02-27T06:40:00.000Z',
+    },
+    {
+      eventType: 'project.paused',
+      status: 'success',
+      responseCode: 200,
+      attemptAt: '2026-02-27T06:21:00.000Z',
+    },
+    {
+      eventType: 'project.created',
+      status: 'failure',
+      responseCode: 503,
+      attemptAt: '2026-02-27T06:03:00.000Z',
+    },
+    {
+      eventType: 'project.updated',
+      status: 'success',
+      responseCode: 200,
+      attemptAt: '2026-02-27T05:44:00.000Z',
+    },
+    {
+      eventType: 'project.deleted',
+      status: 'skipped',
+      attemptAt: '2026-02-27T05:25:00.000Z',
+    },
+    {
+      eventType: 'organization.member_invited',
+      status: 'success',
+      responseCode: 201,
+      attemptAt: '2026-02-27T05:07:00.000Z',
+    },
+  ]
+)
+
+const organizationSecondaryDeliveries = createDeliveries(
+  '1a4e8c73-5b29-44af-8c62-9f1d2b3c4d5e',
+  'org-secondary-delivery',
+  [
+    {
+      eventType: 'organization.updated',
+      status: 'skipped',
+      attemptAt: '2026-02-26T14:12:00.000Z',
+    },
+  ]
+)
+
+const projectDeliveries = createDeliveries(
+  '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
+  'project-delivery',
+  [
+    {
+      eventType: 'project.updated',
+      status: 'success',
+      responseCode: 200,
+      attemptAt: '2026-02-27T09:01:00.000Z',
+    },
+    {
+      eventType: 'project.resource_exhausted',
+      status: 'failure',
+      responseCode: 429,
+      attemptAt: '2026-02-27T08:47:00.000Z',
+    },
+    {
+      eventType: 'project.paused',
+      status: 'success',
+      responseCode: 202,
+      attemptAt: '2026-02-26T21:10:00.000Z',
+    },
+    {
+      eventType: 'project.branch_created',
+      status: 'success',
+      responseCode: 200,
+      attemptAt: '2026-02-26T19:45:00.000Z',
+    },
+    {
+      eventType: 'project.resumed',
+      status: 'pending',
+      attemptAt: '2026-02-26T18:30:00.000Z',
+    },
+    {
+      eventType: 'project.branch_deleted',
+      status: 'success',
+      responseCode: 204,
+      attemptAt: '2026-02-26T17:04:00.000Z',
+    },
+    {
+      eventType: 'project.updated',
+      status: 'failure',
+      responseCode: 500,
+      attemptAt: '2026-02-26T15:59:00.000Z',
+    },
+    {
+      eventType: 'project.resource_exhausted',
+      status: 'skipped',
+      attemptAt: '2026-02-26T14:12:00.000Z',
+    },
+  ]
+)
 
 export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksMockSeed> = {
   organization: {
@@ -39,38 +195,7 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
         createdAt: '2026-02-12T10:14:00.000Z',
       },
     ],
-    deliveries: [
-      {
-        id: 'org-delivery-1',
-        endpointId: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
-        eventType: 'project.created',
-        status: 'success',
-        responseCode: 200,
-        attemptAt: '2026-02-27T08:04:00.000Z',
-      },
-      {
-        id: 'org-delivery-2',
-        endpointId: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
-        eventType: 'project.updated',
-        status: 'failure',
-        responseCode: 500,
-        attemptAt: '2026-02-27T07:56:00.000Z',
-      },
-      {
-        id: 'org-delivery-3',
-        endpointId: '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081',
-        eventType: 'project.deleted',
-        status: 'pending',
-        attemptAt: '2026-02-27T07:45:00.000Z',
-      },
-      {
-        id: 'org-delivery-4',
-        endpointId: '1a4e8c73-5b29-44af-8c62-9f1d2b3c4d5e',
-        eventType: 'organization.updated',
-        status: 'skipped',
-        attemptAt: '2026-02-26T14:12:00.000Z',
-      },
-    ],
+    deliveries: [...organizationPrimaryDeliveries, ...organizationSecondaryDeliveries],
   },
   project: {
     eventTypes: [
@@ -94,31 +219,6 @@ export const PLATFORM_WEBHOOKS_MOCK_DATA: Record<WebhookScope, PlatformWebhooksM
         createdAt: '2026-02-18T11:23:00.000Z',
       },
     ],
-    deliveries: [
-      {
-        id: 'project-delivery-1',
-        endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
-        eventType: 'project.updated',
-        status: 'success',
-        responseCode: 200,
-        attemptAt: '2026-02-27T09:01:00.000Z',
-      },
-      {
-        id: 'project-delivery-2',
-        endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
-        eventType: 'project.resource_exhausted',
-        status: 'failure',
-        responseCode: 429,
-        attemptAt: '2026-02-27T08:47:00.000Z',
-      },
-      {
-        id: 'project-delivery-3',
-        endpointId: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
-        eventType: 'project.paused',
-        status: 'success',
-        responseCode: 202,
-        attemptAt: '2026-02-26T21:10:00.000Z',
-      },
-    ],
+    deliveries: projectDeliveries,
   },
 }

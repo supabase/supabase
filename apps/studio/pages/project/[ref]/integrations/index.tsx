@@ -1,17 +1,6 @@
-import {
-  IntegrationCard,
-  IntegrationLoadingCard,
-} from 'components/interfaces/Integrations/Landing/IntegrationCard'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { AlertError } from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { DOCS_URL } from 'lib/constants'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -24,8 +13,19 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent, PageSectionMeta } from 'ui-patterns/PageSection'
 
+import {
+  IntegrationCard,
+  IntegrationLoadingCard,
+} from '@/components/interfaces/Integrations/Landing/IntegrationCard'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const FEATURED_INTEGRATIONS = ['cron', 'queues', 'stripe_sync_engine']
 
@@ -190,7 +190,7 @@ const IntegrationsPage: NextPageWithLayout = () => {
                     {/* Featured Integrations */}
                     {groupedIntegrations.featured.length > 0 && (
                       <div
-                        className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 mb-6 border-b"
+                        className="grid grid-cols-2 @4xl:grid-cols-3 gap-4 mb-4 items-stretch pb-6 border-b"
                         style={{ gridAutoRows: 'minmax(110px, auto)' }}
                       >
                         {groupedIntegrations.featured.map((integration) => (

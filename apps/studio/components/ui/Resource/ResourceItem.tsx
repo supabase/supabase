@@ -1,6 +1,5 @@
 import { ChevronRight, MoreVertical } from 'lucide-react'
 import { forwardRef, HTMLAttributes, ReactNode } from 'react'
-
 import {
   Button,
   CardContent,

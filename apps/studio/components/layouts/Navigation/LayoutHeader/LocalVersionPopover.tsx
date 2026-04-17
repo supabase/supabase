@@ -1,9 +1,4 @@
 import dayjs from 'dayjs'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useCLIReleaseVersionQuery } from 'data/misc/cli-release-version-query'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
@@ -17,14 +12,19 @@ import {
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
-  SimpleCodeBlock,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
 import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCLIReleaseVersionQuery } from '@/data/misc/cli-release-version-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const LocalVersionPopover = () => {
   const { data, isSuccess } = useCLIReleaseVersionQuery()

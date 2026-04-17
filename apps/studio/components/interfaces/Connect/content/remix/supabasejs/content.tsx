@@ -1,12 +1,12 @@
-import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
 import {
-  ConnectTabs,
-  ConnectTabTriggers,
-  ConnectTabTrigger,
   ConnectTabContent,
-} from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from 'ui'
+  ConnectTabs,
+  ConnectTabTrigger,
+  ConnectTabTriggers,
+} from '@/components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -23,7 +23,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
             `VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
             projectKeys?.publishableKey
-              ? `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+              ? `VITE_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
               : `VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
             '',
           ].join('\n')}
@@ -44,7 +44,7 @@ export function createClient(request: Request) {
 
   const supabase = createServerClient(
     process.env.VITE_SUPABASE_URL!,
-    process.env.VITE_${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'SUPABASE_ANON_KEY'};,
+    process.env.VITE_${projectKeys.publishableKey ? 'SUPABASE_PUBLISHABLE_KEY' : 'SUPABASE_ANON_KEY'};,
     {
       cookies: {
         getAll() {

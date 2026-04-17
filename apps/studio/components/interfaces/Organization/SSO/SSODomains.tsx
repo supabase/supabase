@@ -1,23 +1,10 @@
-import { Plus, Trash } from 'lucide-react'
-import { useFieldArray, useForm } from 'react-hook-form'
-import {
-  Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { useForm } from 'react-hook-form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 
 import { SSOConfigFormSchema } from './SSOConfig'
 
 export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfigFormSchema>> }) => {
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'domains',
-  })
-
   return (
     <>
       <FormItemLayout

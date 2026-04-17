@@ -1,14 +1,24 @@
 import { useEffect } from 'react'
 import { useLatest } from 'react-use'
 
-// [Joshen] Refactor: Remove dependencies, and just make this into a single definition
+/**
+ * @deprecated Use `useShortcut` from `state/shortcuts/useShortcut` instead.
+ * It reads from a central shortcut registry (`SHORTCUT_DEFINITIONS`) and
+ * integrates with the user's enable/disable preferences + the Cmd+P command menu.
+ *
+ * Migration:
+ *   1. Add an entry to `state/shortcuts/registry.ts` with a unique ID, label, and sequence.
+ *   2. Replace `useHotKey(cb, 'k', { shift: true })` with
+ *      `useShortcut(SHORTCUT_IDS.YOUR_ID, cb)`.
+ */
 function useHotKey(
   callback: (e: KeyboardEvent) => void,
   key: string,
   options?: { enabled?: boolean; shift?: boolean }
 ): void
 /**
- * @deprecated The `dependencies` parameter is deprecated. Use the overload without dependencies instead.
+ * @deprecated Use `useShortcut` from `state/shortcuts/useShortcut` instead.
+ * The `dependencies` parameter is also deprecated in this legacy hook.
  */
 function useHotKey(
   callback: (e: KeyboardEvent) => void,

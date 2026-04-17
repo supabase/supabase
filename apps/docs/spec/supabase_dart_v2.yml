@@ -82,6 +82,10 @@ functions:
             isOptional: true
             type: int
             description: The number of times to retry a failed upload request. Defaults to `0`.
+          - name: useNewHostname
+            isOptional: true
+            type: bool
+            description: Whether to rewrite legacy storage URLs to use the dedicated storage host (`<ref>.storage.supabase.co`). Set to `true` only if your project has the dedicated storage host enabled. Defaults to `false`.
     examples:
       - id: flutter-initialize
         name: For Flutter
@@ -788,6 +792,18 @@ functions:
             redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
             authScreenLaunchMode:
                 kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+          );
+          ```
+      - id: sign-in-with-custom-provider
+        name: Sign in with a custom OIDC provider
+        description: |
+          `OAuthProvider` is now a class instead of an enum, allowing you to use custom OIDC providers by passing a custom provider string.
+        isSpotlight: false
+        code: |
+          ```dart
+          await supabase.auth.signInWithOAuth(
+            OAuthProvider('custom:my-oidc-provider'),
+            redirectTo: kIsWeb ? null : 'my.scheme://my-host',
           );
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
@@ -1579,6 +1595,10 @@ functions:
         isOptional: false
         type: String
         description: Refresh token to use to get a new session.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Optional access token to set along with the refresh token.
     examples:
       - id: refresh-the-session
         name: Refresh the session
@@ -1590,6 +1610,17 @@ functions:
           final AuthResponse response = await supabase.auth.setSession(refreshToken);
 
           final session = res.session;
+          ```
+      - id: set-session-with-access-token
+        name: Set session with access token
+        description: You can optionally provide an access token along with the refresh token.
+        isSpotlight: false
+        code: |
+          ```dart
+          final AuthResponse response = await supabase.auth.setSession(
+            refreshToken,
+            accessToken: accessToken,
+          );
           ```
         response: |
           ```json

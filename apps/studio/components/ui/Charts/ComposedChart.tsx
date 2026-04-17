@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { formatBytes } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -45,6 +44,7 @@ import {
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
+import { formatBytes } from '@/lib/helpers'
 
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
@@ -664,13 +664,13 @@ export function ComposedChart({
             }}
           />
         </RechartComposedChart>
-        <ChartHighlightActions
-          chartHighlight={chartHighlight}
-          updateDateRange={updateDateRange}
-          actions={highlightActions}
-          chartId={chartId}
-        />
       </Container>
+      <ChartHighlightActions
+        chartHighlight={chartHighlight}
+        updateDateRange={updateDateRange}
+        actions={highlightActions}
+        chartId={chartId}
+      />
       {data && (
         <div
           className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs"

@@ -1,7 +1,7 @@
 import { BookOpen, Github } from 'lucide-react'
-
-import { BASE_PATH } from 'lib/constants'
 import { Badge, Button } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
 
 interface ClientLibraryProps {
   language: string

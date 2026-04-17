@@ -1,16 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type StopPipelineParams = {
   projectRef: string
   pipelineId: number
 }
 
-async function stopPipeline({ projectRef, pipelineId }: StopPipelineParams, signal?: AbortSignal) {
+export async function stopPipeline(
+  { projectRef, pipelineId }: StopPipelineParams,
+  signal?: AbortSignal
+) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/stop', {

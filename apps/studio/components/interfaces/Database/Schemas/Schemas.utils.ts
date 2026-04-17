@@ -6,10 +6,10 @@ import { uniqBy } from 'lodash'
 import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { tryParseJson } from 'lib/helpers'
 
 import { TableNodeData } from './Schemas.constants'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
+import { tryParseJson } from '@/lib/helpers'
 
 const NODE_SEP = 25
 const RANK_SEP = 50

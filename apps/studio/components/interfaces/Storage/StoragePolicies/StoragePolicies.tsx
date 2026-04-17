@@ -1,13 +1,5 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useParams } from 'common'
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies/PolicyEditorModal'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
-import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
-import { usePaginatedBucketsQuery } from 'data/storage/buckets-query'
-import { useDebouncedValue } from 'hooks/misc/useDebouncedValue'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEmpty } from 'lodash'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -28,6 +20,14 @@ import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.ut
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import { BucketsPolicies, type SelectBucketPolicyForAction } from './StoragePoliciesBucketsSection'
 import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal'
+import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useDatabasePolicyCreateMutation } from '@/data/database-policies/database-policy-create-mutation'
+import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
+import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
+import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const StoragePolicies = () => {
   const { ref: projectRef } = useParams()

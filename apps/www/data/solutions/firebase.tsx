@@ -1,29 +1,30 @@
-import { cn, Image } from 'ui'
-import dynamic from 'next/dynamic'
 import { CubeIcon } from '@heroicons/react/outline'
 import {
   ArrowRight,
   ArrowUpRight,
-  Timer,
-  Lock,
-  ShieldCheck,
-  Users,
-  UserX,
+  Check,
+  ClipboardCheck,
   FolderLock,
+  HeartPulse,
+  InfoIcon,
   Lightbulb,
   List,
-  ClipboardCheck,
+  Lock,
   ShieldAlert,
-  HeartPulse,
-  Check,
-  InfoIcon,
+  ShieldCheck,
+  Timer,
+  Users,
+  UserX,
 } from 'lucide-react'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-
-import MainProducts from 'data/MainProducts'
+import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { companyStats } from 'data/company-stats'
-import { MobbinLogo } from '~/components/BrandLogo'
+import { cn } from 'ui'
+import { Image } from 'ui-patterns/Image'
+
+import { MobbinLogo } from '@/components/BrandLogo'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import { companyStats } from '@/data/company-stats'
+import MainProducts from '@/data/MainProducts'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
