@@ -1,8 +1,9 @@
 import type { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { OrganizationBase } from 'data/organizations/organizations-query'
-import type { PlanId } from 'data/subscriptions/types'
 import type jsonLogic from 'json-logic-js'
-import type { ManagedBy } from 'lib/constants/infrastructure'
+
+import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import type { PlanId } from '@/data/subscriptions/types'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
 
 export interface Organization extends OrganizationBase {
   managed_by: ManagedBy

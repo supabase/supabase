@@ -161,3 +161,8 @@ keys.json
 
 # Application
 **/.superset/**
+
+# examples
+examples/**/package-lock.json
+examples/**/yarn.lock
+examples/**/pnpm-lock.yaml

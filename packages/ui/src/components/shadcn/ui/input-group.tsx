@@ -6,7 +6,39 @@ import { Button } from '../../Button'
 import { Input, type InputProps } from './input'
 import { Textarea, type TextareaProps } from './textarea'
 
-function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
+interface InputGroupProps extends React.ComponentProps<'div'> {
+  /**
+   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * regular <Input> and <Textarea> components.
+   */
+  id?: string
+  /**
+   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * regular <Input> and <Textarea> components.
+   */
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
+  /**
+   * This props is passed in by <FormControl_Shadcn_> but they should be applied on the input itself. When using
+   * <InputGroup> inside a <Form_Shadcn_>, use <FormInputGroupInput> and <FormInputGroupTextArea> instead of the
+   * regular <Input> and <Textarea> components.
+   */
+  'aria-describedby'?: string
+}
+
+/*
+ * Used to group input elements together with addons like labels, buttons, or text. When using this component
+ * inside a <Form_Shadcn_>, use FormInputGroupInput and FormInputGroupTextArea instead of the regular Input
+ * and Textarea components to ensure proper form field association and accessibility.
+ */
+function InputGroup({
+  className,
+  id,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedby,
+  ...props
+}: InputGroupProps) {
   return (
     <div
       data-slot="input-group"
@@ -27,7 +59,8 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
         'has-[[data-slot=input-group-control]:focus-visible]:outline-none has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-background-control has-[[data-slot=input-group-control]:focus-visible]:ring-offset-2 has-[[data-slot=input-group-control]:focus-visible]:ring-offset-foreground-muted',
 
         // Error state.
-        'has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+        'has-[[data-slot][aria-invalid=true]]:bg-destructive-200 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive-400 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
+        'has-[[data-slot][aria-invalid=true]]:has-[[data-slot=input-group-control]:focus-visible]:border-destructive',
 
         // Disabled state.
         'has-[[data-slot=input-group-control]:disabled]:cursor-not-allowed has-[[data-slot=input-group-control]:disabled]:text-foreground-muted',
@@ -123,12 +156,19 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   )
 }
 
+/*
+ * If you need to use this component inside a <Form_Shadcn_>, use FormInputGroupInput instead.
+ */
 function InputGroupInput({ className, ...props }: InputProps) {
   return (
     <Input
       data-slot="input-group-control"
       className={cn(
-        'flex-1 rounded-none border-0 -m-px bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+        'flex-1 rounded-none border border-transparent -m-px bg-transparent shadow-none',
+        'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
+        'read-only:border-transparent',
+        'aria-[invalid=true]:border-transparent aria-[invalid=true]:bg-transparent',
+        'aria-[invalid=true]:focus:border-transparent aria-[invalid=true]:focus-visible:border-transparent',
         className
       )}
       {...props}
@@ -136,12 +176,16 @@ function InputGroupInput({ className, ...props }: InputProps) {
   )
 }
 
+/*
+ * If you need to use this component inside a <Form_Shadcn_>, use FormInputGroupTextArea instead.
+ */
 function InputGroupTextarea({ className, ...props }: TextareaProps) {
   return (
     <Textarea
       data-slot="input-group-control"
       className={cn(
-        'flex-1 resize-none rounded-none border-0 bg-transparent py-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+        'flex-1 resize-none rounded-none border border-transparent bg-transparent py-0 shadow-none',
+        'focus:border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
         className
       )}
       {...props}

@@ -11,11 +11,11 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -296,7 +296,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                         <InputGroupAddon align="inline-start">
                           <InputGroupText>custom:</InputGroupText>
                         </InputGroupAddon>
-                        <InputGroupInput
+                        <FormInputGroupInput
                           {...field}
                           placeholder="my-company"
                           disabled={isEditMode}

@@ -169,6 +169,22 @@ functions:
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
   - id: mfa-delete-factor
     $ref: '@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor'
+  - id: admin-custom-providers-api
+    title: Custom OIDC/OAuth Provider Admin API
+    notes: |
+      - These methods allow you to manage custom OIDC/OAuth providers programmatically.
+      - Requires `service_role` key.
+      - Custom providers use the `custom:` prefix when signing in (e.g., `custom:my-oidc-provider`).
+  - id: admin-custom-providers-create
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.createProvider'
+  - id: admin-custom-providers-list
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.listProviders'
+  - id: admin-custom-providers-get
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.getProvider'
+  - id: admin-custom-providers-update
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.updateProvider'
+  - id: admin-custom-providers-delete
+    $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.deleteProvider'
   - id: select
     $ref: '@supabase/postgrest-js.PostgrestQueryBuilder.select'
   - id: insert

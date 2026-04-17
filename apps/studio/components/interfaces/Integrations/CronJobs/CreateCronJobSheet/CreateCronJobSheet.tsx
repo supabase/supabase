@@ -183,6 +183,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
         }
       } catch (error: any) {
         toast.error(`Failed to validate cron job name: ${error.message}`)
+        return
       } finally {
         setIsLoadingGetCronJob(false)
       }

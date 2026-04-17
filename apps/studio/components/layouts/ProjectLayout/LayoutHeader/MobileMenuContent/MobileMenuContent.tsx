@@ -12,10 +12,7 @@ import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
 import { TopLevelRouteItem } from './TopLevelRouteItem'
 import { routeHasSubmenu, useMobileMenuNavigation } from './useMobileMenuNavigation'
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useUnifiedLogsPreview,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import {
   generateOtherRoutes,
@@ -67,7 +64,6 @@ export function MobileMenuContent({
   ])
   const authOverviewPageEnabled = useFlag('authOverviewPage')
   const showReports = useIsFeatureEnabled('reports:all')
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const toolRoutes = useMemo(() => generateToolRoutes(ref, project), [ref, project])
@@ -95,9 +91,8 @@ export function MobileMenuContent({
       generateOtherRoutes(ref, project, {
         unifiedLogs: isUnifiedLogsEnabled,
         showReports,
-        apiDocsSidePanel: isNewAPIDocsEnabled,
       }),
-    [ref, project, isUnifiedLogsEnabled, showReports, isNewAPIDocsEnabled]
+    [ref, project, isUnifiedLogsEnabled, showReports]
   )
   const settingsRoutes = useMemo(() => generateSettingsRoutes(ref), [ref])
 

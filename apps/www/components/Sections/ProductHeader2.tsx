@@ -1,16 +1,17 @@
-import React from 'react'
-import { Button, cn } from 'ui'
-import Link from 'next/link'
-import ProductIcon from '../ProductIcon'
-import SectionContainer from '../Layouts/SectionContainer'
 import { CTA } from '~/types/common'
+import Link from 'next/link'
+import React, { Children, type ReactNode } from 'react'
+import { Button, cn } from 'ui'
+
+import SectionContainer from '../Layouts/SectionContainer'
+import ProductIcon from '../ProductIcon'
 
 // to do: move types to be global
 // then solutions.types.ts should extend this
 interface Props {
-  label?: string | React.ReactNode
-  h1: string | React.ReactNode
-  subheader?: string[] | React.ReactNode[]
+  label?: ReactNode
+  h1: ReactNode
+  subheader?: ReactNode
   icon?: string
   title?: string
   image?: React.ReactNode
@@ -54,7 +55,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
         </h1>
         {props.subheader && (
           <div className="">
-            {props.subheader.map((subheader, i) => {
+            {Children.map(props.subheader, (subheader, i) => {
               return (
                 <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
                   {subheader}
