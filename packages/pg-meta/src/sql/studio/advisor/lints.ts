@@ -72,7 +72,7 @@ select
         fk.table_name,
         fk.fkey_name
     ) as detail,
-    ${literal(`${docsUrl}/guides/database/database-linter?lint=0001_unindexed_foreign_keys`)} as remediation
+    ${literal(`${docsUrl}/guides/database/database-linter?lint=0001_unindexed_foreign_keys`)} as remediation,
     jsonb_build_object(
         'schema', fk.schema_name,
         'name', fk.table_name,
