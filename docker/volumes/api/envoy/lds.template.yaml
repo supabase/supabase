@@ -45,6 +45,15 @@ resources:
                       allow_headers: "*"
                       expose_headers: "*"
                       max_age: "3600"
+                    request_headers_to_add:
+                      - header:
+                          key: X-Forwarded-Host
+                          value: "%REQ(:AUTHORITY)%"
+                        append_action: ADD_IF_ABSENT
+                      - header:
+                          key: X-Forwarded-Port
+                          value: "%DOWNSTREAM_LOCAL_PORT%"
+                        append_action: ADD_IF_ABSENT
                     routes:
                       - match:
                           prefix: /auth/v1/verify
@@ -52,6 +61,11 @@ resources:
                           cluster: auth
                           prefix_rewrite: /verify
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/verify
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -76,6 +90,11 @@ resources:
                           cluster: auth
                           prefix_rewrite: /callback
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/callback
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -100,6 +119,11 @@ resources:
                           cluster: auth
                           prefix_rewrite: /authorize
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/authorize
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -124,6 +148,11 @@ resources:
                           cluster: auth
                           prefix_rewrite: /.well-known/jwks.json
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/.well-known/jwks.json
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -147,6 +176,11 @@ resources:
                         route:
                           cluster: auth
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /.well-known/oauth-authorization-server
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -170,6 +204,11 @@ resources:
                         route:
                           cluster: auth
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /sso/saml/acs
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -193,6 +232,11 @@ resources:
                         route:
                           cluster: auth
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /sso/saml/metadata
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -218,6 +262,11 @@ resources:
                           cluster: functions
                           prefix_rewrite: /
                           timeout: 150s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /functions/v1/
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -246,7 +295,7 @@ resources:
                           - header:
                               key: X-Forwarded-Prefix
                               value: /storage/v1
-                            append: false
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -272,6 +321,11 @@ resources:
                           cluster: auth
                           prefix_rewrite: /
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -285,6 +339,11 @@ resources:
                           cluster: rest
                           prefix_rewrite: /
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /rest/v1/
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -299,6 +358,10 @@ resources:
                           prefix_rewrite: /rpc/graphql
                           timeout: 30s
                         request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /graphql/v1
+                            append_action: ADD_IF_ABSENT
                           - header:
                               key: Content-Profile
                               value: graphql_public
@@ -317,6 +380,11 @@ resources:
                           prefix_rewrite: /api
                           timeout: 30s
                           host_rewrite_literal: realtime-dev.supabase-realtime
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /realtime/v1/api
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -331,6 +399,11 @@ resources:
                           prefix_rewrite: /socket/
                           timeout: 30s
                           host_rewrite_literal: realtime-dev.supabase-realtime
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /realtime/v1/
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -344,6 +417,11 @@ resources:
                           cluster: meta
                           prefix_rewrite: /
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /pg/
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -355,6 +433,11 @@ resources:
                         route:
                           cluster: studio
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /api/mcp
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -379,6 +462,11 @@ resources:
                           cluster: studio
                           prefix_rewrite: /api/mcp
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /mcp
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
@@ -419,6 +507,11 @@ resources:
                         route:
                           cluster: studio
                           timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.rbac:
                             '@type': >-
