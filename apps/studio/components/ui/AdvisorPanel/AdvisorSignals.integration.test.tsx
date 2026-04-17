@@ -257,7 +257,7 @@ describe('Advisor signals integration', () => {
 
     expect(screen.getByText('Advisor found 5 issues')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'View 1 more issue in Advisor' })).toBeInTheDocument()
-    expect(screen.queryByText('Banned IP address: 203.0.113.10')).not.toBeInTheDocument()
+    expect(screen.queryByText('Banned IP address')).not.toBeInTheDocument()
   })
 
   it('does not block the homepage while signal items are pending', () => {
