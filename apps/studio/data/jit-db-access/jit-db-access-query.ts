@@ -39,8 +39,9 @@ async function getJitDbAccessConfiguration(
     signal,
   })
 
-  // jit access might not be available on the project due to
-  // postgres version
+  // Temporary access may be unavailable for several reasons (e.g. Postgres
+  // upgrade required, manual migration required). Errors are thrown; the
+  // unavailable state is communicated via a structured 200 response instead.
   if (error) {
     handleError(error)
   }
