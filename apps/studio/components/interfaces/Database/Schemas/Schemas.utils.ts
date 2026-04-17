@@ -37,6 +37,7 @@ export async function getGraphDataFromTables(
         isUnique: column.is_unique,
         isUpdateable: column.is_updatable,
         isIdentity: column.is_identity,
+        description: column.comment ?? '',
       }
     })
 
@@ -254,4 +255,28 @@ const getLayoutedElementsViaLocalStorage = (
     }
   })
   return { nodes, edges }
+}
+
+export const getTableDefinitionAsMarkdown = (table: TableNodeData) => {
+  let markdown = `## Table \`${table.name}\`\n\n`
+  if (table.description) {
+    markdown += `${table.description}\n\n`
+  }
+  markdown += `### Columns\n\n`
+  markdown += `| Name | Type | Constraints |\n`
+  markdown += `|------|------|-------------|\n`
+
+  return table.columns.reduce((current, column) => {
+    current += `| \`${column.name}\` | \`${column.format}\` | ${column.isPrimary ? 'Primary' : ''}${column.isNullable ? ' Nullable' : ''}${column.isUnique ? ' Unique' : ''}${column.isIdentity ? ' Identity' : ''} |\n`
+    return current
+  }, markdown)
+}
+
+export const getSchemaAsMarkdown = (schema: string, tables: TableNodeData[]) => {
+  return tables.reduce((current, table) => {
+    if (table.schema === schema) {
+      current += `${getTableDefinitionAsMarkdown(table)}\n`
+    }
+    return current
+  }, '')
 }

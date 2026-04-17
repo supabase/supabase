@@ -52,7 +52,7 @@ test.describe('Database', () => {
 
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
-      await page.getByRole('button', { name: 'Download Schema' }).click()
+      await page.getByRole('button', { name: 'Export options' }).click()
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
@@ -100,6 +100,8 @@ test.describe('Database', () => {
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
+      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
+      await page.waitForTimeout(500)
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(page.getByText(`Successfully updated ${databaseTableName}!`)).toBeVisible()
@@ -111,8 +113,6 @@ test.describe('Database', () => {
       await editTableMenuItem.press('Enter')
       await expect(editTableMenuItem).not.toBeVisible()
       await expect(page.getByRole('dialog')).toBeVisible()
-      // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
-      await page.waitForTimeout(500)
       await expect(page.getByLabel('Description')).toHaveValue('Bazinga')
       await page.getByRole('button', { name: 'Cancel' }).click()
       await expect(page.getByRole('dialog')).not.toBeVisible()
