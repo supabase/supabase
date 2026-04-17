@@ -141,6 +141,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/enterprise-terms',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
