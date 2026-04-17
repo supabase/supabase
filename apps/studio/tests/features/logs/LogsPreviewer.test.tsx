@@ -1,20 +1,20 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
-import {
-  calculateBarClickTimeRange,
-  LogsPreviewer,
-} from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { customRender, customRenderHook } from 'tests/lib/custom-render'
-import { addAPIMock } from 'tests/lib/msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { LOGS_API_MOCKS } from './logs.mocks'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import {
+  calculateBarClickTimeRange,
+  LogsPreviewer,
+} from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
+import { customRender, customRenderHook } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
-vi.mock('components/interfaces/Settings/Logs/LogTable', () => ({
+vi.mock('@/components/interfaces/Settings/Logs/LogTable', () => ({
   LogTable: ({ data }: { data: any[] }) => (
     <div data-testid="log-table-mock">
       {data.map((row) => (
@@ -39,7 +39,7 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('lib/gotrue', async (importOriginal) => ({
+vi.mock('@/lib/gotrue', async (importOriginal) => ({
   ...(await importOriginal()),
   auth: { onAuthStateChange: vi.fn() },
 }))

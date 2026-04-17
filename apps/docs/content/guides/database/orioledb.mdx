@@ -1,12 +1,12 @@
 ---
 id: 'orioledb'
 title: 'OrioleDB Overview'
-description: "A storage extension for PostgreSQL which uses PostgreSQL's pluggable storage system"
+description: "A storage extension for Postgres which uses Postgres's pluggable storage system"
 ---
 
 The [OrioleDB](https://www.orioledb.com/) Postgres extension provides a drop-in replacement storage engine for the default heap storage method. It is designed to improve Postgres' scalability and performance.
 
-OrioleDB addresses PostgreSQL's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default Postgres heap method with a 3.3x speedup.
+OrioleDB addresses Postgres's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default Postgres heap method with a 3.3x speedup.
 
 <Image
   alt="TPC-C (warehouses = 500)"
@@ -31,7 +31,7 @@ OrioleDB uses index-organized tables, where table data is stored in the index st
 
 ### No buffer mapping
 
-In-memory pages are connected to the storage pages using direct links. This allows OrioleDB to bypass PostgreSQL's shared buffer pool and eliminate the associated complexity and contention in buffer mapping.
+In-memory pages are connected to the storage pages using direct links. This allows OrioleDB to bypass Postgres's shared buffer pool and eliminate the associated complexity and contention in buffer mapping.
 
 ### Undo log
 

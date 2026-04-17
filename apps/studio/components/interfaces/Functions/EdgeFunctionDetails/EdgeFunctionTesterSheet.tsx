@@ -291,6 +291,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
     <Sheet open={visible} onOpenChange={onClose}>
       <SheetContent
         size="default"
+        hasOverlay={false}
         className="flex flex-col gap-0 p-0"
         onPointerDownOutside={(e) => {
           // react-resizable-panels v4 registers document-level capture-phase pointer

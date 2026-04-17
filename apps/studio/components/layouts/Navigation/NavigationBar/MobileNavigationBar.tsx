@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 import { CommandMenuTrigger, MobileSheetNav } from 'ui-patterns'
 
+import { HeaderUpgradeButton } from '../LayoutHeader/HeaderUpgradeButton'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
@@ -91,6 +92,7 @@ const MobileNavigationBar = ({
               </button>
             </CommandMenuTrigger>
           )}
+          {IS_PLATFORM && <HeaderUpgradeButton />}
           {IS_PLATFORM ? <UserDropdown /> : <LocalDropdown />}
           {!hideMobileMenu && (
             <Button

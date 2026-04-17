@@ -1,5 +1,6 @@
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
+
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {

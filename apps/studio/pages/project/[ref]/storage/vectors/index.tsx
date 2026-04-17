@@ -1,13 +1,6 @@
 import { useParams } from 'common'
-import { BucketsUpgradePlan } from 'components/interfaces/Storage/BucketsUpgradePlan'
-import { VectorsBuckets } from 'components/interfaces/Storage/VectorBuckets'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { StorageBucketsLayout } from 'components/layouts/StorageLayout/StorageBucketsLayout'
-import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
-import { useIsVectorBucketsEnabled } from 'data/config/project-storage-config-query'
 import { VectorBucket } from 'icons'
 import { AWS_REGIONS } from 'shared-data'
-import type { NextPageWithLayout } from 'types'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import {
   EmptyStatePresentational,
@@ -16,9 +9,16 @@ import {
   PageSectionContent,
 } from 'ui-patterns'
 
+import { BucketsUpgradePlan } from '@/components/interfaces/Storage/BucketsUpgradePlan'
+import { VectorsBuckets } from '@/components/interfaces/Storage/VectorBuckets'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { StorageBucketsLayout } from '@/components/layouts/StorageLayout/StorageBucketsLayout'
+import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useIsVectorBucketsEnabled } from '@/data/config/project-storage-config-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { NextPageWithLayout } from '@/types'
 
 const AVAILABLE_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2', 'eu-central-1', 'ap-southeast-2']
 
