@@ -452,6 +452,8 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'
+  - id: strip-nulls
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.stripNulls'
   - id: returns
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.returns'
   - id: overrideTypes

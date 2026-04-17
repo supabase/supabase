@@ -1128,6 +1128,8 @@ test.describe('Filter Bar', () => {
 
         await query(`ALTER TABLE ${tableName} DROP COLUMN first_name`)
 
+        // Wait for the filter bar's debounced URL sync (500ms) before reloading
+        await page.waitForURL(/filter=/, { timeout: 5000 })
         await page.reload({ waitUntil: 'networkidle' })
 
         await expect(page.getByText('No results found — check your filter values')).toBeVisible({

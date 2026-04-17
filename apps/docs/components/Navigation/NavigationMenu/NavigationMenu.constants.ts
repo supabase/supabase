@@ -697,6 +697,10 @@ export const auth: NavMenuConstant = {
           name: 'Next.js',
           url: '/guides/auth/quickstarts/nextjs' as `/${string}`,
         },
+        {
+          name: 'Astro',
+          url: '/guides/auth/quickstarts/astrojs',
+        },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'React Native',
@@ -1988,6 +1992,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
             { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+            { name: 'Download Objects', url: '/guides/storage/management/download-objects' },
           ],
         },
         {

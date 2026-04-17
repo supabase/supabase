@@ -660,6 +660,18 @@ export interface SqlEditorResultCopyJsonClickedEvent {
 }
 
 /**
+ * User clicked the "Result copy CSV" button in the SQL editor
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyCsvClickedEvent {
+  action: 'sql_editor_result_copy_csv_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User submitted a prompt to the assistant sidebar.
  *
  * @group Events
@@ -3186,6 +3198,7 @@ export type TelemetryEvent =
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
+  | SqlEditorResultCopyCsvClickedEvent
   | AssistantPromptSubmittedEvent
   | AssistantDebugSubmittedEvent
   | AssistantSuggestionRunQueryClickedEvent
