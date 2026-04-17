@@ -28,7 +28,7 @@ export function FilterSideBar({
   const { table } = useDataTable()
 
   const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
+  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
@@ -69,7 +69,7 @@ export function FilterSideBar({
       </div>
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        {isUnifiedLogsPreviewAvailable && (
+        {isUnifiedLogsPreviewAvailable && isUnifiedLogsEligible && (
           <FeaturePreviewSidebarPanel
             className="mx-2 mt-2 mb-3"
             title="Go back to old logs"

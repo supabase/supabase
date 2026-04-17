@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 export type FeaturePreview = {
   key: string
@@ -23,6 +24,9 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isEnterprise = subscription?.plan?.id === 'enterprise'
 
+  const { profile } = useProfile()
+  const isInternalUser = profile?.primary_email?.includes('@supabase.') ?? false
+
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const showFloatingMobileToolbar = useFlag('enableFloatingMobileToolbar')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
@@ -33,7 +37,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
       name: 'New Logs interface',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-      enabled: isUnifiedLogsPreviewAvailable && isEnterprise,
+      enabled: isUnifiedLogsPreviewAvailable && (isEnterprise || isInternalUser),
       isNew: false,
       isPlatformOnly: true,
       isDefaultOptIn: false,

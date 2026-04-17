@@ -15,6 +15,7 @@ import { useFeaturePreviews } from './useFeaturePreviews'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { useProfile } from '@/lib/profile'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -93,13 +94,16 @@ export const useUnifiedLogsPreview = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isEnterprise = subscription?.plan?.id === 'enterprise'
 
-  const isEnabled =
-    unifiedLogsEnabled && isEnterprise && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const { profile } = useProfile()
+  const isInternalUser = profile?.primary_email?.includes('@supabase.') ?? false
+
+  const isEligible = unifiedLogsEnabled && (isEnterprise || isInternalUser)
+  const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, enable, disable }
+  return { isEnabled, isEligible, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
