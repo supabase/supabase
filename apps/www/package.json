@@ -75,7 +75,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",
     "react-dom": "catalog:",
-    "react-markdown": "^9.0.1",
+    "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.6",
     "react-transition-group": "^4.4.1",
     "react-use": "^17.4.0",
@@ -91,8 +91,7 @@
     "ui-patterns": "workspace:*",
     "unicornstudio-react": "2.0.1-1",
     "use-debounce": "^7.0.1",
-    "vanilla-tilt": "1.7.0",
-    "yup": "^1.4.0"
+    "vanilla-tilt": "1.7.0"
   },
   "devDependencies": {
     "@babel/core": "*",

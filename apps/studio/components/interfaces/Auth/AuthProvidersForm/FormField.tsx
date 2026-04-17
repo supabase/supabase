@@ -243,7 +243,9 @@ const FormField = ({
                           {...field}
                           id={name}
                           type="number"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
                           readOnly={readOnly}
                         />
                         <InputGroupAddon align="inline-end">
@@ -257,8 +259,10 @@ const FormField = ({
                         {...field}
                         id={name}
                         type="number"
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
                         readOnly={readOnly}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     )}
                   </FormControl_Shadcn_>
@@ -327,13 +331,11 @@ const FormField = ({
                   label={properties.title}
                   description={
                     description ? (
-                      <ReactMarkdown
-                        unwrapDisallowed
-                        disallowedElements={['p']}
-                        className="form-field-markdown"
-                      >
-                        {description}
-                      </ReactMarkdown>
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
                     ) : null
                   }
                 >

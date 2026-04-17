@@ -14,6 +14,13 @@
   <pubDate>Tue, 14 Apr 2026 00:00:00 -0700</pubDate>
 </item>
 <item>
+  <guid>https://supabase.com/blog/supabase-agent-skills</guid>
+  <title>AI Agents Know About Supabase. They Don&apos;t Always Use It Right.</title>
+  <link>https://supabase.com/blog/supabase-agent-skills</link>
+  <description>Introducing Supabase Agent Skills: an open-source set of instructions that teach AI coding agents how to build on Supabase correctly.</description>
+  <pubDate>Thu, 09 Apr 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/custom-oauth-oidc-providers</guid>
   <title>Custom OIDC Providers for Supabase Auth</title>
   <link>https://supabase.com/blog/custom-oauth-oidc-providers</link>

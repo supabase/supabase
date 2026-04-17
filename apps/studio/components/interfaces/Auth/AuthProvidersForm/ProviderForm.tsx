@@ -1,4 +1,4 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Check } from 'lucide-react'
@@ -88,6 +88,12 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
+        // This ensures the default value is visibly selected
+        if (key === 'PASSWORD_REQUIRED_CHARACTERS' && config.PASSWORD_REQUIRED_CHARACTERS === '') {
+          values[key] = NO_REQUIRED_CHARACTERS
+          return
+        }
+
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
@@ -158,7 +164,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
-    resolver: yupResolver(provider.validationSchema),
+    resolver: zodResolver(provider.validationSchema),
     shouldUnregister: true,
   })
 
