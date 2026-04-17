@@ -13,7 +13,7 @@
     "@ionic/pwa-elements": "^3.4.0",
     "@ionic/react": "^8.8.1",
     "@ionic/react-router": "^8.8.1",
-    "@supabase/supabase-js": "^2.99.2",
+    "@supabase/supabase-js": "^2",
     "ionicons": "^7.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

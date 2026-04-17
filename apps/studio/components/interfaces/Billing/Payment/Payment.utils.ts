@@ -1,5 +1,6 @@
 import type { Appearance, CustomFontSource } from '@stripe/stripe-js'
-import { CUSTOM_FONT_BOOK_DATA_URL } from 'fonts/stripe-fonts'
+
+import { CUSTOM_FONT_BOOK_DATA_URL } from '@/fonts/stripe-fonts'
 
 /**
  * Custom font for Stripe Elements iframes.

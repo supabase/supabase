@@ -30,7 +30,7 @@
     "postcss": "^8.5.8",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
-    "vite": "catalog:",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite": "^7.3.2",
+    "vite-tsconfig-paths": "catalog:"
   }
 }

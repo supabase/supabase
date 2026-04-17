@@ -10,12 +10,13 @@ import {
 } from 'ai'
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
-import { buildAssistantEvalOutput } from 'evals/output'
-import type { AssistantEvalInput, AssistantEvalOutput } from 'evals/scorer'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
-import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from 'lib/ai/prompts'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
+
+import { buildAssistantEvalOutput } from '@/evals/output'
+import type { AssistantEvalInput, AssistantEvalOutput } from '@/evals/scorer'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
+import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
+import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -28,7 +29,7 @@ export async function generateAssistantResponse({
   projectRef,
   chatId,
   chatName,
-  isHipaaEnabled,
+  allowTracing,
   userId,
   orgId,
   planId,
@@ -46,7 +47,7 @@ export async function generateAssistantResponse({
   projectRef?: string
   chatId?: string
   chatName?: string
-  isHipaaEnabled?: boolean
+  allowTracing?: boolean
   userId?: string
   orgId?: number
   planId?: string
@@ -56,7 +57,7 @@ export async function generateAssistantResponse({
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
 }) {
-  const shouldTrace = IS_TRACING_ENABLED && !isHipaaEnabled
+  const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
 
   const run = async (span?: Span) => {
     // Only returns last 7 messages
@@ -87,7 +88,9 @@ export async function generateAssistantResponse({
 
     const schemasString =
       aiOptInLevel !== 'disabled' && getSchemas
-        ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+        ? shouldTrace
+          ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
+          : await getSchemas()
         : "You don't have access to any schemas."
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it

@@ -238,6 +238,19 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should parse a POST body without swallowing later quoted arguments', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', body:='{"payload":"ok"}'::jsonb, headers:='{"Authorization":"Bearer demo"}'::jsonb, timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Authorization', value: 'Bearer demo' }],
+      httpBody: '{"payload":"ok"}',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
   it('should return SQL snippet type if the command is an HTTP request that cannot be parsed properly due to positional notation', () => {
     const command = `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({

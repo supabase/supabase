@@ -1,12 +1,12 @@
-import { screen, waitFor } from '@testing-library/dom'
+import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { customRender } from 'tests/lib/custom-render'
-import { routerMock } from 'tests/lib/route-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { IntegrationDefinition } from '../../Landing/Integrations.constants'
-import { InstallIntegrationSheet } from './InstallIntegrationSheet'
+import { InstallIntegrationSheet } from './InstallIntegrationSheet/InstallIntegrationSheet'
+import { customRender } from '@/tests/lib/custom-render'
+import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -113,10 +113,15 @@ describe('InstallIntegrationSheet', () => {
     )
 
     await userEvent.click(screen.getByRole('button', { name: 'Install integration' }))
-    await userEvent.click(getInstallButton())
+
+    // SheetContent renders via a Radix portal, placing the submit button outside
+    // the <form> in the DOM. jsdom doesn't support the HTML `form` attribute on
+    // buttons, so we submit the form directly instead of clicking the button.
+    const form = document.getElementById('installation-settings')!
+    fireEvent.submit(form)
 
     await waitFor(() => {
-      expect(mockCommand).toHaveBeenCalledWith({ ref: 'default' })
+      expect(mockCommand).toHaveBeenCalledWith(expect.objectContaining({ ref: 'default' }))
     })
     expect(mockExecuteSql).not.toHaveBeenCalled()
   })

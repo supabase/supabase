@@ -1,11 +1,11 @@
 import { getUserSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 
 import { authKeys } from './keys'
 import { User } from './users-infinite-query'
+import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
 import { UUID_REGEX } from '@/lib/constants'
+import { UseCustomQueryOptions } from '@/types'
 
 type UserVariables = {
   projectRef?: string

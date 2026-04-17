@@ -1,10 +1,6 @@
 import { useParams } from 'common'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -17,8 +13,12 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
+import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectIntegrationsLayout } from '@/components/layouts/ProjectIntegrationsLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const router = useRouter()

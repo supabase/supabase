@@ -1,4 +1,4 @@
-import { ident } from '../../../pg-format'
+import { ident, joinSqlFragments, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 /**
  * The functions below are basically just queries but may be supported directly
@@ -11,8 +11,8 @@ export const getAddPrimaryKeySQL = ({
 }: {
   schema: string
   table: string
-  columns: string[]
-}) => {
-  const primaryKeyColumns = columns.map((col) => ident(col)).join(', ')
-  return `ALTER TABLE ${ident(schema)}.${ident(table)} ADD PRIMARY KEY (${primaryKeyColumns})`
+  columns: Array<string>
+}): SafeSqlFragment => {
+  const primaryKeyColumns = joinSqlFragments(columns.map(ident), ', ')
+  return safeSql`ALTER TABLE ${ident(schema)}.${ident(table)} ADD PRIMARY KEY (${primaryKeyColumns})`
 }

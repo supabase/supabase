@@ -39,6 +39,7 @@ import {
   useAccessTokenCreateMutation,
   type NewAccessToken,
 } from '@/data/access-tokens/access-tokens-create-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 const formId = 'new-access-token-form'
 
@@ -71,6 +72,7 @@ export const NewTokenDialog = ({
     defaultValues: { tokenName: '', expiresAt: EXPIRES_AT_OPTIONS['month'].value },
     mode: 'onChange',
   })
+  const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof TokenSchema>> = async (values) => {
@@ -86,6 +88,10 @@ export const NewTokenDialog = ({
       { name: values.tokenName, scope: tokenScope, expires_at: expiresAt },
       {
         onSuccess: (data) => {
+          track('access_token_created', {
+            tokenType: 'classic',
+            expiryPreset: values.expiresAt || 'never',
+          })
           toast.success('Access token created successfully')
           onCreateToken(data)
           handleClose()
