@@ -230,13 +230,14 @@ Test with 2-3 additional users to verify:
    This test is critical if you're using multiple environments under the same domain. See [Multiple SSO Providers](/docs/guides/platform/sso/multiple-providers) for details.
 
    </Admonition>
+
 - If you configured SSO without domains (IdP-initiated only):
   - Enable auto-join
   - New user accesses via IdP app tile
   - Verify auto-join works without domain check
   - User automatically added to organization
   - Correct role assigned
-   - Expected: Auto-join works for IdP-initiated regardless of email domain
+  - Expected: Auto-join works for IdP-initiated regardless of email domain
 
 8. **Test auto-join re-enablement**:
    - Disable auto-join
@@ -776,7 +777,7 @@ Common causes:
 - Certificate renewals require coordination
 - User access reviews should include Supabase
 - Incident response plans should consider SSO dependencies
-- Document SSO configuration in your organization's runbooks
+- Document SSO configuration in your organization's runbook
 
 ## Final verification checklist
 

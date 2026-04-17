@@ -56,9 +56,12 @@ const FormSchema = z
   })
   .refine(
     (data) => {
-      // When SP-initiated is enabled, require at least one domain
-      if (data.enableSpInitiated && (!data.domains || data.domains.length === 0)) {
-        return false
+      // When SP-initiated is enabled, require at least one non-empty domain
+      if (data.enableSpInitiated) {
+        const hasValidDomain = data.domains?.some((d) => d.value && d.value.trim().length > 0)
+        if (!hasValidDomain) {
+          return false
+        }
       }
       return true
     },
@@ -81,6 +84,7 @@ export type SSOConfigFormSchema = z.infer<typeof FormSchema>
 
 const defaultValues = {
   enabled: false,
+  enableSpInitiated: false,
   domains: [{ value: '' }],
   metadataXmlUrl: '',
   metadataXmlFile: '',
@@ -112,19 +116,6 @@ export const SSOConfig = () => {
   const ssoMemberCount = members.filter((m) => m.is_sso_user === true).length
   const isSSOProviderNotFound = ssoConfig === null
 
-  const defaultValues = {
-    enabled: false,
-    enableSpInitiated: false,
-    domains: [],
-    metadataXmlUrl: '',
-    metadataXmlFile: '',
-    emailMapping: [{ value: '' }],
-    userNameMapping: [{ value: '' }],
-    firstNameMapping: [{ value: '' }],
-    lastNameMapping: [{ value: '' }],
-    joinOrgOnSignup: false,
-    roleOnJoin: 'Developer',
-  }
   const form = useForm<SSOConfigFormSchema>({
     resolver: zodResolver(FormSchema),
     defaultValues,
@@ -133,9 +124,23 @@ export const SSOConfig = () => {
   const isSSOEnabled = form.watch('enabled')
   const enableSpInitiated = form.watch('enableSpInitiated')
 
-  const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation()
+  const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
+    onSuccess: () => {
+      toast.success('Successfully created SSO configuration')
+      // Reset form to current values to mark as clean
+      // This allows useEffect to reset with fresh data when query refetches
+      form.reset(form.getValues())
+    },
+  })
 
-  const { mutate: updateSSOConfig, isPending: isUpdating } = useSSOConfigUpdateMutation()
+  const { mutate: updateSSOConfig, isPending: isUpdating } = useSSOConfigUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated SSO configuration')
+      // Reset form to current values to mark as clean
+      // This allows useEffect to reset with fresh data when query refetches
+      form.reset(form.getValues())
+    },
+  })
 
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
 
@@ -185,33 +190,27 @@ export const SSOConfig = () => {
   }
 
   useEffect(() => {
-    // Reset form when organization changes or SSO config loads
-    // Only reset if user hasn't made changes (not dirty)
-    if (!form.formState.isDirty) {
-      if (ssoConfig) {
-        form.reset({
-          enabled: ssoConfig.enabled,
-          // Infer SP-initiated from domains presence
-          enableSpInitiated: ssoConfig.domains && ssoConfig.domains.length > 0,
-          domains: ssoConfig.domains?.map((domain) => ({ value: domain })) || [],
-          metadataXmlUrl: ssoConfig.metadata_xml_url,
-          metadataXmlFile: ssoConfig.metadata_xml_file,
-          emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
-          userNameMapping:
-            ssoConfig.user_name_mapping?.map((userName) => ({ value: userName })) || [],
-          firstNameMapping:
-            ssoConfig.first_name_mapping?.map((firstName) => ({ value: firstName })) || [],
-          lastNameMapping:
-            ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })) || [],
-          joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
-          roleOnJoin: ssoConfig.join_org_on_signup_role,
-        })
-      } else {
-        // Reset to defaults when no SSO config exists or org changes
-        form.reset(defaultValues)
-      }
+    // Only reset form if it's not dirty (user hasn't made changes)
+    if (ssoConfig && !form.formState.isDirty) {
+      form.reset({
+        enabled: ssoConfig.enabled,
+        // Infer SP-initiated from domains presence
+        enableSpInitiated: ssoConfig.domains && ssoConfig.domains.length > 0,
+        domains: ssoConfig.domains?.map((domain) => ({ value: domain })) || [],
+        metadataXmlUrl: ssoConfig.metadata_xml_url,
+        metadataXmlFile: ssoConfig.metadata_xml_file,
+        emailMapping: ssoConfig.email_mapping.map((email) => ({ value: email })),
+        userNameMapping:
+          ssoConfig.user_name_mapping?.map((userName) => ({ value: userName })) || [],
+        firstNameMapping:
+          ssoConfig.first_name_mapping?.map((firstName) => ({ value: firstName })) || [],
+        lastNameMapping:
+          ssoConfig.last_name_mapping?.map((lastName) => ({ value: lastName })) || [],
+        joinOrgOnSignup: ssoConfig.join_org_on_signup_enabled,
+        roleOnJoin: ssoConfig.join_org_on_signup_role,
+      })
     }
-  }, [ssoConfig, organization?.slug, form.formState.isDirty])
+  }, [ssoConfig])
 
   // Automatically add an empty domain field when SP-initiated is enabled
   useEffect(() => {

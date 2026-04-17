@@ -50,19 +50,16 @@ Create three separate SAML apps in your identity provider, each pointing to a di
 #### In your identity provider (Okta, Azure AD, Google Workspace)
 
 1. **Create "Supabase Dev" SAML app**
-
    - Configure with Dev organization's ACS URL
    - Assign developers and testers
    - Deploy app tile labeled "Supabase Dev"
 
 2. **Create "Supabase Staging" SAML app**
-
    - Configure with Staging organization's ACS URL
    - Assign QA team and release managers
    - Deploy app tile labeled "Supabase Staging"
 
 3. **Create "Supabase Production" SAML app**
-
    - Configure with Production organization's ACS URL
    - Assign production users only
    - Deploy app tile labeled "Supabase Production"
@@ -87,11 +84,11 @@ Create three separate SAML apps in your identity provider, each pointing to a di
 
 Here's how the three configurations differ:
 
-| Environment | Organization  | IDP App Name       | ACS URL                              | Users Assigned    |
-| ----------- | ------------- | ------------------ | ------------------------------------ | ----------------- |
-| Dev         | `dev-org`     | "Supabase Dev"     | `https://...dev-org.../saml/acs`     | All engineers     |
-| Staging     | `staging-org` | "Supabase Staging" | `https://...staging-org.../saml/acs` | QA + Release mgrs |
-| Production  | `prod-org`    | "Supabase Prod"    | `https://...prod-org.../saml/acs`    | Production users  |
+| Environment | Organization | IDP App Name       | ACS URL                              |
+| ----------- | ------------ | ------------------ | ------------------------------------ |
+| Dev         | `dev`        | "Supabase Dev"     | `https://...dev-org.../saml/acs`     |
+| Staging     | `staging`    | "Supabase Staging" | `https://...staging-org.../saml/acs` |
+| Production  | `prod`       | "Supabase Prod"    | `https://...prod-org.../saml/acs`    |
 
 #### Each organization
 
