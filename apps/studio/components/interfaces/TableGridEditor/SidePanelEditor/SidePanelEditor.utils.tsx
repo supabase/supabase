@@ -1,54 +1,64 @@
-import pgMeta from '@supabase/pg-meta'
+import * as Sentry from '@sentry/nextjs'
+import pgMeta, {
+  getAddForeignKeySQL,
+  getAddPrimaryKeySQL,
+  getDropConstraintSQL,
+  getDuplicateIdentitySequenceSQL,
+  getDuplicateRowsSQL,
+  getDuplicateTableSQL,
+  getEnableRLSSQL,
+  getRemoveForeignKeySQL,
+  getUpdateIdentitySequenceSQL,
+  type ForeignKey,
+} from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import type { PostgresPrimaryKey } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid/types'
-import { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import SparkBar from 'components/ui/SparkBar'
-import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
-import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
-import { updateDatabaseColumn } from 'data/database-columns/database-column-update-mutation'
-import { createDatabasePolicy } from 'data/database-policies/database-policy-create-mutation'
-import type { Constraint } from 'data/database/constraints-query'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import { databaseKeys } from 'data/database/keys'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { lintKeys } from 'data/lint/keys'
-import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
-import { getQueryClient } from 'data/query-client'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { executeWithRetry } from 'data/table-rows/table-rows-query'
-import { tableKeys } from 'data/tables/keys'
-import {
-  RetrieveTableResult,
-  RetrievedTableColumn,
-  getTable,
-  getTableQuery,
-} from 'data/tables/table-retrieve-query'
-import {
-  UpdateTableBody,
-  updateTable as updateTableMutation,
-} from 'data/tables/table-update-mutation'
-import { getTables } from 'data/tables/tables-query'
-import { sendEvent } from 'data/telemetry/send-event-mutation'
-import { timeout, tryParseJson } from 'lib/helpers'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import type { SidePanel } from 'state/table-editor'
 
 import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
-import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
+import type { SupaRow } from '@/components/grid/types'
+import { GeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
+import SparkBar from '@/components/ui/SparkBar'
+import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
+import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
+import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
+import { createDatabasePolicy } from '@/data/database-policies/database-policy-create-mutation'
+import type { Constraint } from '@/data/database/constraints-query'
+import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import { databaseKeys } from '@/data/database/keys'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { lintKeys } from '@/data/lint/keys'
+import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
+import { getQueryClient } from '@/data/query-client'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { executeWithRetry } from '@/data/table-rows/table-rows-query'
+import { tableKeys } from '@/data/tables/keys'
+import {
+  getTable,
+  getTableQuery,
+  RetrievedTableColumn,
+  RetrieveTableResult,
+} from '@/data/tables/table-retrieve-query'
+import {
+  UpdateTableBody,
+  updateTable as updateTableMutation,
+} from '@/data/tables/table-update-mutation'
+import { getTables } from '@/data/tables/tables-query'
+import { sendEvent } from '@/data/telemetry/send-event-mutation'
+import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { DeepReadonly } from '@/lib/type-helpers'
+import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -80,23 +90,6 @@ export function getRowFromSidePanel(
   }
 }
 
-/**
- * The functions below are basically just queries but may be supported directly
- * from the pg-meta library in the future
- */
-const getAddPrimaryKeySQL = ({
-  schema,
-  table,
-  columns,
-}: {
-  schema: string
-  table: string
-  columns: string[]
-}) => {
-  const primaryKeyColumns = columns.map((col) => `"${col}"`).join(', ')
-  return `ALTER TABLE "${schema}"."${table}" ADD PRIMARY KEY (${primaryKeyColumns})`
-}
-
 const addPrimaryKey = async (
   projectRef: string,
   connectionString: string | undefined | null,
@@ -120,56 +113,13 @@ const dropConstraint = async (
   table: string,
   name: string
 ) => {
-  const query = `ALTER TABLE "${schema}"."${table}" DROP CONSTRAINT "${name}"`
+  const query = getDropConstraintSQL({ schema, table, name })
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
     sql: query,
     queryKey: ['drop-constraint'],
   })
-}
-
-const getAddForeignKeySQL = ({
-  table,
-  foreignKeys,
-}: {
-  table: { schema: string; name: string }
-  foreignKeys: ForeignKey[]
-}) => {
-  const getOnDeleteSql = (action: string) =>
-    action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
-      ? 'ON DELETE CASCADE'
-      : action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-        ? 'ON DELETE RESTRICT'
-        : action === FOREIGN_KEY_CASCADE_ACTION.SET_DEFAULT
-          ? 'ON DELETE SET DEFAULT'
-          : action === FOREIGN_KEY_CASCADE_ACTION.SET_NULL
-            ? 'ON DELETE SET NULL'
-            : ''
-  const getOnUpdateSql = (action: string) =>
-    action === FOREIGN_KEY_CASCADE_ACTION.CASCADE
-      ? 'ON UPDATE CASCADE'
-      : action === FOREIGN_KEY_CASCADE_ACTION.RESTRICT
-        ? 'ON UPDATE RESTRICT'
-        : ''
-  return (
-    foreignKeys
-      .map((relation) => {
-        const { deletionAction, updateAction } = relation
-        const onDeleteSql = getOnDeleteSql(deletionAction)
-        const onUpdateSql = getOnUpdateSql(updateAction)
-        return `
-      ALTER TABLE "${table.schema}"."${table.name}"
-      ADD FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
-      REFERENCES "${relation.schema}"."${relation.table}" (${relation.columns.map((column) => `"${column.target}"`).join(',')})
-      ${onUpdateSql}
-      ${onDeleteSql}
-    `
-          .replace(/\s+/g, ' ')
-          .trim()
-      })
-      .join(';') + ';'
-  )
 }
 
 const addForeignKey = async ({
@@ -190,27 +140,6 @@ const addForeignKey = async ({
     sql: query,
     queryKey: ['foreign-keys'],
   })
-}
-
-const getRemoveForeignKeySQL = ({
-  table,
-  foreignKeys,
-}: {
-  table: { schema: string; name: string }
-  foreignKeys: ForeignKey[]
-}) => {
-  return (
-    foreignKeys
-      .map((relation) =>
-        `
-ALTER TABLE IF EXISTS "${table.schema}"."${table.name}"
-DROP CONSTRAINT IF EXISTS "${relation.name}"
-`
-          .replace(/\s+/g, ' ')
-          .trim()
-      )
-      .join(';') + ';'
-  )
 }
 
 const removeForeignKey = async ({
@@ -256,22 +185,6 @@ const updateForeignKey = async ({
     sql: query,
     queryKey: ['foreign-keys'],
   })
-}
-
-const getUpdateIdentitySequenceSQL = ({
-  schema,
-  table,
-  column,
-}: {
-  schema: string
-  table: string
-  column: string
-}) => {
-  return `SELECT setval('"${schema}"."${table}_${column}_seq"', (SELECT COALESCE(MAX("${column}"), 1) FROM "${schema}"."${table}"))`
-}
-
-const getEnableRLSSQL = ({ schema, table }: { schema: string; table: string }) => {
-  return `ALTER TABLE "${schema}"."${table}" ENABLE ROW LEVEL SECURITY`
 }
 
 /**
@@ -349,7 +262,7 @@ export const createColumn = async ({
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
     }
     return { error: undefined }
-  } catch (error: any) {
+  } catch (error) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
   }
@@ -457,12 +370,12 @@ export const duplicateTable = async (
   await executeSql({
     projectRef,
     connectionString,
-    sql: [
-      `CREATE TABLE "${sourceTableSchema}"."${duplicatedTableName}" (LIKE "${sourceTableSchema}"."${sourceTableName}" INCLUDING ALL);`,
-      payload.comment != undefined
-        ? `comment on table "${sourceTableSchema}"."${duplicatedTableName}" is '${payload.comment}';`
-        : '',
-    ].join('\n'),
+    sql: getDuplicateTableSQL({
+      sourceTableName,
+      sourceTableSchema,
+      duplicatedTableName,
+      comment: payload.comment,
+    }),
   })
   await queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, sourceTableSchema) })
 
@@ -481,7 +394,11 @@ export const duplicateTable = async (
     await executeSql({
       projectRef,
       connectionString,
-      sql: `INSERT INTO "${sourceTableSchema}"."${duplicatedTableName}" SELECT * FROM "${sourceTableSchema}"."${sourceTableName}";`,
+      sql: getDuplicateRowsSQL({
+        sourceTableName,
+        sourceTableSchema,
+        duplicatedTableName,
+      }),
     })
 
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
@@ -491,7 +408,12 @@ export const duplicateTable = async (
       await executeSql({
         projectRef,
         connectionString,
-        sql: `SELECT setval('"${sourceTableSchema}"."${duplicatedTableName}_${column.name}_seq"', (SELECT MAX("${column.name}") FROM "${sourceTableSchema}"."${sourceTableName}"));`,
+        sql: getDuplicateIdentitySequenceSQL({
+          sourceTableName,
+          sourceTableSchema,
+          duplicatedTableName,
+          columnName: column.name,
+        }),
       })
     })
   }
@@ -554,12 +476,15 @@ export const createTable = async ({
   const sqlStatements: string[] = []
 
   // 1. Create table SQL
-  const { sql: createTableSql } = pgMeta.tables.create(payload)
+  const { sql: createTableSql } = pgMeta.tables.create({ ...payload, no_transaction: true })
   sqlStatements.push(createTableSql)
 
   // 2. Enable RLS if configured
   if (isRLSEnabled) {
-    const enableRLSSQL = getEnableRLSSQL({ schema: payload.schema, table: payload.name })
+    const enableRLSSQL = getEnableRLSSQL({
+      schema: payload.schema,
+      table: payload.name,
+    })
     sqlStatements.push(enableRLSSQL)
   }
 
@@ -582,6 +507,7 @@ export const createTable = async ({
       is_unique: columnPayload.isUnique,
       comment: columnPayload.comment,
       check: columnPayload.check,
+      no_transaction: true,
     })
     sqlStatements.push(columnSQL)
   }
@@ -612,12 +538,18 @@ export const createTable = async ({
   // Execute all table creation SQL in a single transaction
   toast.loading(`Creating table ${payload.name}...`, { id: toastId })
 
-  await executeSql({
-    projectRef,
-    connectionString,
-    sql: sqlStatements.join(';\n'),
-    queryKey: ['table', 'create-with-columns'],
-  })
+  await Sentry.startSpan(
+    { name: 'create_table.execute_sql', op: 'db.sql.transaction' },
+    async (span) => {
+      span.setAttribute('sql.statement_count', sqlStatements.length)
+      await executeSql({
+        projectRef,
+        connectionString,
+        sql: `BEGIN; ${sqlStatements.join(';\n')}; COMMIT;`,
+        queryKey: ['table', 'create-with-columns'],
+      })
+    }
+  )
 
   // 6. Create generated RLS policies if any
   // [Joshen] Possible area for optimization to create all policies in a single query call
@@ -625,31 +557,38 @@ export const createTable = async ({
 
   const failedPolicies: GeneratedPolicy[] = []
   if (generatedPolicies.length > 0 && isRLSEnabled) {
-    toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
-    await Promise.all(
-      generatedPolicies.map(async (policy) => {
-        try {
-          return await createDatabasePolicy({
-            projectRef,
-            connectionString,
-            payload: {
-              name: policy.name,
-              table: policy.table,
-              schema: policy.schema,
-              definition: policy.definition,
-              check: policy.check,
-              action: policy.action,
-              command: policy.command,
-              roles: policy.roles,
-            },
+    await Sentry.startSpan(
+      { name: 'create_table.create_policies', op: 'db.policies.create' },
+      async (span) => {
+        span.setAttribute('policies.count', generatedPolicies.length)
+        toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
+        await Promise.all(
+          generatedPolicies.map(async (policy) => {
+            try {
+              return await createDatabasePolicy({
+                projectRef,
+                connectionString,
+                payload: {
+                  name: policy.name,
+                  table: policy.table,
+                  schema: policy.schema,
+                  definition: policy.definition,
+                  check: policy.check,
+                  action: policy.action,
+                  command: policy.command,
+                  roles: policy.roles,
+                },
+              })
+            } catch (error: any) {
+              console.error('Failed to generate policy', error.message)
+              failedPolicies.push(policy)
+            }
           })
-        } catch (error: any) {
-          console.error('Failed to generate policy', error.message)
-          failedPolicies.push(policy)
-        }
-      })
+        )
+        span.setAttribute('policies.failed_count', failedPolicies.length)
+        onCreatePoliciesSuccess?.()
+      }
     )
-    onCreatePoliciesSuccess?.()
   }
 
   // Track table creation event (fire-and-forget to avoid blocking)
@@ -692,102 +631,128 @@ export const createTable = async ({
   }
 
   // Fetch the created table
-  const table = await getTableQuery({
-    projectRef,
-    connectionString,
-    name: payload.name,
-    schema: payload.schema,
-  })
+  const table = await Sentry.startSpan(
+    { name: 'create_table.fetch_table', op: 'db.table.fetch' },
+    async () => {
+      return await getTableQuery({
+        projectRef,
+        connectionString,
+        name: payload.name,
+        schema: payload.schema,
+      })
+    }
+  )
 
   // If the user is importing data via a spreadsheet
   if (importContent !== undefined) {
-    if (importContent.file && importContent.rowCount > 0) {
-      // Via a CSV file
-      const { error }: any = await insertRowsViaSpreadsheet(
-        projectRef,
-        connectionString,
-        importContent.file,
-        table,
-        importContent.selectedHeaders,
-        (progress: number) => {
-          toast.loading(
-            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-              <SparkBar
-                value={progress}
-                max={100}
-                type="horizontal"
-                barClass="bg-brand"
-                labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
-                labelBottomClass=""
-                labelTop={`${progress.toFixed(2)}%`}
-                labelTopClass="tabular-nums"
-              />
-            </div>,
-            { id: toastId }
-          )
-        }
-      )
+    await Sentry.startSpan(
+      { name: 'create_table.import_data', op: 'db.table.import' },
+      async (span) => {
+        const rowCount = importContent.file
+          ? importContent.rowCount
+          : (importContent.rows?.length ?? 0)
+        span.setAttribute('import.row_count', rowCount)
+        span.setAttribute('import.method', importContent.file ? 'csv' : 'paste')
 
-      if (error !== undefined) {
-        toast.error('Do check your spreadsheet if there are any discrepancies.')
-        const message = `Table ${table.name} has been created but we ran into an error while inserting rows: ${error.message}`
-        toast.error(message)
-        console.error('Error:', { error, message })
-      }
-    } else {
-      // Via text copy and paste
-      await insertTableRows(
-        projectRef,
-        connectionString,
-        table,
-        importContent.rows,
-        importContent.selectedHeaders,
-        (progress: number) => {
-          toast.loading(
-            <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-              <SparkBar
-                value={progress}
-                max={100}
-                type="horizontal"
-                barClass="bg-brand"
-                labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                labelTop={`${progress.toFixed(2)}%`}
-                labelTopClass="tabular-nums"
-              />
-            </div>,
-            { id: toastId }
-          )
-        }
-      )
-    }
-
-    // For identity columns, manually raise the sequences (batched for performance)
-    const identityColumns = columns.filter((column) => column.isIdentity)
-    if (identityColumns.length > 0) {
-      const updateSequenceSQL = identityColumns
-        .map((column) =>
-          getUpdateIdentitySequenceSQL({
-            schema: table.schema,
-            table: table.name,
-            column: column.name,
+        if (importContent.file && importContent.rowCount > 0) {
+          // Via a CSV file
+          const { error } = await insertRowsViaSpreadsheet({
+            projectRef,
+            connectionString,
+            file: importContent.file,
+            table,
+            selectedHeaders: importContent.selectedHeaders,
+            onProgressUpdate: (progress: number) => {
+              toast.loading(
+                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                  <SparkBar
+                    value={progress}
+                    max={100}
+                    type="horizontal"
+                    barClass="bg-brand"
+                    labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
+                    labelBottomClass=""
+                    labelTop={`${progress.toFixed(2)}%`}
+                    labelTopClass="tabular-nums"
+                  />
+                </div>,
+                { id: toastId }
+              )
+            },
+            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
           })
-        )
-        .join(';\n')
-      await executeSql({
-        projectRef,
-        connectionString,
-        sql: updateSequenceSQL,
-        queryKey: ['sequences', 'update-batch'],
-      })
-    }
+
+          if (error !== undefined) {
+            span.setAttribute('import.error', 1)
+            toast.error('Do check your spreadsheet if there are any discrepancies.')
+            const message = isObjectContainingKeys(error, ['message'])
+              ? String(error.message)
+              : 'An unknown error occurred during data import.'
+            toast.error(message)
+            console.error('Error:', { error, message })
+          }
+        } else {
+          // Via text copy and paste
+          await insertTableRows({
+            projectRef,
+            connectionString,
+            table,
+            rows: importContent.rows,
+            selectedHeaders: importContent.selectedHeaders,
+            onProgressUpdate: (progress: number) => {
+              toast.loading(
+                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                  <SparkBar
+                    value={progress}
+                    max={100}
+                    type="horizontal"
+                    barClass="bg-brand"
+                    labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
+                    labelTop={`${progress.toFixed(2)}%`}
+                    labelTopClass="tabular-nums"
+                  />
+                </div>,
+                { id: toastId }
+              )
+            },
+            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
+          })
+        }
+
+        // For identity columns, manually raise the sequences (batched for performance)
+        const identityColumns = columns.filter((column) => column.isIdentity)
+        if (identityColumns.length > 0) {
+          const updateSequenceSQL = identityColumns
+            .map((column) =>
+              getUpdateIdentitySequenceSQL({
+                schema: table.schema,
+                table: table.name,
+                column: column.name,
+              })
+            )
+            .join(';\n')
+          await executeSql({
+            projectRef,
+            connectionString,
+            sql: updateSequenceSQL,
+            queryKey: ['sequences', 'update-batch'],
+          })
+        }
+      }
+    )
   }
 
-  await prefetchEditorTablePage({
-    queryClient,
-    projectRef,
-    connectionString,
-    id: table.id,
-  })
+  await Sentry.startSpan(
+    { name: 'create_table.prefetch_editor', op: 'db.table.prefetch' },
+    async () => {
+      await prefetchEditorTablePage({
+        queryClient,
+        projectRef,
+        connectionString,
+        id: table.id,
+      })
+    }
+  )
 
   // Finally, return the created table
   return { table, failedPolicies }
@@ -1005,15 +970,22 @@ export const formatRowsForInsert = ({
   rows,
   headers,
   columns = [],
+  emptyStringAsNullHeaders = headers,
 }: {
-  rows: any[]
+  rows: unknown[]
   headers: string[]
   columns?: RetrieveTableResult['columns']
+  emptyStringAsNullHeaders?: string[]
 }) => {
-  return rows.map((row: any) => {
-    const formattedRow: any = {}
+  return rows.map((row) => {
+    const formattedRow: Record<string, unknown> = {}
+    if (!isObject(row)) {
+      return formattedRow
+    }
+
     headers.forEach((header) => {
       const column = columns?.find((c) => c.name === header)
+
       const originalValue = row[header]
 
       if ((column?.format ?? '').includes('json')) {
@@ -1030,7 +1002,8 @@ export const formatRowsForInsert = ({
           formattedRow[header] = tryParseJson(originalValue)
         }
       } else if (originalValue === '') {
-        formattedRow[header] = column?.is_nullable ? null : ''
+        formattedRow[header] =
+          column?.is_nullable && emptyStringAsNullHeaders.includes(header) ? null : ''
       } else {
         formattedRow[header] = originalValue
       }
@@ -1039,17 +1012,26 @@ export const formatRowsForInsert = ({
   })
 }
 
-export const insertRowsViaSpreadsheet = async (
-  projectRef: string,
-  connectionString: string | undefined | null,
-  file: any,
-  table: RetrieveTableResult,
-  selectedHeaders: string[],
+export async function insertRowsViaSpreadsheet({
+  projectRef,
+  connectionString,
+  file,
+  table,
+  selectedHeaders,
+  emptyStringAsNullHeaders = selectedHeaders,
+  onProgressUpdate,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  file: File
+  table: RetrieveTableResult
+  selectedHeaders: string[]
+  emptyStringAsNullHeaders?: string[]
   onProgressUpdate: (progress: number) => void
-) => {
+}): Promise<{ error: unknown }> {
   let chunkNumber = 0
-  let insertError: any = undefined
-  const t1: any = new Date()
+  let insertError: unknown = undefined
+  const t1 = new Date()
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true,
@@ -1058,13 +1040,14 @@ export const insertRowsViaSpreadsheet = async (
       skipEmptyLines: true,
       chunkSize: CHUNK_SIZE,
       quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
-      chunk: async (results: any, parser: any) => {
+      chunk: async (results, parser) => {
         parser.pause()
 
         const formattedData = formatRowsForInsert({
           rows: results.data,
           headers: selectedHeaders,
           columns: table.columns,
+          emptyStringAsNullHeaders,
         })
 
         const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
@@ -1085,33 +1068,45 @@ export const insertRowsViaSpreadsheet = async (
         parser.resume()
       },
       complete: () => {
-        const t2: any = new Date()
-        console.log(`Total time taken for importing spreadsheet: ${(t2 - t1) / 1000} seconds`)
+        const t2 = new Date()
+        console.log(
+          `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
+        )
         resolve({ error: insertError })
       },
     })
   })
 }
 
-export const insertTableRows = async (
-  projectRef: string,
-  connectionString: string | undefined | null,
-  table: RetrieveTableResult,
-  rows: any,
-  selectedHeaders: string[],
+export async function insertTableRows({
+  projectRef,
+  connectionString,
+  table,
+  rows,
+  selectedHeaders,
+  emptyStringAsNullHeaders = selectedHeaders,
+  onProgressUpdate,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  table: RetrieveTableResult
+  rows: unknown[]
+  selectedHeaders: string[]
+  emptyStringAsNullHeaders?: string[]
   onProgressUpdate: (progress: number) => void
-) => {
-  let insertError = undefined
+}): Promise<{ error: unknown }> {
+  let insertError: unknown = undefined
   let insertProgress = 0
 
   const formattedRows = formatRowsForInsert({
     rows,
     headers: selectedHeaders,
     columns: table.columns,
+    emptyStringAsNullHeaders,
   })
 
   const batches = chunk(formattedRows, BATCH_SIZE)
-  const promises = batches.map((batch: any) => {
+  const tasks = batches.map((batch) => {
     return () => {
       return Promise.race([
         new Promise(async (resolve, reject) => {
@@ -1126,12 +1121,12 @@ export const insertTableRows = async (
           insertProgress = insertProgress + batch.length / rows.length
           resolve({})
         }),
-        timeout(30000),
+        timeout(30_000),
       ])
     }
   })
 
-  const batchedPromises = chunk(promises, 10)
+  const batchedPromises = chunk(tasks, 10)
   for (const batchedPromise of batchedPromises) {
     const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
     const hasFailedBatch = find(res, { status: 'rejected' })

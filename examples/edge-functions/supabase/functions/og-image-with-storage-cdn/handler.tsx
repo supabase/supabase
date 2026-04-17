@@ -38,147 +38,145 @@ export async function handler(req: Request) {
     const prefix = `00000000`.slice(numDigits)
 
     const generatedImage = new ImageResponse(
-      (
-        <>
+      <>
+        <div
+          style={{
+            width: '1200px',
+            height: '630px',
+            backgroundColor: '#000',
+            color: '#fff',
+            fontFamily: '"Circular"',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* Background image  */}
+          <img
+            width="1200"
+            height="630"
+            style={{
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              zIndex: '-9000',
+            }}
+            src={golden ? BACKGROUND_IMAGE_GOLDEN : BACKGROUND_IMAGE_STD}
+          />
+          {/* GitHub Avatar image */}
+          <img
+            width="200"
+            height="200"
+            style={{
+              position: 'absolute',
+              top: '215',
+              left: '155',
+              borderRadius: 100,
+            }}
+            src={`https://github.com/${username}.png`}
+          />
+          {/* Name & username */}
           <div
             style={{
-              width: '1200px',
-              height: '630px',
-              backgroundColor: '#000',
-              color: '#fff',
-              fontFamily: '"Circular"',
-              overflow: 'hidden',
               display: 'flex',
-              alignItems: 'center',
               justifyContent: 'center',
+              flexDirection: 'column',
+              position: 'absolute',
+              top: '215',
+              left: '400',
+              width: '550',
+              height: '200',
+              overflow: 'hidden',
+              textOverflow: 'clip',
             }}
           >
-            {/* Background image  */}
-            <img
-              width="1200"
-              height="630"
-              style={{
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                zIndex: '-9000',
-              }}
-              src={golden ? BACKGROUND_IMAGE_GOLDEN : BACKGROUND_IMAGE_STD}
-            />
-            {/* GitHub Avatar image */}
-            <img
-              width="200"
-              height="200"
-              style={{
-                position: 'absolute',
-                top: '215',
-                left: '155',
-                borderRadius: 100,
-              }}
-              src={`https://github.com/${username}.png`}
-            />
-            {/* Name & username */}
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                position: 'absolute',
-                top: '215',
-                left: '400',
-                width: '550',
-                height: '200',
-                overflow: 'hidden',
-                textOverflow: 'clip',
+                color: 'transparent',
+                backgroundImage:
+                  'linear-gradient(90deg, #F8F9FA 1.73%, rgba(248, 249, 250, 0.5) 100%)',
+                backgroundClip: 'text',
               }}
             >
-              <div
+              <p
                 style={{
-                  display: 'flex',
-                  color: 'transparent',
-                  backgroundImage:
-                    'linear-gradient(90deg, #F8F9FA 1.73%, rgba(248, 249, 250, 0.5) 100%)',
-                  backgroundClip: 'text',
+                  fontSize: '60px',
+                  lineHeight: '60px',
                 }}
               >
-                <p
-                  style={{
-                    fontSize: '60px',
-                    lineHeight: '60px',
-                  }}
-                >
-                  {name}
-                </p>
-              </div>
-              {/* Username and supaverified checkmark */}
-              <div
-                style={{
-                  display: 'flex',
-                  fontSize: '25',
-                  color: golden ? '#fff' : '#A0A0A0',
-                }}
-              >
-                <span>{`@${username}`}</span>
-                <span
-                  style={{
-                    marginTop: '2',
-                    marginLeft: '10',
-                  }}
-                >
-                  <img width="32" height="32" src={golden ? SUPA_CHECKMARK_GOLD : SUPA_CHECKMARK} />
-                </span>
-              </div>
+                {name}
+              </p>
             </div>
-            {/* Date  */}
-            <p
+            {/* Username and supaverified checkmark */}
+            <div
               style={{
-                position: 'absolute',
-                top: '520',
-                left: '400',
-                fontSize: '22',
+                display: 'flex',
+                fontSize: '25',
                 color: golden ? '#fff' : '#A0A0A0',
               }}
             >
-              December 12th 2022
-            </p>
-            {/* URL  */}
-            <p
-              style={{
-                position: 'absolute',
-                top: '520',
-                left: '680',
-                fontSize: '22',
-                color: golden ? '#fff' : '#A0A0A0',
-              }}
-            >
-              supabase.com/launch-week
-            </p>
+              <span>{`@${username}`}</span>
+              <span
+                style={{
+                  marginTop: '2',
+                  marginLeft: '10',
+                }}
+              >
+                <img width="32" height="32" src={golden ? SUPA_CHECKMARK_GOLD : SUPA_CHECKMARK} />
+              </span>
+            </div>
           </div>
-          {/* Ticket No  */}
-          <div
+          {/* Date  */}
+          <p
             style={{
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               position: 'absolute',
-              bottom: '225',
-              right: '-165',
-              width: '575',
-              height: '175',
-              transform: 'rotate(90deg)',
+              top: '520',
+              left: '400',
+              fontSize: '22',
+              color: golden ? '#fff' : '#A0A0A0',
             }}
           >
-            <p
-              style={{
-                fontSize: '70',
-              }}
-            >
-              {`No ${prefix}${ticketNumber}`}
-            </p>
-          </div>
-        </>
-      ),
+            December 12th 2022
+          </p>
+          {/* URL  */}
+          <p
+            style={{
+              position: 'absolute',
+              top: '520',
+              left: '680',
+              fontSize: '22',
+              color: golden ? '#fff' : '#A0A0A0',
+            }}
+          >
+            supabase.com/launch-week
+          </p>
+        </div>
+        {/* Ticket No  */}
+        <div
+          style={{
+            color: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            bottom: '225',
+            right: '-165',
+            width: '575',
+            height: '175',
+            transform: 'rotate(90deg)',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '70',
+            }}
+          >
+            {`No ${prefix}${ticketNumber}`}
+          </p>
+        </div>
+      </>,
       {
         width: 1200,
         height: 630,

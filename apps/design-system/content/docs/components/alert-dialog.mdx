@@ -99,6 +99,7 @@ This enforced decision helps prevent accidental dismissal of critical warnings o
 
 - **Keep content concise:** AlertDialogDescription renders as a single paragraph and must not contain block-level elements such as lists, multiple paragraphs, or complex layouts.
 - **Use for critical decisions only:** Reserve Alert Dialog for destructive or irreversible actions, or for warnings that require explicit acknowledgement.
+- **Use for dirty-form discard confirmation:** A short discard-confirmation step after a dirty form dismissal attempt (backdrop, Escape, or `Cancel`) is a valid Alert Dialog pattern. In Studio, prefer `DiscardChangesConfirmationDialog` for this flow.
 - **Always provide a cancel action:** Include AlertDialogCancel so users can safely back out, in addition to supporting the Escape key.
 - **Avoid rich content:** If the dialog requires detailed explanations, callouts, or form inputs, use [Confirmation Modal](../fragments/confirmation-modal) or [Dialog](../components/dialog) instead.
 

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import styleHandler from '../../lib/theme/styleHandler'
-import { useFormContext } from '../Form/FormContext'
 import { generateUID } from './../../lib/utils/randomIdGenerator'
 import { RadioContext } from './RadioContext'
 
@@ -61,40 +60,12 @@ function RadioGroup({
 
   const __styles = styleHandler('radio')
 
-  const {
-    formContextOnChange,
-    values,
-    errors,
-    // handleBlur,
-    touched,
-    fieldLevelValidation,
-  } = useFormContext()
-
-  if (values && !value) value = values[id || name]
-  // console.log('errors in. radio group', errors)
-  // console.log('values in radio group', values)
-
-  if (!error) {
-    if (errors && !error) error = errors[id || name]
-    error = touched && touched[id || name] ? error : undefined
-  }
-
-  useEffect(() => {
-    if (validation) fieldLevelValidation(id, validation(value))
-  }, [])
-
   useEffect(() => {
     setActiveId(value)
   }, [value])
 
   function parentCallback(e: React.ChangeEvent<HTMLInputElement>) {
     if (onChange) onChange(e)
-    // update form
-    if (formContextOnChange) {
-      formContextOnChange(e)
-    }
-    // run field level validation
-    if (validation) fieldLevelValidation(id, validation(e.target.value))
     setActiveId(e.target.id)
   }
 
@@ -176,13 +147,6 @@ function Radio({
 
   const inputName = name
 
-  const { handleBlur } = useFormContext()
-
-  function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-    if (handleBlur) handleBlur(e)
-    if (onBlur) onBlur(e)
-  }
-
   return (
     <RadioContext.Consumer>
       {({ parentCallback, type, name, activeId, parentSize }) => {
@@ -251,7 +215,7 @@ function Radio({
               disabled={disabled}
               value={value ? value : markupId}
               onChange={(e) => onInputChange(e)}
-              onBlur={handleBlurEvent}
+              onBlur={onBlur}
             />
             {addOnBefore}
             {children || (

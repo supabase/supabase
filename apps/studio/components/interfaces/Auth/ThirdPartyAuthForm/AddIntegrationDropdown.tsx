@@ -1,7 +1,5 @@
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
-
-import { useFlag } from 'common'
 import {
   Button,
   cn,
@@ -12,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import {
   getIntegrationTypeIcon,
   getIntegrationTypeLabel,
@@ -52,8 +51,6 @@ export const AddIntegrationDropdown = ({
   align = 'end',
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const isWorkOSEnabled = useFlag('isWorkOSTPAEnabled')
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -64,12 +61,9 @@ export const AddIntegrationDropdown = ({
       <DropdownMenuContent align={align} className="w-56">
         <DropdownMenuLabel>Select provider</DropdownMenuLabel>
         <DropdownMenuSeparator />
-
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="clerk" onSelectIntegrationType={onSelectIntegrationType} />
-        {isWorkOSEnabled && (
-          <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
-        )}
+        <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>

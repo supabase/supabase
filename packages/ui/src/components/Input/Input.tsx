@@ -1,7 +1,7 @@
 'use client'
 
 import { Copy } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
@@ -11,10 +11,11 @@ import styleHandler from '../../lib/theme/styleHandler'
 import { copyToClipboard } from '../../lib/utils'
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button'
-import { useFormContext } from '../Form/FormContext'
 
-export interface Props
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
+export interface Props extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'size' | 'onCopy'
+> {
   inputClassName?: string
   iconContainerClassName?: string
   copy?: boolean
@@ -60,8 +61,6 @@ function Input({
   beforeLabel,
   labelOptional,
   layout,
-  onChange,
-  onBlur,
   onCopy,
   placeholder,
   type = 'text',
@@ -78,42 +77,6 @@ function Input({
   const [hidden, setHidden] = useState(true)
 
   const __styles = styleHandler('input')
-
-  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
-    useFormContext()
-
-  if (values && !value) value = values[id || name]
-
-  function handleBlurEvent(e: React.FocusEvent<HTMLInputElement>) {
-    if (handleBlur) {
-      setTimeout(() => {
-        handleBlur(e)
-      }, 100)
-    }
-    if (onBlur) onBlur(e)
-  }
-
-  if (!error) {
-    if (errors && !error) error = errors[id || name]
-    error = touched && touched[id] ? error : undefined
-  }
-
-  function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // console.log('input event', e)
-    if (onChange) onChange(e)
-    // update form
-    if (formContextOnChange) formContextOnChange(e)
-    // run field level validation
-    if (validation) fieldLevelValidation(id, validation(e.target.value))
-  }
-
-  useEffect(() => {
-    if (validation) fieldLevelValidation(id, validation(value))
-  }, [])
-
-  // useEffect(() => {
-  //   error = touched && touched[id] ? error : undefined
-  // }, [errors, touched])
 
   function _onCopy(value: any) {
     copyToClipboard(value, () => {
@@ -161,8 +124,6 @@ function Input({
           disabled={disabled}
           id={id}
           name={name}
-          onChange={onInputChange}
-          onBlur={handleBlurEvent}
           onCopy={onCopy}
           placeholder={placeholder}
           ref={inputRef}
@@ -196,8 +157,10 @@ function Input({
 /**
  * @deprecated Use ./TextArea_Shadcn_ instead
  */
-export interface TextAreaProps
-  extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
+export interface TextAreaProps extends Omit<
+  React.InputHTMLAttributes<HTMLTextAreaElement>,
+  'size' | 'onCopy'
+> {
   textAreaClassName?: string
   descriptionText?: string | React.ReactNode | undefined
   error?: string
@@ -231,8 +194,6 @@ function TextArea({
   beforeLabel,
   labelOptional,
   layout,
-  onChange,
-  onBlur,
   placeholder,
   value,
   style,
@@ -246,7 +207,6 @@ function TextArea({
   actions,
   ...props
 }: TextAreaProps) {
-  const [charLength, setCharLength] = useState(0)
   const [copyLabel, setCopyLabel] = useState('Copy')
 
   function _onCopy(value: any) {
@@ -259,38 +219,6 @@ function TextArea({
       onCopy?.()
     })
   }
-
-  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
-    useFormContext()
-
-  if (values && !value) value = values[id || name]
-
-  function handleBlurEvent(e: React.FocusEvent<HTMLTextAreaElement>) {
-    if (handleBlur) {
-      setTimeout(() => {
-        handleBlur(e)
-      }, 100)
-    }
-    if (onBlur) onBlur(e)
-  }
-
-  if (!error) {
-    if (errors && !error) error = errors[id || name]
-    error = touched && touched[id || name] ? error : undefined
-  }
-
-  function onInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    setCharLength(e.target.value.length)
-    if (onChange) onChange(e)
-    // update form
-    if (formContextOnChange) formContextOnChange(e)
-    // run field level validation
-    if (validation) fieldLevelValidation(id, validation(e.target.value))
-  }
-
-  useEffect(() => {
-    if (validation) fieldLevelValidation(id, validation(value))
-  }, [])
 
   const __styles = styleHandler('input')
 
@@ -325,8 +253,6 @@ function TextArea({
           rows={rows}
           cols={100}
           placeholder={placeholder}
-          onChange={onInputChange}
-          onBlur={handleBlurEvent}
           onCopy={onCopy}
           value={value}
           className={classes.join(' ')}

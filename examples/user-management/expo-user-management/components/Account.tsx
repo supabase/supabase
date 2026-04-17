@@ -2,28 +2,26 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from '@rneui/themed'
-import { Session } from '@supabase/supabase-js'
 import Avatar from './Avatar'
 
-export default function Account({ session }: { session: Session }) {
+export default function Account({ userId, email }: { userId: string; email?: string }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
   const [website, setWebsite] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
 
   useEffect(() => {
-    if (session) getProfile()
-  }, [session])
+    if (userId) getProfile()
+  }, [userId])
 
   async function getProfile() {
     try {
       setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
 
       let { data, error, status } = await supabase
         .from('profiles')
         .select(`username, website, avatar_url`)
-        .eq('id', session?.user.id)
+        .eq('id', userId)
         .single()
       if (error && status !== 406) {
         throw error
@@ -54,10 +52,9 @@ export default function Account({ session }: { session: Session }) {
   }) {
     try {
       setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
 
       const updates = {
-        id: session?.user.id,
+        id: userId,
         username,
         website,
         avatar_url,
@@ -91,7 +88,7 @@ export default function Account({ session }: { session: Session }) {
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
+        <Input label="Email" value={email} disabled />
       </View>
       <View style={styles.verticallySpaced}>
         <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />

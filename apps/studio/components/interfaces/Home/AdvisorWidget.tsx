@@ -1,18 +1,7 @@
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { createLintSummaryPrompt, EntityTypeIcon } from 'components/interfaces/Linter/Linter.utils'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useTrack } from 'lib/telemetry/track'
 import { Activity, ExternalLink, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import { useAdvisorStateSnapshot } from 'state/advisor-state'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Card,
   CardContent,
@@ -31,6 +20,21 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useQueryPerformanceQuery } from '../QueryPerformance/useQueryPerformanceQuery'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import {
+  createLintSummaryPrompt,
+  EntityTypeIcon,
+} from '@/components/interfaces/Linter/Linter.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAdvisorStateSnapshot } from '@/state/advisor-state'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
 interface SlowQuery {
   rolname: string
   mean_time: number
@@ -43,9 +47,7 @@ export const AdvisorWidget = () => {
   const [selectedTab, setSelectedTab] = useState<'security' | 'performance'>('security')
   const { data: lints, isPending: isLoadingLints } = useProjectLintsQuery({ projectRef })
   const { data: slowestQueriesData, isLoading: isLoadingSlowestQueries } = useQueryPerformanceQuery(
-    {
-      preset: 'slowestExecutionTime',
-    }
+    { preset: 'slowestExecutionTime' }
   )
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()

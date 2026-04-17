@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { assertSelfHosted, encryptString, getConnectionString } from './util'
 
-vi.mock('lib/constants', () => ({
+vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
 }))
 
@@ -27,14 +27,14 @@ describe('api/self-hosted/util', () => {
 
   describe('assertSelfHosted', () => {
     it('should not throw when IS_PLATFORM is false', async () => {
-      const constants = await import('lib/constants')
+      const constants = await import('@/lib/constants')
       vi.spyOn(constants, 'IS_PLATFORM', 'get').mockReturnValue(false)
 
       expect(() => assertSelfHosted()).not.toThrow()
     })
 
     it('should throw error when IS_PLATFORM is true', async () => {
-      const constants = await import('lib/constants')
+      const constants = await import('@/lib/constants')
       vi.spyOn(constants, 'IS_PLATFORM', 'get').mockReturnValue(true)
 
       expect(() => assertSelfHosted()).toThrow(

@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import type { ReactNode } from 'react'
-
-import { useOrganizationRestrictions } from 'hooks/misc/useOrganizationRestrictions'
 import { XIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { Button, cn, CriticalIcon, WarningIcon } from 'ui'
+
+import { useOrganizationRestrictions } from '@/hooks/misc/useOrganizationRestrictions'
 
 const bannerMotionProps = {
   initial: { height: 0, opacity: 0 },

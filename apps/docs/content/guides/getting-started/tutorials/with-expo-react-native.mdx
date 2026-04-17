@@ -14,15 +14,18 @@ If you get stuck while working through this guide, refer to the [full example on
 
 </Admonition>
 
-<$Partial path="project_setup.mdx" variables={{ "framework": "exporeactnative", "tab": "mobiles" }} />
+<$Partial
+path="project_setup.mdx"
+variables={{ "framework": "exporeactnative", "tab": "mobiles" }}
+/>
 
 ## Building the app
 
-Let's start building the React Native app from scratch.
+Start by building the React Native app from scratch.
 
 ### Initialize a React Native app
 
-We can use [`expo`](https://docs.expo.dev/get-started/create-a-new-app/) to initialize
+Use [`expo`](https://docs.expo.dev/get-started/create-a-new-app/) to initialize
 an app called `expo-user-management`:
 
 ```bash
@@ -31,14 +34,14 @@ npx create-expo-app -t expo-template-blank-typescript expo-user-management
 cd expo-user-management
 ```
 
-Then let's install the additional dependencies: [supabase-js](https://github.com/supabase/supabase-js)
+Then install the additional dependencies:
 
 ```bash
 npx expo install @supabase/supabase-js @rneui/themed expo-sqlite
 ```
 
-Now let's create a helper file to initialize the Supabase client.
-We need the API URL and the key that you copied [earlier](#get-api-details).
+Now create a helper file to initialize the Supabase client using the API URL and the key that you copied [earlier](#get-api-details).
+
 These variables are safe to expose in your Expo app since Supabase has
 [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled on your Database.
 
@@ -51,26 +54,11 @@ These variables are safe to expose in your Expo app since Supabase has
 >
   <TabPanel id="local-storage" label="LocalStorage">
 
-    <$CodeTabs>
-
-    ```ts name=lib/supabase.ts
-    import 'expo-sqlite/localStorage/install';
-    import { createClient } from '@supabase/supabase-js'
-
-    const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
-    const supabasePublishableKey = YOUR_REACT_NATIVE_SUPABASE_PUBLISHABLE_KEY
-
-    export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
-      auth: {
-        storage: localStorage,
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: false,
-      },
-    })
-    ```
-
-    </$CodeTabs>
+    <$CodeSample
+    path="/user-management/expo-user-management/lib/supabase.ts"
+    lines={[[1, -1]]}
+    meta="name=lib/supabase.ts"
+    />
 
   </TabPanel>
   <TabPanel id="secure-store" label="SecureStore">
@@ -78,6 +66,7 @@ These variables are safe to expose in your Expo app since Supabase has
     If you wish to encrypt the user's session information, you can use `aes-js` and store the encryption key in [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore). The [`aes-js` library](https://github.com/ricmoo/aes-js) is a reputable JavaScript-only implementation of the AES encryption algorithm in CTR mode. A new 256-bit encryption key is generated using the `react-native-get-random-values` library. This key is stored inside Expo's SecureStore, while the value is encrypted and placed inside AsyncStorage.
 
     Make sure that:
+
     - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
     - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
     - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
@@ -169,110 +158,14 @@ These variables are safe to expose in your Expo app since Supabase has
 
 ### Set up a login component
 
-Let's set up a React Native component to manage logins and sign ups.
-Users would be able to sign in with their email and password.
+Set up a React Native component to manage logins and sign ups.
+Users should be able to sign in with their email and password.
 
-<$CodeTabs>
-
-```tsx name=components/Auth.tsx
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState } from 'react-native'
-import { supabase } from '../lib/supabase'
-import { Button, Input } from '@rneui/themed'
-
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
-AppState.addEventListener('change', (state) => {
-  if (state === 'active') {
-    supabase.auth.startAutoRefresh()
-  } else {
-    supabase.auth.stopAutoRefresh()
-  }
-})
-
-export default function Auth() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  async function signInWithEmail() {
-    setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    })
-
-    if (error) Alert.alert(error.message)
-    setLoading(false)
-  }
-
-  async function signUpWithEmail() {
-    setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
-    setLoading(false)
-  }
-
-  return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input
-          label="Email"
-          leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          placeholder="email@address.com"
-          autoCapitalize={'none'}
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Password"
-          leftIcon={{ type: 'font-awesome', name: 'lock' }}
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize={'none'}
-        />
-      </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
-      </View>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/user-management/expo-user-management/components/Auth.tsx"
+lines={[[1, -1]]}
+meta="name=components/Auth.tsx"
+/>
 
 <Admonition type="note">
 
@@ -284,173 +177,25 @@ While testing, you can disable email confirmation in your [project's email auth 
 
 ### Account page
 
-After a user is signed in we can allow them to edit their profile details and manage their account.
+After a user signs in, you can let them to edit their profile details and manage their account.
 
-Let's create a new component for that called `Account.tsx`.
+Create a new component for that called `Account.tsx`.
 
-<$CodeTabs>
-
-```tsx name=components/Account.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert } from 'react-native'
-import { Button, Input } from '@rneui/themed'
-import { Session } from '@supabase/supabase-js'
-
-export default function Account({ session }: { session: Session }) {
-  const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState('')
-  const [website, setWebsite] = useState('')
-  const [avatarUrl, setAvatarUrl] = useState('')
-
-  useEffect(() => {
-    if (session) getProfile()
-  }, [session])
-
-  async function getProfile() {
-    try {
-      setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
-
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', session?.user.id)
-        .single()
-      if (error && status !== 406) {
-        throw error
-      }
-
-      if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }: {
-    username: string
-    website: string
-    avatar_url: string
-  }) {
-    try {
-      setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
-
-      const updates = {
-        id: session?.user.id,
-        username,
-        website,
-        avatar_url,
-        updated_at: new Date(),
-      }
-
-      const { error } = await supabase.from('profiles').upsert(updates)
-
-      if (error) {
-        throw error
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input label="Website" value={website || ''} onChangeText={(text) => setWebsite(text)} />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
-          disabled={loading}
-        />
-      </View>
-
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
-      </View>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/user-management/expo-user-management/components/Account.tsx"
+lines={[[1, -1]]}
+meta="name=components/Account.tsx"
+/>
 
 ### Launch!
 
-Now that we have all the components in place, let's update `App.tsx`:
+Now that you have all the components in place, update `App.tsx`:
 
-<$CodeTabs>
-
-```tsx name=App.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from './lib/supabase'
-import Auth from './components/Auth'
-import Account from './components/Account'
-import { View } from 'react-native'
-import { Session } from '@supabase/supabase-js'
-
-export default function App() {
-  const [session, setSession] = useState<Session | null>(null)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
-
-  return (
-    <View>
-      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
-    </View>
-  )
-}
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/user-management/expo-user-management/App.tsx"
+lines={[[1, -1]]}
+meta="name=App.tsx"
+/>
 
 Once that's done, run this in a terminal window:
 
@@ -467,7 +212,7 @@ photos and videos.
 
 ### Additional dependency installation
 
-You will need an image picker that works on the environment you will build the project for, we will use `expo-image-picker` in this example.
+You need an image picker that works on the environment you are building the project for, this example uses `expo-image-picker`.
 
 ```bash
 npx expo install expo-image-picker
@@ -475,179 +220,20 @@ npx expo install expo-image-picker
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo.
-We can start by creating a new component:
+Create an avatar for the user so that they can upload a profile photo.
+Start by creating a new component:
 
-<$CodeTabs>
-
-```tsx name=components/Avatar.tsx
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
-
-interface Props {
-  size: number
-  url: string | null
-  onUpload: (filePath: string) => void
-}
-
-export default function Avatar({ url, size = 150, onUpload }: Props) {
-  const [uploading, setUploading] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-  const avatarSize = { height: size, width: size }
-
-  useEffect(() => {
-    if (url) downloadImage(url)
-  }, [url])
-
-  async function downloadImage(path: string) {
-    try {
-      const { data, error } = await supabase.storage.from('avatars').download(path)
-
-      if (error) {
-        throw error
-      }
-
-      const fr = new FileReader()
-      fr.readAsDataURL(data)
-      fr.onload = () => {
-        setAvatarUrl(fr.result as string)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log('Error downloading image: ', error.message)
-      }
-    }
-  }
-
-  async function uploadAvatar() {
-    try {
-      setUploading(true)
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
-        allowsMultipleSelection: false, // Can only select one image
-        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
-        quality: 1,
-        exif: false, // We don't want nor need that data.
-      })
-
-      if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log('User cancelled image picker.')
-        return
-      }
-
-      const image = result.assets[0]
-      console.log('Got image', image)
-
-      if (!image.uri) {
-        throw new Error('No image uri!') // Realistically, this should never happen, but just in case...
-      }
-
-      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer())
-
-      const fileExt = image.uri?.split('.').pop()?.toLowerCase() ?? 'jpeg'
-      const path = `${Date.now()}.${fileExt}`
-      const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
-        })
-
-      if (uploadError) {
-        throw uploadError
-      }
-
-      onUpload(data.path)
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message)
-      } else {
-        throw error
-      }
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  return (
-    <View>
-      {avatarUrl ? (
-        <Image
-          source={{ uri: avatarUrl }}
-          accessibilityLabel="Avatar"
-          style={[avatarSize, styles.avatar, styles.image]}
-        />
-      ) : (
-        <View style={[avatarSize, styles.avatar, styles.noImage]} />
-      )}
-      <View>
-        <Button
-          title={uploading ? 'Uploading ...' : 'Upload'}
-          onPress={uploadAvatar}
-          disabled={uploading}
-        />
-      </View>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  avatar: {
-    borderRadius: 5,
-    overflow: 'hidden',
-    maxWidth: '100%',
-  },
-  image: {
-    objectFit: 'cover',
-    paddingTop: 0,
-  },
-  noImage: {
-    backgroundColor: '#333',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'rgb(200, 200, 200)',
-    borderRadius: 5,
-  },
-})
-```
-
-</$CodeTabs>
+<$CodeSample
+path="/user-management/expo-user-management/components/Avatar.tsx"
+lines={[[1, -1]]}
+meta="name=components/Avatar.tsx"
+/>
 
 ### Add the new widget
 
-And then we can add the widget to the Account page:
+And then add the widget to the Account page. The `Account.tsx` component [shown earlier](#account-page) already includes the `Avatar` component when using the full example code.
 
-<$CodeTabs>
-
-```tsx name=components/Account.tsx
-// Import the new component
-import Avatar from './Avatar'
-
-// ...
-return (
-  <View>
-    {/* Add to the body */}
-    <View>
-      <Avatar
-        size={200}
-        url={avatarUrl}
-        onUpload={(url: string) => {
-          setAvatarUrl(url)
-          updateProfile({ username, website, avatar_url: url })
-        }}
-      />
-    </View>
-    {/* ... */}
-  </View>
-)
-// ...
-```
-
-</$CodeTabs>
-
-Now you will need to run the prebuild command to get the application working on your chosen platform.
+Now run the prebuild command to get the application working on your chosen platform.
 
 ```bash
 npx expo prebuild

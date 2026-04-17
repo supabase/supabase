@@ -100,14 +100,14 @@ SELECT * FROM pg_extension;
 
 The database dump includes your schema, data, roles, RLS policies, database functions, triggers, and `auth.users`. However, several things require separate configuration on your self-hosted instance:
 
-| Requires manual setup | How to configure |
-| --- | --- |
-| JWT secrets and API keys | Generate new ones and update `.env` |
+| Requires manual setup                       | How to configure                                  |
+| ------------------------------------------- | ------------------------------------------------- |
+| JWT secrets and API keys                    | Generate new ones and update `.env`               |
 | Auth provider settings (OAuth, Apple, etc.) | Configure `GOTRUE_EXTERNAL_*` variables in `.env` |
-| Edge functions | Manually copy to your self-hosted instance |
-| Storage objects | Transfer separately (not covered in this guide) |
-| SMTP / email settings | Configure `SMTP_*` variables in `.env` |
-| Custom domains and DNS | Point your DNS to the self-hosted server |
+| Edge functions                              | Manually copy to your self-hosted instance        |
+| Storage objects                             | Transfer separately (not covered in this guide)   |
+| SMTP / email settings                       | Configure `SMTP_*` variables in `.env`            |
+| Custom domains and DNS                      | Point your DNS to the self-hosted server          |
 
 ## Auth considerations
 
@@ -155,7 +155,7 @@ Keeping your self-hosted configuration [up to date](https://github.com/supabase/
 If the restore fails because an extension isn't available, check whether it's supported on your self-hosted Postgres version. You can list available extensions with:
 
 ```sql
-SELECT * FROM pg_available_extensions;
+select * from pg_available_extensions;
 ```
 
 ### Connection refused

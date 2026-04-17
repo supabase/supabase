@@ -183,6 +183,9 @@ const uiConfig = ui({
             p: {
               fontWeight: '400',
             },
+            strong: {
+              fontWeight: '500',
+            },
             pre: {
               background: 'none',
               padding: 0,
@@ -430,6 +433,7 @@ const uiConfig = ui({
   plugins: [
     require('@tailwindcss/typography'),
     require('tailwindcss-animate'),
+    require('./tailwind-plugins/hit-area'),
     plugin(motionSafeTransition),
     function ({ addVariant }) {
       addVariant('not-disabled', '&:not(:disabled)')

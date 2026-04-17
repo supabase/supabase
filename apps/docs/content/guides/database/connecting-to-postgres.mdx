@@ -121,12 +121,6 @@ The Dedicated Pooler ensures best performance and latency, while using up more o
 
 Get your project's Dedicated pooler connection string from your project dashboard by clicking [Connect](/dashboard/project/_?showConnect=true&method=transaction).
 
-<Admonition type="note">
-
-PgBouncer always runs in Transaction mode and the current version does not support prepared statement (will be added in a few weeks).
-
-</Admonition>
-
 ## More about connection pooling
 
 Connection pooling improves database performance by reusing existing connections between queries. This reduces the overhead of establishing connections and improves scalability.
@@ -150,8 +144,10 @@ Serverside-poolers, such as Supabase's [Supavisor](https://github.com/supabase/s
     light:
       '/docs/img/guides/database/connecting-to-postgres/how-connection-pooling-works--light.png',
   }}
+  width={1851}
+  height={907}
   caption="Connecting to the database directly vs using a Connection Pooler"
-  zoomable
+
 />
 
 They maintain hot connections with the database and intelligently share them with clients only when needed, maximizing the amount of queries a single connection can service. They're best used to manage queries from auto-scaling systems, such as edge and serverless functions.
@@ -304,5 +300,7 @@ You can follow the decision flow in the connection method diagram to quickly cho
     light: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree-light.svg',
   }}
   caption="Choosing between direct Postgres connections and connection pooling"
-  zoomable
+  width={291}
+  height={150}
+
 />

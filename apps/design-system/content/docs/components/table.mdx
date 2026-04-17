@@ -144,6 +144,23 @@ The component displays:
 
 <ComponentPreview name="table-sort" />
 
+For TanStack tables, prefer the shared adapter instead of reimplementing the `TableHeadSort` bridge in each table.
+
+```tsx
+import { TanStackTableHeadSort } from 'ui-patterns/Table'
+```
+
+```tsx showLineNumbers
+const columns: ColumnDef<Row>[] = [
+  {
+    accessorKey: 'name',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Name</TanStackTableHeadSort>,
+  },
+]
+```
+
+This keeps TanStack tables aligned with the same `TableHeadSort` visual treatment and sorting cycle used by manual tables.
+
 ### Row icons
 
 When adding icon columns to your table, use [Accessibility](../accessibility) markup by including a screen reader-only label in the corresponding Table Head using the `sr-only` class. This ensures that assistive technologies can properly identify the column's purpose. Remove these icon cells when loading or displaying zero results to maintain a clean and consistent table structure.
@@ -176,6 +193,8 @@ When adding icon columns to your table, use [Accessibility](../accessibility) ma
 ### Actions
 
 Action should be placed in the last column of each Table Row to maintain a logical reading flow. Users scan table data from left to right, so positioning actions on the right ensures they encounter the primary information first before reaching interactive controls.
+
+For compact controls in action cells, add the `hit-area-2` utility to increase the tap target by `8px` on each side without changing visual layout. When actions sit next to each other, keep at least `gap-x-2` spacing: with two adjacent `hit-area-2` buttons, hit areas meet at the midpoint but do not overlap.
 
 #### Multiple actions
 

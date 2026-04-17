@@ -1,6 +1,3 @@
-import { ACCESS_TOKEN_RESOURCES } from 'components/interfaces/Account/AccessTokens/AccessToken.constants'
-import { formatAccessText } from 'components/interfaces/Account/AccessTokens/AccessToken.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ChevronDown, RotateCcw, X } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
 import {
@@ -15,6 +12,9 @@ import {
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
 import { sortActions } from './Permissions.utils'
+import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
+import { formatAccessText } from '@/components/interfaces/Account/AccessTokens/AccessToken.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
   setValue,

@@ -26,8 +26,7 @@ const portalVariants = cva('fixed inset-0 z-50 flex', {
 })
 
 interface SheetPortalProps
-  extends SheetPrimitive.DialogPortalProps,
-    VariantProps<typeof portalVariants> {}
+  extends SheetPrimitive.DialogPortalProps, VariantProps<typeof portalVariants> {}
 
 const SheetPortal = ({ side, children, ...props }: SheetPortalProps) => (
   <SheetPrimitive.Portal {...props}>{children}</SheetPrimitive.Portal>
@@ -148,7 +147,8 @@ const sheetVariants = cva(classes, {
 })
 
 export interface DialogContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+  extends
+    React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {
   showClose?: boolean
   hasOverlay?: boolean

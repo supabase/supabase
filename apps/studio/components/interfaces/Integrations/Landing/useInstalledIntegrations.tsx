@@ -1,42 +1,48 @@
 import { useMemo } from 'react'
+import { parseSchemaComment } from 'stripe-experiment-sync/supabase'
 
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useFlag } from 'common'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
-import {
-  INSTALLATION_INSTALLED_SUFFIX,
-  STRIPE_SCHEMA_COMMENT_PREFIX,
-} from 'stripe-experiment-sync/supabase'
 import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
-import { INTEGRATIONS } from './Integrations.constants'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
+import {
+  isInstalled as checkIsInstalled,
+  findStripeSchema,
+} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
+  const {
+    data: allIntegrations = EMPTY_ARR,
+    error: availableIntegrationsError,
+    isPending: isAvailableIntegrationsLoading,
+    isSuccess: isSuccessAvailableIntegrations,
+    isError: isErrorAvailableIntegrations,
+  } = useAvailableIntegrations()
 
-  const allIntegrations = useMemo(() => {
-    return INTEGRATIONS.filter((integration) => {
-      if (
-        !integrationsWrappers &&
-        (integration.type === 'wrapper' || integration.id.endsWith('_wrapper'))
-      ) {
-        return false
-      }
-      if (!stripeSyncEnabled && integration.id === 'stripe_sync_engine') {
-        return false
-      }
-      if (!IS_PLATFORM && integration.id === 'data_api') {
-        return false
-      }
-      return true
-    })
-  }, [integrationsWrappers, stripeSyncEnabled])
+  const hasSecretKeyPrefixIntegration = useMemo(() => {
+    return allIntegrations.some(
+      (integration) =>
+        integration.type === 'oauth' &&
+        integration.installIdentificationMethod === 'secret_key_prefix' &&
+        !!integration.secretKeyPrefix
+    )
+  }, [allIntegrations])
+
+  const {
+    data: apiKeys,
+    error: apiKeysError,
+    isError: isErrorApiKeys,
+    isLoading: isApiKeysLoading,
+    isSuccess: isSuccessApiKeys,
+  } = useAPIKeysQuery(
+    { projectRef: project?.ref, reveal: false },
+    { enabled: !!project?.ref && hasSecretKeyPrefixIntegration }
+  )
 
   const {
     data,
@@ -84,11 +90,9 @@ export const useInstalledIntegrations = () => {
           return true
         }
         if (integration.id === 'stripe_sync_engine') {
-          const stripeSchema = schemas?.find(({ name }) => name === 'stripe')
-          return (
-            !!stripeSchema?.comment?.startsWith(STRIPE_SCHEMA_COMMENT_PREFIX) &&
-            !!stripeSchema.comment?.includes(INSTALLATION_INSTALLED_SUFFIX)
-          )
+          const stripeSchema = findStripeSchema(schemas)
+          const parsedSchema = parseSchemaComment(stripeSchema?.comment)
+          return checkIsInstalled(parsedSchema.status)
         }
         if (integration.type === 'wrapper') {
           return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))
@@ -99,27 +103,48 @@ export const useInstalledIntegrations = () => {
             return !!foundExtension?.installed_version
           })
         }
+        if (integration.type === 'oauth') {
+          const prefix = integration.secretKeyPrefix
+
+          if (integration.installIdentificationMethod !== 'secret_key_prefix' || !prefix) {
+            return false
+          }
+
+          return (apiKeys ?? []).some((key) => key.type === 'secret' && key.name.startsWith(prefix))
+        }
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled])
+  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, apiKeys])
 
-  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
-  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    [allIntegrations]
-  )
-
-  const error = fdwError || extensionsError || schemasError
-  const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
-  const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
-  const isSuccess = isSuccessFDWs && isSuccessExtensions && isSuccessSchemas
+  const error =
+    fdwError ||
+    extensionsError ||
+    schemasError ||
+    availableIntegrationsError ||
+    (hasSecretKeyPrefixIntegration ? apiKeysError : null)
+  const isLoading =
+    isSchemasLoading ||
+    isFDWLoading ||
+    isExtensionsLoading ||
+    isAvailableIntegrationsLoading ||
+    (hasSecretKeyPrefixIntegration && isApiKeysLoading)
+  const isError =
+    isErrorFDWs ||
+    isErrorExtensions ||
+    isErrorSchemas ||
+    isErrorAvailableIntegrations ||
+    (hasSecretKeyPrefixIntegration && isErrorApiKeys)
+  const isSuccess =
+    isSuccessFDWs &&
+    isSuccessExtensions &&
+    isSuccessSchemas &&
+    isSuccessAvailableIntegrations &&
+    (!hasSecretKeyPrefixIntegration || isSuccessApiKeys)
 
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? EMPTY_ARR : installedIntegrations,
-    availableIntegrations: isLoading ? EMPTY_ARR : availableIntegrations,
     error,
     isError,
     isLoading,

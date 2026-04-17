@@ -1,15 +1,15 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { getAccessToken, useFlag } from 'common'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-
-import { getAccessToken, useFlag } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { auth, buildPathWithParams, getReturnToPath } from '@/lib/gotrue'
 
 type SignInLayoutProps = {
   heading: string

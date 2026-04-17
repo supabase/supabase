@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { Button } from 'ui'
-
-import AlertError from 'components/ui/AlertError'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { ResponseError } from 'types'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ForeignKeySelector } from '../../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
 import type { TableField } from '../TableEditor.types'
 import { ForeignKeyRow } from './ForeignKeyRow'
 import { checkIfRelationChanged } from './ForeignKeysManagement.utils'
+import AlertError from '@/components/ui/AlertError'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { ResponseError } from '@/types'
 
 interface ForeignKeysManagementProps {
   table: TableField

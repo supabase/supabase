@@ -1,25 +1,28 @@
-import { PropsWithChildren, ReactNode } from 'react'
-
 import { useParams } from 'common'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { PropsWithChildren, ReactNode } from 'react'
 import { Badge, Card, CardContent, cn, Separator } from 'ui'
+
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
 import { MissingExtensionAlert } from './MissingExtensionAlert'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-interface IntegrationOverviewTabProps {
+export interface IntegrationOverviewTabProps {
   actions?: ReactNode
   status?: string | ReactNode
   alert?: ReactNode
+  hideRequiredExtensionsSection?: boolean
 }
 
+/** [Joshen] This will eventually get replaced by IntegrationOverviewTabV2 */
 export const IntegrationOverviewTab = ({
   actions,
   alert,
   status,
   children,
+  hideRequiredExtensionsSection = false,
 }: PropsWithChildren<IntegrationOverviewTabProps>) => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -49,12 +52,16 @@ export const IntegrationOverviewTab = ({
   return (
     <div className="flex flex-col gap-8 py-10">
       <BuiltBySection integration={integration} status={status} />
-      {alert && <div className="px-10 max-w-4xl">{alert}</div>}
+
+      {!!alert && <div className="px-10 max-w-4xl">{alert}</div>}
+
       <MarkdownContent key={integration.id} integrationId={integration.id} />
+
       <Separator />
-      {dependsOnExtension && (
-        <div className="px-4 md:px-10 max-w-4xl">
-          <h3 className="heading-default mb-4">Required extensions</h3>
+
+      {dependsOnExtension && !hideRequiredExtensionsSection && (
+        <div className="px-4 md:px-10 max-w-4xl flex flex-col gap-y-4">
+          <h4>Required extensions</h4>
           <Card>
             <CardContent className="p-0">
               <ul className="text-foreground-light text-sm">
@@ -66,16 +73,12 @@ export const IntegrationOverviewTab = ({
                   return (
                     <li
                       key={requiredExtension}
-                      className={[
+                      className={cn(
                         'flex items-center justify-between gap-3 py-2 px-3',
-                        !isLastRow ? 'border-b' : '',
-                      ].join(' ')}
+                        !isLastRow ? 'border-b' : ''
+                      )}
                     >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="truncate">
-                          <code>{requiredExtension}</code>
-                        </span>
-                      </div>
+                      <code className="text-xs">{requiredExtension}</code>
 
                       <div className="shrink-0">
                         {extension ? (
@@ -100,12 +103,15 @@ export const IntegrationOverviewTab = ({
           </Card>
         </div>
       )}
+
       {!!actions && (
         <div
-          aria-disabled={hasToInstallExtensions}
+          aria-disabled={hasToInstallExtensions && !hideRequiredExtensionsSection}
           className={cn(
             'px-10 max-w-4xl',
-            hasToInstallExtensions && 'opacity-25 [&_button]:pointer-events-none'
+            hasToInstallExtensions &&
+              !hideRequiredExtensionsSection &&
+              'opacity-25 [&_button]:pointer-events-none'
           )}
         >
           {actions}

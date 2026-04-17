@@ -10,6 +10,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/scripts/format_and_lint.sh",
+            "statusMessage": "Formatting & linting..."
+          }
+        ]
+      }
     ]
   }
 }

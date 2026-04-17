@@ -1,26 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ToggleSpendCapButton } from 'components/ui/ToggleSpendCapButton'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { useRealtimeConfigurationUpdateMutation } from 'data/realtime/realtime-config-mutation'
-import {
-  REALTIME_DEFAULT_CONFIG,
-  useRealtimeConfigurationQuery,
-} from 'data/realtime/realtime-config-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import {
   Button,
   Card,
@@ -29,14 +13,31 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   FormMessage_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import AlertError from '@/components/ui/AlertError'
+import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useRealtimeConfigurationUpdateMutation } from '@/data/realtime/realtime-config-mutation'
+import {
+  REALTIME_DEFAULT_CONFIG,
+  useRealtimeConfigurationQuery,
+} from '@/data/realtime/realtime-config-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'realtime-configuration-form'
 
@@ -90,38 +91,15 @@ export const RealtimeSettings = () => {
       },
     })
 
-  const { getEntitlementMax: getEntitledMaxPayloadSize } = useCheckEntitlements(
-    'realtime.max_payload_size_in_kb'
-  )
-  const entitledMaxPayloadSize = getEntitledMaxPayloadSize() ?? 3000
-
-  const { getEntitlementMax: getEntitledMaxConcurrentUsers } = useCheckEntitlements(
-    'realtime.max_concurrent_users'
-  )
-  const entitledMaxConcurrentUsers = getEntitledMaxConcurrentUsers() ?? 50000
-
-  const { getEntitlementMax: getEntitledMaxEventsPerSecond } = useCheckEntitlements(
-    'realtime.max_events_per_second'
-  )
-  const entitledMaxEventsPerSecond = getEntitledMaxEventsPerSecond() ?? 10000
-
-  const { getEntitlementMax: getEntitledMaxPresenceEventsPerSecond } = useCheckEntitlements(
-    'realtime.max_presence_events_per_second'
-  )
-  const entitledMaxPresenceEventsPerSecond = getEntitledMaxPresenceEventsPerSecond() ?? 10000
-
   const FormSchema = z.object({
     connection_pool: z.coerce
       .number()
       .min(1)
       .max(maxConn?.maxConnections ?? 100),
-    max_concurrent_users: z.coerce.number().min(1).max(entitledMaxConcurrentUsers),
-    max_events_per_second: z.coerce.number().min(1).max(entitledMaxEventsPerSecond),
-    max_presence_events_per_second: z.coerce
-      .number()
-      .min(1)
-      .max(entitledMaxPresenceEventsPerSecond),
-    max_payload_size_in_kb: z.coerce.number().min(1).max(entitledMaxPayloadSize),
+    max_concurrent_users: z.coerce.number().min(1).max(50000),
+    max_events_per_second: z.coerce.number().min(1).max(10000),
+    max_presence_events_per_second: z.coerce.number().min(1).max(10000),
+    max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
     suspend: z.boolean(),
     // [Joshen] These fields are temporarily hidden from the UI
     // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
@@ -299,14 +277,17 @@ export const RealtimeSettings = () => {
                             description="Realtime Authorization uses this database pool to check client access"
                           >
                             <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                              <InputGroup>
+                                <FormInputGroupInput
                                   {...field}
                                   type="number"
                                   disabled={!canUpdateConfig}
                                   value={field.value || ''}
                                 />
-                              </PrePostTab>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                           {!!maxConn && field.value > maxConn.maxConnections * 0.5 && (
@@ -332,14 +313,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of concurrent clients that can connect to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="clients">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -356,14 +340,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -407,14 +394,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of presence events per second that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="events/s">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>events/s</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}
@@ -458,14 +448,17 @@ export const RealtimeSettings = () => {
                           description="Sets maximum number of payload size in KB that can be sent to your Realtime service"
                         >
                           <FormControl_Shadcn_>
-                            <PrePostTab postTab="KB">
-                              <Input_Shadcn_
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 type="number"
                                 disabled={!isUsageBillingEnabled || !canUpdateConfig}
                                 value={field.value || ''}
                               />
-                            </PrePostTab>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>KB</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
                           </FormControl_Shadcn_>
                         </FormItemLayout>
                       )}

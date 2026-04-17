@@ -90,7 +90,6 @@ export const EntityListItem = ({
   const { data: countData } = useTableRowsCountQuery(
     {
       projectRef,
-      connectionString: project?.connectionString,
       tableId: entity.id,
       filters,
       enforceExactCount: false,

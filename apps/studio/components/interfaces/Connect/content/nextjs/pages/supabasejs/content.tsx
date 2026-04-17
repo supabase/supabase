@@ -1,11 +1,12 @@
-import type { ContentFileProps } from 'components/interfaces/Connect/Connect.types'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
+import type { ContentFileProps } from '@/components/interfaces/Connect/Connect.types'
 import {
   ConnectTabContent,
   ConnectTabs,
   ConnectTabTrigger,
   ConnectTabTriggers,
-} from 'components/interfaces/Connect/ConnectTabs'
-import { SimpleCodeBlock } from 'ui'
+} from '@/components/interfaces/Connect/ConnectTabs'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -22,7 +23,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
             '',
             `NEXT_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}`,
             projectKeys?.publishableKey
-              ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=${projectKeys.publishableKey}`
+              ? `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey}`
               : `NEXT_PUBLIC_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}`,
             '',
           ].join('\n')}
@@ -35,7 +36,7 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY' : 'NEXT_PUBLIC_SUPABASE_ANON_KEY'};
+const supabaseKey = process.env.${projectKeys?.publishableKey ? 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY' : 'NEXT_PUBLIC_SUPABASE_ANON_KEY'};
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
         `}

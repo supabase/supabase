@@ -1,32 +1,95 @@
-import { isEmpty } from 'lodash'
-import { useMemo, useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-
-import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
-  Form,
-  Input,
+  Card,
+  CardContent,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Separator,
   SheetFooter,
   SheetHeader,
+  SheetSection,
   SheetTitle,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import * as z from 'zod'
+
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
 import InputField from './InputField'
-import { makeValidateRequired } from './Wrappers.utils'
+import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const FORM_ID = 'create-wrapper-form'
 
-const requiredFields: Record<Target, { name: string; required: boolean }[]> = {
+const S3TableSchema = z.object({
+  target: z.literal('S3Tables'),
+  source_schema: z.string().min(1, 'Please provide a namespace name'),
+  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  target_schema: z.string().min(1, 'Please provide an unique target schema'),
+  vault_aws_access_key_id: z.string().min(1, 'Required'),
+  vault_aws_secret_access_key: z.string().min(1, 'Required'),
+  region_name: z.string().min(1, 'Required'),
+  vault_aws_s3table_bucket_arn: z.string().min(1, 'Required'),
+})
+type S3TableSchemaType = z.infer<typeof S3TableSchema>
+
+const R2CatalogSchema = z.object({
+  target: z.literal('R2Catalog'),
+  source_schema: z.string().min(1, 'Please provide a namespace name'),
+  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  target_schema: z.string().min(1, 'Please provide an unique target schema'),
+  vault_aws_access_key_id: z.string().min(1, 'Required'),
+  vault_aws_secret_access_key: z.string().min(1, 'Required'),
+  vault_token: z.string().min(1, 'Required'),
+  warehouse: z.string().min(1, 'Required'),
+  s3: z.object({ endpoint: z.string().min(1, 'Required') }),
+  catalog_uri: z.string().min(1, 'Required'),
+})
+type R2CatalogSchemaType = z.infer<typeof R2CatalogSchema>
+
+const IcebergRestCatalogSchema = z.object({
+  target: z.literal('IcebergRestCatalog'),
+  source_schema: z.string().min(1, 'Please provide a namespace name'),
+  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  target_schema: z.string().min(1, 'Please provide an unique target schema'),
+  vault_aws_access_key_id: z.string().optional(),
+  vault_aws_secret_access_key: z.string().optional(),
+  region_name: z.string().optional(),
+  vault_aws_s3table_bucket_arn: z.string().optional(),
+  vault_token: z.string().optional(),
+  warehouse: z.string().optional(),
+  s3: z.object({ endpoint: z.string().min(1, 'Required') }),
+  catalog_uri: z.string().optional(),
+})
+type IcebergRestCatalogSchemaType = z.infer<typeof IcebergRestCatalogSchema>
+
+const formSchema = z.discriminatedUnion('target', [
+  S3TableSchema,
+  R2CatalogSchema,
+  IcebergRestCatalogSchema,
+])
+
+type FormSchema = z.infer<typeof formSchema>
+
+const targetFields: Record<Target, { name: string; required: boolean }[]> = {
   S3Tables: [
     { name: 'vault_aws_access_key_id', required: true },
     { name: 'vault_aws_secret_access_key', required: true },
@@ -55,8 +118,19 @@ const requiredFields: Record<Target, { name: string; required: boolean }[]> = {
 
 type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
+const INITIAL_VALUES = {
+  wrapper_name: '',
+  source_schema: '',
+  target_schema: '',
+  target: 'S3Tables',
+  vault_aws_access_key_id: '',
+  vault_aws_s3table_bucket_arn: '',
+  vault_aws_secret_access_key: '',
+  region_name: '',
+} satisfies FormSchema
+
 export const CreateIcebergWrapperSheet = ({
-  wrapperMeta: wrapperMetaOriginal,
+  wrapperMeta,
   onDirty,
   onClose,
   onCloseWithConfirmation,
@@ -65,10 +139,6 @@ export const CreateIcebergWrapperSheet = ({
   const { data: org } = useSelectedOrganizationQuery()
   const { mutate: sendEvent } = useSendEventMutation()
 
-  const [selectedTarget, setSelectedTarget] = useState<Target>('S3Tables')
-
-  const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({})
-
   const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
       toast.success(`Successfully created ${wrapperMeta?.label} foreign data wrapper`)
@@ -76,65 +146,59 @@ export const CreateIcebergWrapperSheet = ({
     },
   })
 
-  const wrapperMeta = useMemo(() => {
-    const fields = requiredFields[selectedTarget]
-
-    return {
-      ...wrapperMetaOriginal,
-      server: {
-        options: wrapperMetaOriginal.server.options
-          // when the target changes, change the wrapperMeta field
-          .filter((option) => fields.find((field) => field.name === option.name))
-          .map((option) => {
-            const field = fields.find((field) => field.name === option.name)
-            return {
-              ...option,
-              required: field?.required ?? false,
-            }
-          }),
-      },
-    }
-  }, [wrapperMetaOriginal, selectedTarget])
-
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref!,
     connectionString: project?.connectionString,
   })
 
-  const initialValues = {
-    wrapper_name: '',
-    server_name: '',
-    source_schema: wrapperMeta.sourceSchemaOption?.defaultValue ?? '',
-    target_schema: '',
-    ...Object.fromEntries(
-      wrapperMeta.server.options.map((option) => [option.name, option.defaultValue ?? ''])
-    ),
-  }
+  const { mutateAsync: createSchema } = useSchemaCreateMutation()
 
-  const { mutateAsync: createSchema, isPending: isCreatingSchema } = useSchemaCreateMutation()
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: INITIAL_VALUES,
+  })
+  const { resetField, formState, setError, watch } = form
+  const { isDirty, isSubmitting } = formState
 
-  const onSubmit = async (values: any) => {
-    const validate = makeValidateRequired(wrapperMeta.server.options)
-    const errors: any = validate(values)
+  useEffect(() => {
+    onDirty(isDirty)
+  }, [onDirty, isDirty])
 
-    if (values.source_schema.length === 0) {
-      errors.source_schema = 'Please provide a namespace name'
-    }
-    if (values.wrapper_name.length === 0) {
-      errors.wrapper_name = 'Please provide a name for your wrapper'
-    }
+  const currentTarget = useRef<FormSchema['target']>(INITIAL_VALUES.target)
+  useEffect(() => {
+    const subscription = watch((values) => {
+      if (!values.target || values.target === currentTarget.current) return
+      currentTarget.current = values.target
 
-    if (values.target_schema.length === 0) {
-      errors.target_schema = 'Please provide an unique target schema'
-    }
+      const fields = targetFields[values.target]
+      if (!fields) return
+
+      wrapperMeta.server.options.forEach((option) => {
+        // @ts-expect-error Can't reconcile with form schema
+        resetField(option.name, { defaultValue: option.defaultValue ?? '' })
+      })
+    })
+
+    return () => subscription.unsubscribe()
+  }, [resetField, watch, wrapperMeta])
+
+  const onSubmit: SubmitHandler<FormSchema> = async (values) => {
     const foundSchema = schemas?.find((s) => s.name === values.target_schema)
     if (foundSchema) {
-      errors.target_schema = 'This schema already exists. Please specify a unique schema name.'
+      setError('target_schema', {
+        type: 'validate',
+        message: 'This schema already exists. Please specify a unique schema name.',
+      })
+      return
     }
 
-    setFormErrors(errors)
-    if (!isEmpty(errors)) {
-      return
+    let formValues: Record<string, string> = {}
+    if (values.target === 'R2Catalog' || values.target === 'IcebergRestCatalog') {
+      const { s3, ...otherFormValues } = values
+      formValues = otherFormValues
+      formValues['s3.endpoint'] = s3.endpoint
+    } else {
+      formValues = values
     }
 
     try {
@@ -149,7 +213,7 @@ export const CreateIcebergWrapperSheet = ({
         connectionString: project?.connectionString,
         wrapperMeta,
         formState: {
-          ...values,
+          ...formValues,
           server_name: `${values.wrapper_name}_server`,
           supabase_target_schema: values.target_schema,
         },
@@ -175,186 +239,223 @@ export const CreateIcebergWrapperSheet = ({
     }
   }
 
-  const isLoading = isCreatingWrapper || isCreatingSchema
+  const isLoading = isCreatingWrapper || isSubmitting
+  const wrapperName = useWatch({ name: 'wrapper_name', control: form.control })
+  const target = useWatch({ name: 'target', control: form.control })
 
+  const targetOptions = wrapperMeta.server.options
+    .filter((option) => targetFields[target].find((field) => field.name === option.name))
+    .map((option) => {
+      return {
+        ...option,
+        required: !!targetFields[target].find((field) => field.name === option.name)?.required,
+      }
+    })
   return (
     <>
       <div className="h-full" tabIndex={-1}>
-        <Form
-          id={FORM_ID}
-          initialValues={initialValues}
-          onSubmit={onSubmit}
-          className="flex-grow flex flex-col h-full"
-        >
-          {({ values, initialValues }: any) => {
-            const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-            onDirty(hasChanges)
-
-            return (
-              <>
-                <SheetHeader>
-                  <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
-                </SheetHeader>
-                <div className="flex-grow overflow-y-auto">
-                  <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      <Input
-                        id="wrapper_name"
-                        label="Wrapper Name"
-                        error={formErrors.wrapper_name}
-                        descriptionText={
-                          (values?.wrapper_name ?? '').length > 0 ? (
-                            <>
-                              Your wrapper's server name will be{' '}
-                              <code className="text-code-inline">{values.wrapper_name}_server</code>
-                            </>
-                          ) : (
-                            ''
-                          )
-                        }
+        <Form_Shadcn_ {...form}>
+          <form
+            id={FORM_ID}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col h-full"
+          >
+            <SheetHeader>
+              <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
+            </SheetHeader>
+            <SheetSection className="flex-grow overflow-y-auto">
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Wrapper Configuration</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
+                    <CardContent>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="wrapper_name"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            layout="horizontal"
+                            label="Wrapper Name"
+                            description={
+                              wrapperName.length > 0 ? (
+                                <>
+                                  Your wrapper's server name will be{' '}
+                                  <code className="text-code-inline">{wrapperName}_server</code>
+                                </>
+                              ) : (
+                                ''
+                              )
+                            }
+                          >
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_ {...field} />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
                       />
-                    </FormSectionContent>
-                  </FormSection>
-                  <Separator />
-                  <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
-                    <FormSectionContent loading={false} className="text-sm">
-                      <RadioGroupStacked
-                        value={selectedTarget}
-                        onValueChange={(value) => setSelectedTarget(value as Target)}
-                      >
-                        <RadioGroupStackedItem
-                          key="S3Tables"
-                          value="S3Tables"
-                          label="AWS S3 Tables"
-                          showIndicator={false}
-                        >
-                          <div className="flex gap-x-5">
-                            <div className="flex flex-col">
-                              <p className="text-foreground-light text-left">
-                                AWS S3 storage that's optimized for analytics workloads.
-                              </p>
+                    </CardContent>
+                  </Card>
+                </PageSectionContent>
+              </PageSection>
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Data target</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
+                    <CardContent>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="target"
+                        render={({ field }) => (
+                          <FormItemLayout layout="vertical">
+                            <div>
+                              <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                                <RadioGroupStackedItem
+                                  key="S3Tables"
+                                  value="S3Tables"
+                                  label="AWS S3 Tables"
+                                  showIndicator={false}
+                                >
+                                  <div className="flex gap-x-5">
+                                    <div className="flex flex-col">
+                                      <p className="text-foreground-light text-left">
+                                        AWS S3 storage that's optimized for analytics workloads.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </RadioGroupStackedItem>
+                                <RadioGroupStackedItem
+                                  key="R2Catalog"
+                                  value="R2Catalog"
+                                  label="Cloudflare R2 Catalog"
+                                  showIndicator={false}
+                                >
+                                  <div className="flex gap-x-5">
+                                    <div className="flex flex-col">
+                                      <p className="text-foreground-light text-left">
+                                        Managed Apache Iceberg built directly into your R2 bucket.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </RadioGroupStackedItem>
+                                <RadioGroupStackedItem
+                                  key="IcebergRestCatalog"
+                                  value="IcebergRestCatalog"
+                                  label="Iceberg REST Catalog"
+                                  showIndicator={false}
+                                >
+                                  <div className="flex gap-x-5">
+                                    <div className="flex flex-col">
+                                      <p className="text-foreground-light text-left">
+                                        Can be used with any S3-compatible storage.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </RadioGroupStackedItem>
+                              </RadioGroupStacked>
                             </div>
-                          </div>
-                        </RadioGroupStackedItem>
-                        <RadioGroupStackedItem
-                          key="R2Catalog"
-                          value="R2Catalog"
-                          label="Cloudflare R2 Catalog"
-                          showIndicator={false}
-                        >
-                          <div className="flex gap-x-5">
-                            <div className="flex flex-col">
-                              <p className="text-foreground-light text-left">
-                                Managed Apache Iceberg built directly into your R2 bucket.
-                              </p>
-                            </div>
-                          </div>
-                        </RadioGroupStackedItem>
-                        <RadioGroupStackedItem
-                          key="IcebergRestCatalog"
-                          value="IcebergRestCatalog"
-                          label="Iceberg REST Catalog"
-                          showIndicator={false}
-                        >
-                          <div className="flex gap-x-5">
-                            <div className="flex flex-col">
-                              <p className="text-foreground-light text-left">
-                                Can be used with any S3-compatible storage.
-                              </p>
-                            </div>
-                          </div>
-                        </RadioGroupStackedItem>
-                      </RadioGroupStacked>
-                    </FormSectionContent>
-                  </FormSection>
-                  <FormSection
-                    header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
-                  >
-                    <FormSectionContent loading={false}>
-                      {wrapperMeta.server.options
-                        .filter((option) => !option.hidden)
-                        .map((option) => (
-                          <InputField
-                            key={option.name}
-                            option={option}
-                            loading={false}
-                            error={formErrors[option.name]}
-                          />
-                        ))}
-                    </FormSectionContent>
-                  </FormSection>
-                  <Separator />
-                  <FormSection
-                    header={
-                      <FormSectionLabel>
-                        <p>Foreign Schema</p>
-                        <p className="text-foreground-light mt-2 w-[90%]">
-                          You can query your data from the foreign tables in the specified schema
-                          after the wrapper is created.
-                        </p>
-                      </FormSectionLabel>
-                    }
-                  >
-                    <FormSectionContent loading={false}>
-                      {wrapperMeta.sourceSchemaOption && (
-                        <div>
-                          <InputField
-                            key="source_schema"
-                            option={wrapperMeta.sourceSchemaOption}
-                            loading={false}
-                            error={formErrors['source_schema']}
-                          />
-                          <p className="text-foreground-lighter text-sm">
-                            {wrapperMeta.sourceSchemaOption.description}
-                          </p>
-                        </div>
-                      )}
-                      <div className="flex flex-col gap-2">
-                        <InputField
-                          key="target_schema"
-                          option={{
-                            name: 'target_schema',
-                            label: 'Specify a new schema to create all wrapper tables in',
-                            required: true,
-                            encrypted: false,
-                            secureEntry: false,
-                          }}
-                          loading={false}
-                          error={formErrors['target_schema']}
-                        />
-                        <p className="text-foreground-lighter text-sm">
-                          A new schema will be created. For security purposes, the wrapper tables
-                          from the foreign schema cannot be created within an existing schema.
-                        </p>
-                      </div>
-                    </FormSectionContent>
-                  </FormSection>
-                </div>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+                </PageSectionContent>
+              </PageSection>
 
-                <SheetFooter>
-                  <Button
-                    size="tiny"
-                    type="default"
-                    htmlType="button"
-                    onClick={onCloseWithConfirmation}
-                    disabled={isLoading}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    size="tiny"
-                    type="primary"
-                    form={FORM_ID}
-                    htmlType="submit"
-                    loading={isLoading}
-                  >
-                    Create wrapper
-                  </Button>
-                </SheetFooter>
-              </>
-            )
-          }}
-        </Form>
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>{wrapperMeta.label} Configuration</PageSectionTitle>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
+                    {targetOptions.map((option) =>
+                      option.hidden ? (
+                        <input
+                          key={`${option.name}-${option.required}-${option.hidden}`}
+                          type="hidden"
+                          // @ts-expect-error Can't reconcile with form schema
+                          {...form.register(option.name)}
+                        />
+                      ) : (
+                        <CardContent key={`${option.name}-${option.required}-${option.hidden}`}>
+                          <InputField control={form.control} option={option} />
+                        </CardContent>
+                      )
+                    )}
+                  </Card>
+                </PageSectionContent>
+              </PageSection>
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Foreign Schema</PageSectionTitle>
+                    <PageSectionDescription>
+                      You can query your data from the foreign tables in the specified schema after
+                      the wrapper is created.
+                    </PageSectionDescription>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <Card>
+                    <CardContent>
+                      {wrapperMeta.sourceSchemaOption && (
+                        <InputField
+                          control={form.control}
+                          option={wrapperMeta.sourceSchemaOption}
+                        />
+                      )}
+                    </CardContent>
+                    <CardContent>
+                      <InputField
+                        control={form.control}
+                        option={{
+                          name: 'target_schema',
+                          label: 'Specify a new schema to create all wrapper tables in',
+                          description:
+                            'A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema.',
+                          required: true,
+                          encrypted: false,
+                          secureEntry: false,
+                        }}
+                      />
+                    </CardContent>
+                  </Card>
+                </PageSectionContent>
+              </PageSection>
+            </SheetSection>
+
+            <SheetFooter>
+              <Button
+                size="tiny"
+                type="default"
+                htmlType="button"
+                onClick={onCloseWithConfirmation}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="tiny"
+                type="primary"
+                form={FORM_ID}
+                htmlType="submit"
+                loading={isLoading}
+                disabled={isLoading || !isDirty}
+              >
+                Create wrapper
+              </Button>
+            </SheetFooter>
+          </form>
+        </Form_Shadcn_>
       </div>
     </>
   )

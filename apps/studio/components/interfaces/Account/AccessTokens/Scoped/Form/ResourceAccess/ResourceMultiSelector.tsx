@@ -8,6 +8,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+
 import { ResourceMultiSelectorProps } from './ResourceAccess.types'
 
 export const ResourceMultiSelector = ({

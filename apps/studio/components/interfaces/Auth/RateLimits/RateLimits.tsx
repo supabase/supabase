@@ -1,35 +1,47 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 export const RateLimits = () => {
   const { ref: projectRef } = useParams()
@@ -63,7 +75,33 @@ export const RateLimits = () => {
   const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
   const canUpdateWeb3RateLimit = authConfig?.EXTERNAL_WEB3_SOLANA_ENABLED
 
-  const FormSchema = z.object({
+  const IPForwardingFormSchema = z.object({
+    SECURITY_SB_FORWARDED_FOR_ENABLED: z.coerce.boolean(),
+  })
+
+  const ipForwardingForm = useForm<z.infer<typeof IPForwardingFormSchema>>({
+    resolver: zodResolver(IPForwardingFormSchema),
+    defaultValues: {
+      SECURITY_SB_FORWARDED_FOR_ENABLED: false,
+    },
+  })
+
+  const onSubmitIPForwardingForm = (data: z.infer<typeof IPForwardingFormSchema>) => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    const payload: Partial<z.infer<typeof IPForwardingFormSchema>> = {}
+
+    if (data.SECURITY_SB_FORWARDED_FOR_ENABLED !== authConfig?.SECURITY_SB_FORWARDED_FOR_ENABLED) {
+      payload.SECURITY_SB_FORWARDED_FOR_ENABLED = data.SECURITY_SB_FORWARDED_FOR_ENABLED
+    }
+
+    updateAuthConfig(
+      { projectRef, config: payload },
+      { onSuccess: () => ipForwardingForm.reset(data) }
+    )
+  }
+
+  const RateLimitFormSchema = z.object({
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
@@ -94,8 +132,8 @@ export const RateLimits = () => {
       .max(32767, 'Must not be more than 32,767 an hour'),
   })
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
+    resolver: zodResolver(RateLimitFormSchema),
     defaultValues: {
       RATE_LIMIT_TOKEN_REFRESH: 0,
       RATE_LIMIT_VERIFY: 0,
@@ -107,10 +145,10 @@ export const RateLimits = () => {
     },
   })
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
 
-    const payload: Partial<z.infer<typeof FormSchema>> = {}
+    const payload: Partial<z.infer<typeof RateLimitFormSchema>> = {}
     const params = [
       'RATE_LIMIT_TOKEN_REFRESH',
       'RATE_LIMIT_VERIFY',
@@ -124,12 +162,15 @@ export const RateLimits = () => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
     })
 
-    updateAuthConfig({ projectRef, config: payload }, { onSuccess: () => form.reset(data) })
+    updateAuthConfig(
+      { projectRef, config: payload },
+      { onSuccess: () => rateLimitForm.reset(data) }
+    )
   }
 
   useEffect(() => {
     if (isSuccess) {
-      form.reset({
+      rateLimitForm.reset({
         RATE_LIMIT_TOKEN_REFRESH: authConfig.RATE_LIMIT_TOKEN_REFRESH,
         RATE_LIMIT_VERIFY: authConfig.RATE_LIMIT_VERIFY,
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
@@ -137,6 +178,10 @@ export const RateLimits = () => {
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
         RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
         RATE_LIMIT_WEB3: authConfig.RATE_LIMIT_WEB3 ?? 0,
+      })
+
+      ipForwardingForm.reset({
+        SECURITY_SB_FORWARDED_FOR_ENABLED: authConfig.SECURITY_SB_FORWARDED_FOR_ENABLED,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,364 +218,457 @@ export const RateLimits = () => {
   }
 
   return (
-    <PageSection>
-      <PageSectionContent>
-        <Form_Shadcn_ {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Card>
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_EMAIL_SENT"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for sending emails"
-                      description="Number of emails that can be sent per hour from your project"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="emails/h">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig || !canUpdateEmailLimit}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig || !canUpdateEmailLimit ? (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            {!authConfig.EXTERNAL_EMAIL_ENABLED ? (
-                              <>
-                                <p className="font-medium">
-                                  Email-based logins are not enabled for your project
-                                </p>
-                                <p className="mt-1">
-                                  Enable email-based logins to update this rate limit
-                                </p>
-                                <div className="mt-3">
-                                  <Button asChild type="default" size="tiny">
-                                    <Link href={`/project/${projectRef}/auth/providers`}>
-                                      View auth providers
-                                    </Link>
-                                  </Button>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <p className="font-medium">
-                                  Custom SMTP provider is required to update this configuration
-                                </p>
-                                <p className="mt-1">
-                                  The built-in email service has a fixed rate limit. You will need
-                                  to set up your own custom SMTP provider to update your email rate
-                                  limit
-                                </p>
-                                <div className="mt-3">
-                                  <Button asChild type="default" size="tiny">
-                                    <Link href={`/project/${projectRef}/auth/smtp`}>
-                                      View SMTP settings
-                                    </Link>
-                                  </Button>
-                                </div>
-                              </>
-                            )}
-                          </TooltipContent>
-                        ) : null}
-                      </Tooltip>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+    <>
+      <PageSection>
+        <PageSectionContent>
+          <Form_Shadcn_ {...rateLimitForm}>
+            <form onSubmit={rateLimitForm.handleSubmit(onSubmitRateLimitForm)}>
+              <Card>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_EMAIL_SENT"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for sending emails"
+                        description="Number of emails that can be sent per hour from your project"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig || !canUpdateEmailLimit}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>emails/h</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig || !canUpdateEmailLimit ? (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              {!authConfig.EXTERNAL_EMAIL_ENABLED ? (
+                                <>
+                                  <p className="font-medium">
+                                    Email-based logins are not enabled for your project
+                                  </p>
+                                  <p className="mt-1">
+                                    Enable email-based logins to update this rate limit
+                                  </p>
+                                  <div className="mt-3">
+                                    <Button asChild type="default" size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/providers`}>
+                                        View auth providers
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="font-medium">
+                                    Custom SMTP provider is required to update this configuration
+                                  </p>
+                                  <p className="mt-1">
+                                    The built-in email service has a fixed rate limit. You will need
+                                    to set up your own custom SMTP provider to update your email
+                                    rate limit
+                                  </p>
+                                  <div className="mt-3">
+                                    <Button asChild type="default" size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/smtp`}>
+                                        View SMTP settings
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+                            </TooltipContent>
+                          ) : null}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_SMS_SENT"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for sending SMS messages"
-                      description="Number of SMS messages that can be sent per hour from your project"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="sms/h">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig || !canUpdateSMSRateLimit ? (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            <p className="font-medium">
-                              Phone-based logins are not enabled for your project
-                            </p>
-                            <p className="mt-1">
-                              Enable phone-based logins to update this rate limit
-                            </p>
-                            <div className="mt-3">
-                              <Button asChild type="default" size="tiny">
-                                <Link href={`/project/${projectRef}/auth/providers`}>
-                                  View auth providers
-                                </Link>
-                              </Button>
-                            </div>
-                          </TooltipContent>
-                        ) : null}
-                      </Tooltip>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_SMS_SENT"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for sending SMS messages"
+                        description="Number of SMS messages that can be sent per hour from your project"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig || !canUpdateSMSRateLimit}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>sms/h</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig || !canUpdateSMSRateLimit ? (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              <p className="font-medium">
+                                Phone-based logins are not enabled for your project
+                              </p>
+                              <p className="mt-1">
+                                Enable phone-based logins to update this rate limit
+                              </p>
+                              <div className="mt-3">
+                                <Button asChild type="default" size="tiny">
+                                  <Link href={`/project/${projectRef}/auth/providers`}>
+                                    View auth providers
+                                  </Link>
+                                </Button>
+                              </div>
+                            </TooltipContent>
+                          ) : null}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_TOKEN_REFRESH"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for token refreshes"
-                      description="Number of sessions that can be refreshed in a 5 minute interval per IP address"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig && (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            <p className="font-medium">
-                              You don't have permission to update this setting
-                            </p>
-                            <p className="mt-1">
-                              You need additional permissions to update auth configuration settings
-                            </p>
-                          </TooltipContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_TOKEN_REFRESH"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for token refreshes"
+                        description="Number of sessions that can be refreshed in a 5 minute interval per IP address"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>requests/5 min</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig && (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              <p className="font-medium">
+                                You don't have permission to update this setting
+                              </p>
+                              <p className="mt-1">
+                                You need additional permissions to update auth configuration
+                                settings
+                              </p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                        {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
+                          <p className="text-foreground-lighter text-sm mt-2">
+                            {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
+                          </p>
                         )}
-                      </Tooltip>
-                      {form.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
-                        <p className="text-foreground-lighter text-sm mt-2">
-                          {form.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
-                        </p>
-                      )}
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_VERIFY"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for token verifications"
-                      description="Number of OTP/Magic link verifications that can be made in a 5 minute interval per IP address"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig && (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            <p className="font-medium">
-                              You don't have permission to update this setting
-                            </p>
-                            <p className="mt-1">
-                              You need additional permissions to update auth configuration settings
-                            </p>
-                          </TooltipContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_VERIFY"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for token verifications"
+                        description="Number of OTP/Magic link verifications that can be made in a 5 minute interval per IP address"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>requests/5 min</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig && (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              <p className="font-medium">
+                                You don't have permission to update this setting
+                              </p>
+                              <p className="mt-1">
+                                You need additional permissions to update auth configuration
+                                settings
+                              </p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                        {rateLimitForm.watch('RATE_LIMIT_VERIFY') > 0 && (
+                          <p className="text-foreground-lighter text-sm mt-2">
+                            {rateLimitForm.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
+                          </p>
                         )}
-                      </Tooltip>
-                      {form.watch('RATE_LIMIT_VERIFY') > 0 && (
-                        <p className="text-foreground-lighter text-sm mt-2">
-                          {form.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
-                        </p>
-                      )}
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_ANONYMOUS_USERS"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for anonymous users"
-                      description="Number of anonymous sign-ins that can be made per hour per IP address"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/h">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig || !canUpdateAnonymousUsersRateLimit ? (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            <p className="font-medium">
-                              Anonymous sign-ins are not enabled for your project. Enable them to
-                              control this rate limit.
-                            </p>
-                            <div className="mt-3">
-                              <Button asChild type="default" size="tiny">
-                                <Link href={`/project/${projectRef}/auth/providers`}>
-                                  View auth settings
-                                </Link>
-                              </Button>
-                            </div>
-                          </TooltipContent>
-                        ) : null}
-                      </Tooltip>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_ANONYMOUS_USERS"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for anonymous users"
+                        description="Number of anonymous sign-ins that can be made per hour per IP address"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig || !canUpdateAnonymousUsersRateLimit}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>requests/h</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig || !canUpdateAnonymousUsersRateLimit ? (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              <p className="font-medium">
+                                Anonymous sign-ins are not enabled for your project. Enable them to
+                                control this rate limit.
+                              </p>
+                              <div className="mt-3">
+                                <Button asChild type="default" size="tiny">
+                                  <Link href={`/project/${projectRef}/auth/providers`}>
+                                    View auth settings
+                                  </Link>
+                                </Button>
+                              </div>
+                            </TooltipContent>
+                          ) : null}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_OTP"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for sign-ups and sign-ins"
-                      description="Number of sign-up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users)"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig && (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            <p className="font-medium">
-                              You don't have permission to update this setting
-                            </p>
-                            <p className="mt-1">
-                              You need additional permissions to update auth configuration settings
-                            </p>
-                          </TooltipContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_OTP"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for sign-ups and sign-ins"
+                        description="Number of sign-up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users)"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>requests/5 min</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig && (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              <p className="font-medium">
+                                You don't have permission to update this setting
+                              </p>
+                              <p className="mt-1">
+                                You need additional permissions to update auth configuration
+                                settings
+                              </p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                        {rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
+                          <p className="text-foreground-lighter text-sm mt-2">
+                            {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
+                          </p>
                         )}
-                      </Tooltip>
-                      {form.watch('RATE_LIMIT_OTP') > 0 && (
-                        <p className="text-foreground-lighter text-sm mt-2">
-                          {form.watch('RATE_LIMIT_OTP') * 12} requests per hour
-                        </p>
-                      )}
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardContent>
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="RATE_LIMIT_WEB3"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="flex-row-reverse"
-                      label="Rate limit for Web3 sign-ups and sign-ins"
-                      description="Number of Web3 sign-up or sign-in requests that can be made per IP address in 5 minutes"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="requests/5 min">
-                              <Input_Shadcn_
-                                type="number"
-                                min={0}
-                                {...field}
-                                disabled={!canUpdateConfig || !canUpdateWeb3RateLimit}
-                              />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
-                        </TooltipTrigger>
-                        {!canUpdateConfig || !canUpdateWeb3RateLimit ? (
-                          <TooltipContent side="left" className="w-80 p-4">
-                            <p className="font-medium">
-                              Web3 auth provider is not enabled for this project. Enable it to
-                              control this rate limit.
-                            </p>
-                            <div className="mt-3">
-                              <Button asChild type="default" size="tiny">
-                                <Link href={`/project/${projectRef}/auth/providers`}>
-                                  View Auth provider settings
-                                </Link>
-                              </Button>
-                            </div>
-                          </TooltipContent>
-                        ) : null}
-                      </Tooltip>
-                    </FormItemLayout>
-                  )}
-                />
-              </CardContent>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={rateLimitForm.control}
+                    name="RATE_LIMIT_WEB3"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Rate limit for Web3 sign-ups and sign-ins"
+                        description="Number of Web3 sign-up or sign-in requests that can be made per IP address in 5 minutes"
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl_Shadcn_>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig || !canUpdateWeb3RateLimit}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>requests/5 min</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl_Shadcn_>
+                          </TooltipTrigger>
+                          {!canUpdateConfig || !canUpdateWeb3RateLimit ? (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              <p className="font-medium">
+                                Web3 auth provider is not enabled for this project. Enable it to
+                                control this rate limit.
+                              </p>
+                              <div className="mt-3">
+                                <Button asChild type="default" size="tiny">
+                                  <Link href={`/project/${projectRef}/auth/providers`}>
+                                    View Auth provider settings
+                                  </Link>
+                                </Button>
+                              </div>
+                            </TooltipContent>
+                          ) : null}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
 
-              <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
-                    Cancel
+                <CardFooter className="justify-end space-x-2">
+                  {rateLimitForm.formState.isDirty && (
+                    <Button type="default" onClick={() => rateLimitForm.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig || isUpdatingConfig || !rateLimitForm.formState.isDirty
+                    }
+                    loading={isUpdatingConfig}
+                  >
+                    Save changes
                   </Button>
-                )}
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
-                  loading={isUpdatingConfig}
-                >
-                  Save changes
-                </Button>
-              </CardFooter>
-            </Card>
-          </form>
-        </Form_Shadcn_>
-      </PageSectionContent>
-    </PageSection>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
+
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>IP Address Forwarding</PageSectionTitle>
+            <PageSectionDescription>
+              Control how Auth determines source IP address for rate limiting.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form_Shadcn_ {...ipForwardingForm}>
+            <form onSubmit={ipForwardingForm.handleSubmit(onSubmitIPForwardingForm)}>
+              <Card>
+                <CardContent>
+                  <FormField_Shadcn_
+                    control={ipForwardingForm.control}
+                    name="SECURITY_SB_FORWARDED_FOR_ENABLED"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enable IP address forwarding"
+                        description=<>
+                          Clients can forward end-user IP addresses to Auth for rate limiting when
+                          using secret API keys.{' '}
+                          <InlineLink
+                            href={`${DOCS_URL}/guides/auth/rate-limits#ip-address-forwarding`}
+                          >
+                            Learn more
+                          </InlineLink>
+                        </>
+                      >
+                        <FormControl_Shadcn_>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={(value) => field.onChange(value)}
+                            disabled={!canUpdateConfig}
+                          />
+                        </FormControl_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  {ipForwardingForm.formState.isDirty && (
+                    <Button type="default" onClick={() => ipForwardingForm.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={
+                      !canUpdateConfig || isUpdatingConfig || !ipForwardingForm.formState.isDirty
+                    }
+                    loading={isUpdatingConfig}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form_Shadcn_>
+        </PageSectionContent>
+      </PageSection>
+    </>
   )
 }

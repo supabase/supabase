@@ -6,9 +6,9 @@ import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
+  Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
   FormField_Shadcn_,
   Switch,
 } from 'ui'
