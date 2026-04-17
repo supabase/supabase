@@ -1502,19 +1502,6 @@ functions:
             (data) {
               final AuthChangeEvent event = data.event;
               final Session? session = data.session;
-
-              print('event: $event, session: $session');
-
-              switch (event) {
-                case AuthChangeEvent.initialSession:
-                case AuthChangeEvent.signedIn:
-                case AuthChangeEvent.signedOut:
-                case AuthChangeEvent.passwordRecovery:
-                case AuthChangeEvent.tokenRefreshed:
-                case AuthChangeEvent.userUpdated:
-                case AuthChangeEvent.userDeleted:
-                case AuthChangeEvent.mfaChallengeVerified:
-              }
             },
             onError: (error, stackTrace) {
               // Network errors (e.g. offline) are emitted here.
