@@ -40,7 +40,8 @@ resources:
                       - '*'
                     cors:
                       allow_origin_string_match:
-                        - prefix: "*"
+                        - safe_regex:
+                            regex: ".*"
                       allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD,CONNECT,TRACE"
                       allow_headers: "*"
                       expose_headers: "*"
