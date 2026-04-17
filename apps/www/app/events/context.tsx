@@ -1,7 +1,7 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
-import { SupabaseEvent, SUPABASE_HOST } from '~/lib/eventsTypes'
+import { SUPABASE_HOST, SupabaseEvent } from '~/lib/eventsTypes'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 
 interface EventsContextValue {
   allEvents: SupabaseEvent[]
@@ -91,9 +91,13 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     fetchLumaEvents()
   }, [])
 
-  // Merge Notion (server) + Luma (client) events
+  // Merge Notion (server) + Luma (client) events, excluding past events
   const allEvents = useMemo(() => {
-    return [...notionEvents, ...lumaEvents]
+    const now = new Date()
+    return [...notionEvents, ...lumaEvents].filter((event) => {
+      const eventDate = new Date(event.end_date || event.date)
+      return eventDate >= now
+    })
   }, [notionEvents, lumaEvents])
 
   const categories = useMemo(() => {
@@ -151,36 +155,14 @@ export function EventsProvider({ children, notionEvents }: EventsProviderProps) 
     return [...filtered].sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
-      return dateB - dateA
+      return dateA - dateB
     })
   }, [allEvents, selectedCategories, searchQuery])
 
   const featuredEvent = useMemo(() => {
     if (allEvents.length === 0) return undefined
 
-    const now = new Date()
-
-    const upcomingEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= now
-    })
-
-    const pastEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate < now
-    })
-
-    if (upcomingEvents.length > 0) {
-      return upcomingEvents.sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      )[0]
-    }
-
-    if (pastEvents.length > 0) {
-      return pastEvents.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
-    }
-
-    return undefined
+    return [...allEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
   }, [allEvents])
 
   const value: EventsContextValue = {
