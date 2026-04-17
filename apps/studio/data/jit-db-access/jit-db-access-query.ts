@@ -7,26 +7,26 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type JitDbAccessVariables = { projectRef?: string }
 
-const UNAVAILABLE_REASONS: JitDbAccessUnavailableReason[] = [
-  'manual_migration_required',
-  'postgres_upgrade_required',
-  'temporarily_unavailable',
-]
+// const UNAVAILABLE_REASONS: JitDbAccessUnavailableReason[] = [
+//   'manual_migration_required',
+//   'postgres_upgrade_required',
+//   'temporarily_unavailable',
+// ]
 
-function getUnavailableReason(reason?: unknown): JitDbAccessUnavailableReason {
-  return UNAVAILABLE_REASONS.includes(reason as JitDbAccessUnavailableReason)
-    ? (reason as JitDbAccessUnavailableReason)
-    : 'temporarily_unavailable'
-}
+// function getUnavailableReason(reason?: unknown): JitDbAccessUnavailableReason {
+//   return UNAVAILABLE_REASONS.includes(reason as JitDbAccessUnavailableReason)
+//     ? (reason as JitDbAccessUnavailableReason)
+//     : 'temporarily_unavailable'
+// }
 
-function createUnavailableState(unavailableReason?: JitDbAccessUnavailableReason) {
-  return {
-    appliedSuccessfully: false,
-    state: 'unavailable' as const,
-    isUnavailable: true,
-    unavailableReason: unavailableReason ?? 'temporarily_unavailable',
-  }
-}
+// function createUnavailableState(unavailableReason?: JitDbAccessUnavailableReason) {
+//   return {
+//     appliedSuccessfully: false,
+//     state: 'unavailable' as const,
+//     isUnavailable: true,
+//     unavailableReason: unavailableReason ?? 'temporarily_unavailable',
+//   }
+// }
 
 async function getJitDbAccessConfiguration(
   { projectRef }: JitDbAccessVariables,
@@ -42,15 +42,13 @@ async function getJitDbAccessConfiguration(
   // Temporary access may be unavailable for several reasons (e.g. Postgres
   // upgrade required, manual migration required). Errors are thrown; the
   // unavailable state is communicated via a structured 200 response instead.
-  if (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
 
-  if (data && 'state' in data && data.state === 'unavailable') {
-    return createUnavailableState(
-      getUnavailableReason('unavailableReason' in data ? data.unavailableReason : undefined)
-    )
-  }
+  // if (data.state === 'unavailable') {
+  //   return createUnavailableState(
+  //     getUnavailableReason('unavailableReason' in data ? data.unavailableReason : undefined)
+  //   )
+  // }
 
   return data
 }

@@ -14,7 +14,7 @@ export const JitDbAccessPreview = () => {
       <div className="space-y-2">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
-          <li>Show Temporary access controls in Database Settings</li>
+          <li>Show temporary access controls in Database Settings</li>
           <li>Allow configuring role grants and member-level temporary access rules</li>
         </ul>
       </div>

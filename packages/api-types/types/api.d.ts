@@ -1564,9 +1564,9 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's just-in-time access configuration. */
+    /** [Beta] Get project's temporary access configuration. */
     get: operations['v1-get-jit-access-config']
-    /** [Beta] Update project's just-in-time access configuration. */
+    /** [Beta] Update project's temporary access configuration. */
     put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
@@ -3094,7 +3094,7 @@ export interface components {
      *     } */
     JitAccessRequestRequest: {
       /** @enum {string} */
-      state: 'enabled' | 'disabled' | 'unavailable'
+      state: 'enabled' | 'disabled'
     }
     JitAccessResponse: {
       /** Format: uuid */
@@ -3146,6 +3146,21 @@ export interface components {
         }[]
       }[]
     }
+    JitStateResponse:
+      | {
+          appliedSuccessfully?: boolean
+          /** @enum {string} */
+          state: 'enabled' | 'disabled'
+        }
+      | {
+          /** @enum {string} */
+          state: 'unavailable'
+          /** @enum {string} */
+          unavailableReason:
+            | 'manual_migration_required'
+            | 'postgres_upgrade_required'
+            | 'temporarily_unavailable'
+        }
     LegacyApiKeysResponse: {
       enabled: boolean
     }
@@ -4896,6 +4911,7 @@ export interface components {
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
+            | 'security.iso27001_certificate'
             | 'security.private_link'
             | 'security.enforce_mfa'
             | 'log.retention_days'
@@ -11183,7 +11199,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitStateResponse']
         }
       }
       /** @description Unauthorized */
@@ -11207,7 +11223,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to retrieve project's JIT access config */
+      /** @description Failed to retrieve project's temporary access configuration. */
       500: {
         headers: {
           [name: string]: unknown
@@ -11237,7 +11253,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitAccessResponse']
+          'application/json': components['schemas']['JitStateResponse']
         }
       }
       /** @description Unauthorized */
@@ -11261,7 +11277,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to update project's just-in-time access configuration. */
+      /** @description Failed to update project's temporary access configuration. */
       500: {
         headers: {
           [name: string]: unknown

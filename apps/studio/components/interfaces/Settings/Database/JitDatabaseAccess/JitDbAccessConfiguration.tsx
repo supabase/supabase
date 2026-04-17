@@ -32,7 +32,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import type { JitDbAccessUnavailableReason, JitUserRule, SheetMode } from './JitDbAccess.types'
+import type { JitUserRule, SheetMode } from './JitDbAccess.types'
 import {
   getAssignableJitRoleOptions,
   getJitMemberOptions,
@@ -138,25 +138,13 @@ export const JitDbAccessConfiguration = () => {
   const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
 
   const initialIsEnabled =
-    isSuccessConfiguration &&
-    !!jitDbAccessConfiguration &&
-    'appliedSuccessfully' in jitDbAccessConfiguration &&
-    jitDbAccessConfiguration.appliedSuccessfully &&
-    'state' in jitDbAccessConfiguration &&
-    (jitDbAccessConfiguration as { state: string }).state === 'enabled'
-
-  const isJitDbAccessUnavailable =
-    (jitDbAccessConfiguration &&
-      'state' in jitDbAccessConfiguration &&
-      jitDbAccessConfiguration.state === 'unavailable') ||
-    (jitDbAccessConfiguration &&
-      'isUnavailable' in jitDbAccessConfiguration &&
-      jitDbAccessConfiguration.isUnavailable)
-  const hasAccessToJitDbAccess = !isJitDbAccessUnavailable
-  const unavailableReason: JitDbAccessUnavailableReason =
-    jitDbAccessConfiguration && 'unavailableReason' in jitDbAccessConfiguration
-      ? jitDbAccessConfiguration.unavailableReason
-      : 'temporarily_unavailable'
+    jitDbAccessConfiguration?.state === 'enabled'
+      ? jitDbAccessConfiguration?.appliedSuccessfully
+      : false
+  const isJitDbAccessUnavailable = jitDbAccessConfiguration?.state === 'unavailable'
+  const unavailableReason = isJitDbAccessUnavailable
+    ? jitDbAccessConfiguration.unavailableReason
+    : undefined
 
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
 
@@ -221,7 +209,7 @@ export const JitDbAccessConfiguration = () => {
   }
 
   const handleJitToggleChange = (checked: boolean) => {
-    if (!hasAccessToJitDbAccess || !canUpdateJitDbAccess) return
+    if (isJitDbAccessUnavailable || !canUpdateJitDbAccess) return
 
     if (checked && !enabled) {
       if (activeRuleCount > 0) {
@@ -354,7 +342,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isErrorJitDbAccessConfiguration && hasAccessToJitDbAccess && (
+          {!isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
@@ -415,7 +403,7 @@ export const JitDbAccessConfiguration = () => {
             </Card>
           )}
 
-          {enabled && hasAccessToJitDbAccess && !isUpdatingJitDbAccess && (
+          {enabled && !isJitDbAccessUnavailable && !isUpdatingJitDbAccess && (
             <>
               {isErrorJitMembers && (
                 <AlertError
