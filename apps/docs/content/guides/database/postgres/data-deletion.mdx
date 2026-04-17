@@ -23,7 +23,7 @@ The system catalog tables `pg_class`, `pg_constraint`, and `pg_depend` can be us
 
 ```sql
 -- Find tables that depend on a specific table
-select 
+select
   d.classid::regclass as dependent_object,
   d.objid::regclass as dependent_object_id,
   d.refclassid::regclass as referenced_object,
@@ -66,7 +66,7 @@ WHERE id IN (
 
 This approach has the benefit of controlling when it runs, locking for a shorter period of time and minimising impact on other transactions.
 
-If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using (table parititioning)[/docs/guides/database/partitions] as a management tool. 
+If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using (table parititioning)[/docs/guides/database/partitions] as a management tool.
 
 ### Soft deletes
 
@@ -86,7 +86,7 @@ Then exclude soft-deleted rows in your queries or views:
 
 ```sql
 create view active_orders as
-select * from orders where deleted_at is null;
+  select * from orders where deleted_at is null;
 ```
 
 <Admonition type="tip">
@@ -159,7 +159,7 @@ supabase inspect db index-stats
 
 ## Monitoring
 
-### Check for blocked queries 
+### Check for blocked queries
 
 Query `pg_locks` and `pg_stat_activity` to see currently active queries and queries waiting for locks.
 
@@ -180,7 +180,7 @@ supabase inspect db bloat
 
 ## Reclaiming disk space
 
-To reclaim the disk space freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes. 
+To reclaim the disk space freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes.
 
 If autovacuum is not keeping up, you can trigger a manual vacuum:
 
@@ -196,7 +196,6 @@ vacuum full logs;
 ```
 
 The most efficient way to reclaim disk space, without locks, is to use [pg_repack](/docs/guides/database/extensions/pg_repack).
-
 
 ## Related links
 
