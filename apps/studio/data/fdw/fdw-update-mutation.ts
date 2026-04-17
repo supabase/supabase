@@ -1,16 +1,16 @@
 import { getCreateFDWSql, getDeleteFDWSql, getUpdateFDWSql } from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { foreignTableKeys } from 'data/foreign-tables/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { vaultSecretsKeys } from 'data/vault/keys'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
 import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
+import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { foreignTableKeys } from '@/data/foreign-tables/keys'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { vaultSecretsKeys } from '@/data/vault/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type FDWUpdateVariables = {
   projectRef?: string

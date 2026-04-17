@@ -1,7 +1,5 @@
-import { Command, CornerDownLeft, Loader2 } from 'lucide-react'
-import { Button } from 'ui'
-
-import { detectOS } from '@/lib/helpers'
+import { Loader2 } from 'lucide-react'
+import { Button, KeyboardShortcut } from 'ui'
 
 interface SqlRunButtonProps {
   isDisabled?: boolean
@@ -18,15 +16,9 @@ export const SqlRunButton = ({
   className,
   onClick,
 }: SqlRunButtonProps) => {
-  const os = detectOS()
-
-  function handleOnClick() {
-    onClick()
-  }
-
   return (
     <Button
-      onClick={handleOnClick}
+      onClick={onClick}
       disabled={isDisabled}
       type="primary"
       size="tiny"
@@ -35,14 +27,7 @@ export const SqlRunButton = ({
         isExecuting ? (
           <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
         ) : (
-          <div className="flex items-center space-x-1">
-            {os === 'macos' ? (
-              <Command size={10} strokeWidth={1.5} />
-            ) : (
-              <p className="text-xs text-foreground-light">CTRL</p>
-            )}
-            <CornerDownLeft size={10} strokeWidth={1.5} />
-          </div>
+          <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
         )
       }
       className={className}

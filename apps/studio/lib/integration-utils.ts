@@ -1,9 +1,9 @@
 import { getCreateMigrationsTableSQL, getInsertMigrationSQL } from '@supabase/pg-meta'
-import { fetchHandler } from 'data/fetchers'
-import type { Integration } from 'data/integrations/integrations.types'
-import { ResponseError, type SupaResponse } from 'types'
 
 import { isResponseOk } from './api/apiWrapper'
+import { fetchHandler } from '@/data/fetchers'
+import type { Integration } from '@/data/integrations/integrations.types'
+import { ResponseError, type SupaResponse } from '@/types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetchHandler(url)

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
-import { subscriptionKeys } from '../subscriptions/keys'
 import { organizationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { subscriptionKeys } from '@/data/subscriptions/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreditCodeRedemptionVariables = {
   code: string

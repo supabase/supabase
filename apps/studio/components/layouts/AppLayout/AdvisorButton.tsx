@@ -20,8 +20,8 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const notifications = useMemo(() => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
   }, [notificationsData?.pages])
-  const hasUnreadNotifications = notifications.some((x) => x.status === 'new')
-  const hasCriticalNotifications = notifications.some((x) => x.priority === 'Critical')
+  const hasUnreadNotifications = notifications.some((x) => x?.status === 'new')
+  const hasCriticalNotifications = notifications.some((x) => x?.priority === 'Critical')
 
   const hasCriticalIssues =
     hasCriticalNotifications ||

@@ -25,6 +25,7 @@ interface UpgradePlanButtonProps {
   disabled?: boolean
   className?: string
   slug?: string
+  onClick?: () => void
 }
 
 /**
@@ -42,6 +43,7 @@ export const UpgradePlanButton = ({
   children,
   className,
   slug: slugParam,
+  onClick,
 }: PropsWithChildren<UpgradePlanButtonProps>) => {
   const { ref } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -120,7 +122,7 @@ export const UpgradePlanButton = ({
   }
 
   return (
-    <Button asChild type={variant} disabled={disabled} className={className}>
+    <Button asChild type={variant} disabled={disabled} className={className} onClick={onClick}>
       {link}
     </Button>
   )

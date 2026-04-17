@@ -112,25 +112,21 @@ export const ObservabilityOverview = () => {
 
   const dbServiceData = overviewData.services.db
 
-  // Creates a 1-hour time window for the clicked bar for log filtering
+  // Navigate to the log view scoped to the clicked bar's bucket window
   const handleBarClick = useCallback(
-    (serviceKey: string, logsUrl: string) => (datum: any) => {
+    (logsUrl: string) => (datum: any) => {
       if (!datum?.timestamp) return
 
-      const datumTimestamp = dayjs(datum.timestamp)
-      // Round down to the start of the hour
-      const start = datumTimestamp.startOf('hour').toISOString()
-      // Add 1 hour to get the end of the hour
-      const end = datumTimestamp.startOf('hour').add(1, 'hour').toISOString()
+      // datum.timestamp is already the UTC-truncated bucket boundary from timestamp_trunc(),
+      // so use it directly to avoid local-timezone startOf() misalignment (e.g. UTC+5:30).
+      const unit = interval === '1hr' ? 'minute' : 'hour'
+      const start = datum.timestamp
+      const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
-      const queryParams = new URLSearchParams({
-        its: start,
-        ite: end,
-      })
-
+      const queryParams = new URLSearchParams({ its: start, ite: end })
       router.push(`${logsUrl}?${queryParams.toString()}`)
     },
-    [router]
+    [router, interval]
   )
 
   return (
@@ -181,7 +177,6 @@ export const ObservabilityOverview = () => {
           }))}
           serviceData={overviewData.services}
           onBarClick={handleBarClick}
-          interval={interval}
           datetimeFormat={datetimeFormat}
         />
       </div>

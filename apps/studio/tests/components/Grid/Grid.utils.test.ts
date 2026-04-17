@@ -1,5 +1,6 @@
-import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
+
+import { formatFilterURLParams, formatSortURLParams } from '@/components/grid/SupabaseGrid.utils'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {

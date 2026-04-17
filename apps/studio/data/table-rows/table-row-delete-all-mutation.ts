@@ -1,15 +1,15 @@
+import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import type { Filter } from 'components/grid/types'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { Entity } from 'data/table-editor/table-editor-types'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import type { Filter } from '@/components/grid/types'
+import { executeSql } from '@/data/sql/execute-sql-query'
+import { Entity } from '@/data/table-editor/table-editor-types'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TableRowDeleteAllVariables = {
   projectRef: string
