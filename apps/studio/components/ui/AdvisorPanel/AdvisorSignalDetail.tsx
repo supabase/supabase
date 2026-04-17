@@ -27,15 +27,11 @@ const buildSignalAssistantPrompt = (item: AdvisorSignalItem) => {
 
 export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
   const { ref: projectRef } = useParams()
-  const dismissSignal = useAdvisorSignalDismissal(projectRef)
-  const { setSelectedItem } = useAdvisorStateSnapshot()
+
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-
-  const handleDismiss = () => {
-    dismissSignal(item.dismissalKey)
-    setSelectedItem(undefined)
-  }
+  const { setSelectedItem } = useAdvisorStateSnapshot()
+  const { dismissSignal } = useAdvisorSignals({ projectRef })
 
   const issueDescription = (
     <>
@@ -53,8 +49,8 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
     })
   }
 
-  const onDismissSignal = (key: string) => {
-    dismissSignal(key)
+  const onDismissSignal = () => {
+    dismissSignal(item.dismissalKey)
     setSelectedItem(undefined)
   }
 
