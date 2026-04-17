@@ -1,4 +1,3 @@
-import { IS_PLATFORM } from 'common'
 import { useCallback, useEffect, useMemo } from 'react'
 
 import type { AdvisorSignalItem } from './AdvisorPanel.types'
@@ -41,6 +40,30 @@ const createBannedIPSignalItems = ({
     ],
     sourceData: { type: 'banned-ip' as const, ip },
   }))
+}
+
+/**
+ * Lightweight hook that only provides `dismissSignal`.
+ * Use this inside detail views (e.g. `AdvisorSignalDetail`) instead of the
+ * full `useAdvisorSignals` to avoid creating a second `useBannedIPsQuery`
+ * instance and a second pruning effect, which would cause an infinite update
+ * loop when both hooks share the same localStorage query key.
+ */
+export const useAdvisorSignalDismissal = (projectRef?: string) => {
+  const storageKey = projectRef
+    ? createDismissalStorageKey(projectRef)
+    : 'advisor-signal-dismissals:unknown-project'
+
+  const [, setDismissedKeys] = useLocalStorageQuery<string[]>(storageKey, [])
+
+  return useCallback(
+    (dismissalKey: string) => {
+      setDismissedKeys((current) =>
+        current.includes(dismissalKey) ? current : [...current, dismissalKey]
+      )
+    },
+    [setDismissedKeys]
+  )
 }
 
 interface UseAdvisorSignalsOptions {

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { AdvisorSignalItem } from './AdvisorPanel.types'
-import { useAdvisorSignals } from './useAdvisorSignals'
+import { useAdvisorSignalDismissal } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -27,7 +27,7 @@ const buildSignalAssistantPrompt = (item: AdvisorSignalItem) => {
 
 export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
   const { ref: projectRef } = useParams()
-  const { dismissSignal } = useAdvisorSignals({ projectRef })
+  const dismissSignal = useAdvisorSignalDismissal(projectRef)
   const { setSelectedItem } = useAdvisorStateSnapshot()
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()

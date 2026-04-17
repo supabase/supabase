@@ -58,7 +58,7 @@ describe('useLocalStorageQuery', () => {
     await waitFor(() => expect(result.current[0]).toBe(5))
 
     act(() => {
-      result.current[1]((prev) => prev + 1)
+      result.current[1]((prev: number) => prev + 1)
     })
 
     await waitFor(() => expect(result.current[0]).toBe(6))
@@ -104,7 +104,7 @@ describe('useLocalStorageQuery', () => {
     await waitFor(() => expect(result.current[2].isSuccess).toBe(true))
 
     act(() => {
-      result.current[1]((prev) => prev * 2)
+      result.current[1]((prev: number) => prev * 2)
     })
 
     await waitFor(() => expect(result.current[0]).toBe(20))
