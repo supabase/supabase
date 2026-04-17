@@ -10,6 +10,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import CreditCard from './CreditCard'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
+import { StripePaymentConnection } from './StripePaymentConnection'
 import AddNewPaymentMethodModal from '@/components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
@@ -27,6 +28,7 @@ import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organiz
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
 
 const PaymentMethods = () => {
@@ -56,6 +58,8 @@ const PaymentMethods = () => {
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )
+  const isStripeManagedOrganization =
+    selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   return (
     <>
@@ -64,12 +68,18 @@ const PaymentMethods = () => {
           <div className="sticky space-y-2 top-12">
             <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
-              Payments for your subscription are made using the default card.
+              {isStripeManagedOrganization
+                ? 'Billing for this organisation is handled through a connected Stripe payment token.'
+                : 'Payments for your subscription are made using the default card.'}
             </p>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
-          {selectedOrganization && isPartnerBilledOrganization ? (
+          {isStripeManagedOrganization ? (
+            <StripePaymentConnection
+              status="connected" // TODO: derive from token status once API-917 lands
+            />
+          ) : selectedOrganization && isPartnerBilledOrganization ? (
             <PartnerManagedResource
               managedBy={selectedOrganization?.managed_by}
               resource="Payment Methods"
