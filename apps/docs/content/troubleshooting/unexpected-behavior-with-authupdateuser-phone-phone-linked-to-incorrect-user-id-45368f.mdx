@@ -2,6 +2,8 @@
 title = "`Unexpected behavior with 'auth.updateUser({ phone })': Phone linked to incorrect user ID`"
 topics = [ "auth" ]
 keywords = []
+database_id = "780a9450-760a-4b49-a193-cb7730c64680"
+
 ---
 
 When using `auth.updateUser({ phone: '...' })`, you might observe that a phone number is unexpectedly linked to a different `auth.users` record than the currently authenticated user during the phone verification process, even if `auth.getUser()` reports the correct user ID beforehand.
