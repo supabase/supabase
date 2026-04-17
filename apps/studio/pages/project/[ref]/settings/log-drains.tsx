@@ -156,6 +156,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
 
               updateLogDrain({
                 ...patchPayload,
+                type, // required by the platform endpoint even for partial updates
                 projectRef: ref,
                 token: selectedLogDrain.token,
                 id: selectedLogDrain.id,
