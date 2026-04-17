@@ -36,7 +36,8 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { DevToolbar, DevToolbarProvider, DevToolbarTrigger } from 'dev-tools'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, type ComponentProps } from 'react'
@@ -69,6 +70,20 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+// Keep dev-only components out of the production bundle
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_DEV_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+
+const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => m.ResourceWarningsTab)
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
+  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  : []
 
 const FeatureFlagProviderWithOrgContext = ({
   children,
@@ -190,7 +205,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                               <MonacoThemeProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
-                          <DevToolbar />
+                          <DevToolbar extraTabs={devToolbarExtraTabs} />
                           <DevToolbarTrigger />
                         </DevToolbarProvider>
                       </ThemeProvider>

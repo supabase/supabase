@@ -21,7 +21,6 @@ export const LOCAL_STORAGE_KEYS = {
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
-  UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
   UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
@@ -49,10 +48,6 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
-
-  // Key to track if the user has acknowledged the security notifications preview
-  SECURITY_NOTIFICATIONS_ACKNOWLEDGED: (ref: string) =>
-    `security-notifications-acknowledged-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
@@ -100,6 +95,7 @@ export const LOCAL_STORAGE_KEYS = {
 
   HOTKEY_COPY_MARKDOWN: 'supabase-dashboard-hotkey-copy-markdown',
   HOTKEY_COPY_JSON: 'supabase-dashboard-hotkey-copy-json',
+  HOTKEY_COPY_CSV: 'supabase-dashboard-hotkey-copy-csv',
   HOTKEY_DOWNLOAD_CSV: 'supabase-dashboard-hotkey-download-csv',
 
   // Index Advisor notice dismissed
@@ -127,7 +123,6 @@ export const LOCAL_STORAGE_KEYS = {
    */
   /** @deprecated – we're using usercentrics instead to handle telemetry consent */
   TELEMETRY_CONSENT: 'supabase-consent-ph',
-  TELEMETRY_DATA: 'supabase-telemetry-data',
 
   /**
    * DOCS
@@ -157,7 +152,6 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,

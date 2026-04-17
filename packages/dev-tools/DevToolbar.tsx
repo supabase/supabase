@@ -32,7 +32,7 @@ import {
 } from 'ui'
 
 import { useDevToolbar } from './DevToolbarContext'
-import type { DevTelemetryEvent } from './types'
+import type { DevTelemetryEvent, ExtraTab } from './types'
 import {
   CC_ORIGINALS_KEY,
   deleteCookie,
@@ -204,7 +204,7 @@ function FlagRow({
   )
 }
 
-export function DevToolbar() {
+export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
   const { isEnabled, isOpen, setIsOpen, events, setEvents, dismissToolbar } = useDevToolbar()
   const [activeTab, setActiveTab] = useState<string>('events')
   const [flagsSubTab, setFlagsSubTab] = useState<'posthog' | 'configcat'>('posthog')
@@ -398,6 +398,15 @@ export function DevToolbar() {
                 >
                   Flags {totalOverrideCount > 0 && `(${totalOverrideCount})`}
                 </TabsTrigger>
+                {extraTabs.map((tab) => (
+                  <TabsTrigger
+                    key={tab.id}
+                    value={tab.id}
+                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
                 <Tooltip>
@@ -553,6 +562,15 @@ export function DevToolbar() {
                 </div>
               </div>
             )}
+
+            {extraTabs.map((tab) => (
+              <div
+                key={tab.id}
+                className={cn('flex-1 min-h-0 overflow-y-auto', activeTab !== tab.id && 'hidden')}
+              >
+                {tab.content}
+              </div>
+            ))}
           </div>
         </Tabs>
       </SheetContent>

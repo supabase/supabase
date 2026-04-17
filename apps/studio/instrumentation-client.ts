@@ -97,7 +97,7 @@ Sentry.init({
   debug: false,
 
   // Enable performance monitoring
-  tracesSampleRate: 1.0, // Capture 100% of transactions for performance monitoring
+  tracesSampleRate: 0.02,
 
   integrations: (() => {
     const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration

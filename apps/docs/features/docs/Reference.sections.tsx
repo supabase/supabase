@@ -172,12 +172,8 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader title={command.title} className="col-[1_/_-1]" monoFont={true} />
-      <div className="w-full min-w-0">
-        {command.description && (
-          <ReactMarkdown className="prose w-full break-words mb-8">
-            {command.description}
-          </ReactMarkdown>
-        )}
+      <div className="w-full min-w-0 prose break-words mb-8">
+        {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
             <h3 className="mb-2 text-base text-foreground">Usage</h3>
@@ -224,9 +220,9 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   </div>
                   {flag.description && (
-                    <ReactMarkdown className="prose break-words text-sm">
-                      {flag.description}
-                    </ReactMarkdown>
+                    <div className="prose break-words text-sm">
+                      <ReactMarkdown>{flag.description}</ReactMarkdown>
+                    </div>
                   )}
                 </li>
               ))}
@@ -346,9 +342,9 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
           </code>
         </div>
         {endpointDetails.description && (
-          <ReactMarkdown className="prose break-words mb-8">
-            {endpointDetails.description}
-          </ReactMarkdown>
+          <div className="prose break-words mb-8">
+            <ReactMarkdown>{endpointDetails.description}</ReactMarkdown>
+          </div>
         )}
         {endpointDetails['x-oauth-scope'] && (
           <section>

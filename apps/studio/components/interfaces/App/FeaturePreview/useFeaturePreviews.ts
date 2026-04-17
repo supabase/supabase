@@ -78,15 +78,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       isDefaultOptIn: false,
     },
     {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
-      name: 'New Table Filter Bar',
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/42461',
-      enabled: true,
-      isNew: true,
-      isPlatformOnly: false,
-      isDefaultOptIn: true,
-    },
-    {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FLOATING_MOBILE_TOOLBAR,
       name: 'Floating Mobile Toolbar',
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/43721',
