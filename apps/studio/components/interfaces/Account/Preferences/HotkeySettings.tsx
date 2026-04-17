@@ -11,7 +11,9 @@ import {
 import { HotkeyToggle } from './HotkeyToggle'
 import { SHORTCUT_DEFINITIONS } from '@/state/shortcuts/registry'
 
-const SHORTCUT_ORDER = Object.values(SHORTCUT_DEFINITIONS)
+const SHORTCUT_ORDER = Object.values(SHORTCUT_DEFINITIONS).filter(
+  (definition) => definition.showInSettings !== false
+)
 
 export const HotkeySettings = () => {
   return (
