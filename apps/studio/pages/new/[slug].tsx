@@ -522,7 +522,7 @@ const Wizard: NextPageWithLayout = () => {
                             name="githubRepositoryId"
                             installationIdField="githubInstallationId"
                             repositoryNameField="githubRepositoryName"
-                            label="GitHub repo"
+                            label="GitHub"
                             description={
                               <>
                                 Optional. Ideal for agent-first workflows: update your schema in
