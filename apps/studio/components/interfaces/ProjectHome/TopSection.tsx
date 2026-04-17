@@ -60,8 +60,8 @@ export const TopSection = () => {
                       <Badge variant="warning">OrioleDB</Badge>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" align="start" className="max-w-80 text-center">
-                      This project is using Postgres with OrioleDB which is currently in preview
-                      and not suitable for production workloads. View our{' '}
+                      This project is using Postgres with OrioleDB which is currently in preview and
+                      not suitable for production workloads. View our{' '}
                       <InlineLink href={`${DOCS_URL}/guides/database/orioledb`}>
                         documentation
                       </InlineLink>{' '}
