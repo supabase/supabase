@@ -64,14 +64,14 @@ function PartnerManagedResource({ managedBy, resource, cta }: PartnerManagedReso
   const showCta = ctaEnabled && supportsRedirectCta && Boolean(ctaUrl)
   const partnerHeading =
     managedBy === MANAGED_BY.STRIPE_PROJECTS
-      ? `${resource} are connected to Stripe.`
-      : `${resource} are managed by ${PARTNER_TO_NAME[managedBy]}.`
+      ? `${resource} are connected to Stripe`
+      : `${resource} are managed by ${PARTNER_TO_NAME[managedBy]}`
 
   return (
-    <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
+    <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none bg-none">
       <PartnerIcon organization={{ managed_by: managedBy }} showTooltip={false} size="large" />
 
-      <AlertTitle_Shadcn_ className="text-sm">{partnerHeading}</AlertTitle_Shadcn_>
+      <AlertTitle_Shadcn_ className="text-sm font-normal">{partnerHeading}</AlertTitle_Shadcn_>
 
       {showCta && (
         <Button asChild type="default" iconRight={<ExternalLink />}>
