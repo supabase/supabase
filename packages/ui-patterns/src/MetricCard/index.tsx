@@ -38,7 +38,7 @@ const useMetricCard = () => {
   return useContext(MetricCardContext)
 }
 
-interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean
   isDisabled?: boolean
 }

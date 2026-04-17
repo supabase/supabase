@@ -6,7 +6,7 @@ import { Button } from 'ui'
 
 import { PrivacySettings } from '../PrivacySettings'
 
-interface ConsentToastProps {
+export interface ConsentToastProps {
   onAccept: () => void
   onOptOut: () => void
 }

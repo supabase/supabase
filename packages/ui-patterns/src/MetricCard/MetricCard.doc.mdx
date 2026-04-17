@@ -1,0 +1,27 @@
+import { Canvas, Story, Meta } from '@storybook/addon-docs/blocks';
+ 
+import * as MetricCardStories from './MetricCard.stories';
+ 
+<Meta of={MetricCardStories} />
+
+# MetricCard
+
+## Examples
+
+### Minimal
+
+<Canvas>
+  <Story name={MetricCardStories.Minimal} />
+</Canvas>
+
+### Minimal Horizontal
+
+<Canvas>
+  <Story name={MetricCardStories.MinimalHorizontal} />
+</Canvas>
+
+### With Icon, Link and Tooltip
+
+<Canvas>
+  <Story name={MetricCardStories.WithIconLinkTooltip} />
+</Canvas>

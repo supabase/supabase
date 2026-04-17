@@ -166,3 +166,5 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+*storybook.log
+storybook-static

@@ -45,6 +45,7 @@
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.823.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@storybook/react-vite": "^10.3.5",
     "@types/node": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
@@ -52,6 +53,7 @@
     "prettier-plugin-sql-cst": "^0.18.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
+    "storybook": "^10.3.5",
     "supabase": "^2.76.10",
     "supports-color": "^8.0.0",
     "tailwindcss": "catalog:",
@@ -68,6 +70,13 @@
     "pnpm": "10.24",
     "node": ">=22"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "packageManager": "pnpm@10.24.0"
 }
