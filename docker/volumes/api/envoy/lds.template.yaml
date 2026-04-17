@@ -507,6 +507,8 @@ resources:
                         route:
                           cluster: studio
                           timeout: 30s
+                        request_headers_to_remove:
+                          - authorization
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
