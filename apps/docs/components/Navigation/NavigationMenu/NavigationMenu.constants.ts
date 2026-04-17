@@ -342,6 +342,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/reactjs',
         },
         {
+          name: 'Astro',
+          url: '/guides/getting-started/quickstarts/astrojs',
+        },
+        {
           name: 'Nuxt',
           url: '/guides/getting-started/quickstarts/nuxtjs',
         },
@@ -692,6 +696,10 @@ export const auth: NavMenuConstant = {
         {
           name: 'Next.js',
           url: '/guides/auth/quickstarts/nextjs' as `/${string}`,
+        },
+        {
+          name: 'Astro',
+          url: '/guides/auth/quickstarts/astrojs',
         },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
         {
@@ -1403,7 +1411,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/first-row-in-group' as `/${string}`,
         },
         {
-          name: 'Print PostgreSQL Version',
+          name: 'Print Postgres Version',
           url: '/guides/database/postgres/which-version-of-postgres' as `/${string}`,
         },
         {
@@ -1984,6 +1992,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
             { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+            { name: 'Download Objects', url: '/guides/storage/management/download-objects' },
           ],
         },
         {

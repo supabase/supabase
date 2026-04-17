@@ -203,7 +203,7 @@ export const AIEditor = ({
     })
 
     if (language === 'javascript' || language === 'typescript') {
-      // The Deno libs are loaded as a raw text via raw-loader in next.config.js. They're passed as raw text to the
+      // The Deno libs are loaded as a raw text via raw-loader in next.config.ts. They're passed as raw text to the
       // Monaco editor.
       import('@/public/deno/edge-runtime.d.ts' as string)
         .then((module) => {

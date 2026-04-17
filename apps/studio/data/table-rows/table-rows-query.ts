@@ -394,14 +394,15 @@ export const useTableRowsQuery = <TData = TableRowsData>(
   const queryClient = useQueryClient()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
 
-  // [Joshen] Exclude preflightCheck from query key
-  const { preflightCheck, ...othersArgs } = args
+  // [Ali] Exclude preflightCheck from query key — it controls how the query
+  // executes (whether an EXPLAIN guard runs first), not what data is returned.
+  const { preflightCheck, ...queryKeyArgs } = args
 
   return useQuery<TableRowsData, TableRowsError, TData>({
     queryKey: tableRowKeys.tableRows(projectRef, {
       table: { id: tableId },
       readReplicaIdentifier,
-      ...othersArgs,
+      ...queryKeyArgs,
     }),
     queryFn: ({ signal }) =>
       getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),

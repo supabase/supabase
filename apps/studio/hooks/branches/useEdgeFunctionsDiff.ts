@@ -11,7 +11,6 @@ import {
   type EdgeFunctionsData,
 } from '@/data/edge-functions/edge-functions-query'
 import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
-import { handleError } from '@/data/fetchers'
 
 interface UseEdgeFunctionsDiffProps {
   currentBranchRef?: string
@@ -162,18 +161,6 @@ export const useEdgeFunctionsDiff = ({
     ].some((q) => q.isLoading) ||
     isCurrentFunctionsLoading ||
     isMainFunctionsLoading
-
-  // Aggregate errors across all queries and handle the first encountered error.
-  const firstError = [
-    ...currentBodiesQueries,
-    ...mainBodiesQueries,
-    ...addedBodiesQueries,
-    ...removedBodiesQueries,
-  ].find((q) => q.error)?.error
-
-  if (firstError) {
-    handleError(firstError)
-  }
 
   // Build lookup maps --------------------------------------------------------
   const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}

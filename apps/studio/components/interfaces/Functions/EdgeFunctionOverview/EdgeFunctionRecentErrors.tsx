@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { Check, ExternalLink, Eye } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo } from 'react'
 import {
@@ -33,6 +33,10 @@ import {
   getRecentErrorGroupsBase,
   getRecentErrorInvocationsSql,
   getRelatedExecutionIds,
+  getSinceLastDeployInvocationCount,
+  getSinceLastDeployInvocationCountSql,
+  getSinceLastDeployInvocationPhrase,
+  getSinceLastDeployLogRange,
   getStatusBadgeVariant,
   toAlertError,
   type RecentErrorGroup,
@@ -48,24 +52,32 @@ interface EdgeFunctionRecentErrorsProps {
   functionId?: string
   functionSlug?: string
   projectRef?: string
-  isoTimestampStart?: string
-  isoTimestampEnd?: string
+  updatedAt?: string | number
 }
 
 export const EdgeFunctionRecentErrors = ({
   functionId,
   functionSlug,
   projectRef,
-  isoTimestampStart,
-  isoTimestampEnd,
+  updatedAt,
 }: EdgeFunctionRecentErrorsProps) => {
   const router = useRouter()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiAssistant = useAiAssistantStateSnapshot()
+  const { isoTimestampStart, isoTimestampEnd } = useMemo(
+    () => getSinceLastDeployLogRange(updatedAt),
+    [updatedAt]
+  )
+  const emptyStateFallback =
+    'Runtime errors since the last deploy will appear here when this function returns a 5xx response.'
 
-  const isQueryEnabled = Boolean(projectRef && functionId)
+  const isQueryEnabled = Boolean(projectRef && functionId && isoTimestampStart)
   const recentErrorInvocationsSql = useMemo(
     () => getRecentErrorInvocationsSql(functionId),
+    [functionId]
+  )
+  const sinceLastDeployInvocationCountSql = useMemo(
+    () => getSinceLastDeployInvocationCountSql(functionId),
     [functionId]
   )
 
@@ -86,6 +98,19 @@ export const EdgeFunctionRecentErrors = ({
   const recentErrorGroupsBase = useMemo(
     () => getRecentErrorGroupsBase(recentErrorInvocations),
     [recentErrorInvocations]
+  )
+  const {
+    logData: sinceLastDeployInvocationCountRows,
+    isLoading: isLoadingSinceLastDeployInvocationCount,
+    error: sinceLastDeployInvocationCountError,
+  } = useLogsQuery(
+    projectRef as string,
+    {
+      sql: sinceLastDeployInvocationCountSql,
+      iso_timestamp_start: isoTimestampStart,
+      iso_timestamp_end: isoTimestampEnd,
+    },
+    Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart)
   )
 
   const relatedExecutionIds = useMemo(
@@ -109,7 +134,7 @@ export const EdgeFunctionRecentErrors = ({
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && functionRuntimeLogsSql)
+    Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart)
   )
   const queryError =
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
@@ -118,6 +143,46 @@ export const EdgeFunctionRecentErrors = ({
     () => getRecentErrorGroups({ recentErrorGroupsBase, functionRuntimeLogs }),
     [functionRuntimeLogs, recentErrorGroupsBase]
   )
+  const sinceLastDeployInvocationCount = useMemo(
+    () => getSinceLastDeployInvocationCount(sinceLastDeployInvocationCountRows),
+    [sinceLastDeployInvocationCountRows]
+  )
+  const emptyStateMessage = useMemo(() => {
+    if (!isoTimestampStart || sinceLastDeployInvocationCountError) return emptyStateFallback
+
+    const verb = sinceLastDeployInvocationCount === 1 ? 'has' : 'have'
+    const invocationPhrase = getSinceLastDeployInvocationPhrase(sinceLastDeployInvocationCount)
+
+    return (
+      <>
+        There {verb} been <span className="text-foreground">{invocationPhrase}</span> since last
+        deploy and no errors.
+      </>
+    )
+  }, [
+    emptyStateFallback,
+    isoTimestampStart,
+    sinceLastDeployInvocationCount,
+    sinceLastDeployInvocationCountError,
+  ])
+  const emptyStateIcon =
+    isoTimestampStart && !sinceLastDeployInvocationCountError ? (
+      sinceLastDeployInvocationCount > 0 ? (
+        <Check
+          size={16}
+          strokeWidth={1.5}
+          className="mt-0.5 shrink-0 text-brand"
+          aria-hidden="true"
+        />
+      ) : (
+        <Eye
+          size={16}
+          strokeWidth={1.5}
+          className="mt-0.5 shrink-0 text-foreground-muted"
+          aria-hidden="true"
+        />
+      )
+    ) : null
 
   const handleOpenAssistant = (group: RecentErrorGroup) => {
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
@@ -134,7 +199,7 @@ export const EdgeFunctionRecentErrors = ({
           <div className="flex flex-col gap-6">
             <PageSectionMeta>
               <PageSectionSummary>
-                <PageSectionTitle>Recent Failed Invocations</PageSectionTitle>
+                <PageSectionTitle>Errors since last deploy</PageSectionTitle>
               </PageSectionSummary>
               <PageSectionAside>
                 <Button
@@ -153,13 +218,18 @@ export const EdgeFunctionRecentErrors = ({
             {recentErrorInvocationsError || functionRuntimeLogsError ? (
               <AlertError
                 error={queryError}
-                subject="Failed to retrieve recent edge function errors"
+                subject="Failed to retrieve edge function errors since the last deploy"
               />
-            ) : isLoadingRecentErrorInvocations || isLoadingFunctionRuntimeLogs ? (
+            ) : isLoadingRecentErrorInvocations ||
+              isLoadingFunctionRuntimeLogs ||
+              isLoadingSinceLastDeployInvocationCount ? (
               <GenericSkeletonLoader />
             ) : recentErrorGroups.length === 0 ? (
-              <div className="rounded-md border border-dashed px-4 py-6 text-sm text-foreground-light">
-                Recent runtime errors will appear here when this function returns a 5xx response.
+              <div className="rounded-md border border-dashed px-5 py-6 text-sm text-foreground-light">
+                <div className="flex items-start gap-3">
+                  {emptyStateIcon}
+                  <div>{emptyStateMessage}</div>
+                </div>
               </div>
             ) : (
               <Card className="p-0 overflow-hidden">

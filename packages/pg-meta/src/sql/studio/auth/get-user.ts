@@ -1,5 +1,7 @@
-export const getUserSQL = (userId: string) => {
-  const sql = /* SQL */ `
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
+export const getUserSQL = (userId: string): SafeSqlFragment => {
+  return safeSql`
 select
   auth.users.id,
   auth.users.email,
@@ -28,8 +30,5 @@ select
   ) as providers
 from
   auth.users
-where id = '${userId}';
-`.trim()
-
-  return sql
+where id = ${literal(userId)};`
 }

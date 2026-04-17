@@ -29,6 +29,7 @@ import {
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InstallIntegrationSheet } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallIntegrationSheet'
+import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -208,11 +209,7 @@ const IntegrationPage: NextPageWithLayout = () => {
             </PageHeaderSummary>
 
             {integration?.type === 'oauth' ? (
-              <Button asChild type="primary" className="shrink-0">
-                <a target="_blank" rel="noreferrer" href={integration.siteUrl ?? '/'}>
-                  Install integration
-                </a>
-              </Button>
+              <InstallOAuthIntegrationButton integration={integration} />
             ) : isMarketplaceEnabled && !!integration && !isInstalled ? (
               <InstallIntegrationSheet integration={integration} />
             ) : isMarketplaceEnabled && isInstalled ? (

@@ -344,7 +344,7 @@ revoke execute
 </TabPanel>
 
 <TabPanel id="sql-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
-This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+This example shows how you might restrict sign up from a single IP address or a range of them using [Postgres’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:
@@ -599,7 +599,7 @@ Deno.serve(async (req) => {
 </TabPanel>
 
 <TabPanel id="http-allow-deny-by-cidr" label="Allow/Deny by IP or CIDR">
-This example shows how you might restrict sign up from a single IP address or a range of them using [PostgreSQL’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
+This example shows how you might restrict sign up from a single IP address or a range of them using [Postgres’s built-in](https://www.postgresql.org/docs/current/datatype-net-types.html) `inet` and `<<` operators for [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) -- a method of representing IP address ranges.
 For instance: `123.123.123.123/32` represents only a single IP address, while `123.123.123.0/24` means all IP addresses starting with `123.123.123.`.
 
 The `before-user-created` hook solves this by:

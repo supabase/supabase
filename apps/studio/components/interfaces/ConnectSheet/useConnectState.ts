@@ -28,6 +28,7 @@ import { resolveFrameworkLibraryKey } from './Connect.utils'
 import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 // ============================================================================
 // Data Source Helpers
@@ -196,6 +197,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
   const { ref: projectRef } = useParams()
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const [state, setState] = useState<ConnectState>(() => {
     const defaults = getDefaultState({ schema: connectSchema })
@@ -321,12 +323,17 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
   )
 
   const activeFields = useMemo(() => {
-    const fields = getActiveFields(connectSchema, state)
+    let fields = getActiveFields(connectSchema, state)
     if (!hasDedicatedPooler) {
-      return fields.filter((f) => f.id !== 'useSharedPooler')
+      fields = fields.filter((f) => f.id !== 'useSharedPooler')
+    }
+    if (isHighAvailability) {
+      fields = fields
+        .filter((f) => f.id !== 'connectionMethod' && f.id !== 'useSharedPooler')
+        .map((f) => (f.id === 'connectionType' ? { ...f, label: 'Connection Type' } : f))
     }
     return fields
-  }, [state, hasDedicatedPooler])
+  }, [state, hasDedicatedPooler, isHighAvailability])
 
   const resolvedSteps = useMemo(() => resolveSteps(connectSchema, state), [state])
 
