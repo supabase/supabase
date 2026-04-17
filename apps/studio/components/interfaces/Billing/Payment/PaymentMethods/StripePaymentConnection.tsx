@@ -51,7 +51,7 @@ export function StripePaymentConnection({ status = 'connected' }: { status?: Str
       <Admonition
         type="default"
         title="Stripe payment setup in progress"
-        description="Your Stripe payment connection is being configured. No action needed — check back shortly."
+        description="Your Stripe payment connection is being configured. Check back shortly."
       />
     )
   }
@@ -61,9 +61,8 @@ export function StripePaymentConnection({ status = 'connected' }: { status?: Str
       <StripeIcon />
       <div className="space-y-1">
         <p className="text-sm text-foreground">Payment managed through Stripe</p>
-        <p className="text-sm text-foreground-light max-w-sm">
-          Billing for this organisation is handled via a connected Stripe payment token. To view or
-          update your payment details, visit your Stripe Dashboard.
+        <p className="text-sm text-foreground-light max-w-sm text-balance">
+          Billing for this organisation is handled via a connected Stripe payment token.
         </p>
       </div>
       <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
