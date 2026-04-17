@@ -37,7 +37,7 @@ import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
 
-import { RefDefinitionReturnType } from '~/features/docs/Reference.components.new'
+import { RefDefinitionReturnType, RefDefinitionParams } from '~/features/docs/Reference.components.new'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -45,6 +45,7 @@ const AdmonitionWithMargin = (props: AdmonitionProps) => {
 }
 
 const components = {
+  RefDefinitionParams,
   RefDefinitionReturnType,
   Accordion,
   AccordionItem,

@@ -170,9 +170,9 @@ export function FnParameterDetails({
   return (
     <div className={className ?? ''}>
       <h3 className="mb-3 text-base text-foreground">Parameters</h3>
-      <ul>
+      <ul className="not-prose">
         {combinedParameters.map((parameter, index) => (
-          <li key={index} className="border-t last-of-type:border-b py-5 flex flex-col gap-3">
+          <li key={index} className="not-prose border-t last-of-type:border-b py-5 flex flex-col gap-3">
             <ParamOrTypeDetails paramOrType={parameter} />
           </li>
         ))}

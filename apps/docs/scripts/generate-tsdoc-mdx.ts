@@ -48,9 +48,9 @@ function generateMdx(categories: ReturnType<typeof processSpec>): string {
         }
       }
       
-      // if (def.parameters?.length) {
-        //   lines.push(`<RefDefinitionParams parameters=${prop(def.parameters)} />`, "");
-        // }
+      if (def.parameters?.length) {
+          lines.push(`<RefDefinitionParams parameters=${prop(def.parameters)} />`, "");
+        }
         
         if (def.returnType) {
           lines.push(`<RefDefinitionReturnType returnType=${prop(def.returnType)} />`, "");
