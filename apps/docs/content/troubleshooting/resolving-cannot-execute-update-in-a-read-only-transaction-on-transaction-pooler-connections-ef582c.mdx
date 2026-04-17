@@ -7,7 +7,7 @@ keywords = []
 ### Key technical Terms
 
 **Transaction Pooling**
-A connection management method used by tools like Supavisor or pgBouncer. Instead of giving every client a dedicated, permanent connection to the database, the pooler maintains a small set of "backend connections." It lends one of these connections to a client for the duration of a single transaction, then immediately takes it back to give to another client.
+A connection management method used by tools like Supavisor or PgBouncer. Instead of giving every client a dedicated, permanent connection to the database, the pooler maintains a small set of "backend connections." It lends one of these connections to a client for the duration of a single transaction, then immediately takes it back to give to another client.
 
 **Backend Connection**
 The actual physical process on the Postgres server that executes your queries. In pooling environments, one backend connection will serve many different database clients over its lifetime.
@@ -65,7 +65,7 @@ If you have existing scripts that use session-level settings and cannot be immed
 Ensure your application is using the intended pooler.
 
 - **Shared Transaction Pooler (Supavisor):** `postgresql://postgres.PROJECT_REF:[YOUR-PASSWORD]@aws-X-REGION.pooler.supabase.com:6543/postgres`
-- **Dedicated Transaction Pooler (pgBouncer):** `postgresql://postgres:[YOUR-PASSWORD]@db.PROJECT_REF.supabase.co:6543/postgres`
+- **Dedicated Transaction Pooler (PgBouncer):** `postgresql://postgres:[YOUR-PASSWORD]@db.PROJECT_REF.supabase.co:6543/postgres`
 
 ---
 
