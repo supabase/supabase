@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/turbo/schema.json",
   "ui": "stream",
+  "cacheMaxAge": "14d",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

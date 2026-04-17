@@ -1,10 +1,10 @@
 import { screen } from '@testing-library/dom'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { customRender } from 'tests/lib/custom-render'
-import { routerMock } from 'tests/lib/route-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { IntegrationOverviewTab } from './IntegrationOverviewTab'
+import { customRender } from '@/tests/lib/custom-render'
+import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -31,7 +31,7 @@ vi.mock('framer-motion', async (importOriginal) => {
 
 const mockExtensions = vi.fn()
 
-vi.mock('data/database-extensions/database-extensions-query', () => ({
+vi.mock('@/data/database-extensions/database-extensions-query', () => ({
   useDatabaseExtensionsQuery: () => ({ data: mockExtensions() }),
 }))
 

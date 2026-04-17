@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { handleError, post } from 'data/fetchers'
 import dayjs from 'dayjs'
-import { quoteLiteral } from 'lib/pg-format'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { edgeFunctionsKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { quoteLiteral } from '@/lib/pg-format'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsLastHourStatsVariables = { projectRef?: string; functionIds?: string[] }
 

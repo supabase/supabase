@@ -15,6 +15,19 @@ module.exports = config({
   ],
   theme: {
     extend: {
+      colors: {
+        'purple-sos': {
+          100: 'hsl(293 80% 97% / <alpha-value>)',
+          200: 'hsl(293 85% 91% / <alpha-value>)',
+          300: 'hsl(293 90% 80% / <alpha-value>)',
+          400: 'hsl(293 95% 67% / <alpha-value>)',
+          500: 'hsl(293 100% 54% / <alpha-value>)',
+          600: 'hsl(293 100% 44% / <alpha-value>)',
+          700: 'hsl(293 100% 34% / <alpha-value>)',
+          800: 'hsl(293 95% 22% / <alpha-value>)',
+          900: 'hsl(293 90% 12% / <alpha-value>)',
+        },
+      },
       keyframes: {
         'flash-code': {
           '0%': { backgroundColor: 'rgba(63, 207, 142, 0.1)' },

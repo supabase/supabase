@@ -7,10 +7,10 @@ import {
   Calendar,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -40,6 +40,7 @@ interface FormFieldProps {
   control: Control
   hasAccess: boolean
   disabled?: boolean
+  readOnly?: boolean
 }
 
 const FormField = ({
@@ -50,6 +51,7 @@ const FormField = ({
   control,
   hasAccess,
   disabled: disabledProp,
+  readOnly,
 }: FormFieldProps) => {
   const { description: originalDescription } = properties
   let description = originalDescription
@@ -95,7 +97,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -160,9 +162,16 @@ const FormField = ({
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.isSecret ? (
-                      <DataInput {...field} id={name} size="small" copy reveal />
+                      <DataInput
+                        {...field}
+                        id={name}
+                        size="small"
+                        copy
+                        reveal
+                        readOnly={readOnly}
+                      />
                     ) : (
-                      <Input_Shadcn_ {...field} id={name} />
+                      <Input_Shadcn_ {...field} id={name} readOnly={readOnly} />
                     )}
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -198,6 +207,7 @@ const FormField = ({
                       rows={4}
                       placeholder="Enter multi-line text"
                       className="resize-none"
+                      readOnly={readOnly}
                     />
                   </FormControl_Shadcn_>
                 </FormItemLayout>
@@ -229,24 +239,30 @@ const FormField = ({
                   <FormControl_Shadcn_ className="col-span-6">
                     {properties.units ? (
                       <InputGroup>
+                        <FormInputGroupInput
+                          {...field}
+                          id={name}
+                          type="number"
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          readOnly={readOnly}
+                        />
                         <InputGroupAddon align="inline-end">
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
                             {properties.units}
                           </ReactMarkdown>
                         </InputGroupAddon>
-                        <InputGroupInput
-                          {...field}
-                          id={name}
-                          type="number"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
                       </InputGroup>
                     ) : (
                       <Input_Shadcn_
                         {...field}
                         id={name}
                         type="number"
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        readOnly={readOnly}
                       />
                     )}
                   </FormControl_Shadcn_>
@@ -265,7 +281,7 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
@@ -308,20 +324,18 @@ const FormField = ({
             <FormField_Shadcn_
               control={control}
               name={name}
-              disabled={disabled}
+              disabled={disabled || readOnly}
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
                   label={properties.title}
                   description={
                     description ? (
-                      <ReactMarkdown
-                        unwrapDisallowed
-                        disallowedElements={['p']}
-                        className="form-field-markdown"
-                      >
-                        {description}
-                      </ReactMarkdown>
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
                     ) : null
                   }
                 >

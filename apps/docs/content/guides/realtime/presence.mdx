@@ -65,7 +65,7 @@ In most cases, you can get the correct key from [the Project's **Connect** dialo
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://<project>.supabase.co'
-const SUPABASE_KEY = '<sb_publishable_... or anon key>'
+const SUPABASE_KEY = '<sb_publishable_... key>'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 ```
@@ -78,7 +78,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 void main() {
   Supabase.initialize(
     url: 'https://<project>.supabase.co',
-    anonKey: '<sb_publishable_... or anon key>',
+    anonKey: '<sb_publishable_... key>',
   );
 
   runApp(MyApp());
@@ -94,7 +94,7 @@ final supabase = Supabase.instance.client;
 
 ```swift
 let supabaseURL = "https://<project>.supabase.co"
-let supabaseKey = "<sb_publishable_... or anon key>"
+let supabaseKey = "<sb_publishable_... key>"
 let supabase = SupabaseClient(supabaseURL: URL(string: supabaseURL)!, supabaseKey: supabaseKey)
 
 let realtime = supabase.realtime
@@ -107,7 +107,7 @@ let realtime = supabase.realtime
 
 ```kotlin
 val supabaseUrl = "https://<project>.supabase.co"
-val supabaseKey = "<sb_publishable_... or anon key>"
+val supabaseKey = "<sb_publishable_... key>"
 val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
     install(Realtime)
 }
@@ -122,7 +122,7 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 from supabase import create_client
 
 SUPABASE_URL = 'https://<project>.supabase.co'
-SUPABASE_KEY = '<sb_publishable_... or anon key>'
+SUPABASE_KEY = '<sb_publishable_... key>'
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 ```
@@ -146,6 +146,7 @@ Listen to the `sync`, `join`, and `leave` events triggered whenever any client j
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -386,6 +387,7 @@ You can stop tracking presence using the `untrack()` method. This will trigger t
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 const roomOne = supabase.channel('room_01')
 
@@ -467,6 +469,7 @@ By default, Presence will generate a unique `UUIDv1` key on the server to track 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('SUPABASE_URL', 'SUPABASE_PUBLISHABLE_KEY')
 
 const channelC = supabase.channel('test', {

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getStaticEvents } from '~/lib/events'
+import { getNotionEvents } from '~/lib/events'
 import { EventClientRenderer } from '~/components/Events/new/EventClientRenderer'
 
 export const metadata: Metadata = {
@@ -9,8 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default async function EventsPage() {
-  // This needs to be server-side as we use FS api.
-  const { upcomingEvents, onDemandEvents } = await getStaticEvents()
+  const notionEvents = await getNotionEvents()
 
-  return <EventClientRenderer staticEvents={upcomingEvents} onDemandEvents={onDemandEvents} />
+  return <EventClientRenderer notionEvents={notionEvents} />
 }

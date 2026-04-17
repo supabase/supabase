@@ -2665,7 +2665,7 @@
                     "type": "object",
                     "properties": {
                       "error": {
-                        "error": ["string", "null"],
+                        "type": ["null", "string"],
                         "example": "Either the object does not exist or you do not have access to it"
                       },
                       "path": {

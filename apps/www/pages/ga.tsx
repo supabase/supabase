@@ -1,3 +1,4 @@
+import DefaultLayout from '~/components/Layouts/Default'
 import { NextSeo } from 'next-seo'
 import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
@@ -6,9 +7,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import DefaultLayout from '~/components/Layouts/Default'
+
 import ImageGrid from '../components/ImageGrid'
 import SectionContainer from '../components/Layouts/SectionContainer'
 import { data as pageData } from '../data/ga'
@@ -99,9 +99,9 @@ export default function IndexPage() {
                       <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                         {highlight.number}
                       </h2>
-                      <ReactMarkdown className="text-foreground-light text-sm lg:text-base lg:mt-3">
-                        {highlight.text}
-                      </ReactMarkdown>
+                      <div className="text-foreground-light text-sm lg:text-base lg:mt-3">
+                        <ReactMarkdown>{highlight.text}</ReactMarkdown>
+                      </div>
                     </div>
                   )
                 }
@@ -155,9 +155,9 @@ export default function IndexPage() {
                     <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                       {highlight.number}
                     </h2>
-                    <ReactMarkdown className="text-foreground-light text-sm lg:text-base lg:mt-3">
-                      {highlight.text}
-                    </ReactMarkdown>
+                    <div className="text-foreground-light text-sm lg:text-base lg:mt-3">
+                      <ReactMarkdown>{highlight.text}</ReactMarkdown>
+                    </div>
                   </div>
                 )
               }
@@ -198,9 +198,9 @@ export default function IndexPage() {
                         {highlight.number}
                       </h2>
                     )}
-                    <ReactMarkdown className="text-foreground-light text-sm lg:text-base lg:mt-3">
-                      {highlight.text}
-                    </ReactMarkdown>
+                    <div className="text-foreground-light text-sm lg:text-base lg:mt-3">
+                      <ReactMarkdown>{highlight.text}</ReactMarkdown>
+                    </div>
                   </div>
                 )
               }

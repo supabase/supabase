@@ -40,10 +40,8 @@ export * from './src/components/Select'
 export * from './src/components/Listbox'
 export * from './src/components/Checkbox'
 export * from './src/components/Input'
-export * from './src/components/InputNumber'
 export * from './src/components/Radio'
 export * from './src/components/Toggle'
-export * from './src/components/Form'
 export * from './src/components/ExpandingTextArea'
 
 // layout
@@ -142,6 +140,8 @@ export {
   FormMessage as FormMessage_Shadcn_,
   FormField as FormField_Shadcn_,
   useWatch as useWatch_Shadcn_,
+  FormInputGroupInput,
+  FormInputGroupTextArea,
 } from './src/components/shadcn/ui/form'
 
 export {
