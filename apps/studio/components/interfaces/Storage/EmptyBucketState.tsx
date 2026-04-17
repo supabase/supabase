@@ -24,7 +24,7 @@ export const EmptyBucketState = ({
       description={config.valueProp}
       className={className}
     >
-      <CreateBucketButton onClick={onCreateBucket} />
+      {onCreateBucket ? <CreateBucketButton onClick={onCreateBucket} /> : null}
     </EmptyStatePresentational>
   )
 }
