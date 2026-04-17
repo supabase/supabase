@@ -4580,7 +4580,7 @@ functions:
   - id: admin-oauth-list-clients
     title: 'admin.oauth.listClients()'
     notes: |
-      Lists all OAuth 2.1 clients. Requires a `service_role` key.
+      Lists all OAuth 2.1 clients. Requires a `secret key`.
     params:
       - name: page
         isOptional: true
@@ -4601,7 +4601,7 @@ functions:
   - id: admin-oauth-create-client
     title: 'admin.oauth.createClient()'
     notes: |
-      Creates a new OAuth 2.1 client. Requires a `service_role` key.
+      Creates a new OAuth 2.1 client. Requires a `secret key`.
     examples:
       - id: create-oauth-client
         name: Create an OAuth client
@@ -4616,7 +4616,7 @@ functions:
   - id: admin-oauth-get-client
     title: 'admin.oauth.getClient()'
     notes: |
-      Retrieves an OAuth 2.1 client by ID. Requires a `service_role` key.
+      Retrieves an OAuth 2.1 client by ID. Requires a `secret key`.
     params:
       - name: clientId
         isOptional: false
@@ -4633,7 +4633,7 @@ functions:
   - id: admin-oauth-update-client
     title: 'admin.oauth.updateClient()'
     notes: |
-      Updates an existing OAuth 2.1 client. Requires a `service_role` key.
+      Updates an existing OAuth 2.1 client. Requires a `secret key`.
     params:
       - name: clientId
         isOptional: false
@@ -4652,7 +4652,7 @@ functions:
   - id: admin-oauth-delete-client
     title: 'admin.oauth.deleteClient()'
     notes: |
-      Deletes an OAuth 2.1 client. Requires a `service_role` key.
+      Deletes an OAuth 2.1 client. Requires a `secret key`.
     params:
       - name: clientId
         isOptional: false
@@ -4669,7 +4669,7 @@ functions:
   - id: admin-oauth-regenerate-client-secret
     title: 'admin.oauth.regenerateClientSecret()'
     notes: |
-      Regenerates the client secret for an OAuth 2.1 client. Requires a `service_role` key.
+      Regenerates the client secret for an OAuth 2.1 client. Requires a `secret key`.
     params:
       - name: clientId
         isOptional: false
