@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router'
-
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
-import { InlineLink } from 'components/ui/InlineLink'
+import { useRouter } from 'next/router'
 import { TimestampInfo } from 'ui-patterns'
+
+import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 /**
  * Used to display urgent notices that apply for all users, such as maintenance windows.
@@ -12,7 +12,7 @@ import { TimestampInfo } from 'ui-patterns'
 export const NoticeBanner = () => {
   const router = useRouter()
 
-  const [bannerAcknowledged, setBannerAcknowledge, { isSuccess }] = useLocalStorageQuery(
+  const [bannerAcknowledged, setBannerAcknowledged, { isSuccess }] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.MAINTENANCE_WINDOW_BANNER,
     false
   )
@@ -38,7 +38,7 @@ export const NoticeBanner = () => {
           </InlineLink>
         </>
       }
-      onDismiss={() => setBannerAcknowledge(true)}
+      onDismiss={() => setBannerAcknowledged(true)}
     />
   )
 }

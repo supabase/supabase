@@ -10,8 +10,8 @@ const transport = nodemailer.createTransport({
   secure: Boolean(Deno.env.get('SMTP_SECURE')!),
   auth: {
     user: Deno.env.get('SMTP_USERNAME')!,
-    pass: Deno.env.get('SMTP_PASSWORD')!
-  }
+    pass: Deno.env.get('SMTP_PASSWORD')!,
+  },
 })
 
 console.log(`Function "send-email-smtp" up and running!`)
@@ -19,18 +19,21 @@ console.log(`Function "send-email-smtp" up and running!`)
 Deno.serve(async (_req) => {
   try {
     await new Promise<void>((resolve, reject) => {
-      transport.sendMail({
-        from: Deno.env.get('SMTP_FROM')!,
-        to: 'testr@test.de',
-        subject: `Hello from Supabase Edge Functions`,
-        text: `Hello Functions \\o/`,
-      }, error => {
-        if (error) {
-          return reject(error)
+      transport.sendMail(
+        {
+          from: Deno.env.get('SMTP_FROM')!,
+          to: 'testr@test.de',
+          subject: `Hello from Supabase Edge Functions`,
+          text: `Hello Functions \\o/`,
+        },
+        (error) => {
+          if (error) {
+            return reject(error)
+          }
+
+          resolve()
         }
-  
-        resolve()
-      })
+      )
     })
   } catch (error) {
     return new Response(error.message, { status: 500 })

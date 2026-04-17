@@ -58,6 +58,7 @@ import {
 
 - **Use for non-critical interactions:** Dialog is appropriate when dismissal has no serious consequences.
 - **Design for cancellation**: Assume users may close the dialog without completing the action.
+- **Guard dirty forms on dismissal:** For form dialogs, keep `Dialog` dismissible but intercept close attempts when the form is dirty and show a discard-confirmation dialog (for example, Studio's `DiscardChangesConfirmationDialog` pattern via `useConfirmOnClose`).
 - **Keep focus contained**: Dialog content should remain scoped to a single task or flow.
 - **Avoid destructive confirmations**: If the dialog’s primary purpose is to confirm a risky action, use a confirmation-focused pattern instead.
 - **Compose freely**: Dialog is intentionally unopinionated. Build custom layouts, forms, or step-based flows as needed.

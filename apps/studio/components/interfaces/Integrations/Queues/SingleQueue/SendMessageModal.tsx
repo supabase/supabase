@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { useDatabaseQueueMessageSendMutation } from 'data/database-queues/database-queue-messages-send-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
+import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { useDatabaseQueueMessageSendMutation } from '@/data/database-queues/database-queue-messages-send-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface SendMessageModalProps {
   visible: boolean

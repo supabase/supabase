@@ -1,14 +1,7 @@
+import { useParams } from 'common'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { DOCS_URL } from 'lib/constants'
-import { Button, Modal, ScrollArea, cn } from 'ui'
+import { Button, cn, Modal, ScrollArea } from 'ui'
 import {
   PageSection,
   PageSectionAside,
@@ -18,11 +11,16 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
-
-const MAX_URLS_LENGTH = 2 * 1024
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
@@ -51,9 +49,6 @@ export const RedirectUrls = () => {
     // Remove selectedUrl from array and update
     const payload = URI_ALLOW_LIST_ARRAY.filter((url: string) => !selectedUrls.includes(url))
     const payloadString = payload.join(',')
-    if (payloadString.length > MAX_URLS_LENGTH) {
-      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
-    }
     updateAuthConfig(
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {

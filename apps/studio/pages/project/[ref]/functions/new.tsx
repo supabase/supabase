@@ -1,25 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import { isEqual } from 'lodash'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
@@ -45,8 +31,23 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import { EDGE_FUNCTION_TEMPLATES } from '@/components/interfaces/Functions/Functions.templates'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
+import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -77,7 +78,7 @@ const NOUNS = [
 // Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
 const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
 
-// Define form schema with yup
+// Define form schema with zod
 const FormSchema = z.object({
   functionName: z
     .string()
@@ -142,14 +143,22 @@ const NewFunctionPage = () => {
     },
   })
 
-  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
+  const {
+    mutate: deployFunction,
+    isPending: isDeploying,
+    isSuccess: hasDeployed,
+  } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
-      if (ref && functionName) {
-        router.push(`/project/${ref}/functions/${functionName}/details`)
-      }
+      // Allow the mutation state (isSuccess) to propagate before navigating
+      // to prevent unnecessary dialog about unsaved changes
+      setTimeout(() => {
+        if (ref && functionName) {
+          router.push(`/project/${ref}/functions/${functionName}/details`)
+        }
+      }, 150)
     },
   })
 
@@ -276,21 +285,7 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
-  // [Joshen] Probably a candidate for useStaticEffectEvent
-  const filesRef = useLatest(files)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      const hasUnsavedChanges = !isEqual(INITIAL_FILES, filesRef.current)
-
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
 
   return (
     <PageLayout
@@ -428,6 +423,7 @@ const NewFunctionPage = () => {
           </Button>
         </form>
       </Form_Shadcn_>
+      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
     </PageLayout>
   )
 }
@@ -435,7 +431,7 @@ const NewFunctionPage = () => {
 NewFunctionPage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="New">{page}</EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }

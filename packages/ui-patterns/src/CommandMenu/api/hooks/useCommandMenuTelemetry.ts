@@ -1,6 +1,7 @@
 'use client'
 
 import type {
+  CommandMenuClosedEvent,
   CommandMenuCommandClickedEvent,
   CommandMenuOpenedEvent,
   CommandMenuSearchSubmittedEvent,
@@ -11,7 +12,11 @@ import { useCommandMenuTelemetryContext } from './useCommandMenuTelemetryContext
 import { useCommandMenuOpen } from './viewHooks'
 
 export type CommandMenuTelemetryCallback = (
-  event: CommandMenuOpenedEvent | CommandMenuCommandClickedEvent | CommandMenuSearchSubmittedEvent
+  event:
+    | CommandMenuOpenedEvent
+    | CommandMenuClosedEvent
+    | CommandMenuCommandClickedEvent
+    | CommandMenuSearchSubmittedEvent
 ) => void
 
 export interface UseCommandMenuTelemetryOptions {
@@ -64,7 +69,7 @@ export const useCommandMenuOpenedTelemetry: (
         action: 'command_menu_opened' as const,
         properties: {
           trigger_type: trigger,
-          location: 'user_dropdown_menu',
+          trigger_location: 'user_dropdown_menu',
           app: telemetryContext.app,
         },
         groups: {},

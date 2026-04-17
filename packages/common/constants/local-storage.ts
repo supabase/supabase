@@ -7,20 +7,24 @@ export const LOCAL_STORAGE_KEYS = {
   SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
   EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
   PROJECTS_VIEW: 'projects-view',
+  PROJECTS_FILTER: 'projects-filter',
+  PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
-  INCIDENT_BANNER_DISMISSED: (id: string) => `incident-banner-dismissed-${id}`,
+  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   MAINTENANCE_BANNER_DISMISSED: (id: string) => `maintenance-banner-dismissed-${id}`,
+  DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
 
-  UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
   UI_PREVIEW_UNIFIED_LOGS: 'supabase-ui-preview-unified-logs',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-  UI_PREVIEW_BRANCHING_2_0: 'supabase-ui-branching-2-0',
   UI_PREVIEW_ADVISOR_RULES: 'supabase-ui-advisor-rules',
   UI_PREVIEW_QUEUE_OPERATIONS: 'supabase-ui-queue-operations',
-  UI_PREVIEW_TABLE_FILTER_BAR: 'supabase-ui-table-filter-bar',
+  UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
+  UI_PREVIEW_FLOATING_MOBILE_TOOLBAR: 'supabase-ui-floating-mobile-toolbar',
+  UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
+  UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
 
   NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
   TABS_INTERFACE_ACKNOWLEDGED: 'tabs-interface-acknowledge',
@@ -44,10 +48,6 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
-
-  // Key to track if the user has acknowledged the security notifications preview
-  SECURITY_NOTIFICATIONS_ACKNOWLEDGED: (ref: string) =>
-    `security-notifications-acknowledged-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
@@ -74,6 +74,8 @@ export const LOCAL_STORAGE_KEYS = {
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   MAINTENANCE_WINDOW_BANNER: 'maintenance-window-banner-2026-01-16',
   REPORT_DATERANGE: 'supabase-report-daterange',
+  PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
+  PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
 
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
@@ -91,6 +93,11 @@ export const LOCAL_STORAGE_KEYS = {
   // Project sidebar hotkeys
   HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
 
+  HOTKEY_COPY_MARKDOWN: 'supabase-dashboard-hotkey-copy-markdown',
+  HOTKEY_COPY_JSON: 'supabase-dashboard-hotkey-copy-json',
+  HOTKEY_COPY_CSV: 'supabase-dashboard-hotkey-copy-csv',
+  HOTKEY_DOWNLOAD_CSV: 'supabase-dashboard-hotkey-download-csv',
+
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
 
@@ -100,12 +107,22 @@ export const LOCAL_STORAGE_KEYS = {
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
 
+  // Tax ID banner dismissed
+  TAX_ID_BANNER_DISMISSED: (slug: string) => `tax-id-banner-dismissed-${slug}`,
+
+  TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED: (ref: string) =>
+    `table-editor-queue-operations-banner-dismissed-${ref}`,
+  FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
+    `free-micro-upgrade-banner-dismissed-${ref}`,
+  STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
+    `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
+  PRIVACY_NOTICE_ACKNOWLEDGED: 'privacy-notice-acknowledged-2026-03',
+
   /**
    * COMMON
    */
   /** @deprecated – we're using usercentrics instead to handle telemetry consent */
   TELEMETRY_CONSENT: 'supabase-consent-ph',
-  TELEMETRY_DATA: 'supabase-telemetry-data',
 
   /**
    * DOCS
@@ -131,17 +148,16 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   'supabase.dashboard.auth.debug',
   'supabase.dashboard.auth.navigatorLock.disabled',
   LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_INLINE_EDITOR,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_QUEUE_OPERATIONS,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_TABLE_FILTER_BAR,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_BRANCHING_2_0,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
 ]

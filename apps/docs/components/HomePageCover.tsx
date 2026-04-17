@@ -63,6 +63,12 @@ const HomePageCover = (props) => {
       hasLightIcon: true,
     },
     {
+      tooltip: 'Astro.js',
+      icon: '/docs/img/icons/astro-icon',
+      href: '/guides/getting-started/quickstarts/astrojs',
+      hasLightIcon: true,
+    },
+    {
       tooltip: 'Vue',
       icon: '/docs/img/icons/vuejs-icon',
       href: '/guides/getting-started/quickstarts/vue',
@@ -141,12 +147,7 @@ const HomePageCover = (props) => {
 
                 return (
                   <Link key={i} href={framework.href} passHref className="no-underline">
-                    <IconPanel
-                      iconSize={iconSize}
-                      hideArrow
-                      tooltip={framework.tooltip}
-                      icon={iconToUse}
-                    />
+                    <IconPanel iconSize={iconSize} tooltip={framework.tooltip} icon={iconToUse} />
                   </Link>
                 )
               })}

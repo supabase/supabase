@@ -1,17 +1,4 @@
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useContentQuery } from 'data/content/content-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -34,6 +21,19 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
+import {
+  useFeaturePreviewModal,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useContentQuery } from '@/data/content/content-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const SupaIcon = ({ className }: { className?: string }) => {
   return (
@@ -116,8 +116,7 @@ export function LogsSidebarMenuV2() {
   // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const { plan: orgPlan } = useCurrentOrgPlan()
-  const isFreePlan = orgPlan?.id === 'free'
+  const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -153,13 +152,13 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
+          name: hasDedicatedPooler ? 'Shared Pooler' : 'Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    !isFreePlan && IS_PLATFORM
+    hasDedicatedPooler && IS_PLATFORM
       ? {
           name: 'Dedicated Pooler',
           key: 'dedicated-pooler-logs',

@@ -1,11 +1,12 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
 import {
+  Button,
   Collapsible_Shadcn_ as Collapsible,
   CollapsibleContent_Shadcn_ as CollapsibleContent,
   CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
 } from 'ui'
+
 import { PermissionsList } from './PermissionList'
 
 const PERMISSIONS_COLLAPSE_THRESHOLD = 5

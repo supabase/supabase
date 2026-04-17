@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { describe, expect, it } from 'vitest'
 
+import { buildPropertyChangeItems } from './menuItems'
 import { FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   addFilterToGroup,
@@ -15,9 +16,11 @@ import {
   isFilterOptionObject,
   isSyncOptionsFunction,
   removeFromGroup,
+  resolvePropertyChange,
   truncateText,
   updateNestedLogicalOperator,
   updateNestedOperator,
+  updateNestedPropertyName,
   updateNestedValue,
 } from './utils'
 
@@ -191,6 +194,141 @@ describe('FilterBar Utils', () => {
       const result = updateNestedLogicalOperator(sampleFilterGroup, [1])
       const nestedGroup = result.conditions[1] as FilterGroup
       expect(nestedGroup.logicalOperator).toBe('AND')
+    })
+  })
+
+  describe('updateNestedPropertyName', () => {
+    it('updates property name at root path', () => {
+      const result = updateNestedPropertyName(sampleFilterGroup, [0], 'email')
+      expect(result.conditions[0]).toEqual({
+        propertyName: 'email',
+        value: 'test',
+        operator: '=',
+      })
+    })
+
+    it('updates property name at nested path', () => {
+      const result = updateNestedPropertyName(sampleFilterGroup, [1, 0], 'role')
+      const nestedGroup = result.conditions[1] as FilterGroup
+      expect(nestedGroup.conditions[0]).toEqual({
+        propertyName: 'role',
+        value: 'active',
+        operator: '=',
+      })
+    })
+
+    it('updates property name and resets operator and value', () => {
+      const result = updateNestedPropertyName(sampleFilterGroup, [0], 'email', '', '')
+      expect(result.conditions[0]).toEqual({
+        propertyName: 'email',
+        value: '',
+        operator: '',
+      })
+    })
+
+    it('updates property name and preserves compatible operator', () => {
+      const result = updateNestedPropertyName(sampleFilterGroup, [0], 'email', '=', 'test')
+      expect(result.conditions[0]).toEqual({
+        propertyName: 'email',
+        value: 'test',
+        operator: '=',
+      })
+    })
+
+    it('does not modify other conditions', () => {
+      const result = updateNestedPropertyName(sampleFilterGroup, [0], 'email')
+      expect(result.conditions[1]).toEqual(sampleFilterGroup.conditions[1])
+    })
+  })
+
+  describe('resolvePropertyChange', () => {
+    const stringProperty: FilterProperty = {
+      label: 'Email',
+      name: 'email',
+      type: 'string',
+      operators: [
+        { value: '=', label: 'Equals', group: 'comparison' },
+        { value: '<>', label: 'Not equal', group: 'comparison' },
+        { value: '~~', label: 'Like', group: 'pattern' },
+      ],
+    }
+
+    const booleanProperty: FilterProperty = {
+      label: 'Active',
+      name: 'active',
+      type: 'boolean',
+      options: [
+        { label: 'true', value: 'true' },
+        { label: 'false', value: 'false' },
+      ],
+      operators: [
+        { value: '=', label: 'Equals', group: 'comparison' },
+        { value: '<>', label: 'Not equal', group: 'comparison' },
+      ],
+    }
+
+    const noOperatorsProperty: FilterProperty = {
+      label: 'Raw',
+      name: 'raw',
+      type: 'string',
+    }
+
+    it('preserves compatible operator and free-form value', () => {
+      const result = resolvePropertyChange('=', 'hello', stringProperty)
+      expect(result).toEqual({ operator: '=', value: 'hello', focusTarget: 'value' })
+    })
+
+    it('resets operator when incompatible with new property', () => {
+      const result = resolvePropertyChange('in', 'something', stringProperty)
+      expect(result).toEqual({ operator: '', value: '', focusTarget: 'operator' })
+    })
+
+    it('preserves operator but resets value when fixed options do not match', () => {
+      const result = resolvePropertyChange('=', 'hello', booleanProperty)
+      expect(result).toEqual({ operator: '=', value: '', focusTarget: 'value' })
+    })
+
+    it('preserves operator and value when fixed options match', () => {
+      const result = resolvePropertyChange('=', 'true', booleanProperty)
+      expect(result).toEqual({ operator: '=', value: 'true', focusTarget: 'value' })
+    })
+
+    it('resets everything when current operator is empty', () => {
+      const result = resolvePropertyChange('', 'hello', stringProperty)
+      expect(result).toEqual({ operator: '', value: '', focusTarget: 'operator' })
+    })
+
+    it('resets everything when new property has no operators', () => {
+      const result = resolvePropertyChange('=', 'hello', noOperatorsProperty)
+      expect(result).toEqual({ operator: '', value: '', focusTarget: 'operator' })
+    })
+
+    it('preserves operator with empty value', () => {
+      const result = resolvePropertyChange('=', '', stringProperty)
+      expect(result).toEqual({ operator: '=', value: '', focusTarget: 'value' })
+    })
+
+    it('handles string-based operators (not FilterOperatorObject)', () => {
+      const simpleOpProperty: FilterProperty = {
+        label: 'Simple',
+        name: 'simple',
+        type: 'string',
+        operators: ['=', '!='],
+      }
+      const result = resolvePropertyChange('=', 'test', simpleOpProperty)
+      expect(result).toEqual({ operator: '=', value: 'test', focusTarget: 'value' })
+    })
+
+    it('handles string-based fixed options', () => {
+      const stringOptionsProperty: FilterProperty = {
+        label: 'Status',
+        name: 'status',
+        type: 'string',
+        options: ['active', 'inactive'],
+        operators: ['='],
+      }
+      const result = resolvePropertyChange('=', 'active', stringOptionsProperty)
+      expect(result).toEqual({ operator: '=', value: 'active', focusTarget: 'value' })
     })
   })
 
@@ -453,6 +591,63 @@ describe('FilterBar Utils', () => {
         { label: 'Status', name: 'status', type: 'string' as const },
       ]
       expect(buildFilterPlaceholder(props, { maxProperties: 2 })).toBe('Filter by Name, Status')
+    })
+  })
+
+  describe('buildPropertyChangeItems', () => {
+    const testProperties: FilterProperty[] = [
+      { label: 'Name', name: 'name', type: 'string' },
+      { label: 'Status', name: 'status', type: 'string' },
+      { label: 'Count', name: 'count', type: 'number' },
+    ]
+
+    it('returns all properties except the current one', () => {
+      const items = buildPropertyChangeItems({
+        filterProperties: testProperties,
+        currentPropertyName: 'name',
+        inputValue: '',
+      })
+      expect(items).toHaveLength(2)
+      expect(items.map((i) => i.value)).toEqual(['status', 'count'])
+    })
+
+    it('filters by input value', () => {
+      const items = buildPropertyChangeItems({
+        filterProperties: testProperties,
+        currentPropertyName: 'name',
+        inputValue: 'sta',
+      })
+      expect(items).toHaveLength(1)
+      expect(items[0].value).toBe('status')
+    })
+
+    it('returns empty array when no matches', () => {
+      const items = buildPropertyChangeItems({
+        filterProperties: testProperties,
+        currentPropertyName: 'name',
+        inputValue: 'xyz',
+      })
+      expect(items).toHaveLength(0)
+    })
+
+    it('is case insensitive', () => {
+      const items = buildPropertyChangeItems({
+        filterProperties: testProperties,
+        currentPropertyName: 'name',
+        inputValue: 'STA',
+      })
+      expect(items).toHaveLength(1)
+      expect(items[0].value).toBe('status')
+    })
+
+    it('returns items with label and value', () => {
+      const items = buildPropertyChangeItems({
+        filterProperties: testProperties,
+        currentPropertyName: 'count',
+        inputValue: '',
+      })
+      expect(items[0]).toEqual({ value: 'name', label: 'Name' })
+      expect(items[1]).toEqual({ value: 'status', label: 'Status' })
     })
   })
 })

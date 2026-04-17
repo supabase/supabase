@@ -1,11 +1,11 @@
 import { useRef } from 'react'
-
-import { VirtualizedTable, VirtualizedTableBody } from 'components/ui/VirtualizedTable'
-import { Bucket } from 'data/storage/buckets-query'
 import { Table, TableBody } from 'ui'
-import { BucketTableEmptyState, BucketTableHeader, BucketTableRow } from './BucketTable'
+
 import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
+import { BucketTableEmptyState, BucketTableHeader, BucketTableRow } from './BucketTable'
+import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
+import { Bucket } from '@/data/storage/buckets-query'
 
 type BucketsTableProps = {
   buckets: Bucket[]

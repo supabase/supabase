@@ -1,9 +1,9 @@
 import { Check } from 'lucide-react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
+
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation

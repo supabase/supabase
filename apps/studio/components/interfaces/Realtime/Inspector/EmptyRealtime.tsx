@@ -1,11 +1,12 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, cn } from 'ui'
 
 import { AnimatedCursors } from './AnimatedCursors'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 /**
  * Acts as a container component for the entire log display
@@ -93,13 +94,10 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Receive realtime messages in your application by listening to a channel
             </p>
-            <Button type="default" asChild>
-              <Link
-                href={`${DOCS_URL}/guides/realtime/subscribing-to-database-changes#listening-on-client-side`}
-              >
-                Read the guide
-              </Link>
-            </Button>
+            <DocsButton
+              abbrev={false}
+              href={`${DOCS_URL}/guides/realtime/subscribing-to-database-changes#listening-on-client-side`}
+            />
           </div>
         </Card>
       </div>

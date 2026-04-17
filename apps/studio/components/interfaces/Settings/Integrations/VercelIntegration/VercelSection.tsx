@@ -1,41 +1,41 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
+import { Button, cn } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
+import { IntegrationImageHandler } from '../IntegrationsSettings'
+import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
+import { IntegrationConnectionItem } from '@/components/interfaces/Integrations/VercelGithub/IntegrationConnection'
 import {
   EmptyIntegrationConnection,
   IntegrationConnectionHeader,
   IntegrationInstallation,
-} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
-import { Markdown } from 'components/interfaces/Markdown'
+} from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
+import { Markdown } from '@/components/interfaces/Markdown'
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
+} from '@/components/layouts/Scaffold'
+import NoPermission from '@/components/ui/NoPermission'
+import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
+import { useIntegrationsVercelInstalledConnectionDeleteMutation } from '@/data/integrations/integrations-vercel-installed-connection-delete-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import type {
   Integration,
   IntegrationName,
   IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { pluralize } from 'lib/helpers'
-import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { IntegrationImageHandler } from '../IntegrationsSettings'
-import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
+} from '@/data/integrations/integrations.types'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { pluralize } from '@/lib/helpers'
+import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
+import { useSidePanelsStateSnapshot } from '@/state/side-panels'
 
 export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { data: project } = useSelectedProjectQuery()

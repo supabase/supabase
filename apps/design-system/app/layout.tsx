@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next'
 
 import { customFont, sourceCodePro } from './fonts'
 import { ThemeProvider } from './Providers'
-import { SonnerToaster } from './SonnerToast'
+import { Toaster } from './toaster'
 
 const className = `${customFont.variable} ${sourceCodePro.variable}`
 
@@ -139,7 +139,7 @@ export default async function Layout({ children }: RootLayoutProps) {
           <div vaul-drawer-wrapper="">
             <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
           </div>
-          <SonnerToaster />
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

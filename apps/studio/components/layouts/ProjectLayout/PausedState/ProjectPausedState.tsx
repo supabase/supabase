@@ -1,31 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { PauseCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useFlag, useParams } from 'common'
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useSetProjectStatus } from 'data/projects/project-detail-query'
-import { useProjectPauseStatusQuery } from 'data/projects/project-pause-status-query'
-import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { usePHFlag } from 'hooks/ui/useFlag'
-import { PROJECT_STATUS } from 'lib/constants'
 import { AWS_REGIONS, CloudProvider } from 'shared-data'
+import { toast } from 'sonner'
 import {
   Button,
   Card,
@@ -47,7 +29,25 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
+
 import { PauseDisabledState } from './PauseDisabledState'
+import {
+  extractPostgresVersionDetails,
+  PostgresVersionSelector,
+} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
+import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface ProjectPausedStateProps {
   product?: string
@@ -236,23 +236,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
         {isPauseStatusSuccess && !isRestoreDisabled && (
           <CardFooter className="flex justify-end items-center gap-x-2">
-            {isFreePlan ? (
-              <Button asChild type="default">
-                <Link
-                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
-                >
-                  Upgrade to Pro
-                </Link>
-              </Button>
-            ) : (
-              <Button asChild type="default">
-                <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
-              </Button>
-            )}
-
             <ButtonTooltip
               size="tiny"
-              type="primary"
+              type="default"
               disabled={!canResumeProject}
               onClick={onSelectRestore}
               tooltip={{
@@ -266,6 +252,20 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
             >
               Resume project
             </ButtonTooltip>
+
+            {isFreePlan ? (
+              <Button asChild type="primary">
+                <Link
+                  href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=projectPausedStateRestore`}
+                >
+                  Upgrade to Pro
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild type="default">
+                <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
+              </Button>
+            )}
           </CardFooter>
         )}
 

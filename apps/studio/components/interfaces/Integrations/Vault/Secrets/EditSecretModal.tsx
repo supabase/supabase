@@ -1,13 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Eye, EyeOff } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import type { VaultSecret } from 'types'
 import {
   Button,
   Dialog,
@@ -26,7 +22,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { VaultSecret } from '@/types'
 
 const SecretSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),
@@ -186,7 +186,7 @@ export const EditSecretModal = () => {
                               aria-label={
                                 showSecretValue ? `Hide secret value` : `Show secret value`
                               }
-                              className="absolute right-2 top-1 px-3 py-2"
+                              className="absolute right-1 top-1 w-7"
                               icon={showSecretValue ? <EyeOff /> : <Eye />}
                               onClick={() => setShowSecretValue(!showSecretValue)}
                             />

@@ -157,7 +157,7 @@ const buttonVariants = cva(
   }
 )
 
-const IconContainerVariants = cva('', {
+const IconContainerVariants = cva('inline-flex items-center justify-center shrink-0', {
   variants: {
     size: {
       tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
@@ -208,7 +208,8 @@ const loadingVariants = cva('', {
 export interface ButtonProps
   // omit `type` as we use it to change type of button
   // replaced with `htmlType`
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
     Omit<LoadingVariantProps, 'type'> {

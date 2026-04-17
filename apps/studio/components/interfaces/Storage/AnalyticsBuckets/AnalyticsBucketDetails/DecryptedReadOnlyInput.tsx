@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { ExternalLink, Eye, EyeOff, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DecryptedReadOnlyInput = ({
   value,

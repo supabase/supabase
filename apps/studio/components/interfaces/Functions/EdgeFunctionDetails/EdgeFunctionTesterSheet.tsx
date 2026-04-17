@@ -1,31 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Loader2, Plus, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useEdgeFunctionTestMutation } from 'data/edge-functions/edge-function-test-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
-import { prettifyJSON } from 'lib/helpers'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import {
-  RoleImpersonationStateContextProvider,
-  useGetImpersonatedRoleState,
-} from 'state/role-impersonation-state'
 import {
   Badge,
   Button,
-  CodeBlock,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -50,9 +31,28 @@ import {
   TabsTrigger_Shadcn_ as TabsTrigger,
   TextArea_Shadcn_ as Textarea,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
+import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import { prettifyJSON } from '@/lib/helpers'
+import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import {
+  RoleImpersonationStateContextProvider,
+  useGetImpersonatedRoleState,
+} from '@/state/role-impersonation-state'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -289,7 +289,29 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
   return (
     <Sheet open={visible} onOpenChange={onClose}>
-      <SheetContent size="default" className="flex flex-col gap-0 p-0">
+      <SheetContent
+        size="default"
+        hasOverlay={false}
+        className="flex flex-col gap-0 p-0"
+        onPointerDownOutside={(e) => {
+          // react-resizable-panels v4 registers document-level capture-phase pointer
+          // handlers that can interfere with Radix Dialog's outside-interaction detection.
+          // Prevent the sheet from closing when interacting with the resize handle.
+          const target = (e as CustomEvent<{ originalEvent: PointerEvent }>).detail?.originalEvent
+            ?.target as HTMLElement | null
+          if (target?.closest?.('[data-separator]')) {
+            e.preventDefault()
+          }
+        }}
+        onFocusOutside={(e) => {
+          // The v4 Separator explicitly calls .focus() on itself during pointerdown,
+          // which can trigger Radix Dialog's focus-outside detection.
+          const target = e.target as HTMLElement | null
+          if (target?.closest?.('[data-separator]')) {
+            e.preventDefault()
+          }
+        }}
+      >
         <SheetHeader>
           <SheetTitle>Test {functionSlug}</SheetTitle>
         </SheetHeader>
@@ -299,7 +321,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex-1 overflow-y-auto flex flex-col"
           >
-            <ResizablePanelGroup direction="vertical">
+            <ResizablePanelGroup orientation="vertical">
               <ResizablePanel>
                 <div className="flex flex-col gap-y-4 p-5 h-full overflow-y-auto">
                   <FormField_Shadcn_
@@ -353,7 +375,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={41} minSize={41} maxSize={83}>
+              <ResizablePanel defaultSize="41" minSize="41" maxSize="83">
                 <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
                   {response ? (
                     <div className="h-full bg-surface-100 flex flex-col overflow-hidden">

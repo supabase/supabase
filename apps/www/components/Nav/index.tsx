@@ -1,23 +1,21 @@
 'use client'
 
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { getMenu } from 'data/nav'
+import { DevToolbarTrigger } from 'dev-tools'
+import { useSendTelemetryEvent } from 'lib/telemetry'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
-
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
-import { DevToolbarTrigger } from 'dev-tools'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns'
 
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
-
-import { getMenu } from 'data/nav'
-import { usePathname } from 'next/navigation'
 
 const MenuItem = dynamic(() => import('./MenuItem'))
 const MobileMenu = dynamic(() => import('./MobileMenu'))
@@ -61,6 +59,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const isLaunchWeek12Page = pathname === '/launch-week/12'
   const isLaunchWeek13Page = pathname === '/launch-week/13'
   const isGAWeekSection = pathname?.startsWith('/ga-week')
+  const isStateOfStartupsPage = pathname?.startsWith('/state-of-startups')
   const disableStickyNav =
     isLaunchWeekXPage ||
     isGAWeekSection ||
@@ -69,6 +68,16 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
     isLaunchWeek13Page ||
     !stickyNavbar
   const showLaunchWeekNavMode = (isGAWeekSection || isLaunchWeekXPage) && !open
+
+  const [scrolled, setScrolled] = React.useState(false)
+  React.useEffect(() => {
+    if (!isStateOfStartupsPage) return
+    const handleScroll = () => setScrolled(window.scrollY > 50)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isStateOfStartupsPage])
+
+  const isTransparent = isStateOfStartupsPage && !scrolled && !open
 
   React.useEffect(() => {
     if (open) {
@@ -91,21 +100,28 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   return (
     <>
       <div
-        className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
+        className={cn(
+          'sticky top-0 z-40 transform',
+          disableStickyNav && 'relative',
+          isStateOfStartupsPage && 'fixed left-0 right-0'
+        )}
         style={{ transform: 'translate3d(0,0,999px)' }}
+        data-nav-transparent={isTransparent ? '' : undefined}
       >
         <div
           className={cn(
-            'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95',
-            !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black transition-all',
-            isGAWeekSection && 'dark:!bg-alternative'
+            'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
+            !showLaunchWeekNavMode && !isTransparent && '!opacity-100',
+            showLaunchWeekNavMode && '!bg-transparent dark:!bg-black',
+            isGAWeekSection && 'dark:!bg-alternative',
+            isTransparent && '!bg-transparent dark:!bg-transparent !opacity-100'
           )}
         />
         <nav
           className={cn(
-            `relative z-40 border-default border-b backdrop-blur-sm transition-opacity`,
-            showLaunchWeekNavMode && 'border-muted border-b bg-transparent'
+            `relative z-40 border-default border-b backdrop-blur-sm transition-all duration-300`,
+            showLaunchWeekNavMode && 'border-muted border-b bg-transparent',
+            isTransparent && 'border-transparent backdrop-blur-none'
           )}
         >
           <div className="relative flex justify-between h-16 mx-auto lg:container lg:px-16 xl:px-20">
@@ -182,7 +198,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       </Button>
                       <Button className="hidden lg:block" asChild>
                         <Link
-                          href="https://supabase.com/dashboard"
+                          href="https://supabase.com/dashboard/sign-up"
                           onClick={() =>
                             sendTelemetryEvent({
                               action: 'start_project_button_clicked',

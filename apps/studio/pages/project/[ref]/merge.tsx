@@ -1,34 +1,10 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertTriangle, GitBranchIcon, GitMerge, MoreVertical, Shield, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { DatabaseDiffPanel } from 'components/interfaces/BranchManagement/DatabaseDiffPanel'
-import { EdgeFunctionsDiffPanel } from 'components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
-import { OutOfDateNotice } from 'components/interfaces/BranchManagement/OutOfDateNotice'
-import { ReviewWithAI } from 'components/interfaces/BranchManagement/ReviewWithAI'
-import { WorkflowLogsCard } from 'components/interfaces/BranchManagement/WorkflowLogsCard'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
-import { useBranchMergeMutation } from 'data/branches/branch-merge-mutation'
-import { useBranchPushMutation } from 'data/branches/branch-push-mutation'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useBranchMergeDiff } from 'hooks/branches/useBranchMergeDiff'
-import { useWorkflowManagement } from 'hooks/branches/useWorkflowManagement'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
@@ -42,11 +18,37 @@ import {
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { DatabaseDiffPanel } from '@/components/interfaces/BranchManagement/DatabaseDiffPanel'
+import { EdgeFunctionsDiffPanel } from '@/components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
+import { OutOfDateNotice } from '@/components/interfaces/BranchManagement/OutOfDateNotice'
+import { ReviewWithAI } from '@/components/interfaces/BranchManagement/ReviewWithAI'
+import { WorkflowLogsCard } from '@/components/interfaces/BranchManagement/WorkflowLogsCard'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
+import { useBranchMergeMutation } from '@/data/branches/branch-merge-mutation'
+import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
+import { useWorkflowManagement } from '@/hooks/branches/useWorkflowManagement'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { NextPageWithLayout } from '@/types'
+
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, workflow_run_id: currentWorkflowRunId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [workflowFinalStatus, setWorkflowFinalStatus] = useState<'SUCCESS' | 'FAILED' | null>(null)
@@ -297,6 +299,7 @@ const MergePage: NextPageWithLayout = () => {
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
+      pgdelta: pgDeltaDiffEnabled,
     })
   }
 
@@ -483,7 +486,7 @@ const MergePage: NextPageWithLayout = () => {
       breadcrumbs={breadcrumbs}
       primaryActions={primaryActions}
       size="full"
-      className="border-b-0 pb-0"
+      className="h-full border-b-0 pb-0"
     >
       <div className="border-b">
         <ScaffoldContainer size="full">
@@ -570,18 +573,20 @@ const MergePage: NextPageWithLayout = () => {
           </NavMenu>
         </ScaffoldContainer>
       </div>
-      <ScaffoldContainer size="full" className="pt-6 pb-12">
-        {currentTab === 'database' ? (
-          <DatabaseDiffPanel
-            diffContent={diffContent}
-            isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
-            error={diffError}
-            showRefreshButton={true}
-            currentBranchRef={ref}
-          />
-        ) : (
-          <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
-        )}
+      <ScaffoldContainer size="full" className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
+        <div className="flex min-h-0 flex-1 flex-col">
+          {currentTab === 'database' ? (
+            <DatabaseDiffPanel
+              diffContent={diffContent}
+              isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
+              error={diffError}
+              showRefreshButton={true}
+              currentBranchRef={ref}
+            />
+          ) : (
+            <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
+          )}
+        </div>
       </ScaffoldContainer>
 
       <ConfirmationModal

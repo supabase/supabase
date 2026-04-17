@@ -1,9 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Calendar, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -29,10 +26,12 @@ import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 
 const FORM_ID = 'credit-code-redemption'
@@ -53,7 +52,6 @@ export const CreditCodeRedemption = ({
   onClose?: () => void
 }) => {
   const router = useRouter()
-  const redeemCodeEnabled = useFlag('redeemCodeEnabled')
   const [codeRedemptionModalVisible, setCodeRedemptionModalVisible] = useState(
     modalVisible || false
   )
@@ -146,8 +144,6 @@ export const CreditCodeRedemption = ({
       initHcaptchaRef.current()
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
-
-  if (!redeemCodeEnabled) return null
 
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>

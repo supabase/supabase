@@ -4,6 +4,55 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
 
+/**
+ * Check if the user previously accepted all consent services by reading
+ * localStorage state that was written before UC.init() overwrites it.
+ *
+ * Handles two scenarios (FE-2648):
+ *
+ * 1. Slow navigation: GTM's Usercentrics integration replaced uc_settings with
+ *    compressed ucString/ucData after acceptAllServices(). On the next page load,
+ *    UC.init() can't read that format and treats the user as new.
+ *
+ * 2. Fast navigation: User accepted on app A and navigated to app B before GTM
+ *    finished writing ucData. App B's UC.init() overwrites uc_settings with a
+ *    fresh controllerId and resets uc_user_interaction to false. We detect the
+ *    prior uc_user_interaction: "true" before init stomps it.
+ *
+ * Must be called BEFORE UC.init() since init overwrites these keys.
+ */
+export function detectPriorConsent(): boolean {
+  try {
+    // Scenario 1: GTM wrote compressed format (slow navigation / same-app refresh)
+    const ucData = localStorage?.getItem('ucData')
+    if (ucData) {
+      const data = JSON.parse(ucData)
+      const services = data?.consent?.services
+      if (services && typeof services === 'object') {
+        const serviceValues = Object.values(services)
+        if (
+          serviceValues.length > 0 &&
+          serviceValues.every(
+            (s) =>
+              typeof s === 'object' && s !== null && (s as { consent: boolean }).consent === true
+          )
+        ) {
+          return true
+        }
+      }
+    }
+
+    // Scenario 2: SDK wrote uc_user_interaction: "true" (fast cross-app navigation)
+    if (localStorage?.getItem('uc_user_interaction') === 'true') {
+      return true
+    }
+
+    return false
+  } catch {
+    return false
+  }
+}
+
 export const consentState = proxy({
   // Usercentrics state
   UC: null as Usercentrics | null,
@@ -73,27 +122,59 @@ async function initUserCentrics() {
     return
   }
 
-  const { default: Usercentrics } = await import('@usercentrics/cmp-browser-sdk')
+  // Check for prior consent BEFORE UC.init(), which can't read the compressed
+  // ucData format written by the GTM/Usercentrics integration (FE-2648).
+  const previouslyAccepted = detectPriorConsent()
 
-  const UC = new Usercentrics(process.env.NEXT_PUBLIC_USERCENTRICS_RULESET_ID!, {
-    rulesetId: process.env.NEXT_PUBLIC_USERCENTRICS_RULESET_ID,
-    useRulesetId: true,
-  })
+  try {
+    const { default: Usercentrics } = await import('@usercentrics/cmp-browser-sdk')
 
-  const initialUIValues = await UC.init()
+    const UC = new Usercentrics(process.env.NEXT_PUBLIC_USERCENTRICS_RULESET_ID!, {
+      rulesetId: process.env.NEXT_PUBLIC_USERCENTRICS_RULESET_ID,
+      useRulesetId: true,
+    })
 
-  consentState.UC = UC
-  const hasConsented = UC.areAllConsentsAccepted()
+    const initialUIValues = await UC.init()
 
-  // 0 = first layer, aka show consent toast
-  consentState.showConsentToast = initialUIValues.initialLayer === 0
-  consentState.hasConsented = hasConsented
-  consentState.categories = UC.getCategoriesBaseInfo()
+    consentState.UC = UC
+    const hasConsented = UC.areAllConsentsAccepted()
 
-  // If the user has previously consented (before usercentrics), accept all services
-  if (!hasConsented && localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) === 'true') {
-    consentState.acceptAll()
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+    // If the SDK wants to show the banner but the user previously accepted
+    // (detected via ucData or uc_user_interaction before init overwrote them),
+    // silently re-accept instead of showing the banner again (FE-2648).
+    if (initialUIValues.initialLayer === 0 && !hasConsented && previouslyAccepted) {
+      consentState.hasConsented = true
+      consentState.showConsentToast = false
+      consentState.categories = UC.getCategoriesBaseInfo()
+      localStorage?.removeItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      UC.acceptAllServices()
+        .then(() => {
+          consentState.categories = UC.getCategoriesBaseInfo()
+        })
+        .catch(() => {
+          // If re-accept fails, fall back to showing the banner
+          consentState.hasConsented = false
+          consentState.showConsentToast = true
+        })
+      return
+    }
+
+    // 0 = first layer, aka show consent toast
+    consentState.showConsentToast = initialUIValues.initialLayer === 0
+    consentState.hasConsented = hasConsented
+    consentState.categories = UC.getCategoriesBaseInfo()
+
+    // If the user has previously consented (before usercentrics), accept all services
+    if (!hasConsented && localStorage?.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) === 'true') {
+      consentState.acceptAll()
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+    }
+  } catch (error) {
+    console.error('Failed to initialize Usercentrics:', error)
+    // If SDK fails but user previously accepted, honor that
+    if (previouslyAccepted) {
+      consentState.hasConsented = true
+    }
   }
 }
 

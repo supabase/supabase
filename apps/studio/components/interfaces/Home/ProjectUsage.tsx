@@ -1,24 +1,25 @@
 import { useParams } from 'common'
-import BarChart from 'components/ui/Charts/BarChart'
-import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
-import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
-import Panel from 'components/ui/Panel'
-import {
-  ProjectLogStatsVariables,
-  UsageApiCounts,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
 import dayjs from 'dayjs'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Auth, Database, Realtime, Storage } from 'icons'
 import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Loading } from 'ui'
+
+import BarChart from '@/components/ui/Charts/BarChart'
+import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
+import Panel from '@/components/ui/Panel'
+import {
+  ProjectLogStatsVariables,
+  UsageApiCounts,
+  useProjectLogStatsQuery,
+} from '@/data/analytics/project-log-stats-query'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 type ChartIntervalKey = ProjectLogStatsVariables['interval']
 
@@ -32,11 +33,17 @@ const ProjectUsage = () => {
     'project_storage:all',
   ])
 
-  const { plan } = useCurrentOrgPlan()
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const retentionDays = getEntitlementMax()
 
-  const DEFAULT_INTERVAL: ChartIntervalKey = plan?.id === 'free' ? '1hr' : '1day'
+  const DEFAULT_INTERVAL: ChartIntervalKey =
+    retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
 
   const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
+
+  useEffect(() => {
+    setInterval(retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
+  }, [retentionDays])
 
   const { data, isPending: isLoading } = useProjectLogStatsQuery({ projectRef, interval })
 
@@ -94,8 +101,6 @@ const ProjectUsage = () => {
         <ChartIntervalDropdown
           value={interval || '1day'}
           onChange={(interval) => setInterval(interval as ProjectLogStatsVariables['interval'])}
-          planId={plan?.id}
-          planName={plan?.name}
           organizationSlug={organization?.slug}
           dropdownAlign="start"
           tooltipSide="right"

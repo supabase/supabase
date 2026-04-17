@@ -1,28 +1,36 @@
-import type { PostgresSchema } from '@supabase/postgres-meta'
+import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import {
+  Background,
+  BackgroundVariant,
+  ColorMode,
+  Edge,
+  MiniMap,
+  Node,
+  OnSelectionChangeParams,
+  ReactFlow,
+  useReactFlow,
+} from '@xyflow/react'
 import { toPng, toSvg } from 'html-to-image'
 import { Check, Copy, Download, Loader2, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-import 'reactflow/dist/style.css'
+import '@xyflow/react/dist/style.css'
 
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
-import { tablesToSQL } from 'lib/helpers'
 import { toast } from 'sonner'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   copyToClipboard,
   DropdownMenu,
@@ -32,9 +40,26 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { DefaultEdge } from './DefaultEdge'
+import { SchemaGraphContextProvider, SchemaGraphContextType } from './SchemaGraphContext'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
+import { EdgeData, TableNodeData } from './Schemas.constants'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import SchemaSelector from '@/components/ui/SchemaSelector'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { tablesToSQL } from '@/lib/helpers'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -43,6 +68,8 @@ export const SchemaGraph = () => {
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
+  const snap = useTableEditorStateSnapshot()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -62,6 +89,12 @@ export const SchemaGraph = () => {
   const nodeTypes = useMemo(
     () => ({
       table: TableNode,
+    }),
+    []
+  )
+  const edgeTypes = useMemo(
+    () => ({
+      default: DefaultEdge,
     }),
     []
   )
@@ -106,18 +139,26 @@ export const SchemaGraph = () => {
 
   const canAddTables = canUpdateTables && !isSchemaLocked
 
-  const resetLayout = () => {
+  const resetLayout = async () => {
     const nodes = reactFlowInstance.getNodes()
     const edges = reactFlowInstance.getEdges()
 
-    getLayoutedElementsViaDagre(nodes, edges)
+    getLayoutedElementsViaDagre(
+      nodes.filter((item) => item.type === 'table') as Node<TableNodeData>[],
+      edges
+    )
     reactFlowInstance.setNodes(nodes)
     reactFlowInstance.setEdges(edges)
-    setTimeout(() => reactFlowInstance.fitView({}))
+    await new Promise<void>((resolve) =>
+      setTimeout(async () => {
+        await reactFlowInstance.fitView({})
+        resolve()
+      })
+    )
     saveNodePositions()
   }
 
-  const saveNodePositions = () => {
+  const saveNodePositions = useStaticEffectEvent(() => {
     if (schema === undefined) return console.error('Schema is required')
 
     const nodes = reactFlowInstance.getNodes()
@@ -127,7 +168,18 @@ export const SchemaGraph = () => {
       }, {})
       setStoredPositions(nodesPositionData)
     }
-  }
+  })
+
+  const [selectedEdge, setSelectedEdge] = useState<Edge | undefined>(undefined)
+  const handleSelectionChange = useStaticEffectEvent(
+    (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
+      if (params.edges.length === 1) {
+        setSelectedEdge(params.edges[0])
+        return
+      }
+      setSelectedEdge(undefined)
+    }
+  )
 
   const downloadImage = (format: 'png' | 'svg') => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
@@ -191,16 +243,55 @@ export const SchemaGraph = () => {
     }
   }
 
+  const isFirstLoad = useRef(true)
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
-        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        // Prevent resetting a view after first load to avoid layout changes after editing a column
+        if (isFirstLoad.current) {
+          isFirstLoad.current = false
+          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+        }
       })
     }
-  }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
+  }, [
+    isSuccessTables,
+    isSuccessSchemas,
+    tables,
+    reactFlowInstance,
+    ref,
+    resolvedTheme,
+    schemas,
+    selectedSchema,
+  ])
+
+  const schemaGraphPanelEditorContext = useMemo<SchemaGraphContextType>(
+    () => ({
+      selectedEdge,
+      isDownloading,
+      onEditColumn: (tableId, columnId) => {
+        const table = tables.find((table) => table.id === tableId)
+        if (!table || table.columns == null) return
+
+        const column = table.columns.find((column) => column.id === columnId)
+        if (!column) return
+
+        setSelectedTable(table)
+        snap.onEditColumn(column)
+      },
+      onEditTable: (tableId) => {
+        const table = tables.find((table) => table.id === tableId)
+        if (!table || table.columns == null) return
+
+        setSelectedTable(table)
+        snap.onEditTable()
+      },
+    }),
+    [tables, snap, isDownloading, selectedEdge]
+  )
 
   return (
     <>
@@ -209,9 +300,7 @@ export const SchemaGraph = () => {
           <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
         )}
 
-        {isErrorSchemas && (
-          <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
-        )}
+        {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
 
         {isSuccessSchemas && (
           <>
@@ -226,7 +315,7 @@ export const SchemaGraph = () => {
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   type="outline"
-                  icon={copied ? <Check /> : <Copy />}
+                  icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
                   onClick={() => {
                     if (tables) {
                       copyToClipboard(tablesToSQL(tables))
@@ -270,18 +359,33 @@ export const SchemaGraph = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <ButtonTooltip
-                  type="default"
-                  onClick={resetLayout}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: 'Automatically arrange the layout of all nodes',
-                    },
-                  }}
-                >
-                  Auto layout
-                </ButtonTooltip>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <ButtonTooltip
+                      type="default"
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: 'Automatically arrange the layout of all nodes',
+                        },
+                      }}
+                    >
+                      Auto layout
+                    </ButtonTooltip>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm to rearrange all nodes</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Auto layout will rearrange all nodes in the graph. This cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={resetLayout}>Apply</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )}
           </>
@@ -323,41 +427,48 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <div className="w-full h-full">
-              <ReactFlow
-                defaultNodes={[]}
-                defaultEdges={[]}
-                defaultEdgeOptions={{
-                  type: 'smoothstep',
-                  animated: true,
-                  deletable: false,
-                }}
-                nodeTypes={nodeTypes}
-                fitView
-                minZoom={0.8}
-                maxZoom={1.8}
-                proOptions={{ hideAttribution: true }}
-                onNodeDragStop={() => saveNodePositions()}
-              >
-                <Background
-                  gap={16}
-                  className="[&>*]:stroke-foreground-muted opacity-[25%]"
-                  variant={BackgroundVariant.Dots}
-                  color={'inherit'}
-                />
-                <MiniMap
-                  pannable
-                  zoomable
-                  nodeColor={miniMapNodeColor}
-                  maskColor={miniMapMaskColor}
-                  className="border rounded-md shadow-sm"
-                />
-                <SchemaGraphLegend />
-              </ReactFlow>
-            </div>
+            <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
+              <div className="w-full h-full">
+                <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
+                  // FIXME: https://github.com/xyflow/xyflow/issues/4876
+                  colorMode={'' as unknown as ColorMode}
+                  defaultNodes={[]}
+                  defaultEdges={[]}
+                  defaultEdgeOptions={{
+                    type: 'default',
+                    animated: true,
+                    deletable: false,
+                  }}
+                  nodeTypes={nodeTypes}
+                  edgeTypes={edgeTypes}
+                  fitView
+                  minZoom={0.8}
+                  maxZoom={1.8}
+                  proOptions={{ hideAttribution: true }}
+                  onNodeDragStop={saveNodePositions}
+                  onSelectionChange={handleSelectionChange}
+                >
+                  <Background
+                    gap={16}
+                    className="[&>*]:stroke-foreground-muted opacity-[25%]"
+                    variant={BackgroundVariant.Dots}
+                    color={'inherit'}
+                  />
+                  <MiniMap
+                    pannable
+                    zoomable
+                    nodeColor={miniMapNodeColor}
+                    maskColor={miniMapMaskColor}
+                    className="border rounded-md shadow-sm"
+                  />
+                  <SchemaGraphLegend />
+                </ReactFlow>
+              </div>
+            </SchemaGraphContextProvider>
           )}
         </>
       )}
+      <SidePanelEditor selectedTable={selectedTable ?? undefined} includeColumns />
     </>
   )
 }

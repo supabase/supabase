@@ -1,6 +1,6 @@
 import { Info } from 'lucide-react'
-
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { SlotLagMetricKey, SlotLagMetrics } from './ReplicationPipelineStatus.types'
 import { getFormattedLagValue } from './ReplicationPipelineStatus.utils'
 

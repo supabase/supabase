@@ -1,20 +1,19 @@
 import 'react-data-grid/lib/styles.css'
-import 'styles/code.scss'
-import 'styles/contextMenu.scss'
-import 'styles/editor.scss'
-import 'styles/focus.scss'
-import 'styles/graphiql-base.scss'
-import 'styles/grid.scss'
-import 'styles/main.scss'
-import 'styles/markdown-preview.scss'
-import 'styles/monaco.scss'
-import 'styles/react-data-grid-logs.scss'
-import 'styles/reactflow.scss'
-import 'styles/storage.scss'
-import 'styles/stripe.scss'
-import 'styles/toast.scss'
-import 'styles/typography.scss'
-import 'styles/ui.scss'
+import '@/styles/code.scss'
+import '@/styles/editor.scss'
+import '@/styles/focus.scss'
+import '@/styles/graphiql-base.scss'
+import '@/styles/grid.scss'
+import '@/styles/main.scss'
+import '@/styles/markdown-preview.scss'
+import '@/styles/monaco.scss'
+import '@/styles/react-data-grid-logs.scss'
+import '@/styles/reactflow.scss'
+import '@/styles/storage.scss'
+import '@/styles/stripe.scss'
+import '@/styles/toast.scss'
+import '@/styles/typography.scss'
+import '@/styles/ui.scss'
 import 'ui-patterns/ShimmeringLoader/index.css'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
@@ -25,48 +24,66 @@ import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import {
   FeatureFlagProvider,
+  getFlags,
   TelemetryTagManager,
   ThemeProvider,
-  getFlags,
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
-import { StudioCommandProvider as CommandProvider } from 'components/interfaces/App/CommandMenu/StudioCommandProvider'
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
-import { MonacoThemeProvider } from 'components/interfaces/App/MonacoThemeProvider'
-import { RouteValidationWrapper } from 'components/interfaces/App/RouteValidationWrapper'
-import { MainScrollContainerProvider } from 'components/layouts/MainScrollContainerContext'
-import { DevToolbar, DevToolbarProvider } from 'dev-tools'
-import { GlobalErrorBoundaryState } from 'components/ui/ErrorBoundary/GlobalErrorBoundaryState'
-import { useRootQueryClient } from 'data/query-client'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { customFont, sourceCodePro } from 'fonts'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { AuthProvider } from 'lib/auth'
-import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from 'lib/constants'
-import { ProfileProvider } from 'lib/profile'
-import { Telemetry } from 'lib/telemetry'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { type ComponentProps, ErrorInfo, useCallback } from 'react'
+import { ErrorInfo, useCallback, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { AiAssistantStateContextProvider } from 'state/ai-assistant-state'
-import type { AppPropsWithLayout } from 'types'
-import { SonnerToaster, TooltipProvider } from 'ui'
+import { TooltipProvider } from 'ui'
+
+import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
+import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
+import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
+import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
+import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { useRootQueryClient } from '@/data/query-client'
+import { customFont, sourceCodePro } from '@/fonts'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { AuthProvider } from '@/lib/auth'
+import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { ProfileProvider } from '@/lib/profile'
+import { Telemetry } from '@/lib/telemetry'
+import { Toaster } from '@/lib/toaster'
+import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
+import type { AppPropsWithLayout } from '@/types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
+
+// Keep dev-only components out of the production bundle
+const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+const IS_DEV_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
+
+const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => m.ResourceWarningsTab)
+    )
+  : () => null
+
+const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
+  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  : []
 
 const FeatureFlagProviderWithOrgContext = ({
   children,
@@ -182,12 +199,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 </MainScrollContainerProvider>
                                 <StudioCommandMenu />
                                 <FeaturePreviewModal />
+                                <UpdateBillingAddressModal />
                               </FeaturePreviewContextProvider>
-                              <SonnerToaster position="top-right" />
+                              <Toaster />
                               <MonacoThemeProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
-                          <DevToolbar />
+                          <DevToolbar extraTabs={devToolbarExtraTabs} />
+                          <DevToolbarTrigger />
                         </DevToolbarProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>

@@ -3,6 +3,7 @@
 This function allows you to access your Supabase database directly via TCP from an edge function.
 
 ## Setup
+
 1. Rename `.env.example` to `.env`
 2. Insert Supabase database connection string for `DATABASE_URL` in `.env` file
 3. Replace `DATABASE_URL` with your connection string.

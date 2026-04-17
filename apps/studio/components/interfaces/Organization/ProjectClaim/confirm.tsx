@@ -1,17 +1,9 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
-import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
-import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
-import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
-import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { BASE_PATH } from 'lib/constants'
-import type { Organization } from 'types'
 import {
   Button,
   cn,
@@ -20,9 +12,17 @@ import {
   CollapsibleTrigger_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps/OAuthApps.constants'
 import { ProjectClaimLayout } from './layout'
+import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api-authorization-approve-mutation'
+import { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
+import { useOrganizationProjectClaimMutation } from '@/data/organizations/organization-project-claim-mutation'
+import { OrganizationProjectClaimResponse } from '@/data/organizations/organization-project-claim-query'
+import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { BASE_PATH } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export const ProjectClaimConfirm = ({
   selectedOrganization,
@@ -198,6 +198,11 @@ export const ProjectClaimConfirm = ({
                     description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
                     hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+                  />
+                  <ScopeSection
+                    description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+                    hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
+                    hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
                   />
                   <ScopeSection
                     description={PERMISSIONS_DESCRIPTIONS.AUTH}

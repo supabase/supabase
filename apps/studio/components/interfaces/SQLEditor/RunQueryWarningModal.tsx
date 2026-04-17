@@ -1,21 +1,24 @@
-import { Separator } from 'ui'
+import { DialogSectionSeparator, Separator } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { PotentialIssues } from './SQLEditor.types'
 
 interface RunQueryWarningModalProps {
   visible: boolean
-  hasDestructiveOperations: boolean
-  hasUpdateWithoutWhere: boolean
+  potentialIssues: PotentialIssues | undefined
   onCancel: () => void
   onConfirm: () => void
 }
 
 export const RunQueryWarningModal = ({
   visible,
-  hasDestructiveOperations,
-  hasUpdateWithoutWhere,
+  potentialIssues,
   onCancel,
   onConfirm,
 }: RunQueryWarningModalProps) => {
+  const { hasDestructiveOperations, hasUpdateWithoutWhere, hasAlterDatabasePreventConnection } =
+    potentialIssues || {}
+
   return (
     <ConfirmationModal
       visible={visible}
@@ -37,22 +40,30 @@ export const RunQueryWarningModal = ({
       onConfirm={onConfirm}
     >
       <div className="text-sm">
-        <ul className="border rounded-md grid bg-surface-200">
+        <ul className="border rounded-md grid bg-surface-200 divide-y">
           {hasDestructiveOperations && (
             <li className="grid pt-3 pb-2 px-4">
-              <span className="font-bold">Query has destructive operation</span>
-              <span className="text-foreground-lighter">
+              <span className="font-bold">Query has destructive operations</span>
+              <span className="text-foreground-light">
                 Make sure you are not accidentally removing something important.
               </span>
             </li>
           )}
-          {hasDestructiveOperations && hasUpdateWithoutWhere && <Separator />}
           {hasUpdateWithoutWhere && (
             <li className="grid pt-2 pb-3 px-4 gap-1">
               <span className="font-bold">Query uses update without a where clause</span>
-              <span className="text-foreground-lighter">
+              <span className="text-foreground-light">
                 Without a <code className="text-code-inline">where</code> clause, this could update
                 all rows in the table.
+              </span>
+            </li>
+          )}
+          {hasAlterDatabasePreventConnection && (
+            <li className="grid pt-2 pb-3 px-4 gap-1">
+              <span className="font-bold">Query will prevent connections to your database</span>
+              <span className="text-foreground-light">
+                The dashboard will no longer have access to your database, and you will need a
+                direct connection to your database to reconfigure this setting
               </span>
             </li>
           )}

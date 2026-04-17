@@ -21,9 +21,9 @@ Auth0 can be used as a third-party authentication provider alongside Supabase Au
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
-import Auth0Client from '@auth0/auth0-spa-js'
+import { createAuth0Client } from '@auth0/auth0-spa-js'
 
-const auth0 = new Auth0Client({
+const auth0 = await createAuth0Client({
   domain: '<AUTH0_DOMAIN>',
   clientId: '<AUTH0_CLIENT_ID>',
   authorizationParams: {
@@ -36,12 +36,10 @@ const supabase = createClient(
   'SUPABASE_PUBLISHABLE_KEY',
   {
     accessToken: async () => {
-      const accessToken = await auth0.getTokenSilently()
-
-      // Alternatively you can use (await auth0.getIdTokenClaims()).__raw to
-      // use an ID token instead.
-
-      return accessToken
+      // Use the ID token which reliably includes custom claims.
+      const idToken = (await auth0.getIdTokenClaims())?.__raw
+      if (!idToken) throw new Error('Missing ID token')
+      return idToken
     },
   }
 )
@@ -93,7 +91,7 @@ Future<void> main() async {
     anonKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final credentials = await auth0.credentialsManager.credentials();
-      return credentials.accessToken;
+      return credentials.idToken;
     },
   );
   runApp(const MyApp());
@@ -116,7 +114,7 @@ val supabase = createSupabaseClient(
 ) {
     accessToken = {
         val credentials: Credentials = ...; // Get credentials from Auth0
-        credentials.accessToken
+        credentials.idToken
     }
 }
 ```
@@ -145,13 +143,19 @@ Your Supabase project inspects the `role` claim present in all JWTs sent to it, 
 
 By default, Auth0 JWTs (both access token and ID token) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
 
-A recommended approach to do this is to configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) which will add the custom claim:
+Configure the [`onExecutePostLogin` Auth0 Action](https://auth0.com/docs/secure/tokens/json-web-tokens/create-custom-claims#create-custom-claims) to add the custom claim to **ID tokens**:
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
-  api.accessToken.setCustomClaim('role', 'authenticated')
+  api.idToken.setCustomClaim('role', 'authenticated')
 }
 ```
+
+<Admonition type="caution">
+
+Supabase requires the literal `role` claim key in the JWT. Auth0 [silently strips non-namespaced custom claims from access tokens](https://auth0.com/docs/troubleshoot/product-lifecycle/past-migrations/custom-claims-migration), so `api.accessToken.setCustomClaim('role', 'authenticated')` does not work. Use `api.idToken.setCustomClaim` and pass the ID token to Supabase as shown in the examples above.
+
+</Admonition>
 
 ## Limitations
 

@@ -2,17 +2,17 @@ import { useParams } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import SQLTemplates from 'components/interfaces/SQLEditor/SQLTemplates/SQLTemplates'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { EditorBaseLayout } from 'components/layouts/editors/EditorBaseLayout'
-import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
-import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import type { NextPageWithLayout } from 'types'
+import SQLTemplates from '@/components/interfaces/SQLEditor/SQLTemplates/SQLTemplates'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
+import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import type { NextPageWithLayout } from '@/types'
 
 const SqlTemplates: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref } = useParams<{ ref: string }>()
+  const ref = useParams<{ ref: string }>()?.ref
   const tabs = useTabsStateSnapshot()
 
   useEffect(() => {

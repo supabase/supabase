@@ -1,5 +1,5 @@
-import { FilterPopover } from 'components/ui/FilterPopover'
 import { QUEUE_MESSAGE_OPTIONS, QUEUE_MESSAGE_TYPE } from './Queue.utils'
+import { FilterPopover } from '@/components/ui/FilterPopover'
 
 interface QueueFiltersProps {
   selectedTypes: QUEUE_MESSAGE_TYPE[]

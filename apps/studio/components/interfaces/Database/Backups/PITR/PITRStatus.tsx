@@ -3,13 +3,13 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
