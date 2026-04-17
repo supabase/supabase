@@ -2016,7 +2016,7 @@ export interface DocumentViewButtonClickedEvent {
     /**
      * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
      */
-    documentName: 'TIA' | 'SOC2' | 'Standard Security Questionnaire'
+    documentName: 'TIA' | 'SOC2' | 'ISO27001' | 'Standard Security Questionnaire'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
