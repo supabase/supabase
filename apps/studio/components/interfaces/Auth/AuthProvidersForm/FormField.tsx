@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
 import { useEffect } from 'react'
-import { type Control, useFormContext } from 'react-hook-form'
+import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
