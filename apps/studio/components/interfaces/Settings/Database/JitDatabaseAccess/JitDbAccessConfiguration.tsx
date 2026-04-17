@@ -32,7 +32,7 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import type { JitUserRule, SheetMode } from './JitDbAccess.types'
+import type { JitDbAccessUnavailableReason, JitUserRule, SheetMode } from './JitDbAccess.types'
 import {
   getAssignableJitRoleOptions,
   getJitMemberOptions,
@@ -74,8 +74,6 @@ export const JitDbAccessConfiguration = () => {
     isError: isErrorJitDbAccessConfiguration,
     isLoading: isLoadingConfiguration,
     isSuccess: isSuccessConfiguration,
-    isUnavailable: isJitDbAccessUnavailable,
-    unavailableReason,
   } = useJitDbAccessQuery({ projectRef: ref })
 
   const {
@@ -141,10 +139,24 @@ export const JitDbAccessConfiguration = () => {
 
   const initialIsEnabled =
     isSuccessConfiguration &&
-    jitDbAccessConfiguration?.appliedSuccessfully === true &&
-    jitDbAccessConfiguration?.state === 'enabled'
+    !!jitDbAccessConfiguration &&
+    'appliedSuccessfully' in jitDbAccessConfiguration &&
+    jitDbAccessConfiguration.appliedSuccessfully &&
+    'state' in jitDbAccessConfiguration &&
+    (jitDbAccessConfiguration as { state: string }).state === 'enabled'
 
+  const isJitDbAccessUnavailable =
+    (jitDbAccessConfiguration &&
+      'state' in jitDbAccessConfiguration &&
+      jitDbAccessConfiguration.state === 'unavailable') ||
+    (jitDbAccessConfiguration &&
+      'isUnavailable' in jitDbAccessConfiguration &&
+      jitDbAccessConfiguration.isUnavailable)
   const hasAccessToJitDbAccess = !isJitDbAccessUnavailable
+  const unavailableReason: JitDbAccessUnavailableReason =
+    jitDbAccessConfiguration && 'unavailableReason' in jitDbAccessConfiguration
+      ? jitDbAccessConfiguration.unavailableReason
+      : 'temporarily_unavailable'
 
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
 
@@ -255,7 +267,10 @@ export const JitDbAccessConfiguration = () => {
   const switchTooltipText = !canUpdateJitDbAccess ? 'Additional permissions required' : undefined
 
   const showToggleFailedWarning =
-    isSuccessConfiguration && jitDbAccessConfiguration?.appliedSuccessfully === false
+    isSuccessConfiguration &&
+    !!jitDbAccessConfiguration &&
+    'appliedSuccessfully' in jitDbAccessConfiguration &&
+    !jitDbAccessConfiguration.appliedSuccessfully
 
   const projectReference = ref ? (
     <>
@@ -294,7 +309,7 @@ export const JitDbAccessConfiguration = () => {
         </PageSectionMeta>
 
         <PageSectionContent className="space-y-4">
-          {isErrorJitDbAccessConfiguration && !isJitDbAccessUnavailable && (
+          {isErrorJitDbAccessConfiguration && (
             <AlertError
               projectRef={ref}
               subject="Failed to load temporary access"
@@ -303,7 +318,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {isJitDbAccessUnavailable && (
+          {!isErrorJitDbAccessConfiguration && isJitDbAccessUnavailable && (
             <Admonition
               type="note"
               layout="responsive"
@@ -339,7 +354,7 @@ export const JitDbAccessConfiguration = () => {
             />
           )}
 
-          {!isJitDbAccessUnavailable && !isErrorJitDbAccessConfiguration && (
+          {!isErrorJitDbAccessConfiguration && hasAccessToJitDbAccess && (
             <Card>
               <CardContent className="space-y-4">
                 <FormLayout
