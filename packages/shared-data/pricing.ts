@@ -620,7 +620,7 @@ export const pricing: Pricing = {
       },
       {
         key: 'security.soc2',
-        title: 'SOC2',
+        title: 'SOC 2 Type 2 report',
         plans: {
           free: false,
           pro: false,
