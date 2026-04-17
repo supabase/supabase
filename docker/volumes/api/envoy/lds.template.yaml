@@ -302,7 +302,7 @@ resources:
                           - header:
                               key: Content-Profile
                               value: graphql_public
-                            append: false
+                            append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
                             '@type': >-
