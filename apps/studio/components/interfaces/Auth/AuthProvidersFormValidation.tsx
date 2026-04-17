@@ -378,10 +378,12 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
           return enabledSchema.parse(values)
         }
       })
-      // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true
+      // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true.
+      // enabledSchema strips EXTERNAL_PHONE_ENABLED (not declared on its branches), so re-add it
+      // to keep the flag in the submitted payload.
       .transform((values) => {
         if (values.EXTERNAL_PHONE_ENABLED === true) {
-          return enabledSchema.parse(values)
+          return { ...enabledSchema.parse(values), EXTERNAL_PHONE_ENABLED: true as const }
         }
         return values
       })
