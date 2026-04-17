@@ -58,11 +58,17 @@ Any data, views, or functions that should be exposed need to be deliberately put
     create schema if not exists api;
     ```
 
-1.  Grant the `anon` and `authenticated` roles usage on this schema.
+1.  Grant the `anon`, `authenticated`, and `service_role` roles usage on this schema.
 
     ```sql
-    grant usage on schema api to anon, authenticated;
+    grant usage on schema api to anon, authenticated, service_role;
     ```
+
+    <Admonition type="note">
+
+    `service_role` needs `USAGE` on any custom schema to access it through the Data API (PostgREST). Without this grant, requests using the service role key will fail even though they bypass Row Level Security.
+
+    </Admonition>
 
 1.  Go to [API Settings](/dashboard/project/_/settings/api) in the Supabase Dashboard.
 
