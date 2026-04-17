@@ -80,9 +80,9 @@ If you plan on solely using Drizzle instead of the Supabase Data API (PostgREST)
     import { drizzle } from 'drizzle-orm/postgres-js'
     import postgres from 'postgres'
 
-    let connectionString = process.env.DATABASE_URL
-    if (host.includes('postgres:postgres@supabase_db_')) {
-      const url = URL.parse(host)!
+    let connectionString = process.env.DATABASE_URL!
+    if (connectionString.includes('postgres:postgres@supabase_db_')) {
+      const url = new URL(connectionString)
       url.hostname = url.hostname.split('_')[1]
       connectionString = url.href
     }
