@@ -14,7 +14,7 @@ By default, that role has `log_statement` set to `ddl`, which means Postgres log
 
 So, if someone truncates a table, and you're relying on the default logging, you won't see it.
 
-### **Enabling data modification Logging**
+### **Enabling data modification logging**
 
 To make those operations visible, you can increase the logging level for the `postgres` role:
 
@@ -72,7 +72,7 @@ The response will include entries like:
 
 Now you can directly match `user_id` values from the Postgres logs to the corresponding team members.
 
-### **Querying logs for specific Operations**
+### **Querying logs for specific operations**
 
 Navigate to the [Logs Explorer](/dashboard/project/_/logs/explorer) and query `postgres_logs`. Here's an example query that searches for data-modifying operations and maps user IDs to team members:
 
@@ -111,10 +111,10 @@ This query:
 - Returns results ordered by timestamp (most recent first)
 
 **Example Output:**
-
-| db_role  | detected_user | error_severity | event_message                                                                    | identifier |
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+| db_role | detected_user | error_severity | event_message | identifier |
 | -------- | ------------- | -------------- | -------------------------------------------------------------------------------- | ---------- |
-| postgres | support       | LOG            | statement: TRUNCATE TABLE public.data; -- source: dashboard -- user: f8c2e1a9... | ...        |
+| postgres | support | LOG | statement: TRUNCATE TABLE public.data; -- source: dashboard -- user: f8c2e1a9... | ... |
 
 You can further refine your search by filtering for specific commands like `TRUNCATE` or `DELETE` where `parsed.user_name = 'postgres'`.
 

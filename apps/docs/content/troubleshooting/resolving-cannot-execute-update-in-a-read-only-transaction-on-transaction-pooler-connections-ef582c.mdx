@@ -17,7 +17,7 @@ That backend connection has _state_. Postgres connections carry settings like ti
 
 ---
 
-### Understanding the problem: The "sticky" State
+### Understanding the problem: The "sticky" state
 
 When you encounter the error `cannot execute UPDATE in a read-only transaction` while using a transaction pooler (typically on port 6543), even when you have verified that the connection is made to the primary database and the database itself is not in read-only mode (check with `SHOW default_transaction_read_only;` or `SELECT pg_is_in_recovery();` using a direct connection on port 5432), it signifies that a backend connection has been unintentionally locked into a read-only state.
 
@@ -35,7 +35,7 @@ The error appears intermittent because it only occurs when your application is r
 
 ---
 
-### Step-by-Step resolution
+### Step-by-step resolution
 
 To resolve this issue, you must identify and remove any commands that modify the session state globally rather than locally.
 
@@ -69,6 +69,6 @@ Ensure your application is using the intended pooler.
 
 ---
 
-### Best practices for transaction Pooling
+### Best practices for transaction pooling
 
 - **Use Dedicated Connections for Maintenance:** If a script requires a specific session state (like a long-running read-only export), connect directly to the database (port 5432) rather than using the transaction pooler (port 6543). This prevents maintenance settings from leaking into the application's connection pool.%
