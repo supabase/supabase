@@ -3,7 +3,7 @@ import { CardContent, KeyboardShortcut, Switch } from 'ui'
 
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import type { ShortcutId } from '@/state/shortcuts/registry'
-import { setShortcutEnabled } from '@/state/shortcuts/state'
+import { useShortcutPreferences } from '@/state/shortcuts/state'
 import type { ShortcutDefinition } from '@/state/shortcuts/types'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
@@ -14,6 +14,7 @@ interface HotkeyToggleProps {
 
 export function HotkeyToggle({ definition, isLast }: HotkeyToggleProps) {
   const enabled = useIsShortcutEnabled(definition.id as ShortcutId)
+  const { setShortcutEnabled } = useShortcutPreferences()
 
   return (
     <CardContent className={isLast ? undefined : 'border-b'}>

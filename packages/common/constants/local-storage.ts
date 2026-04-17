@@ -80,6 +80,9 @@ export const LOCAL_STORAGE_KEYS = {
   // api keys view switcher for new and legacy api keys
   API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
 
+  // Shortcut preferences
+  SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
+
   LAST_VISITED_ORGANIZATION: 'last-visited-organization',
 
   // user impersonation selector previous searches

@@ -1,63 +1,51 @@
-import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useCallback } from 'react'
 
 import type { ShortcutId } from './registry'
+import { DisabledShortcuts } from './types'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
-const LOCAL_STORAGE_KEY = 'supabase-shortcut-preferences'
+const STORAGE_KEY = LOCAL_STORAGE_KEYS.SHORTCUT_STORAGE_KEY
 
-interface ShortcutStateData {
-  disabled: Record<string, boolean>
-}
+const DEFAULT_DISABLED: DisabledShortcuts = {}
 
-function loadDisabled(): Record<string, boolean> {
-  if (typeof window === 'undefined') return {}
-  try {
-    const raw = localStorage.getItem(LOCAL_STORAGE_KEY)
-    return raw ? JSON.parse(raw) : {}
-  } catch {
-    return {}
+export function useShortcutPreferences() {
+  const [disabled, setDisabled] = useLocalStorageQuery<DisabledShortcuts>(
+    STORAGE_KEY,
+    DEFAULT_DISABLED
+  )
+
+  const setShortcutEnabled = useCallback(
+    (id: ShortcutId, enabled: boolean) => {
+      setDisabled((prev) => {
+        if (enabled) {
+          const { [id]: _removed, ...rest } = prev
+          return rest
+        }
+        return { ...prev, [id]: true }
+      })
+    },
+    [setDisabled]
+  )
+
+  const resetShortcut = useCallback(
+    (id: ShortcutId) => {
+      setDisabled((prev) => {
+        const { [id]: _removed, ...rest } = prev
+        return rest
+      })
+    },
+    [setDisabled]
+  )
+
+  const resetAllShortcuts = useCallback(() => {
+    setDisabled(DEFAULT_DISABLED)
+  }, [setDisabled])
+
+  return {
+    disabled,
+    setShortcutEnabled,
+    resetShortcut,
+    resetAllShortcuts,
   }
-}
-
-function persistDisabled(disabled: Record<string, boolean>) {
-  if (typeof window === 'undefined') return
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(disabled))
-}
-
-function createShortcutState() {
-  const state = proxy<ShortcutStateData>({
-    disabled: loadDisabled(),
-  })
-
-  subscribe(state, () => {
-    persistDisabled(state.disabled)
-  })
-
-  return state
-}
-
-export const shortcutState = createShortcutState()
-
-export const useShortcutStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
-  useSnapshot(shortcutState, options)
-
-export const getShortcutStateSnapshot = () => snapshot(shortcutState)
-
-export function isShortcutEnabled(id: ShortcutId): boolean {
-  return !shortcutState.disabled[id]
-}
-
-export function setShortcutEnabled(id: ShortcutId, enabled: boolean) {
-  if (enabled) {
-    delete shortcutState.disabled[id]
-  } else {
-    shortcutState.disabled[id] = true
-  }
-}
-
-export function resetShortcut(id: ShortcutId) {
-  delete shortcutState.disabled[id]
-}
-
-export function resetAllShortcuts() {
-  shortcutState.disabled = {}
 }
