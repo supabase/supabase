@@ -111,9 +111,9 @@ This query:
 - Returns results ordered by timestamp (most recent first)
 
 **Example Output:**
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 | db_role | detected_user | error_severity | event_message | identifier |
 | -------- | ------------- | -------------- | -------------------------------------------------------------------------------- | ---------- |
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 | postgres | support | LOG | statement: TRUNCATE TABLE public.data; -- source: dashboard -- user: f8c2e1a9... | ... |
 
 You can further refine your search by filtering for specific commands like `TRUNCATE` or `DELETE` where `parsed.user_name = 'postgres'`.
