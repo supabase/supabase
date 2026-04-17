@@ -4,8 +4,8 @@ import { KeyboardShortcut } from 'ui'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 import { SHORTCUT_DEFINITIONS, type ShortcutId } from './registry'
-import { useShortcutStateSnapshot } from './state'
 import type { ShortcutOptions } from './types'
+import { useIsShortcutEnabled } from './useIsShortcutEnabled'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import useLatest from '@/hooks/misc/useLatest'
 
@@ -25,9 +25,9 @@ const hotkeyToKeys = (hotkey: string): string[] =>
  *   2. `def.options` from the registry entry
  *   3. Hard-coded fallbacks (`enabled: true`, `timeout: undefined`, `registerInCommandMenu: false`)
  *
- * `enabled` is ANDed with the user's global enable/disable preference from
- * `shortcutState` — if the user has disabled the shortcut in Preferences, it
- * won't fire even if the caller or registry say `enabled: true`.
+ * `enabled` is ANDed with the user's global enable/disable preference — if the
+ * user has disabled the shortcut in Preferences, it won't fire even if the
+ * caller or registry say `enabled: true`.
  *
  * @param id       The registered shortcut to bind to. See `SHORTCUT_IDS`.
  * @param callback Runs when the sequence matches. Always calls the latest
@@ -51,11 +51,10 @@ const hotkeyToKeys = (hotkey: string): string[] =>
  * })
  */
 export function useShortcut(id: ShortcutId, callback: () => void, options?: ShortcutOptions) {
-  const snap = useShortcutStateSnapshot()
   const def = SHORTCUT_DEFINITIONS[id]
 
   // Handle override for the shortcut
-  const globallyEnabled = !snap.disabled[id]
+  const globallyEnabled = useIsShortcutEnabled(id)
   const callerEnabled = options?.enabled ?? def.options?.enabled ?? true
   const enabled = globallyEnabled && callerEnabled
   const timeout = options?.timeout ?? def.options?.timeout ?? undefined

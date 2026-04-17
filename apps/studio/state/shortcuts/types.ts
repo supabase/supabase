@@ -1,5 +1,7 @@
 import { HotkeySequence } from '@tanstack/react-hotkeys'
 
+export type DisabledShortcuts = Record<string, boolean>
+
 /**
  * Runtime options for a shortcut. Used in two places:
  *
