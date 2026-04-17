@@ -3116,6 +3116,10 @@ functions:
             isOptional: true
             type: String?
             description: The captcha token when having captcha enabled.
+          - name: data
+            isOptional: true
+            type: JsonObject?
+            description: '**Deprecated** — use `extraData` or user metadata on the sign-up flow instead. Will be removed in a future release.'
 
     examples:
       - id: sign-in-with-id-token
@@ -3127,9 +3131,6 @@ functions:
               provider = Google //Also supported: Apple, Azure and Facebook
               //optional:
               nonce = "nonce"
-              data = buildJsonObject {
-                  //...
-              }
           }
           ```
   - id: sign-in-with-otp
@@ -4575,6 +4576,118 @@ functions:
         code: |
           ```kotlin
           supabase.auth.admin.deleteFactor(uid = "id", factorId = "factor_id")
+          ```
+  - id: oauth-admin-api
+    title: OAuth Admin API
+    notes: |
+      The OAuth Admin API allows you to manage OAuth clients programmatically.
+      Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+      These functions should only be called on a server. Never expose your `secret key` in the browser.
+  - id: admin-oauth-list-clients
+    title: 'admin.oauth.listClients()'
+    notes: |
+      Lists all OAuth 2.1 clients. Requires a `secret key`.
+    params:
+      - name: page
+        isOptional: true
+        type: Int?
+        description: The page number for pagination.
+      - name: perPage
+        isOptional: true
+        type: Int?
+        description: The number of results per page.
+    examples:
+      - id: list-oauth-clients
+        name: List all OAuth clients
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val clients = supabase.auth.admin.oauth.listClients()
+          ```
+  - id: admin-oauth-create-client
+    title: 'admin.oauth.createClient()'
+    notes: |
+      Creates a new OAuth 2.1 client. Requires a `secret key`.
+    examples:
+      - id: create-oauth-client
+        name: Create an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.createClient {
+              name = "My App"
+              redirectUris = listOf("https://example.com/callback")
+          }
+          ```
+  - id: admin-oauth-get-client
+    title: 'admin.oauth.getClient()'
+    notes: |
+      Retrieves an OAuth 2.1 client by ID. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to retrieve.
+    examples:
+      - id: get-oauth-client
+        name: Get an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.getClient(clientId = "client_id")
+          ```
+  - id: admin-oauth-update-client
+    title: 'admin.oauth.updateClient()'
+    notes: |
+      Updates an existing OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to update.
+    examples:
+      - id: update-oauth-client
+        name: Update an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.updateClient(clientId = "client_id") {
+              name = "Updated App Name"
+          }
+          ```
+  - id: admin-oauth-delete-client
+    title: 'admin.oauth.deleteClient()'
+    notes: |
+      Deletes an OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client to delete.
+    examples:
+      - id: delete-oauth-client
+        name: Delete an OAuth client
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.admin.oauth.deleteClient(clientId = "client_id")
+          ```
+  - id: admin-oauth-regenerate-client-secret
+    title: 'admin.oauth.regenerateClientSecret()'
+    notes: |
+      Regenerates the client secret for an OAuth 2.1 client. Requires a `secret key`.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The ID of the OAuth client whose secret should be regenerated.
+    examples:
+      - id: regenerate-client-secret
+        name: Regenerate client secret
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val client = supabase.auth.admin.oauth.regenerateClientSecret(clientId = "client_id")
           ```
   - id: invoke
     title: 'invoke()'
