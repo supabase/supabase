@@ -1,6 +1,6 @@
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { get } from 'data/fetchers'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { get } from '@/data/fetchers'
 
 export type Granularity = 'minute' | 'hour' | 'day'
 export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {

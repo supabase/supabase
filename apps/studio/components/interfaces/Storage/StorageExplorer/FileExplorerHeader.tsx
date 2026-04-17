@@ -46,8 +46,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { useIsAPIDocsSidePanelEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { APIDocsButton } from '@/components/ui/APIDocsButton'
+import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
@@ -207,7 +206,6 @@ export const FileExplorerHeader = ({
   onFilesUpload = noop,
 }: FileExplorerHeader) => {
   const snap = useStorageExplorerStateSnapshot()
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const track = useTrack()
 
   const [pathString, setPathString] = useState('')
@@ -220,11 +218,8 @@ export const FileExplorerHeader = ({
   const previousBreadcrumbs = useRef<string[] | null>(null)
 
   const {
+    projectRef,
     columns,
-    sortBy,
-    setSortBy,
-    sortByOrder,
-    setSortByOrder,
     popColumn,
     popColumnAtIndex,
     popOpenedFolders,
@@ -236,10 +231,30 @@ export const FileExplorerHeader = ({
     setSelectedFilePreview,
     selectedBucket,
   } = useStorageExplorerStateSnapshot()
+  const {
+    view,
+    setView,
+    sortBy,
+    setSortBy: setPreferenceSortBy,
+    sortByOrder,
+    setSortByOrder: setPreferenceSortByOrder,
+  } = useStoragePreference(projectRef)
 
   const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
+  const setSortBy = async (value: STORAGE_SORT_BY) => {
+    setPreferenceSortBy(value)
+    setSelectedFilePreview(undefined)
+    await refetchAllOpenedFolders()
+  }
+
+  const setSortByOrder = async (value: STORAGE_SORT_BY_ORDER) => {
+    setPreferenceSortByOrder(value)
+    setSelectedFilePreview(undefined)
+    await refetchAllOpenedFolders()
+  }
 
   useEffect(() => {
     // [Joshen] Somehow toggle search triggers this despite breadcrumbs
@@ -370,7 +385,7 @@ export const FileExplorerHeader = ({
           {/* Actions */}
           <div className="flex shrink-0 items-center whitespace-nowrap py-[7px]">
             <div className="flex shrink-0 items-center space-x-1 px-2">
-              {snap.view === STORAGE_VIEWS.COLUMNS && (
+              {view === STORAGE_VIEWS.COLUMNS && (
                 <Button
                   size="tiny"
                   icon={<Edit2 />}
@@ -396,7 +411,7 @@ export const FileExplorerHeader = ({
                   <Button
                     type="text"
                     icon={
-                      snap.view === 'LIST' ? (
+                      view === 'LIST' ? (
                         <List size={16} strokeWidth={2} />
                       ) : (
                         <Columns size={16} strokeWidth={2} />
@@ -408,10 +423,10 @@ export const FileExplorerHeader = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40 min-w-0">
                   {VIEW_OPTIONS.map((option) => (
-                    <DropdownMenuItem key={option.key} onClick={() => snap.setView(option.key)}>
+                    <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
-                        {snap.view === option.key && (
+                        {view === option.key && (
                           <Check size={16} className="text-brand" strokeWidth={2} />
                         )}
                       </div>
@@ -527,15 +542,6 @@ export const FileExplorerHeader = ({
                 />
               )}
             </div>
-
-            {isNewAPIDocsEnabled && (
-              <>
-                <div className="h-6 shrink-0 border-r border-control" />
-                <div className="mx-2 shrink-0">
-                  <APIDocsButton section={['storage', selectedBucket.name]} source="storage" />
-                </div>
-              </>
-            )}
           </div>
         </div>
       </div>

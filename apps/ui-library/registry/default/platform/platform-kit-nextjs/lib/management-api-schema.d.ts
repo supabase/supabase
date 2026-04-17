@@ -2493,6 +2493,7 @@ export interface components {
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
       security_update_password_require_reauthentication: boolean | null
+      security_update_password_require_current_password: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
       sessions_tags: string | null
@@ -2591,6 +2592,7 @@ export interface components {
         | null
       security_manual_linking_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
+      security_update_password_require_current_password?: boolean | null
       security_refresh_token_reuse_interval?: number | null
       mailer_otp_exp?: number
       mailer_otp_length?: number | null
