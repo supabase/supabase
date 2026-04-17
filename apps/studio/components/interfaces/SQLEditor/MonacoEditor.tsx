@@ -79,6 +79,9 @@ const MonacoEditor = ({
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
 
+  const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
+  aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
+
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
@@ -133,7 +136,7 @@ const MonacoEditor = ({
       label: 'Toggle AI Assistant',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
       run: () => {
-        if (isAIAssistantHotkeyEnabled) {
+        if (aiHotkeyEnabledRef.current) {
           toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         }
       },
