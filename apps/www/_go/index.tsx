@@ -26,6 +26,7 @@ import boltWebinar from './webinar/bolt-webinar'
 import boltWebinarThankYou from './webinar/bolt-webinar-thank-you'
 import figmaWebinarMay2026 from './webinar/figma-webinar-may2026'
 import figmaWebinarMay2026ThankYou from './webinar/figma-webinar-may2026-thankyou'
+import promptToProdSentry from './webinar/prompt-to-prod-sentry'
 
 const pages: GoPageInput[] = [
   exampleLeadGen,
@@ -35,6 +36,7 @@ const pages: GoPageInput[] = [
   contestRules,
   figmaWebinarMay2026,
   figmaWebinarMay2026ThankYou,
+  promptToProdSentry, // remove after April 30, 2026
   boltWebinar, // remove after March 31, 2026
   boltWebinarThankYou, // remove after March 31, 2026
   stripeExecDinner, // remove after May 31, 2026

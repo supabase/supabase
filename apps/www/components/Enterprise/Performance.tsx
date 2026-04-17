@@ -1,12 +1,11 @@
-import React, { FC } from 'react'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import UsersGrowthChart from '~/components/UsersGrowthChart'
+import React, { type FC, type ReactNode } from 'react'
 
 interface Props {
   id: string
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  heading: ReactNode
+  subheading: ReactNode
   highlights: Highlight[]
 }
 

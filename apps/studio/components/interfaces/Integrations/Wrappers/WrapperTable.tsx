@@ -35,7 +35,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
 
-  const { data, isSuccess } = useFDWsQuery({
+  const { data, isError } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -52,11 +52,11 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
 
   useEffect(() => {
-    if (isSuccess && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
+    if (isError && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
       toast('Wrapper not found')
       setSelectedWrapperToEdit(null)
     }
-  }, [isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
+  }, [isError, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (

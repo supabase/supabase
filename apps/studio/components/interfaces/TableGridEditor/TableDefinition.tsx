@@ -9,13 +9,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { Footer } from '@/components/grid/components/footer/Footer'
 import { useTableDefinitionQuery } from '@/data/database/table-definition-query'
 import { useViewDefinitionQuery } from '@/data/database/view-definition-query'
-import {
-  Entity,
-  isMaterializedView,
-  isTableLike,
-  isView,
-  isViewLike,
-} from '@/data/table-editor/table-editor-types'
+import { Entity, isTableLike, isViewLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 import { timeout } from '@/lib/helpers'
@@ -34,6 +28,7 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const viewResult = useViewDefinitionQuery(
     {
       id: entity?.id,
+      includeCreateStatement: true,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
@@ -55,14 +50,8 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
 
   const { data: definition, isLoading } = isViewLike(entity) ? viewResult : tableResult
 
-  const prepend = isView(entity)
-    ? `create view ${entity.schema}.${entity.name} as\n`
-    : isMaterializedView(entity)
-      ? `create materialized view ${entity.schema}.${entity.name} as\n`
-      : ''
-
   const formattedDefinition = useMemo(
-    () => (definition ? formatSql(prepend + definition) : undefined),
+    () => (definition ? formatSql(definition) : undefined),
     [definition]
   )
 

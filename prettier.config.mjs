@@ -28,7 +28,7 @@ if (process.env.SORT_IMPORTS !== 'false') {
   options = { ...options, ...sortImportsOptions }
 } else {
   options.overrides.push({
-    files: 'apps/studio/{components,hooks}/**/*.{js,jsx,ts,tsx}',
+    files: 'apps/studio/**/*.{js,jsx,ts,tsx}',
     options: sortImportsOptions,
   })
 }

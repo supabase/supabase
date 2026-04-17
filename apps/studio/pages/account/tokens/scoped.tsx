@@ -1,17 +1,17 @@
-import { NewScopedTokenButton } from 'components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
-import { ScopedTokenList } from 'components/interfaces/Account/AccessTokens/Scoped/ScopedTokenList'
-import { AccessTokensLayout } from 'components/layouts/AccessTokens/AccessTokensLayout'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import { AppLayout } from 'components/layouts/AppLayout/AppLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { NewScopedAccessToken } from 'data/scoped-access-tokens/scoped-access-token-create-mutation'
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
-import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
+import { NewScopedTokenButton } from '@/components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
+import { ScopedTokenList } from '@/components/interfaces/Account/AccessTokens/Scoped/ScopedTokenList'
+import { AccessTokensLayout } from '@/components/layouts/AccessTokens/AccessTokensLayout'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NewScopedAccessToken } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
+import type { NextPageWithLayout } from '@/types'
 
 const ScopedTokens: NextPageWithLayout = () => {
   const [searchString, setSearchString] = useState('')

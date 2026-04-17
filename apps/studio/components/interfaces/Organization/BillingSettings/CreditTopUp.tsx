@@ -49,8 +49,8 @@ const FORM_ID = 'credit-top-up'
 const FormSchema = z.object({
   amount: z.coerce
     .number()
-    .gte(100, 'Amount must be between $100 - $2000.')
-    .lte(2000, 'Amount must be between $100 - $2000.')
+    .gte(300, 'Amount must be between $300 - $2000.')
+    .lte(2000, 'Amount must be between $300 - $2000.')
     .int('Amount must be a whole number.'),
   paymentMethod: z.string(),
 })
@@ -62,6 +62,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const queryClient = useQueryClient()
   const paymentMethodSelectionRef = useRef<{
     createPaymentMethod: PaymentMethodElementRef['createPaymentMethod']
+    validateBillingProfile: () => Promise<boolean>
   }>(null)
 
   const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -78,12 +79,13 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const form = useForm<CreditTopUpForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      amount: 100,
+      amount: 300,
       paymentMethod: '',
     },
   })
 
   const [topUpModalVisible, setTopUpModalVisible] = useState(false)
+  const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -127,6 +129,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     setPaymentIntentConfirmation(undefined)
 
     const token = await initHcaptcha()
+
+    const isValid = await paymentMethodSelectionRef.current?.validateBillingProfile()
+    if (!isValid) return
 
     const paymentMethodResult = await paymentMethodSelectionRef.current?.createPaymentMethod()
     if (!paymentMethodResult) {
@@ -267,7 +272,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 name="amount"
                 render={({ field }) => (
                   <FormItemLayout label="Amount (USD)" className="gap-1">
-                    <Input_Shadcn_ {...field} type="number" placeholder="100" />
+                    <Input_Shadcn_ {...field} type="number" placeholder="300" />
                   </FormItemLayout>
                 )}
               />
@@ -281,6 +286,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     onSelectPaymentMethod={(pm) => form.setValue('paymentMethod', pm)}
                     selectedPaymentMethod={form.getValues('paymentMethod')}
                     readOnly={executingTopUp || paymentConfirmationLoading}
+                    useAsDefaultBillingAddress={useAsDefaultBillingAddress}
+                    onUseAsDefaultBillingAddressChange={setUseAsDefaultBillingAddress}
                   />
                 )}
               />
