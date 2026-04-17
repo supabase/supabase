@@ -350,7 +350,7 @@ export const SchemaGraph = () => {
                       <Button
                         type="default"
                         size="tiny"
-                        className="rounded-l-none px-1"
+                        className="rounded-l-none pl-1 pr-0"
                         icon={<ChevronDown size={12} />}
                       >
                         <span className="sr-only">Export options</span>
