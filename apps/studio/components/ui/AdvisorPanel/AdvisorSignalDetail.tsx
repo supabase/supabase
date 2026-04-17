@@ -97,7 +97,7 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
         <Button
           type="default"
           icon={<EyeOff size={14} strokeWidth={1.5} />}
-          onClick={handleDismiss}
+          onClick={onDismissSignal}
         >
           Dismiss
         </Button>
