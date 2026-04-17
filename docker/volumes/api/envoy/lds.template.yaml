@@ -798,6 +798,7 @@ resources:
                     inline_code: |
                       local FUNCTIONS_ROUTE = "functions-v1-all"
                       local FUNCTIONS_PREFIX = "/functions/v1/"
+                      local REALTIME_WS_ROUTE = "realtime-v1-ws-protected"
 
                       local function is_functions_request(request_handle, headers)
                         if request_handle:streamInfo():routeName() == FUNCTIONS_ROUTE then
@@ -838,6 +839,10 @@ resources:
 
                       function envoy_on_request(request_handle)
                         local headers = request_handle:headers()
+                        if request_handle:streamInfo():routeName() == REALTIME_WS_ROUTE then
+                          return
+                        end
+
                         if is_functions_request(request_handle, headers) then
                           return
                         end
