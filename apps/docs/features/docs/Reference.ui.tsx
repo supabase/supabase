@@ -308,7 +308,7 @@ function TypeSubDetails({
         Details
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_>
-        <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+        <ul className="border-b border-x border-default rounded-b-lg not-prose">
           {details.map(
             (detail: SubContent | CustomTypePropertyType | TypeDetails, index: number) => (
               <li
@@ -536,11 +536,11 @@ export function ApiSchemaParamSubdetails({
       </CollapsibleTrigger_Shadcn_>
       <CollapsibleContent_Shadcn_>
         {'type' in schema && schema.type === 'object' ? (
-          <div className={cn('border-b border-x border-fault', 'rounded-b-lg', 'p-5')}>
+          <div className="border-b border-x border-default rounded-b-lg p-5">
             <ApiSchema schema={schema} />
           </div>
         ) : (
-          <ul className={cn('border-b border-x border-default', 'rounded-b-lg')}>
+          <ul className="border-b border-x border-default rounded-b-lg not-prose">
             {subContent.map((detail: any, index: number) => (
               <li
                 key={index}

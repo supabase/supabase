@@ -76,13 +76,12 @@ const params = {
   version: undefined
 }
 
-export default async function ReferencePage() {
+async function ReferencePage() {
   const { library, version } = params
   const libKey = `${library}${version ? `-${version}` : ''}` as LibKey
   const { name, icon, currentVersion, isLatestVersion } = libs[libKey]
-
+  // const sections = await getReferenceSections(library, version)
   const { meta, content } = await getReferenceContent(library, version)
-  const sections = await getReferenceSections(library, version)
 
   return (
     <ReferencePageLayout
@@ -91,9 +90,11 @@ export default async function ReferencePage() {
       library={library}
       version={currentVersion}
       isLatestVersion={isLatestVersion}
-      sections={sections}
+      sections={[]}
       meta={meta}
       content={content}
     />
   )
 }
+
+export default ReferencePage

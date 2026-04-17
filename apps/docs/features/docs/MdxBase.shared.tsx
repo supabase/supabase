@@ -36,12 +36,16 @@ import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
+
+import { RefDefinitionReturnType } from '~/features/docs/Reference.components.new'
+
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
   return <Admonition {...props} className="mb-8" />
 }
 
 const components = {
+  RefDefinitionReturnType,
   Accordion,
   AccordionItem,
   Admonition: AdmonitionWithMargin,
