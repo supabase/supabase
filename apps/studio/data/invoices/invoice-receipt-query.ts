@@ -1,4 +1,4 @@
-import { get, handleError } from 'data/fetchers'
+import { get, handleError } from '@/data/fetchers'
 
 export type InvoiceReceiptVariables = {
   invoiceId: string

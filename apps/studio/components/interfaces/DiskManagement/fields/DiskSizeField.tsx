@@ -6,10 +6,10 @@ import {
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
   InputGroupText,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -100,6 +100,22 @@ export function DiskSizeField({
             <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <FormControl_Shadcn_ className="max-w-32">
                 <InputGroup>
+                  <FormInputGroupInput
+                    type="number"
+                    id={field.name}
+                    {...field}
+                    disabled={disableInput || isError}
+                    onWheel={(e) => e.currentTarget.blur()}
+                    onChange={(e) => {
+                      setValue('totalSize', e.target.valueAsNumber, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                      trigger('provisionedIOPS')
+                      trigger('throughput')
+                    }}
+                    min={includedDiskGB}
+                  />
                   <InputGroupAddon align="inline-end">
                     <InputGroupText>GB</InputGroupText>
                     {isDirty ? (
@@ -118,22 +134,6 @@ export function DiskSizeField({
                       </InputGroupButton>
                     ) : null}
                   </InputGroupAddon>
-                  <InputGroupInput
-                    type="number"
-                    id={field.name}
-                    {...field}
-                    disabled={disableInput || isError}
-                    onWheel={(e) => e.currentTarget.blur()}
-                    onChange={(e) => {
-                      setValue('totalSize', e.target.valueAsNumber, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                      trigger('provisionedIOPS')
-                      trigger('throughput')
-                    }}
-                    min={includedDiskGB}
-                  />
                 </InputGroup>
               </FormControl_Shadcn_>
             </FormItemLayout>

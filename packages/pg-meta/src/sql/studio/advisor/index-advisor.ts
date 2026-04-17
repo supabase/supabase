@@ -1,15 +1,18 @@
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
 /**
  * Generates SQL to find top 5 SELECT queries involving a table and run them through index_advisor
  */
-export function getTableIndexAdvisorSql(schema: string, table: string): string {
-  const escapedSchema = schema.replace(/'/g, "''")
-  const escapedTable = table.replace(/'/g, "''")
+export function getTableIndexAdvisorSql(schema: string, table: string): SafeSqlFragment {
+  // Escape regex metacharacters so schema/table names are matched literally in PostgreSQL regex
+  const regexSchema = schema.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
+  const regexTable = table.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
 
-  // Escape regex metacharacters so schema/table names are matched literally
-  const regexSchema = escapedSchema.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
-  const regexTable = escapedTable.toLowerCase().replace(/[.+*?^${}()|[\]\\]/g, '\\$&')
+  const tablePattern = literal(`(^|[^a-z0-9_$])${regexSchema}[.]${regexTable}($|[^a-z0-9_$])`)
+  const fromPattern = literal(`(^|[^a-z0-9_$])from[[:space:]]+${regexTable}($|[^a-z0-9_$])`)
+  const joinPattern = literal(`(^|[^a-z0-9_$])join[[:space:]]+${regexTable}($|[^a-z0-9_$])`)
 
-  return /* SQL */ `
+  return safeSql`
 -- Get top 5 SELECT queries involving this table and run through index_advisor
 set search_path to public, extensions;
 
@@ -27,9 +30,9 @@ with top_queries as (
     -- Filter for queries involving our table. Use regex word boundaries so that e.g.
     -- looking for table "orders" does not match queries on "orders_items".
     and (
-      lower(statements.query) ~ '(^|[^a-z0-9_$])${regexSchema}[.]${regexTable}($|[^a-z0-9_$])'
-      or lower(statements.query) ~ '(^|[^a-z0-9_$])from[[:space:]]+${regexTable}($|[^a-z0-9_$])'
-      or lower(statements.query) ~ '(^|[^a-z0-9_$])join[[:space:]]+${regexTable}($|[^a-z0-9_$])'
+      lower(statements.query) ~ ${tablePattern}
+      or lower(statements.query) ~ ${fromPattern}
+      or lower(statements.query) ~ ${joinPattern}
     )
     -- Exclude system queries
     and statements.query not like '%pg_catalog%'
@@ -50,6 +53,5 @@ select
 from top_queries tq
 left join lateral (
   select * from index_advisor(tq.query)
-) ia on true;
-`.trim()
+) ia on true;`
 }

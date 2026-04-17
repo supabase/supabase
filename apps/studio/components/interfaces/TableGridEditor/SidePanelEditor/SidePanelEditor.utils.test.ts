@@ -41,6 +41,31 @@ describe('SidePanelEditor.utils.test.ts', () => {
     ])
   })
 
+  test('formatRowsForInsert should only convert empty strings to null for selected columns', () => {
+    const rows = [
+      { id: 1, name: '', email: '' },
+      { id: 2, name: 'Bob', email: '' },
+    ]
+    const headers = ['id', 'name', 'email']
+    const columns = [
+      { id: '1', name: 'id', data_type: 'bigint', format: 'int8', is_nullable: false },
+      { id: '2', name: 'name', data_type: 'text', format: 'text', is_nullable: true },
+      { id: '3', name: 'email', data_type: 'text', format: 'text', is_nullable: true },
+    ]
+
+    const formattedRows = formatRowsForInsert({
+      rows,
+      headers,
+      columns: columns as any,
+      emptyStringAsNullHeaders: ['email'],
+    })
+
+    expect(formattedRows).toEqual([
+      { id: 1, name: '', email: null },
+      { id: 2, name: 'Bob', email: null },
+    ])
+  })
+
   test('formatRowsForInsert should handle JSON object values properly', () => {
     const rows = [{ id: 1, value: '{"key": "value"}' }]
     const headers = ['id', 'value']

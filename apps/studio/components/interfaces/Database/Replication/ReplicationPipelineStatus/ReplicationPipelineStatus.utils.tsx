@@ -1,8 +1,7 @@
 import dayjs from 'dayjs'
-import { Activity, Clock, HelpCircle, Loader2, XCircle } from 'lucide-react'
 import { Badge } from 'ui'
 
-import { getPipelineStateMessages } from '../Pipeline.utils'
+import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
 import { RetryPolicy, TableState } from './ReplicationPipelineStatus.types'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { formatBytes } from '@/lib/helpers'
@@ -64,60 +63,11 @@ export const getDisabledStateConfig = ({
   requestStatus: PipelineStatusRequestStatus
   statusName?: ReplicationPipelineStatusData['status']['name']
 }) => {
-  const { title, message, badge } = getPipelineStateMessages(requestStatus, statusName)
+  const normalizedStatusName = normalizePipelineStatusName(statusName)
+  const displayState = getPipelineDisplayState(requestStatus, normalizedStatusName)
+  const { title, message } = displayState
 
-  // Get icon and colors based on current state
-  const isEnabling = requestStatus === PipelineStatusRequestStatus.StartRequested
-  const isDisabling = requestStatus === PipelineStatusRequestStatus.StopRequested
-  const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
-  const isTransitioning = isEnabling || isDisabling || isRestarting
-
-  const icon = isTransitioning ? (
-    <Loader2 className="w-6 h-6 animate-spin" />
-  ) : statusName === 'failed' ? (
-    <XCircle className="w-6 h-6" />
-  ) : statusName === 'starting' ? (
-    <Clock className="w-6 h-6" />
-  ) : statusName === 'unknown' ? (
-    <HelpCircle className="w-6 h-6" />
-  ) : (
-    <Activity className="w-6 h-6" />
-  )
-
-  const colors =
-    isEnabling || isRestarting
-      ? {
-          bg: 'bg-brand-50',
-          text: 'text-brand-900',
-          subtext: 'text-brand-700',
-          iconBg: 'bg-brand-600',
-          icon: 'text-white dark:text-black',
-        }
-      : isDisabling || statusName === 'starting' || statusName === 'unknown'
-        ? {
-            bg: 'bg-warning-50',
-            text: 'text-warning-900',
-            subtext: 'text-warning-700',
-            iconBg: 'bg-warning-600',
-            icon: 'text-white dark:text-black',
-          }
-        : statusName === 'failed'
-          ? {
-              bg: 'bg-destructive-50',
-              text: 'text-destructive-900',
-              subtext: 'text-destructive-700',
-              iconBg: 'bg-destructive-600',
-              icon: 'text-white dark:text-black',
-            }
-          : {
-              bg: 'bg-surface-100',
-              text: 'text-foreground',
-              subtext: 'text-foreground-light',
-              iconBg: 'bg-foreground-lighter',
-              icon: 'text-white dark:text-black',
-            }
-
-  return { title, message, badge, icon, colors }
+  return { title, message }
 }
 
 export const isValidRetryPolicy = (policy: any): policy is RetryPolicy => {

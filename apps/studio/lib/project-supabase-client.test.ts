@@ -1,14 +1,14 @@
 import * as supabaseJs from '@supabase/supabase-js'
-import * as apiKeysUtils from 'data/api-keys/temp-api-keys-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createProjectSupabaseClient } from './project-supabase-client'
+import * as apiKeysUtils from '@/data/api-keys/temp-api-keys-utils'
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(),
 }))
 
-vi.mock('data/api-keys/temp-api-keys-utils', () => ({
+vi.mock('@/data/api-keys/temp-api-keys-utils', () => ({
   getOrRefreshTemporaryApiKey: vi.fn(),
 }))
 

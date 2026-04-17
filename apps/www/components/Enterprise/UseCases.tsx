@@ -3,7 +3,7 @@ import 'swiper/css'
 import type { LucideIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { FC } from 'react'
+import React, { type FC, type ReactNode } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { TextLink } from 'ui-patterns/TextLink'
 
@@ -12,8 +12,8 @@ import Panel from '@/components/Panel'
 
 interface Props {
   id: string
-  label?: string | JSX.Element
-  heading?: string | JSX.Element
+  label?: ReactNode
+  heading?: ReactNode
   stories?: Story[]
   highlights?: Highlight[]
 }
@@ -23,7 +23,7 @@ export type Story = {
   url: string
   target?: '_blank' | string
   heading?: string
-  subheading?: string | JSX.Element
+  subheading?: ReactNode
 }
 
 type Highlight = {

@@ -12,9 +12,9 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormInputGroupInput,
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
   Switch,
 } from 'ui'
@@ -242,15 +242,15 @@ export const SessionsAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_ className="w-full">
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>seconds</InputGroupText>
-                            </InputGroupAddon>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               min={0}
                               {...field}
                               disabled={!canUpdateConfig}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>seconds</InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -329,17 +329,17 @@ export const SessionsAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_ className="w-full">
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>
-                                <HoursOrNeverText value={field.value || 0} />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               min={0}
                               {...field}
                               disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>
+                                <HoursOrNeverText value={field.value || 0} />
+                              </InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>
@@ -359,17 +359,17 @@ export const SessionsAuthSettingsForm = () => {
                       >
                         <FormControl_Shadcn_ className="w-full">
                           <InputGroup>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>
-                                <HoursOrNeverText value={field.value || 0} />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <InputGroupInput
+                            <FormInputGroupInput
                               type="number"
                               {...field}
                               className="flex-1"
                               disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
                             />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>
+                                <HoursOrNeverText value={field.value || 0} />
+                              </InputGroupText>
+                            </InputGroupAddon>
                           </InputGroup>
                         </FormControl_Shadcn_>
                       </FormItemLayout>

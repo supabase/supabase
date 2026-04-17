@@ -148,10 +148,9 @@ Rotating a secret key (`sb_secret_...`) is easy and painless. Use the [API Keys]
 
 **Deleting a secret key is irreversible and once done it will be gone forever.**
 
-If you are still using the JWT-based `service_role` key, there are two options.
+If you are still using the JWT-based `service_role` key, replace the `service_role` key with a new secret key instead. Follow the guide from above as if you are rotating an existing secret key.
 
-1. **Strongly recommended:** Replace the `service_role` key with a new secret key instead. Follow the guide from above as if you are rotating an existing secret key.
-2. [Rotate your project's JWT secret.](/dashboard/project/_/settings/jwt) This operation is only recommended if you suspect that the JWT secret has leaked itself. Consider switching your `anon` JWT-based key to the publishable key, and all `service_role` JWT-based keys to secret keys. Only then rotate the JWT secret. Check the FAQ below if you use the JWT-based keys in mobile, desktop or CLI applications!
+If you believe this is not possible for your implementation, [contact Support](/dashboard/support/new).
 
 ## Known limitations and compatibility differences
 
@@ -167,9 +166,7 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 
 ### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
 
-If you know or suspect that the JWT secret itself is leaked, refer to the section on [rotating the JWT](#what-to-do-if-a-secret-key-or-servicerole-has-been-leaked-or-compromised).
-
-If the JWT secret is secure, prefer substituting the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. This will prevent downtime for your application.
+If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. This will prevent downtime for your application.
 
 ### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
 

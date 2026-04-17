@@ -172,6 +172,12 @@ const UtilityPanel = ({
                   groups: { project: ref ?? '', organization: org?.slug ?? '' },
                 })
               }}
+              onCopyAsCSV={() => {
+                sendEvent({
+                  action: 'sql_editor_result_copy_csv_clicked',
+                  groups: { project: ref ?? '', organization: org?.slug ?? '' },
+                })
+              }}
             />
           )}
         </div>
