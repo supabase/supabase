@@ -76,11 +76,11 @@ export default function Account({ session }: { session: Session }) {
 
       if (error) {
         throw error;
+      } else {
+        Alert.alert('Profile updated successfully');
       }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message);
-      }
+    } catch (error: any) {
+      Alert.alert(error.message ?? String(error));
     } finally {
       setLoading(false);
     }

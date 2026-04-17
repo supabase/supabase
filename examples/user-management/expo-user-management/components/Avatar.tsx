@@ -35,10 +35,8 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
       fr.onload = () => {
         setAvatarUrl(fr.result as string);
       };
-    } catch (error) {
-      if (error instanceof Error) {
+    } catch (error: any) {
         console.log("Error downloading image: ", error.message);
-      }
     }
   }
 
