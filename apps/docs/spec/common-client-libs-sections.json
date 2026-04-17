@@ -369,6 +369,14 @@
             "type": "function"
           },
           {
+            "id": "strip-nulls",
+            "title": "Strip null values",
+            "slug": "db-strip-nulls",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "returns",
             "title": "Override type of successful response",
             "slug": "db-returns",
@@ -889,6 +897,48 @@
               },
               {
                 "id": "auth-js-gotrueadminoauthapi-regenerateclientsecret",
+                "title": "Regenerate client secret",
+                "slug": "auth-admin-oauth-regenerateclientsecret",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-list-clients",
+                "title": "List OAuth clients",
+                "slug": "auth-admin-oauth-listclients",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-create-client",
+                "title": "Create OAuth client",
+                "slug": "auth-admin-oauth-createclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-get-client",
+                "title": "Get OAuth client",
+                "slug": "auth-admin-oauth-getclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-update-client",
+                "title": "Update OAuth client",
+                "slug": "auth-admin-oauth-updateclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-delete-client",
+                "title": "Delete OAuth client",
+                "slug": "auth-admin-oauth-deleteclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-regenerate-client-secret",
                 "title": "Regenerate client secret",
                 "slug": "auth-admin-oauth-regenerateclientsecret",
                 "product": "auth-admin",
