@@ -1,14 +1,15 @@
 import {
-  KeyIcon,
-  UserGroupIcon,
-  ShieldCheckIcon,
-  RewindIcon,
-  CreditCardIcon,
   ClipboardCheckIcon,
+  CreditCardIcon,
+  KeyIcon,
+  RewindIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
 } from '@heroicons/react/outline'
-import { Activity, Lock } from 'lucide-react'
-import Layout from '../layouts/Layout'
 import SecurityNewsletterForm from '~/components/SecurityNewsletterForm'
+import { Activity, Lock } from 'lucide-react'
+
+import Layout from '../layouts/Layout'
 
 export const meta = {
   type: 'lp',
@@ -80,6 +81,19 @@ Enterprise and Team customers can request to sign our BAA [on the dashboard](/da
 
 <div className="w-32">
   <img src="/images/security/HIPAA.svg" />
+</div>
+
+</Section>
+<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
+
+### ISO 27001
+
+Supabase is ISO 27001:2022 certified. ISO 27001 is an internationally recognized standard for managing information security, covering the policies, processes, and controls that keep customer data secure.
+
+Enterprise and Team customers can access our ISO 27001 certificate [on the dashboard](/dashboard/org/_/documents).
+
+<div className="w-32">
+  <img src="/images/security/iso-27001.svg" />
 </div>
 
 </Section>
