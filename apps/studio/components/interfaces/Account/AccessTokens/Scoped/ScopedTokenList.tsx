@@ -28,6 +28,7 @@ import {
   useScopedAccessTokensQuery,
 } from '@/data/scoped-access-tokens/scoped-access-token-query'
 import { useScopedAccessTokenDeleteMutation } from '@/data/scoped-access-tokens/scoped-access-tokens-delete-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface ScopedTokenListProps {
   searchString?: string
@@ -35,6 +36,7 @@ export interface ScopedTokenListProps {
 }
 
 export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTokenListProps) => {
+  const track = useTrack()
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<ScopedAccessToken | undefined>(undefined)
   const [viewToken, setViewToken] = useState<ScopedAccessToken | undefined>(undefined)
@@ -50,6 +52,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
 
   const { mutate: deleteToken } = useScopedAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
+      track('access_token_removed', { tokenType: 'scoped' })
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)

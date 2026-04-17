@@ -5,6 +5,7 @@ import { parseEdgeFunctionEventMessage } from '../EdgeFunctionRecentInvocations.
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
+  genCountQuery,
   genDefaultQuery,
   isUnixMicro,
   unixMicroToIsoTimestamp,
@@ -16,6 +17,7 @@ dayjs.extend(relativeTime)
 export const MAX_RECENT_ERROR_GROUPS = 5
 export const RECENT_ERROR_INVOCATIONS_LIMIT = 50
 export const RELATED_RUNTIME_LOGS_LIMIT = 100
+const NUMERIC_TIMESTAMP_PATTERN = /^\d+(?:\.\d+)?$/
 
 export type GroupedRuntimeLog = {
   key: string
@@ -66,9 +68,45 @@ export const formatLogTimestamp = (
     : dayjs.utc(timestamp).format('HH:mm:ss')
 }
 
+export const toIsoTimestamp = (value?: string | number) => {
+  if (value === undefined) return undefined
+
+  const normalizedValue = typeof value === 'string' ? value.trim() : value
+  if (normalizedValue === '') return undefined
+
+  const stringValue = String(normalizedValue)
+  const isNumericTimestamp = NUMERIC_TIMESTAMP_PATTERN.test(stringValue)
+  const date = (() => {
+    if (!isNumericTimestamp) return new Date(stringValue)
+
+    const numericValue = Number(stringValue)
+    if (!Number.isFinite(numericValue)) return new Date(NaN)
+
+    if (stringValue.length >= 16) return new Date(numericValue / 1000)
+    if (stringValue.length <= 10) return new Date(numericValue * 1000)
+    return new Date(numericValue)
+  })()
+
+  return Number.isNaN(date.valueOf()) ? undefined : date.toISOString()
+}
+
+export const getSinceLastDeployLogRange = (updatedAt?: string | number, now: Date = new Date()) => {
+  const isoTimestampStart = toIsoTimestamp(updatedAt)
+  if (!isoTimestampStart) return {}
+
+  const startDate = new Date(isoTimestampStart)
+  const normalizedNow = new Date(now)
+  const endDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+
+  return {
+    isoTimestampStart,
+    isoTimestampEnd: new Date(Math.max(startDate.valueOf(), endDate.valueOf())).toISOString(),
+  }
+}
+
 export const buildGroupMarkdown = (group: RecentErrorGroup, functionSlug?: string) => {
   const lines = [
-    `## Recent error for \`${functionSlug ?? 'edge function'}\``,
+    `## Error since last deploy for \`${functionSlug ?? 'edge function'}\``,
     '',
     `### ${group.message}`,
     `- Occurrences: ${group.count}`,
@@ -98,7 +136,7 @@ export const buildGroupMarkdown = (group: RecentErrorGroup, functionSlug?: strin
 
 export const buildGroupAssistantPrompt = (group: RecentErrorGroup, functionSlug?: string) => {
   return [
-    `Analyze this recurring edge function error for \`${functionSlug ?? 'edge function'}\`.`,
+    `Analyze this edge function error since the last deploy for \`${functionSlug ?? 'edge function'}\`.`,
     'Summarize the likely root cause, what the runtime logs suggest, and the next debugging steps.',
     '',
     buildGroupMarkdown(group, functionSlug),
@@ -127,6 +165,30 @@ export const getRecentErrorInvocationsSql = (
     },
     limit
   )
+
+export const getSinceLastDeployInvocationCountSql = (functionId?: string) =>
+  genCountQuery(LOGS_TABLES.fn_edge, {
+    function_id: functionId ?? '__pending__',
+  })
+
+export const getSinceLastDeployInvocationCount = (invocationCountRows: LogData[]) => {
+  const count = Number(invocationCountRows[0]?.count ?? 0)
+  return Number.isFinite(count) ? count : 0
+}
+
+export const getSinceLastDeployInvocationPhrase = (invocationCount: number) => {
+  const formattedCount = invocationCount.toLocaleString('en-US')
+  const invocationLabel = invocationCount === 1 ? 'invocation' : 'invocations'
+
+  return `${formattedCount} ${invocationLabel}`
+}
+
+export const getNoErrorsSinceLastDeployMessage = (invocationCount: number) => {
+  const verb = invocationCount === 1 ? 'has' : 'have'
+  const invocationPhrase = getSinceLastDeployInvocationPhrase(invocationCount)
+
+  return `There ${verb} been ${invocationPhrase} since last deploy and no errors.`
+}
 
 export const getFunctionRuntimeLogsSql = ({
   functionId,

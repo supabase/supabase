@@ -109,9 +109,9 @@ Due to restrictions on the underlying cloud provider, disk modifications are lim
 
 ### Free Plan behavior
 
-Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500 MB limit. Once in read-only mode, you have these options:
+Free Plan projects enter [read-only](#read-only-mode) mode when your **database size** exceeds 500 MB. Note that this is the _database size_ limit (the size of your actual Postgres data), not the _disk size_. Free Plan projects include 1 GB of disk space, but read-only mode is triggered by the 500 MB database size quota. Once in read-only mode, you have these options:
 
-- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to increase the limit to 8 GB. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale beyond the 8 GB disk size limit.
+- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to increase the database size quota. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale beyond the 8 GB disk size limit.
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
 
 ### Read-only mode

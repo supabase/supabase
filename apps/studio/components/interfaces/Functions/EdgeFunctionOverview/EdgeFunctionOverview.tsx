@@ -203,8 +203,7 @@ export const EdgeFunctionOverview = () => {
         functionId={id}
         functionSlug={functionSlug as string}
         projectRef={projectRef as string}
-        isoTimestampStart={selectedWindowStart.toISOString()}
-        isoTimestampEnd={selectedWindowEnd.toISOString()}
+        updatedAt={selectedFunction?.updated_at}
       />
 
       <EdgeFunctionPerformanceSection

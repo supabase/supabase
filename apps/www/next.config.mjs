@@ -71,6 +71,10 @@ const nextConfig = {
       'public/**/*',
     ],
   },
+  outputFileTracingIncludes: {
+    '/llms-full.txt': ['./data/llms/**/*'],
+    '/llms/[slug]': ['./data/llms/**/*'],
+  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
@@ -78,6 +82,22 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Link',
+            value: '</.well-known/api-catalog>; rel="api-catalog"',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [
+          { key: 'content-type', value: 'application/linkset+json' },
+          { key: 'access-control-allow-origin', value: '*' },
+        ],
+      },
       {
         source: '/.well-known/vercel/flags',
         headers: [

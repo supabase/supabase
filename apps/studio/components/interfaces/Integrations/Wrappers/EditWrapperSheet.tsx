@@ -291,7 +291,8 @@ export const EditWrapperSheet = ({
                             {table.schema_name}.{table.table_name}
                           </p>
                           <p className="text-sm text-foreground-light">
-                            Columns: {table.columns.map((column: any) => column.name).join(', ')}
+                            Columns:{' '}
+                            {(table.columns ?? []).map((column: any) => column.name).join(', ')}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">

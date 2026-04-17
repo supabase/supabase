@@ -72,6 +72,8 @@
         "CUSTOMERIO_API_KEY",
         "CUSTOMERIO_APP_API_KEY",
         "HUBSPOT_MEETINGS_TOKEN",
+        "NOTION_EVENTS_API_KEY",
+        "NOTION_EVENTS_DB_ID_ACTUAL",
       ],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".contentlayer/**"],
     },
