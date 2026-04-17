@@ -18,7 +18,7 @@
   "dependencies": {
     "common": "workspace:*",
     "contentlayer2": "0.4.6",
-    "framer-motion": "^11.0.3",
+    "framer-motion": "^11.18.2",
     "jotai": "^2.8.0",
     "lucide-react": "*",
     "next": "catalog:",

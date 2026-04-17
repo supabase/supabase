@@ -21,7 +21,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@supabase/ssr": "^0.9.0",
-    "@supabase/supabase-js": "^2.99.3"
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "^2"
   }
 }

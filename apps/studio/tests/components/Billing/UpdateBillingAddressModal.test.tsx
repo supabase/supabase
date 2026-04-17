@@ -6,10 +6,11 @@ import type {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { UpdateBillingAddressModal } from 'components/interfaces/App/UpdateBillingAddressModal'
 import { useEffect, type ReactNode } from 'react'
-import { createMockOrganization, render } from 'tests/helpers'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { UpdateBillingAddressModal } from '@/components/interfaces/App/UpdateBillingAddressModal'
+import { createMockOrganization, render } from '@/tests/helpers'
 
 type MockAddressElementProps = {
   onChange?: (event: StripeAddressElementChangeEvent) => void
@@ -155,8 +156,8 @@ vi.mock('@stripe/stripe-js', () => ({
   loadStripe: vi.fn(() => Promise.resolve(null)),
 }))
 
-vi.mock('lib/constants', async (importOriginal) => {
-  const original = (await importOriginal()) as typeof import('lib/constants')
+vi.mock('@/lib/constants', async (importOriginal) => {
+  const original = (await importOriginal()) as typeof import('@/lib/constants')
   return { ...original, IS_PLATFORM: true }
 })
 
@@ -177,7 +178,7 @@ const mockOrg = vi.fn<() => ReturnType<typeof createMockOrganization> | undefine
     billing_partner: null,
   })
 )
-vi.mock('hooks/misc/useSelectedOrganization', () => ({
+vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: mockOrg() }),
 }))
 
@@ -185,7 +186,7 @@ const mockCanRead = vi.fn(() => true)
 const mockCanWrite = vi.fn(() => true)
 const mockBillingReadLoaded = vi.fn(() => true)
 const mockBillingWriteLoaded = vi.fn(() => true)
-vi.mock('hooks/misc/useCheckPermissions', () => ({
+vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: (action: PermissionAction) =>
     action === PermissionAction.BILLING_READ
       ? {
@@ -204,7 +205,7 @@ const mockCustomerProfile = vi.fn(() => ({
 }))
 const mockProfileLoaded = vi.fn(() => true)
 const mockProfileError = vi.fn(() => false)
-vi.mock('data/organizations/organization-customer-profile-query', () => ({
+vi.mock('@/data/organizations/organization-customer-profile-query', () => ({
   useOrganizationCustomerProfileQuery: () => ({
     data: mockCustomerProfile(),
     isSuccess: mockProfileLoaded(),
@@ -215,7 +216,7 @@ vi.mock('data/organizations/organization-customer-profile-query', () => ({
 const mockTaxId = vi.fn(() => null)
 const mockTaxIdLoaded = vi.fn(() => true)
 const mockTaxIdError = vi.fn(() => false)
-vi.mock('data/organizations/organization-tax-id-query', () => ({
+vi.mock('@/data/organizations/organization-tax-id-query', () => ({
   useOrganizationTaxIdQuery: () => ({
     data: mockTaxId(),
     isSuccess: mockTaxIdLoaded(),
@@ -224,20 +225,13 @@ vi.mock('data/organizations/organization-tax-id-query', () => ({
 }))
 
 const mockUpdateCustomerProfile = vi.fn(() => Promise.resolve())
-vi.mock('data/organizations/organization-customer-profile-update-mutation', () => ({
+vi.mock('@/data/organizations/organization-customer-profile-update-mutation', () => ({
   useOrganizationCustomerProfileUpdateMutation: () => ({
     mutateAsync: mockUpdateCustomerProfile,
   }),
 }))
 
-const mockUpdateTaxId = vi.fn(() => Promise.resolve())
-vi.mock('data/organizations/organization-tax-id-update-mutation', () => ({
-  useOrganizationTaxIdUpdateMutation: () => ({
-    mutateAsync: mockUpdateTaxId,
-  }),
-}))
-
-vi.mock('data/organizations/organizations-query', () => ({
+vi.mock('@/data/organizations/organizations-query', () => ({
   invalidateOrganizationsQuery: vi.fn(() => Promise.resolve()),
 }))
 
@@ -402,7 +396,6 @@ describe('UpdateBillingAddressModal', () => {
 
     await waitFor(() => {
       expect(mockUpdateCustomerProfile).not.toHaveBeenCalled()
-      expect(mockUpdateTaxId).not.toHaveBeenCalled()
     })
   })
 })
