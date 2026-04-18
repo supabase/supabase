@@ -141,23 +141,23 @@ While we provided example placeholder passwords and keys in the `.env.example` f
 
 ### Quick setup
 
-To generate secure passwords and secrets you can run:
+To generate secure passwords and secrets, run:
 
 ```sh
 sh utils/generate-keys.sh
 ```
 
-As the **next step**, run the following to add the new API keys and the new asymmetric signing key pair:
+As the **next step**, use the following script to add the new API keys and asymmetric key pair:
 
 ```sh
 sh utils/add-new-auth-keys.sh
 ```
 
-Review the output of both scripts and check the `.env` file **before proceeding** to configure [Supabase URLs](#configure-important-urls).
+Review the output of both scripts and check the `.env` file **before proceeding** to configure [Supabase URLs](#configure-supabase-urls).
 
-For a description of all secrets refer to the related section in the "Advanced topics" below. If you'd like to learn more about how the new API keys and asymmetric JWT signing work in a self-hosted Supabase setup, make sure to read the detailed [how-to guide](/docs/guides/self-hosting/self-hosted-auth-keys).
+For a description of all secrets refer to the [related section](#configuring-secrets) in the "Advanced topics" below. If you'd like to learn more about how the new API keys and asymmetric JWT signing work in a self-hosted Supabase setup, make sure to read the detailed [how-to guide](/docs/guides/self-hosting/self-hosted-auth-keys).
 
-### Configure important URLs
+### Configure Supabase URLs
 
 Review and change URL configuration variables:
 
@@ -173,15 +173,13 @@ Review and change URL configuration variables:
 
 ### Studio authentication
 
-Access to Studio dashboard and internal API is protected with **HTTP basic authentication**.
+Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
 
 <Admonition type="danger">
 
-    The default password MUST be changed before starting Supabase.
+    A secure password MUST be set before starting Supabase. The password must include at least one letter - do not use numbers only or any special characters.
 
 </Admonition>
-
-The password must include at least one letter: do not use numbers only and do not use any special characters.
 
 You can change the generated password in the `.env` file:
 
@@ -223,11 +221,7 @@ To stop Supabase, use:
 docker compose down
 ```
 
-## Accessing Supabase services
-
-After the Supabase services are configured and running, you can access the dashboard, connect to the database, and use edge functions.
-
-### Accessing Supabase Studio (Dashboard)
+## Accessing Supabase Studio (Dashboard)
 
 By default, you can access the dashboard through the API gateway on port `8000`.
 
@@ -235,7 +229,7 @@ For example: `http://example.com:8000`, or `http://<your-ip>:8000` (or `localhos
 
 You will be prompted for a username and password. Use the credentials that you set up earlier in [Studio authentication](#studio-authentication).
 
-### Accessing Postgres
+## Accessing Postgres
 
 The self-hosted Supabase stack provides the [Supavisor](https://supabase.github.io/supavisor/development/docs/) connection pooler for accessing Postgres and managing database connections.
 
@@ -261,7 +255,7 @@ If you need to configure Postgres to be directly accessible from the Internet, r
 
 To change the database password, read [Changing database password](#changing-database-password).
 
-### Accessing Edge Functions
+## Accessing Edge Functions
 
 Edge Functions are stored in `volumes/functions`. The default setup has a `hello` function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`.
 
@@ -273,7 +267,7 @@ docker compose restart functions --no-deps
 
 Make sure to read the detailed [how-to guide](/docs/guides/self-hosting/self-hosted-functions) covering the Edge Runtime setup in self-hosted Supabase.
 
-### Accessing the APIs
+## Accessing APIs
 
 Each of the APIs is available through the same API gateway:
 
@@ -284,7 +278,7 @@ Each of the APIs is available through the same API gateway:
 
 ## Configuring HTTPS
 
-By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or nginx) in front of Kong.
+By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of Kong.
 
 See the [Configure HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) guide for detailed setup instructions.
 
@@ -405,9 +399,9 @@ Use the key generator below to obtain and configure the following secure keys in
 
 The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of `JWT_SECRET`.
 
-### Configure secrets
+### Configuring secrets
 
-Edit the following settings in the `.env` file:
+The `generate-keys.sh` script sets the following secrets automatically. You can also configure them manually in the `.env` file if needed:
 
 - `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
 - `VAULT_ENC_KEY`: encryption key used by Supavisor for storing encrypted configuration. (Must be exactly 32 characters; generate with `openssl rand -hex 16`)
@@ -435,7 +429,7 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET}
 ```
 
-```bash name=.env
+```sh name=.env
 ## Never check your secrets into version control
 JWT_SECRET=${JWT_SECRET}
 ```
