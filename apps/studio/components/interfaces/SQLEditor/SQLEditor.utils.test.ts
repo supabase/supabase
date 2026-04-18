@@ -244,6 +244,36 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     expect(match).toBe(true)
   })
 
+  it('catches update on a single quoted table name without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "messages" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('does not flag update on a single quoted table name with a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "messages" SET id = 1 WHERE id = 2;`)
+    expect(match).toBe(false)
+  })
+
+  it('catches update on a quoted schema with a bareword table without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "public".messages SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update on a bareword schema with a quoted table without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE public."messages" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update on a quoted table name containing a space without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "my table" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update on a quoted table name containing escaped quotes without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "weird""name" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
   it('contains both an update query and a delete query, triggers destructive', () => {
     const match = checkDestructiveQuery(stripIndent`
       delete from countries; update countries set name = 'hello';
