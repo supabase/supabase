@@ -43,7 +43,9 @@ import {
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
+  filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
+  hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
@@ -58,6 +60,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
 import { GridFooter } from '@/components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -175,6 +178,14 @@ export const SQLEditor = () => {
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
     {
       projectRef: ref,
+    },
+    { enabled: isValidConnString(project?.connectionString) }
+  )
+
+  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
     },
     { enabled: isValidConnString(project?.connectionString) }
   )
@@ -327,7 +338,10 @@ export const SQLEditor = () => {
       const hasDestructiveOperations = checkDestructiveQuery(sql)
       const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
       const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
-      const createTablesMissingRLS = getCreateTablesMissingRLS(sql)
+      const createTablesMissingRLS = filterTablesCoveredByEnsureRLSTrigger(
+        getCreateTablesMissingRLS(sql),
+        hasActiveEnsureRLSTrigger(eventTriggers)
+      )
 
       const queryHasIssues =
         !force &&
@@ -403,6 +417,7 @@ export const SQLEditor = () => {
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
       databases,
+      eventTriggers,
       limit,
     ]
   )

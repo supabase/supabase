@@ -6,10 +6,26 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
+  filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
+  hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+
+const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEventTrigger => ({
+  oid: 1,
+  name: 'ensure_rls',
+  event: 'ddl_command_end',
+  enabled_mode: 'ORIGIN',
+  tags: ['CREATE TABLE'],
+  function_name: 'rls_auto_enable',
+  function_schema: 'public',
+  owner: 'postgres',
+  function_definition: null,
+  ...overrides,
+})
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
   test('Should return false if limit passed is <= 0', () => {
@@ -394,6 +410,70 @@ describe('SQLEditor.utils:appendEnableRLSStatements', () => {
   it('returns the original SQL unchanged when there are no tables', () => {
     const sql = 'select 1;'
     expect(appendEnableRLSStatements(sql, [])).toBe(sql)
+  })
+})
+
+describe('SQLEditor.utils:hasActiveEnsureRLSTrigger', () => {
+  it('returns false for undefined triggers', () => {
+    expect(hasActiveEnsureRLSTrigger(undefined)).toBe(false)
+  })
+
+  it('returns false for an empty list', () => {
+    expect(hasActiveEnsureRLSTrigger([])).toBe(false)
+  })
+
+  it('returns true when a trigger named "ensure_rls" is active', () => {
+    expect(hasActiveEnsureRLSTrigger([buildTrigger()])).toBe(true)
+  })
+
+  it('returns true when a trigger uses the rls_auto_enable function (renamed trigger)', () => {
+    expect(
+      hasActiveEnsureRLSTrigger([
+        buildTrigger({ name: 'something_else', function_name: 'rls_auto_enable' }),
+      ])
+    ).toBe(true)
+  })
+
+  it('returns false when the matching trigger is DISABLED', () => {
+    expect(hasActiveEnsureRLSTrigger([buildTrigger({ enabled_mode: 'DISABLED' })])).toBe(false)
+  })
+
+  it('ignores unrelated triggers', () => {
+    expect(
+      hasActiveEnsureRLSTrigger([buildTrigger({ name: 'audit_log', function_name: 'log_changes' })])
+    ).toBe(false)
+  })
+})
+
+describe('SQLEditor.utils:filterTablesCoveredByEnsureRLSTrigger', () => {
+  it('returns the input unchanged when the trigger is not present', () => {
+    const tables = [{ tableName: 'foo' }, { schema: 'private', tableName: 'bar' }]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, false)).toEqual(tables)
+  })
+
+  it('drops public-schema tables when the trigger is present', () => {
+    const tables = [
+      { schema: 'public', tableName: 'foo' },
+      { tableName: 'bar' }, // no schema → defaults to public
+    ]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, true)).toEqual([])
+  })
+
+  it('keeps tables in non-public schemas when the trigger is present', () => {
+    const tables = [
+      { schema: 'public', tableName: 'foo' },
+      { schema: 'private', tableName: 'bar' },
+      { schema: 'app', tableName: 'baz' },
+    ]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, true)).toEqual([
+      { schema: 'private', tableName: 'bar' },
+      { schema: 'app', tableName: 'baz' },
+    ])
+  })
+
+  it('matches the public schema case-insensitively', () => {
+    const tables = [{ schema: 'PUBLIC', tableName: 'foo' }]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, true)).toEqual([])
   })
 })
 

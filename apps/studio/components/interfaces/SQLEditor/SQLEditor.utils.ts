@@ -8,6 +8,7 @@ import {
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff } from './SQLEditor.types'
+import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { sqlEventParser } from '@/lib/sql-event-parser'
@@ -16,6 +17,33 @@ import type { SnippetWithContent } from '@/state/sql-editor-v2'
 export type CreateTableWithoutRLS = {
   schema?: string
   tableName: string
+}
+
+// The ensure_rls event trigger only auto-enables RLS on tables in the public
+// schema (see AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL).
+const ENSURE_RLS_TRIGGER_SCHEMAS = new Set(['public'])
+
+export function hasActiveEnsureRLSTrigger(triggers: DatabaseEventTrigger[] | undefined) {
+  return (
+    triggers?.some(
+      (t) =>
+        (t.name === 'ensure_rls' || t.function_name === 'rls_auto_enable') &&
+        t.enabled_mode !== 'DISABLED'
+    ) ?? false
+  )
+}
+
+/**
+ * Filters out CREATE TABLE entries that will be covered by the project's
+ * ensure_rls event trigger (which only handles tables in the public schema).
+ * Tables in any other schema are returned unchanged so the user is still warned.
+ */
+export function filterTablesCoveredByEnsureRLSTrigger(
+  tables: CreateTableWithoutRLS[],
+  hasTrigger: boolean
+): CreateTableWithoutRLS[] {
+  if (!hasTrigger) return tables
+  return tables.filter((t) => !ENSURE_RLS_TRIGGER_SCHEMAS.has((t.schema ?? 'public').toLowerCase()))
 }
 
 export const createSqlSnippetSkeletonV2 = ({
