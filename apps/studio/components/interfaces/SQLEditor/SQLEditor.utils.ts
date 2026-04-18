@@ -91,13 +91,22 @@ export function checkDestructiveQuery(sql: string) {
   return destructiveSqlRegex.some((regex) => regex.test(cleanedSql))
 }
 
+// Replace the contents of single-quoted string literals and double-quoted
+// identifiers with empty quotes, so a downstream `where` scan can't be fooled
+// by tokens like `UPDATE "where table" SET ...` or `SET name = 'where x'`.
+// Postgres uses doubled quotes to escape, so `''` and `""` are matched as
+// part of the same span rather than terminating it.
+const stripQuotedSpans = (sql: string) =>
+  sql.replace(/'(?:''|[^'])*'/g, "''").replace(/"(?:""|[^"])*"/g, '""')
+
 // Function to check for UPDATE queries without WHERE clause
 export function isUpdateWithoutWhere(sql: string): boolean {
   const updateStatements = sql
     .split(';')
     .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
   return updateStatements.some(
-    (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
+    (statement) =>
+      updateWithoutWhereRegex.test(statement) && !/where\s/i.test(stripQuotedSpans(statement))
   )
 }
 

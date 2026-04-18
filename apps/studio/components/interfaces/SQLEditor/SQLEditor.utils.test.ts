@@ -274,6 +274,21 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     expect(match).toBe(true)
   })
 
+  it('catches update where a quoted identifier contains the word where', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "where table" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update where a string literal contains the word where', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'where x';`)
+    expect(match).toBe(true)
+  })
+
+  it('does not flag update where the only "where" sits inside a string literal but a real where clause exists', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'where x' WHERE id = 1;`)
+    expect(match).toBe(false)
+  })
+
   it('contains both an update query and a delete query, triggers destructive', () => {
     const match = checkDestructiveQuery(stripIndent`
       delete from countries; update countries set name = 'hello';
