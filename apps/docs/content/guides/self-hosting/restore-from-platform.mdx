@@ -81,7 +81,7 @@ Setting `session_replication_role` to `replica` disables triggers during the dat
 
 Connect to your self-hosted database and run a few checks:
 
-```bash
+```sh
 psql "postgres://postgres.your-tenant-id:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres"
 ```
 
@@ -147,7 +147,7 @@ The platform may run a newer Postgres version (17 vs 15) and newer Auth service 
 
 **Workaround:** Edit `data.sql` before restoring:
 
-```bash
+```sh
 # Comment out PG17-only transaction_timeout
 sed -i 's/^SET transaction_timeout/-- &/' data.sql
 ```
