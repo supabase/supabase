@@ -1,3 +1,5 @@
+import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
+
 import {
   alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
@@ -8,7 +10,13 @@ import {
 import { ContentDiff } from './SQLEditor.types'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
+import { sqlEventParser } from '@/lib/sql-event-parser'
 import type { SnippetWithContent } from '@/state/sql-editor-v2'
+
+export type CreateTableWithoutRLS = {
+  schema?: string
+  tableName: string
+}
 
 export const createSqlSnippetSkeletonV2 = ({
   name,
@@ -63,6 +71,51 @@ export function isUpdateWithoutWhere(sql: string): boolean {
   return updateStatements.some(
     (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
   )
+}
+
+/**
+ * Returns CREATE TABLE statements in `sql` that do not have a matching
+ * ALTER TABLE ... ENABLE ROW LEVEL SECURITY in the same SQL submission.
+ *
+ * Operates on the SQL passed in (which is the user's selection if any, or the
+ * full editor contents otherwise) so partial-execution selects work naturally.
+ */
+export function getCreateTablesMissingRLS(sql: string): CreateTableWithoutRLS[] {
+  const events = sqlEventParser.getTableEvents(sql)
+
+  const rlsEnabled = new Set(
+    events
+      .filter((e) => e.type === TABLE_EVENT_ACTIONS.TableRLSEnabled && e.tableName)
+      .map((e) => `${e.schema ?? ''}.${e.tableName}`.toLowerCase())
+  )
+
+  return events
+    .filter((e) => e.type === TABLE_EVENT_ACTIONS.TableCreated && e.tableName)
+    .filter((e) => !rlsEnabled.has(`${e.schema ?? ''}.${e.tableName}`.toLowerCase()))
+    .map((e) => ({ schema: e.schema, tableName: e.tableName as string }))
+}
+
+/**
+ * Appends `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` statements to `sql`
+ * for each provided table.
+ */
+export function appendEnableRLSStatements(sql: string, tables: CreateTableWithoutRLS[]) {
+  if (tables.length === 0) return sql
+
+  const quote = (identifier: string) =>
+    /^[a-z_][a-z0-9_]*$/i.test(identifier) ? identifier : `"${identifier.replace(/"/g, '""')}"`
+
+  const additions = tables
+    .map(({ schema, tableName }) => {
+      const target = schema ? `${quote(schema)}.${quote(tableName)}` : quote(tableName)
+      return `ALTER TABLE ${target} ENABLE ROW LEVEL SECURITY;`
+    })
+    .join('\n')
+
+  const trimmed = sql.replace(/\s+$/, '')
+  const separator = trimmed.endsWith(';') ? '\n\n' : ';\n\n'
+
+  return `${trimmed}${separator}-- Added by Supabase: enable Row Level Security on newly created tables\n${additions}\n`
 }
 
 export function checkAlterDatabaseConnection(sql: string): boolean {

@@ -38,10 +38,12 @@ import {
   type PotentialIssues,
 } from './SQLEditor.types'
 import {
+  appendEnableRLSStatements,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
+  getCreateTablesMissingRLS,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
@@ -298,7 +300,7 @@ export const SQLEditor = () => {
   }, [id, isDiffOpen, project, snapV2])
 
   const executeQuery = useCallback(
-    async (force: boolean = false) => {
+    async (force: boolean = false, sqlOverride?: string) => {
       if (isDiffOpen) {
         clearPendingRunRefocus()
         return
@@ -317,23 +319,29 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
-      const sql = snippet
+      const editorSql = snippet
         ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql)
         : selectedValue || editorRef.current?.getValue()
+      const sql = sqlOverride ?? editorSql
 
       const hasDestructiveOperations = checkDestructiveQuery(sql)
       const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
       const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
+      const createTablesMissingRLS = getCreateTablesMissingRLS(sql)
 
       const queryHasIssues =
         !force &&
-        (hasDestructiveOperations || hasUpdateWithoutWhere || hasAlterDatabasePreventConnection)
+        (hasDestructiveOperations ||
+          hasUpdateWithoutWhere ||
+          hasAlterDatabasePreventConnection ||
+          createTablesMissingRLS.length > 0)
 
       if (queryHasIssues) {
         setPotentialIssues({
           hasDestructiveOperations,
           hasUpdateWithoutWhere,
           hasAlterDatabasePreventConnection,
+          createTablesMissingRLS,
         })
         return
       }
@@ -815,6 +823,21 @@ export const SQLEditor = () => {
           setPotentialIssues(undefined)
           refocusEditor()
           void executeQuery(true)
+        }}
+        onConfirmWithRLS={() => {
+          const tables = potentialIssues?.createTablesMissingRLS ?? []
+          if (tables.length === 0) return
+          const editor = editorRef.current
+          const selection = editor?.getSelection()
+          const selectedValue = selection
+            ? editor?.getModel()?.getValueInRange(selection)
+            : undefined
+          const baseSql = selectedValue || editor?.getValue() || ''
+          const rewrittenSql = appendEnableRLSStatements(baseSql, tables)
+          shouldRefocusAfterRunRef.current = true
+          setPotentialIssues(undefined)
+          refocusEditor()
+          void executeQuery(true, rewrittenSql)
         }}
       />
 

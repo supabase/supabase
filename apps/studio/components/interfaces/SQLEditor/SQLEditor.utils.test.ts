@@ -2,9 +2,11 @@ import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
 import {
+  appendEnableRLSStatements,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
+  getCreateTablesMissingRLS,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
@@ -260,6 +262,138 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     DESTRUCTIVE_QUERIES.forEach((query) => {
       expect(checkDestructiveQuery(query), `Query ${query} should be destructive`).toBe(true)
     })
+  })
+})
+
+describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
+  it('flags a basic CREATE TABLE without RLS', () => {
+    const result = getCreateTablesMissingRLS('create table foo (id int8 primary key);')
+    expect(result).toEqual([{ schema: undefined, tableName: 'foo' }])
+  })
+
+  it('flags CREATE TABLE IF NOT EXISTS', () => {
+    const result = getCreateTablesMissingRLS(
+      'create table if not exists foo (id int8 primary key);'
+    )
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('foo')
+  })
+
+  it('flags schema-qualified CREATE TABLE', () => {
+    const result = getCreateTablesMissingRLS('create table public.foo (id int8 primary key);')
+    expect(result).toEqual([{ schema: 'public', tableName: 'foo' }])
+  })
+
+  it('flags quoted identifiers', () => {
+    const result = getCreateTablesMissingRLS(
+      'create table "public"."user_table" (id int8 primary key);'
+    )
+    expect(result).toEqual([{ schema: 'public', tableName: 'user_table' }])
+  })
+
+  it('flags quoted identifiers containing spaces', () => {
+    const result = getCreateTablesMissingRLS(
+      'create table "public"."My Table" (id int8 primary key);'
+    )
+    expect(result).toEqual([{ schema: 'public', tableName: 'My Table' }])
+  })
+
+  it('matches RLS to a table whose name contains spaces', () => {
+    const sql = stripIndent`
+      create table "My Table" (id int8 primary key);
+      alter table "My Table" enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when ENABLE ROW LEVEL SECURITY is in the same SQL', () => {
+    const sql = stripIndent`
+      create table foo (id int8 primary key);
+      alter table foo enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when ENABLE RLS shorthand is in the same SQL', () => {
+    const sql = stripIndent`
+      create table foo (id int8 primary key);
+      alter table foo enable rls;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('matches RLS to the right table when multiple tables created', () => {
+    const sql = stripIndent`
+      create table foo (id int8 primary key);
+      create table bar (id int8 primary key);
+      alter table foo enable row level security;
+    `
+    const result = getCreateTablesMissingRLS(sql)
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('bar')
+  })
+
+  it('does not flag when CREATE TABLE is inside a comment', () => {
+    const sql = stripIndent`
+      -- create table foo (id int8 primary key);
+      select 1;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when there is no CREATE TABLE at all', () => {
+    expect(getCreateTablesMissingRLS('select * from foo;')).toEqual([])
+  })
+
+  it('schema-qualified RLS matches schema-qualified CREATE', () => {
+    const sql = stripIndent`
+      create table public.foo (id int8 primary key);
+      alter table public.foo enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('flags CREATE TEMP TABLE', () => {
+    const result = getCreateTablesMissingRLS('create temp table foo (id int8 primary key);')
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('foo')
+  })
+})
+
+describe('SQLEditor.utils:appendEnableRLSStatements', () => {
+  it('appends a single ALTER TABLE ENABLE RLS statement', () => {
+    const result = appendEnableRLSStatements('create table foo (id int8 primary key);', [
+      { tableName: 'foo' },
+    ])
+    expect(result).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('appends one ALTER per table', () => {
+    const result = appendEnableRLSStatements(
+      'create table foo (id int8); create table bar (id int8);',
+      [{ tableName: 'foo' }, { tableName: 'bar' }]
+    )
+    expect(result).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+    expect(result).toContain('ALTER TABLE bar ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('schema-qualifies the table when schema is provided', () => {
+    const result = appendEnableRLSStatements('create table public.foo (id int8);', [
+      { schema: 'public', tableName: 'foo' },
+    ])
+    expect(result).toContain('ALTER TABLE public.foo ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('quotes identifiers that are not simple', () => {
+    const result = appendEnableRLSStatements('create table "My Table" (id int8);', [
+      { tableName: 'My Table' },
+    ])
+    expect(result).toContain('ALTER TABLE "My Table" ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('returns the original SQL unchanged when there are no tables', () => {
+    const sql = 'select 1;'
+    expect(appendEnableRLSStatements(sql, [])).toBe(sql)
   })
 })
 
