@@ -407,6 +407,20 @@ describe('SQLEditor.utils:appendEnableRLSStatements', () => {
     expect(result).toContain('ALTER TABLE "My Table" ENABLE ROW LEVEL SECURITY;')
   })
 
+  it('quotes mixed-case identifiers so Postgres does not fold them to lowercase', () => {
+    const result = appendEnableRLSStatements('create table "MyTable" (id int8);', [
+      { tableName: 'MyTable' },
+    ])
+    expect(result).toContain('ALTER TABLE "MyTable" ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('quotes mixed-case schema and table identifiers', () => {
+    const result = appendEnableRLSStatements('create table "MySchema"."MyTable" (id int8);', [
+      { schema: 'MySchema', tableName: 'MyTable' },
+    ])
+    expect(result).toContain('ALTER TABLE "MySchema"."MyTable" ENABLE ROW LEVEL SECURITY;')
+  })
+
   it('returns the original SQL unchanged when there are no tables', () => {
     const sql = 'select 1;'
     expect(appendEnableRLSStatements(sql, [])).toBe(sql)

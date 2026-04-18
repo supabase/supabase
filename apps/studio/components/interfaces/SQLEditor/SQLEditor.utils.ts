@@ -130,8 +130,11 @@ export function getCreateTablesMissingRLS(sql: string): CreateTableWithoutRLS[] 
 export function appendEnableRLSStatements(sql: string, tables: CreateTableWithoutRLS[]) {
   if (tables.length === 0) return sql
 
+  // Postgres folds unquoted identifiers to lowercase, so any identifier that
+  // isn't strictly lowercase-safe (e.g. "MyTable", "user table") must be quoted
+  // to refer back to the original table.
   const quote = (identifier: string) =>
-    /^[a-z_][a-z0-9_]*$/i.test(identifier) ? identifier : `"${identifier.replace(/"/g, '""')}"`
+    /^[a-z_][a-z0-9_]*$/.test(identifier) ? identifier : `"${identifier.replace(/"/g, '""')}"`
 
   const additions = tables
     .map(({ schema, tableName }) => {
