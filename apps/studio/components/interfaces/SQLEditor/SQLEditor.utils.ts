@@ -111,15 +111,20 @@ export function isUpdateWithoutWhere(sql: string): boolean {
 export function getCreateTablesMissingRLS(sql: string): CreateTableWithoutRLS[] {
   const events = sqlEventParser.getTableEvents(sql)
 
+  // Match case-sensitively. Lowercasing would let quoted identifiers like
+  // "MyTable" and "mytable" — which are different tables in Postgres — collide
+  // and silently suppress the warning. The trade-off is rare false positives
+  // when users mix case for *unquoted* identifiers (Postgres would have folded
+  // them anyway), which is annoying but safe.
+  const key = (e: { schema?: string; tableName?: string }) => `${e.schema ?? ''}.${e.tableName}`
+
   const rlsEnabled = new Set(
-    events
-      .filter((e) => e.type === TABLE_EVENT_ACTIONS.TableRLSEnabled && e.tableName)
-      .map((e) => `${e.schema ?? ''}.${e.tableName}`.toLowerCase())
+    events.filter((e) => e.type === TABLE_EVENT_ACTIONS.TableRLSEnabled && e.tableName).map(key)
   )
 
   return events
     .filter((e) => e.type === TABLE_EVENT_ACTIONS.TableCreated && e.tableName)
-    .filter((e) => !rlsEnabled.has(`${e.schema ?? ''}.${e.tableName}`.toLowerCase()))
+    .filter((e) => !rlsEnabled.has(key(e)))
     .map((e) => ({ schema: e.schema, tableName: e.tableName as string }))
 }
 
@@ -144,7 +149,10 @@ export function appendEnableRLSStatements(sql: string, tables: CreateTableWithou
     .join('\n')
 
   const trimmed = sql.replace(/\s+$/, '')
-  const separator = trimmed.endsWith(';') ? '\n\n' : ';\n\n'
+  // If the SQL ends with a line comment, the appended ';' would be swallowed,
+  // so put the terminator on its own line.
+  const endsWithLineComment = /--[^\r\n]*$/.test(trimmed)
+  const separator = trimmed.endsWith(';') ? '\n\n' : endsWithLineComment ? '\n;\n\n' : ';\n\n'
 
   return `${trimmed}${separator}-- Added by Supabase: enable Row Level Security on newly created tables\n${additions}\n`
 }

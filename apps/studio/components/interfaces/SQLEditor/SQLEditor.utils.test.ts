@@ -374,6 +374,18 @@ describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
     expect(result).toHaveLength(1)
     expect(result[0].tableName).toBe('foo')
   })
+
+  it('does not collide quoted identifiers that differ only by case', () => {
+    // "MyTable" and "mytable" are distinct tables in Postgres, so the ALTER
+    // here targets a different table than the CREATE — the warning must fire.
+    const sql = stripIndent`
+      create table "MyTable" (id int8 primary key);
+      alter table "mytable" enable row level security;
+    `
+    const result = getCreateTablesMissingRLS(sql)
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('MyTable')
+  })
 })
 
 describe('SQLEditor.utils:appendEnableRLSStatements', () => {
@@ -424,6 +436,18 @@ describe('SQLEditor.utils:appendEnableRLSStatements', () => {
   it('returns the original SQL unchanged when there are no tables', () => {
     const sql = 'select 1;'
     expect(appendEnableRLSStatements(sql, [])).toBe(sql)
+  })
+
+  it('puts the terminator on its own line when SQL ends with a line comment', () => {
+    // Without this, the appended ';' would be swallowed by the line comment and
+    // the following ALTER TABLE would be parsed as part of the CREATE TABLE.
+    const sql = stripIndent`
+      create table foo (id int)
+      -- forgot the semicolon
+    `
+    const result = appendEnableRLSStatements(sql, [{ tableName: 'foo' }])
+    expect(result).toMatch(/-- forgot the semicolon\n;\n/)
+    expect(result).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
   })
 })
 
