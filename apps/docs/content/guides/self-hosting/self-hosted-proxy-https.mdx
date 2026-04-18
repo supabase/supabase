@@ -27,6 +27,7 @@ If you already run [HAProxy](https://www.haproxy.com/), [Traefik](https://traefi
 - Add `X-Forwarded` headers to all requests
 - Comment out Kong's host port bindings in `docker-compose.yml` if the proxy runs in the same Docker network
 - Update `SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, and `SITE_URL` in `.env` to your HTTPS URL
+- See `volumes/proxy` for example proxy configuration files
 
 </Admonition>
 
@@ -89,11 +90,17 @@ HTTP-to-HTTPS redirects are handled automatically by the `jonasal/nginx-certbot`
 
 ### Step 3: Verify HTTPS connection
 
+Test the HTTPS connection - you should get a `401` response confirming you could connect to Auth:
+
 ```sh
 curl -I https://<your-domain>/auth/v1/
 ```
 
-You should receive a `401` response confirming you could connect to Auth.
+Check container logs if needed (use `supabase-nginx` for Nginx):
+
+```sh
+docker logs supabase-caddy
+```
 
 ## Self-signed certificates (development only)
 
