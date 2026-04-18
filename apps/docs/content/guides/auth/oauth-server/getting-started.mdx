@@ -313,7 +313,7 @@ export async function POST(request: Request) {
     }
 
     // Redirect back to the client with authorization code
-    return NextResponse.redirect(data.redirect_to)
+    return NextResponse.redirect(data.redirect_url)
   } else {
     const { data, error } = await supabase.auth.oauth.denyAuthorization(authorizationId)
 
@@ -322,7 +322,7 @@ export async function POST(request: Request) {
     }
 
     // Redirect back to the client with error
-    return NextResponse.redirect(data.redirect_to)
+    return NextResponse.redirect(data.redirect_url)
   }
 }
 ```
@@ -387,7 +387,7 @@ export function OAuthConsent() {
       setError(error.message)
     } else {
       // Redirect to client app
-      window.location.href = data.redirect_to
+      window.location.href = data.redirect_url
     }
   }
 
@@ -400,7 +400,7 @@ export function OAuthConsent() {
       setError(error.message)
     } else {
       // Redirect to client app with error
-      window.location.href = data.redirect_to
+      window.location.href = data.redirect_url
     }
   }
 
@@ -454,8 +454,8 @@ export function OAuthConsent() {
 6. **Handle decision** - When the user clicks approve/deny:
    - Call `supabase.auth.oauth.approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)`
    - These methods handle all OAuth logic internally (generating authorization codes, etc.)
-   - They return a `redirect_to` URL
-7. **Redirect back** - Redirect the user to the `redirect_to` URL, which sends them back to the third-party app with either an authorization code (approved) or error (denied)
+   - They return a `redirect_url`
+7. **Redirect back** - Redirect the user to the `redirect_url`, which sends them back to the third-party app with either an authorization code (approved) or error (denied)
 
 ## Register an OAuth client
 
