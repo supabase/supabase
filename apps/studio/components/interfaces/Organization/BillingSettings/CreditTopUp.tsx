@@ -4,6 +4,7 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import { AlertCircle, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -14,6 +15,7 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -38,19 +40,24 @@ import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.u
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrganizationCreditTopUpMutation } from '@/data/organizations/organization-credit-top-up-mutation'
+import { useCreditTopUpPreview } from '@/data/organizations/organization-credit-top-up-preview'
+import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'credit-top-up'
+const MIN_TOP_UP_AMOUNT = 300
+const MAX_TOP_UP_AMOUNT = 2000
 
 const FormSchema = z.object({
   amount: z.coerce
     .number()
-    .gte(300, 'Amount must be between $300 - $2000.')
-    .lte(2000, 'Amount must be between $300 - $2000.')
+    .gte(MIN_TOP_UP_AMOUNT, `Amount must be between $${MIN_TOP_UP_AMOUNT} - $${MAX_TOP_UP_AMOUNT}.`)
+    .lte(MAX_TOP_UP_AMOUNT, `Amount must be between $${MIN_TOP_UP_AMOUNT} - $${MAX_TOP_UP_AMOUNT}.`)
     .int('Amount must be a whole number.'),
   paymentMethod: z.string(),
 })
@@ -87,6 +94,47 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const [topUpModalVisible, setTopUpModalVisible] = useState(false)
   const [useAsDefaultBillingAddress, setUseAsDefaultBillingAddress] = useState(true)
   const [paymentConfirmationLoading, setPaymentConfirmationLoading] = useState(false)
+
+  const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
+  const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
+
+  const billingAddress = useAsDefaultBillingAddress ? latestAddress : undefined
+  const billingTaxId = useAsDefaultBillingAddress ? latestTaxId : null
+  const debouncedAddress = useDebounce(billingAddress, 1000)
+  const debouncedTaxId = useDebounce(billingTaxId, 1000)
+
+  const watchedAmount = form.watch('amount')
+  const debouncedAmount = useDebounce(watchedAmount, 1000)
+  const parsedAmount = Number(debouncedAmount)
+  const validAmount =
+    !Number.isNaN(parsedAmount) &&
+    Number.isInteger(parsedAmount) &&
+    parsedAmount >= MIN_TOP_UP_AMOUNT &&
+    parsedAmount <= MAX_TOP_UP_AMOUNT
+      ? parsedAmount
+      : undefined
+
+  const handleAddressChange = useCallback((address: CustomerAddress) => {
+    setLatestAddress(address)
+  }, [])
+
+  const handleTaxIdChange = useCallback((taxId: CustomerTaxId | null) => {
+    setLatestTaxId(taxId)
+  }, [])
+
+  const {
+    data: creditPreview,
+    isFetching: creditPreviewIsFetching,
+    isSuccess: creditPreviewInitialized,
+  } = useCreditTopUpPreview(
+    {
+      slug,
+      amount: validAmount,
+      address: debouncedAddress,
+      taxId: debouncedTaxId ?? undefined,
+    },
+    { enabled: !!validAmount }
+  )
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -175,6 +223,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
       setCaptchaRef(null)
       setPaymentIntentConfirmation(undefined)
       setPaymentIntentSecret('')
+      setLatestAddress(undefined)
+      setLatestTaxId(null)
     }
   }
 
@@ -288,6 +338,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     readOnly={executingTopUp || paymentConfirmationLoading}
                     useAsDefaultBillingAddress={useAsDefaultBillingAddress}
                     onUseAsDefaultBillingAddressChange={setUseAsDefaultBillingAddress}
+                    onAddressChange={handleAddressChange}
+                    onTaxIdChange={handleTaxIdChange}
                   />
                 )}
               />
@@ -323,6 +375,50 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     {errorInitiatingTopUp.message}
                   </AlertDescription_Shadcn_>
                 </Alert_Shadcn_>
+              )}
+
+              {creditPreviewInitialized && !!validAmount && (
+                <div
+                  className={cn(
+                    'text-foreground-light text-sm transition-opacity mt-4',
+                    creditPreviewIsFetching && 'opacity-50'
+                  )}
+                >
+                  {creditPreview.total !== creditPreview.amount && (
+                    <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
+                      <div className="py-2">Credit amount</div>
+                      <div className="py-2 text-right tabular-nums" translate="no">
+                        {formatCurrency(creditPreview.amount)}
+                      </div>
+                    </div>
+                  )}
+
+                  {creditPreview.tax_status === 'calculated' &&
+                    creditPreview.tax &&
+                    creditPreview.tax.tax_amount > 0 && (
+                      <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
+                        <div className="py-2">Tax ({creditPreview.tax.tax_rate_percentage}%)</div>
+                        <div className="py-2 text-right tabular-nums" translate="no">
+                          {formatCurrency(creditPreview.tax.tax_amount)}
+                        </div>
+                      </div>
+                    )}
+
+                  {creditPreview.tax_status === 'failed' && (
+                    <div className="flex items-center justify-between gap-2 border-b border-muted text-sm">
+                      <div className="py-2 text-foreground-lighter">
+                        Tax could not be estimated and may be applied separately
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between gap-2 text-foreground text-base">
+                    <div className="py-2">Total due today</div>
+                    <div className="py-2 text-right tabular-nums" translate="no">
+                      {formatCurrency(creditPreview.total)}
+                    </div>
+                  </div>
+                </div>
               )}
             </DialogSection>
 
