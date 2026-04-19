@@ -172,6 +172,17 @@ Review and change URL configuration variables:
 
 </Admonition>
 
+### Where to find your credentials
+
+The generated secrets and password are written to the `.env` file. The ones you are most likely to need when connecting your application to self-hosted Supabase are:
+
+- `POSTGRES_PASSWORD` - database password used in Postgres connection strings and by `psql`
+- `SUPABASE_PUBLISHABLE_KEY` - publishable API key for client-side use (e.g., in your frontend)
+- `SUPABASE_SECRET_KEY` - secret API key for server-side use. Never expose this in client code
+- `SUPABASE_PUBLIC_URL` - base URL you pass as `supabaseUrl` to the client libraries
+
+If you are still using the [legacy API keys](#configuring-legacy-api-keys), look for `ANON_KEY` and `SERVICE_ROLE_KEY` instead of the new publishable and secret API keys above.
+
 ### Studio authentication
 
 Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
