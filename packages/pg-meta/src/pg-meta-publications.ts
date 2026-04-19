@@ -112,9 +112,12 @@ function create({
   if (publish_delete) publishOps.push('delete')
   if (publish_truncate) publishOps.push('truncate')
 
+  const publishClause =
+    publishOps.length > 0 ? safeSql`WITH (publish = ${literal(publishOps.join(', '))})` : safeSql``
+
   const sql = safeSql`
 CREATE PUBLICATION ${ident(name)} ${tableClause}
-  WITH (publish = ${literal(publishOps.join(','))});`
+${publishClause};`
 
   return { sql }
 }

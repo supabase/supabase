@@ -317,3 +317,11 @@ withTestDatabase('update all tables -> no tables', async ({ executeQuery }) => {
   const { sql: removeSql } = pgMeta.publications.remove(updatedRes!)
   await executeQuery(removeSql)
 })
+
+test('create omits publish clause when no publish operations are provided', () => {
+  const { sql } = pgMeta.publications.create({
+    name: 'no_publish',
+  })
+
+  expect(sql.toString()).not.toContain('WITH (publish =')
+})
