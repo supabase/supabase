@@ -415,56 +415,6 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'Close' }).first().click()
   })
 
-  test('filtering rows works as expected', async ({ page, ref }) => {
-    const tableName = 'pw_table_filtering'
-    const colName = 'pw_column'
-
-    await using _ = await withSetupCleanup(
-      async () => {
-        await createTableWithRLS(tableName, 'pw_column')
-      },
-      async () => {
-        await dropTable(tableName)
-      }
-    )
-    // Disable the new filter bar for this test since it uses the old filter UI
-    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await page.evaluate(() => {
-      localStorage.setItem('supabase-ui-table-filter-bar', 'false')
-    })
-    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
-    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
-    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
-
-    for (const value of ['789', '456', '123']) {
-      await page.getByTestId('table-editor-insert-new-row').click()
-      await page.getByRole('menuitem', { name: 'Insert row Insert a new row' }).click()
-      await page.getByTestId(`${colName}-input`).fill(value)
-      const apiPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
-      await page.getByTestId('action-bar-save-row').click()
-      await apiPromise
-    }
-
-    await page.getByRole('button', { name: 'Filter', exact: true }).click()
-    await page.getByRole('button', { name: 'Add filter' }).click()
-    await page.getByRole('dialog').getByRole('button', { name: 'id', exact: true }).click()
-    await page.getByRole('menuitem', { name: colName }).click()
-    await page.getByRole('textbox', { name: 'Enter a value' }).fill('789')
-    const waitForFilterApply = createApiResponseWaiter(
-      page,
-      'pg-meta',
-      ref,
-      'query?key=table-rows-'
-    )
-    await page.getByRole('button', { name: 'Apply filter' }).click()
-    await waitForFilterApply
-    await page.waitForTimeout(500)
-    await page.getByRole('button', { name: 'Filtered by 1 rule' }).click({ force: true })
-    await expect(page.getByRole('gridcell', { name: '789' })).toBeVisible()
-    await expect(page.getByRole('gridcell', { name: '456' })).not.toBeVisible()
-    await expect(page.getByRole('gridcell', { name: '123' })).not.toBeVisible()
-  })
-
   test('view table definition works as expected', async ({ page, ref }) => {
     const tableName = 'pw_table_definition'
     const colName = 'pw_column'

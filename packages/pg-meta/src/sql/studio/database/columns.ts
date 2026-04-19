@@ -1,16 +1,25 @@
-export const getTableColumnsSql = ({ table, schema }: { table?: string; schema?: string }) => {
-  const conditions = []
+import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+
+export const getTableColumnsSql = ({
+  table,
+  schema,
+}: {
+  table?: string
+  schema?: string
+}): SafeSqlFragment => {
+  const conditions: Array<SafeSqlFragment> = []
   if (table) {
-    conditions.push(`tablename = '${table}'`)
+    conditions.push(safeSql`tablename = ${literal(table)}`)
   }
   if (schema) {
-    conditions.push(`schemaname = '${schema}'`)
+    conditions.push(safeSql`schemaname = ${literal(schema)}`)
   }
 
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+  const whereClause =
+    conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
-  const sql = /* SQL */ `
-  
+  return safeSql`
+
   SELECT
     tbl.schemaname,
     tbl.tablename,
@@ -68,7 +77,5 @@ export const getTableColumnsSql = ({ table, schema }: { table?: string; schema?:
     )
   ${whereClause}
   GROUP BY schemaname, tablename, quoted_name, is_table;
-`.trim()
-
-  return sql
+`
 }

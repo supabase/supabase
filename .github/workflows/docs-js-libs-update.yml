@@ -55,7 +55,7 @@ jobs:
         working-directory: apps/docs
         run: |
           echo "Generating new typespec snapshot for review..."
-          npx vitest run --update ./features/docs/Reference.typeSpec.test.ts
+          npx vitest run --update --dir features/docs
 
       - name: Generate token
         id: app-token

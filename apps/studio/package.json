@@ -67,6 +67,7 @@
     "@supabase/shared-types": "0.1.88",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
+    "@tanstack/react-hotkeys": "^0.9.1",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-query-devtools": "^5.0.0",
     "@tanstack/react-table": "^8.21.3",
