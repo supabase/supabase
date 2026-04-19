@@ -14,6 +14,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { memo, useMemo, useRef } from 'react'
 
+import { RealtimeFlowOverlay } from '../blocks/realtime-flow/components/realtime-flow-overlay'
 import { useRealtimeFlow } from '../blocks/realtime-flow/hooks/use-realtime-flow'
 import { Button } from '../components/ui/button'
 
@@ -79,12 +80,21 @@ const INITIAL_EDGES: Edge[] = [
 
 const RealtimeFlowDemo = () => {
   const nextNodeIndexRef = useRef(3)
-  const { nodes, edges, synced, onNodesChange, onEdgesChange, onConnect, setNodes, setEdges } =
-    useRealtimeFlow({
-      channel: 'realtime-flow-demo-2',
-      initialNodes: INITIAL_NODES,
-      initialEdges: INITIAL_EDGES,
-    })
+  const {
+    nodes,
+    edges,
+    synced,
+    syncError,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    setNodes,
+    setEdges,
+  } = useRealtimeFlow({
+    channel: 'realtime-flow-demo-2',
+    initialNodes: INITIAL_NODES,
+    initialEdges: INITIAL_EDGES,
+  })
 
   const displayNodes = useMemo(
     () =>
@@ -151,11 +161,8 @@ const RealtimeFlowDemo = () => {
             <Background />
             <Controls />
           </ReactFlow>
-          {!synced && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
-              <span className="text-sm text-muted-foreground">Syncing…</span>
-            </div>
-          )}
+          {!synced && !syncError && <RealtimeFlowOverlay status="syncing" />}
+          {!synced && syncError && <RealtimeFlowOverlay status="error" message={syncError} />}
         </div>
       </div>
     </ReactFlowProvider>

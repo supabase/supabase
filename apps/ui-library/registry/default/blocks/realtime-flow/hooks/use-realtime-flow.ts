@@ -39,6 +39,7 @@ export function useRealtimeFlow({
   const [nodes, setNodesState] = useState<Node[]>([])
   const [edges, setEdgesState] = useState<Edge[]>([])
   const [synced, setSynced] = useState(false)
+  const [syncError, setSyncError] = useState<string | null>(null)
 
   const docRef = useRef<Y.Doc | null>(null)
   const providerRef = useRef<SupabaseProvider | null>(null)
@@ -89,6 +90,10 @@ export function useRealtimeFlow({
       }
     }
 
+    const clearSyncError = () => {
+      setSyncError(null)
+    }
+
     const seedInitialState = () => {
       if (yNodes.size === 0 && initialNodesForChannel.length > 0) {
         doc.transact(() => {
@@ -125,6 +130,7 @@ export function useRealtimeFlow({
     const markSynced = (shouldSeed = false) => {
       if (syncedRef.current) return
       clearInitialSyncTimer()
+      clearSyncError()
       syncedRef.current = true
 
       if (shouldSeed && !hasRemoteActivity) {
@@ -137,6 +143,12 @@ export function useRealtimeFlow({
       setSynced(true)
     }
 
+    const markSyncError = (error: Error) => {
+      clearInitialSyncTimer()
+      if (syncedRef.current) return
+      setSyncError(error.message || 'Failed to sync flow')
+    }
+
     const persistenceInstance = provider.getPersistence()
     if (persistenceInstance) {
       // With persistence: wait for persisted state to load
@@ -146,9 +158,13 @@ export function useRealtimeFlow({
         persistenceInstance.on('synced', () => {
           markSynced()
         })
+        persistenceInstance.on('error', (error) => {
+          markSyncError(error)
+        })
       }
     } else {
       provider.on('connect', () => {
+        clearSyncError()
         clearInitialSyncTimer()
         initialSyncTimer = setTimeout(() => {
           markSynced(true)
@@ -157,6 +173,9 @@ export function useRealtimeFlow({
       provider.on('message', () => {
         hasRemoteActivity = true
         markSynced()
+      })
+      provider.on('error', (error) => {
+        markSyncError(error)
       })
     }
 
@@ -173,6 +192,7 @@ export function useRealtimeFlow({
       providerRef.current = null
       syncedRef.current = false
       setSynced(false)
+      setSyncError(null)
     }
   }, [channel, awareness, persistence])
 
@@ -308,5 +328,15 @@ export function useRealtimeFlow({
     })
   }, [])
 
-  return { nodes, edges, synced, onNodesChange, onEdgesChange, onConnect, setNodes, setEdges }
+  return {
+    nodes,
+    edges,
+    synced,
+    syncError,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    setNodes,
+    setEdges,
+  }
 }
