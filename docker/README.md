@@ -36,6 +36,7 @@ This Docker Compose configuration includes the following services:
 - **[Documentation](https://supabase.com/docs/guides/self-hosting/docker)** - Setup and configuration guides
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
+- [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/supabase/supabase)
 
 ## Updates
 
