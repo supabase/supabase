@@ -20,6 +20,11 @@ import { Button } from '../components/ui/button'
 
 const NODE_Y_BASE = 80
 const NODE_X_BASE = 80
+const FLOW_NODE_STYLE = {
+  backgroundColor: 'hsl(var(--card))',
+  borderColor: 'hsl(var(--border))',
+  color: 'hsl(var(--card-foreground))',
+}
 
 type EditableNodeData = {
   label: string
@@ -29,11 +34,11 @@ type EditableNodeData = {
 
 const EditableNode = memo(({ data }: NodeProps<Node<EditableNodeData>>) => {
   return (
-    <div className="min-w-56 rounded-xl border bg-background p-3 shadow-sm">
+    <div className="min-w-56 rounded-xl border border-border bg-card p-3 text-card-foreground shadow-sm">
       <Handle type="target" position={Position.Top} />
       <div className="space-y-3">
         <input
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground"
           value={data.label}
           onChange={(event) => data.onLabelChange?.(event.target.value)}
           placeholder="Write something..."
@@ -61,12 +66,14 @@ const INITIAL_NODES: Node[] = [
     type: 'editable',
     position: { x: 100, y: 100 },
     data: { label: 'Node 1' },
+    style: FLOW_NODE_STYLE,
   },
   {
     id: 'node-2',
     type: 'editable',
     position: { x: 100, y: 300 },
     data: { label: 'Node 2' },
+    style: FLOW_NODE_STYLE,
   },
 ]
 
@@ -139,6 +146,7 @@ const RealtimeFlowDemo = () => {
                 data: {
                   label: `Node ${nodeNumber}`,
                 },
+                style: FLOW_NODE_STYLE,
               }
 
               setNodes((prev) => [...prev, node])
