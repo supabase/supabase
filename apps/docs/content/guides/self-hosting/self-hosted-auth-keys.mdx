@@ -8,8 +8,9 @@ You can configure self-hosted Supabase to use the [new API keys](/docs/guides/ap
 
 ## Before you begin
 
-- Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - Ensure OpenSSL and Node.js 16+ are available on the machine where you will generate new keys
+- Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file
 - If you are upgrading an existing self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and add/update the following files:
   - `.env.example` (merge new sections into your `.env` file)
   - `docker-compose.yml`

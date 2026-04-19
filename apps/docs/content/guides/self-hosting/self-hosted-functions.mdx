@@ -61,7 +61,7 @@ curl -X POST http://<your-domain>:8000/functions/v1/my-function \
 You should be able to see the response from `my-function`:
 
 ```json
-{"message":"Hello, World!"}
+{ "message": "Hello, World!" }
 ```
 
 ## Custom environment variables
@@ -125,16 +125,16 @@ const customVar = Deno.env.get('MY_CUSTOM_VAR')
 
 The functions service is pre-configured with the following environment variables:
 
-| Variable | Value | Purpose |
-| --- | --- | --- |
-| `SUPABASE_URL` | `http://kong:8000` | Internal API gateway URL |
-| `SUPABASE_PUBLIC_URL` | `http://<your-domain>:8000` | Base URL for accessing Supabase from the Internet |
-| `JWT_SECRET` | your-jwt-secret | Legacy symmetric encryption key for JWTs |
-| `SUPABASE_ANON_KEY` | your-anon-key | Client-side API key (`anon` role). |
-| `SUPABASE_SERVICE_ROLE_KEY` | your-service-role-key  | Server-side API key (`service_role` role) |
-| `SUPABASE_DB_URL` | `postgresql://...` | Postgres connection string |
-| `SUPABASE_PUBLISHABLE_KEYS` | `{"default":"sb_publishable_...}` | New publishable API key |
-| `SUPABASE_SECRET_KEYS` | `{"default":"sb_secret_...}` | New secret API key |
+| Variable                    | Value                             | Purpose                                           |
+| --------------------------- | --------------------------------- | ------------------------------------------------- |
+| `SUPABASE_URL`              | `http://kong:8000`                | Internal API gateway URL                          |
+| `SUPABASE_PUBLIC_URL`       | `http://<your-domain>:8000`       | Base URL for accessing Supabase from the Internet |
+| `JWT_SECRET`                | `your-jwt-secret`                 | Legacy symmetric encryption key for JWTs          |
+| `SUPABASE_ANON_KEY`         | `your-anon-key`                   | Client-side API key (`anon` role).                |
+| `SUPABASE_SERVICE_ROLE_KEY` | `your-service-role-key`           | Server-side API key (`service_role` role)         |
+| `SUPABASE_DB_URL`           | `postgresql://...`                | Postgres connection string                        |
+| `SUPABASE_PUBLISHABLE_KEYS` | `{"default":"sb_publishable_...}` | New publishable API key                           |
+| `SUPABASE_SECRET_KEYS`      | `{"default":"sb_secret_...}`      | New secret API key                                |
 
 Here's an example function that queries a table using `@supabase/supabase-js`:
 

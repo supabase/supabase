@@ -37,6 +37,7 @@ You need the following installed on your system:
   - **Linux desktop**: Install [Docker Desktop](https://docs.docker.com/desktop/setup/install/linux/)
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 - OpenSSL and Node.js 16+ (when switching to the [new API keys](/docs/guides/self-hosting/self-hosted-auth-keys) and new auth)
 
 
@@ -512,6 +513,7 @@ By default, the database's `log_min_messages` configuration is set to `fatal` in
 
 ### Using file backend in Storage on macOS
 
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. Change the [bind mount](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L391) to a named Docker volume instead.
 
 ## Managing your secrets

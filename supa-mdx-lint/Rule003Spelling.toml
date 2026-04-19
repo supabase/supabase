@@ -282,6 +282,7 @@ allow_list = [
     "OpenAI",
     "OpenID",
     "OpenMetrics",
+    "[Oo]pen[Ss]l",
     "Opsgenie",
     "OrbStack",
     "OrioleDB",
