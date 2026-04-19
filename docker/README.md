@@ -1,7 +1,7 @@
 <div align="center">
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/supabase/supabase)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)
 
 </div>
 
@@ -43,7 +43,7 @@ This Docker Compose configuration includes the following services:
 - **[Documentation](https://supabase.com/docs/guides/self-hosting/docker)** - Setup and configuration guides
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
-- **[Ask DeepWiki / Supabase](https://deepwiki.com/badge.svg)](https://deepwiki.com/supabase/supabase)
+- **[Ask DeepWiki / Supabase](https://deepwiki.com/badge.svg)](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)
 
 <a href="https://deepwiki.com/huggingface/huggingface_hub"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 
