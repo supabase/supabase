@@ -3,15 +3,13 @@ import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ProviderForm } from './ProviderForm'
-import type { Provider } from './AuthProvidersForm.types'
 import { getPhoneProviderValidationSchema, PROVIDER_PHONE } from '../AuthProvidersFormValidation'
+import type { Provider } from './AuthProvidersForm.types'
+import { ProviderForm } from './ProviderForm'
 import type { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 import { customRender } from '@/tests/lib/custom-render'
 
-const {
-  updateAuthConfigMutateMock,
-} = vi.hoisted(() => ({
+const { updateAuthConfigMutateMock } = vi.hoisted(() => ({
   updateAuthConfigMutateMock: vi.fn(),
 }))
 
@@ -88,7 +86,9 @@ vi.mock('@/components/ui/ButtonTooltip', () => ({
 
 mockAnimationsApi()
 
-function createPhoneAuthConfig(overrides: Partial<ProjectAuthConfigData> = {}): ProjectAuthConfigData {
+function createPhoneAuthConfig(
+  overrides: Partial<ProjectAuthConfigData> = {}
+): ProjectAuthConfigData {
   return {
     DISABLE_SIGNUP: false,
     EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -174,7 +174,10 @@ describe('ProviderForm', () => {
 
     let dialog = await openPhoneSheet()
 
-    const enablePhoneSwitch = getElementByIdOrThrow<HTMLButtonElement>(dialog, 'EXTERNAL_PHONE_ENABLED')
+    const enablePhoneSwitch = getElementByIdOrThrow<HTMLButtonElement>(
+      dialog,
+      'EXTERNAL_PHONE_ENABLED'
+    )
     expect(enablePhoneSwitch).toHaveAttribute('aria-checked', 'false')
 
     expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_ACCOUNT_SID')).toHaveValue(
@@ -217,8 +220,8 @@ describe('ProviderForm', () => {
       getElementByIdOrThrow<HTMLButtonElement>(dialog, 'EXTERNAL_PHONE_ENABLED')
     ).toHaveAttribute('aria-checked', 'true')
     expect(within(dialog).getAllByRole('combobox')[0]).toHaveTextContent('Twilio')
-    expect(
-      getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_ACCOUNT_SID')
-    ).toHaveValue('AC123456789')
+    expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_ACCOUNT_SID')).toHaveValue(
+      'AC123456789'
+    )
   })
 })

@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { getPhoneProviderValidationSchema } from './AuthProvidersFormValidation'
 import type { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 
-function createPhoneAuthConfig(overrides: Partial<ProjectAuthConfigData> = {}): ProjectAuthConfigData {
+function createPhoneAuthConfig(
+  overrides: Partial<ProjectAuthConfigData> = {}
+): ProjectAuthConfigData {
   return {
     DISABLE_SIGNUP: false,
     EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
