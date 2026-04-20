@@ -179,7 +179,7 @@ export default {
 
 ### Service-to-service calls
 
-`allow: 'secret:<name>'` validates the `apikey` header against the named secret key from your [dashboard](https://supabase.com/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. The `<name>` matches the name you gave the key. Keep `verify_jwt = false`.
+`allow: 'secret:<name>'` validates the `apikey` header against the named secret key from your [dashboard](/dashboard/project/_/settings/api-keys) and gives you `ctx.supabaseAdmin` for privileged work. The `<name>` matches the name you gave the key. Keep `verify_jwt = false`.
 
 ```ts
 import { withSupabase } from 'npm:@supabase/server'
@@ -194,7 +194,7 @@ export default {
 
 <Admonition type="tip">
 
-Create a named secret key for each caller in your project's [API keys settings](https://supabase.com/dashboard/project/_/settings/api-keys). Give it a name like `automations`, and share the generated `sb_secret_...` value with the service that calls this function.
+Create a named secret key for each caller in your project's [API keys settings](/dashboard/project/_/settings/api-keys). Give it a name like `automations`, and share the generated `sb_secret_...` value with the service that calls this function.
 
 ![A secret key named "automations" listed under Secret keys in the Supabase dashboard.](/docs/img/guides/functions/secret-keys-automations.png)
 
