@@ -26,15 +26,11 @@ There are 4 types of API keys that can be used with Supabase:
 | <span className="!whitespace-nowrap">`anon`</span>         | JWT (long lived)                                                 | Low        | <span className="!whitespace-nowrap">Platform, CLI</span> | Exactly like the publishable key.                                                                                                                                                                                                                                                                 |
 | <span className="!whitespace-nowrap">`service_role`</span> | JWT (long lived)                                                 | Elevated   | <span className="!whitespace-nowrap">Platform, CLI</span> | Exactly like secret keys.                                                                                                                                                                                                                                                                         |
 
-<Admonition type="note">
-
-`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and can only be changed when you rotate the JWT secret. This can cause significant issues in production applications. Use the publishable and secret keys instead.
-
-</Admonition>
-
 <Admonition type="note" title="Changes to API keys">
 
-Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
+Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260).
+
+`anon` and `service_role` keys are based on the project's JWT secret. They are generated when your project is created and can only be changed when you rotate the JWT secret. This can cause significant issues in production applications. You should now use the `sb_publishable_xxx` and `secret` keys instead.
 
 </Admonition>
 
@@ -42,14 +38,14 @@ Supabase is changing the way keys work to improve project security and developer
 
 You can find API keys in a couple of different places.
 
-In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
-
+In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard:
+{/* TODO: Check */}
 - **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
 - **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
 
-## `anon` and publishable keys
+## What publishable keys secure
 
-The `anon` and publishable keys secure the public components of your application. Public components run in environments where it is impossible to secure any secrets. These include:
+Publishable keys secure the public components of your application. Public components run in environments where it is impossible to secure any secrets. These include:
 
 - Web pages, where the key is bundled in source code.
 - Mobile or desktop applications, where the key is bundled inside the compiled packages or executables.
@@ -60,34 +56,30 @@ These environments are always considered public because anyone can retrieve the 
 
 ### Interaction with Supabase Auth
 
-Using the `anon` or publishable key does not mean that your user is anonymous. (Thinking of both these keys as publishable rather than `anon` makes the mental model clearer.)
-
-Your application can be authenticated with the publishable key, while your user is authenticated (via Supabase Auth) with their personal JWT:
+Using a publishable key does not mean that your user is anonymous. You can authenticate your application with the publishable key, while your user is authenticated (via Supabase Auth) with their personal JWT:
 
 | Key             | User logged in via Supabase Auth | Postgres role used for RLS, etc. |
 | --------------- | -------------------------------- | -------------------------------- |
 | Publishable key | No                               | `anon`                           |
-| `anon`          | No                               | `anon`                           |
 | Publishable key | Yes                              | `authenticated`                  |
-| `anon`          | Yes                              | `authenticated`                  |
 
 ### Protection
 
-These keys provide first-layer protection to your project's data, performance and bill, such as:
+These keys provide first-layer protection to your project's data, performance, and bill, such as:
 
 - Providing basic Denial-of-Service protection, by requiring a minimal threshold of knowledge.
 - Protecting your bill by ignoring bots, scrapers, automated vulnerability scanners and other well meaning or random Internet activity.
 
 ### Security considerations
 
-The publishable and `anon` keys are not intended to protect from the following, since key retrieval is always possible from a public component:
+Publishable keys are not intended to protect from the following, since key retrieval is always possible from a public component:
 
 - Static or dynamic code analysis and reverse engineering attempts.
 - Use of the Network inspector in the browser.
 - Cross-site request forgery, cross-site scripting, phishing attacks.
 - Man-in-the-middle attacks.
 
-When using the publishable or `anon` key, access to your project's data is guarded by Postgres via the built-in `anon` and `authenticated` roles. For full protection make sure:
+When using a publishable key, access to your project's data is guarded by Postgres via the built-in `anon` and `authenticated` roles. For full protection make sure:
 
 - You have enabled Row Level Security on all tables.
 - You regularly review your Row Level Security policies for permissions granted to the `anon` and `authenticated` roles.
@@ -95,9 +87,9 @@ When using the publishable or `anon` key, access to your project's data is guard
 
 Your project's [Security Advisor](/dashboard/project/_/advisors/security) constantly checks for common security problems with the built-in Postgres roles. Make sure you carefully review each finding before dismissing it.
 
-## `service_role` and secret keys
+## What secret keys allow access to
 
-Unlike the `anon` and publishable key, the `service_role` and secret keys allow elevated access to your project's data. It is meant to be used only in secure, developer-controlled components of your application, such as:
+Unlike publishable keys, secret keys allow elevated access to your project's data. It is meant to be used only in secure, developer-controlled components of your application, such as:
 
 - Servers that implement prior authorization themselves, such as Edge Functions, microservices, traditional or specialized web servers.
 - Periodic jobs, queue processors, topic subscribers.
@@ -106,11 +98,11 @@ Unlike the `anon` and publishable key, the `service_role` and secret keys allow 
 
 <Admonition type="caution">
 
-Never expose your `service_role` and secret keys publicly. Your data is at risk. **Do not:**
+Never expose your secret keys publicly. Your data is at risk. **Do not:**
 
-- Add in web pages, public documents, source code, bundle in executables or packages for mobile, desktop or CLI apps.
+- Add it to web pages, public documents, source code, bundle in executables or packages for mobile, desktop or CLI apps.
 - Send over chat applications, email or SMS to your peers.
-- Never use in a browser, even on `localhost`!
+- Never use in a browser, even on `localhost`.
 - Do not pass in URLs or query params, as these are often logged.
 - Be careful passing them in request headers without prior log sanitization.
 - Take extra care logging even potentially **invalid API keys**. Simple typos might reveal the real key in the future.
@@ -119,8 +111,8 @@ Never expose your `service_role` and secret keys publicly. Your data is at risk.
 Ensure you handle them with care and using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
 
 </Admonition>
-
-Secret keys and the `service_role` JWT-based API key authorize access to your project's data via the built-in `service_role` Postgres role. By design, this role has full access to your project's data. It also uses the [`BYPASSRLS` attribute](https://www.postgresql.org/docs/current/ddl-rowsecurity.html#:~:text=BYPASSRLS), skipping any and all Row Level Security policies you attach.
+{/* TODO: Check */}
+Secret keys authorize access to your project's data via the built-in `service_role` Postgres role. By design, this role has full access to your project's data. It also uses the [`BYPASSRLS` attribute](https://www.postgresql.org/docs/current/ddl-rowsecurity.html#:~:text=BYPASSRLS), skipping any and all Row Level Security policies you attach.
 
 The secret key is an improvement over the old JWT-based `service_role` key, and we recommend using it where possible. It adds more checks to prevent misuse, specifically:
 
@@ -132,7 +124,7 @@ The secret key is an improvement over the old JWT-based `service_role` key, and 
 Below are some starting guidelines on how to securely work with secret keys:
 
 - Always work with secret keys on computers you fully own or control.
-- Use secure & encrypted send tools to share API keys with others (often provided by good password managers), but prefer the [API Keys](/dashboard/project/_/settings/api-keys) dashboard instead.
+- Use secure & encrypted send tools to share API keys with others (often provided by good password managers), but prefer the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard instead.
 - Prefer encrypting them when stored in files or environment variables.
 - Do not add in source control, especially for CI scripts and tools. Prefer using the tool's native secrets capability instead.
 - Prefer using a separate secret key for each separate backend component of your application, so that if one is found to be vulnerable or to have leaked the key you will only need to change it and not all.
@@ -144,7 +136,7 @@ Below are some starting guidelines on how to securely work with secret keys:
 
 Don't rush if this has happened, or you are suspecting it has. Make sure you have fully considered the situation and have remediated the root cause of the suspicion or vulnerability **first**. Consider using the [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) as an easy way to identify the severity of the incident and to plan your next steps.
 
-Rotating a secret key (`sb_secret_...`) is easy and painless. Use the [API Keys](/dashboard/project/_/settings/api-keys) dashboard to create a new secret API key, then replace it with the compromised key. Once all components are using the new key, delete the compromised one.
+To rotate a secret key (`sb_secret_...`), use the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard to create a new secret API key, then replace it with the compromised key. Once all components are using the new key, delete the compromised one.
 
 **Deleting a secret key is irreversible and once done it will be gone forever.**
 
@@ -166,7 +158,7 @@ As the publishable and secret keys are no longer JWT-based, there are some known
 
 ### I am using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate my `service_role` JWT secret?
 
-If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. This will prevent downtime for your application.
+If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. This prevents downtime for your application.
 
 ### Can I still use my old `anon` and `service-role` API keys after enabling the publishable and secret keys?
 
@@ -174,7 +166,7 @@ Yes. This allows you to transition between the API keys with zero downtime by gr
 
 ### How do I deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
 
-You can do this in the [API Keys](/dashboard/project/_/settings/api-keys) dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
+You can do this in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
 
 You can re-activate them should you need to.
 
@@ -193,7 +185,7 @@ The main reasons for preferring the publishable and secret keys (`sb_publishable
 - JWTs were self-referential and full of redundant information not necessary for achieving their primary purpose.
 - JWTs are large, hard to parse, verify, and manipulate -- leading to insecure logging or bad security practices.
 - They were signed with a symmetric JWT secret.
-
+{/* TODO: Check */}
 ### Why is there no publishable or secret keys in the CLI / self-hosting?
 
 Publishable and secret keys are only available on the Supabase hosted platform. They are managed by our API Gateway component, which does not currently have a CLI equivalent.

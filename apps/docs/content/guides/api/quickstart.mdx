@@ -5,17 +5,15 @@ breadcrumb: 'API Quickstart'
 hideToc: true
 ---
 
-Let's create our first REST route which we can query using `cURL` or the browser.
-
-We'll create a database table called `todos` for storing tasks. This creates a corresponding API route `/rest/v1/todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
+This guide covers creating a REST route you can query using `cURL` or the browser by creating create a database table called `todos` for storing tasks. This creates a corresponding API route `/rest/v1/todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Set up a Supabase project with a 'todos' table">
-
+{/* TODO: Direct link */}
     [Create a new project](/dashboard) in the Supabase Dashboard.
-
+{/* TODO: Tighten */}
     After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
@@ -61,7 +59,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
     <StepHikeCompact.Details title="Allow public access">
 
-    Let's turn on Row Level Security for this table and allow public access.
+    Turn on Row Level Security for this table and allow public access.
 
     </StepHikeCompact.Details>
 
@@ -87,7 +85,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Insert some dummy data">
 
-    Now we can add some data to our table which we can access through our API.
+    Now add some data to our table which you can access through the API.
 
     </StepHikeCompact.Details>
 
@@ -109,17 +107,17 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Fetch the data">
 
-    Find your API URL and Keys in your Dashboard [API Settings](/dashboard/project/_/settings/api). You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
+    Find your API URL and Keys in the [**Settings > API Settings**](/dashboard/project/_/settings/api) section of the Dashboard. You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
 
-    Copy this block of code, substitute `<PROJECT_REF>` and `<ANON_KEY>`, then run it from a terminal.
+    Copy this block of code, substitute `<PROJECT_REF>` and `<PUBLISHABLE_KEY>`, then run it from a terminal.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
       ```bash Terminal
       curl 'https://<PROJECT_REF>.supabase.co/rest/v1/todos' \
-      -H "apikey: <ANON_KEY>" \
-      -H "Authorization: Bearer <ANON_KEY>"
+      -H "apikey: <PUBLISHABLE_KEY>" \
+      -H "Authorization: Bearer <PUBLISHABLE_KEY>"
       ```
 
     </StepHikeCompact.Code>
@@ -134,9 +132,9 @@ There are several options for accessing your data:
 
 ### Browser
 
-You can query the route in your browser, by appending the `anon` key as a query parameter:
+You can query the route in your browser, by appending the `publishable` key as a query parameter:
 
-`https://<PROJECT_REF>.supabase.co/rest/v1/todos?apikey=<ANON_KEY>`
+`https://<PROJECT_REF>.supabase.co/rest/v1/todos?apikey=<PUBLISHABLE_KEY>`
 
 ### Client libraries
 
