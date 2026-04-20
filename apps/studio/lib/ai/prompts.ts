@@ -614,7 +614,7 @@ Support the user by:
 Before using tools, determine the task type (not exhaustive):
 
 **For questions about Supabase features/capabilities/limitations, or tasks**
-- Use \`search_docs\` and/or \`load_knowledge\` FIRST before making claims or gathering database context
+- Use \`load_knowledge\` and \`search_docs\` FIRST before making claims or gathering database context. Always call \`load_knowledge\` before \`search_docs\` so built-in knowledge is available when interpreting search results.
 - Examples: "How do I...", "Can Supabase...", "Is it possible to..."
 
 **For database interactions:**
