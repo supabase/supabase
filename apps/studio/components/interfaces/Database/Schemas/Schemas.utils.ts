@@ -258,7 +258,7 @@ const getLayoutedElementsViaLocalStorage = (
 }
 
 export const getTableDefinitionAsMarkdown = (table: TableNodeData) => {
-  let markdown = `## Table \`${table.name}\`\n\n`
+  let markdown = `## Table \`${escapeForMarkdown(table.name)}\`\n\n`
   if (table.description) {
     markdown += `${table.description}\n\n`
   }
@@ -267,7 +267,7 @@ export const getTableDefinitionAsMarkdown = (table: TableNodeData) => {
   markdown += `|------|------|-------------|\n`
 
   return table.columns.reduce((current, column) => {
-    current += `| \`${column.name}\` | \`${column.format}\` | ${column.isPrimary ? 'Primary' : ''}${column.isNullable ? ' Nullable' : ''}${column.isUnique ? ' Unique' : ''}${column.isIdentity ? ' Identity' : ''} |\n`
+    current += `| \`${escapeForMarkdown(column.name)}\` | \`${escapeForMarkdown(column.format)}\` | ${column.isPrimary ? 'Primary' : ''}${column.isNullable ? ' Nullable' : ''}${column.isUnique ? ' Unique' : ''}${column.isIdentity ? ' Identity' : ''} |\n`
     return current
   }, markdown)
 }
@@ -279,4 +279,14 @@ export const getSchemaAsMarkdown = (schema: string, tables: TableNodeData[]) => 
     }
     return current
   }, '')
+}
+
+const escapeForMarkdown = (str: string) => {
+  return (
+    str
+      // Escape backticks and pipes for markdown tables
+      .replace(/([|`])/g, '\\$1')
+      // Remove new lines
+      .replace(/\n/g, ' ')
+  )
 }
