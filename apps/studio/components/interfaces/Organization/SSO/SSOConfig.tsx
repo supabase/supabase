@@ -190,6 +190,8 @@ export const SSOConfig = () => {
   }
 
   useEffect(() => {
+    if (!organization?.slug) return
+
     // Only reset form if it's not dirty (user hasn't made changes)
     if (ssoConfig && !form.formState.isDirty) {
       form.reset({
@@ -210,7 +212,7 @@ export const SSOConfig = () => {
         roleOnJoin: ssoConfig.join_org_on_signup_role,
       })
     }
-  }, [ssoConfig])
+  }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
   useEffect(() => {
