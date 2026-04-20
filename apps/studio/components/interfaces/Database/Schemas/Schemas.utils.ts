@@ -284,6 +284,8 @@ export const getSchemaAsMarkdown = (schema: string, tables: TableNodeData[]) => 
 const escapeForMarkdown = (str: string) => {
   return (
     str
+      // Escape backslashes first so later escapes are not ambiguous
+      .replace(/\\/g, '\\\\')
       // Escape backticks and pipes for markdown tables
       .replace(/([|`])/g, '\\$1')
       // Remove new lines
