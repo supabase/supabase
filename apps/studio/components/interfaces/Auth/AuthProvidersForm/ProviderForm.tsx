@@ -1,4 +1,4 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Check } from 'lucide-react'
@@ -88,6 +88,12 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
+        // This ensures the default value is visibly selected
+        if (key === 'PASSWORD_REQUIRED_CHARACTERS' && config.PASSWORD_REQUIRED_CHARACTERS === '') {
+          values[key] = NO_REQUIRED_CHARACTERS
+          return
+        }
+
         const isDoubleNegative = doubleNegativeKeys.includes(key)
         if (provider.title === 'SAML 2.0') {
           const configValue = (config as any)[key]
@@ -110,8 +116,12 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   )
 
   const INITIAL_VALUES = useMemo(() => {
+    // This check will always be true but let us avoid adding an eslint disable comment on unused memo dependencies
+    // which could hide real issues in the future.
+    // Adding the provider in the memo dependencies ensures the INITIAL_VALUES is properly applied
+    if (!provider) return
     return getValuesForProvider(config)
-  }, [config, getValuesForProvider])
+  }, [config, getValuesForProvider, provider])
 
   const onSubmit = (values: any) => {
     const payload = { ...values }
@@ -154,8 +164,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
-    resolver: yupResolver(provider.validationSchema),
-    shouldUnregister: true,
+    resolver: zodResolver(provider.validationSchema),
+    shouldUnregister: false,
   })
 
   useEffect(() => {
@@ -230,7 +240,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                     name={x}
                     properties={provider.properties[x]}
                     control={form.control}
-                    disabled={shouldDisableField(x) || !canUpdateConfig}
+                    readOnly={shouldDisableField(x) || !canUpdateConfig}
                     hasAccess={hasAccess}
                   />
                 )

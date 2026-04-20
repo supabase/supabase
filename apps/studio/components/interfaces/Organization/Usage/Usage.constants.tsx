@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns'
 
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
@@ -60,7 +61,7 @@ export interface CategoryAttribute {
   chartPrefix?: 'Max' | 'Average' | 'Cumulative'
   chartSuffix?: string
   chartDescription: string
-  additionalInfo?: (usage?: OrgUsageResponse) => JSX.Element | null
+  additionalInfo?: (usage?: OrgUsageResponse) => ReactNode | null
 }
 
 export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute' | 'logs'

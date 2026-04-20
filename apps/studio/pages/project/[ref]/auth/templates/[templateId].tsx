@@ -127,9 +127,9 @@ const RedirectToTemplates = () => {
     defaultValues,
   })
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: z.infer<typeof TemplateFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    updateAuthConfig({ projectRef: projectRef, config: { ...values } })
+    updateAuthConfig({ projectRef: projectRef, config: { ...values }, skipInvalidation: true })
   }
 
   useEffect(() => {

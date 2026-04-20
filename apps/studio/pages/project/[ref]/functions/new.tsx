@@ -78,7 +78,7 @@ const NOUNS = [
 // Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
 const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
 
-// Define form schema with yup
+// Define form schema with zod
 const FormSchema = z.object({
   functionName: z
     .string()

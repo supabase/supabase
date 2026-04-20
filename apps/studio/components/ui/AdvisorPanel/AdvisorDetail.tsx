@@ -1,10 +1,11 @@
 import { noop } from 'lodash'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
+import { AdvisorSignalDetail } from './AdvisorSignalDetail'
 import { NotificationDetail } from './NotificationDetail'
 import LintDetail from '@/components/interfaces/Linter/LintDetail'
-import { Lint } from '@/data/lint/lint-query'
-import { Notification } from '@/data/notifications/notifications-v2-query'
+import type { Lint } from '@/data/lint/lint-query'
+import type { Notification } from '@/data/notifications/notifications-v2-query'
 
 interface AdvisorDetailProps {
   item: AdvisorItem
@@ -22,6 +23,14 @@ export const AdvisorDetail = ({
     return (
       <div className="px-6 py-6">
         <LintDetail lint={lint} projectRef={projectRef} />
+      </div>
+    )
+  }
+
+  if (item.source === 'signal') {
+    return (
+      <div className="px-6 py-6">
+        <AdvisorSignalDetail item={item} />
       </div>
     )
   }

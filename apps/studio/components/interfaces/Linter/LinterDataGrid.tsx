@@ -71,7 +71,11 @@ const LinterDataGrid = ({
       name: 'Description',
       description: undefined,
       minWidth: 400,
-      value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
+      value: (row: any) => (
+        <div className="text-xs">
+          <ReactMarkdown>{row.description}</ReactMarkdown>
+        </div>
+      ),
     },
   ]
 

@@ -159,6 +159,7 @@ may_uppercase = [
     "OrbStack",
     "OrioleDB",
     "PGAudit",
+    "pgvector",
 	"Pandas",
     "PgBouncer",
     "Phoenix",
