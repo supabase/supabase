@@ -198,7 +198,7 @@ export const BucketFilePickerHeader = () => {
         <div className="flex min-h-[40px] w-max min-w-full items-center justify-between">
           {/* Navigation */}
           <div className="flex min-w-0 flex-1 items-center overflow-hidden pl-2 py-[7px]">
-            {breadcrumbs.length > 1 && (
+            {breadcrumbs.length > 0 && (
               <>
                 <Button
                   icon={<ArrowLeft size={16} strokeWidth={2} />}
@@ -213,7 +213,7 @@ export const BucketFilePickerHeader = () => {
                 <div className="mx-1 h-5 shrink-0 border-r border-strong" />
               </>
             )}
-            {breadcrumbs.length > 1 ? (
+            {breadcrumbs.length > 0 ? (
               <HeaderBreadcrumbs breadcrumbs={breadcrumbs} selectBreadcrumb={selectBreadcrumb} />
             ) : null}
           </div>
