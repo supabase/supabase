@@ -238,7 +238,8 @@
                   "description": "The timeout for the request in milliseconds.\nIf the function takes longer than this, the request will be aborted.",
                   "type": "number"
                 }
-              ]
+              ],
+              "name": "FunctionInvokeOptions"
             }
           }
         ],
@@ -254,7 +255,7 @@
                   "name": "FunctionsResponseSuccess",
                   "typeArguments": [
                     {
-                      "kind": "reference",
+                      "kind": "typeParam",
                       "name": "T"
                     }
                   ]
@@ -594,7 +595,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -657,7 +659,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -1073,7 +1076,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -1136,7 +1140,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -1433,7 +1438,8 @@
                         "value": "signup"
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateSignupLinkParams"
                 },
                 {
                   "kind": "object",
@@ -1502,7 +1508,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateInviteOrMagiclinkParams"
                 },
                 {
                   "kind": "object",
@@ -1553,7 +1560,8 @@
                         "value": "recovery"
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateRecoveryLinkParams"
                 },
                 {
                   "kind": "object",
@@ -1619,7 +1627,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateEmailChangeLinkParams"
                 }
               ]
             }
@@ -1705,7 +1714,8 @@
                                     ]
                                   }
                                 }
-                              ]
+                              ],
+                              "name": "GenerateLinkProperties"
                             }
                           },
                           {
@@ -1859,7 +1869,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -1922,7 +1933,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -2341,7 +2353,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -2404,7 +2417,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -2828,7 +2842,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -2891,7 +2906,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -3140,7 +3156,8 @@
                   "description": "Number of items returned per page",
                   "type": "number"
                 }
-              ]
+              ],
+              "name": "PageParams"
             }
           }
         ],
@@ -3321,7 +3338,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -3384,7 +3402,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -3548,7 +3567,8 @@
                                 "optional": false,
                                 "type": "number"
                               }
-                            ]
+                            ],
+                            "name": "Pagination"
                           }
                         ]
                       }
@@ -4032,7 +4052,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -4095,7 +4116,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -4596,7 +4618,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -4659,7 +4682,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -4947,7 +4971,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -5010,7 +5035,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -5620,7 +5646,8 @@
                                   "optional": false,
                                   "type": "string"
                                 }
-                              ]
+                              ],
+                              "name": "JwtHeader"
                             }
                           },
                           {
@@ -5986,7 +6013,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -6049,7 +6077,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -6496,7 +6525,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -6559,7 +6589,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -7027,7 +7058,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "InitializeResult"
             }
           ]
         }
@@ -7185,7 +7217,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignInWithOAuthCredentials"
             }
           }
         ],
@@ -7872,7 +7905,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -7935,7 +7969,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -8232,7 +8267,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -8295,7 +8331,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -8786,7 +8823,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -8849,7 +8887,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -9146,7 +9185,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -9209,7 +9249,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -10157,7 +10198,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -10220,7 +10262,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -10517,7 +10560,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -10580,7 +10624,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -10843,7 +10888,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignInAnonymouslyCredentials"
             }
           }
         ],
@@ -11087,7 +11133,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -11150,7 +11197,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -11447,7 +11495,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -11510,7 +11559,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -11831,7 +11881,8 @@
                   "description": "OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "SignInWithIdTokenCredentials"
             }
           }
         ],
@@ -12072,7 +12123,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -12135,7 +12187,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -12423,7 +12476,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -12486,7 +12540,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -12862,7 +12917,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignInWithOAuthCredentials"
             }
           }
         ],
@@ -13740,7 +13796,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -13803,7 +13860,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -14091,7 +14149,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -14154,7 +14213,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -14313,7 +14373,8 @@
                                     }
                                   }
                                 }
-                              ]
+                              ],
+                              "name": "WeakPassword"
                             }
                           }
                         ]
@@ -14718,7 +14779,8 @@
                                   "properties": []
                                 }
                               }
-                            ]
+                            ],
+                            "name": "SolanaWallet"
                           }
                         }
                       ]
@@ -15147,7 +15209,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -15210,7 +15273,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -15498,7 +15562,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -15561,7 +15626,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -15847,7 +15913,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignOut"
             }
           }
         ],
@@ -16192,7 +16259,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -16255,7 +16323,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -16552,7 +16621,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -16615,7 +16685,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -17301,7 +17372,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -17364,7 +17436,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -18037,7 +18110,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -18100,7 +18174,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -18397,7 +18472,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -18460,7 +18536,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -18745,7 +18822,8 @@
                             "description": "Complete redirect URL with authorization code and state parameters (e.g., \"https://app.com/callback?code=xxx&state=yyy\")",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthRedirect"
                       }
                     },
                     {
@@ -18831,7 +18909,8 @@
                             "description": "Complete redirect URL with authorization code and state parameters (e.g., \"https://app.com/callback?code=xxx&state=yyy\")",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthRedirect"
                       }
                     },
                     {
@@ -18935,7 +19014,8 @@
                                       "description": "URI of the OAuth client's website",
                                       "type": "string"
                                     }
-                                  ]
+                                  ],
+                                  "name": "OAuthAuthorizationClient"
                                 }
                               },
                               {
@@ -18972,7 +19052,8 @@
                                   ]
                                 }
                               }
-                            ]
+                            ],
+                            "name": "OAuthAuthorizationDetails"
                           },
                           {
                             "kind": "object",
@@ -18983,7 +19064,8 @@
                                 "description": "Complete redirect URL with authorization code and state parameters (e.g., \"https://app.com/callback?code=xxx&state=yyy\")",
                                 "type": "string"
                               }
-                            ]
+                            ],
+                            "name": "OAuthRedirect"
                           }
                         ]
                       }
@@ -19076,7 +19158,8 @@
                                     "description": "URI of the OAuth client's website",
                                     "type": "string"
                                   }
-                                ]
+                                ],
+                                "name": "OAuthAuthorizationClient"
                               }
                             },
                             {
@@ -19094,7 +19177,8 @@
                                 "elementType": "string"
                               }
                             }
-                          ]
+                          ],
+                          "name": "OAuthGrant"
                         }
                       }
                     },
@@ -19227,7 +19311,8 @@
                   "description": "ID of the user whose factor is being deleted.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "AuthMFAAdminDeleteFactorParams"
             }
           }
         ],
@@ -19313,7 +19398,8 @@
                   "description": "ID of the user.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "AuthMFAAdminListFactorsParams"
             }
           }
         ],
@@ -19352,7 +19438,7 @@
                                     "optional": false,
                                     "description": "Type of factor. `totp` and `phone` supported with this version",
                                     "type": {
-                                      "kind": "reference",
+                                      "kind": "typeParam",
                                       "name": "Type"
                                     }
                                   },
@@ -19378,7 +19464,7 @@
                                     "optional": false,
                                     "description": "The verification status of the factor, default is `unverified` after `.enroll()`, then `verified` after the user verifies it with `.verify()`",
                                     "type": {
-                                      "kind": "reference",
+                                      "kind": "typeParam",
                                       "name": "Status"
                                     }
                                   },
@@ -19387,7 +19473,8 @@
                                     "optional": false,
                                     "type": "string"
                                   }
-                                ]
+                                ],
+                                "name": "Factor"
                               }
                             }
                           }
@@ -19527,7 +19614,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "CreateOAuthClientParams"
             }
           }
         ],
@@ -19695,7 +19783,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -19996,7 +20085,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -20056,7 +20146,8 @@
                   "description": "Number of items returned per page",
                   "type": "number"
                 }
-              ]
+              ],
+              "name": "PageParams"
             }
           }
         ],
@@ -20240,7 +20331,8 @@
                                         "description": "Timestamp when the client was last updated",
                                         "type": "string"
                                       }
-                                    ]
+                                    ],
+                                    "name": "OAuthClient"
                                   }
                                 }
                               }
@@ -20273,7 +20365,8 @@
                                 "optional": false,
                                 "type": "number"
                               }
-                            ]
+                            ],
+                            "name": "Pagination"
                           }
                         ]
                       }
@@ -20540,7 +20633,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -20661,7 +20755,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "UpdateOAuthClientParams"
             }
           }
         ],
@@ -20829,7 +20924,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -21249,7 +21345,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -21312,7 +21409,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -21446,7 +21544,8 @@
                               ]
                             }
                           }
-                        ]
+                        ],
+                        "name": "AuthMFAVerifyResponseData"
                       }
                     },
                     {
@@ -21873,7 +21972,8 @@
                   "description": "ID of the factor being unenrolled.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "MFAUnenrollParams"
             }
           }
         ],
@@ -22173,7 +22273,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -22236,7 +22337,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -22370,7 +22472,8 @@
                               ]
                             }
                           }
-                        ]
+                        ],
+                        "name": "AuthMFAVerifyResponseData"
                       }
                     },
                     {
@@ -22677,7 +22780,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -22740,7 +22844,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -23162,7 +23267,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -23225,7 +23331,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -23527,7 +23634,8 @@
                         "value": "signup"
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateSignupLinkParams"
                 },
                 {
                   "kind": "object",
@@ -23596,7 +23704,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateInviteOrMagiclinkParams"
                 },
                 {
                   "kind": "object",
@@ -23647,7 +23756,8 @@
                         "value": "recovery"
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateRecoveryLinkParams"
                 },
                 {
                   "kind": "object",
@@ -23713,7 +23823,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "GenerateEmailChangeLinkParams"
                 }
               ]
             }
@@ -23799,7 +23910,8 @@
                                     ]
                                   }
                                 }
-                              ]
+                              ],
+                              "name": "GenerateLinkProperties"
                             }
                           },
                           {
@@ -23953,7 +24065,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -24016,7 +24129,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -24440,7 +24554,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -24503,7 +24618,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -24933,7 +25049,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -24996,7 +25113,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -25250,7 +25368,8 @@
                   "description": "Number of items returned per page",
                   "type": "number"
                 }
-              ]
+              ],
+              "name": "PageParams"
             }
           }
         ],
@@ -25431,7 +25550,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -25494,7 +25614,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -25658,7 +25779,8 @@
                                 "optional": false,
                                 "type": "number"
                               }
-                            ]
+                            ],
+                            "name": "Pagination"
                           }
                         ]
                       }
@@ -26153,7 +26275,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -26216,7 +26339,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -26722,7 +26846,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -26785,7 +26910,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -27073,7 +27199,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -27136,7 +27263,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -27752,7 +27880,8 @@
                                   "optional": false,
                                   "type": "string"
                                 }
-                              ]
+                              ],
+                              "name": "JwtHeader"
                             }
                           },
                           {
@@ -28123,7 +28252,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -28186,7 +28316,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -28638,7 +28769,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -28701,7 +28833,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -29184,7 +29317,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "InitializeResult"
             }
           ]
         }
@@ -29436,7 +29570,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -29499,7 +29634,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -29796,7 +29932,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -29859,7 +29996,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -30355,7 +30493,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -30418,7 +30557,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -30715,7 +30855,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -30778,7 +30919,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -31742,7 +31884,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -31805,7 +31948,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -32102,7 +32246,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -32165,7 +32310,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -32433,7 +32579,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignInAnonymouslyCredentials"
             }
           }
         ],
@@ -32677,7 +32824,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -32740,7 +32888,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -33037,7 +33186,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -33100,7 +33250,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -33426,7 +33577,8 @@
                   "description": "OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "SignInWithIdTokenCredentials"
             }
           }
         ],
@@ -33667,7 +33819,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -33730,7 +33883,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -34018,7 +34172,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -34081,7 +34236,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -34462,7 +34618,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignInWithOAuthCredentials"
             }
           }
         ],
@@ -35350,7 +35507,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -35413,7 +35571,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -35701,7 +35860,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -35764,7 +35924,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -35923,7 +36084,8 @@
                                     }
                                   }
                                 }
-                              ]
+                              ],
+                              "name": "WeakPassword"
                             }
                           }
                         ]
@@ -36333,7 +36495,8 @@
                                   "properties": []
                                 }
                               }
-                            ]
+                            ],
+                            "name": "SolanaWallet"
                           }
                         }
                       ]
@@ -36762,7 +36925,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               },
                                               {
                                                 "kind": "object",
@@ -36825,7 +36989,8 @@
                                                     "optional": false,
                                                     "type": "string"
                                                   }
-                                                ]
+                                                ],
+                                                "name": "Factor"
                                               }
                                             ]
                                           }
@@ -37113,7 +37278,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -37176,7 +37342,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -37468,7 +37635,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "SignOut"
             }
           }
         ],
@@ -37818,7 +37986,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -37881,7 +38050,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -38178,7 +38348,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -38241,7 +38412,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -38938,7 +39110,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -39001,7 +39174,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -39679,7 +39853,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   },
                                                   {
                                                     "kind": "object",
@@ -39742,7 +39917,8 @@
                                                         "optional": false,
                                                         "type": "string"
                                                       }
-                                                    ]
+                                                    ],
+                                                    "name": "Factor"
                                                   }
                                                 ]
                                               }
@@ -40039,7 +40215,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             },
                                             {
                                               "kind": "object",
@@ -40102,7 +40279,8 @@
                                                   "optional": false,
                                                   "type": "string"
                                                 }
-                                              ]
+                                              ],
+                                              "name": "Factor"
                                             }
                                           ]
                                         }
@@ -40392,7 +40570,8 @@
                             "description": "Complete redirect URL with authorization code and state parameters (e.g., \"https://app.com/callback?code=xxx&state=yyy\")",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthRedirect"
                       }
                     },
                     {
@@ -40478,7 +40657,8 @@
                             "description": "Complete redirect URL with authorization code and state parameters (e.g., \"https://app.com/callback?code=xxx&state=yyy\")",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthRedirect"
                       }
                     },
                     {
@@ -40582,7 +40762,8 @@
                                       "description": "URI of the OAuth client's website",
                                       "type": "string"
                                     }
-                                  ]
+                                  ],
+                                  "name": "OAuthAuthorizationClient"
                                 }
                               },
                               {
@@ -40619,7 +40800,8 @@
                                   ]
                                 }
                               }
-                            ]
+                            ],
+                            "name": "OAuthAuthorizationDetails"
                           },
                           {
                             "kind": "object",
@@ -40630,7 +40812,8 @@
                                 "description": "Complete redirect URL with authorization code and state parameters (e.g., \"https://app.com/callback?code=xxx&state=yyy\")",
                                 "type": "string"
                               }
-                            ]
+                            ],
+                            "name": "OAuthRedirect"
                           }
                         ]
                       }
@@ -40723,7 +40906,8 @@
                                     "description": "URI of the OAuth client's website",
                                     "type": "string"
                                   }
-                                ]
+                                ],
+                                "name": "OAuthAuthorizationClient"
                               }
                             },
                             {
@@ -40741,7 +40925,8 @@
                                 "elementType": "string"
                               }
                             }
-                          ]
+                          ],
+                          "name": "OAuthGrant"
                         }
                       }
                     },
@@ -40874,7 +41059,8 @@
                   "description": "ID of the user whose factor is being deleted.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "AuthMFAAdminDeleteFactorParams"
             }
           }
         ],
@@ -40960,7 +41146,8 @@
                   "description": "ID of the user.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "AuthMFAAdminListFactorsParams"
             }
           }
         ],
@@ -40999,7 +41186,7 @@
                                     "optional": false,
                                     "description": "Type of factor. `totp` and `phone` supported with this version",
                                     "type": {
-                                      "kind": "reference",
+                                      "kind": "typeParam",
                                       "name": "Type"
                                     }
                                   },
@@ -41025,7 +41212,7 @@
                                     "optional": false,
                                     "description": "The verification status of the factor, default is `unverified` after `.enroll()`, then `verified` after the user verifies it with `.verify()`",
                                     "type": {
-                                      "kind": "reference",
+                                      "kind": "typeParam",
                                       "name": "Status"
                                     }
                                   },
@@ -41034,7 +41221,8 @@
                                     "optional": false,
                                     "type": "string"
                                   }
-                                ]
+                                ],
+                                "name": "Factor"
                               }
                             }
                           }
@@ -41174,7 +41362,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "CreateOAuthClientParams"
             }
           }
         ],
@@ -41342,7 +41531,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -41648,7 +41838,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -41708,7 +41899,8 @@
                   "description": "Number of items returned per page",
                   "type": "number"
                 }
-              ]
+              ],
+              "name": "PageParams"
             }
           }
         ],
@@ -41892,7 +42084,8 @@
                                         "description": "Timestamp when the client was last updated",
                                         "type": "string"
                                       }
-                                    ]
+                                    ],
+                                    "name": "OAuthClient"
                                   }
                                 }
                               }
@@ -41925,7 +42118,8 @@
                                 "optional": false,
                                 "type": "number"
                               }
-                            ]
+                            ],
+                            "name": "Pagination"
                           }
                         ]
                       }
@@ -42197,7 +42391,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -42318,7 +42513,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "UpdateOAuthClientParams"
             }
           }
         ],
@@ -42486,7 +42682,8 @@
                             "description": "Timestamp when the client was last updated",
                             "type": "string"
                           }
-                        ]
+                        ],
+                        "name": "OAuthClient"
                       }
                     },
                     {
@@ -42911,7 +43108,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -42974,7 +43172,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -43108,7 +43307,8 @@
                               ]
                             }
                           }
-                        ]
+                        ],
+                        "name": "AuthMFAVerifyResponseData"
                       }
                     },
                     {
@@ -43535,7 +43735,8 @@
                   "description": "ID of the factor being unenrolled.",
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "MFAUnenrollParams"
             }
           }
         ],
@@ -43835,7 +44036,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         },
                                         {
                                           "kind": "object",
@@ -43898,7 +44100,8 @@
                                               "optional": false,
                                               "type": "string"
                                             }
-                                          ]
+                                          ],
+                                          "name": "Factor"
                                         }
                                       ]
                                     }
@@ -44032,7 +44235,8 @@
                               ]
                             }
                           }
-                        ]
+                        ],
+                        "name": "AuthMFAVerifyResponseData"
                       }
                     },
                     {
@@ -44661,11 +44865,11 @@
               "kind": "union",
               "types": [
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "TResult1"
                 },
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "TResult2"
                 }
               ]
@@ -44968,7 +45172,7 @@
                   "optional": true,
                   "description": "Postgres schema to switch to",
                   "type": {
-                    "kind": "reference",
+                    "kind": "typeParam",
                     "name": "SchemaName"
                   }
                 },
@@ -45017,7 +45221,7 @@
               "name": "schemaName",
               "optional": true,
               "type": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "SchemaName"
               }
             },
@@ -45071,7 +45275,7 @@
           {
             "name": "relation",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "TableName"
             }
           }
@@ -45165,7 +45369,7 @@
             "name": "fn",
             "description": "The function name to call",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "FnName"
             }
           },
@@ -45173,7 +45377,7 @@
             "name": "args",
             "description": "The arguments to pass to the function call",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Args"
             }
           },
@@ -45633,7 +45837,7 @@
             "name": "schema",
             "description": "The schema to query",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "DynamicSchema"
             }
           }
@@ -45667,7 +45871,7 @@
               "name": "schemaName",
               "optional": true,
               "type": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "SchemaName"
               }
             },
@@ -46211,7 +46415,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -46266,7 +46470,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -46816,7 +47020,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47087,7 +47291,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47096,7 +47300,7 @@
             "type": {
               "kind": "indexedAccess",
               "objectType": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "Row"
               },
               "indexType": null
@@ -47121,7 +47325,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47130,7 +47334,7 @@
             "type": {
               "kind": "indexedAccess",
               "objectType": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "Row"
               },
               "indexType": null
@@ -47154,7 +47358,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47180,7 +47384,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47200,7 +47404,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47221,7 +47425,7 @@
             "name": "column",
             "description": "The column to filter on",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47250,7 +47454,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47262,7 +47466,7 @@
                 {
                   "kind": "indexedAccess",
                   "objectType": {
-                    "kind": "reference",
+                    "kind": "typeParam",
                     "name": "Row"
                   },
                   "indexType": null
@@ -47299,7 +47503,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47325,7 +47529,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47345,7 +47549,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47412,7 +47616,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47421,7 +47625,7 @@
             "type": {
               "kind": "indexedAccess",
               "objectType": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "Row"
               },
               "indexType": null
@@ -47445,7 +47649,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47454,7 +47658,7 @@
             "type": {
               "kind": "indexedAccess",
               "objectType": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "Row"
               },
               "indexType": null
@@ -47482,13 +47686,13 @@
               "name": "Record",
               "typeArguments": [
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "ColumnName"
                 },
                 {
                   "kind": "indexedAccess",
                   "objectType": {
-                    "kind": "reference",
+                    "kind": "typeParam",
                     "name": "Row"
                   },
                   "indexType": null
@@ -47695,7 +47899,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47711,7 +47915,7 @@
             "type": {
               "kind": "indexedAccess",
               "objectType": {
-                "kind": "reference",
+                "kind": "typeParam",
                 "name": "Row"
               },
               "indexType": null
@@ -47791,7 +47995,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -47852,7 +48056,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -48097,7 +48301,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -48124,7 +48328,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -48151,7 +48355,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -48178,7 +48382,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -48205,7 +48409,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -48443,7 +48647,7 @@
             "optional": true,
             "description": "The columns to retrieve, separated by commas",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Query"
             }
           }
@@ -48980,7 +49184,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -49097,11 +49301,11 @@
               "kind": "union",
               "types": [
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "TResult1"
                 },
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "TResult2"
                 }
               ]
@@ -50167,7 +50371,7 @@
           {
             "name": "values",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Row"
             }
           },
@@ -50599,7 +50803,7 @@
             "optional": true,
             "description": "The columns to retrieve, separated by commas. Columns can be renamed when returned with `customName:columnName`",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Query"
             }
           },
@@ -51097,7 +51301,7 @@
             "name": "values",
             "description": "The values to update with",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Row"
             }
           },
@@ -51528,7 +51732,7 @@
           {
             "name": "values",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Row"
             }
           },
@@ -53088,7 +53292,7 @@
           {
             "name": "column",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "ColumnName"
             }
           },
@@ -53564,7 +53768,7 @@
             "optional": true,
             "description": "The columns to retrieve, separated by commas",
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Query"
             }
           }
@@ -54138,11 +54342,11 @@
               "kind": "union",
               "types": [
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "TResult1"
                 },
                 {
-                  "kind": "reference",
+                  "kind": "typeParam",
                   "name": "TResult2"
                 }
               ]
@@ -54547,7 +54751,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "RealtimeChannelOptions"
             }
           },
           {
@@ -54712,7 +54917,8 @@
                                   ]
                                 }
                               }
-                            ]
+                            ],
+                            "name": "RealtimeChannelOptions"
                           }
                         },
                         {
@@ -55176,7 +55382,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -55819,7 +56026,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -56297,7 +56505,8 @@
         "parameters": [],
         "returnType": {
           "kind": "object",
-          "properties": []
+          "properties": [],
+          "name": "RealtimePresenceState"
         }
       },
       {
@@ -56512,7 +56721,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -57218,7 +57428,8 @@
                   "optional": true,
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "RealtimeClientOptions"
             }
           }
         ],
@@ -57382,7 +57593,8 @@
                               ]
                             }
                           }
-                        ]
+                        ],
+                        "name": "RealtimeChannelOptions"
                       }
                     },
                     {
@@ -57826,7 +58038,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "RealtimeChannelOptions"
             }
           }
         ],
@@ -57931,7 +58144,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -58517,7 +58731,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "RealtimeChannelOptions"
                 }
               },
               {
@@ -59025,7 +59240,8 @@
                   "optional": false,
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "RealtimeMessage"
             }
           }
         ],
@@ -59170,7 +59386,8 @@
                           ]
                         }
                       }
-                    ]
+                    ],
+                    "name": "RealtimeChannelOptions"
                   }
                 },
                 {
@@ -59769,7 +59986,8 @@
                           ]
                         }
                       }
-                    ]
+                    ],
+                    "name": "RealtimeChannelOptions"
                   }
                 },
                 {
@@ -60314,7 +60532,8 @@
                             ]
                           }
                         }
-                      ]
+                      ],
+                      "name": "RealtimeChannelOptions"
                     }
                   },
                   {
@@ -60836,7 +61055,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "RealtimeChannelOptions"
                 }
               ]
             }
@@ -61003,7 +61223,8 @@
                                   ]
                                 }
                               }
-                            ]
+                            ],
+                            "name": "RealtimeChannelOptions"
                           }
                         },
                         {
@@ -61465,7 +61686,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -61974,7 +62196,8 @@
         "parameters": [],
         "returnType": {
           "kind": "object",
-          "properties": []
+          "properties": [],
+          "name": "RealtimePresenceState"
         }
       },
       {
@@ -62191,7 +62414,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -62898,7 +63122,8 @@
                   "optional": true,
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "RealtimeClientOptions"
             }
           }
         ],
@@ -63062,7 +63287,8 @@
                               ]
                             }
                           }
-                        ]
+                        ],
+                        "name": "RealtimeChannelOptions"
                       }
                     },
                     {
@@ -63505,7 +63731,8 @@
                     ]
                   }
                 }
-              ]
+              ],
+              "name": "RealtimeChannelOptions"
             }
           }
         ],
@@ -63610,7 +63837,8 @@
                       ]
                     }
                   }
-                ]
+                ],
+                "name": "RealtimeChannelOptions"
               }
             },
             {
@@ -64194,7 +64422,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "RealtimeChannelOptions"
                 }
               },
               {
@@ -64700,7 +64929,8 @@
                   "optional": false,
                   "type": "string"
                 }
-              ]
+              ],
+              "name": "RealtimeMessage"
             }
           }
         ],
@@ -64845,7 +65075,8 @@
                           ]
                         }
                       }
-                    ]
+                    ],
+                    "name": "RealtimeChannelOptions"
                   }
                 },
                 {
@@ -65443,7 +65674,8 @@
                           ]
                         }
                       }
-                    ]
+                    ],
+                    "name": "RealtimeChannelOptions"
                   }
                 },
                 {
@@ -65985,7 +66217,8 @@
                             ]
                           }
                         }
-                      ]
+                      ],
+                      "name": "RealtimeChannelOptions"
                     }
                   },
                   {
@@ -69328,7 +69561,7 @@
             "name": "options",
             "optional": true,
             "type": {
-              "kind": "reference",
+              "kind": "typeParam",
               "name": "Options"
             }
           },
@@ -72324,7 +72557,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -72429,7 +72662,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -72597,7 +72830,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -72725,7 +72958,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -72989,7 +73222,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -73094,7 +73327,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -73199,7 +73432,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -73406,7 +73639,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -73641,7 +73874,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -73803,7 +74036,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -73980,7 +74213,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -74174,7 +74407,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -74366,7 +74599,7 @@
                       "optional": false,
                       "description": "Response data of type T",
                       "type": {
-                        "kind": "reference",
+                        "kind": "typeParam",
                         "name": "T"
                       }
                     },
@@ -74610,7 +74843,7 @@
                         "name": "schema",
                         "optional": true,
                         "type": {
-                          "kind": "reference",
+                          "kind": "typeParam",
                           "name": "SchemaName"
                         }
                       },
@@ -74801,7 +75034,8 @@
                         "optional": true,
                         "type": "string"
                       }
-                    ]
+                    ],
+                    "name": "RealtimeClientOptions"
                   }
                 },
                 {
@@ -74812,7 +75046,8 @@
                     "name": "StorageClientOptions"
                   }
                 }
-              ]
+              ],
+              "name": "SupabaseClientOptions"
             }
           }
         ],
@@ -75046,7 +75281,8 @@
                                     ]
                                   }
                                 }
-                              ]
+                              ],
+                              "name": "RealtimeChannelOptions"
                             }
                           },
                           {
@@ -75422,15 +75658,15 @@
                 "name": "PostgrestClient",
                 "typeArguments": [
                   {
-                    "kind": "reference",
+                    "kind": "typeParam",
                     "name": "Database"
                   },
                   {
-                    "kind": "reference",
+                    "kind": "typeParam",
                     "name": "ClientOptions"
                   },
                   {
-                    "kind": "reference",
+                    "kind": "typeParam",
                     "name": "SchemaName"
                   }
                 ]
@@ -75662,7 +75898,8 @@
                         ]
                       }
                     }
-                  ]
+                  ],
+                  "name": "RealtimeChannelOptions"
                 }
               },
               {
@@ -76239,7 +76476,8 @@
                           ]
                         }
                       }
-                    ]
+                    ],
+                    "name": "RealtimeChannelOptions"
                   }
                 },
                 {

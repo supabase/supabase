@@ -15,12 +15,13 @@ interface ProcessedProperty {
 type ProcessedType =
   | string
   | { kind: 'reference'; name: string; typeArguments?: ProcessedType[] }
-  | { kind: 'object'; properties: ProcessedProperty[] }
+  | { kind: 'object'; name?: string; properties: ProcessedProperty[] }
   | { kind: 'array'; elementType: ProcessedType }
   | { kind: 'union'; types: ProcessedType[] }
   | { kind: 'intersection'; types: ProcessedType[] }
   | { kind: 'literal'; value: string | number | boolean | null }
   | { kind: 'conditional' }
+  | { kind: 'typeParam'; name: string }
 
 interface ProcessedParam {
   name: string
@@ -38,10 +39,15 @@ function typeNameStr(pt: ProcessedType): string {
   switch (pt.kind) {
     case 'reference': {
       if (!pt.typeArguments?.length) return pt.name
-      return `${pt.name}<${pt.typeArguments.map(typeNameStr).join(', ')}>`
+      // Omit type arguments that are all unresolved generic placeholders
+      const resolvedArgs = pt.typeArguments.filter(
+        (a) => typeof a === 'string' || a.kind !== 'typeParam'
+      )
+      if (!resolvedArgs.length) return pt.name
+      return `${pt.name}<${resolvedArgs.map(typeNameStr).join(', ')}>`
     }
     case 'object':
-      return 'object'
+      return pt.name ?? 'object'
     case 'array':
       return `${typeNameStr(pt.elementType)}[]`
     case 'union':
@@ -52,6 +58,8 @@ function typeNameStr(pt: ProcessedType): string {
       return pt.value === null ? 'null' : String(pt.value)
     case 'conditional':
       return 'conditional'
+    case 'typeParam':
+      return pt.name
   }
 }
 
@@ -80,7 +88,7 @@ function adaptType(pt: ProcessedType | null | undefined): TypeDetails {
       return { type: 'intrinsic', name: typeNameStr(pt) }
     }
     case 'object':
-      return { type: 'object', properties: (pt.properties ?? []).map(adaptProperty) }
+      return { type: 'object', ...(pt.name ? { name: pt.name } : {}), properties: (pt.properties ?? []).map(adaptProperty) }
     case 'array':
       return { type: 'array', elemType: adaptType(pt.elementType) }
     case 'union':
@@ -93,6 +101,8 @@ function adaptType(pt: ProcessedType | null | undefined): TypeDetails {
       return { type: 'literal', value: pt.value } as unknown as TypeDetails
     case 'conditional':
       return { type: 'intrinsic', name: 'conditional' }
+    case 'typeParam':
+      return { type: 'intrinsic', name: pt.name }
   }
 }
 
@@ -108,7 +118,7 @@ export function RefDefinitionParams({ parameters }: { parameters: ProcessedParam
   if (!parameters?.length) return null
   const adapted = parameters.map((p) => ({
     ...p,
-    isOptional: p.optional ?? false,
+    ...(p.optional === true ? { isOptional: true } : {}),
     type: adaptType(p.type),
   }))
   return <FnParameterDetails parameters={adapted} className="max-w-[80ch]" />

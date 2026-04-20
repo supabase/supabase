@@ -45,8 +45,12 @@ function serializeType(
     case "tuple": return { kind: "tuple", elements: (t.elements ?? []).map(st) };
     case "reference": {
       // Substitute generic type parameters with their concrete arguments
-      if (t.refersToTypeParameter && typeof t.target === "number" && typeParamMap.has(t.target)) {
-        return serializeType(typeParamMap.get(t.target), targetMap, seen, typeParamMap);
+      if (t.refersToTypeParameter) {
+        if (typeof t.target === "number" && typeParamMap.has(t.target)) {
+          return serializeType(typeParamMap.get(t.target), targetMap, seen, typeParamMap);
+        }
+        // Unresolved type parameter (e.g. invoke<T> — T is unknown at doc time)
+        return { kind: "typeParam", name: t.name };
       }
       const targetId: number | undefined = t.target ?? t.id;
       if (targetId && !seen.has(targetId)) {
@@ -79,7 +83,12 @@ function serializeType(
                 childMap.set(node.typeParameters[i].id, t.typeArguments[i]);
               }
             }
-            return serializeType(node.type, targetMap, nextSeen, childMap);
+            const result = serializeType(node.type, targetMap, nextSeen, childMap);
+            // Preserve the alias name on inlined objects so the display can use it
+            if (result && typeof result === "object" && result.kind === "object" && !result.name) {
+              result.name = node.name;
+            }
+            return result;
           }
         }
       }
