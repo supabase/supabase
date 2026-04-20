@@ -16,7 +16,7 @@ import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integratio
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
+import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, PROVIDERS } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
@@ -63,7 +63,10 @@ const CreateProject = () => {
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
   const snapshot = useIntegrationInstallationSnapshot()
-  const isDataApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+  const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
+    !isDataApiRevokeOnCreateDefault
+  )
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
@@ -145,7 +148,7 @@ const CreateProject = () => {
       if (migrationSql) dbSqlParts.push(migrationSql)
       toast.success(`Done fetching initial migrations`, { id })
     }
-    if (isDataApiGrantTogglesEnabled) {
+    if (!dataApiDefaultPrivileges) {
       dbSqlParts.push(buildDefaultPrivilegesSql('revoke'))
     }
 
@@ -285,6 +288,15 @@ const CreateProject = () => {
           description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
           checked={shouldRunMigrations}
           onChange={(e) => setShouldRunMigrations(e.target.checked)}
+        />
+      </div>
+      <div className="py-2 pb-4">
+        <Checkbox
+          name="dataApiDefaultPrivileges"
+          label="Default privileges for new entities"
+          description="When enabled, new tables and functions in the public schema are automatically accessible via the Data API. We recommend disabling this and manually granting access to each new entity."
+          checked={dataApiDefaultPrivileges}
+          onChange={(e) => setDataApiDefaultPrivileges(e.target.checked)}
         />
       </div>
       <div className="flex flex-row w-full justify-end">

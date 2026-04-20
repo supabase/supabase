@@ -323,13 +323,28 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     useOrioleDb?: boolean
     /**
-     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user,
-     * meaning the project was created with default public schema grants revoked.
-     * true = user is in the staged rollout cohort (revoke SQL ran at creation)
-     * false = user is outside the rollout (default grants left intact)
+     * Whether the tableEditorApiAccessToggle PostHog flag was enabled for this user.
+     * Gates the integrations → Data API settings surface only; no longer controls
+     * project-creation revoke behaviour (see dataApiRevokeOnCreateDefaultEnabled).
+     * true/false = flag state when project was created
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     tableEditorApiAccessToggleEnabled?: boolean
+    /**
+     * Raw checkbox state for "Default privileges for new entities" at submission.
+     * true = default privileges are granted on new entities (current behaviour)
+     * false = revoke SQL ran; user must manually grant access per entity
+     */
+    dataApiDefaultPrivilegesGranted?: boolean
+    /**
+     * Whether the dataApiRevokeOnCreateDefault PostHog flag was enabled for this user.
+     * Controls only the default checkbox state of "Default privileges for new entities"
+     * at project creation. Tracking it lets us correlate flag cohort with user choice.
+     * true = user is in the staged rollout cohort (checkbox defaulted to unchecked)
+     * false = user is outside the rollout (checkbox defaulted to checked)
+     * omitted = PostHog flags had not loaded at the time of project creation
+     */
+    dataApiRevokeOnCreateDefaultEnabled?: boolean
   }
   groups: TelemetryGroups
 }
