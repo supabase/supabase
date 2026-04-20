@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 
+import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 
 // Pagination and control parameters
@@ -418,21 +419,29 @@ const getSupabaseStorageLogsQuery = () => {
   `
 }
 
+const LOG_TYPE_QUERIES: Record<string, () => string> = {
+  postgrest: getPostgrestLogsQuery,
+  postgres: getPostgresLogsQuery,
+  'edge function': getEdgeFunctionLogsQuery,
+  auth: getAuthLogsQuery,
+  storage: getSupabaseStorageLogsQuery,
+}
+
 /**
- * Combine all log sources to create the unified logs CTE
+ * Combine the requested log sources to create the unified logs CTE.
+ * Defaults to postgres + postgrest on first load to reduce query cost.
  */
-export const getUnifiedLogsCTE = () => {
+export const getUnifiedLogsCTE = (logTypes: string[] = [...DEFAULT_LOG_TYPES]) => {
+  const queries = logTypes
+    .filter((type) => type in LOG_TYPE_QUERIES)
+    .map((type) => LOG_TYPE_QUERIES[type]())
+
+  const effectiveQueries =
+    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((type) => LOG_TYPE_QUERIES[type]())
+
   return `
 WITH unified_logs AS (
-    ${getPostgrestLogsQuery()}
-    union all
-    ${getPostgresLogsQuery()}
-    union all 
-    ${getEdgeFunctionLogsQuery()}
-    union all
-    ${getAuthLogsQuery()}
-    union all
-    ${getSupabaseStorageLogsQuery()}
+    ${effectiveQueries.join('\n    union all\n    ')}
 )
   `
 }
@@ -441,12 +450,11 @@ WITH unified_logs AS (
  * Unified logs SQL query
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
-  // The unified SQL query with UNION ALL statements
   const sql = `
-${getUnifiedLogsCTE()}
+${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
     id,
     timestamp,
@@ -708,14 +716,12 @@ SELECT dimension, value, count from pathname_count
  * Incorporates dynamic bucketing from the older implementation
  */
 export const getLogsChartQuery = (search: QuerySearchParamsType): string => {
-  // Use the buildQueryConditions helper
   const { finalWhere } = buildQueryConditions(search)
-
-  // Determine appropriate bucketing level based on time range
   const truncationLevel = calculateChartBucketing(search)
+  const effectiveLogTypes = search.log_type?.length ? search.log_type : [...DEFAULT_LOG_TYPES]
 
   return `
-${getUnifiedLogsCTE()}
+${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
   TIMESTAMP_TRUNC(timestamp, ${truncationLevel}) as time_bucket,
   COUNTIF(level = 'success') as success,
