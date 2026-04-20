@@ -1,8 +1,9 @@
+import { ident } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { executeSql } from '../sql/execute-sql-query'
 import { replicationKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreatePublicationParams = {
@@ -10,27 +11,28 @@ export type CreatePublicationParams = {
   sourceId: number
   name: string
   tables: { schema: string; name: string }[]
+  connectionString?: string | null
 }
 
 async function createPublication(
-  { projectRef, sourceId, name, tables }: CreatePublicationParams,
+  { projectRef, connectionString, name, tables }: CreatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post(
-    '/platform/replication/{ref}/sources/{source_id}/publications',
-    {
-      params: { path: { ref: projectRef, source_id: sourceId } },
-      body: { name, tables },
-      signal,
-    }
-  )
-  if (error) {
-    handleError(error)
-  }
+  const query =
+    tables.length > 0
+      ? `FOR TABLE ONLY ${tables.map(({ schema, name }) => `${ident(schema)}.${ident(name)}`).join(', ')} `
+      : ''
 
-  return data
+  await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql: `CREATE PUBLICATION ${ident(name)} ${query}WITH (publish_via_partition_root = true)`,
+    },
+    signal
+  )
 }
 
 type CreatePublicationData = Awaited<ReturnType<typeof createPublication>>

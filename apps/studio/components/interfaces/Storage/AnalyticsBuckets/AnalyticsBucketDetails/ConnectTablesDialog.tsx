@@ -185,6 +185,7 @@ export const ConnectTablesDialogContent = ({
 
   const onSubmitNewPublication: SubmitHandler<ConnectTablesForm> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
     if (!bucketId) return toast.error('Bucket ID is required')
     if (!sourceId) return toast.error('Replication has not been enabled for your project')
 
@@ -203,6 +204,7 @@ export const ConnectTablesDialogContent = ({
         sourceId,
         name: publicationName,
         tables: publicationTables,
+        connectionString: project.connectionString,
       })
 
       // Step 2: Create destination pipeline
