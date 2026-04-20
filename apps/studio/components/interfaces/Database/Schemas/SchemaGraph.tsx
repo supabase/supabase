@@ -47,6 +47,7 @@ import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { EdgeData, TableNodeData } from './Schemas.constants'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
+import { useExportSchemaToImage } from './useExportSchemaToImage'
 import AlertError from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import SchemaSelector from '@/components/ui/SchemaSelector'
@@ -70,6 +71,7 @@ export const SchemaGraph = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [selectedTable, setSelectedTable] = useState<PostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
+  const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
 
   const [copied, setCopied] = useState(false)
   useEffect(() => {
@@ -77,8 +79,6 @@ export const SchemaGraph = () => {
       setTimeout(() => setCopied(false), 2000)
     }
   }, [copied])
-
-  const [isDownloading, setIsDownloading] = useState(false)
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -181,66 +181,12 @@ export const SchemaGraph = () => {
     }
   )
 
-  const downloadImage = (format: 'png' | 'svg') => {
+  const downloadImage = async (format: 'png' | 'svg') => {
     const reactflowViewport = document.querySelector('.react-flow__viewport') as HTMLElement
     if (!reactflowViewport) return
-
-    setIsDownloading(true)
-    const width = reactflowViewport.clientWidth
-    const height = reactflowViewport.clientHeight
+    if (!ref) return
     const { x, y, zoom } = reactFlowInstance.getViewport()
-
-    if (format === 'svg') {
-      toSvg(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.svg`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as SVG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    } else if (format === 'png') {
-      toPng(reactflowViewport, {
-        backgroundColor: 'white',
-        width,
-        height,
-        style: {
-          width: width.toString(),
-          height: height.toString(),
-          transform: `translate(${x}px, ${y}px) scale(${zoom})`,
-        },
-      })
-        .then((data) => {
-          const a = document.createElement('a')
-          a.setAttribute('download', `supabase-schema-${ref}.png`)
-          a.setAttribute('href', data)
-          a.click()
-          toast.success('Successfully downloaded as PNG')
-        })
-        .catch((error) => {
-          console.error('Failed to download:', error)
-          toast.error('Failed to download current view:', error.message)
-        })
-        .finally(() => {
-          setIsDownloading(false)
-        })
-    }
+    exportSchemaToImage({ element: reactflowViewport, format, x, y, zoom, projectRef: ref })
   }
 
   const isFirstLoad = useRef(true)
@@ -268,7 +214,7 @@ export const SchemaGraph = () => {
     selectedSchema,
   ])
 
-  const schemaGraphPanelEditorContext = useMemo<SchemaGraphContextType>(
+  const schemaGraphContext = useMemo<SchemaGraphContextType>(
     () => ({
       selectedEdge,
       isDownloading,
@@ -427,7 +373,7 @@ export const SchemaGraph = () => {
               </Admonition>
             </div>
           ) : (
-            <SchemaGraphContextProvider value={schemaGraphPanelEditorContext}>
+            <SchemaGraphContextProvider value={schemaGraphContext}>
               <div className="w-full h-full">
                 <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
                   // FIXME: https://github.com/xyflow/xyflow/issues/4876
