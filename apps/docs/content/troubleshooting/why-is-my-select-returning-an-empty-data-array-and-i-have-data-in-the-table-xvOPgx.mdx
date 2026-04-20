@@ -32,7 +32,7 @@ const { data: testData, error: testError } = await supabase.rpc('test_authorizat
 console.log(`The user role is ${testData.role} and the user UUID is ${testData.sub}. `, testError)
 ```
 
-If you have publishable or secret as the role then you do not have a user session at the time of your call.
+If you have anon or service_role as the role then you do not have a user session at the time of your call.
 
 To delete the test SQL function:
 
