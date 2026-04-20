@@ -72,19 +72,25 @@ export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSign
     [projectRef, data]
   )
 
-  // Prune stale dismissals when the active signal list changes (e.g. an IP was unbanned)
+  // Prune stale dismissals when the active signal list changes (e.g. an IP was unbanned).
+  // Only call the setter when pruning would actually change something — otherwise we
+  // churn subscribers unnecessarily, which can cause feedback loops when this hook is
+  // mounted in more than one place (AdvisorSection + AdvisorPanel).
   useEffect(() => {
     if (!data) return
 
-    const activeKeys = new Set(signalItems.map((item) => item.dismissalKey))
+    const hasStaleBannedIPDismissal = dismissedKeys.some(
+      (key) =>
+        key.startsWith('signal:banned-ip:') &&
+        !signalItems.some((item) => item.dismissalKey === key)
+    )
+    if (!hasStaleBannedIPDismissal) return
 
-    setDismissedKeys((current) => {
-      const next = current.filter((key) =>
-        key.startsWith('signal:banned-ip:') ? activeKeys.has(key) : true
-      )
-      return next.length === current.length ? current : next
-    })
-  }, [data, signalItems, setDismissedKeys])
+    const activeKeys = new Set(signalItems.map((item) => item.dismissalKey))
+    setDismissedKeys((current) =>
+      current.filter((key) => (key.startsWith('signal:banned-ip:') ? activeKeys.has(key) : true))
+    )
+  }, [data, signalItems, dismissedKeys, setDismissedKeys])
 
   const formattedData = useMemo(
     () => signalItems.filter((item) => !dismissedKeySet.has(item.dismissalKey)),
