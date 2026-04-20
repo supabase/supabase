@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { AlertCircle, LoaderCircle, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
+import { Button } from 'ui'
 
 import { StorageItemWithColumn } from '../Storage.types'
 import { useFetchFileUrlQuery } from '../StorageExplorer/useFetchFileUrlQuery'
@@ -102,73 +103,58 @@ const PreviewFile = ({ item }: { item: StorageItemWithColumn }) => {
   )
 }
 
-export const PreviewPane = () => {
-  const { selectedFilePreview: file, setSelectedFilePreview } = useBucketFilePickerStateSnapshot()
+export const PreviewPane = ({ onSelect }: { onSelect: (url: string) => void }) => {
+  const { ref: projectRef } = useParams()
+  const {
+    selectedFilePreview: file,
+    setSelectedFilePreview,
+    bucket,
+    columns,
+  } = useBucketFilePickerStateSnapshot()
+
+  const path = file ? columns.slice(0, file.columnIndex).concat(file.name).join('/') : ''
+  const { data: previewUrl, isLoading } = useFetchFileUrlQuery(
+    { path, projectRef: projectRef!, bucket },
+    { enabled: !!file }
+  )
 
   if (!file) return null
 
-  const width = 450
   const size = file.metadata ? formatBytes(file.metadata.size) : null
   const mimeType = file.metadata ? file.metadata.mimetype : undefined
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
   return (
-    <div
-      className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
-      style={{ width }}
-    >
+    <div className="h-full border-l border-overlay bg-surface-100 overflow-y-auto w-[450px] pb-4">
       {/* Preview Header */}
-      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X
-          className="cursor-pointer"
-          size={14}
-          strokeWidth={2}
-          onClick={() => setSelectedFilePreview(undefined)}
-        />
+      <div className="flex w-full justify-end items-center gap-2 sticky top-0 bg-surface-100 p-4 border-b">
+        <Button
+          size="tiny"
+          onClick={() => onSelect(previewUrl!)}
+          disabled={!previewUrl}
+          loading={isLoading}
+        >
+          Select
+        </Button>
+        <div className="text-foreground-lighter transition-colors hover:text-foreground">
+          <X
+            className="cursor-pointer"
+            size={14}
+            strokeWidth={2}
+            onClick={() => setSelectedFilePreview(undefined)}
+          />
+        </div>
       </div>
 
       {/* Preview Thumbnail*/}
-      <div className="my-4 border border-overlay">
+      <div className="my-4 border border-overlay mx-4">
         <div className="flex h-56 w-full items-center 2xl:h-72">
           <PreviewFile item={file} />
         </div>
       </div>
 
-      <div className="w-full space-y-6">
-        {/* Preview Information */}
-        <div className="space-y-1">
-          <h5 className="break-words text-base text-foreground">{file.name}</h5>
-          {file.isCorrupted && (
-            <div className="flex items-center space-x-2">
-              <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
-              <p className="text-sm text-foreground-light">
-                File is corrupted, please delete and reupload this file again
-              </p>
-            </div>
-          )}
-          {mimeType && (
-            <p className="text-sm text-foreground-light">
-              {mimeType}
-              {size && <span> - {size}</span>}
-            </p>
-          )}
-        </div>
-
-        {/* Preview Metadata */}
-        <div className="space-y-2">
-          <div>
-            <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
-            <p className="text-sm text-foreground-light">{createdAt}</p>
-          </div>
-          <div>
-            <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
-            <p className="text-sm text-foreground-light">{updatedAt}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full space-y-6">
+      <div className="w-full space-y-6 px-4">
         {/* Preview Information */}
         <div className="space-y-1">
           <h5 className="break-words text-base text-foreground">{file.name}</h5>

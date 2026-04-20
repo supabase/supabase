@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 
 import { STORAGE_VIEWS } from '../Storage.constants'
-import { useFetchFileUrlQuery } from '../StorageExplorer/useFetchFileUrlQuery'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketFilePickerColumn } from './BucketFilePickerColumn'
 import { BucketFilePickerHeader } from './BucketFilePickerHeader'
@@ -13,23 +12,10 @@ import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 export function BucketFilePickerExplorer({ onSelect }: { onSelect: (value: string) => void }) {
   const { ref: projectRef } = useParams()
   const { view } = useStoragePreference(projectRef!)
-  const { bucket, selectedItems, columns, selectedFilePreview } = useBucketFilePickerStateSnapshot()
-
-  let path = ''
-  if (selectedFilePreview) {
-    path = columns
-      .slice(0, selectedFilePreview.columnIndex)
-      .concat(selectedFilePreview.name)
-      .join('/')
-  }
-
-  const { data: previewUrl, isLoading } = useFetchFileUrlQuery(
-    { path, projectRef: projectRef!, bucket },
-    { enabled: !!selectedFilePreview }
-  )
+  const { selectedItems, columns } = useBucketFilePickerStateSnapshot()
 
   return (
-    <div className="flex-1 min-h-0 px-6 pb-6">
+    <div className="flex-1 min-h-0 px-6 ">
       <div className="bg-studio border rounded-md border-overlay flex h-full w-full flex-col">
         {selectedItems.length === 0 ? (
           <BucketFilePickerHeader />
@@ -51,13 +37,8 @@ export function BucketFilePickerExplorer({ onSelect }: { onSelect: (value: strin
               <BucketFilePickerColumn fullWidth index={columns.length} />
             )}
           </div>
-          <PreviewPane />
+          <PreviewPane onSelect={onSelect} />
         </div>
-      </div>
-      <div>
-        <Button onClick={() => onSelect(previewUrl!)} disabled={!previewUrl} loading={isLoading}>
-          Select
-        </Button>
       </div>
     </div>
   )
