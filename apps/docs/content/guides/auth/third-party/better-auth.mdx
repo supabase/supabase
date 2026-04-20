@@ -163,7 +163,7 @@ try {
   return Response.json({ token })
 } catch (err) {
   console.error('[supabase-token]', err)
-  return Response.json({ error: String(err) }, { status: 500 })
+  return Response.json({ error: 'Internal Server Error' }, { status: 500 })
 }
 ```
 
