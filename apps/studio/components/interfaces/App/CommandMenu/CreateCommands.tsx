@@ -1,7 +1,6 @@
 'use client'
 
 import { IS_PLATFORM } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import {
   Clock5,
   Code2,
@@ -39,6 +38,7 @@ import {
   getIntegrationRoute,
   useCreateCommandsConfig,
 } from './CreateCommands.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))

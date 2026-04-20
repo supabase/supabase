@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
+
+import CountdownTimerRadial from '@/components/ui/CountdownTimer/CountdownTimerRadial'
 
 export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {
   const [progress, setProgress] = useState(100)

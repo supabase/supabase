@@ -1,14 +1,13 @@
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
-import CountdownTimerSpan from 'components/ui/CountdownTimer/CountdownTimerSpan'
-import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
-import { COOLDOWN_DURATION } from 'data/config/disk-attributes-update-mutation'
 import { Card, CardContent } from 'ui'
 
 import FormMessage from './FormMessage'
+import CountdownTimerRadial from '@/components/ui/CountdownTimer/CountdownTimerRadial'
+import CountdownTimerSpan from '@/components/ui/CountdownTimer/CountdownTimerSpan'
+import { useRemainingDurationForDiskAttributeUpdate } from '@/data/config/disk-attributes-query'
+import { COOLDOWN_DURATION } from '@/data/config/disk-attributes-update-mutation'
 
 export function DiskCountdownRadial() {
   const { ref } = useParams()

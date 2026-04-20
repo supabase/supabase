@@ -1,8 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useUserInviteMutation } from 'data/auth/user-invite-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -15,6 +13,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+
+import { useUserInviteMutation } from '@/data/auth/user-invite-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export type InviteUserModalProps = {
   visible: boolean

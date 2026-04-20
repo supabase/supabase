@@ -1,5 +1,5 @@
-import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
 import { hasIndexRecommendations } from '../../QueryPerformance/IndexAdvisor/index-advisor.utils'
+import type { QueryPerformanceRow } from '../../QueryPerformance/QueryPerformance.types'
 import { SLOW_QUERY_THRESHOLD_MS } from '../QueryInsightsHealth/QueryInsightsHealth.constants'
 import type { IssueType } from '../QueryInsightsHealth/QueryInsightsHealth.types'
 

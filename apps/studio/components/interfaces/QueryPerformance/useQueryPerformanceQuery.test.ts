@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { QueryPerformanceSort } from './QueryPerformance.types'
 import { generateQueryPerformanceSql } from './useQueryPerformanceQuery'
 
 describe('generateQueryPerformanceSql', () => {
@@ -168,5 +169,53 @@ describe('generateQueryPerformanceSql', () => {
     const result = generateQueryPerformanceSql({ preset: 'unified', page: 1, pageSize: NaN })
     expect(result.sql).not.toContain('NaN')
     expect(result.sql).toContain('limit 20')
+  })
+})
+
+describe('generateQueryPerformanceSql - ORDER BY column validation', () => {
+  it('rejects invalid orderBy column containing colon (old URL format)', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      orderBy: { column: 'created_at:asc' as any, order: 'desc' },
+    })
+    expect(result.orderBySql).toBeUndefined()
+  })
+
+  it('rejects SQL injection in orderBy column', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      orderBy: { column: 'calls; DROP TABLE users--' as any, order: 'asc' },
+    })
+    expect(result.orderBySql).toBeUndefined()
+    expect(result.sql).not.toContain('DROP TABLE')
+  })
+
+  it('falls back to default ORDER BY when column is invalid', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      orderBy: { column: 'created_at:asc' as any, order: 'asc' },
+    })
+    expect(result.sql).toContain('order by statements.calls desc')
+  })
+
+  it('accepts all valid sort columns', () => {
+    const columns: QueryPerformanceSort['column'][] = [
+      'query',
+      'rolname',
+      'total_time',
+      'prop_total_time',
+      'calls',
+      'avg_rows',
+      'max_time',
+      'mean_time',
+      'min_time',
+    ]
+    for (const column of columns) {
+      const result = generateQueryPerformanceSql({
+        preset: 'mostFrequentlyInvoked',
+        orderBy: { column, order: 'asc' },
+      })
+      expect(result.orderBySql).toBe(`ORDER BY ${column} asc`)
+    }
   })
 })

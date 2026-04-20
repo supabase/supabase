@@ -1,9 +1,5 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-
-import { useBucketEmptyMutation } from 'data/storage/bucket-empty-mutation'
-import type { Bucket } from 'data/storage/buckets-query'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Button,
   Dialog,
@@ -15,6 +11,10 @@ import {
   DialogTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
+import { useBucketEmptyMutation } from '@/data/storage/bucket-empty-mutation'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface EmptyBucketModalProps {
   visible: boolean

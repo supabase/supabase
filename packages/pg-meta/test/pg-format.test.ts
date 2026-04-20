@@ -1,6 +1,6 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, expectTypeOf, test } from 'vitest'
 
-import { ident, literal } from '../src/pg-format'
+import { ident, keyword, literal, safeSql } from '../src/pg-format'
 
 describe('pg-format', () => {
   describe('ident', () => {
@@ -137,6 +137,167 @@ describe('pg-format', () => {
     test('should handle strings with backslashes', () => {
       expect(literal('path\\to\\file')).toBe("E'path\\\\to\\\\file'")
       expect(literal('C:\\Users\\test')).toBe("E'C:\\\\Users\\\\test'")
+    })
+  })
+
+  describe('keyword', () => {
+    test('accepts single uppercase words', () => {
+      expect(keyword('BEFORE')).toBe('BEFORE')
+      expect(keyword('AFTER')).toBe('AFTER')
+      expect(keyword('ROW')).toBe('ROW')
+    })
+
+    test('accepts lowercase and mixed case', () => {
+      expect(keyword('instead of')).toBe('instead of')
+      expect(keyword('Each Row')).toBe('Each Row')
+    })
+
+    test('accepts words with underscores and digits', () => {
+      expect(keyword('EACH_ROW')).toBe('EACH_ROW')
+      expect(keyword('col2')).toBe('col2')
+    })
+
+    test('rejects empty string', () => {
+      expect(() => keyword('')).toThrow('Not a valid keyword')
+    })
+
+    test('rejects strings starting with a digit', () => {
+      expect(() => keyword('1BEFORE')).toThrow('Not a valid keyword')
+    })
+
+    test('rejects strings with semicolons', () => {
+      expect(() => keyword('BEFORE;')).toThrow('Not a valid keyword')
+    })
+
+    test('rejects strings with dashes', () => {
+      expect(() => keyword('BE-FORE')).toThrow('Not a valid keyword')
+    })
+
+    test('rejects strings with single quotes', () => {
+      expect(() => keyword("BE'FORE")).toThrow('Not a valid keyword')
+    })
+
+    test('rejects strings with parentheses', () => {
+      expect(() => keyword('fn()')).toThrow('Not a valid keyword')
+    })
+  })
+
+  describe('safeSql', () => {
+    test('returns a plain string when there are no interpolations', () => {
+      const result = safeSql`SELECT 1`
+      expect(result).toBe('SELECT 1')
+    })
+
+    test('interpolates ident values', () => {
+      const table = ident('my_table')
+      const result = safeSql`SELECT * FROM ${table}`
+      expect(result).toBe('SELECT * FROM my_table')
+    })
+
+    test('interpolates literal values', () => {
+      const value = literal('hello')
+      const result = safeSql`SELECT ${value}`
+      expect(result).toBe("SELECT 'hello'")
+    })
+
+    test('interpolates multiple values', () => {
+      const table = ident('users')
+      const col = ident('email')
+      const val = literal('test@example.com')
+      const result = safeSql`SELECT ${col} FROM ${table} WHERE ${col} = ${val}`
+      expect(result).toBe(`SELECT email FROM users WHERE email = 'test@example.com'`)
+    })
+
+    test('handles ident with special characters', () => {
+      const table = ident('my "table"')
+      const result = safeSql`SELECT * FROM ${table}`
+      expect(result).toBe('SELECT * FROM "my ""table"""')
+    })
+
+    test('literal: escapes classic quote bypass', () => {
+      const val = literal("' OR '1'='1")
+      const result = safeSql`SELECT * FROM users WHERE password = ${val}`
+      expect(result).toBe("SELECT * FROM users WHERE password = ''' OR ''1''=''1'")
+    })
+
+    test('literal: escapes UNION SELECT attack', () => {
+      const val = literal("x' UNION SELECT username, password FROM admins --")
+      const result = safeSql`SELECT name FROM products WHERE id = ${val}`
+      expect(result).toBe(
+        "SELECT name FROM products WHERE id = 'x'' UNION SELECT username, password FROM admins --'"
+      )
+    })
+
+    test('literal: escapes stacked query injection', () => {
+      const val = literal("1'; DROP TABLE users; --")
+      const result = safeSql`SELECT * FROM users WHERE id = ${val}`
+      expect(result).toBe("SELECT * FROM users WHERE id = '1''; DROP TABLE users; --'")
+    })
+
+    test('literal: escapes comment-based injection', () => {
+      const val = literal("admin'--")
+      const result = safeSql`SELECT * FROM users WHERE username = ${val}`
+      expect(result).toBe("SELECT * FROM users WHERE username = 'admin''--'")
+    })
+
+    test('ident: escapes SQL keyword injection in table name', () => {
+      const table = ident('users WHERE 1=1 --')
+      const result = safeSql`SELECT * FROM ${table}`
+      expect(result).toBe('SELECT * FROM "users WHERE 1=1 --"')
+    })
+
+    test('ident: escapes stacked query injection in column name', () => {
+      const col = ident('id; DROP TABLE users')
+      const result = safeSql`SELECT ${col} FROM users`
+      expect(result).toBe('SELECT "id; DROP TABLE users" FROM users')
+    })
+
+    test('handles literal with null', () => {
+      const val = literal(null)
+      const result = safeSql`SELECT ${val}`
+      expect(result).toBe('SELECT NULL')
+    })
+
+    test('handles literal with numbers', () => {
+      const val = literal(42)
+      const result = safeSql`SELECT ${val}`
+      expect(result).toBe('SELECT 42')
+    })
+
+    test('can be nested', () => {
+      const col = ident('id')
+      const inner = safeSql`SELECT ${col} FROM ${ident('items')}`
+      const outer = safeSql`WITH cte AS (${inner}) SELECT * FROM cte`
+      expect(outer).toBe('WITH cte AS (SELECT id FROM items) SELECT * FROM cte')
+    })
+  })
+
+  describe('safeSql type safety', () => {
+    test('rejects a plain string interpolation', () => {
+      const unsafeValue = 'malicious'
+      // @ts-expect-error plain string is not a SafeSqlFragment
+      safeSql`SELECT * FROM ${unsafeValue}`
+    })
+
+    test('rejects a number interpolation', () => {
+      // @ts-expect-error number is not a SafeSqlFragment
+      safeSql`SELECT * FROM users LIMIT ${10}`
+    })
+
+    test('rejects an object interpolation', () => {
+      const obj = { table: 'users' }
+      // @ts-expect-error object is not a SafeSqlFragment
+      safeSql`SELECT * FROM ${obj}`
+    })
+
+    test('accepts SafeSqlFragment from ident', () => {
+      const result = safeSql`SELECT * FROM ${ident('users')}`
+      expectTypeOf(result).toBeString
+    })
+
+    test('accepts SafeSqlFragment from literal', () => {
+      const result = safeSql`SELECT ${literal('value')}`
+      expectTypeOf(result).toBeString
     })
   })
 })

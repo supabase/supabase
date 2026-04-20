@@ -1,7 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DiscardChangesConfirmationDialog } from 'components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useConfirmOnClose } from 'hooks/ui/useConfirmOnClose'
 import { ChevronDown, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -31,6 +28,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
+import {
+  getKeyValueFieldArrayValidationIssues,
+  stripEmptyKeyValueFieldArrayRows,
+} from 'ui-patterns/form/KeyValueFieldArray/validation'
 import * as z from 'zod'
 
 import type {
@@ -39,6 +40,9 @@ import type {
   WebhookScope,
 } from './PlatformWebhooks.types'
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 
 const endpointFormSchema = z
@@ -70,6 +74,20 @@ const endpointFormSchema = z
         path: ['eventTypes'],
       })
     }
+
+    getKeyValueFieldArrayValidationIssues({
+      rows: data.customHeaders,
+      keyFieldName: 'key',
+      valueFieldName: 'value',
+      keyRequiredMessage: 'Header name is required',
+      valueRequiredMessage: 'Header value is required',
+    }).forEach((issue) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: issue.message,
+        path: ['customHeaders', ...issue.path],
+      })
+    })
   })
 
 export type EndpointFormValues = z.infer<typeof endpointFormSchema>
@@ -124,7 +142,11 @@ export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndp
   description: values.description,
   enabled: values.enabled,
   eventTypes: toEventTypes(values),
-  customHeaders: values.customHeaders,
+  customHeaders: stripEmptyKeyValueFieldArrayRows({
+    rows: values.customHeaders,
+    keyFieldName: 'key',
+    valueFieldName: 'value',
+  }),
 })
 
 interface EndpointSheetProps {

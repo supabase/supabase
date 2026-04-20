@@ -1,11 +1,4 @@
 import { useParams } from 'common'
-import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { usePgbouncerConfigQuery } from 'data/database/pgbouncer-config-query'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { pluckObjectFields } from 'lib/helpers'
 import dynamic from 'next/dynamic'
 import { useMemo, useRef } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -20,6 +13,13 @@ import type {
 import { ConnectSheetStep } from './ConnectSheetStep'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { getConnectionStrings } from './DatabaseSettings.utils'
+import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { pluckObjectFields } from '@/lib/helpers'
 
 interface ConnectStepsSectionProps {
   steps: ResolvedStep[]

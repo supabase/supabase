@@ -1,33 +1,33 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Ban, Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
-import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
-import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
-import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-infinite-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
-import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useUserDeleteMFAFactorsMutation } from '@/data/auth/user-delete-mfa-factors-mutation'
+import { useUserResetPasswordMutation } from '@/data/auth/user-reset-password-mutation'
+import { useUserSendMagicLinkMutation } from '@/data/auth/user-send-magic-link-mutation'
+import { useUserSendOTPMutation } from '@/data/auth/user-send-otp-mutation'
+import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
+import { User } from '@/data/auth/users-infinite-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
+import { timeout } from '@/lib/helpers'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -224,9 +224,22 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               (x) =>
                 ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
-            const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
-              x.toLowerCase().endsWith('_enabled')
-            )
+            const enabledProperty =
+              provider.name.toLowerCase() === 'web3'
+                ? (
+                    {
+                      solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
+                      ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
+                    } as const
+                  )[
+                    (
+                      (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
+                        ?.chain ?? ''
+                    ).toLowerCase() as 'solana' | 'ethereum'
+                  ]
+                : Object.keys(providerMeta?.properties ?? {}).find((x) =>
+                    x.toLowerCase().endsWith('_enabled')
+                  )
             const providerName =
               provider.name === 'email'
                 ? provider.name.toLowerCase()

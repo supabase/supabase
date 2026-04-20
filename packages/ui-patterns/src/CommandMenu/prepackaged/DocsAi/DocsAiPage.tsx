@@ -12,8 +12,8 @@ import {
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  markdownComponents,
 } from 'ui'
+import { markdownComponents } from 'ui-patterns/Markdown'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
@@ -245,16 +245,17 @@ function AiMessages({ messages }: { messages: Array<Message> }) {
                     {message.status === MessageStatus.Pending && (
                       <span className="inline-block h-[1lh] w-[0.8lh] mt-1 bg-border-strong animate-bounce" />
                     )}
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        ...markdownComponents,
-                        a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-                      }}
-                      className="prose dark:prose-dark break-words"
-                    >
-                      {message.content}
-                    </ReactMarkdown>
+                    <div className="prose dark:prose-dark break-words">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          ...markdownComponents,
+                          a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                     {message.sources && message.sources.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-border-muted">
                         <p className="text-sm text-foreground-muted mb-2">Sources:</p>

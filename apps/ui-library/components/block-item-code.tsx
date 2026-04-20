@@ -2,7 +2,8 @@
 
 import { File } from 'lucide-react'
 import { useState } from 'react'
-import { CodeBlock, flattenTree, TreeView, TreeViewItem } from 'ui'
+import { flattenTree, TreeView, TreeViewItem } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { RegistryNode } from '@/lib/process-registry'
 

@@ -14,7 +14,7 @@ describe('ai/tools/incident-tools', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockFetch = vi.fn()
-    global.fetch = mockFetch
+    global.fetch = mockFetch as typeof fetch
 
     // Mock AbortSignal.timeout
     mockAbortSignal = new AbortController().signal

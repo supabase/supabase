@@ -7,7 +7,7 @@ import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { Inter } from 'next/font/google'
 
 import { ThemeProvider } from './Providers'
-import { SonnerToaster } from './SonnerToast'
+import { Toaster } from './toaster'
 import { API_URL } from '@/lib/constants'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -53,7 +53,7 @@ export default async function Layout({ children }: RootLayoutProps) {
             enableSystem
           >
             {children}
-            <SonnerToaster />
+            <Toaster />
           </ThemeProvider>
         </FeatureFlagProvider>
       </body>

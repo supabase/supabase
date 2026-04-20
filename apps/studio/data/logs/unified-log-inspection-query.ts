@@ -1,20 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { logsKeys } from './keys'
+import {
+  getUnifiedLogsISOStartEnd,
+  UNIFIED_LOGS_QUERY_OPTIONS,
+} from './unified-logs-infinite-query'
 import {
   getAuthServiceFlowQuery,
   getEdgeFunctionServiceFlowQuery,
   getPostgresServiceFlowQuery,
   getPostgrestServiceFlowQuery,
   getStorageServiceFlowQuery,
-} from 'components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
-import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { logsKeys } from './keys'
-import {
-  getUnifiedLogsISOStartEnd,
-  UNIFIED_LOGS_QUERY_OPTIONS,
-} from './unified-logs-infinite-query'
+} from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
+import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
 export const SERVICE_FLOW_TYPES = [

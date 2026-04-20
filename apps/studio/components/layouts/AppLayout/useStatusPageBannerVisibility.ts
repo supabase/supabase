@@ -1,11 +1,10 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { IS_PROD, LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useCallback, useMemo } from 'react'
 
 import { getRelevantIncidentIds, shouldShowBanner } from './StatusPageBanner.utils'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { incidentBannerQueryOptions } from '@/data/platform/incident-banner-query'
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import { projectKeys } from '@/data/projects/keys'
 import {
   getOrganizationProjects,
@@ -15,25 +14,14 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 export type StatusPageBannerData = { title: string; dismiss?: () => void }
 
-// In non-production environments the incident-banner endpoint is the source of truth.
-const IS_NON_PROD = !IS_PROD
-
 export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
   const showIncidentBannerOverride =
     useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
 
-  // Both queries run in parallel on all environments.
-  const { data: allStatusPageEvents } = useIncidentStatusQuery()
   const { data: incidentBannerData } = useQuery(incidentBannerQueryOptions())
 
-  // In non-production: derive incidents from the incident-banner endpoint.
-  // In production: derive incidents from the statuspage endpoint (existing behaviour).
   const bannerItems = incidentBannerData?.incidents ?? []
-
-  const incidents = IS_NON_PROD
-    ? bannerItems.map((i) => ({ id: i.id, cache: i.metadata }))
-    : (allStatusPageEvents?.incidents ?? []).filter((i) => i.impact !== 'none')
-
+  const incidents = bannerItems.map((i) => ({ id: i.id, cache: i.metadata }))
   const hasActiveIncidents = incidents.length > 0
 
   const { data: organizations } = useOrganizationsQuery({

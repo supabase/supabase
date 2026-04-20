@@ -1,19 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { isMsSqlForeignTable } from 'data/table-editor/table-editor-types'
-import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { RoleImpersonationState } from 'lib/role-impersonation'
-import { EMPTY_ARR } from 'lib/void'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useRef } from 'react'
 import { DataGridHandle } from 'react-data-grid'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { createPortal } from 'react-dom'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { QueuedOperation } from 'state/table-editor-operation-queue.types'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
 
 import { useIsTableFilterBarEnabled } from '../interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Shortcuts } from './components/common/Shortcuts'
@@ -21,12 +9,20 @@ import { Footer } from './components/footer/Footer'
 import { Grid } from './components/grid/Grid'
 import { Header, HeaderProps } from './components/header/Header'
 import { HeaderNew } from './components/header/HeaderNew'
-import { RowContextMenu } from './components/menu/RowContextMenu'
 import { useTableFilter } from './hooks/useTableFilter'
 import { useTableSort } from './hooks/useTableSort'
 import { validateMsSqlSorting } from './MsSqlValidation'
 import { GridProps } from './types'
 import { formatGridDataWithOperationValues } from './utils/queueOperationUtils'
+import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
+import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { EMPTY_ARR } from '@/lib/void'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export const SupabaseGrid = ({
   customHeader,
@@ -46,8 +42,6 @@ export const SupabaseGrid = ({
   const preflightCheck = !tableEditorSnap.tablesToIgnorePreflightCheck.includes(tableId ?? -1)
 
   const gridRef = useRef<DataGridHandle>(null)
-  const [mounted, setMounted] = useState(false)
-
   const newFilterBarEnabled = useIsTableFilterBarEnabled()
 
   const { filters } = useTableFilter()
@@ -89,10 +83,6 @@ export const SupabaseGrid = ({
     }
   )
 
-  useEffect(() => {
-    if (!mounted) setMounted(true)
-  }, [])
-
   const operations = (tableEditorSnap.operationQueue.operations as QueuedOperation[]).filter(
     (op) => op.tableId === tableId
   )
@@ -102,35 +92,31 @@ export const SupabaseGrid = ({
   const HeaderComponent = newFilterBarEnabled ? HeaderNew : Header
 
   return (
-    <DndProvider backend={HTML5Backend} context={window}>
-      <div className="sb-grid h-full flex flex-col">
-        <HeaderComponent
-          customHeader={customHeader}
-          isRefetching={isRefetching}
-          tableQueriesEnabled={tableQueriesEnabled}
-        />
+    <div className="sb-grid h-full flex flex-col">
+      <HeaderComponent
+        customHeader={customHeader}
+        isRefetching={isRefetching}
+        tableQueriesEnabled={tableQueriesEnabled}
+      />
 
-        {msSqlWarning.warning !== null && <msSqlWarning.Component />}
+      {msSqlWarning.warning !== null && <msSqlWarning.Component />}
 
-        {children || (
-          <>
-            <Grid
-              ref={gridRef}
-              {...gridProps}
-              rows={rows}
-              error={error}
-              isDisabled={!tableQueriesEnabled}
-              isLoading={isLoading}
-              isSuccess={isSuccess}
-              isError={isError}
-            />
-            <Footer enableForeignRowsQuery={tableQueriesEnabled} />
-            <Shortcuts gridRef={gridRef} rows={rows} />
-          </>
-        )}
-
-        {mounted && createPortal(<RowContextMenu rows={rows} />, document.body)}
-      </div>
-    </DndProvider>
+      {children || (
+        <>
+          <Grid
+            ref={gridRef}
+            {...gridProps}
+            rows={rows}
+            error={error}
+            isDisabled={!tableQueriesEnabled}
+            isLoading={isLoading}
+            isSuccess={isSuccess}
+            isError={isError}
+          />
+          <Footer enableForeignRowsQuery={tableQueriesEnabled} />
+          <Shortcuts gridRef={gridRef} rows={rows} />
+        </>
+      )}
+    </div>
   )
 }

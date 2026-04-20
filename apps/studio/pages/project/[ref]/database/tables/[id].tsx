@@ -1,24 +1,25 @@
 import { useParams } from 'common'
-import { ColumnList } from 'components/interfaces/Database/Tables/ColumnList'
-import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { SidePanelEditor } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { ChevronRight } from 'lucide-react'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { TableEditorTableStateContextProvider } from 'state/table-editor-table'
-import type { NextPageWithLayout } from 'types'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { ColumnList } from '@/components/interfaces/Database/Tables/ColumnList'
+import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
 
-  const { id: _id } = useParams()
+  const { id: _id, ref } = useParams()
   const id = _id ? Number(_id) : undefined
 
   const { data: project } = useSelectedProjectQuery()
@@ -30,26 +31,28 @@ const DatabaseTables: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12 space-y-6">
-            <div className="flex items-center space-x-2">
-              <FormHeader className="!mb-0 !w-fit !whitespace-nowrap" title="Database Tables" />
-              <ChevronRight size={18} strokeWidth={1.5} className="text-foreground-light" />
-              {isLoading ? (
-                <ShimmeringLoader className="w-40" />
-              ) : (
-                <FormHeader className="!mb-0" title={selectedTable?.name ?? ''} />
-              )}
-            </div>
-            <ColumnList
-              onAddColumn={snap.onAddColumn}
-              onEditColumn={snap.onEditColumn}
-              onDeleteColumn={snap.onDeleteColumn}
-            />
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
+      <PageLayout
+        title={isLoading ? <ShimmeringLoader className="w-40" /> : (selectedTable?.name ?? '')}
+        breadcrumbs={[
+          {
+            label: 'Tables',
+            href: `/project/${ref}/database/tables`,
+          },
+        ]}
+        size="large"
+      >
+        <PageContainer size="large">
+          <PageSection>
+            <PageSectionContent>
+              <ColumnList
+                onAddColumn={snap.onAddColumn}
+                onEditColumn={snap.onEditColumn}
+                onDeleteColumn={snap.onDeleteColumn}
+              />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </PageLayout>
 
       {project?.ref !== undefined && selectedTable !== undefined && isTableLike(selectedTable) && (
         <TableEditorTableStateContextProvider

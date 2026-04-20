@@ -1,10 +1,7 @@
 // End of third-party imports
 
 import { useParams } from 'common'
-import CopyButton from 'components/ui/CopyButton'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
@@ -24,6 +21,9 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import CopyButton from '@/components/ui/CopyButton'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ProjectAndPlanProps {
   form: UseFormReturn<SupportFormValues>

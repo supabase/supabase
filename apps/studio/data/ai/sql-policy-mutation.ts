@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { CreatePolicyBody } from 'data/database-policies/database-policy-create-mutation'
-import { fetchPost } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
-import { ResponseError, UseCustomMutationOptions } from 'types'
+import type { CreatePolicyBody } from '@/data/database-policies/database-policy-create-mutation'
+import { fetchPost } from '@/data/fetchers'
+import { BASE_PATH } from '@/lib/constants'
+import { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SqlPolicyGenerateVariables = {
   tableName: string

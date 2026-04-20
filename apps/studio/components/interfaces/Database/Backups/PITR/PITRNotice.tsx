@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Calendar } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { getPITRRetentionDuration } from './PITR.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const PITRNotice = () => {
   const { ref: projectRef } = useParams()

@@ -1,11 +1,11 @@
-import type { Branch } from 'data/branches/branches-query'
-import { useTrack } from 'lib/telemetry/track'
 import { Check, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { CommandItem_Shadcn_ } from 'ui'
 
 import { sanitizeRoute } from './ProjectDropdown.utils'
+import type { Branch } from '@/data/branches/branches-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface BranchLinkProps {
   branch: Branch

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { cn, SidebarMenuItem, sidebarMenuButtonVariants } from 'ui'
+import { cn, sidebarMenuButtonVariants, SidebarMenuItem } from 'ui'
 
 import type { OrgNavItem } from './OrgMenuContent.utils'
 

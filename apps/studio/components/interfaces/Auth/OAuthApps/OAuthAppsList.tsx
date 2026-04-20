@@ -1,13 +1,5 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useProjectApiUrl } from 'data/config/project-endpoint-query'
-import { useOAuthServerAppDeleteMutation } from 'data/oauth-server-apps/oauth-server-app-delete-mutation'
-import { useOAuthServerAppRegenerateSecretMutation } from 'data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
-import { useOAuthServerAppsQuery } from 'data/oauth-server-apps/oauth-server-apps-query'
 import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -43,6 +35,14 @@ import {
   OAUTH_APP_CLIENT_TYPE_OPTIONS,
   OAUTH_APP_REGISTRATION_TYPE_OPTIONS,
 } from './oauthApps.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FilterPopover } from '@/components/ui/FilterPopover'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthServerAppDeleteMutation } from '@/data/oauth-server-apps/oauth-server-app-delete-mutation'
+import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
+import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
 
 const OAUTH_APPS_SORT_VALUES = [
   'name:asc',

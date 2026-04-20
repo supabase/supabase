@@ -143,14 +143,11 @@ echo ""
 echo "SUPABASE_PUBLISHABLE_KEY=${SUPABASE_PUBLISHABLE_KEY}"
 echo "SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}"
 echo ""
-echo "ANON_KEY_ASYMMETRIC=${ANON_KEY_ASYMMETRIC}"
-echo "SERVICE_ROLE_KEY_ASYMMETRIC=${SERVICE_ROLE_KEY_ASYMMETRIC}"
-echo ""
 echo "JWT_KEYS=${JWT_KEYS}"
 echo ""
 echo "JWT_JWKS=${JWT_JWKS}"
 echo ""
-echo "To enable asymmetric key support, uncomment these lines in docker-compose.yml:"
+echo "To enable asymmetric key pair, the following should be enabled in docker-compose.yml:"
 echo ""
 echo "  Auth:     GOTRUE_JWT_KEYS: \${JWT_KEYS:-[]}"
 echo "  Realtime: API_JWT_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
@@ -186,3 +183,25 @@ for var in SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY ANON_KEY_ASYMMETRIC SERV
         echo "${var}=${val}" >> .env
     fi
 done
+
+# Uncomment new auth configuration in docker-compose.yml
+echo "Updating docker-compose.yml..."
+if [ ! -f docker-compose.yml ]; then
+    echo "Error: docker-compose.yml not found in $(pwd)"
+    exit 1
+fi
+
+# Always fall through to the grep check
+sed -i.old \
+    -e '/^[ ]*#GOTRUE_JWT_KEYS:/ s/#//' \
+    -e '/^[ ]*#API_JWT_JWKS:/ s/#//' \
+    -e '/^[ ]*#JWT_JWKS:/ s/#//' \
+    docker-compose.yml || true
+
+if grep -q '^[ ]*GOTRUE_JWT_KEYS:' docker-compose.yml && \
+   grep -q '^[ ]*API_JWT_JWKS:' docker-compose.yml && \
+   grep -q '^[ ]*JWT_JWKS:' docker-compose.yml; then
+    echo "Done."
+else
+    echo "Warning: could not edit docker-compose.yml. Uncomment auth configuration manually."
+fi

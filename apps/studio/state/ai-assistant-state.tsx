@@ -1,18 +1,18 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
 import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { constructHeaders } from 'data/fetchers'
-import { prepareMessagesForAPI } from 'lib/ai/message-utils'
-import type { AssistantModelId } from 'lib/ai/model.utils'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { constructHeaders } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
+import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
   title: string
@@ -46,7 +46,7 @@ type AiAssistantData = {
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
-  model: AssistantModel
+  model?: AssistantModel
   context: AiAssistantContext
 }
 
@@ -65,7 +65,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   tables: [],
   chats: {},
   activeChatId: undefined,
-  model: 'gpt-5',
+  model: undefined,
   context: {},
 }
 
@@ -487,7 +487,11 @@ export const createAiAssistantState = (): AiAssistantState => {
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
-      state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
+      const storedModel = persistedState.model
+      state.model =
+        storedModel && isKnownAssistantModelId(storedModel)
+          ? storedModel
+          : INITIAL_AI_ASSISTANT.model
 
       // Ensure an active chat exists after loading
       if (!state.activeChat) {

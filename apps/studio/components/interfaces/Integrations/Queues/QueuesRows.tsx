@@ -3,12 +3,12 @@ import { includes, sortBy } from 'lodash'
 import { Check, ChevronRight, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
-import Table from 'components/to-be-cleaned/Table'
-import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
-import { PostgresQueue } from 'data/database-queues/database-queues-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DATETIME_FORMAT } from 'lib/constants'
+import Table from '@/components/to-be-cleaned/Table'
+import { useQueuesMetricsQuery } from '@/data/database-queues/database-queues-metrics-query'
+import { PostgresQueue } from '@/data/database-queues/database-queues-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DATETIME_FORMAT } from '@/lib/constants'
 
 interface QueuesRowsProps {
   queues: PostgresQueue[]

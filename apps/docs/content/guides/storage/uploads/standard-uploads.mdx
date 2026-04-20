@@ -95,6 +95,16 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file)
 
 </TabPanel>
 </$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  --data-binary "@/local/path/to/your/file.ext"
+```
+
+</TabPanel>
 </Tabs>
 
 ## Overwriting files
@@ -181,6 +191,17 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 
 </TabPanel>
 </$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  -H "x-upsert: true" \
+  --data-binary "@/local/path/to/your/file.ext"
+```
+
+</TabPanel>
 </Tabs>
 
 We do advise against overwriting files when possible, as our Content Delivery Network will take sometime to propagate the changes to all the edge nodes leading to stale content.
@@ -269,6 +290,17 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 
 </TabPanel>
 </$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}" \
+  -H "Content-Type: {Content-Type}" \
+  --data-binary "@/local/path/to/your/file.ext"
+```
+
+</TabPanel>
 </Tabs>
 
 ## Concurrency

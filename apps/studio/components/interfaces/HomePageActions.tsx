@@ -1,14 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import {
-  PROJECT_LIST_SORT_VALUES,
-  type ProjectListSort,
-} from 'components/interfaces/Home/ProjectList/ProjectListSort.utils'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { PROJECT_STATUS } from 'lib/constants'
 import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -18,6 +10,14 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { FilterPopover } from '../ui/FilterPopover'
 import { SortDropdown } from '../ui/SortDropdown'
+import {
+  PROJECT_LIST_SORT_VALUES,
+  type ProjectListSort,
+} from '@/components/interfaces/Home/ProjectList/ProjectListSort.utils'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 interface HomePageActionsProps {
   slug?: string

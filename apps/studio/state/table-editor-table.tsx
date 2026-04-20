@@ -1,19 +1,19 @@
-import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
-import {
-  loadTableEditorStateFromLocalStorage,
-  parseSupaTable,
-  saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
-import { Filter, SupaRow } from 'components/grid/types'
-import { getInitialGridColumns } from 'components/grid/utils/column'
-import { getGridColumns } from 'components/grid/utils/gridColumns'
-import { Entity } from 'data/table-editor/table-editor-types'
 import { createContext, PropsWithChildren, useContext, useEffect, useRef } from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
 import { useTableEditorStateSnapshot } from './table-editor'
+import { TableIndexAdvisorProvider } from '@/components/grid/context/TableIndexAdvisorContext'
+import {
+  loadTableEditorStateFromLocalStorage,
+  parseSupaTable,
+  saveTableEditorStateToLocalStorageDebounced,
+} from '@/components/grid/SupabaseGrid.utils'
+import { Filter, SupaRow } from '@/components/grid/types'
+import { getInitialGridColumns } from '@/components/grid/utils/column'
+import { getGridColumns } from '@/components/grid/utils/gridColumns'
+import { Entity } from '@/data/table-editor/table-editor-types'
 
 export const createTableEditorTableState = ({
   projectRef,
@@ -95,10 +95,18 @@ export const createTableEditorTableState = ({
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
       const toIdx = state.gridColumns.findIndex((x) => x.key === toKey)
+      if (fromIdx === -1 || toIdx === -1) return
       const moveItem = state.gridColumns[fromIdx]
+      const overItem = state.gridColumns[toIdx]
+      if (moveItem.frozen || overItem.frozen) return
 
       state.gridColumns.splice(fromIdx, 1)
       state.gridColumns.splice(toIdx, 0, moveItem)
+
+      // Update idx values to match new positions
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     updateColumnSize: (index: number, width: number) => {
       if (state.gridColumns[index]) {
@@ -107,17 +115,35 @@ export const createTableEditorTableState = ({
     },
     freezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      if (state.gridColumns[index]) {
-        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-          true
-      }
+      if (index === -1) return
+      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen = true
+
+      // Move the column to just after the last currently-frozen column
+      const lastFrozenIdx = state.gridColumns.reduce(
+        (last, col, i) => (col.frozen && i !== index ? i : last),
+        -1
+      )
+      const col = state.gridColumns[index]
+      state.gridColumns.splice(index, 1)
+      state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     unfreezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      if (state.gridColumns[index]) {
-        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-          false
-      }
+      if (index === -1) return
+      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+        false
+
+      // Move the column to just after the remaining frozen columns
+      const col = state.gridColumns[index]
+      state.gridColumns.splice(index, 1)
+      const lastFrozenIdx = state.gridColumns.reduce((last, col, i) => (col.frozen ? i : last), -1)
+      state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     updateColumnIdx: (columnKey: string, columnIdx: number) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)

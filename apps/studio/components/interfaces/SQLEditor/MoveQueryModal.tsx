@@ -1,31 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { IS_PLATFORM, useParams } from 'common'
 import { Check, Code, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { IS_PLATFORM, useParams } from 'common'
-import { getContentById } from 'data/content/content-id-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import {
-  SnippetWithContent,
-  useSnippetFolders,
-  useSqlEditorV2StateSnapshot,
-} from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
 import {
   Button,
+  Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
-  Command_Shadcn_,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -34,19 +22,31 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
-  Form_Shadcn_,
   Input_Shadcn_,
   Label_Shadcn_,
+  Popover_Shadcn_,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import * as z from 'zod'
+
+import { getContentById } from '@/data/content/content-id-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import {
+  SnippetWithContent,
+  useSnippetFolders,
+  useSqlEditorV2StateSnapshot,
+} from '@/state/sql-editor-v2'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface MoveQueryModalProps {
   visible: boolean

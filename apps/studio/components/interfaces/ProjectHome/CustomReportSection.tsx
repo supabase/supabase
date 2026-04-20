@@ -10,34 +10,35 @@ import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@d
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { SnippetDropdown } from 'components/interfaces/ProjectHome/SnippetDropdown'
-import { ReportBlock } from 'components/interfaces/Reports/ReportBlock/ReportBlock'
-import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import type { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { useInvalidateAnalyticsQuery } from 'data/analytics/utils'
-import { useContentInfiniteQuery } from 'data/content/content-infinite-query'
-import { Content } from 'data/content/content-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
 import dayjs from 'dayjs'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useTrack } from 'lib/telemetry/track'
 import { Plus, RefreshCw } from 'lucide-react'
 import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { Dashboards } from 'types'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns'
+
+import { SnippetDropdown } from '@/components/interfaces/ProjectHome/SnippetDropdown'
+import { ReportBlock } from '@/components/interfaces/Reports/ReportBlock/ReportBlock'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import type { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { useInvalidateAnalyticsQuery } from '@/data/analytics/utils'
+import { useContentInfiniteQuery } from '@/data/content/content-infinite-query'
+import { Content } from '@/data/content/content-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { Dashboards } from '@/types'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()

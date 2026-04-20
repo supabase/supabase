@@ -786,6 +786,53 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'only in table 2' })).not.toBeVisible()
   })
 
+  test('reverted cell edit clears the pending change', async ({ page, ref }) => {
+    const tableName = `${tableNamePrefix}_revert_edit`
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName, [{ name: 'original value' }])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await enableQueueOperations(page)
+    await page.reload()
+    await waitForTableToLoad(page, ref)
+
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+
+    await expect(page.getByRole('gridcell', { name: 'original value' })).toBeVisible()
+
+    // Edit the cell to a different value
+    const cell = page.getByRole('gridcell', { name: 'original value' })
+    await cell.dblclick()
+
+    const editor = page.getByRole('textbox', { name: /Editor content/ })
+    await expect(editor).toBeVisible()
+    await editor.fill('changed value')
+    await page.keyboard.press('Enter')
+
+    await expect(page.getByText('1 pending change')).toBeVisible()
+
+    // Edit the cell back to the original value
+    const changedCell = page.getByRole('gridcell', { name: 'changed value' })
+    await changedCell.dblclick()
+
+    const editor2 = page.getByRole('textbox', { name: /Editor content/ })
+    await expect(editor2).toBeVisible()
+    await editor2.fill('original value')
+    await page.keyboard.press('Enter')
+
+    // The pending change should be cleared since the value was reverted
+    await expect(page.getByText('pending change')).not.toBeVisible()
+  })
+
   test('editing multiple columns via side panel queues all changes', async ({ page, ref }) => {
     const tableName = `${tableNamePrefix}_multi_col`
 

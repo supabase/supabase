@@ -17,6 +17,17 @@ module.exports = defineConfig([
       'react/display-name': 'warn',
       'react/no-unstable-nested-components': 'warn',
       'react/jsx-key': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
+              message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
+            },
+          ],
+        },
+      ],
       'barrel-files/avoid-re-export-all': 'error',
       'jsx-a11y/alt-text': 'warn',
       'jsx-a11y/role-has-required-aria-props': 'error',

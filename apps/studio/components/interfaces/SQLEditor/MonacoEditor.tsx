@@ -1,21 +1,24 @@
 import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
-
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useTabsStateSnapshot } from 'state/tabs'
+import { useRouter } from 'next/router'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useTabsStateSnapshot } from '@/state/tabs'
 
 export type MonacoEditorProps = {
   id: string
@@ -64,10 +67,7 @@ const MonacoEditor = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
   // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
   const [value, setValue] = useState('')
@@ -79,6 +79,9 @@ const MonacoEditor = ({
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
+
+  const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
+  aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -134,7 +137,7 @@ const MonacoEditor = ({
       label: 'Toggle AI Assistant',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
       run: () => {
-        if (isAIAssistantHotkeyEnabled) {
+        if (aiHotkeyEnabledRef.current) {
           toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         }
       },
@@ -146,26 +149,8 @@ const MonacoEditor = ({
         label: 'Generate SQL',
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
         run: () => {
-          const selection = editor.getSelection()
-          const model = editor.getModel()
-          if (!model || !selection) return
-
-          const allLines = model.getLinesContent()
-
-          const startLineIndex = selection.startLineNumber - 1
-          const endLineIndex = selection.endLineNumber
-
-          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-          onPrompt({
-            selection: selectedText,
-            beforeSelection,
-            afterSelection,
-            startLineNumber: selection?.startLineNumber ?? 0,
-            endLineNumber: selection?.endLineNumber ?? 0,
-          })
+          const selectionParts = getEditorSelectionParts(editor)
+          if (selectionParts) onPrompt(selectionParts)
         },
       })
     }

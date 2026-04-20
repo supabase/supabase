@@ -1,4 +1,4 @@
-import { mergeRefs, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -35,11 +35,16 @@ import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import { RestoreFailedState } from './RestoreFailedState'
 import { RestoringState } from './RestoringState'
+import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
+import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ResourceExhaustionWarningBanner } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { withAuth } from '@/hooks/misc/withAuth'
@@ -110,6 +115,24 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const router = useRouter()
     const { data: selectedOrganization } = useSelectedOrganizationQuery()
     const { data: selectedProject } = useSelectedProjectQuery()
+    const { addBanner, dismissBanner } = useBannerStack()
+    const { data: resourceWarnings } = useResourceWarningsQuery({
+      slug: selectedOrganization?.slug,
+    })
+    const projectResourceWarnings = resourceWarnings?.find(
+      (w) => w.project === selectedProject?.ref
+    )
+    const isComputeNearExhaustion =
+      !!projectResourceWarnings?.cpu_exhaustion ||
+      !!projectResourceWarnings?.memory_and_swap_exhaustion ||
+      !!projectResourceWarnings?.disk_space_exhaustion ||
+      !!projectResourceWarnings?.disk_io_exhaustion
+    const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
+    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+    const [isFreeMicroUpgradeBannerDismissed] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
+      false
+    )
     const { showSidebar } = useAppStateSnapshot()
     const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
 
@@ -152,6 +175,28 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
     const showPausedState = isPaused && !ignorePausedState
+
+    useEffect(() => {
+      if (!selectedProject?.ref) return
+      const isProjectHomepage = router.pathname === '/project/[ref]'
+      if (isProjectHomepage && showUpgradeBanner && !isFreeMicroUpgradeBannerDismissed) {
+        addBanner({
+          id: BANNER_ID.FREE_MICRO_UPGRADE,
+          isDismissed: false,
+          content: <BannerFreeMicroUpgrade />,
+          priority: 2,
+        })
+      } else {
+        dismissBanner(BANNER_ID.FREE_MICRO_UPGRADE)
+      }
+    }, [
+      router.pathname,
+      selectedProject?.ref,
+      showUpgradeBanner,
+      isFreeMicroUpgradeBannerDismissed,
+      addBanner,
+      dismissBanner,
+    ])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
@@ -314,7 +359,13 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
     selectedProject?.status === PROJECT_STATUS.UNKNOWN
   const isProjectPausing = selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
+  const isProjectUnhealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+
+  const ignoreUnhealthyState =
+    isHomePage ||
+    router.pathname.includes('/project/[ref]/settings') ||
+    router.pathname.includes('/project/[ref]/logs')
 
   const shouldRedirectToHomeForBuilding = isProjectBuilding && requiresDbConnection && !isHomePage
 
@@ -353,6 +404,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isProjectPauseFailed) {
     return <PauseFailedState />
+  }
+
+  if (isProjectUnhealthy && !ignoreUnhealthyState) {
+    return <UnhealthyState />
   }
 
   if (requiresPostgrestConnection && isProjectOffline) {
