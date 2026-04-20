@@ -94,6 +94,9 @@ function serializeType(
         properties: (t.declaration?.children ?? []).map((child: any) => ({
           name: child.name,
           optional: child.flags?.isOptional ?? false,
+          ...(child.comment?.summary?.length
+            ? { description: contentToMd(child.comment.summary) }
+            : {}),
           type: st(child.type),
         })),
       };

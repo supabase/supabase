@@ -23,5 +23,10 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(node -e \":*)"
+    ]
   }
 }
