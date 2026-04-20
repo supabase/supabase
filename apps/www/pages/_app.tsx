@@ -1,5 +1,5 @@
 import '@code-hike/mdx/styles.css'
-import 'config/code-hike.scss'
+import 'config/code-hike.css'
 import '../styles/index.css'
 
 import {

@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { CalendarIcon, ExternalLink } from 'lucide-react'
-import { type Control } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
   Button,
@@ -53,6 +54,7 @@ const FormField = ({
   disabled: disabledProp,
   readOnly,
 }: FormFieldProps) => {
+  const { setValue } = useFormContext()
   const { description: originalDescription } = properties
   let description = originalDescription
 
@@ -78,6 +80,12 @@ const FormField = ({
     name: properties.show?.key,
     disabled: properties.show == null,
   })
+
+  useEffect(() => {
+    if (properties.show?.key != null && !showValue && fieldValue !== '') {
+      setValue(name, '', { shouldDirty: true })
+    }
+  }, [fieldValue, name, properties.show?.key, setValue, showValue])
 
   if (properties.show) {
     if (properties.show.matches) {
@@ -243,7 +251,9 @@ const FormField = ({
                           {...field}
                           id={name}
                           type="number"
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
                           readOnly={readOnly}
                         />
                         <InputGroupAddon align="inline-end">
@@ -257,8 +267,10 @@ const FormField = ({
                         {...field}
                         id={name}
                         type="number"
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
                         readOnly={readOnly}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     )}
                   </FormControl_Shadcn_>
@@ -327,19 +339,17 @@ const FormField = ({
                   label={properties.title}
                   description={
                     description ? (
-                      <ReactMarkdown
-                        unwrapDisallowed
-                        disallowedElements={['p']}
-                        className="form-field-markdown"
-                      >
-                        {description}
-                      </ReactMarkdown>
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
                     ) : null
                   }
                 >
                   <FormControl_Shadcn_ className="col-span-6">
                     <Select_Shadcn_
-                      defaultValue={properties.enum[0]}
+                      defaultValue={properties.enum[0]?.value}
                       value={field.value}
                       onValueChange={field.onChange}
                     >

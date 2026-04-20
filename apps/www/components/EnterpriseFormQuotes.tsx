@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { useEffect, useState, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 interface TabProps {
-  label: string | JSX.Element
+  label: ReactNode
   isActive: boolean
   onClick: VoidFunction
 }
@@ -22,9 +22,9 @@ const Tab = ({ isActive, label, onClick }: TabProps) => (
 )
 
 interface Tab {
-  label: string | JSX.Element
+  label: ReactNode
   paragraph?: string
-  panel: JSX.Element
+  panel: ReactNode
 }
 
 interface Props {

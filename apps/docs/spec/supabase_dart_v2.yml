@@ -1506,55 +1506,50 @@ functions:
     description: |
       Receive a notification every time an auth event happens.
     notes: |
-      - Types of auth events: `AuthChangeEvent.passwordRecovery`, `AuthChangeEvent.signedIn`, `AuthChangeEvent.signedOut`, `AuthChangeEvent.tokenRefreshed`, `AuthChangeEvent.userUpdated`and `AuthChangeEvent.userDeleted`
+      - **You must provide an `onError` handler.** Network errors (e.g. an offline token refresh) are emitted as stream errors. If no `onError` is provided, Dart rethrows them as unhandled zone exceptions, crashing the app.
+      - Auth event types: `initialSession`, `signedIn`, `signedOut`, `passwordRecovery`, `tokenRefreshed`, `userUpdated`, `userDeleted`, `mfaChallengeVerified`
     examples:
       - id: listen-to-auth-changes
         name: Listen to auth changes
         isSpotlight: true
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-            final AuthChangeEvent event = data.event;
-            final Session? session = data.session;
-
-            print('event: $event, session: $session');
-
-            switch (event) {
-              case AuthChangeEvent.initialSession:
-              // handle initial session
-              case AuthChangeEvent.signedIn:
-              // handle signed in
-              case AuthChangeEvent.signedOut:
-              // handle signed out
-              case AuthChangeEvent.passwordRecovery:
-              // handle password recovery
-              case AuthChangeEvent.tokenRefreshed:
-              // handle token refreshed
-              case AuthChangeEvent.userUpdated:
-              // handle user updated
-              case AuthChangeEvent.userDeleted:
-              // handle user deleted
-              case AuthChangeEvent.mfaChallengeVerified:
-              // handle mfa challenge verified
-            }
-          });
+          final authSubscription = supabase.auth.onAuthStateChange.listen(
+            (data) {
+              final AuthChangeEvent event = data.event;
+              final Session? session = data.session;
+              // handle event
+            },
+            onError: (error, stackTrace) {
+              // Network errors (e.g. offline) are emitted here.
+              // Handle or log them to avoid an unhandled exception crash.
+            },
+          );
           ```
       - id: listen-to-a-specific-event
         name: Listen to a specific event
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-            final AuthChangeEvent event = data.event;
-            if (event == AuthChangeEvent.signedIn) {
-              // handle signIn
-            }
-          });
+          final authSubscription = supabase.auth.onAuthStateChange.listen(
+            (data) {
+              final AuthChangeEvent event = data.event;
+              if (event == AuthChangeEvent.signedIn) {
+                // handle signIn
+              }
+            },
+            onError: (error, stackTrace) {
+              // Handle or log network / auth errors here.
+            },
+          );
           ```
       - id: unsubscribe-from-auth-subscription
         name: Unsubscribe from auth subscription
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {});
+          final authSubscription = supabase.auth.onAuthStateChange.listen(
+            (data) {},
+            onError: (error, stackTrace) {},
+          );
 
           authSubscription.cancel();
           ```

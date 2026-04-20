@@ -10,6 +10,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type AuthConfigUpdateVariables = {
   projectRef: string
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
+  skipInvalidation?: boolean
 }
 
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
@@ -41,9 +42,10 @@ export const useAuthConfigUpdateMutation = ({
   return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
     mutationFn: (vars) => updateAuthConfig(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
+      const { projectRef, skipInvalidation = false } = variables
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
+        !skipInvalidation &&
+          queryClient.invalidateQueries({ queryKey: authKeys.authConfig(projectRef) }),
         queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
       ])
       await queryClient.refetchQueries({
