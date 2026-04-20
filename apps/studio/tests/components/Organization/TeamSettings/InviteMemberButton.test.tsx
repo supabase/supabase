@@ -169,7 +169,7 @@ describe('InviteMemberButton', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
 
-    expect(await screen.findByText(/invalid email address: not-an-email/i)).toBeInTheDocument()
+    expect(await screen.findByText(/invalid email address: "not-an-email"/i)).toBeInTheDocument()
     expect(mockInvite).not.toHaveBeenCalled()
   })
 
