@@ -18,15 +18,28 @@ async function forwardToSupabaseAPI(request: Request, method: string, params: { 
 
   const projectRef = path[2]
 
-  // Implement your permission check here (e.g. check if the user is a member of the project)
-  // In this example, everyone can access all projects
-  const userHasPermissionForProject = Boolean(projectRef)
-
-  if (!userHasPermissionForProject) {
+  // Verify the requesting user is authenticated via their Supabase Management API token
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json(
-      { message: 'You do not have permission to access this project.' },
-      { status: 403 }
+      { message: 'Authentication required.' },
+      { status: 401 }
     )
+  }
+  const userToken = authHeader.slice(7)
+
+  // Verify the user has access to this project by checking their project membership
+  if (projectRef) {
+    const membershipResponse = await fetch(
+      `https://api.supabase.com/v1/projects/${encodeURIComponent(projectRef)}/members`,
+      { headers: { Authorization: `Bearer ${userToken}` } }
+    )
+    if (!membershipResponse.ok) {
+      return NextResponse.json(
+        { message: 'You do not have permission to access this project.' },
+        { status: 403 }
+      )
+    }
   }
 
   try {

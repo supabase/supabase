@@ -66,11 +66,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'projectRef is required.' }, { status: 400 })
     }
 
-    // Implement your permission check here (e.g. check if the user is a member of the project)
-    // In this example, everyone can access all projects
-    const userHasPermissionForProject = Boolean(projectRef)
+    // Verify the requesting user is authenticated via their Supabase Management API token
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { message: 'Authentication required.' },
+        { status: 401 }
+      )
+    }
+    const userToken = authHeader.slice(7)
 
-    if (!userHasPermissionForProject) {
+    // Verify the user has access to this project by checking their project membership
+    const membershipResponse = await fetch(
+      `https://api.supabase.com/v1/projects/${encodeURIComponent(projectRef)}/members`,
+      { headers: { Authorization: `Bearer ${userToken}` } }
+    )
+    if (!membershipResponse.ok) {
       return NextResponse.json(
         { message: 'You do not have permission to access this project.' },
         { status: 403 }
