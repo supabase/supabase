@@ -7,7 +7,7 @@ The Supabase Data API is a standalone server that sits between your application 
 
 With the Data API, you have granular control over exposure: expose specific tables and functions by granting Data API roles the access they need, or enable **Default privileges for new entities** to automatically grant access to new tables and functions in `public`.
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 Any table that is exposed through the Data API should have [Row Level Security (RLS) enabled](/docs/guides/database/postgres/row-level-security) to prevent unauthorized data access.
 
