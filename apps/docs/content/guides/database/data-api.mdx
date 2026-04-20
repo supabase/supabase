@@ -7,7 +7,11 @@ The Supabase Data API is a standalone server that sits between your application 
 
 With the Data API, you have granular control over exposure: expose specific tables and functions by granting Data API roles the access they need, or enable **Default privileges for new entities** to automatically grant access to new tables and functions in `public`.
 
-**Important:** Any table that is exposed through the Data API should have [Row Level Security (RLS) enabled](/docs/guides/database/postgres/row-level-security) to prevent unauthorized data access.
+<Admonition type="warning">
+
+Any table that is exposed through the Data API should have [Row Level Security (RLS) enabled](/docs/guides/database/postgres/row-level-security) to prevent unauthorized data access.
+
+</Admonition>
 
 ## Expose specific tables and functions (recommended)
 
@@ -21,7 +25,7 @@ grant execute on function public.your_function to anon, authenticated;
 
 ## Use default privileges for new entities in `public`
 
-If you want new entities in `public` to be accessible automatically, enable **Default privileges for new entities** in [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings). This applies only to new tables and functions in `public`.
+If you want new entities in `public` to be accessible automatically, enable **Default privileges for new entities** in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard. This applies only to new tables and functions in `public`.
 
 ```sql
 alter default privileges for role postgres in schema public
@@ -35,7 +39,7 @@ grant execute on functions to anon, authenticated, service_role;
 
 If your app never uses Supabase client libraries, REST, or GraphQL data endpoints:
 
-1. Go to [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings).
+1. In the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/overview) section of the Dashboard.
 1. Turn **Enable Data API** off.
 
 ## Learn more
