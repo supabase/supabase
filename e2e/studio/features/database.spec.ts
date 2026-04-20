@@ -1051,12 +1051,31 @@ test.describe('Database Enumerated Types', () => {
     const databaseEnumValue1Name = 'pw_database_value1'
     const databaseEnumValue2Name = 'pw_database_value2'
     const databaseEnumValue3Name = 'pw_database_value3'
+    const quotedEnumName = 'pw_database_enum_"quoted"'
+    const updatedQuotedEnumName = 'pw_database_enum_"updated"'
+    const quotedEnumValue1Name = 'pw_database_value_"double"'
+    const quotedEnumValue2Name = `pw_database_value's_apostrophe`
+    const quotedEnumValue3Name = `pw_database_value_"combo"'s`
+    const quotedEnumTypes = [quotedEnumName, updatedQuotedEnumName].map(
+      (name) => `public."${name.replaceAll('"', '""')}"`
+    )
 
-    const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=schemas')
+    await using _ = await withSetupCleanup(
+      async () => {
+        for (const typeName of quotedEnumTypes) {
+          await query(`drop type if exists ${typeName};`)
+        }
+      },
+      async () => {
+        for (const typeName of quotedEnumTypes) {
+          await query(`drop type if exists ${typeName};`)
+        }
+      }
+    )
+
     await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/types?schema=public`))
 
-    // Wait for database roles list to be populated
-    await wait
+    await page.waitForLoadState('networkidle')
 
     // if enum exists, delete it.
     if ((await page.getByRole('cell', { name: databaseEnumName, exact: true }).count()) > 0) {
@@ -1103,6 +1122,43 @@ test.describe('Database Enumerated Types', () => {
     await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
     await page.getByRole('button', { name: 'Confirm delete' }).click()
     await expect(page.getByText(`Successfully deleted type "${databaseEnumName}"`)).toBeVisible({
+      timeout: 50000,
+    })
+
+    await page.getByRole('button', { name: 'Create type' }).click()
+    await page.getByRole('textbox', { name: 'Name' }).fill(quotedEnumName)
+    await page.locator('input[name="values.0.value"]').fill(quotedEnumValue1Name)
+    await page.getByRole('button', { name: 'Add value' }).click()
+    await page.locator('input[name="values.1.value"]').fill(quotedEnumValue2Name)
+    const quotedEnumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'types')
+    await page.getByRole('button', { name: 'Create type' }).click()
+
+    await quotedEnumCreateWait
+    const quotedEnumRow = page.getByRole('row', { name: `${quotedEnumName}` })
+    await expect(quotedEnumRow).toContainText(quotedEnumName)
+    await expect(quotedEnumRow).toContainText(
+      `${quotedEnumValue1Name}, ${quotedEnumValue2Name}`
+    )
+
+    await quotedEnumRow.getByRole('button').click()
+    await page.getByRole('menuitem', { name: 'Update type' }).click()
+    await page.getByRole('textbox', { name: 'Name' }).fill(updatedQuotedEnumName)
+    await page.getByRole('button', { name: 'Add value' }).click()
+    await page.locator('input[name="values.2.updatedValue"]').fill(quotedEnumValue3Name)
+    await page.getByRole('button', { name: 'Update type' }).click()
+    const updatedQuotedEnumRow = page.getByRole('row', { name: `${updatedQuotedEnumName}` })
+    await expect(updatedQuotedEnumRow).toContainText(updatedQuotedEnumName)
+    await expect(updatedQuotedEnumRow).toContainText(
+      `${quotedEnumValue1Name}, ${quotedEnumValue2Name}, ${quotedEnumValue3Name}`
+    )
+
+    await updatedQuotedEnumRow.getByRole('button').click()
+    await page.getByRole('menuitem', { name: 'Delete type' }).click()
+    await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
+    await page.getByRole('button', { name: 'Confirm delete' }).click()
+    await expect(
+      page.getByText(`Successfully deleted type "${updatedQuotedEnumName}"`)
+    ).toBeVisible({
       timeout: 50000,
     })
   })

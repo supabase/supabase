@@ -2588,12 +2588,28 @@ export const platform: NavMenuConstant = {
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/sso' as `/${string}` },
+            {
+              name: 'Understanding Login Flows',
+              url: '/guides/platform/sso/login-flows' as `/${string}`,
+            },
+            {
+              name: 'Choosing a Login Flow',
+              url: '/guides/platform/sso/choosing-login-flow' as `/${string}`,
+            },
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },
             {
               name: 'SSO with Google Workspace',
               url: '/guides/platform/sso/gsuite' as `/${string}`,
             },
             { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+            {
+              name: 'Multiple SSO Providers',
+              url: '/guides/platform/sso/multiple-providers' as `/${string}`,
+            },
+            {
+              name: 'Testing and Best Practices',
+              url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
+            },
           ],
         },
       ],

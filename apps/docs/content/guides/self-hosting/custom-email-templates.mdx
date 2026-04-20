@@ -69,7 +69,7 @@ volumes/
 
 Update the `auth` service to depend on `templates-server`, and pass the email template environment variables. Then add a `templates-server` service to serve the templates from `./volumes/templates`.
 
-```yml
+```yml name=docker-compose.yml
 services:
   auth:
     depends_on:
@@ -90,7 +90,7 @@ services:
 
 #### What this configuration does
 
-- Adds a `templates-server`service that runs alongside the Supabase services in the same docker network.
+- Adds a `templates-server` service that runs alongside the Supabase services in the same docker network.
 - Serves your custom email template files from the `./volumes/templates` directory.
 - Keeps the templates-server private to the Docker network (no published ports), so it is not accessible from outside.
 - Allows the `auth` service to fetch templates via `http://templates-server/<template>.html`.
@@ -148,7 +148,7 @@ volumes/
 
 Update the `auth` service in `docker-compose.yml` to enable password changed notification
 
-```yml
+```yml name=docker-compose.yml
 services:
   auth:
     depends_on:
