@@ -3,6 +3,7 @@ import { expect, Page } from '@playwright/test'
 import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/auth-helpers.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
+import { waitForApiResponse } from '../utils/wait-for-response.js'
 
 test.describe('auth users list refresh', () => {
   test.beforeEach(async ({ page, ref }) => {
