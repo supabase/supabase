@@ -1,6 +1,6 @@
 import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
@@ -18,6 +18,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
 import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useTrackDefaultPrivilegesExposure'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { BASE_PATH, PROVIDERS } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
@@ -67,29 +68,12 @@ const CreateProject = () => {
   const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
-  // Raw flag for telemetry — see useDataApiRevokeOnCreateDefaultEnabled for the coerced value
-  // used by the UI. The raw value preserves undefined so exposure only fires once the flag
-  // resolves and cohort attribution is clean.
   const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
 
-  // Fire an exposure event once the flag resolves so we can measure whether the new
-  // checkbox impacts Vercel project creation completion rate. Deduped via ref so we
-  // fire once per mount.
-  const hasTrackedDefaultPrivilegesExposure = useRef(false)
-  useEffect(() => {
-    if (hasTrackedDefaultPrivilegesExposure.current) return
-    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
-    hasTrackedDefaultPrivilegesExposure.current = true
-    track('project_creation_default_privileges_exposed', {
-      surface: 'vercel',
-      // Vercel flow has no "Enable Data API" toggle — Data API is always enabled here.
-      dataApiEnabled: true,
-      dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
-    })
-  }, [dataApiRevokeOnCreateDefaultFlag, track])
+  useTrackDefaultPrivilegesExposure({ surface: 'vercel' })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
@@ -149,6 +133,21 @@ const CreateProject = () => {
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
+      track(
+        'project_creation_simple_version_submitted',
+        {
+          surface: 'vercel',
+          dataApiEnabled: true,
+          dataApiDefaultPrivilegesGranted: dataApiDefaultPrivileges,
+          ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
+            dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+          }),
+        },
+        {
+          project: res.ref,
+          organization: res.organization_slug,
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message)

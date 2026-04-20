@@ -5,7 +5,7 @@ import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -60,6 +60,7 @@ import {
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useTrackDefaultPrivilegesExposure'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -154,22 +155,10 @@ const Wizard: NextPageWithLayout = () => {
     highAvailability,
   } = useWatch_Shadcn_({ control: form.control })
 
-  // Fire an exposure event once the dataApiRevokeOnCreateDefault flag resolves so we
-  // can measure whether the new checkbox impacts project creation completion rate.
-  // Gated on flag resolution (not mount) so cohort attribution is clean — users whose
-  // flag never resolved are not counted in either cohort. Deduped via ref so we fire
-  // once per mount.
-  const hasTrackedDefaultPrivilegesExposure = useRef(false)
-  useEffect(() => {
-    if (hasTrackedDefaultPrivilegesExposure.current) return
-    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
-    hasTrackedDefaultPrivilegesExposure.current = true
-    track('project_creation_default_privileges_exposed', {
-      surface: 'main',
-      dataApiEnabled: form.getValues('dataApi'),
-      dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
-    })
-  }, [dataApiRevokeOnCreateDefaultFlag, track, form])
+  useTrackDefaultPrivilegesExposure({
+    surface: 'main',
+    dataApiEnabled: form.getValues('dataApi'),
+  })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -285,6 +274,7 @@ const Wizard: NextPageWithLayout = () => {
       track(
         'project_creation_simple_version_submitted',
         {
+          surface: 'main',
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),

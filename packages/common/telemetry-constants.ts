@@ -283,10 +283,10 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
 }
 
 /**
- * The project creation form was rendered and the "Default privileges for new entities"
- * checkbox became visible. Fires once per mount after the dataApiRevokeOnCreateDefault
- * flag resolves so cohort attribution is clean. Use this as the top of the funnel when
- * measuring the flag's impact on project creation completion rate.
+ * Top-of-funnel event for the dataApiRevokeOnCreateDefault rollout. Fires once per
+ * mount after the flag resolves so cohort attribution is clean — pair with
+ * project_creation_simple_version_submitted to measure the flag's impact on
+ * project creation completion rate.
  *
  * @group Events
  * @source studio
@@ -295,23 +295,17 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
 export interface ProjectCreationDefaultPrivilegesExposedEvent {
   action: 'project_creation_default_privileges_exposed'
   properties: {
-    /**
-     * The surface where the checkbox was shown.
-     * 'main' = /new/{slug} project creation form
-     * 'vercel' = /integrations/vercel/{slug}/deploy-button/new-project Vercel deploy-button flow
-     */
+    /** Where the checkbox was shown. */
     surface: 'main' | 'vercel'
     /**
-     * Whether the "Enable Data API" toggle is checked at exposure time.
-     * Relevant because the default-privileges checkbox is disabled/dimmed when Data API is off.
-     * Vercel flow has no Data API toggle; always true there.
+     * State of the "Enable Data API" toggle at exposure time. Main flow only —
+     * the Vercel surface has no such toggle, so this is omitted there.
      */
-    dataApiEnabled: boolean
+    dataApiEnabled?: boolean
     /**
      * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
-     * true = user is in the revoke-on-create cohort (checkbox defaulted to unchecked)
-     * false = user is outside the cohort (checkbox defaulted to checked)
-     * Only fires once the flag is resolved, so this property is never omitted.
+     * true = revoke cohort (checkbox defaulted to unchecked)
+     * false = control cohort (checkbox defaulted to checked)
      */
     dataApiRevokeOnCreateDefaultEnabled: boolean
   }
@@ -319,15 +313,22 @@ export interface ProjectCreationDefaultPrivilegesExposedEvent {
 }
 
 /**
- * Existing project creation form was submitted and the project was created.
+ * Project creation form was submitted and the project was created. Fires from both
+ * the main project creation wizard and the Vercel deploy-button flow — disambiguate
+ * by the `surface` property.
  *
  * @group Events
  * @source studio
- * @page new/{slug}
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
  */
 export interface ProjectCreationSimpleVersionSubmittedEvent {
   action: 'project_creation_simple_version_submitted'
   properties: {
+    /**
+     * Which surface produced the submission. Omitted on events emitted before this
+     * property was introduced; treat absent as 'main' for backfill.
+     */
+    surface?: 'main' | 'vercel'
     /**
      * The instance size selected in the project creation form.
      */
