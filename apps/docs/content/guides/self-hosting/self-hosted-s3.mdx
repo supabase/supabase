@@ -17,7 +17,7 @@ You can configure either feature independently. For example, you can enable the 
 
 The S3 protocol endpoint at `/storage/v1/s3` allows standard S3 clients to interact with your self-hosted Storage instance. It works with any storage backend, including the default file-based storage - you do not need to configure an S3 backend first. The Supabase REST API and SDK do not use the S3 protocol.
 
-Make sure to check that `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in you `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
+Make sure to check that `REGION`, `S3_PROTOCOL_ACCESS_KEY_ID` and `S3_PROTOCOL_ACCESS_KEY_SECRET` are properly configured in your `.env` file. Read more about the secrets and passwords in [Configuring and securing Supabase](/docs/guides/self-hosting/docker#configuring-and-securing-supabase).
 
 ```yaml name=docker-compose.yml
 storage:

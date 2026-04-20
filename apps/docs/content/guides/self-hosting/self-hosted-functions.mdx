@@ -31,7 +31,7 @@ mkdir -p volumes/functions/my-function &&
 touch volumes/functions/my-function/index.ts
 ```
 
-add the following code to `index.ts`:
+Add the following code to `index.ts`:
 
 ```typescript
 Deno.serve(async (req: Request) => {
@@ -115,7 +115,7 @@ Then define `MY_CUSTOM_VAR` in your main `.env` file, or specify the value direc
 
 ### Accessing variables in functions
 
-All container environment variables are forwarded to function workers by `main/index.ts`. Access them with:
+All container environment variables are forwarded to the function workers by `main/index.ts`. Access them with:
 
 ```typescript
 const customVar = Deno.env.get('MY_CUSTOM_VAR')
