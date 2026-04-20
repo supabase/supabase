@@ -450,6 +450,49 @@ describe('SQL Event Parser', () => {
       expect(results).toEqual([])
     })
 
+    it('does not leak nested dollar-quoted dynamic SQL through statement splitting', () => {
+      // Regression: an inner $sql$...$sql$ tag used inside an outer $fn$...$fn$
+      // body was pairing with the outer opening tag (the splitStatements regex
+      // doesn't enforce matching tags), which caused the inner semicolon to
+      // split the statement and exposed `create table fake` to the detectors.
+      // The fix is that stripDollarQuoteBodies runs before splitStatements and
+      // uses a backreference to require matching tags.
+      const sql = `
+        create function f()
+        returns void
+        language plpgsql
+        as $fn$
+        begin
+          execute $sql$create table fake(id int);$sql$;
+        end;
+        $fn$;
+      `
+      const results = sqlEventParser.getTableEvents(sql)
+      expect(results).toEqual([])
+    })
+
+    it('still detects a real top-level CREATE TABLE next to a function with nested dollar tags', () => {
+      const sql = `
+        create table public.real_table(id int);
+        create function f()
+        returns void
+        language plpgsql
+        as $fn$
+        begin
+          execute $sql$create table fake(id int);$sql$;
+        end;
+        $fn$;
+      `
+      const results = sqlEventParser.getTableEvents(sql)
+      expect(results).toEqual([
+        {
+          type: TABLE_EVENT_ACTIONS.TableCreated,
+          schema: 'public',
+          tableName: 'real_table',
+        },
+      ])
+    })
+
     it('handles SQL injection attempts safely', () => {
       const sql = "CREATE TABLE users'; DROP TABLE users; -- (id INT)"
       const results = sqlEventParser.getTableEvents(sql)

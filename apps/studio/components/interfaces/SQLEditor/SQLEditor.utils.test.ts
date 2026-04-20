@@ -487,6 +487,24 @@ describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
     expect(result).toEqual([{ schema: 'public', tableName: 'foo' }])
   })
 
+  it('does not flag CREATE TABLE inside nested dollar-quoted dynamic SQL', () => {
+    // Regression: the `$sql$...$sql$` block inside the outer `$fn$...$fn$`
+    // body was previously pairing with the outer tag, letting the inner
+    // semicolon split the statement and exposing `create table fake` to the
+    // RLS warning.
+    const sql = stripIndent`
+      create function f()
+      returns void
+      language plpgsql
+      as $fn$
+      begin
+        execute $sql$create table fake(id int);$sql$;
+      end;
+      $fn$;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
   it('handles custom dollar-quote tags (e.g. $body$...$body$)', () => {
     const sql = stripIndent`
       create or replace function f()
