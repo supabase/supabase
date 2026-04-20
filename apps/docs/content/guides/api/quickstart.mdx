@@ -40,10 +40,8 @@ We'll create a database table called `todos` for storing tasks. This creates a c
       );
 
       -- Enable Data API access
-      -- Allow read-only access for anonymous clients (write access requires RLS policies)
+      -- Allow read-only access for anonymous clients
       grant select on public.todos to anon;
-      grant select, insert, update, delete on public.todos to authenticated;
-      grant select, insert, update, delete on public.todos to service_role;
       ```
 
       </TabPanel>
@@ -67,7 +65,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
     <StepHikeCompact.Details title="Allow public access">
 
-    Let's turn on Row Level Security for this table and allow public access.
+    Let's turn on Row Level Security for this table, create the required policies, and then grant any write access.
 
     </StepHikeCompact.Details>
 
@@ -84,6 +82,18 @@ We'll create a database table called `todos` for storing tasks. This creates a c
         for select
         to anon
         using (true);
+
+      -- Allow authenticated users to read and modify todos
+      create policy "Allow authenticated users to manage todos"
+        on todos
+        for all
+        to authenticated
+        using (true)
+        with check (true);
+
+      -- Grant write access only after RLS and policies are in place
+      grant select, insert, update, delete on public.todos to authenticated;
+      grant select, insert, update, delete on public.todos to service_role;
       ```
 
     </StepHikeCompact.Code>
