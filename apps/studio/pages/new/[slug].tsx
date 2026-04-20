@@ -59,8 +59,10 @@ import {
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
-import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useTrackDefaultPrivilegesExposure'
+import {
+  useDataApiRevokeOnCreateDefaultEnabled,
+  useTrackDefaultPrivilegesExposure,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'

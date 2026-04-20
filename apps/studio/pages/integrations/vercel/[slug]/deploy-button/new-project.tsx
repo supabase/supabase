@@ -16,9 +16,11 @@ import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integratio
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
-import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import {
+  useDataApiRevokeOnCreateDefaultEnabled,
+  useTrackDefaultPrivilegesExposure,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useTrackDefaultPrivilegesExposure'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { BASE_PATH, PROVIDERS } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
