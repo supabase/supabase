@@ -166,12 +166,12 @@ Review and change URL configuration variables:
 - `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000`
 - `SITE_URL`: default [redirect URL](/docs/guides/auth/redirect-urls) for Auth, e.g., `http://example.com:3000`
 
-<Admonition type="note" label="What <your-domain> means in the docs">
+<Admonition type="note" label="What your-domain means in the docs">
 
-Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
+  Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
-- **Default setup:** Kong listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
-- **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
+  - **Default setup:** Kong listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+  - **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
 
