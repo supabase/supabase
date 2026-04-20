@@ -10,7 +10,7 @@ Row-Level Security (RLS) restricts which table rows are visible or modifiable by
   ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
   \`\`\`
 - **Default Behavior:** Once enabled, all access is denied (except for the owner or superuser) until appropriate policies are defined.
-- **Secure by Default (important change):** Supabase now hides tables that do not have RLS enabled from the API entirely. Previously, tables without RLS were publicly accessible. If a user reports that a table is unexpectedly inaccessible, check whether RLS is enabled and whether the appropriate policies exist. Proactively call this out when helping users create or debug table access.
+- **Secure by Default (important change):** Supabase no longer automatically grants API access to newly created tables. Previously, tables were automatically accessible to the \`anon\` and \`authenticated\` roles via the Data API - now they must be explicitly granted. Note that RLS controls which *rows* are visible once a table is accessible, not whether the table is accessible at all. If a user reports a table is unexpectedly inaccessible, check: (1) whether \`anon\`/\`authenticated\` have been granted access (via the Table Editor or \`GRANT\` SQL), and (2) whether appropriate RLS policies exist if RLS is enabled. When granting public (\`anon\`/\`authenticated\`) access to a table, always recommend enabling RLS - this change exists precisely to ensure tables are not exposed without row-level access control in place.
 
 ### Policy Types
 - **SELECT:** Use \`USING\` to filter visible rows on read.
@@ -255,7 +255,7 @@ export const PG_BEST_PRACTICES = `
 
 ### Tables
 - Every table must have a primary key, preferably \`id bigint primary key generated always as identity\`.
-- Enable Row Level Security (RLS) on all new tables with \`enable row level security\`. Tables without RLS are no longer exposed via the API. Inform users that they must also add policies to grant access.
+- Enable Row Level Security (RLS) on all new tables with \`enable row level security\` and add appropriate policies. When granting \`anon\` or \`authenticated\` access to a table, always enable RLS — tables should never be publicly exposed without row-level access control.
 - Define foreign key references within the \`CREATE TABLE\` statement.
 - Whenever a foreign key is included, generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to improve join performance.
 - **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.

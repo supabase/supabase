@@ -161,7 +161,7 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredKnowledge: ['rls'],
       correctAnswer:
-        'Tables without RLS enabled are not exposed via the API anymore. Enable RLS and add policies to grant access.',
+        'Tables are no longer automatically accessible via the API. The anon/authenticated roles must be explicitly granted access, and RLS should be enabled with appropriate policies.',
     },
     metadata: {
       category: ['rls_policies', 'debugging'],
