@@ -150,9 +150,7 @@ Deno.serve(async (req) => {
 
 ## Simplifying with `@supabase/server`
 
-The patterns above share a lot of plumbing: reading headers, matching API keys, forwarding the user JWT, handling CORS, and wiring up the Supabase client. The [`@supabase/server`](https://github.com/supabase/server) package collapses each one into a single `allow` mode.
-
-`withSupabase({ allow })` wraps your handler. It checks the credential against the declared mode, returns a 401 automatically if it doesn't match, and hands you a pre-configured Supabase client on `ctx`.
+The [`@supabase/server`](https://github.com/supabase/server) package wraps your handler, checks the caller's credentials against a declared `allow` mode, and hands you a pre-configured Supabase client on `ctx`. The same patterns above, written against the SDK, look like this.
 
 | `allow` mode      | Accepts                                    |
 | ----------------- | ------------------------------------------ |
