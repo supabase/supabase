@@ -247,7 +247,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {unifiedLogsFlagEnabled && isUnifiedLogsEligible && (
+      {isUnifiedLogsEligible && (
         <FeaturePreviewSidebarPanel
           className="mx-4 mt-4"
           title="Introducing unified logs"
