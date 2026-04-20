@@ -1,7 +1,18 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ArrowLeft, Check, ChevronRight, Columns, List, RefreshCw, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import {
+  ArrowLeft,
+  Check,
+  ChevronRight,
+  Columns,
+  List,
+  RefreshCw,
+  Search,
+  Upload,
+  X,
+} from 'lucide-react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -12,13 +23,18 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Label_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
+import { uploadFilesToBucket } from './BucketFilePickerDialog.utils'
 import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { storageKeys } from '@/data/storage/keys'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
@@ -97,9 +113,14 @@ const HeaderBreadcrumbs = ({
 
 export const BucketFilePickerHeader = () => {
   const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
 
   const [isSearching, setIsSearching] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const uploadButtonRef = useRef<HTMLInputElement | null>(null)
+
+  const { hostEndpoint } = useProjectApiUrl({ projectRef: projectRef! })
 
   const { view, sortBy, sortByOrder, setSortBy, setSortByOrder, setView } = useStoragePreference(
     projectRef!
@@ -115,6 +136,8 @@ export const BucketFilePickerHeader = () => {
     setSelectedFilePreview,
   } = useBucketFilePickerStateSnapshot()
 
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+
   const breadcrumbs = columns
   const backDisabled = columns.length <= 1
 
@@ -123,9 +146,30 @@ export const BucketFilePickerHeader = () => {
     setSelectedFilePreview(undefined)
   }
 
+  const onSelectUpload = () => {
+    if (uploadButtonRef.current) {
+      uploadButtonRef.current.click()
+    }
+  }
+
+  const handleFilesUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    await uploadFilesToBucket({
+      files,
+      projectRef: projectRef!,
+      hostEndpoint: hostEndpoint!,
+      bucketName: bucket.name,
+      bucketId: bucket.id,
+      currentPath: columns.join('/'),
+      queryClient,
+    })
+    queryClient.invalidateQueries({
+      queryKey: storageKeys.objects(projectRef!, bucket.id, columns.join('/')),
+    })
+    event.target.value = ''
+  }
+
   /** Methods for searching */
-  // Search is currently within local scope when the view is set to list
-  // Searching for column view requires much more thinking
   const toggleSearch = () => {
     setIsSearching(true)
   }
@@ -140,8 +184,6 @@ export const BucketFilePickerHeader = () => {
   const selectBreadcrumb = (columnIndex: number) => {
     popColumnAtIndex(columnIndex)
   }
-
-  const queryClient = useQueryClient()
 
   const refreshData = async () => {
     setIsRefreshing(true)
@@ -254,6 +296,27 @@ export const BucketFilePickerHeader = () => {
             </div>
 
             <div className="h-6 shrink-0 border-r border-control" />
+            <div className="flex shrink-0 items-center space-x-1 px-2">
+              <div className="hidden">
+                <input ref={uploadButtonRef} type="file" multiple onChange={handleFilesUpload} />
+              </div>
+              <ButtonTooltip
+                icon={<Upload size={16} strokeWidth={2} />}
+                type="text"
+                disabled={!canUpdateStorage}
+                onClick={onSelectUpload}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text: !canUpdateStorage
+                      ? 'You need additional permissions to upload files'
+                      : undefined,
+                  },
+                }}
+              >
+                Upload files
+              </ButtonTooltip>
+            </div>
 
             <div className="h-6 shrink-0 border-r border-control" />
             <div className="flex shrink-0 items-center px-2">

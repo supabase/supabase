@@ -1,7 +1,12 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import { compact, find, get, sum, uniqBy } from 'lodash'
-import { useCallback, useMemo } from 'react'
+import { Upload } from 'lucide-react'
+import { useCallback, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -9,10 +14,15 @@ import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage
 import type { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import { formatFolderItems } from '../StorageExplorer/StorageExplorer.utils'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
+import { uploadFilesToBucket } from './BucketFilePickerDialog.utils'
 import { BucketFilePickerRow } from './BucketFilePickerRow'
 import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
+import { listBucketObjects } from '@/data/storage/bucket-objects-list-mutation'
+import { storageKeys } from '@/data/storage/keys'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 
 const SelectAllCheckbox = ({
@@ -33,6 +43,41 @@ const SelectAllCheckbox = ({
   />
 )
 
+const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1, ease: 'easeOut' }}
+          className="h-full w-full absolute top-0"
+        >
+          <div
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+            className="absolute top-0 flex h-full w-full items-center justify-center"
+            style={{ backgroundColor: folderIsEmpty ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.2)' }}
+          >
+            {!folderIsEmpty && (
+              <div
+                className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
+                style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+              >
+                <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+                <p className="text-center text-sm text-white mt-2 pointer-events-none">
+                  Drop your files to upload to this folder
+                </p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
 export interface BucketFilePickerColumnProps {
   index: number
   fullWidth?: boolean
@@ -43,6 +88,13 @@ export const BucketFilePickerColumn = ({
   fullWidth = false,
 }: BucketFilePickerColumnProps) => {
   const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
+
+  const [isDraggedOver, setIsDraggedOver] = useState(false)
+  const columnRef = useRef<HTMLDivElement | null>(null)
+
+  const { hostEndpoint } = useProjectApiUrl({ projectRef: projectRef! })
+  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const {
     columns,
@@ -202,14 +254,53 @@ export const BucketFilePickerColumn = ({
     clearSelectedItems()
   }
 
+  const onDragOver = (event: any) => {
+    if (event) {
+      event.stopPropagation()
+      event.preventDefault()
+      if (event.type === 'dragover' && !isDraggedOver) {
+        setIsDraggedOver(true)
+      }
+    }
+  }
+
+  const onDrop = async (event: any) => {
+    onDragOver(event)
+
+    if (!canUpdateStorage) {
+      toast('You need additional permissions to upload files to this project')
+      return
+    }
+
+    const files = Array.from(event.dataTransfer?.files ?? []) as File[]
+    await uploadFilesToBucket({
+      files,
+      projectRef: projectRef!,
+      hostEndpoint: hostEndpoint!,
+      bucketName: bucket.name,
+      bucketId: bucket.id,
+      currentPath: columns.slice(0, index).join('/'),
+      queryClient,
+    })
+
+    queryClient.invalidateQueries({
+      queryKey: storageKeys.objects(projectRef!, bucket.id, columns.slice(0, index).join('/')),
+    })
+
+    setIsDraggedOver(false)
+  }
+
   return (
     <>
       <div
+        ref={columnRef}
         className={cn(
           fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
           view === STORAGE_VIEWS.LIST && 'h-full',
           'hide-scrollbar relative flex flex-shrink-0 flex-col overflow-auto'
         )}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
         onClick={(event) => {
           const eventTarget = get(event.target, ['className'], '')
           if (typeof eventTarget === 'string' && eventTarget.includes('react-contexify')) return
@@ -331,6 +422,22 @@ export const BucketFilePickerColumn = ({
             </p>
           </div>
         )}
+
+        {debouncedSearchString.length === 0 && isEmpty && !isLoading && (
+          <div className="h-full w-full flex flex-col items-center justify-center">
+            <p className="text-sm my-3 opacity-75">Drop your files here</p>
+            <p className="w-40 text-center text-xs text-foreground-light">
+              Or upload them via the "Upload files" button above
+            </p>
+          </div>
+        )}
+
+        <DragOverOverlay
+          isOpen={isDraggedOver}
+          folderIsEmpty={isEmpty}
+          onDragLeave={() => setIsDraggedOver(false)}
+          onDrop={() => setIsDraggedOver(false)}
+        />
 
         {/* List interface footer */}
         {view === STORAGE_VIEWS.LIST && (
