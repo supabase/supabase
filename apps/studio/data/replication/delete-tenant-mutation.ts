@@ -47,11 +47,7 @@ export const useDeleteReplicationTenantMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    DeleteReplicationTenantData,
-    ResponseError,
-    DeleteReplicationTenantParams
-  >({
+  return useMutation<DeleteReplicationTenantData, ResponseError, DeleteReplicationTenantParams>({
     mutationFn: (vars) => deleteReplicationTenant(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

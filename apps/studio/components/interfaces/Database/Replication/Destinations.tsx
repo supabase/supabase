@@ -23,10 +23,10 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
+import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
 import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import { useIsETLBigQueryPrivateAlpha, useIsETLIcebergPrivateAlpha } from './useIsETLPrivateAlpha'
@@ -220,35 +220,37 @@ export const Destinations = () => {
             >
               Add destination
             </Button>
-            {canDisableExternalReplication && externalReplicationSource !== undefined && projectRef && (
-              <>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      aria-label="Manage replication"
-                      type="default"
-                      className="px-1"
-                      icon={<MoreVertical />}
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="bottom" align="end" className="w-56">
-                    <DropdownMenuItem
-                      className="text-destructive focus:text-destructive"
-                      onClick={() => setShowDisableExternalReplicationDialog(true)}
-                    >
-                      Disable external replication
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+            {canDisableExternalReplication &&
+              externalReplicationSource !== undefined &&
+              projectRef && (
+                <>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        aria-label="Manage replication"
+                        type="default"
+                        className="px-1"
+                        icon={<MoreVertical />}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end" className="w-56">
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() => setShowDisableExternalReplicationDialog(true)}
+                      >
+                        Disable external replication
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
 
-                <DisableExternalReplicationDialog
-                  projectRef={projectRef}
-                  tenantId={externalReplicationSource.tenant_id}
-                  visible={showDisableExternalReplicationDialog}
-                  onOpenChange={setShowDisableExternalReplicationDialog}
-                />
-              </>
-            )}
+                  <DisableExternalReplicationDialog
+                    projectRef={projectRef}
+                    tenantId={externalReplicationSource.tenant_id}
+                    visible={showDisableExternalReplicationDialog}
+                    onOpenChange={setShowDisableExternalReplicationDialog}
+                  />
+                </>
+              )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
           </div>
         </div>
