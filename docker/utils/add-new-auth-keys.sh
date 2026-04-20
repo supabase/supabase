@@ -143,9 +143,6 @@ echo ""
 echo "SUPABASE_PUBLISHABLE_KEY=${SUPABASE_PUBLISHABLE_KEY}"
 echo "SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY}"
 echo ""
-echo "ANON_KEY_ASYMMETRIC=${ANON_KEY_ASYMMETRIC}"
-echo "SERVICE_ROLE_KEY_ASYMMETRIC=${SERVICE_ROLE_KEY_ASYMMETRIC}"
-echo ""
 echo "JWT_KEYS=${JWT_KEYS}"
 echo ""
 echo "JWT_JWKS=${JWT_JWKS}"
@@ -186,3 +183,20 @@ for var in SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY ANON_KEY_ASYMMETRIC SERV
         echo "${var}=${val}" >> .env
     fi
 done
+
+# Uncomment the JWKS lines in docker-compose.yml so the new keys take effect.
+echo "Uncommenting JWKS lines in docker-compose.yml..."
+if [ ! -f docker-compose.yml ]; then
+    echo "Error: docker-compose.yml not found in $(pwd)."
+    exit 1
+fi
+
+if sed -i.old \
+    -e '/^[ ]*#GOTRUE_JWT_KEYS:/ s/#//' \
+    -e '/^[ ]*#API_JWT_JWKS:/ s/#//' \
+    -e '/^[ ]*#JWT_JWKS:/ s/#//' \
+    docker-compose.yml; then
+    echo "Done."
+else
+    echo "Warning: could not edit docker-compose.yml. Uncomment the JWKS lines manually."
+fi
