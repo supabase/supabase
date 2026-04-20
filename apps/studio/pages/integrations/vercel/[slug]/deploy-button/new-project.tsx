@@ -1,6 +1,6 @@
 import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
@@ -18,10 +18,12 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
 import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 import { BASE_PATH, PROVIDERS } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
 import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
+import { useTrack } from '@/lib/telemetry/track'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 import type { NextPageWithLayout } from '@/types'
 
@@ -62,11 +64,32 @@ const CreateProject = () => {
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
   const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
+  const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+  // Raw flag for telemetry — see useDataApiRevokeOnCreateDefaultEnabled for the coerced value
+  // used by the UI. The raw value preserves undefined so exposure only fires once the flag
+  // resolves and cohort attribution is clean.
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
   const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
     !isDataApiRevokeOnCreateDefault
   )
+
+  // Fire an exposure event once the flag resolves so we can measure whether the new
+  // checkbox impacts Vercel project creation completion rate. Deduped via ref so we
+  // fire once per mount.
+  const hasTrackedDefaultPrivilegesExposure = useRef(false)
+  useEffect(() => {
+    if (hasTrackedDefaultPrivilegesExposure.current) return
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    hasTrackedDefaultPrivilegesExposure.current = true
+    track('project_creation_default_privileges_exposed', {
+      surface: 'vercel',
+      // Vercel flow has no "Enable Data API" toggle — Data API is always enabled here.
+      dataApiEnabled: true,
+      dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+    })
+  }, [dataApiRevokeOnCreateDefaultFlag, track])
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)

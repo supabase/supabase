@@ -283,6 +283,42 @@ export interface ProjectCreationRlsOptionExperimentExposedEvent {
 }
 
 /**
+ * The project creation form was rendered and the "Default privileges for new entities"
+ * checkbox became visible. Fires once per mount after the dataApiRevokeOnCreateDefault
+ * flag resolves so cohort attribution is clean. Use this as the top of the funnel when
+ * measuring the flag's impact on project creation completion rate.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface ProjectCreationDefaultPrivilegesExposedEvent {
+  action: 'project_creation_default_privileges_exposed'
+  properties: {
+    /**
+     * The surface where the checkbox was shown.
+     * 'main' = /new/{slug} project creation form
+     * 'vercel' = /integrations/vercel/{slug}/deploy-button/new-project Vercel deploy-button flow
+     */
+    surface: 'main' | 'vercel'
+    /**
+     * Whether the "Enable Data API" toggle is checked at exposure time.
+     * Relevant because the default-privileges checkbox is disabled/dimmed when Data API is off.
+     * Vercel flow has no Data API toggle; always true there.
+     */
+    dataApiEnabled: boolean
+    /**
+     * Raw value of the dataApiRevokeOnCreateDefault PostHog flag at exposure time.
+     * true = user is in the revoke-on-create cohort (checkbox defaulted to unchecked)
+     * false = user is outside the cohort (checkbox defaulted to checked)
+     * Only fires once the flag is resolved, so this property is never omitted.
+     */
+    dataApiRevokeOnCreateDefaultEnabled: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Existing project creation form was submitted and the project was created.
  *
  * @group Events
@@ -3193,6 +3229,7 @@ export type TelemetryEvent =
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | ProjectCreationRlsOptionExperimentExposedEvent
+  | ProjectCreationDefaultPrivilegesExposedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | TableApiAccessToggleClickedEvent

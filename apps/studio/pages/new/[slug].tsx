@@ -5,7 +5,7 @@ import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -153,6 +153,23 @@ const Wizard: NextPageWithLayout = () => {
     organization,
     highAvailability,
   } = useWatch_Shadcn_({ control: form.control })
+
+  // Fire an exposure event once the dataApiRevokeOnCreateDefault flag resolves so we
+  // can measure whether the new checkbox impacts project creation completion rate.
+  // Gated on flag resolution (not mount) so cohort attribution is clean — users whose
+  // flag never resolved are not counted in either cohort. Deduped via ref so we fire
+  // once per mount.
+  const hasTrackedDefaultPrivilegesExposure = useRef(false)
+  useEffect(() => {
+    if (hasTrackedDefaultPrivilegesExposure.current) return
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    hasTrackedDefaultPrivilegesExposure.current = true
+    track('project_creation_default_privileges_exposed', {
+      surface: 'main',
+      dataApiEnabled: form.getValues('dataApi'),
+      dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+    })
+  }, [dataApiRevokeOnCreateDefaultFlag, track, form])
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
