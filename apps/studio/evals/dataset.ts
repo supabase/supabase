@@ -142,6 +142,34 @@ export const dataset: AssistantEvalCase[] = [
     metadata: { category: ['rls_policies'] },
   },
   {
+    input: {
+      prompt: "I have an orders table but now I can't query it through the API. What's wrong?",
+      mockTables: {
+        public: [
+          {
+            name: 'orders',
+            rls_enabled: false,
+            columns: [
+              { name: 'id', data_type: 'bigint' },
+              { name: 'user_id', data_type: 'uuid' },
+              { name: 'total', data_type: 'numeric' },
+            ],
+          },
+        ],
+      },
+    },
+    expected: {
+      requiredKnowledge: ['rls'],
+      correctAnswer:
+        'Tables without RLS enabled are not exposed via the API anymore. Enable RLS and add policies to grant access.',
+    },
+    metadata: {
+      category: ['rls_policies', 'debugging'],
+      description:
+        'Verifies the assistant calls out secure-by-default behavior when a table is inaccessible due to RLS not being enabled',
+    },
+  },
+  {
     input: { prompt: 'Write an edge function that sends a welcome email when a user signs up' },
     expected: {
       requiredTools: ['deploy_edge_function'],
