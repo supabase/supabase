@@ -295,7 +295,7 @@ function Database() {
           </div>
         </SectionContainer>
 
-        <SectionContainer className="-mb-48">
+        <SectionContainer className="pb-16 lg:pb-24">
           <APISection
             // @ts-ignore
             content={ApiExamplesData}
@@ -307,10 +307,9 @@ function Database() {
               </p>,
             ]}
             footer={[
-              <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1 xl:gap-2 xl:items-center">
-                  <p className="text-foreground-light m-0">Available libraries:</p>
-                  <div className="flex gap-1 xl:mb-0.5">
+              <div key={0} className="mt-4 flex flex-col gap-2">
+                <p className="text-foreground-light m-0">Available libraries:</p>
+                <div className="flex flex-wrap gap-1">
                     <Link href="/docs/reference/javascript/introduction" target="_blank">
                       <Badge>Javascript</Badge>
                     </Link>
@@ -331,7 +330,6 @@ function Database() {
                     </Link>
                   </div>
                 </div>
-              </div>,
             ]}
             documentation_link={'/docs/guides/database'}
           />
