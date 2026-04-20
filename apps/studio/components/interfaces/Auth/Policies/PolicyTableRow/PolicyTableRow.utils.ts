@@ -14,6 +14,7 @@ export type TableDataApiStatus =
   | 'publicly-readable' // fully granted + RLS disabled (dangerous)
   | 'locked-by-rls' // fully granted + RLS enabled, no policies
   | 'secured' // fully granted + RLS enabled, policies exist
+  | 'unknown' // privileges query is still loading or errored — caller should stay silent
 
 export function getTableDataApiStatus({
   isSchemaExposed,
@@ -34,7 +35,10 @@ export function getTableDataApiStatus({
     if (policiesCount === 0) return 'locked-by-rls'
     return 'secured'
   }
-  return 'schema-not-exposed'
+  // Schema is exposed but the privileges query hasn't resolved (still loading
+  // or errored). We return 'unknown' rather than 'schema-not-exposed' so the
+  // caller doesn't falsely tell the user to reconfigure API settings.
+  return 'unknown'
 }
 
 /**

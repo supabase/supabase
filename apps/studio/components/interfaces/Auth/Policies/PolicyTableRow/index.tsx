@@ -58,7 +58,11 @@ const PolicyTableRowComponent = ({
   // Ideally we'd rely on the security lints, but they only look at the public schema and
   // ignore roles. Once the lints cover both, we can switch to them as the source of truth.
   const tableNames = useMemo(() => [table.name], [table.name])
-  const { data: apiAccessMap, isPending: isLoadingRolesAccess } = useTableApiAccessQuery({
+  const {
+    data: apiAccessMap,
+    isPending: isLoadingRolesAccess,
+    isError: isRolesAccessError,
+  } = useTableApiAccessQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schemaName: table.schema,
@@ -101,7 +105,7 @@ const PolicyTableRowComponent = ({
         />
       </CardHeader>
 
-      {!isLoadingRolesAccess && status === 'schema-not-exposed' && (
+      {!isLoadingRolesAccess && !isRolesAccessError && status === 'schema-not-exposed' && (
         <Admonition
           showIcon={false}
           type="warning"
@@ -118,7 +122,7 @@ const PolicyTableRowComponent = ({
         </Admonition>
       )}
 
-      {!isLoadingRolesAccess && admonitionMessage !== null && (
+      {!isLoadingRolesAccess && !isRolesAccessError && admonitionMessage !== null && (
         <Admonition
           showIcon={false}
           type={isPubliclyReadable ? 'warning' : 'default'}

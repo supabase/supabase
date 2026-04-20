@@ -92,26 +92,29 @@ describe('getTableDataApiStatus', () => {
     expect(status).toBe('secured')
   })
 
-  it('falls back to schema-not-exposed when apiAccessData is still loading', () => {
-    // apiAccessData is undefined during the initial fetch — the row should be neutral
-    // (the skeleton loader handles the visual), not trip any admonition.
+  it('returns unknown when apiAccessData is still loading or errored', () => {
+    // apiAccessData is undefined during loading AND on query error (isPending flips false
+    // but data stays undefined). We must not fall through to 'schema-not-exposed' — that
+    // would tell the user to reconfigure API settings for a schema that is in fact exposed.
     const status = getTableDataApiStatus({
       isSchemaExposed: true,
       apiAccessData: undefined,
       isRLSEnabled: true,
       policiesCount: 0,
     })
-    expect(status).toBe('schema-not-exposed')
+    expect(status).toBe('unknown')
   })
 
-  it('falls back to schema-not-exposed when apiAccessData reports apiAccessType=none', () => {
+  it('returns unknown when apiAccessData reports apiAccessType=none on an exposed schema', () => {
+    // Defensive: the query shouldn't emit apiAccessType=none when schema is exposed,
+    // but if it does we still don't want the false "schema not exposed" admonition.
     const status = getTableDataApiStatus({
       isSchemaExposed: true,
       apiAccessData: schemaNotExposedData,
       isRLSEnabled: true,
       policiesCount: 0,
     })
-    expect(status).toBe('schema-not-exposed')
+    expect(status).toBe('unknown')
   })
 
   it('isSchemaExposed=false wins over any apiAccessData value', () => {
@@ -173,5 +176,9 @@ describe('getTableAdmonitionMessage', () => {
 
   it('returns null for schema-not-exposed — handled by a separate admonition with a link', () => {
     expect(getTableAdmonitionMessage('schema-not-exposed')).toBeNull()
+  })
+
+  it('returns null for unknown — caller should stay silent during loading/errored state', () => {
+    expect(getTableAdmonitionMessage('unknown')).toBeNull()
   })
 })
