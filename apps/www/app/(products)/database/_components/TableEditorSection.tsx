@@ -61,7 +61,7 @@ const INTERVAL_DURATION = 8000
 export function TableEditorSection() {
   const [activeIdx, setActiveIdx] = useState(0)
   const [progress, setProgress] = useState(0)
-  const intervalRef = useRef<ReturnType | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const { ref: inViewRef, inView } = useInView({ threshold: 0.3 })
   const active = TABS[activeIdx]
 

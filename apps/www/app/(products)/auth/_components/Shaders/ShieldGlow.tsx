@@ -126,8 +126,9 @@ export function ShieldGlow({ hovered }: Props) {
   }, [hovered])
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvasMaybe = canvasRef.current
+    if (!canvasMaybe) return
+    const canvas: HTMLCanvasElement = canvasMaybe
 
     let running = true
     let raf: number

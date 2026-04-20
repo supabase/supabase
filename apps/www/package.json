@@ -77,6 +77,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-countdown": "^2.3.5",
     "react-dom": "catalog:",
+    "react-intersection-observer": "^9.8.2",
     "react-markdown": "^9.0.1",
     "react-syntax-highlighter": "^15.6.6",
     "react-transition-group": "^4.4.1",
