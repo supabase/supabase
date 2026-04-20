@@ -43,7 +43,7 @@ const FormSchema = z
     enableSpInitiated: z.boolean(),
     domains: z.array(
       z.object({
-        value: z.string().trim().min(1, 'Please provide a domain'),
+        value: z.string().trim(),
       })
     ),
     metadataXmlUrl: z.string().trim().optional(),
@@ -55,22 +55,28 @@ const FormSchema = z
     joinOrgOnSignup: z.boolean(),
     roleOnJoin: z.string().optional(),
   })
-  .refine(
-    (data) => {
-      // When SP-initiated is enabled, require at least one non-empty domain
-      if (data.enableSpInitiated) {
-        const hasValidDomain = data.domains?.some((d) => d.value && d.value.trim().length > 0)
-        if (!hasValidDomain) {
-          return false
-        }
-      }
-      return true
-    },
-    {
-      message: 'At least one domain is required when SP-initiated login is enabled',
-      path: ['domains'],
+  .superRefine((data, ctx) => {
+    if (!data.enableSpInitiated) return
+
+    const hasValidDomain = data.domains?.some((d) => d.value && d.value.trim().length > 0)
+    if (!hasValidDomain) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'At least one domain is required when SP-initiated login is enabled',
+        path: ['domains'],
+      })
     }
-  )
+
+    data.domains?.forEach((d, idx) => {
+      if (!d.value || d.value.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please provide a domain',
+          path: ['domains', idx, 'value'],
+        })
+      }
+    })
+  })
   // set the error on both fields
   .refine((data) => data.metadataXmlUrl || data.metadataXmlFile, {
     message: 'Please provide either a metadata XML URL or upload a metadata XML file',
