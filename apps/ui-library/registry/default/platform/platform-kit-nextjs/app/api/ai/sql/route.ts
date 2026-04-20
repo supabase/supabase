@@ -55,6 +55,28 @@ function formatSchemaForPrompt(schema: any) {
   return schemaString
 }
 
+// Verify user has access to the project using their own token
+async function verifyProjectAccess(callerToken: string, projectRef: string): Promise<boolean> {
+  try {
+    const response = await fetch('https://api.supabase.com/v1/projects', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${callerToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      return false
+    }
+
+    const projects = await response.json()
+    return Array.isArray(projects) && projects.some((p: any) => p.ref === projectRef)
+  } catch {
+    return false
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const { prompt, projectRef } = await request.json()
@@ -70,24 +92,14 @@ export async function POST(request: Request) {
     const authHeader = request.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return NextResponse.json(
-        { message: 'Authentication required.' },
+        { message: 'Authorization header with Bearer token is required.' },
         { status: 401 }
       )
     }
-    const userToken = authHeader.slice(7)
+    const callerToken = authHeader.slice(7)
 
-    // Verify the user has access to this project using the documented GET /v1/projects endpoint
-    const projectsResponse = await fetch('https://api.supabase.com/v1/projects', {
-      headers: { Authorization: `Bearer ${userToken}` },
-    })
-    if (!projectsResponse.ok) {
-      return NextResponse.json(
-        { message: 'You do not have permission to access this project.' },
-        { status: 403 }
-      )
-    }
-    const projects = await projectsResponse.json()
-    const hasAccess = Array.isArray(projects) && projects.some((p: any) => p.id === projectRef)
+    // Verify the caller has access to the requested project using their own token
+    const hasAccess = await verifyProjectAccess(callerToken, projectRef)
     if (!hasAccess) {
       return NextResponse.json(
         { message: 'You do not have permission to access this project.' },
