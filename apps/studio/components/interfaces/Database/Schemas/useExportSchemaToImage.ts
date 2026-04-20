@@ -74,10 +74,14 @@ export const useExportSchemaToImage = () => {
 
 // Get all property names accessible through getComputedStyle(), excluding custom properties
 export const getAllPropertyNames = () => {
-  var names = []
-  var style = getComputedStyle(document.documentElement)
-  for (var i = 0; i < style.length; i++) {
-    var name = style[i]
+  if (typeof document === 'undefined' || typeof getComputedStyle === 'undefined') {
+    return []
+  }
+
+  const names = []
+  const style = getComputedStyle(document.documentElement)
+  for (let i = 0; i < style.length; i++) {
+    const name = style[i]
     if (!name.startsWith('--')) {
       names.push(name)
     }
