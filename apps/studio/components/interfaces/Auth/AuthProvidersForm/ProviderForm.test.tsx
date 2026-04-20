@@ -9,28 +9,35 @@ import { ProviderForm } from './ProviderForm'
 import type { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 import { customRender } from '@/tests/lib/custom-render'
 
-const { updateAuthConfigMutateMock } = vi.hoisted(() => ({
-  updateAuthConfigMutateMock: vi.fn(),
+const { useAuthConfigUpdateMutationMock } = vi.hoisted(() => ({
+  useAuthConfigUpdateMutationMock: vi.fn(),
 }))
+
+const SAVED_PHONE_SETTINGS = {
+  SMS_PROVIDER: 'twilio',
+  SMS_OTP_EXP: 300,
+  SMS_OTP_LENGTH: 6,
+  SMS_TEMPLATE: 'Your code is {{ .Code }}',
+  SMS_TWILIO_ACCOUNT_SID: 'AC123456789',
+  SMS_TWILIO_AUTH_TOKEN: 'auth-token',
+  SMS_TWILIO_MESSAGE_SERVICE_SID: 'MG123456789',
+} as const
 
 vi.mock('next-themes', () => ({
   useTheme: () => ({ resolvedTheme: 'dark' }),
 }))
 
-vi.mock('common', async (importOriginal) => {
-  const actual = (await importOriginal()) as object
+vi.mock(import('common'), async (importOriginal) => {
+  const actual = await importOriginal()
 
   return {
     ...actual,
-    useParams: () => ({ ref: 'default' }),
+    useParams: vi.fn().mockReturnValue({ ref: 'default' }),
   }
 })
 
 vi.mock('@/data/auth/auth-config-update-mutation', () => ({
-  useAuthConfigUpdateMutation: () => ({
-    mutate: updateAuthConfigMutateMock,
-    isPending: false,
-  }),
+  useAuthConfigUpdateMutation: useAuthConfigUpdateMutationMock,
 }))
 
 vi.mock('@/data/config/project-endpoint-query', () => ({
@@ -47,41 +54,6 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useHasEntitlementAccess: () => () => true,
-}))
-
-vi.mock('sonner', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}))
-
-vi.mock('./AuthAlert', () => ({
-  AuthAlert: () => null,
-}))
-
-vi.mock('@/components/ui/DocsButton', () => ({
-  DocsButton: ({ href }: { href: string }) => <a href={href}>Docs</a>,
-}))
-
-vi.mock('@/components/ui/ButtonTooltip', () => ({
-  ButtonTooltip: ({
-    children,
-    htmlType,
-    loading: _loading,
-    tooltip: _tooltip,
-    ...props
-  }: {
-    children: React.ReactNode
-    htmlType?: 'button' | 'submit' | 'reset'
-    loading?: boolean
-    tooltip?: unknown
-    [key: string]: unknown
-  }) => (
-    <button type={htmlType} {...props}>
-      {children}
-    </button>
-  ),
 }))
 
 mockAnimationsApi()
@@ -146,6 +118,28 @@ function getElementByIdOrThrow<T extends HTMLElement>(container: HTMLElement, id
   return element as T
 }
 
+function expectSavedPhoneConfig(dialog: HTMLElement) {
+  expect(within(dialog).getAllByRole('combobox')[0]).toHaveTextContent('Twilio')
+  expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_ACCOUNT_SID')).toHaveValue(
+    SAVED_PHONE_SETTINGS.SMS_TWILIO_ACCOUNT_SID
+  )
+  expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_AUTH_TOKEN')).toHaveValue(
+    SAVED_PHONE_SETTINGS.SMS_TWILIO_AUTH_TOKEN
+  )
+  expect(
+    getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_MESSAGE_SERVICE_SID')
+  ).toHaveValue(SAVED_PHONE_SETTINGS.SMS_TWILIO_MESSAGE_SERVICE_SID)
+  expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_OTP_EXP')).toHaveValue(
+    SAVED_PHONE_SETTINGS.SMS_OTP_EXP
+  )
+  expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_OTP_LENGTH')).toHaveValue(
+    SAVED_PHONE_SETTINGS.SMS_OTP_LENGTH
+  )
+  expect(getElementByIdOrThrow<HTMLTextAreaElement>(dialog, 'SMS_TEMPLATE')).toHaveValue(
+    SAVED_PHONE_SETTINGS.SMS_TEMPLATE
+  )
+}
+
 async function openPhoneSheet() {
   await userEvent.click(screen.getByText('Phone'))
   return await screen.findByRole('dialog', { name: 'Phone' })
@@ -155,45 +149,22 @@ describe('ProviderForm', () => {
   let currentConfig: ProjectAuthConfigData
 
   beforeEach(() => {
-    currentConfig = createPhoneAuthConfig({
-      SMS_PROVIDER: 'twilio',
-      SMS_OTP_EXP: 300,
-      SMS_OTP_LENGTH: 6,
-      SMS_TEMPLATE: 'Your code is {{ .Code }}',
-      SMS_TWILIO_ACCOUNT_SID: 'AC123456789',
-      SMS_TWILIO_AUTH_TOKEN: 'auth-token',
-      SMS_TWILIO_MESSAGE_SERVICE_SID: 'MG123456789',
+    currentConfig = createPhoneAuthConfig(SAVED_PHONE_SETTINGS)
+    useAuthConfigUpdateMutationMock.mockReturnValue({
+      mutate: vi.fn(),
+      isPending: false,
     })
-    updateAuthConfigMutateMock.mockReset()
-    updateAuthConfigMutateMock.mockImplementation(() => {})
   })
 
-  it('reflects the saved phone provider enabled state and config after rerendering with updated values', async () => {
+  it('shows the saved phone provider state and config after rerendering with updated values', async () => {
     const user = userEvent.setup()
     const view = renderPhoneProvider(currentConfig)
 
     let dialog = await openPhoneSheet()
-
-    const enablePhoneSwitch = getElementByIdOrThrow<HTMLButtonElement>(
-      dialog,
-      'EXTERNAL_PHONE_ENABLED'
-    )
-    expect(enablePhoneSwitch).toHaveAttribute('aria-checked', 'false')
-
-    expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_ACCOUNT_SID')).toHaveValue(
-      'AC123456789'
-    )
-    expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_AUTH_TOKEN')).toHaveValue(
-      'auth-token'
-    )
     expect(
-      getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_MESSAGE_SERVICE_SID')
-    ).toHaveValue('MG123456789')
-    expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_OTP_EXP')).toHaveValue(300)
-    expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_OTP_LENGTH')).toHaveValue(6)
-    expect(getElementByIdOrThrow<HTMLTextAreaElement>(dialog, 'SMS_TEMPLATE')).toHaveValue(
-      'Your code is {{ .Code }}'
-    )
+      getElementByIdOrThrow<HTMLButtonElement>(dialog, 'EXTERNAL_PHONE_ENABLED')
+    ).toHaveAttribute('aria-checked', 'false')
+    expectSavedPhoneConfig(dialog)
 
     currentConfig = {
       ...currentConfig,
@@ -219,9 +190,6 @@ describe('ProviderForm', () => {
     expect(
       getElementByIdOrThrow<HTMLButtonElement>(dialog, 'EXTERNAL_PHONE_ENABLED')
     ).toHaveAttribute('aria-checked', 'true')
-    expect(within(dialog).getAllByRole('combobox')[0]).toHaveTextContent('Twilio')
-    expect(getElementByIdOrThrow<HTMLInputElement>(dialog, 'SMS_TWILIO_ACCOUNT_SID')).toHaveValue(
-      'AC123456789'
-    )
+    expectSavedPhoneConfig(dialog)
   })
 })
