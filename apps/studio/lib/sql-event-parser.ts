@@ -49,10 +49,19 @@ export class SQLEventParser {
     return identifier?.replace(/["`']/g, '').replace(/\.$/, '')
   }
 
+  // Blank out the body of $tag$...$tag$ blocks (PL/pgSQL function bodies, DO
+  // blocks, dollar-quoted string literals) so their contents aren't scanned for
+  // DDL. A `select ... into var` inside a function body is variable assignment,
+  // not table creation, and would otherwise trip the SELECT..INTO detector.
+  private stripDollarQuoteBodies(sql: string): string {
+    return sql.replace(/(\$[a-zA-Z0-9_]*\$)[\s\S]*?\1/g, '$1$1')
+  }
+
   private match(sql: string): TableEventDetails | null {
+    const scannable = this.stripDollarQuoteBodies(sql)
     for (const { type, patterns } of SQLEventParser.DETECTORS) {
       for (const pattern of patterns) {
-        const match = sql.match(pattern)
+        const match = scannable.match(pattern)
         if (match?.groups) {
           return {
             type,
