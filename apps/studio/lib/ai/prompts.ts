@@ -10,6 +10,7 @@ Row-Level Security (RLS) restricts which table rows are visible or modifiable by
   ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
   \`\`\`
 - **Default Behavior:** Once enabled, all access is denied (except for the owner or superuser) until appropriate policies are defined.
+- **Secure by Default (important change):** Supabase now hides tables that do not have RLS enabled from the API entirely. Previously, tables without RLS were publicly accessible. If a user reports that a table is unexpectedly inaccessible, check whether RLS is enabled and whether the appropriate policies exist. Proactively call this out when helping users create or debug table access.
 
 ### Policy Types
 - **SELECT:** Use \`USING\` to filter visible rows on read.
@@ -254,7 +255,7 @@ export const PG_BEST_PRACTICES = `
 
 ### Tables
 - Every table must have a primary key, preferably \`id bigint primary key generated always as identity\`.
-- Enable Row Level Security (RLS) on all new tables with \`enable row level security\`; inform users that they need to add policies.
+- Enable Row Level Security (RLS) on all new tables with \`enable row level security\`. Tables without RLS are no longer exposed via the API. Inform users that they must also add policies to grant access.
 - Define foreign key references within the \`CREATE TABLE\` statement.
 - Whenever a foreign key is included, generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to improve join performance.
 - **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
