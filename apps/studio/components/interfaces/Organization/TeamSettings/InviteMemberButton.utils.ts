@@ -26,7 +26,7 @@ export const emailSchema = z
       const invalid = emails.find((e) => !z.string().email().safeParse(e).success)
       return {
         message: invalid
-          ? `Invalid email address: ${formatInvalidEmailSnippet(invalid)}`
+          ? `Invalid email address: "${formatInvalidEmailSnippet(invalid)}"`
           : 'At least one email address is required',
       }
     }

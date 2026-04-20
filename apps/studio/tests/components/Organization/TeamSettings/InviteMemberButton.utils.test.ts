@@ -244,7 +244,7 @@ describe('emailSchema', () => {
     const result = emailSchema.safeParse('notanemail')
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues[0].message).toBe('Invalid email address: notanemail')
+      expect(result.error.issues[0].message).toBe('Invalid email address: "notanemail"')
     }
   })
 
@@ -253,8 +253,8 @@ describe('emailSchema', () => {
     const result = emailSchema.safeParse(longToken)
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues[0].message.startsWith('Invalid email address: ')).toBe(true)
-      expect(result.error.issues[0].message.endsWith('…')).toBe(true)
+      expect(result.error.issues[0].message.startsWith('Invalid email address: "')).toBe(true)
+      expect(result.error.issues[0].message.endsWith('…"')).toBe(true)
       expect(result.error.issues[0].message.length).toBeLessThan(longToken.length + 50)
     }
   })
