@@ -77,4 +77,14 @@ export interface ShortcutDefinition {
    * is overridable by the caller of `useShortcut`.
    */
   options?: ShortcutOptions
+
+  /**
+   * Whether this shortcut appears as a toggleable entry in Account →
+   * Preferences → Keyboard shortcuts. Defaults to `true`.
+   *
+   * Set to `false` for shortcuts that users shouldn't be able to disable (e.g.
+   * the command menu opener) or for shortcuts that aren't meaningful as a
+   * standalone user preference.
+   */
+  showInSettings?: boolean
 }

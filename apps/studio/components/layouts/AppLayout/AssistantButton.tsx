@@ -1,18 +1,14 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { AiIconAnimation, cn, KeyboardShortcut } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const AssistantButton = () => {
   const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
 

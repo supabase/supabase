@@ -89,17 +89,7 @@ export const LOCAL_STORAGE_KEYS = {
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
     `user-impersonation-selector-previous-searches-${ref}`,
 
-  HOTKEY_COMMAND_MENU: 'supabase-dashboard-hotkey-command-menu',
-
   LAST_OPENED_SIDE_BAR: (ref: string) => `last-opened-sidebar-${ref}`,
-
-  // Project sidebar hotkeys
-  HOTKEY_SIDEBAR: (sidebarId: string) => `supabase-dashboard-hotkey-sidebar-${sidebarId}`,
-
-  HOTKEY_COPY_MARKDOWN: 'supabase-dashboard-hotkey-copy-markdown',
-  HOTKEY_COPY_JSON: 'supabase-dashboard-hotkey-copy-json',
-  HOTKEY_COPY_CSV: 'supabase-dashboard-hotkey-copy-csv',
-  HOTKEY_DOWNLOAD_CSV: 'supabase-dashboard-hotkey-download-csv',
 
   // Index Advisor notice dismissed
   INDEX_ADVISOR_NOTICE_DISMISSED: (ref: string) => `index-advisor-notice-dismissed-${ref}`,
