@@ -76,12 +76,19 @@ export async function POST(request: Request) {
     }
     const userToken = authHeader.slice(7)
 
-    // Verify the user has access to this project by checking their project membership
-    const membershipResponse = await fetch(
-      `https://api.supabase.com/v1/projects/${encodeURIComponent(projectRef)}/members`,
-      { headers: { Authorization: `Bearer ${userToken}` } }
-    )
-    if (!membershipResponse.ok) {
+    // Verify the user has access to this project using the documented GET /v1/projects endpoint
+    const projectsResponse = await fetch('https://api.supabase.com/v1/projects', {
+      headers: { Authorization: `Bearer ${userToken}` },
+    })
+    if (!projectsResponse.ok) {
+      return NextResponse.json(
+        { message: 'You do not have permission to access this project.' },
+        { status: 403 }
+      )
+    }
+    const projects = await projectsResponse.json()
+    const hasAccess = Array.isArray(projects) && projects.some((p: any) => p.id === projectRef)
+    if (!hasAccess) {
       return NextResponse.json(
         { message: 'You do not have permission to access this project.' },
         { status: 403 }
