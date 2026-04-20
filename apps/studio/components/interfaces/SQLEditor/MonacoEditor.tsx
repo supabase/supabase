@@ -13,6 +13,8 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { useTabsStateSnapshot } from '@/state/tabs'
@@ -64,10 +66,7 @@ const MonacoEditor = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
 
   // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
   const [value, setValue] = useState('')
@@ -79,6 +78,9 @@ const MonacoEditor = ({
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
+
+  const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
+  aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -134,7 +136,7 @@ const MonacoEditor = ({
       label: 'Toggle AI Assistant',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
       run: () => {
-        if (isAIAssistantHotkeyEnabled) {
+        if (aiHotkeyEnabledRef.current) {
           toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         }
       },

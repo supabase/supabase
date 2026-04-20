@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
@@ -28,10 +28,11 @@ import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
 import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
 import { getResourcesExceededLimitsOrg } from '@/components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
   <span className={cn('text-border-stronger pr-2', className)} {...props}>
@@ -71,7 +72,7 @@ export const LayoutHeader = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const showFloatingMobileToolbar = useIsFloatingMobileToolbarEnabled()
-  const [commandMenuEnabled] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.HOTKEY_COMMAND_MENU, true)
+  const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
   const isAccountPage = router.pathname.startsWith('/account')
 

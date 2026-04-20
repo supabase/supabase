@@ -3,6 +3,7 @@ import { expect, Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
+import { dropTable, query } from '../utils/db/index.js'
 import { isCLI } from '../utils/is-cli.js'
 import { resetLocalStorage } from '../utils/reset-local-storage.js'
 import { test } from '../utils/test.js'
@@ -286,6 +287,59 @@ test.describe('SQL Editor', () => {
       await deleteSqlSnippet(page, ref, newSqlSnippetName)
     } else {
       await page.reload()
+    }
+  })
+
+  test('warns on CREATE TABLE without RLS and "Run and enable RLS" enables it', async ({ ref }) => {
+    const tableName = 'pw_rls_smoke_test'
+
+    // Drop any leftover table from a previous failed run, and ensure cleanup
+    // after the test regardless of pass/fail.
+    await dropTable(tableName)
+
+    try {
+      await expect(page.getByText('Loading...')).not.toBeVisible()
+      await page.locator('.view-lines').click()
+      await page.keyboard.press('ControlOrMeta+KeyA')
+      await page.keyboard.type(`create table ${tableName} (id int8 primary key);`)
+
+      await page.getByTestId('sql-run-button').click()
+
+      // Modal appears with the RLS warning
+      await expect(
+        page.getByRole('heading', { name: 'Potential issue detected with' }),
+        'Warning modal should appear when CREATE TABLE has no RLS'
+      ).toBeVisible()
+      await expect(
+        page.getByText('Row Level Security'),
+        'Modal should mention Row Level Security'
+      ).toBeVisible()
+
+      // Click "Run and enable RLS" — query runs with appended ALTER
+      const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+        method: 'POST',
+      })
+      await page.getByRole('button', { name: 'Run and enable RLS' }).click()
+      await sqlMutationPromise
+
+      // Verify the table was created with RLS enabled
+      const rows = await query<{ relrowsecurity: boolean }>(
+        `select c.relrowsecurity
+         from pg_class c
+         join pg_namespace n on n.oid = c.relnamespace
+         where n.nspname = 'public' and c.relname = $1`,
+        [tableName]
+      )
+      expect(rows[0]?.relrowsecurity, 'Table should exist and have RLS enabled').toBe(true)
+    } finally {
+      await dropTable(tableName)
+
+      // clear SQL snippet
+      if (!isCLI()) {
+        await deleteSqlSnippet(page, ref, newSqlSnippetName)
+      } else {
+        await page.reload()
+      }
     }
   })
 

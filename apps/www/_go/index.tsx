@@ -16,6 +16,7 @@ import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-
 import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-scheduler'
 import stripeParty from './events/stripe-sessions-2026/party'
 import sxswContest from './events/sxsw-2026/contest'
+import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
@@ -29,6 +30,7 @@ import figmaWebinarMay2026ThankYou from './webinar/figma-webinar-may2026-thankyo
 import promptToProdSentry from './webinar/prompt-to-prod-sentry'
 
 const pages: GoPageInput[] = [
+  awsActivateOffer,
   exampleLeadGen,
   byocEarlyAccess,
   amoe,
