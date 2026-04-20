@@ -34,6 +34,7 @@ import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useSSOConfigUpdateMutation } from '@/data/sso/sso-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { DOCS_URL } from '@/lib/constants'
 
 const FormSchema = z
@@ -189,7 +190,7 @@ export const SSOConfig = () => {
     deleteSSOConfig({ slug: organization.slug })
   }
 
-  useEffect(() => {
+  const syncFormFromConfig = useStaticEffectEvent(() => {
     if (!organization?.slug) return
 
     // Only reset form if it's not dirty (user hasn't made changes)
@@ -212,15 +213,23 @@ export const SSOConfig = () => {
         roleOnJoin: ssoConfig.join_org_on_signup_role,
       })
     }
-  }, [ssoConfig, organization?.slug])
+  })
+
+  useEffect(() => {
+    syncFormFromConfig()
+  }, [ssoConfig, organization?.slug, syncFormFromConfig])
 
   // Automatically add an empty domain field when SP-initiated is enabled
-  useEffect(() => {
+  const ensureDomainField = useStaticEffectEvent(() => {
     const currentDomains = form.getValues('domains')
     if (enableSpInitiated && (!currentDomains || currentDomains.length === 0)) {
       form.setValue('domains', [{ value: '' }], { shouldValidate: false })
     }
-  }, [enableSpInitiated])
+  })
+
+  useEffect(() => {
+    ensureDomainField()
+  }, [enableSpInitiated, ensureDomainField])
 
   return (
     <ScaffoldContainer size="small" className="px-6 xl:px-10">
