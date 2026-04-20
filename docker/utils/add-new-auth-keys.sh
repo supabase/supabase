@@ -147,7 +147,7 @@ echo "JWT_KEYS=${JWT_KEYS}"
 echo ""
 echo "JWT_JWKS=${JWT_JWKS}"
 echo ""
-echo "To enable asymmetric key support, uncomment these lines in docker-compose.yml:"
+echo "To enable asymmetric key pair, the following should be enabled in docker-compose.yml:"
 echo ""
 echo "  Auth:     GOTRUE_JWT_KEYS: \${JWT_KEYS:-[]}"
 echo "  Realtime: API_JWT_JWKS: \${JWT_JWKS:-{\"keys\":[]}}"
@@ -184,8 +184,8 @@ for var in SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY ANON_KEY_ASYMMETRIC SERV
     fi
 done
 
-# Uncomment the JWKS lines in docker-compose.yml so the new keys take effect.
-echo "Uncommenting JWKS lines in docker-compose.yml..."
+# Uncomment new auth configuration in docker-compose.yml
+echo "Updating docker-compose.yml..."
 if [ ! -f docker-compose.yml ]; then
     echo "Error: docker-compose.yml not found in $(pwd)."
     exit 1
@@ -198,5 +198,5 @@ if sed -i.old \
     docker-compose.yml; then
     echo "Done."
 else
-    echo "Warning: could not edit docker-compose.yml. Uncomment the JWKS lines manually."
+    echo "Warning: could not edit docker-compose.yml."
 fi
