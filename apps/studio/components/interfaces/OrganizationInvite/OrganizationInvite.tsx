@@ -8,10 +8,6 @@ import { Admonition, ShimmeringLoader } from 'ui-patterns'
 
 import { OrganizationInviteError } from './OrganizationInviteError'
 import {
-  getOrganizationInviteContent,
-  getOrganizationInviteStatus,
-} from './OrganizationInvite.utils'
-import {
   ConnectMockMenu,
   ConnectPreviewToolbar,
   isTemporaryConnectMockPreviewEnabled,
@@ -221,25 +217,57 @@ export const OrganizationInvite = () => {
   const effectiveIsLoadingInvitation = isMockMode
     ? mockConfig?.invitationState === 'loading'
     : !router.isReady || isLoadingInvitation
-  const inviteStatus = getOrganizationInviteStatus({
-    data: effectiveData,
-    error: effectiveError,
-    isErrorInvitation: effectiveIsErrorInvitation,
-    isLoadingInvitation: effectiveIsLoadingInvitation,
-    isLoadingProfile: effectiveIsLoadingProfile,
-    isLoggedIn: effectiveIsLoggedIn,
-    isRouterReady: router.isReady,
-    isSuccessInvitation: effectiveIsSuccessInvitation,
-    profileExists: !!effectiveProfile,
-  })
-  const isSignedOut = inviteStatus === 'signed-out'
-  const isInvitationLoading = inviteStatus === 'loading'
-  const inviteContent = getOrganizationInviteContent({
-    data: effectiveData,
-    isSignUpEnabled: effectiveIsSignUpEnabled,
-    status: inviteStatus,
-  })
-  const effectiveHasError = ['wrong-account', 'expired', 'invalid', 'error'].includes(inviteStatus)
+  const effectiveHasError =
+    effectiveIsErrorInvitation ||
+    (effectiveIsSuccessInvitation &&
+      !!effectiveData &&
+      (effectiveData.token_does_not_exist ||
+        effectiveData.expired_token ||
+        !effectiveData.email_match))
+  const inviteIsNoLongerValid =
+    effectiveError?.code === 401 &&
+    effectiveError.message.includes('Failed to retrieve organization')
+  const inviteIsInvalid =
+    (effectiveIsSuccessInvitation && !!effectiveData?.token_does_not_exist) ||
+    (effectiveIsErrorInvitation && effectiveError?.code === 404)
+
+  const isWrongAccount =
+    effectiveIsSuccessInvitation && !!effectiveData && !effectiveData.email_match
+  const showOrganizationHeader =
+    effectiveIsSuccessInvitation &&
+    !!effectiveData &&
+    !effectiveData.token_does_not_exist &&
+    !effectiveData.expired_token &&
+    !isWrongAccount
+  const organizationName = effectiveData?.organization_name ?? 'an organization'
+  const isSignedOut = !effectiveIsLoggedIn || (!effectiveProfile && !effectiveIsLoadingProfile)
+  const isInvitationLoading =
+    !isSignedOut && (effectiveIsLoadingProfile || effectiveIsLoadingInvitation)
+  const signedOutDescription = `Sign in${
+    effectiveIsSignUpEnabled ? ' or create an account' : ''
+  } to view this invitation`
+  const interstitialTitle = inviteIsNoLongerValid
+    ? 'Invite no longer available'
+    : isSignedOut
+      ? 'View invitation'
+      : isWrongAccount
+        ? 'Wrong account'
+        : inviteIsInvalid
+          ? 'Invite invalid'
+          : effectiveIsErrorInvitation
+            ? 'Unable to load invitation'
+            : effectiveData?.expired_token
+              ? 'Invite expired'
+              : showOrganizationHeader
+                ? `Join ${organizationName}`
+                : undefined
+  const interstitialDescription = showOrganizationHeader
+    ? isSignedOut
+      ? signedOutDescription
+      : 'You have been invited to join this Supabase organization'
+    : isSignedOut
+      ? signedOutDescription
+      : undefined
   const invitationPath = isMockMode
     ? `/join?mock=${mockParam}`
     : `/join?token=${token}&slug=${slug}`
@@ -295,15 +323,15 @@ export const OrganizationInvite = () => {
         title={
           isInvitationLoading ? (
             <ShimmeringLoader className="mx-auto h-7 w-36 max-w-full py-0" />
-          ) : inviteContent.title ? (
-            inviteContent.title
+          ) : interstitialTitle ? (
+            interstitialTitle
           ) : undefined
         }
         description={
           isInvitationLoading ? (
             <ShimmeringLoader className="mx-auto h-4 w-48 max-w-full py-0" />
-          ) : inviteContent.description ? (
-            inviteContent.description
+          ) : interstitialDescription ? (
+            interstitialDescription
           ) : undefined
         }
         subtitle={
@@ -354,7 +382,7 @@ export const OrganizationInvite = () => {
     )
   }
 
-  if (inviteStatus === 'no-longer-valid') {
+  if (inviteIsNoLongerValid) {
     return withMockSwitcher(
       <div className="flex flex-col gap-3">
         <Admonition
@@ -374,7 +402,7 @@ export const OrganizationInvite = () => {
         data={effectiveData}
         error={effectiveError}
         isError={effectiveIsErrorInvitation}
-        isInvalidInvite={inviteStatus === 'invalid'}
+        isInvalidInvite={inviteIsInvalid}
         profileEmail={effectivePrimaryEmail}
         onSignOut={
           isMockMode
