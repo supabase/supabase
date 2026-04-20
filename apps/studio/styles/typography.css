@@ -56,11 +56,13 @@
 @layer utilities {
   /* Heading */
   .heading-title {
-    @apply scroll-m-20 text-2xl tracking-tight;
+    @apply scroll-m-20 text-2xl tracking-tight font-semibold;
+    font-family: var(--font-heading);
   }
 
   .heading-section {
-    @apply scroll-m-20 text-xl;
+    @apply scroll-m-20 text-xl font-semibold;
+    font-family: var(--font-heading);
   }
 
   .heading-subSection {
@@ -68,11 +70,13 @@
   }
 
   .heading-default {
-    @apply scroll-m-20 text-sm font-medium;
+    @apply scroll-m-20 text-sm font-semibold;
+    font-family: var(--font-heading);
   }
 
   .heading-compact {
-    @apply scroll-m-20 text-xs font-medium;
+    @apply scroll-m-20 text-xs font-semibold;
+    font-family: var(--font-heading);
   }
 
   .heading-meta {
