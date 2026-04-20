@@ -52,6 +52,21 @@ describe('parseEmails', () => {
   test('returns an empty array for commas only', () => {
     expect(parseEmails(',,,,')).toStrictEqual([])
   })
+
+  test('parses space-separated emails', () => {
+    expect(parseEmails('a@example.com b@example.com')).toStrictEqual([
+      'a@example.com',
+      'b@example.com',
+    ])
+  })
+
+  test('parses line breaks and mixed comma or space separators', () => {
+    expect(parseEmails('a@example.com\nb@example.com, c@example.com')).toStrictEqual([
+      'a@example.com',
+      'b@example.com',
+      'c@example.com',
+    ])
+  })
 })
 
 function makeMember(overrides: Partial<OrganizationMember> = {}): OrganizationMember {
@@ -177,6 +192,10 @@ function makeEmailList(count: number): string {
   return Array.from({ length: count }, (_, i) => `user${i + 1}@example.com`).join(', ')
 }
 
+function makeEmailListSpaceSeparated(count: number): string {
+  return Array.from({ length: count }, (_, i) => `user${i + 1}@example.com`).join(' ')
+}
+
 describe('emailSchema', () => {
   test('accepts a single valid email', () => {
     expect(emailSchema.safeParse('user@example.com').success).toBe(true)
@@ -188,6 +207,16 @@ describe('emailSchema', () => {
 
   test('rejects 51 emails — singular "address" when exactly 1 needs removing', () => {
     const result = emailSchema.safeParse(makeEmailList(51))
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0].message).toBe(
+        'You can invite up to 50 members at a time. Remove 1 email address to continue.'
+      )
+    }
+  })
+
+  test('rejects 51 space-separated emails (same as comma-separated batch limit)', () => {
+    const result = emailSchema.safeParse(makeEmailListSpaceSeparated(51))
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues[0].message).toBe(
@@ -216,6 +245,17 @@ describe('emailSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues[0].message).toBe('Invalid email address: notanemail')
+    }
+  })
+
+  test('truncates a very long invalid token in the error message', () => {
+    const longToken = `${'x'.repeat(130)}@`
+    const result = emailSchema.safeParse(longToken)
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues[0].message.startsWith('Invalid email address: ')).toBe(true)
+      expect(result.error.issues[0].message.endsWith('…')).toBe(true)
+      expect(result.error.issues[0].message.length).toBeLessThan(longToken.length + 50)
     }
   })
 })

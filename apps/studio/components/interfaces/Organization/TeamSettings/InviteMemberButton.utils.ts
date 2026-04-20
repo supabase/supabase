@@ -4,6 +4,14 @@ import type { OrganizationMember } from '@/data/organizations/organization-membe
 
 export const MAX_BATCH_INVITE_SIZE = 50
 
+/** Max characters to show when an invalid token is long (e.g. comma-less paste of many addresses). */
+const MAX_INVALID_EMAIL_SNIPPET_LENGTH = 120
+
+function formatInvalidEmailSnippet(token: string): string {
+  if (token.length <= MAX_INVALID_EMAIL_SNIPPET_LENGTH) return token
+  return `${token.slice(0, MAX_INVALID_EMAIL_SNIPPET_LENGTH)}…`
+}
+
 export const emailSchema = z
   .string()
   .min(1, 'At least one email address is required')
@@ -18,7 +26,7 @@ export const emailSchema = z
       const invalid = emails.find((e) => !z.string().email().safeParse(e).success)
       return {
         message: invalid
-          ? `Invalid email address: ${invalid}`
+          ? `Invalid email address: ${formatInvalidEmailSnippet(invalid)}`
           : 'At least one email address is required',
       }
     }
@@ -35,7 +43,7 @@ export const emailSchema = z
 
 export function parseEmails(value: string): string[] {
   const emails = value
-    .split(',')
+    .split(/[\s,]+/)
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean)
   return [...new Set(emails)]
