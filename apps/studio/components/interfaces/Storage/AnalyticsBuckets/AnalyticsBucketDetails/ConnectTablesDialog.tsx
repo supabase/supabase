@@ -431,9 +431,9 @@ const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) =>
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Database replication needs to be enabled</DialogTitle>
+        <DialogTitle>External replication needs to be enabled</DialogTitle>
         <DialogDescription>
-          Replication is used to sync data from your Postgres tables
+          External replication is used to sync data from your Postgres tables
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
@@ -472,7 +472,7 @@ const EnableReplicationDialogContent = ({ onClose }: { onClose: () => void }) =>
         </Button>
         {!noAccessToReplication && (
           <Button type="primary" loading={creatingTenantSource} onClick={onEnableReplication}>
-            Enable replication
+            Enable external replication
           </Button>
         )}
       </DialogFooter>
