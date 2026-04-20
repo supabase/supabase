@@ -49,6 +49,22 @@ export class SQLEventParser {
     return identifier?.replace(/["`']/g, '').replace(/\.$/, '')
   }
 
+  // Blank out the body of $tag$...$tag$ blocks (PL/pgSQL function bodies, DO
+  // blocks, dollar-quoted string literals) so their contents aren't scanned for
+  // DDL. A `select ... into var` inside a function body is variable assignment,
+  // not table creation, and would otherwise trip the SELECT..INTO detector.
+  //
+  // The backreference \1 forces opening and closing tags to match, so a nested
+  // inner block with a different tag (e.g. $fn$ containing $sql$...$sql$) is
+  // consumed as part of the outer body instead of being paired as the outer.
+  //
+  // Must run before statement splitting — splitStatements' dollar-quote regex
+  // doesn't enforce matching tags, so inner semicolons would otherwise leak
+  // out and fragment the function body across statements.
+  private stripDollarQuoteBodies(sql: string): string {
+    return sql.replace(/(\$[a-zA-Z0-9_]*\$)[\s\S]*?\1/g, '$1$1')
+  }
+
   private match(sql: string): TableEventDetails | null {
     for (const { type, patterns } of SQLEventParser.DETECTORS) {
       for (const pattern of patterns) {
@@ -113,7 +129,11 @@ export class SQLEventParser {
   }
 
   getTableEvents(sql: string): TableEventDetails[] {
-    const statements = this.splitStatements(this.removeComments(sql))
+    // Order matters: strip dollar-quote bodies first so comment syntax inside
+    // a function body (which is just literal text in Postgres) isn't treated
+    // as a comment by removeComments, and so inner semicolons inside the body
+    // can't confuse splitStatements.
+    const statements = this.splitStatements(this.removeComments(this.stripDollarQuoteBodies(sql)))
     const results: TableEventDetails[] = []
 
     for (const stmt of statements) {
