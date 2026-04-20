@@ -39,9 +39,9 @@ Supabase is changing the way keys work to improve project security and developer
 You can find API keys in a couple of different places.
 
 In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard:
-{/* TODO: Check */}
-- **For legacy keys**, copy the `anon` key for client-side operations and the `service_role` key for server-side operations from the **Legacy API Keys** tab.
-- **For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
+
+- **For new keys**, open the **Publishable and secret API keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
+- **For legacy keys**, open the **Legacy anon, service_role API keys** tab, and copy the `anon` key for client-side operations and the `service_role` key for server-side operations.
 
 ## What publishable keys secure
 
@@ -111,7 +111,7 @@ Never expose your secret keys publicly. Your data is at risk. **Do not:**
 Ensure you handle them with care and using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
 
 </Admonition>
-{/* TODO: Check */}
+
 Secret keys authorize access to your project's data via the built-in `service_role` Postgres role. By design, this role has full access to your project's data. It also uses the [`BYPASSRLS` attribute](https://www.postgresql.org/docs/current/ddl-rowsecurity.html#:~:text=BYPASSRLS), skipping any and all Row Level Security policies you attach.
 
 The secret key is an improvement over the old JWT-based `service_role` key, and we recommend using it where possible. It adds more checks to prevent misuse, specifically:
@@ -185,14 +185,6 @@ The main reasons for preferring the publishable and secret keys (`sb_publishable
 - JWTs were self-referential and full of redundant information not necessary for achieving their primary purpose.
 - JWTs are large, hard to parse, verify, and manipulate -- leading to insecure logging or bad security practices.
 - They were signed with a symmetric JWT secret.
-{/* TODO: Check */}
-### Why is there no publishable or secret keys in the CLI / self-hosting?
-
-Publishable and secret keys are only available on the Supabase hosted platform. They are managed by our API Gateway component, which does not currently have a CLI equivalent.
-
-We are looking into providing similar but limited in scope support for publishable or secret keys in the future. For now you can only use the `anon` and `service_role` JWT-based keys there.
-
-For advanced users, see the following question on how these keys are implemented on the hosted platform for an idea on how to provide similar functionality for yourself.
 
 ### How are publishable and secret keys implemented on the hosted platform?
 
