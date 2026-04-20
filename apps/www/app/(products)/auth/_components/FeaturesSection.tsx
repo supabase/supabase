@@ -111,7 +111,9 @@ function ProvidersSkeleton() {
   return (
     <div
       ref={containerRef}
-      className="flex items-center justify-center w-full h-full relative overflow-hidden"
+      role="img"
+      aria-label="A grid of social login provider icons — Google, GitHub, Apple, Discord, and more — with one highlighted at a time"
+      className="flex items-center justify-center w-full h-full relative overflow-hidden pointer-events-none select-none"
       style={{
         maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 75%)',
         WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 75%)',
@@ -157,7 +159,9 @@ function ProvidersSkeleton() {
 function IntegratedSkeleton() {
   return (
     <div
-      className="relative flex h-full w-full items-center justify-center overflow-hidden"
+      role="img"
+      aria-label="Preview of Supabase Auth UI components — magic link sign-in, profile, organization setup, email verification, sign-up, password reset, account chooser, session tokens, and two-factor authentication"
+      className="relative flex h-full w-full items-center justify-center overflow-hidden pointer-events-none select-none"
       style={{
         maskImage:
           'linear-gradient(to bottom, transparent, black 15%, black 65%, transparent), linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
@@ -416,7 +420,9 @@ function DataOwnershipSkeleton() {
 
   return (
     <div
-      className="relative flex h-full w-full items-center justify-center"
+      role="img"
+      aria-label="A shield icon with a glowing green effect, representing user data ownership and security"
+      className="relative flex h-full w-full items-center justify-center select-none"
       style={{
         maskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 75%)',
         WebkitMaskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 75%)',
@@ -533,25 +539,20 @@ function DataOwnershipSkeleton() {
         <ShieldGlow hovered={hovered} />
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          fill="none"
           viewBox="0 0 24 24"
           className="relative z-[5] h-44 w-44"
           strokeLinecap="round"
           strokeLinejoin="round"
           style={{
-            color: hovered ? 'hsl(var(--brand-default))' : 'hsl(var(--foreground-muted))',
-            opacity: hovered ? 1 : 0.8,
-            transition: 'color 0.5s, opacity 0.5s',
+            color: 'hsl(var(--brand-default))',
           }}
-          strokeWidth={0.25}
         >
           <path
             d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+            fill="none"
             stroke="currentColor"
             strokeWidth={0.25}
           />
-          <path d="M6.376 18.91a6 6 0 0 1 11.249.003" stroke="currentColor" strokeWidth={0.25} />
-          <circle cx="12" cy="11" r="4" stroke="currentColor" strokeWidth={0.25} />
         </svg>
       </div>
     </div>

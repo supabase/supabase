@@ -2,12 +2,9 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { FileDown, Link2, Table, TableProperties } from 'lucide-react'
-import Image from 'next/image'
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { cn } from 'ui'
-
-import { SpreadsheetIllustration } from './Illustrations/SpreadsheetIllustration'
 
 const ICONS = { TableProperties, Table, Link2, FileDown } as const
 
@@ -17,7 +14,7 @@ type Tab = {
   icon: IconName
   label: string
   description: string
-  image: string | ReactNode
+  image: { dark: string; light: string }
 }
 
 const TABS: Tab[] = [
@@ -25,25 +22,37 @@ const TABS: Tab[] = [
     icon: 'TableProperties',
     label: 'Spreadsheet editing',
     description: 'Add, edit, and update your data with the simplicity of a no-code tool.',
-    image: '/images/product/database/table-view/spreadsheet.png',
+    image: {
+      dark: '/images/product/database/table-view/spreadsheet.png',
+      light: '/images/product/database/table-view/table-editor-light.png',
+    },
   },
   {
     icon: 'Table',
     label: 'Create tables',
     description: 'Add tables, columns and rows without writing SQL.',
-    image: '/images/product/database/table-view/create-tables.png',
+    image: {
+      dark: '/images/product/database/table-view/create-tables.png',
+      light: '/images/product/database/table-view/create-table-light.png',
+    },
   },
   {
     icon: 'Link2',
     label: 'Foreign keys',
     description: 'Build connections across tables with the full power of relational data.',
-    image: '/images/product/database/table-view/foreign-keys.png',
+    image: {
+      dark: '/images/product/database/table-view/foreign-keys.png',
+      light: '/images/product/database/table-view/foreign-keys-light.png',
+    },
   },
   {
     icon: 'FileDown',
     label: 'Export to CSV',
     description: 'Pick the rows you want and export them into a CSV.',
-    image: '/images/product/database/table-view/export-csv.png',
+    image: {
+      dark: '/images/product/database/table-view/export-csv.png',
+      light: '/images/product/database/table-view/export-csv-light.png',
+    },
   },
 ]
 
@@ -149,16 +158,17 @@ export function TableEditorSection() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.05 } }}
                   exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                  className={`absolute inset-0 ${
-                    typeof active.image === 'string'
-                      ? 'flex items-end justify-center px-6'
-                      : 'flex items-end justify-end'
-                  }`}
+                  className="absolute inset-0 flex items-end justify-center px-6"
                 >
                   <img
-                    src={active.image}
+                    src={active.image.dark}
                     alt={active.label}
-                    className="absolute inset-0 rounded-lg object-cover pointer-events-none"
+                    className="absolute inset-0 rounded-lg object-cover pointer-events-none hidden dark:block"
+                  />
+                  <img
+                    src={active.image.light}
+                    alt={active.label}
+                    className="absolute inset-0 rounded-lg object-cover pointer-events-none dark:hidden"
                   />
                 </motion.div>
               </AnimatePresence>

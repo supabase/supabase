@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { Code, FileDown, Heart, MousePointerClick } from 'lucide-react'
-import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { cn } from 'ui'
@@ -16,25 +15,37 @@ const TABS = [
     icon: 'Code' as IconName,
     label: 'Full SQL',
     description: 'A full SQL editor built right into the dashboard.',
-    image: '/images/product/database/sql-view/sql-editor.png',
+    image: {
+      dark: '/images/product/database/sql-view/sql-editor.png',
+      light: '/images/product/database/sql-view/sql-editor-light.png',
+    },
   },
   {
     icon: 'MousePointerClick' as IconName,
     label: 'Monaco editor',
     description: 'Built-in Monaco editor, with rich validation and autocomplete.',
-    image: '/images/product/database/sql-view/monaco-editor.png',
+    image: {
+      dark: '/images/product/database/sql-view/monaco-editor.png',
+      light: '/images/product/database/sql-view/monaco-editor-light.png',
+    },
   },
   {
     icon: 'Heart' as IconName,
     label: 'Favorite queries',
     description: 'Save your favorite queries to use again and again.',
-    image: '/images/product/database/sql-view/favorites.png',
+    image: {
+      dark: '/images/product/database/sql-view/favorites.png',
+      light: '/images/product/database/sql-view/favorites-light.png',
+    },
   },
   {
     icon: 'FileDown' as IconName,
     label: 'Export to CSV',
     description: 'Any output can be exported into a CSV.',
-    image: '/images/product/database/sql-view/export.png',
+    image: {
+      dark: '/images/product/database/sql-view/export.png',
+      light: '/images/product/database/sql-view/export-csv-light.png',
+    },
   },
 ]
 
@@ -143,10 +154,14 @@ export function SqlEditorSection() {
                   className="absolute inset-0 flex items-end justify-center px-6"
                 >
                   <img
-                    src={active.image}
+                    src={active.image.dark}
                     alt={active.label}
-                    // fill
-                    className="absolute inset-0 rounded-lg object-cover pointer-events-none"
+                    className="absolute inset-0 rounded-lg object-cover pointer-events-none hidden dark:block"
+                  />
+                  <img
+                    src={active.image.light}
+                    alt={active.label}
+                    className="absolute inset-0 rounded-lg object-cover pointer-events-none dark:hidden"
                   />
                 </motion.div>
               </AnimatePresence>

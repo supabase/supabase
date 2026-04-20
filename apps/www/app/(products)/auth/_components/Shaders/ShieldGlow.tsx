@@ -82,7 +82,7 @@ const frag = /* glsl */ `
     float dithered  = smoothstep(dither - 0.04, dither + 0.04, value);
 
     vec3  col   = GREEN * dithered;
-    float alpha = dithered * uHover;
+    float alpha = dithered;
 
     gl_FragColor = vec4(col * alpha, alpha);
   }
@@ -98,7 +98,6 @@ function buildSVGCanvas(size: number): Promise<HTMLCanvasElement> {
     const ctx = canvas.getContext('2d')!
     const svgSrc = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}">
       <path d="${SHIELD_PATH}" fill="white"/>
-      <circle cx="12" cy="11" r="4" fill="white"/>
     </svg>`
     const blob = new Blob([svgSrc], { type: 'image/svg+xml;charset=utf-8' })
     const url = URL.createObjectURL(blob)
