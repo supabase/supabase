@@ -17,7 +17,7 @@ On managed Supabase platform, Edge Functions are deployed across multiple region
 The default `hello` function is located at `volumes/functions/hello/index.ts`. You can invoke it immediately after starting your stack:
 
 ```sh
-curl http://<your-domain>:8000/functions/v1/hello
+curl http://<your-domain>/functions/v1/hello
 ```
 
 This returns `"Hello from Edge Functions!"`.
@@ -53,7 +53,7 @@ docker compose restart functions --no-deps
 ### Step 3: Invoke your function
 
 ```sh
-curl -X POST http://<your-domain>:8000/functions/v1/my-function \
+curl -X POST http://<your-domain>/functions/v1/my-function \
   -H 'Content-Type: application/json' \
   -d '{"name": "World"}'
 ```
@@ -128,7 +128,7 @@ The functions service is pre-configured with the following environment variables
 | Variable                    | Value                             | Purpose                                           |
 | --------------------------- | --------------------------------- | ------------------------------------------------- |
 | `SUPABASE_URL`              | `http://kong:8000`                | Internal API gateway URL                          |
-| `SUPABASE_PUBLIC_URL`       | `http://<your-domain>:8000`       | Base URL for accessing Supabase from the Internet |
+| `SUPABASE_PUBLIC_URL`       | `http(s)://<your-domain>`         | Base URL for accessing Supabase from the Internet |
 | `JWT_SECRET`                | `your-jwt-secret`                 | Legacy symmetric encryption key for JWTs          |
 | `SUPABASE_ANON_KEY`         | `your-anon-key`                   | Client-side API key (`anon` role).                |
 | `SUPABASE_SERVICE_ROLE_KEY` | `your-service-role-key`           | Server-side API key (`service_role` role)         |
@@ -161,7 +161,7 @@ This is a key distinction that affects how you build URLs in your functions:
 
 - **`SUPABASE_URL`** contains an internal Docker network hostname. Use it for server-side calls from your functions to other Supabase services (Auth, Storage, database via PostgREST). This is what the Supabase JS client should use inside functions.
 
-- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance (e.g., `<your-domain>:8000`). Use it if your function needs to build URLs that HTTP clients can reach from the outside.
+- **`SUPABASE_PUBLIC_URL`** is the externally-reachable URL of your Supabase instance. Use it if your function needs to build URLs that HTTP clients can reach from the outside.
 
 ## Managing functions via dashboard
 

@@ -14,7 +14,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should ta
 3. [Installing Supabase](#installing-supabase)
 4. [Configuring and securing Supabase](#configuring-and-securing-supabase)
 5. [Starting and stopping](#starting-and-stopping)
-6. [Accessing Supabase services](#accessing-supabase-services)
+6. [Accessing Supabase services](#accessing-supabase-studio-dashboard)
 7. [Updating](#updating)
 8. [Uninstalling](#uninstalling)
 9. [Advanced topics](#advanced-topics)
@@ -163,12 +163,15 @@ For a description of all secrets refer to the [related section](#configuring-sec
 Review and change URL configuration variables:
 
 - `SUPABASE_PUBLIC_URL`: base URL for accessing Supabase from the Internet (Dashboard, API, Storage, etc.), e.g., `http://example.com:8000`
-- `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000/auth/v1`
+- `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000`
 - `SITE_URL`: default [redirect URL](/docs/guides/auth/redirect-urls) for Auth, e.g., `http://example.com:3000`
 
-<Admonition type="tip">
+<Admonition type="note" label="What <your-domain> means in the docs">
 
-    If you are only using self-hosted Supabase locally, you can use `localhost`.
+Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
+
+- **Default setup:** Kong listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+- **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
 
@@ -176,10 +179,10 @@ Review and change URL configuration variables:
 
 The generated secrets and password are written to the `.env` file. The ones you are most likely to need when connecting your application to self-hosted Supabase are:
 
-- `POSTGRES_PASSWORD` - database password used in Postgres connection strings and by `psql`
-- `SUPABASE_PUBLISHABLE_KEY` - publishable API key for client-side use (e.g., in your frontend)
-- `SUPABASE_SECRET_KEY` - secret API key for server-side use. Never expose this in client code
-- `SUPABASE_PUBLIC_URL` - base URL you pass as `supabaseUrl` to the client libraries
+- `POSTGRES_PASSWORD`: database password used in Postgres connection strings and by `psql`
+- `SUPABASE_PUBLISHABLE_KEY`: publishable API key for client-side use (e.g., in your frontend)
+- `SUPABASE_SECRET_KEY`: secret API key for server-side use. Never expose this in client code
+- `SUPABASE_PUBLIC_URL`: base URL you pass as `supabaseUrl` to the client libraries
 
 If you are still using the [legacy API keys](#configuring-legacy-api-keys), look for `ANON_KEY` and `SERVICE_ROLE_KEY` instead of the new publishable and secret API keys above.
 
@@ -193,13 +196,7 @@ Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
 
 </Admonition>
 
-You can change the generated password in the `.env` file:
-
-- `DASHBOARD_PASSWORD`: password for Studio / dashboard
-
-Optionally change the username:
-
-- `DASHBOARD_USERNAME`: username for Studio / dashboard
+In the `.env` file, edit `DASHBOARD_PASSWORD` to change the password, and optionally `DASHBOARD_USERNAME` to change the username.
 
 ## Starting and stopping
 
@@ -209,7 +206,7 @@ You can start Supabase by using the following command in the same directory as y
 docker compose up -d
 ```
 
-After all the services have started you can see them running in the background:
+Check the status of the services:
 
 ```sh
 docker compose ps
@@ -237,9 +234,9 @@ docker compose down
 
 By default, you can access the dashboard through the API gateway on port `8000`.
 
-For example: `http://example.com:8000`, or `http://<your-ip>:8000` (or `localhost:8000` if you are running Docker Compose locally).
+For example: `http://<your-domain>:8000`, or `http://<your-ip>:8000` (or `localhost:8000` if you are running Docker Compose locally).
 
-You will be prompted for a username and password. Use the credentials that you set up earlier in [Studio authentication](#studio-authentication).
+You will be prompted for a username and password. See the [Studio authentication](#studio-authentication) section for details.
 
 ## Accessing Postgres
 
@@ -269,15 +266,19 @@ To change the database password, read [Changing database password](#changing-dat
 
 ## Accessing Edge Functions
 
-Edge Functions are stored in `volumes/functions`. The default setup has a `hello` function that you can invoke on `http://<your-domain>:8000/functions/v1/hello`.
+Edge Functions live in `volumes/functions`. The default setup includes a `hello` function you can invoke with `curl`:
 
-You can add new Functions as `volumes/functions/<FUNCTION_NAME>/index.ts`. Restart the service to pick up the changes:
+```sh
+curl http://<your-domain>:8000/functions/v1/hello
+```
+
+Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart the service to pick them up:
 
 ```sh
 docker compose restart functions --no-deps
 ```
 
-Make sure to read the detailed [how-to guide](/docs/guides/self-hosting/self-hosted-functions) covering the Edge Runtime setup in self-hosted Supabase.
+See the [self-hosted Edge Functions guide](/docs/guides/self-hosting/self-hosted-functions) for more details.
 
 ## Accessing APIs
 
