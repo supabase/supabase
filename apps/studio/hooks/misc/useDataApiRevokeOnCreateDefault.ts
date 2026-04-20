@@ -45,7 +45,7 @@ export const useTrackDefaultPrivilegesExposure = (
   const hasTracked = useRef(false)
 
   const { surface } = options
-  const dataApiEnabled = options.surface === 'main' ? options.dataApiEnabled : undefined
+  const dataApiEnabled = options.surface === 'main' ? options.dataApiEnabled : null
 
   useEffect(() => {
     if (hasTracked.current) return
@@ -53,7 +53,7 @@ export const useTrackDefaultPrivilegesExposure = (
     hasTracked.current = true
     track('project_creation_default_privileges_exposed', {
       surface,
-      ...(surface === 'main' && { dataApiEnabled: dataApiEnabled as boolean }),
+      ...(dataApiEnabled !== null && { dataApiEnabled }),
       dataApiRevokeOnCreateDefaultEnabled: flag,
     })
   }, [flag, track, surface, dataApiEnabled])

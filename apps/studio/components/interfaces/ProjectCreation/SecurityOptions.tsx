@@ -18,6 +18,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
+import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
@@ -26,6 +27,8 @@ interface SecurityOptionsProps {
 
 export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
   const dataApi = useWatch_Shadcn_({ control: form.control, name: 'dataApi' })
+
+  useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: dataApi ?? true })
 
   return (
     <Panel.Content className="pb-8">

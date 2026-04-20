@@ -59,10 +59,7 @@ import {
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import {
-  useDataApiRevokeOnCreateDefaultEnabled,
-  useTrackDefaultPrivilegesExposure,
-} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -156,11 +153,6 @@ const Wizard: NextPageWithLayout = () => {
     organization,
     highAvailability,
   } = useWatch_Shadcn_({ control: form.control })
-
-  useTrackDefaultPrivilegesExposure({
-    surface: 'main',
-    dataApiEnabled: form.getValues('dataApi'),
-  })
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
