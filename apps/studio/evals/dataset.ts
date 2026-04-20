@@ -161,12 +161,12 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredKnowledge: ['rls'],
       correctAnswer:
-        'Tables are no longer automatically accessible via the API - this is a platform behavior change. The anon/authenticated roles must be explicitly granted access via the Table Editor or GRANT SQL.',
+        'The anon/authenticated roles may not have been granted access to the table. Check privileges and use GRANT to expose the table via the Data API.',
     },
     metadata: {
       category: ['rls_policies', 'debugging'],
       description:
-        'Verifies the assistant leads with the secure-by-default platform change when diagnosing an inaccessible SQL-created table',
+        'Verifies the assistant identifies missing grants as the likely cause of an inaccessible table and guides the user to fix it',
     },
   },
   {
