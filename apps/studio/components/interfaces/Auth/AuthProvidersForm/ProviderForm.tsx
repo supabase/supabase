@@ -165,7 +165,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
     resolver: zodResolver(provider.validationSchema),
-    shouldUnregister: true,
+    shouldUnregister: false,
   })
 
   useEffect(() => {

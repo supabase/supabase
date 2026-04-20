@@ -22,25 +22,25 @@ export class SQLEventParser {
     {
       type: TABLE_EVENT_ACTIONS.TableCreated,
       patterns: [
-        /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)/i,
-        /CREATE\s+TEMP(?:ORARY)?\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)/i,
-        /CREATE\s+UNLOGGED\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)/i,
-        /SELECT\s+.*?\s+INTO\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)/is,
-        /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)\s+AS\s+SELECT/i,
+        /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))/i,
+        /CREATE\s+TEMP(?:ORARY)?\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))/i,
+        /CREATE\s+UNLOGGED\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))/i,
+        /SELECT\s+.*?\s+INTO\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))/is,
+        /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))\s+AS\s+SELECT/i,
       ],
     },
     {
       type: TABLE_EVENT_ACTIONS.TableDataAdded,
       patterns: [
-        /INSERT\s+INTO\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)/i,
-        /COPY\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+)\s+FROM/i,
+        /INSERT\s+INTO\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))/i,
+        /COPY\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+))\s+FROM/i,
       ],
     },
     {
       type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
       patterns: [
-        /ALTER\s+TABLE\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+).*?ENABLE\s+ROW\s+LEVEL\s+SECURITY/i,
-        /ALTER\s+TABLE\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>[\w"`]+).*?ENABLE\s+RLS/i,
+        /ALTER\s+TABLE\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+)).*?ENABLE\s+ROW\s+LEVEL\s+SECURITY/i,
+        /ALTER\s+TABLE\s+(?<schema>(?:"[^"]+"|[\w]+)\.)?(?<table>(?:"(?:[^"]|"")+"|`(?:[^`]|``)+`|[\w]+)).*?ENABLE\s+RLS/i,
       ],
     },
   ]

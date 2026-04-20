@@ -1040,6 +1040,10 @@ export const database: NavMenuConstant = {
           name: 'Implementing cascade deletes',
           url: '/guides/database/postgres/cascade-deletes' as `/${string}`,
         },
+        {
+          name: 'Deleting data and dropping objects safely',
+          url: '/guides/database/postgres/data-deletion' as `/${string}`,
+        },
         { name: 'Managing enums', url: '/guides/database/postgres/enums' },
         {
           name: 'Managing database functions',

@@ -7,6 +7,10 @@ function includes(array: string[], element: string) {
 /**
  * Hook for listening on key events.
  *
+ * @deprecated Use `useShortcut` from `state/shortcuts/useShortcut` instead.
+ * The new hook reads from a central registry, respects user preferences, and
+ * can surface shortcuts in the Cmd+P command menu.
+ *
  * @param {Object|Map} keyMap       Key names mapped to event handlers. If a key name exists, its
  *                                  default behavior will be suppressed.
  * @param {Array} whitelistNodes    If target element is in the whitelist nodes array, will not

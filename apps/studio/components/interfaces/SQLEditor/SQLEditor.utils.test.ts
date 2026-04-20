@@ -2,12 +2,30 @@ import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
 import {
+  appendEnableRLSStatements,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
+  filterTablesCoveredByEnsureRLSTrigger,
+  getCreateTablesMissingRLS,
+  hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+
+const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEventTrigger => ({
+  oid: 1,
+  name: 'ensure_rls',
+  event: 'ddl_command_end',
+  enabled_mode: 'ORIGIN',
+  tags: ['CREATE TABLE'],
+  function_name: 'rls_auto_enable',
+  function_schema: 'public',
+  owner: 'postgres',
+  function_definition: null,
+  ...overrides,
+})
 
 describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
   test('Should return false if limit passed is <= 0', () => {
@@ -226,6 +244,51 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     expect(match).toBe(true)
   })
 
+  it('catches update on a single quoted table name without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "messages" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('does not flag update on a single quoted table name with a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "messages" SET id = 1 WHERE id = 2;`)
+    expect(match).toBe(false)
+  })
+
+  it('catches update on a quoted schema with a bareword table without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "public".messages SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update on a bareword schema with a quoted table without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE public."messages" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update on a quoted table name containing a space without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "my table" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update on a quoted table name containing escaped quotes without a where clause', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "weird""name" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update where a quoted identifier contains the word where', () => {
+    const match = isUpdateWithoutWhere(`UPDATE "where table" SET id = 1;`)
+    expect(match).toBe(true)
+  })
+
+  it('catches update where a string literal contains the word where', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'where x';`)
+    expect(match).toBe(true)
+  })
+
+  it('does not flag update where the only "where" sits inside a string literal but a real where clause exists', () => {
+    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'where x' WHERE id = 1;`)
+    expect(match).toBe(false)
+  })
+
   it('contains both an update query and a delete query, triggers destructive', () => {
     const match = checkDestructiveQuery(stripIndent`
       delete from countries; update countries set name = 'hello';
@@ -260,6 +323,240 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
     DESTRUCTIVE_QUERIES.forEach((query) => {
       expect(checkDestructiveQuery(query), `Query ${query} should be destructive`).toBe(true)
     })
+  })
+})
+
+describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {
+  it('flags a basic CREATE TABLE without RLS', () => {
+    const result = getCreateTablesMissingRLS('create table foo (id int8 primary key);')
+    expect(result).toEqual([{ schema: undefined, tableName: 'foo' }])
+  })
+
+  it('flags CREATE TABLE IF NOT EXISTS', () => {
+    const result = getCreateTablesMissingRLS(
+      'create table if not exists foo (id int8 primary key);'
+    )
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('foo')
+  })
+
+  it('flags schema-qualified CREATE TABLE', () => {
+    const result = getCreateTablesMissingRLS('create table public.foo (id int8 primary key);')
+    expect(result).toEqual([{ schema: 'public', tableName: 'foo' }])
+  })
+
+  it('flags quoted identifiers', () => {
+    const result = getCreateTablesMissingRLS(
+      'create table "public"."user_table" (id int8 primary key);'
+    )
+    expect(result).toEqual([{ schema: 'public', tableName: 'user_table' }])
+  })
+
+  it('flags quoted identifiers containing spaces', () => {
+    const result = getCreateTablesMissingRLS(
+      'create table "public"."My Table" (id int8 primary key);'
+    )
+    expect(result).toEqual([{ schema: 'public', tableName: 'My Table' }])
+  })
+
+  it('matches RLS to a table whose name contains spaces', () => {
+    const sql = stripIndent`
+      create table "My Table" (id int8 primary key);
+      alter table "My Table" enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when ENABLE ROW LEVEL SECURITY is in the same SQL', () => {
+    const sql = stripIndent`
+      create table foo (id int8 primary key);
+      alter table foo enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when ENABLE RLS shorthand is in the same SQL', () => {
+    const sql = stripIndent`
+      create table foo (id int8 primary key);
+      alter table foo enable rls;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('matches RLS to the right table when multiple tables created', () => {
+    const sql = stripIndent`
+      create table foo (id int8 primary key);
+      create table bar (id int8 primary key);
+      alter table foo enable row level security;
+    `
+    const result = getCreateTablesMissingRLS(sql)
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('bar')
+  })
+
+  it('does not flag when CREATE TABLE is inside a comment', () => {
+    const sql = stripIndent`
+      -- create table foo (id int8 primary key);
+      select 1;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('does not flag when there is no CREATE TABLE at all', () => {
+    expect(getCreateTablesMissingRLS('select * from foo;')).toEqual([])
+  })
+
+  it('schema-qualified RLS matches schema-qualified CREATE', () => {
+    const sql = stripIndent`
+      create table public.foo (id int8 primary key);
+      alter table public.foo enable row level security;
+    `
+    expect(getCreateTablesMissingRLS(sql)).toEqual([])
+  })
+
+  it('flags CREATE TEMP TABLE', () => {
+    const result = getCreateTablesMissingRLS('create temp table foo (id int8 primary key);')
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('foo')
+  })
+
+  it('does not collide quoted identifiers that differ only by case', () => {
+    // "MyTable" and "mytable" are distinct tables in Postgres, so the ALTER
+    // here targets a different table than the CREATE — the warning must fire.
+    const sql = stripIndent`
+      create table "MyTable" (id int8 primary key);
+      alter table "mytable" enable row level security;
+    `
+    const result = getCreateTablesMissingRLS(sql)
+    expect(result).toHaveLength(1)
+    expect(result[0].tableName).toBe('MyTable')
+  })
+})
+
+describe('SQLEditor.utils:appendEnableRLSStatements', () => {
+  it('appends a single ALTER TABLE ENABLE RLS statement', () => {
+    const result = appendEnableRLSStatements('create table foo (id int8 primary key);', [
+      { tableName: 'foo' },
+    ])
+    expect(result).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('appends one ALTER per table', () => {
+    const result = appendEnableRLSStatements(
+      'create table foo (id int8); create table bar (id int8);',
+      [{ tableName: 'foo' }, { tableName: 'bar' }]
+    )
+    expect(result).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+    expect(result).toContain('ALTER TABLE bar ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('schema-qualifies the table when schema is provided', () => {
+    const result = appendEnableRLSStatements('create table public.foo (id int8);', [
+      { schema: 'public', tableName: 'foo' },
+    ])
+    expect(result).toContain('ALTER TABLE public.foo ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('quotes identifiers that are not simple', () => {
+    const result = appendEnableRLSStatements('create table "My Table" (id int8);', [
+      { tableName: 'My Table' },
+    ])
+    expect(result).toContain('ALTER TABLE "My Table" ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('quotes mixed-case identifiers so Postgres does not fold them to lowercase', () => {
+    const result = appendEnableRLSStatements('create table "MyTable" (id int8);', [
+      { tableName: 'MyTable' },
+    ])
+    expect(result).toContain('ALTER TABLE "MyTable" ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('quotes mixed-case schema and table identifiers', () => {
+    const result = appendEnableRLSStatements('create table "MySchema"."MyTable" (id int8);', [
+      { schema: 'MySchema', tableName: 'MyTable' },
+    ])
+    expect(result).toContain('ALTER TABLE "MySchema"."MyTable" ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('returns the original SQL unchanged when there are no tables', () => {
+    const sql = 'select 1;'
+    expect(appendEnableRLSStatements(sql, [])).toBe(sql)
+  })
+
+  it('puts the terminator on its own line when SQL ends with a line comment', () => {
+    // Without this, the appended ';' would be swallowed by the line comment and
+    // the following ALTER TABLE would be parsed as part of the CREATE TABLE.
+    const sql = stripIndent`
+      create table foo (id int)
+      -- forgot the semicolon
+    `
+    const result = appendEnableRLSStatements(sql, [{ tableName: 'foo' }])
+    expect(result).toMatch(/-- forgot the semicolon\n;\n/)
+    expect(result).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+  })
+})
+
+describe('SQLEditor.utils:hasActiveEnsureRLSTrigger', () => {
+  it('returns false for undefined triggers', () => {
+    expect(hasActiveEnsureRLSTrigger(undefined)).toBe(false)
+  })
+
+  it('returns false for an empty list', () => {
+    expect(hasActiveEnsureRLSTrigger([])).toBe(false)
+  })
+
+  it('returns true when a trigger named "ensure_rls" is active', () => {
+    expect(hasActiveEnsureRLSTrigger([buildTrigger()])).toBe(true)
+  })
+
+  it('returns true when a trigger uses the rls_auto_enable function (renamed trigger)', () => {
+    expect(
+      hasActiveEnsureRLSTrigger([
+        buildTrigger({ name: 'something_else', function_name: 'rls_auto_enable' }),
+      ])
+    ).toBe(true)
+  })
+
+  it('returns false when the matching trigger is DISABLED', () => {
+    expect(hasActiveEnsureRLSTrigger([buildTrigger({ enabled_mode: 'DISABLED' })])).toBe(false)
+  })
+
+  it('ignores unrelated triggers', () => {
+    expect(
+      hasActiveEnsureRLSTrigger([buildTrigger({ name: 'audit_log', function_name: 'log_changes' })])
+    ).toBe(false)
+  })
+})
+
+describe('SQLEditor.utils:filterTablesCoveredByEnsureRLSTrigger', () => {
+  it('returns the input unchanged when the trigger is not present', () => {
+    const tables = [{ tableName: 'foo' }, { schema: 'private', tableName: 'bar' }]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, false)).toEqual(tables)
+  })
+
+  it('drops public-schema tables when the trigger is present', () => {
+    const tables = [
+      { schema: 'public', tableName: 'foo' },
+      { tableName: 'bar' }, // no schema → defaults to public
+    ]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, true)).toEqual([])
+  })
+
+  it('keeps tables in non-public schemas when the trigger is present', () => {
+    const tables = [
+      { schema: 'public', tableName: 'foo' },
+      { schema: 'private', tableName: 'bar' },
+      { schema: 'app', tableName: 'baz' },
+    ]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, true)).toEqual([
+      { schema: 'private', tableName: 'bar' },
+      { schema: 'app', tableName: 'baz' },
+    ])
+  })
+
+  it('matches the public schema case-insensitively', () => {
+    const tables = [{ schema: 'PUBLIC', tableName: 'foo' }]
+    expect(filterTablesCoveredByEnsureRLSTrigger(tables, true)).toEqual([])
   })
 })
 

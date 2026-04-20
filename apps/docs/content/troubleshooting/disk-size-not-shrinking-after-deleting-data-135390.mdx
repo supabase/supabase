@@ -1,0 +1,9 @@
+---
+title = "'Disk size not shrinking after deleting data'"
+topics = [ "database", "storage" ]
+keywords = []
+---
+
+If you've deleted a significant amount of data (e.g., by dropping large tables), you may observe that your project's disk size does not automatically shrink. This is expected behavior as Postgres reclaims freed space for internal reuse but does not return it to the operating system. Furthermore, cloud storage volumes (such as AWS EBS) do not support in-place shrinking, which means the disk size cannot be directly reduced via the dashboard UI.
+
+To reclaim disk space and reduce your project's disk allocation, you will need to initiate a Postgres version upgrade. This process provisions a new instance with a smaller disk attached, migrates your data, and involves brief downtime during the upgrade and switchover. You can start this process from the [Supabase Dashboard](/dashboard/project/_/settings/database).
