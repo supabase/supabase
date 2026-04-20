@@ -17,6 +17,28 @@
   h4 {
     @apply heading-default;
   }
+  h1,
+  h2,
+  h4 {
+    font-family: var(--font-heading);
+  }
+  h3 {
+    font-family: var(--font-sans);
+  }
+  h3:is(
+    .text-lg,
+    .text-xl,
+    .text-2xl,
+    .text-3xl,
+    .text-4xl,
+    .text-5xl,
+    .text-6xl,
+    .text-7xl,
+    .text-8xl,
+    .text-9xl
+  ) {
+    font-family: var(--font-heading);
+  }
   h5 {
     @apply heading-default;
   }
@@ -60,6 +82,7 @@
   /* Text */
   .text-default {
     @apply text-base;
+    letter-spacing: -0.01em;
   }
 
   .text-subTitle {

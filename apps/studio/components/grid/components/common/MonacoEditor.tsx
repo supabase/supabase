@@ -59,6 +59,7 @@ export const MonacoEditor = ({
         readOnly,
         tabSize: 2,
         fontSize: 13,
+        fontFamily: 'var(--font-inter)',
         minimap: {
           enabled: false,
         },
