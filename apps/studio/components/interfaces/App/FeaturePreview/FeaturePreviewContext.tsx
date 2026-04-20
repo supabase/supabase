@@ -12,9 +12,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useIsEnterpriseOrSupabaseOrg } from './useIsEnterpriseOrSupabaseOrg'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -90,14 +88,9 @@ export const useUnifiedLogsPreview = () => {
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
   const unifiedLogsEnabled = useFlag('unifiedLogs')
 
-  const { data: org } = useSelectedOrganizationQuery()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const isEnterprise = subscription?.plan?.id === 'enterprise'
+  const isEnterpriseOrSupabaseOrg = useIsEnterpriseOrSupabaseOrg()
 
-  const { data: organizations } = useOrganizationsQuery()
-  const isSupabaseOrg = organizations?.some((o) => o.id === 1) ?? false
-
-  const isEligible = unifiedLogsEnabled && (isEnterprise || isSupabaseOrg)
+  const isEligible = unifiedLogsEnabled && isEnterpriseOrSupabaseOrg
   const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
