@@ -133,7 +133,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
       address: debouncedAddress,
       taxId: debouncedTaxId ?? undefined,
     },
-    { enabled: !!validAmount }
+    { enabled: topUpModalVisible && !!validAmount }
   )
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
