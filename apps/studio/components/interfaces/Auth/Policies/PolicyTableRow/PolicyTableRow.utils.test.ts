@@ -32,7 +32,7 @@ const noGrants: TableApiAccessData = { apiAccessType: 'exposed-schema-no-grants'
 const schemaNotExposedData: TableApiAccessData = { apiAccessType: 'none' }
 
 describe('getTableDataApiStatus', () => {
-  it('returns schema-not-exposed when the schema isnt in the exposed list', () => {
+  it('returns schema-not-exposed when the schema is not in the exposed list', () => {
     const status = getTableDataApiStatus({
       isSchemaExposed: false,
       apiAccessData: grantedAccess,
