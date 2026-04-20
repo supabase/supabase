@@ -175,9 +175,19 @@ export const SchemaGraph = () => {
     (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
       if (params.edges.length === 1) {
         setSelectedEdge(params.edges[0])
-        return
+      } else {
+        setSelectedEdge(undefined)
       }
-      setSelectedEdge(undefined)
+
+      const selectedNodeIds = new Set(params.nodes.map((n) => n.id))
+      reactFlowInstance.setEdges(
+        reactFlowInstance.getEdges().map((edge) => ({
+          ...edge,
+          animated:
+            selectedNodeIds.size > 0 &&
+            (selectedNodeIds.has(edge.source) || selectedNodeIds.has(edge.target)),
+        }))
+      )
     }
   )
 
@@ -382,7 +392,7 @@ export const SchemaGraph = () => {
                   defaultEdges={[]}
                   defaultEdgeOptions={{
                     type: 'default',
-                    animated: true,
+                    animated: false,
                     deletable: false,
                   }}
                   nodeTypes={nodeTypes}
