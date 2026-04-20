@@ -630,6 +630,17 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        key: 'security.iso27001',
+        title: 'ISO 27001',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         key: 'security.hipaa',
         title: 'HIPAA',
         plans: {
