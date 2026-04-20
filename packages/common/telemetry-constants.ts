@@ -2567,7 +2567,7 @@ type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
- * User opened an advisor detail page to view a specific advisor (lint or notification).
+ * User opened an advisor detail page to view a specific advisor (lint, notification, or signal).
  * This tracks when users engage with advisor recommendations.
  *
  * @group Events
@@ -2584,7 +2584,7 @@ export interface AdvisorDetailOpenedEvent {
     /**
      * Source of the advisor
      */
-    advisorSource: 'lint' | 'notification'
+    advisorSource: 'lint' | 'notification' | 'signal'
     /**
      * Category of the advisor (SECURITY or PERFORMANCE)
      */
@@ -2661,6 +2661,7 @@ export type AiAssistantSource =
   | 'branch_review'
   | 'log_explorer'
   | 'error_code'
+  | 'advisor_signal_detail'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.

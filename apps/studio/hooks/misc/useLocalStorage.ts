@@ -1,7 +1,7 @@
 // Reference: https://usehooks.com/useLocalStorage/
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
@@ -56,7 +56,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
  */
 export function useLocalStorageQuery<T>(key: string, initialValue: T) {
   const queryClient = useQueryClient()
-  const queryKey = ['localStorage', key]
+  const queryKey = useMemo(() => ['localStorage', key], [key])
 
   const {
     error,
@@ -81,16 +81,25 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     },
   })
 
-  const setValue: Dispatch<SetStateAction<T>> = (value) => {
-    const valueToStore = value instanceof Function ? value(storedValue) : value
+  const setValue: Dispatch<SetStateAction<T>> = useCallback(
+    (value) => {
+      const currentValue = queryClient.getQueryData<T>(queryKey) ?? initialValue
+      const valueToStore = value instanceof Function ? value(currentValue) : value
 
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(key, JSON.stringify(valueToStore))
-    }
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore))
+      }
 
-    queryClient.setQueryData(queryKey, valueToStore)
-    queryClient.invalidateQueries({ queryKey })
-  }
+      queryClient.setQueryData(queryKey, valueToStore)
+      queryClient.invalidateQueries({ queryKey })
+    },
+    // initialValue is intentionally excluded: the function body reads the
+    // current value via queryClient.getQueryData so it doesn't close over
+    // initialValue reactively — including it would cause a new function
+    // reference every render when callers pass an inline literal (e.g. []).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key, queryKey, queryClient]
+  )
 
   return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const
 }
