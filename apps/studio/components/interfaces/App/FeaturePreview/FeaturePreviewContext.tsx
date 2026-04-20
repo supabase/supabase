@@ -12,10 +12,10 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
-import { useProfile } from '@/lib/profile'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -94,10 +94,10 @@ export const useUnifiedLogsPreview = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const isEnterprise = subscription?.plan?.id === 'enterprise'
 
-  const { profile } = useProfile()
-  const isInternalUser = profile?.primary_email?.includes('@supabase.') ?? false
+  const { data: organizations } = useOrganizationsQuery()
+  const isSupabaseOrg = organizations?.some((o) => o.id === 1) ?? false
 
-  const isEligible = unifiedLogsEnabled && (isEnterprise || isInternalUser)
+  const isEligible = unifiedLogsEnabled && (isEnterprise || isSupabaseOrg)
   const isEnabled = isEligible && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
